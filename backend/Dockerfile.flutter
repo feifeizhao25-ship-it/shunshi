@@ -1,0 +1,32 @@
+# 顺时 Flutter Web Dockerfile
+# 多阶段构建: build → nginx serve
+# ======================== Stage 1: Build ========================
+FROM dart:3.3-stable AS builder
+
+WORKDIR /app
+
+# 安装 Flutter
+RUN git clone https://github.com/flutter/flutter.git -b stable /opt/flutter --depth 1
+ENV PATH="/opt/flutter/bin:/opt/flutter/bin/cache/dart-sdk/bin:${PATH}"
+RUN flutter precache --web
+
+# 复制 Flutter 项目
+# 调整路径以匹配实际项目结构
+COPY ../web-admin/pubspec.* ./
+RUN flutter pub get
+
+COPY ../web-admin/ .
+RUN flutter build web --release --base-href="/"
+
+# ======================== Stage 2: Serve ========================
+FROM nginx:alpine
+
+# 复制构建产物
+COPY --from=builder /app/build/web /usr/share/nginx/html
+
+# 复制 nginx 配置
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]

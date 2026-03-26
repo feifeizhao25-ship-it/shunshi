@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#E8F5E9;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#7EB09B22;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg)" rx="16"/>
+  <circle cx="400" cy="240" r="80" fill="#7EB09B22"/>
+  <text x="400" y="260" text-anchor="middle" font-size="72">🧘</text>
+  <text x="400" y="360" text-anchor="middle" font-family="sans-serif" font-size="32" font-weight="bold" fill="#7EB09B">慢跑健身</text>
+  <text x="400" y="410" text-anchor="middle" font-family="sans-serif" font-size="18" fill="#7EB09B99">顺时养生</text>
+</svg>
