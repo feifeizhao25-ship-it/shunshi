@@ -1,0 +1,133 @@
+# 顺时 Docker Compose - 后端独立部署
+# 使用方法:
+#   cp .env.example .env   # 配置环境变量
+#   docker compose up -d   # 启动
+#   docker compose logs -f # 查看日志
+
+services:
+  # ─── PostgreSQL 16 主数据库 ───
+  postgres:
+    image: postgres:16-alpine
+    container_name: shunshi-postgres
+    restart: unless-stopped
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    environment:
+      POSTGRES_DB: ${DB_NAME:-shunshi}
+      POSTGRES_USER: ${DB_USER:-shunshi}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-shunshi123}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./migrations/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-shunshi} -d ${DB_NAME:-shunshi}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - backend-net
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "1.0"
+
+  # ─── Redis 7 缓存 ───
+  redis:
+    image: redis:7-alpine
+    container_name: shunshi-redis
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    command: >
+      redis-server
+      --appendonly yes
+      --maxmemory 256mb
+      --maxmemory-policy allkeys-lru
+      --requirepass ${REDIS_PASSWORD:-}
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - backend-net
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "0.5"
+
+  # ─── FastAPI 后端 ───
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: shunshi-backend
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-4000}:4000"
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+psycopg2://${DB_USER:-shunshi}:${DB_PASSWORD:-shunshi123}@postgres:5432/${DB_NAME:-shunshi}
+      REDIS_URL: redis://redis:6379/0
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - backend_data:/app/data
+      - backend_logs:/app/logs
+      - ./secrets:/app/secrets:ro
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:4000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    networks:
+      - backend-net
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "1.0"
+
+  # ─── 数据库迁移 (一次性) ───
+  migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: shunshi-migrate
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+psycopg2://${DB_USER:-shunshi}:${DB_PASSWORD:-shunshi123}@postgres:5432/${DB_NAME:-shunshi}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    entrypoint: ["alembic", "-x", "url=postgresql+psycopg2://${DB_USER:-shunshi}:${DB_PASSWORD:-shunshi123}@postgres:5432/${DB_NAME:-shunshi}", "upgrade", "head"]
+    networks:
+      - backend-net
+    profiles:
+      - migrate
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  backend_data:
+    driver: local
+  backend_logs:
+    driver: local
+
+networks:
+  backend-net:
+    driver: bridge

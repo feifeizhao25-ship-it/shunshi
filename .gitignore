@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.egg-info/
+.env
+*.db
+*.sqlite
+logs/
+*.log
+node_modules/
+.next/
+*.so
+*.dylib
+.DS_Store
