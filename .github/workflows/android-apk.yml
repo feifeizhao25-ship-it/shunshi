@@ -9,10 +9,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: android-cn
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -22,7 +18,6 @@ jobs:
         with:
           flutter-version: '3.38.5'
           channel: 'stable'
-          cache: true
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -31,10 +26,10 @@ jobs:
           java-version: '17'
 
       - name: Get dependencies
-        run: flutter pub get
+        run: cd android-cn && flutter pub get
 
       - name: Build debug APK
-        run: flutter build apk --debug
+        run: cd android-cn && flutter build apk --debug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
