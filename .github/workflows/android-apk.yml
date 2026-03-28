@@ -9,6 +9,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: android-cn
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -27,14 +31,10 @@ jobs:
           java-version: '17'
 
       - name: Get dependencies
-        run: |
-          cd android-cn
-          flutter pub get
+        run: flutter pub get
 
       - name: Build debug APK
-        run: |
-          cd android-cn
-          flutter build apk --debug
+        run: flutter build apk --debug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
