@@ -26,10 +26,14 @@ jobs:
           java-version: '17'
 
       - name: Get dependencies
-        run: cd android-cn && flutter pub get
+        run: |
+          FLUTTER_ROOT=$(dirname $(dirname $(which flutter)))
+          $FLUTTER_ROOT/bin/flutter pub get --directory=android-cn
 
       - name: Build debug APK
-        run: cd android-cn && flutter build apk --debug
+        run: |
+          FLUTTER_ROOT=$(dirname $(dirname $(which flutter)))
+          $FLUTTER_ROOT/bin/flutter build apk --debug --directory=android-cn
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
@@ -37,9 +41,3 @@ jobs:
           name: shunshi-debug-apk
           path: android-cn/build/app/outputs/flutter-apk/app-debug.apk
           retention-days: 7
-
-      - name: Upload to GitHub Release
-        if: startsWith(github.ref, 'refs/tags/')
-        uses: softprops/action-gh-release@v1
-        with:
-          files: android-cn/build/app/outputs/flutter-apk/app-debug.apk
