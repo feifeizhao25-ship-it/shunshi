@@ -4,11 +4,6 @@ on:
   schedule:
     - cron: '*/15 * * * *'
   workflow_dispatch:
-    inputs:
-      test_mode:
-        description: 'Test mode - just fetch and log'
-        required: false
-        default: 'false'
 
 jobs:
   monitor:
@@ -50,8 +45,7 @@ for i, e in enumerate(active[:15]):
 msg = '\n'.join(lines)
 print(msg)
 
-# Save for WeChat push
 with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
-    f.write(f"message={msg}\n")
+    f.write(f"message={json.dumps(msg)}\n")
     f.write(f"count={len(active)}\n")
 EOF
