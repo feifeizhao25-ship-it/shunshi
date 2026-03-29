@@ -13,13 +13,12 @@ jobs:
       - name: Fetch Polymarket
         run: |
           curl -s "https://gamma-api.polymarket.com/events?limit=30&active=true&closed=false&order=volume24hr&ascending=false" -o events.json
-          python3 -c "
+          python3 << 'PYEOF'
 import json
-with open(\"events.json\") as f:
+with open("events.json") as f:
     data = json.load(f)
-active = [e for e in data if not e.get(\"closed\", True) and float(e.get(\"volume\", 0)) > 5000]
-print(f\"Active markets: {len(active)}\")
-with open(\"count.txt\", \"w\") as f:
+active = [e for e in data if not e.get("closed", True) and float(e.get("volume", 0)) > 5000]
+print(f"Active markets: {len(active)}")
+with open("count.txt", "w") as f:
     f.write(str(len(active)))
-"
-
+PYEOF
