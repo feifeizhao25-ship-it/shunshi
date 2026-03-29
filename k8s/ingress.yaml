@@ -1,0 +1,53 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: shunshi-ingress
+  namespace: shunshi
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    # Let's Encrypt 自动证书 (使用 cert-manager)
+    # cert-manager.io/cluster-issuer: letsencrypt-prod
+    # nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  # TLS 配置 (启用 cert-manager 后取消注释)
+  # tls:
+  #   - hosts:
+  #       - shunshi.com
+  #       - api.shunshi.com
+  #     secretName: shunshi-tls
+  ingressClassName: nginx
+  rules:
+    - host: shunshi.com
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: backend
+                port:
+                  number: 4000
+          - path: /health
+            pathType: Exact
+            backend:
+              service:
+                name: backend
+                port:
+                  number: 4000
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web-admin
+                port:
+                  number: 80
+    - host: api.shunshi.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: backend
+                port:
+                  number: 4000

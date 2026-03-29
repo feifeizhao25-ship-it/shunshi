@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: shunshi
+  labels:
+    app: backend
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: shunshi/backend:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 4000
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: shunshi-config
+            - secretRef:
+                name: shunshi-secret
+          env:
+            - name: DATABASE_URL
+              value: "mysql+pymysql://$(MYSQL_USER):$(MYSQL_PASSWORD)@mysql:3306/$(MYSQL_DATABASE)"
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 4000
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 4000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          volumeMounts:
+            - name: data
+              mountPath: /app/data
+            - name: logs
+              mountPath: /app/logs
+      volumes:
+        - name: data
+          emptyDir: {}
+        - name: logs
+          emptyDir: {}
+      restartPolicy: Always

@@ -2,7 +2,7 @@
 import sys
 sys.path.insert(0, '/opt/shunshi/backend')
 
-from app.db import Session, engine
+from app.db.database import Session, engine
 from sqlalchemy import text
 
 db = Session()

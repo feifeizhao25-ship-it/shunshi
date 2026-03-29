@@ -1,0 +1,39 @@
+workflows:
+  ios-workflow:
+    name: iOS Build
+    max_build_duration: 120
+    environment:
+      flutter-version: "3.24.0"
+      xcode: "15.0"
+      cocoapods: "1.15.0"
+    scripts:
+      - name: Set up code signing
+        script: |
+          keychain initialize
+          app-store-connect fetch-signing-files "com.shunshi.app" --type IOS_APP_STORE --create
+          keychain add-certificates --certificate-password=$KEY_CERTIFICATE_PASSWORD --certificate $KEY_CERTIFICATE_PATH --keystore-password $KEYSTORE_PASSWORD --keystore $KEYSTORE_PATH --provider $KEY_PROVIDER --profile-name "ShunShi App Store"
+      - name: Get Flutter dependencies
+        script: |
+          flutter packages pub get
+      - name: Build iOS
+        script: |
+          flutter build ipa --release --export-options-plist ExportOptions.plist --no-codesign
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+
+  android-workflow:
+    name: Android Build
+    max_build_duration: 60
+    environment:
+      flutter-version: "3.24.0"
+      java-version: "17"
+    scripts:
+      - name: Get Flutter dependencies
+        script: |
+          flutter packages pub get
+      - name: Build Android
+        script: |
+          flutter build apk --release
+    artifacts:
+      - build/app/outputs/flutter-apk/*.apk

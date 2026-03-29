@@ -49,6 +49,9 @@ from .router.push import router as push_router
 from .router.audit import router as audit_router
 from .safety.router import router as safety_router
 from .alerts.router import router as alert_router
+from .router.client_metrics import router as client_metrics_router
+from .router.audio_v2 import router as audio_v2_router
+from .router.first_insight import router as first_insight_router
 from .alerts.store import AlertStore
 from .metrics.middleware import MetricsMiddleware, get_metrics, track_llm_request
 from .middleware.tracing import RequestTracingMiddleware
@@ -201,6 +204,11 @@ app.include_router(seasons_home_router)
 app.include_router(seasons_audio_router)
 app.include_router(seasons_subscription_router)
 app.include_router(seasons_family_router)
+
+# 新增：客户端指标采集 / 音频 v2 / 首次洞察
+app.include_router(client_metrics_router)
+app.include_router(audio_v2_router)
+app.include_router(first_insight_router)
 
 # 全局路由器
 model_router = ModelRouter()

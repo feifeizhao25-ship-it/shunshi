@@ -1,0 +1,54 @@
+# Nginx Ingress Controller Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-ingress
+  namespace: shunshi
+  labels:
+    app: nginx-ingress
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-ingress
+  template:
+    metadata:
+      labels:
+        app: nginx-ingress
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:alpine
+          ports:
+            - containerPort: 80
+              name: http
+            - containerPort: 443
+              name: https
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/conf.d
+              readOnly: true
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: nginx-config
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-ingress
+  namespace: shunshi
+spec:
+  type: LoadBalancer
+  selector:
+    app: nginx-ingress
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+      protocol: TCP
+    - name: https
+      port: 443
+      targetPort: 443
+      protocol: TCP

@@ -779,36 +779,34 @@ async def get_result(user_id: str):
 
 
 @router.get("/types", response_model=List[ConstitutionTypeSummary])
-@router.get("/constitutions", response_model=List[ConstitutionTypeSummary])
-async def get_constitutions_list():
-    """获取9种体质列表（constitutions别名）"""
-    return await get_constitution_types()
-
 async def get_constitution_types():
-    """获取9种体质定义列表"""
-    from app.database.db import get_db
-    import json
-
-    db = get_db()
+    """获取9种体质定义列表（从数据库读取）"""
     try:
-        rows = db.execute("SELECT code, name, name_en, description, characteristics, diet_advice, exercise_advice FROM constitution_types ORDER BY id").fetchall()
-        if rows:
-            result = []
-            for r in rows:
-                chars = json.loads(r[4]) if r[4] and r[4].startswith('[') else []
-                diet = [r[5]] if r[5] else []
-                lifestyle = [r[6]] if r[6] else []
-                result.append(ConstitutionTypeSummary(
-                    type=r[0],
-                    name=r[1],
-                    name_en=r[2] or "",
-                    description=r[3] or "",
-                    characteristics=chars,
-                    diet_recommendations=diet,
-                    lifestyle_advice=lifestyle,
-                ))
-            return result
-    finally:
+        from app.db.database import Session
+        db = Session()
+        try:
+            result = db.execute(text("""
+                SELECT code, name_cn, name_en, description,
+                       characteristics, diet_recommendations, lifestyle_advice
+                FROM constitution_types ORDER BY id
+            """))
+            rows = result.fetchall()
+            if rows:
+                return [
+                    ConstitutionTypeSummary(
+                        type=r[0],
+                        name=r[1],
+                        name_en=r[2] or "",
+                        description=r[3] or "",
+                        characteristics=r[4] if isinstance(r[4], list) else (eval(r[4]) if r[4] else []),
+                        diet_recommendations=r[5] if isinstance(r[5], list) else (eval(r[5]) if r[5] else []),
+                        lifestyle_advice=r[6] if isinstance(r[6], list) else (eval(r[6]) if r[6] else []),
+                    )
+                    for r in rows
+                ]
+        finally:
+            db.close()
+    except Exception:
         pass
 
     # Fallback to in-memory data

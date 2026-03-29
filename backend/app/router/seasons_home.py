@@ -79,14 +79,73 @@ DAILY_INSIGHTS = {
 }
 
 
-def _generate_daily_insight(season: str) -> str:
-    """Get a deterministic daily insight based on date + season"""
+# Personalized insights based on feeling + season + help_goal
+PERSONALIZED_INSIGHTS = {
+    # feeling=calm
+    ("calm", "sleep"): ["A calm mind is the best sleep companion. Tonight, let stillness be your practice."],
+    ("calm", "unwind"): ["Your calm is a gift you give yourself. Savor it with a gentle evening ritual."],
+    ("calm", "calm"): ["Your calm is a quiet strength. Nurture it like a still pond that reflects clearly."],
+    ("calm", "ritual"): ["With a calm heart, even simple rituals become sacred. What small ceremony calls to you today?"],
+    ("calm", "reflect"): ["A calm mind is perfect for reflection. What have you been quietly knowing?"],
+    # feeling=stressed
+    ("stressed", "sleep"): ["Stress melts when you exhale. Take three slow breaths now — your sleep will thank you."],
+    ("stressed", "unwind"): ["Your shoulders carry so much. Tonight, let them drop. You've done enough today."],
+    ("stressed", "calm"): ["The stress is temporary, but your inner calm is always there, like sky behind clouds."],
+    ("stressed", "ritual"): ["A small ritual can be an anchor in storm. What one thing can you return to?"],
+    ("stressed", "reflect"): ["When stress clouds the mind, writing helps. One sentence about today is enough."],
+    # feeling=tired
+    ("tired", "sleep"): ["Your tiredness is your body asking for rest. Tonight, give it what it truly needs."],
+    ("tired", "unwind"): ["Tiredness is not laziness — it's your body whispering for gentleness."],
+    ("tired", "calm"): ["Even the river rests. Your tiredness is calling you toward stillness."],
+    ("tired", "ritual"): ["When tired, the simplest ritual is enough. A warm drink, a quiet moment."],
+    ("tired", "reflect"): ["Tiredness often holds wisdom. What is your tiredness trying to tell you?"],
+    # feeling=overwhelmed
+    ("overwhelmed", "sleep"): ["One breath at a time. That's all tonight asks of you."],
+    ("overwhelmed", "unwind"): ["When everything feels like too much, step back. One thing. Just one."],
+    ("overwhelmed", "calm"): ["The storm passes. Right now, you're safe inside your own calm center."],
+    ("overwhelmed", "ritual"): ["Rituals bring order from chaos. One small anchor — a breath, a cup, a moment."],
+    ("overwhelmed", "reflect"): ["Overwhelm shrinks when we name it. One word: how do you feel right now?"],
+    # feeling=curious
+    ("curious", "sleep"): ["Even your dreams are exploring tonight. Let curiosity guide you to gentle rest."],
+    ("curious", "unwind"): ["Your curiosity is alive! Let it wander — but toward rest, not more stimulation."],
+    ("curious", "calm"): ["Curiosity and calm coexist beautifully. You can be both interested and at peace."],
+    ("curious", "ritual"): ["What ritual speaks to your curiosity? Something old, something new — explore."],
+    ("curious", "reflect"): ["Your curiosity is a compass. What is it pointing you toward today?"],
+}
+
+
+def _generate_daily_insight(season: str, feeling: str = None, help_goal: str = None) -> str:
+    """Get a deterministic daily insight based on date + season (+ feeling + help_goal if available)"""
     import hashlib
     today = datetime.now().strftime("%Y-%m-%d")
+    
+    # Try personalized insight first
+    if feeling and help_goal:
+        key = (feeling.lower(), help_goal.lower())
+        if key in PERSONALIZED_INSIGHTS:
+            pool = PERSONALIZED_INSIGHTS[key]
+            hash_val = int(hashlib.md5(f"{today}-{feeling}-{help_goal}".encode()).hexdigest()[:8], 16)
+            base_insight = pool[hash_val % len(pool)]
+            # Append season-specific note
+            season_note = _get_season_personalization_note(season)
+            return f"{base_insight} {season_note}"
+    
+    # Fall back to season-based insight
     key = f"{today}-{season}"
     hash_val = int(hashlib.md5(key.encode()).hexdigest()[:8], 16)
     insights = DAILY_INSIGHTS.get(season, DAILY_INSIGHTS["spring"])
     return insights[hash_val % len(insights)]
+
+
+def _get_season_personalization_note(season: str) -> str:
+    """Get a short seasonal note to append to personalized insights"""
+    notes = {
+        "spring": "🌱 Spring is stirring — let yourself begin again.",
+        "summer": "☀️ The warmth is with you — stay hydrated, stay present.",
+        "autumn": "🍂 Autumn is release — let what no longer serves you fall away.",
+        "winter": "❄️ Winter is rest — give yourself permission to slow down.",
+    }
+    return notes.get(season, "")
 
 
 # Gentle suggestions database
@@ -174,8 +233,10 @@ async def complete_onboarding(body: OnboardingData):
     user_id = f"seasons-{uuid.uuid4().hex[:8]}"
     
     now = datetime.now()
-    season_data = _get_current_season_full(body.hemisphere or "north")
+    hemisphere = body.hemisphere or "north"
+    season_data = _get_current_season_full(hemisphere)
     season = season_data["season"]
+    support_time = body.support_time or "evening"
     
     # Create user profile
     profile = {
@@ -184,9 +245,9 @@ async def complete_onboarding(body: OnboardingData):
         "feeling": body.feeling,
         "help_goal": body.help_goal,
         "life_stage": body.life_stage,
-        "support_time": body.support_time,
+        "support_time": support_time,
         "style_preference": body.style_preference,
-        "hemisphere": body.hemisphere or "north",
+        "hemisphere": hemisphere,
         "timezone": body.timezone or "UTC",
         "country": body.country or "US",
         "locale": "en",
@@ -199,18 +260,19 @@ async def complete_onboarding(body: OnboardingData):
     }
     user_profiles_db[user_id] = profile
     
-    # Generate first insight
-    first_insight = _generate_daily_insight(season)
-    suggestions = _get_suggestions_for_time(body.support_time or "evening", limit=3)
+    # Generate first personalized insight
+    first_insight = _generate_daily_insight(season, feeling=body.feeling, help_goal=body.help_goal)
+    suggestions = _get_suggestions_for_time(support_time, limit=3)
     
     return {
         "user_id": user_id,
-        "profile": profile,
+        "onboarding_completed": True,
         "dashboard": {
+            "greeting": _get_greeting(now.hour),
             "daily_insight": {
+                "id": f"insight-{uuid.uuid4().hex[:8]}",
                 "text": first_insight,
                 "season": season,
-                "phase": season_data["phase"],
                 "generated_at": now.isoformat(),
             },
             "suggestions": suggestions,
@@ -221,7 +283,6 @@ async def complete_onboarding(body: OnboardingData):
                 "emoji": _get_season_emoji(season),
             },
         },
-        "welcome_message": f"Welcome to SEASONS. Your {season} journey begins now."
     }
 
 
@@ -254,6 +315,7 @@ async def get_home_dashboard(
     return {
         "greeting": _get_greeting(now.hour, profile.get("name")),
         "daily_insight": {
+            "id": f"insight-{uuid.uuid4().hex[:8]}",
             "text": daily_insight,
             "season": season,
             "phase": season_data["phase"],
@@ -263,6 +325,7 @@ async def get_home_dashboard(
         "season_card": {
             "name": season.capitalize(),
             "phase": season_data["phase"],
+            "insight": daily_insight,
             "emoji": _get_season_emoji(season),
             "hemisphere": hemisphere,
         },

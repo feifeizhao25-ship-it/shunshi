@@ -212,7 +212,7 @@ async def seasons_chat(
             max_tokens=300
         )
         
-        response_text = response.choices[0].get("message", {}).get("content", "")
+        response_text = response.choices[0].message.content
         
     except Exception as e:
         # Fallback responses

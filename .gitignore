@@ -1,0 +1,64 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+*.egg-info/
+.env
+.env.*
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+logs/
+*.log
+
+# Node / Next.js
+node_modules/
+.next/
+.nuxt/
+
+# Native libraries
+*.so
+*.dylib
+*.dll
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Flutter / Dart
+*.dart_tool/
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+build/
+.pub-cache/
+.pub/
+pubspec.lock
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# Backup files (should never be committed)
+*.bak
+*.bak2
+*.orig
+*.tmp
+
+# Build output
+build-output/
+*.apk
+*.ipa
+*.aab

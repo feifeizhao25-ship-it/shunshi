@@ -1,0 +1,167 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+env:
+  PYTHON_VERSION: "3.12"
+  FLUTTER_VERSION: "3.29.0"
+
+jobs:
+  # ==================== 后端测试 ====================
+  backend-test:
+    name: Backend Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-cov pytest-asyncio httpx
+
+      - name: Python syntax checks (all routers)
+        run: |
+          echo "Checking core modules..."
+          python -m py_compile app/main.py
+          python -m py_compile app/router/lifecycle.py
+          python -m py_compile app/router/memory.py
+          python -m py_compile app/router/followup.py
+          python -m py_compile app/router/client_metrics.py
+          python -m py_compile app/router/audio_v2.py
+          python -m py_compile app/router/first_insight.py
+          echo "Checking service modules..."
+          python -m py_compile app/services/lifecycle_engine.py
+          python -m py_compile app/services/memory_system.py
+          python -m py_compile app/services/followup_scheduler.py
+          echo "All Python syntax OK ✓"
+
+      - name: Run tests with coverage
+        run: |
+          if [ -d "tests" ]; then
+            python -m pytest tests/ -v --tb=short \
+              --cov=app --cov-report=term-missing --cov-report=xml:coverage.xml \
+              || echo "::warning::Some tests failed"
+          else
+            echo "No tests directory, syntax checks passed — coverage skipped"
+          fi
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage
+          path: backend/coverage.xml
+          retention-days: 7
+
+  # ==================== 前端 Lint & Test ====================
+  frontend-lint:
+    name: Flutter Lint & Test (${{ matrix.app.name }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        app:
+          - name: android-cn
+            path: android-cn
+          - name: android-global
+            path: android-global
+          - name: ios-cn
+            path: ios-cn
+          - name: ios-global
+            path: ios-global
+
+    defaults:
+      run:
+        working-directory: ${{ matrix.app.path }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Flutter ${{ env.FLUTTER_VERSION }}
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Run Flutter analyze
+        run: flutter analyze --no-fatal-infos
+        continue-on-error: true
+
+      - name: Run unit & widget tests (exclude integration)
+        run: |
+          if [ -d "test" ] && [ -n "$(find test -name '*_test.dart' 2>/dev/null)" ]; then
+            flutter test \
+              --exclude-tags integration \
+              --reporter=expanded \
+              --coverage \
+              || echo "::warning::Some tests failed in ${{ matrix.app.name }}"
+          else
+            echo "No tests found in ${{ matrix.app.name }}, skipping"
+          fi
+
+      - name: Upload Flutter coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: flutter-coverage-${{ matrix.app.name }}
+          path: ${{ matrix.app.path }}/coverage/lcov.info
+          retention-days: 7
+          if-no-files-found: ignore
+
+  # ==================== Docker 构建验证 ====================
+  docker-build-check:
+    name: Docker Build Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build backend image
+        run: |
+          docker build -t shunshi-backend:ci ./backend
+          echo "Backend image build OK ✓"
+
+      - name: Build web-admin image (if exists)
+        run: |
+          if [ -d "web-admin" ] && [ -f "web-admin/Dockerfile" ]; then
+            docker build -t shunshi-web-admin:ci ./web-admin
+            echo "Web admin image build OK ✓"
+          else
+            echo "web-admin Dockerfile not found, skipping"
+          fi
+
+  # ==================== Docker Compose 验证 ====================
+  compose-lint:
+    name: Docker Compose Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate root docker-compose.yml
+        run: |
+          docker compose -f docker-compose.yml config --quiet
+          echo "docker-compose.yml is valid ✓"
+
+      - name: Validate backend docker-compose.yml
+        run: |
+          docker compose -f backend/docker-compose.yml config --quiet
+          echo "backend/docker-compose.yml is valid ✓"

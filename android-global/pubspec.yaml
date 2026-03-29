@@ -1,0 +1,94 @@
+name: seasons
+description: "SEASONS - AI Calm Lifestyle Companion"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.10.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+
+  # State Management
+  flutter_riverpod: ^2.6.1
+  riverpod_annotation: ^2.6.1
+
+  # Networking
+  dio: ^5.8.0+1
+
+  # Routing
+  go_router: ^14.8.1
+
+  # Data Classes
+  freezed_annotation: ^3.0.0
+  json_annotation: ^4.9.0
+
+  # Local Storage
+  shared_preferences: ^2.5.3
+  flutter_secure_storage: ^9.2.4
+
+  # UI Components
+  flutter_svg: ^2.2.4
+  cached_network_image: ^3.4.1
+  lottie: ^3.3.1
+  shimmer: ^3.0.0
+
+  # Utils
+  intl: ^0.20.2
+  uuid: ^4.5.1
+  collection: ^1.19.0
+  connectivity_plus: ^6.1.4
+
+  # OAuth (国际版)
+  google_sign_in: ^6.2.2
+  sign_in_with_apple: ^6.0.0
+
+  # In-App Purchase (Apple StoreKit + Google Billing)
+  in_app_purchase: ^3.2.0
+  in_app_purchase_android: ^0.4.0+8
+
+  # URL Launcher (Stripe Checkout)
+  url_launcher: ^6.3.1
+
+  # Sharing
+  share_plus: ^12.0.1
+
+  # Voice Input
+  speech_to_text: ^7.0.0
+
+  # Image Picker
+  image_picker: ^1.1.2
+  permission_handler: ^11.3.1
+  path_provider: ^2.1.5
+
+  # Audio Player
+  just_audio: ^0.9.36
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  integration_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  build_runner: ^2.4.15
+  freezed: ^3.1.0
+  json_serializable: ^6.9.4
+  riverpod_generator: ^2.6.5
+
+  # Testing
+  mocktail: ^1.0.4
+
+  # Linting
+  custom_lint: ^0.7.0
+  riverpod_lint: ^2.6.5
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/icons/
+    - assets/animations/
+    - assets/audio/

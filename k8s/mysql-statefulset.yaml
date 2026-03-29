@@ -1,0 +1,104 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql
+  namespace: shunshi
+  labels:
+    app: mysql
+spec:
+  serviceName: mysql
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:8.0
+          ports:
+            - containerPort: 3306
+              protocol: TCP
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: shunshi-secret
+                  key: MYSQL_ROOT_PASSWORD
+            - name: MYSQL_DATABASE
+              valueFrom:
+                configMapKeyRef:
+                  name: shunshi-config
+                  key: MYSQL_DATABASE
+            - name: MYSQL_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: shunshi-config
+                  key: MYSQL_USER
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: shunshi-secret
+                  key: MYSQL_PASSWORD
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "1000m"
+          volumeMounts:
+            - name: mysql-data
+              mountPath: /var/lib/mysql
+            - name: init-sql
+              mountPath: /docker-entrypoint-initdb.d
+              readOnly: true
+          livenessProbe:
+            exec:
+              command:
+                - mysqladmin
+                - ping
+                - -h
+                - localhost
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            exec:
+              command:
+                - mysqladmin
+                - ping
+                - -h
+                - localhost
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+      volumes:
+        - name: init-sql
+          configMap:
+            name: mysql-init-sql
+      restartPolicy: Always
+  volumeClaimTemplates:
+    - metadata:
+        name: mysql-data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10Gi
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-init-sql
+  namespace: shunshi
+data:
+  init.sql: |
+    # 将 backend/docker/mysql/init.sql 的内容粘贴于此
+    # 或者使用 kubectl create configmap 手动挂载

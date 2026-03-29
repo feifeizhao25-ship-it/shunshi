@@ -10,7 +10,8 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .router import chat, auth
-from .router import contents, family, notifications, solar_terms, subscription, today_plan, records, settings, constitution
+from .router import contents, family, notifications, solar_terms, subscription, today_plan, records, settings
+from .router import multimodal_images, multimodal_speech, multimodal_videos
 from .database.db import init_db, close_db
 
 
@@ -54,7 +55,9 @@ app.include_router(subscription.router)
 app.include_router(notifications.router)
 app.include_router(records.router)
 app.include_router(settings.router)
-app.include_router(constitution.router, prefix="/api/v1/constitution", tags=["constitution"])
+app.include_router(multimodal_images.router)
+app.include_router(multimodal_speech.router)
+app.include_router(multimodal_videos.router)
 
 # 健康检查
 @app.get("/health")
@@ -64,9 +67,3 @@ async def health_check():
 @app.get("/")
 async def root():
     return {"message": "欢迎使用顺时 API", "version": "1.0.0"}
-
-# 体质列表别名 (/api/v1/constitutions → /api/v1/constitution/types)
-@app.get("/api/v1/constitutions")
-async def api_v1_constitutions():
-    from .router.constitution import get_constitution_types
-    return await get_constitution_types()

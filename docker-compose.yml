@@ -1,0 +1,211 @@
+# 顺时 Docker Compose - 完整部署
+# 使用方法:
+#   cp backend/.env.example backend/.env   # 先配置环境变量
+#   docker compose up -d                    # 启动所有服务
+#   docker compose logs -f backend          # 查看后端日志
+#   docker compose down                     # 停止所有服务
+
+services:
+  # ─── PostgreSQL 16 主数据库 ───
+  # 注意: 后端使用 SQLAlchemy + psycopg2，必须使用 PostgreSQL
+  postgres:
+    image: postgres:16-alpine
+    container_name: shunshi-postgres
+    restart: unless-stopped
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    environment:
+      POSTGRES_DB: ${DB_NAME:-shunshi}
+      POSTGRES_USER: ${DB_USER:-shunshi}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-shunshi123}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/migrations/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-shunshi} -d ${DB_NAME:-shunshi}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - backend-net
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "1.0"
+
+  # ─── Redis 7 缓存 ───
+  redis:
+    image: redis:7-alpine
+    container_name: shunshi-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - backend-net
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "0.5"
+
+  # ─── FastAPI 后端 ───
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: shunshi-backend
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    env_file:
+      - ./backend/.env
+    environment:
+      DATABASE_URL: postgresql+psycopg2://${DB_USER:-shunshi}:${DB_PASSWORD:-shunshi123}@postgres:5432/${DB_NAME:-shunshi}
+      REDIS_URL: redis://redis:6379/0
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - backend_data:/app/data
+      - backend_logs:/app/logs
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:4000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - backend-net
+      - frontend-net
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "1.0"
+
+  # ─── Web 管理后台 (Next.js) ───
+  web-admin:
+    build:
+      context: ./web-admin
+      dockerfile: Dockerfile
+    container_name: shunshi-web-admin
+    restart: unless-stopped
+    ports:
+      - "3001:80"
+    environment:
+      NEXT_PUBLIC_API_URL: http://backend:4000
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - frontend-net
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.5"
+
+  # ─── Nginx 反向代理 ───
+  nginx:
+    image: nginx:alpine
+    container_name: shunshi-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./backend/docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./backend/docker/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - backend
+      - web-admin
+    networks:
+      - frontend-net
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: "0.25"
+
+  # ─── Prometheus 监控 ───
+  prometheus:
+    image: prom/prometheus:v2.50.0
+    container_name: shunshi-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./backend/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.retention.time=30d"
+      - "--web.console.libraries=/usr/share/prometheus/console_libraries"
+      - "--web.console.templates=/usr/share/prometheus/consoles"
+    networks:
+      - monitoring-net
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "0.5"
+
+  # ─── Grafana 可视化 ───
+  grafana:
+    image: grafana/grafana:10.4.0
+    container_name: shunshi-grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./backend/monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+    depends_on:
+      - prometheus
+    networks:
+      - monitoring-net
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.5"
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  backend_data:
+    driver: local
+  backend_logs:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+
+networks:
+  backend-net:
+    driver: bridge
+  frontend-net:
+    driver: bridge
+  monitoring-net:
+    driver: bridge

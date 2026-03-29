@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="01J-lp-oVM">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21679"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--View Controller-->
+        <scene sceneID="EHf-IW-A2E">
+            <objects>
+                <viewController id="01J-lp-oVM" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Ze5-6b-2t3">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <!-- Green Circle Background -->
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="circleView">
+                                <rect key="frame" x="146.66666666666666" y="346" width="100" height="100"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="100" id="circleWidth"/>
+                                    <constraint firstAttribute="height" constant="100" id="circleHeight"/>
+                                    <constraint firstAttribute="cornerRadius" constant="50" id="cornerRadius"/>
+                                </constraints>
+                            </view>
+                            <!-- Eco Icon (using text for now) -->
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="🌿" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="iconLabel">
+                                <rect key="frame" x="166.66666666666666" y="366" width="60" height="60"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="40"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <!-- Title -->
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="顺时" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="title">
+                                <rect key="frame" x="146.66666666666666" y="470" width="100" height="36"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="30"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </label>
+                            <!-- Subtitle -->
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="AI 养生顾问" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="subtitle">
+                                <rect key="frame" x="126.66666666666667" y="514" width="140" height="20"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                <color key="textColor" red="0.87843137254901965" green="0.87843137254901965" blue="0.87843137254901965" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            </label>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
+                        <!-- Green gradient background -->
+                        <color key="backgroundColor" red="0.30196078431372547" green="0.6862745098039216" blue="0.31372549019607843" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <!-- Circle -->
+                            <constraint firstItem="circleView" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="circleCenterX"/>
+                            <constraint firstItem="circleView" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" constant="-30" id="circleCenterY"/>
+                            <!-- Icon -->
+                            <constraint firstItem="iconLabel" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="iconCenterX"/>
+                            <constraint firstItem="iconLabel" firstAttribute="centerY" secondItem="circleView" secondAttribute="centerY" id="iconCenterY"/>
+                            <!-- Title -->
+                            <constraint firstItem="title" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="titleCenterX"/>
+                            <constraint firstItem="title" firstAttribute="top" secondItem="circleView" secondAttribute="bottom" constant="24" id="titleTop"/>
+                            <!-- Subtitle -->
+                            <constraint firstItem="subtitle" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="subtitleCenterX"/>
+                            <constraint firstItem="subtitle" firstAttribute="top" secondItem="title" secondAttribute="bottom" constant="8" id="subtitleTop"/>
+                        </constraints>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="iYj-Kq-Ea1" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="53" y="375"/>
+        </scene>
+    </scenes>
+</document>
