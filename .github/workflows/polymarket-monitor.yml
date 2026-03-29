@@ -10,42 +10,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Fetch Polymarket markets
+      - name: Fetch Polymarket
         run: |
-          curl -s "https://gamma-api.polymarket.com/events?limit=30&active=true&closed=false&order=volume24hr&ascending=false" \
-            -H "Accept: application/json" -o /tmp/events.json
-          
-          python3 << 'EOF'
-import json, os
-from datetime import datetime
-
-with open('/tmp/events.json') as f:
+          curl -s "https://gamma-api.polymarket.com/events?limit=30&active=true&closed=false&order=volume24hr&ascending=false" -o events.json
+          python3 -c "
+import json
+with open(\"events.json\") as f:
     data = json.load(f)
+active = [e for e in data if not e.get(\"closed\", True) and float(e.get(\"volume\", 0)) > 5000]
+print(f\"Active markets: {len(active)}\")
+with open(\"count.txt\", \"w\") as f:
+    f.write(str(len(active)))
+"
 
-active = [e for e in data if not e.get('closed', True) and float(e.get('volume', 0)) > 5000]
-
-lines = []
-lines.append(f"🎯 Polymarket 热门市场 ({len(active)}个)")
-lines.append(f"🕐 更新时间: {datetime.now().strftime('%H:%M:%S')}")
-lines.append("="*50)
-
-for i, e in enumerate(active[:15]):
-    title = e.get('title', 'Unknown')[:60]
-    vol = float(e.get('volume', 0))
-    vol24 = float(e.get('volume24hr', 0))
-    slug = e.get('slug', '')
-    cat = e.get('category', '')
-    
-    lines.append(f"\n📌 {title}")
-    lines.append(f"   💰 Vol: ${vol:,.0f} | 24h: ${vol24:,.0f}")
-    lines.append(f"   🏷️ {cat}")
-    lines.append(f"   🔗 polymarket.com/event/{slug}")
-
-msg = '\n'.join(lines)
-print(msg)
-
-with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
-    f.write(f"message={json.dumps(msg)}\n")
-    f.write(f"count={len(active)}\n")
-EOF
