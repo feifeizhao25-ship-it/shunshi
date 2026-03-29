@@ -1,0 +1,9 @@
+name: Test Polymarket
+
+on: workflow_dispatch
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - run: curl -s "https://gamma-api.polymarket.com/events?limit=3" | head -c 500
