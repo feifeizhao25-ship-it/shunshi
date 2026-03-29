@@ -2,8 +2,13 @@ name: Polymarket Monitor
 
 on:
   schedule:
-    - cron: '*/30 * * * *'
+    - cron: '*/15 * * * *'
   workflow_dispatch:
+    inputs:
+      test_mode:
+        description: 'Test mode - just fetch and log'
+        required: false
+        default: 'false'
 
 jobs:
   monitor:
@@ -11,38 +16,42 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Fetch Polymarket
+      - name: Fetch Polymarket markets
         run: |
-          curl -s "https://gamma-api.polymarket.com/events?limit=20&active=true&closed=false&order=volume24hr&ascending=false" \
-            -H "Accept: application/json" -o events.json
+          curl -s "https://gamma-api.polymarket.com/events?limit=30&active=true&closed=false&order=volume24hr&ascending=false" \
+            -H "Accept: application/json" -o /tmp/events.json
           
-          # Count active markets
-          python3 -c "
-import json
-with open('events.json') as f:
+          python3 << 'EOF'
+import json, os
+from datetime import datetime
+
+with open('/tmp/events.json') as f:
     data = json.load(f)
-active = [e for e in data if not e.get('closed', True)]
-print(f'ACTIVE:{len(active)}')
-with open('count.txt', 'w') as f:
-    f.write(str(len(active)))
-"
-      
-      - name: Read previous count
-        id: prev
-        run: |
-          if [ -f count.txt ]; then
-            echo "prev=$(cat count.txt)" >> \$GITHUB_OUTPUT
-          else
-            echo "prev=0" >> \$GITHUB_OUTPUT
-          fi
-          
-      - name: Commit if changed
-        run: |
-          curr=\$(cat count.txt)
-          if [ "\$curr" != "\${{ steps.prev.outputs.prev }}" ]; then
-            git config user.email "bot@github.com"
-            git config user.name "Polymarket Bot"
-            git add count.txt events.json
-            git commit -m "Polymarket update: \$curr active markets"
-            git push
-          fi
+
+active = [e for e in data if not e.get('closed', True) and float(e.get('volume', 0)) > 5000]
+
+lines = []
+lines.append(f"🎯 Polymarket 热门市场 ({len(active)}个)")
+lines.append(f"🕐 更新时间: {datetime.now().strftime('%H:%M:%S')}")
+lines.append("="*50)
+
+for i, e in enumerate(active[:15]):
+    title = e.get('title', 'Unknown')[:60]
+    vol = float(e.get('volume', 0))
+    vol24 = float(e.get('volume24hr', 0))
+    slug = e.get('slug', '')
+    cat = e.get('category', '')
+    
+    lines.append(f"\n📌 {title}")
+    lines.append(f"   💰 Vol: ${vol:,.0f} | 24h: ${vol24:,.0f}")
+    lines.append(f"   🏷️ {cat}")
+    lines.append(f"   🔗 polymarket.com/event/{slug}")
+
+msg = '\n'.join(lines)
+print(msg)
+
+# Save for WeChat push
+with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+    f.write(f"message={msg}\n")
+    f.write(f"count={len(active)}\n")
+EOF
