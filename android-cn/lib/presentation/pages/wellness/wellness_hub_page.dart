@@ -117,8 +117,8 @@ class _WellnessHubPageState extends State<WellnessHubPage> {
                       color: ShunShiColors.primary,
                     )),
                     Row(children: [
-                      IconButton(icon: const Icon(Icons.search), color: ShunShiColors.textTertiary, onPressed: () { ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('搜索功能开发中'), duration: Duration(seconds: 1))); }),
-                      IconButton(icon: const Icon(Icons.notifications_outlined), color: ShunShiColors.textTertiary, onPressed: () { ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('暂无新通知'), duration: Duration(seconds: 1))); }),
+                      IconButton(icon: const Icon(Icons.search), color: ShunShiColors.textTertiary, onPressed: () { ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('搜索功能开发中'), duration: Duration(seconds: 1))); }),
+                      IconButton(icon: const Icon(Icons.notifications_outlined), color: ShunShiColors.textTertiary, onPressed: () { ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('暂无新通知'), duration: Duration(seconds: 1))); }),
                     ]),
                   ],
                 ),
@@ -185,14 +185,14 @@ class _WellnessHubPageState extends State<WellnessHubPage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('精选编辑', style: TextStyle(
+                  Text('精选编辑', style: TextStyle(
                     fontFamily: ShunShiTypography.serifFamily,
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary(context),
                   )),
                   GestureDetector(
-                    onTap: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('更多精选内容开发中'), duration: Duration(seconds: 1))),
+                    onTap: () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('更多精选内容开发中'), duration: Duration(seconds: 1))),
                     child: Text('查看全部', style: TextStyle(
                       fontFamily: ShunShiTypography.sansFamily,
                       fontSize: 13,
@@ -279,7 +279,7 @@ class _WellnessHubPageState extends State<WellnessHubPage> {
               child: GestureDetector(
                 onTap: () {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('向AI顺时助手了解更多个性化养生方案'), duration: Duration(seconds: 2)),
+                    SnackBar(content: Text('向AI顺时助手了解更多个性化养生方案'), duration: Duration(seconds: 2)),
                   );
                 },
                 child: Container(
