@@ -29,26 +29,20 @@ jobs:
           channel: 'stable'
 
       - name: Get dependencies
-        run: |
-          cd android-cn
-          flutter pub get
+        run: cd android-cn && flutter pub get
 
       - name: Build debug APK
-        run: |
-          cd android-cn
-          flutter build apk --debug --target-platform android-arm64 --verbose 2>&1 | tail -200
+        run: cd android-cn && flutter build apk --debug --target-platform android-arm64
 
       - name: Find APK files
         if: always()
-        run: find android-cn/build -name "*.apk" -type f 2>/dev/null
+        run: find android-cn/build -name "*.apk" -type f || echo "No APK found"
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: shunshi-debug-apk
-          path: |
-            android-cn/build/app/outputs/flutter-apk/*.apk
-            android-cn/build/app/outputs/apk/**/*.apk
+          path: android-cn/build/app/outputs/
           retention-days: 7
           if-no-files-found: warn
