@@ -28,11 +28,20 @@ jobs:
           flutter-version: '3.38.5'
           channel: 'stable'
 
+      - name: Verify environment
+        run: |
+          which flutter
+          flutter --version | head -2
+          ls android-cn/pubspec.yaml
+          ls android-cn/android/build.gradle.kts
+
       - name: Get dependencies
-        run: cd android-cn && flutter pub get
+        working-directory: android-cn
+        run: flutter pub get
 
       - name: Build debug APK
-        run: cd android-cn && flutter build apk --debug --target-platform android-arm64
+        working-directory: android-cn
+        run: flutter build apk --debug --target-platform android-arm64
 
       - name: Find APK files
         if: always()
