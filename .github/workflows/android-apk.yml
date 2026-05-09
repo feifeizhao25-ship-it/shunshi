@@ -28,24 +28,20 @@ jobs:
           flutter-version: '3.38.5'
           channel: 'stable'
 
-      - name: Verify environment
-        run: |
-          which flutter
-          flutter --version | head -2
-          ls android-cn/pubspec.yaml
-          ls android-cn/android/build.gradle.kts
-
       - name: Get dependencies
-        working-directory: android-cn
-        run: flutter pub get
+        run: |
+          cd android-cn
+          flutter pub get
 
       - name: Build debug APK
-        working-directory: android-cn
-        run: flutter build apk --debug --target-platform android-arm64
+        run: |
+          cd android-cn
+          flutter build apk --debug --target-platform android-arm64 2>&1
+          echo "=== Build exit code: $? ==="
 
       - name: Find APK files
         if: always()
-        run: find android-cn/build -name "*.apk" -type f || echo "No APK found"
+        run: find . -name "*.apk" -type f 2>/dev/null
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
