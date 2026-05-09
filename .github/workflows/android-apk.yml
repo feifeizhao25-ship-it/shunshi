@@ -30,13 +30,24 @@ jobs:
           cd android-cn
           flutter pub get
 
+      - name: Analyze
+        run: |
+          cd android-cn
+          flutter analyze --no-fatal-infos --no-fatal-warnings || true
+
       - name: Build debug APK
         run: |
           cd android-cn
-          flutter build apk --debug --target-platform android-arm64
+          flutter build apk --debug --target-platform android-arm64 2>&1 || {
+            echo "=== BUILD FAILED ==="
+            cd android
+          ./gradlew assembleDebug --stacktrace 2>&1 | tail -100
+            exit 1
+          }
 
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
+        if: success()
         with:
           name: shunshi-debug-apk
           path: android-cn/build/app/outputs/flutter-apk/app-debug.apk
