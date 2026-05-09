@@ -33,15 +33,20 @@ jobs:
           cd android-cn
           flutter pub get
 
-      - name: Build debug APK (verbose)
+      - name: Build debug APK
         run: |
           cd android-cn
-          flutter build apk --debug --target-platform android-arm64 --verbose 2>&1 | tail -200
+          flutter build apk --debug --target-platform android-arm64
+
+      - name: List build output
+        run: |
+          find android-cn/build -name "*.apk" -type f 2>/dev/null
+          ls -lh android-cn/build/app/outputs/flutter-apk/ 2>/dev/null || echo "No flutter-apk dir"
 
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
-        if: success()
         with:
           name: shunshi-debug-apk
-          path: android-cn/build/app/outputs/flutter-apk/app-debug.apk
+          path: android-cn/build/app/outputs/flutter-apk/
           retention-days: 7
+          if-no-files-found: error
