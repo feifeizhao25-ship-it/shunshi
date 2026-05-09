@@ -3,6 +3,7 @@
 结合用户画像 + 知识库检索 + 当前时空上下文
 支持年龄段/体质/季节/性别差异化推送
 """
+from __future__ import annotations
 import logging
 from datetime import datetime, date
 from typing import Optional

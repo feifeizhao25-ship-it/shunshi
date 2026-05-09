@@ -2,6 +2,8 @@
 顺时 ShunShi - 会员支付相关模型
 包含 3 张表: SubscriptionProduct, SubscriptionOrder, UserSubscription
 """
+from __future__ import annotations
+
 import enum
 from datetime import datetime
 from decimal import Decimal
@@ -118,7 +120,7 @@ class SubscriptionOrder(IDMixin, Base):
         String(100), unique=True, nullable=False, comment="订单号（唯一）"
     )
     user_id: Mapped[str] = mapped_column(
-        ForeignKey("sa_users.id", ondelete="CASCADE"),
+        ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False, index=True, comment="关联用户 ID"
     )
     product_id: Mapped[str] = mapped_column(
@@ -165,7 +167,7 @@ class UserSubscription(IDMixin, Base):
     __tablename__ = "sa_user_subscriptions"
 
     user_id: Mapped[str] = mapped_column(
-        ForeignKey("sa_users.id", ondelete="CASCADE"),
+        ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False, unique=True, index=True, comment="关联用户 ID（同一用户同时仅一个活跃订阅）"
     )
     tier: Mapped[str] = mapped_column(

@@ -2,6 +2,8 @@
 顺时 ShunShi - AI 对话相关模型
 包含 3 张表: ConversationSession, ConversationMessage, CareStatus
 """
+from __future__ import annotations
+
 import enum
 from datetime import datetime
 from typing import Optional
@@ -73,7 +75,7 @@ class ConversationSession(IDMixin, Base):
     __tablename__ = "sa_conversation_sessions"
 
     user_id: Mapped[str] = mapped_column(
-        ForeignKey("sa_users.id", ondelete="CASCADE"),
+        ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False, index=True, comment="关联用户 ID"
     )
     title: Mapped[Optional[str]] = mapped_column(
@@ -157,7 +159,7 @@ class CareStatus(IDMixin, Base):
     __tablename__ = "sa_care_status"
 
     user_id: Mapped[str] = mapped_column(
-        ForeignKey("sa_users.id", ondelete="CASCADE"),
+        ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False, unique=True, index=True, comment="关联用户 ID（唯一，一个用户一条记录）"
     )
     current_status: Mapped[str] = mapped_column(

@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@300;400;700&amp;family=Manrope:wght@300;400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-tertiary-fixed": "#261900",
+              "on-tertiary-container": "#e1bf82",
+              "tertiary-fixed": "#ffdea4",
+              "surface-container": "#f1ede8",
+              "on-background": "#1c1c19",
+              "surface-bright": "#fdf9f4",
+              "on-error": "#ffffff",
+              "secondary-fixed": "#ffddbb",
+              "on-surface": "#1c1c19",
+              "surface-dim": "#ddd9d5",
+              "surface": "#fdf9f4",
+              "background": "#fdf9f4",
+              "primary-fixed": "#bceec8",
+              "on-primary": "#ffffff",
+              "inverse-on-surface": "#f4f0eb",
+              "on-tertiary": "#ffffff",
+              "inverse-surface": "#31302d",
+              "surface-container-highest": "#e6e2dd",
+              "secondary-container": "#ffd9b4",
+              "on-error-container": "#93000a",
+              "error": "#ba1a1a",
+              "surface-container-lowest": "#ffffff",
+              "outline-variant": "#c1c9c0",
+              "primary": "#144227",
+              "on-primary-fixed": "#00210f",
+              "surface-variant": "#e6e2dd",
+              "inverse-primary": "#a1d2ad",
+              "primary-container": "#2d5a3d",
+              "on-secondary-container": "#795d40",
+              "surface-container-low": "#f7f3ee",
+              "on-primary-fixed-variant": "#224f33",
+              "error-container": "#ffdad6",
+              "tertiary": "#4c3605",
+              "on-secondary": "#ffffff",
+              "on-secondary-fixed": "#2a1702",
+              "surface-tint": "#3b684a",
+              "tertiary-container": "#654d1b",
+              "secondary-fixed-dim": "#e4c09c",
+              "outline": "#717971",
+              "on-secondary-fixed-variant": "#5b4227",
+              "tertiary-fixed-dim": "#e4c285",
+              "primary-fixed-dim": "#a1d2ad",
+              "secondary": "#74593c",
+              "on-tertiary-fixed-variant": "#5a4312",
+              "on-surface-variant": "#414942",
+              "surface-container-high": "#ebe8e3",
+              "on-primary-container": "#9ed0ab"
+            },
+            fontFamily: {
+              "headline": ["Noto Serif"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .ink-bleed {
+            filter: blur(40px);
+            opacity: 0.15;
+        }
+        body {
+            font-family: 'Manrope', sans-serif;
+            background-color: #fdf9f4;
+            color: #1c1c19;
+        }
+        h1, h2, h3, .serif {
+            font-family: 'Noto Serif', serif;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen pb-32">
+<!-- Top AppBar (JSON Integration) -->
+<nav class="bg-[#fdf9f4] dark:bg-stone-900 sticky top-0 z-50">
+<div class="flex justify-between items-center w-full px-8 py-4 max-w-7xl mx-auto">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container-highest">
+<img class="w-full h-full object-cover" data-alt="Close-up portrait of a serene man in an ink-wash artistic style, soft lighting and muted natural tones" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBbEDhgT_YDfvCk_NggQdkzuX-X2zVdxhjW_VsS9_srRYjQq_q8IGkBofAoerFWUSiDxkCzx9Jq0PuHLwkfph8F_nAsmk5ICMVW5FrRqK0hWgXa0uDQa4JSIrx10te6DGUQvHj4BFBi8OyGjOBtAjHvL-8tMOHN4QZ6z9VroOrJu2JE9U5rWMN4A5h-8MDlrQUibhS99PLXWTeFpAcuaDZCggq_KrjBbZ8RKZSXkC9y2GlDic-nzThDHaZusQ3xTCTZ5cVDSS_TSns"/>
+</div>
+<h1 class="font-serif text-2xl font-light tracking-tight text-[#144227]">早安, Nickname</h1>
+</div>
+<div class="flex items-center gap-6">
+<span class="material-symbols-outlined text-[#144227] cursor-pointer">notifications</span>
+</div>
+</div>
+<div class="bg-[#f7f3ee] dark:bg-stone-800 h-px w-full opacity-50"></div>
+</nav>
+<main class="max-w-3xl mx-auto px-6 pt-12 space-y-16">
+<!-- Header Section -->
+<header class="space-y-2">
+<div class="flex items-center gap-3">
+<span class="text-secondary font-label tracking-widest text-[10px] uppercase">4月24日 • 谷雨</span>
+<div class="h-px flex-1 bg-outline-variant/20"></div>
+</div>
+<h2 class="text-4xl md:text-5xl font-headline text-primary leading-tight">养生日记 今日记录</h2>
+<p class="text-on-surface-variant font-body font-light italic">"顺应四时节气，静听身体韵律。"</p>
+</header>
+<!-- Sleep Section -->
+<section class="space-y-6">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">bedtime</span>
+<h3 class="text-xl font-headline">睡眠质量</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="bg-surface-container-lowest p-8 rounded-xl space-y-4">
+<label class="block text-xs uppercase tracking-widest text-on-surface-variant font-medium">入睡时间</label>
+<div class="flex items-end gap-2">
+<span class="text-3xl font-headline text-primary">22:45</span>
+<span class="text-sm text-on-surface-variant mb-1">PM</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-8 rounded-xl space-y-4">
+<label class="block text-xs uppercase tracking-widest text-on-surface-variant font-medium">醒来时间</label>
+<div class="flex items-end gap-2">
+<span class="text-3xl font-headline text-primary">06:30</span>
+<span class="text-sm text-on-surface-variant mb-1">AM</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Mood Section -->
+<section class="space-y-6">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">self_improvement</span>
+<h3 class="text-xl font-headline">情绪图谱</h3>
+</div>
+<div class="bg-surface-container-low rounded-xl p-8">
+<div class="flex flex-wrap justify-around gap-8">
+<div class="flex flex-col items-center gap-3 group cursor-pointer">
+<div class="w-16 h-16 rounded-full flex items-center justify-center bg-surface-container-lowest border border-transparent group-hover:border-primary/20 transition-all">
+<span class="material-symbols-outlined text-3xl text-primary" data-weight="fill" style="font-variation-settings: 'FILL' 1;">sentiment_satisfied</span>
+</div>
+<span class="text-xs uppercase tracking-tighter text-on-surface-variant">开心</span>
+</div>
+<div class="flex flex-col items-center gap-3 group cursor-pointer">
+<div class="w-16 h-16 rounded-full flex items-center justify-center bg-surface-container-lowest border border-primary transition-all">
+<span class="material-symbols-outlined text-3xl text-primary" data-weight="fill" style="font-variation-settings: 'FILL' 1;">potted_plant</span>
+</div>
+<span class="text-xs uppercase tracking-tighter text-primary font-bold">平和</span>
+</div>
+<div class="flex flex-col items-center gap-3 group cursor-pointer opacity-50 grayscale">
+<div class="w-16 h-16 rounded-full flex items-center justify-center bg-surface-container-lowest transition-all">
+<span class="material-symbols-outlined text-3xl text-on-surface-variant">bed</span>
+</div>
+<span class="text-xs uppercase tracking-tighter text-on-surface-variant">疲劳</span>
+</div>
+<div class="flex flex-col items-center gap-3 group cursor-pointer opacity-50 grayscale">
+<div class="w-16 h-16 rounded-full flex items-center justify-center bg-surface-container-lowest transition-all">
+<span class="material-symbols-outlined text-3xl text-on-surface-variant">cloud</span>
+</div>
+<span class="text-xs uppercase tracking-tighter text-on-surface-variant">忧郁</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Habits Section -->
+<section class="space-y-6">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">done_all</span>
+<h3 class="text-xl font-headline">每日仪式</h3>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+<div class="bg-surface-container-lowest border border-outline-variant/10 p-6 flex flex-col justify-between aspect-square rounded-xl hover:bg-surface-bright transition-colors cursor-pointer group">
+<div class="flex justify-between items-start">
+<span class="material-symbols-outlined text-secondary text-4xl">emoji_food_beverage</span>
+<div class="w-6 h-6 border-2 border-primary rounded-full flex items-center justify-center">
+<div class="w-3 h-3 bg-primary rounded-full"></div>
+</div>
+</div>
+<span class="font-headline text-lg text-primary">饮茶</span>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant/10 p-6 flex flex-col justify-between aspect-square rounded-xl hover:bg-surface-bright transition-colors cursor-pointer group">
+<div class="flex justify-between items-start">
+<span class="material-symbols-outlined text-secondary text-4xl">air</span>
+<div class="w-6 h-6 border-2 border-outline-variant rounded-full"></div>
+</div>
+<span class="font-headline text-lg text-on-surface">冥想</span>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant/10 p-6 flex flex-col justify-between aspect-square rounded-xl hover:bg-surface-bright transition-colors cursor-pointer group">
+<div class="flex justify-between items-start">
+<span class="material-symbols-outlined text-secondary text-4xl">directions_walk</span>
+<div class="w-6 h-6 border-2 border-outline-variant rounded-full"></div>
+</div>
+<span class="font-headline text-lg text-on-surface">运动</span>
+</div>
+</div>
+</section>
+<!-- AI Analysis Section (Teaser) -->
+<section class="pt-8">
+<div class="relative overflow-hidden rounded-2xl bg-primary-container p-1 text-on-primary-container">
+<div class="relative z-10 bg-primary/95 backdrop-blur-xl rounded-xl p-8 space-y-6">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-on-primary-container animate-pulse">smart_toy</span>
+<h3 class="text-xl font-headline text-on-primary-container">AI 洞察</h3>
+</div>
+<span class="px-3 py-1 bg-on-primary-container/20 rounded-full text-[10px] uppercase tracking-widest">生成中...</span>
+</div>
+<div class="space-y-4">
+<div class="h-4 w-3/4 bg-on-primary-container/10 rounded-full overflow-hidden relative">
+<div class="absolute inset-0 bg-gradient-to-r from-transparent via-on-primary-container/30 to-transparent w-full animate-[shimmer_2s_infinite]"></div>
+</div>
+<div class="h-4 w-1/2 bg-on-primary-container/10 rounded-full overflow-hidden relative">
+<div class="absolute inset-0 bg-gradient-to-r from-transparent via-on-primary-container/30 to-transparent w-full animate-[shimmer_2s_infinite]"></div>
+</div>
+</div>
+<p class="text-sm font-light leading-relaxed opacity-80 italic">
+                        "你在‘谷雨’期间的作息显示体内略有湿气。我正在为你调配一款完美的午后茶饮以协调身心..."
+                    </p>
+</div>
+<!-- Decorative background elements for AI section -->
+<div class="absolute -top-12 -right-12 w-48 h-48 bg-tertiary-fixed-dim/20 rounded-full ink-bleed"></div>
+<div class="absolute -bottom-8 -left-8 w-32 h-32 bg-primary-fixed-dim/20 rounded-full ink-bleed"></div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation (JSON Integration) -->
+<nav class="fixed bottom-0 left-0 w-full z-50">
+<div class="bg-[#fdf9f4]/80 dark:bg-stone-900/80 backdrop-blur-xl shadow-[0_-4px_24px_rgba(28,28,25,0.04)] rounded-t-xl border-t border-[#c1c9c0]/20 flex justify-around items-center px-4 pb-8 pt-3">
+<div class="flex flex-col items-center justify-center text-[#6B7B7D] dark:text-stone-500 opacity-70 group cursor-pointer">
+<span class="material-symbols-outlined mb-1">home</span>
+<span class="font-serif text-[10px] uppercase tracking-[0.05rem] font-medium">首页</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#6B7B7D] dark:text-stone-500 opacity-70 group cursor-pointer">
+<span class="material-symbols-outlined mb-1">menu_book</span>
+<span class="font-serif text-[10px] uppercase tracking-[0.05rem] font-medium">养生</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#6B7B7D] dark:text-stone-500 opacity-70 group cursor-pointer">
+<span class="material-symbols-outlined mb-1">smart_toy</span>
+<span class="font-serif text-[10px] uppercase tracking-[0.05rem] font-medium">AI助手</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#144227] dark:text-emerald-400 scale-110 transition-transform group cursor-pointer">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">edit_note</span>
+<span class="font-serif text-[10px] uppercase tracking-[0.05rem] font-medium font-bold">日记</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#6B7B7D] dark:text-stone-500 opacity-70 group cursor-pointer">
+<span class="material-symbols-outlined mb-1">person</span>
+<span class="font-serif text-[10px] uppercase tracking-[0.05rem] font-medium">我的</span>
+</div>
+</div>
+</nav>
+<style>
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+    </style>
+</body></html>

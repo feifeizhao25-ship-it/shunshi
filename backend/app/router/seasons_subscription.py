@@ -108,8 +108,7 @@ async def get_subscription_status(user_id: str = Query(...)):
         try:
             trial_end = datetime.fromisoformat(trial_ends_at)
             is_in_trial = trial_end > now
-        except:
-            pass
+        except Exception as e:            pass
     
     return {
         "tier": tier,

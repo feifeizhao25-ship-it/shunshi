@@ -1,0 +1,348 @@
+import 'dart:ui';
+import 'package:flutter/material.dart';
+import '../../../../core/theme/shunshi_colors.dart';
+import 'constitution_data.dart';
+
+/// 体质测试结果 Widget
+class ConstitutionResultWidget extends StatelessWidget {
+  final ConstitutionResult result;
+  final bool reportUnlocked;
+  final VoidCallback onUnlock;
+  final VoidCallback onRetest;
+  final VoidCallback onViewDetail;
+  final VoidCallback onShare;
+
+  const ConstitutionResultWidget({
+    super.key,
+    required this.result,
+    required this.reportUnlocked,
+    required this.onUnlock,
+    required this.onRetest,
+    required this.onViewDetail,
+    required this.onShare,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isFree = !reportUnlocked;
+
+    return Stack(children: [
+      ListView(padding: EdgeInsets.only(bottom: isFree ? 220 : 80), children: [
+        _buildHero(),
+        const SizedBox(height: 20),
+        _buildOverview(),
+        _buildScoreBars(),
+        const SizedBox(height: 20),
+        if (isFree) ..._buildBlurredSections(),
+        if (!isFree) ..._buildPremiumSections(),
+        const SizedBox(height: 100),
+      ]),
+      Positioned(bottom: 0, left: 0, right: 0, child: _buildBottomBar(context)),
+    ]);
+  }
+
+  Widget _buildHero() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(24, 32, 24, 28),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [ShunshiColors.primary, ShunshiColors.primaryDark],
+        ),
+        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(24)),
+      ),
+      child: Column(children: [
+        Text(result.emoji, style: const TextStyle(fontSize: 56)),
+        const SizedBox(height: 8),
+        Text('你的体质是',
+            style: TextStyle(fontSize: 14, color: Colors.white.withValues(alpha: 0.8))),
+        const SizedBox(height: 4),
+        Text(result.typeName,
+            style: const TextStyle(
+                fontSize: 32, fontWeight: FontWeight.w700, color: Colors.white, letterSpacing: 2)),
+        const SizedBox(height: 12),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(12)),
+          child: Text('测试时间: ${DateTime.now().toString().substring(0, 16)}',
+              style: TextStyle(fontSize: 12, color: Colors.white.withValues(alpha: 0.7))),
+        ),
+      ]),
+    );
+  }
+
+  Widget _buildOverview() {
+    return _Section([
+      Text(result.description,
+          style: const TextStyle(fontSize: 14, color: ShunshiColors.textSecondary, height: 1.7)),
+      const SizedBox(height: 12),
+      Wrap(
+        spacing: 8,
+        runSpacing: 8,
+        children: result.characteristics
+            .map((c) => Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                      color: ShunshiColors.primaryLight.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(20)),
+                  child: Text(c,
+                      style: const TextStyle(
+                          fontSize: 12, color: ShunshiColors.primaryDark, fontWeight: FontWeight.w500)),
+                ))
+            .toList(),
+      ),
+    ]);
+  }
+
+  Widget _buildScoreBars() {
+    return _Section([
+      const Row(children: [
+        Text('📊', style: TextStyle(fontSize: 18)),
+        SizedBox(width: 8),
+        Text('体质分数',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: ShunshiColors.textPrimary))
+      ]),
+      const SizedBox(height: 14),
+      ...result.scores.map((s) {
+        final name = s['name'] as String? ?? '';
+        final score = (s['score'] as num?)?.toDouble() ?? 0;
+        final level = s['level'] as String? ?? 'normal';
+        final maxScore = 60.0;
+        final ratio = (score / maxScore).clamp(0.0, 1.0);
+        final isPrimary = name == result.typeName;
+        final barColor = isPrimary
+            ? ShunshiColors.primary
+            : (ratio > 0.5 ? ShunshiColors.earth : ShunshiColors.primaryLight);
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 10),
+          child: Row(children: [
+            SizedBox(
+                width: 60,
+                child: Text(name,
+                    style: TextStyle(
+                        fontSize: 12,
+                        color: isPrimary ? ShunshiColors.primaryDark : ShunshiColors.textSecondary,
+                        fontWeight: isPrimary ? FontWeight.w700 : FontWeight.w400))),
+            Expanded(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: LinearProgressIndicator(
+                    value: ratio,
+                    minHeight: 8,
+                    backgroundColor: ShunshiColors.divider,
+                    valueColor: AlwaysStoppedAnimation(barColor)),
+              ),
+            ),
+            const SizedBox(width: 8),
+            SizedBox(
+                width: 28,
+                child: Text(score.toStringAsFixed(0),
+                    style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: isPrimary ? ShunshiColors.primaryDark : ShunshiColors.textPrimary))),
+            const SizedBox(width: 4),
+            if (level == 'obvious')
+              const Text('偏颇', style: TextStyle(fontSize: 10, color: ShunshiColors.earth))
+            else if (level == 'tendency')
+              const Text('倾向', style: TextStyle(fontSize: 10, color: Color(0xFFD4956A))),
+          ]),
+        );
+      }),
+    ]);
+  }
+
+  List<Widget> _buildBlurredSections() {
+    return result.advice.map((adv) {
+      return Container(
+        margin: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: Stack(children: [
+            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Row(children: [
+                Text(adv.icon, style: const TextStyle(fontSize: 18)),
+                const SizedBox(width: 8),
+                Text(adv.category,
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.w600, color: ShunshiColors.textPrimary))
+              ]),
+              const SizedBox(height: 14),
+              ...adv.items.take(2).map((item) => Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Text(item,
+                        style:
+                            const TextStyle(fontSize: 14, color: ShunshiColors.textSecondary, height: 1.6)),
+                  )),
+            ]),
+            Positioned.fill(
+                child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+                    child: Container(color: Colors.white.withValues(alpha: 0.3)))),
+          ]),
+        ),
+      );
+    }).toList();
+  }
+
+  List<Widget> _buildPremiumSections() {
+    return [
+      ...result.advice.map((adv) => _Section([
+            ...adv.items.map((item) => Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Container(width: 6, height: 6, margin: const EdgeInsets.only(top: 8),
+                        decoration: const BoxDecoration(color: ShunshiColors.primary, shape: BoxShape.circle)),
+                    const SizedBox(width: 10),
+                    Expanded(
+                        child: Text(item,
+                            style: const TextStyle(
+                                fontSize: 14, color: ShunshiColors.textSecondary, height: 1.7))),
+                  ]),
+                )),
+          ])),
+      if (result.avoidList.isNotEmpty)
+        Container(
+          margin: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: const Color(0xFFFFFBF0),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: const Color(0xFFFDE68A).withValues(alpha: 0.5)),
+          ),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            const Row(children: [
+              Text('⚠️', style: TextStyle(fontSize: 16)),
+              SizedBox(width: 8),
+              Text('注意事项',
+                  style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF92400E)))
+            ]),
+            const SizedBox(height: 10),
+            Text(result.avoidList,
+                style: const TextStyle(fontSize: 13, color: Color(0xFF92400E), height: 1.7)),
+          ]),
+        ),
+    ];
+  }
+
+  Widget _buildBottomBar(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+      decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+                color: Colors.black.withValues(alpha: 0.06), blurRadius: 20, offset: const Offset(0, -4))
+          ]),
+      child: SafeArea(
+        top: false,
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          if (!reportUnlocked) ...[
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(14),
+              margin: const EdgeInsets.only(bottom: 12),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                    colors: [Color(0xFFFFF7ED), Color(0xFFFFF1E0)]),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFFE5A84B).withValues(alpha: 0.3)),
+              ),
+              child: Row(children: [
+                const Text('👑', style: TextStyle(fontSize: 20)),
+                const SizedBox(width: 10),
+                const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text('解锁完整体质报告',
+                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF92400E))),
+                  SizedBox(height: 2),
+                  Text('饮食·茶饮·运动·穴位·四季调理方案',
+                      style: TextStyle(fontSize: 11, color: Color(0xFFB07937))),
+                ])),
+                Icon(Icons.chevron_right, color: const Color(0xFFD4956A).withValues(alpha: 0.6)),
+              ]),
+            ),
+            Row(children: [
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: onUnlock,
+                  icon: const Icon(Icons.lock_open, size: 18),
+                  label: const Text('解锁报告',
+                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFE5A84B),
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                  ),
+                ),
+              ),
+            ]),
+          ] else ...[
+            Row(children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: onRetest,
+                  icon: const Icon(Icons.refresh, size: 18),
+                  label: const Text('重新测试', style: TextStyle(fontSize: 14)),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: ShunshiColors.primary,
+                    side: const BorderSide(color: ShunshiColors.primary),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    padding: const EdgeInsets.symmetric(vertical: 13),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: onViewDetail,
+                  icon: const Icon(Icons.auto_awesome, size: 18),
+                  label: const Text('查看详情',
+                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: ShunshiColors.primary,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    padding: const EdgeInsets.symmetric(vertical: 13),
+                  ),
+                ),
+              ),
+            ]),
+            const SizedBox(height: 8),
+            TextButton.icon(
+              onPressed: onShare,
+              icon: const Icon(Icons.share_outlined, size: 16),
+              label: const Text('分享结果', style: TextStyle(fontSize: 13)),
+              style: TextButton.styleFrom(foregroundColor: ShunshiColors.textSecondary),
+            ),
+          ],
+        ]),
+      ),
+    );
+  }
+}
+
+/// 内部 Section 封装
+class _Section extends StatelessWidget {
+  final List<Widget> children;
+  const _Section(this.children);
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: children),
+    );
+  }
+}

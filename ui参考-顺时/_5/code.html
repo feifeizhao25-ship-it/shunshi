@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&amp;family=Manrope:wght@300;400;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-tertiary": "#ffffff",
+              "on-primary": "#ffffff",
+              "surface-tint": "#3b684a",
+              "on-primary-container": "#9ed0ab",
+              "surface-variant": "#e6e2dd",
+              "surface": "#fdf9f4",
+              "on-surface": "#1c1c19",
+              "surface-container-lowest": "#ffffff",
+              "surface-container-high": "#ebe8e3",
+              "on-error": "#ffffff",
+              "primary-container": "#2d5a3d",
+              "tertiary-fixed": "#ffdea4",
+              "tertiary": "#4c3605",
+              "on-background": "#1c1c19",
+              "surface-bright": "#fdf9f4",
+              "on-error-container": "#93000a",
+              "secondary-container": "#ffd9b4",
+              "surface-dim": "#ddd9d5",
+              "surface-container-low": "#f7f3ee",
+              "primary-fixed-dim": "#a1d2ad",
+              "on-tertiary-fixed": "#261900",
+              "inverse-surface": "#31302d",
+              "on-primary-fixed-variant": "#224f33",
+              "surface-container-highest": "#e6e2dd",
+              "inverse-primary": "#a1d2ad",
+              "primary": "#144227",
+              "inverse-on-surface": "#f4f0eb",
+              "on-secondary-container": "#795d40",
+              "outline": "#717971",
+              "on-tertiary-fixed-variant": "#5a4312",
+              "surface-container": "#f1ede8",
+              "error-container": "#ffdad6",
+              "on-secondary-fixed-variant": "#5b4227",
+              "secondary": "#74593c",
+              "on-surface-variant": "#414942",
+              "on-primary-fixed": "#00210f",
+              "error": "#ba1a1a",
+              "primary-fixed": "#bceec8",
+              "on-tertiary-container": "#e1bf82",
+              "secondary-fixed-dim": "#e4c09c",
+              "outline-variant": "#c1c9c0",
+              "tertiary-container": "#654d1b",
+              "tertiary-fixed-dim": "#e4c285",
+              "on-secondary-fixed": "#2a1702",
+              "background": "#fdf9f4",
+              "secondary-fixed": "#ffddbb",
+              "on-secondary": "#ffffff"
+            },
+            fontFamily: {
+              "notoSerif": ["Noto Serif SC", "serif"],
+              "manrope": ["Manrope", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .ink-mask {
+            mask-image: radial-gradient(circle, black 50%, transparent 100%);
+        }
+        body {
+            background-color: #fdf9f4;
+            color: #1c1c19;
+            font-family: 'Manrope', sans-serif;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface selection:bg-primary/10">
+<!-- Top Navigation Anchor -->
+<header class="fixed top-0 z-50 w-full flex justify-between items-center px-6 py-4 bg-[#fdf9f4] dark:bg-[#1c1c19]">
+<div class="flex items-center gap-4">
+<button class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-[#f7f3ee] transition-colors active:scale-95 duration-150">
+<span class="material-symbols-outlined text-[#144227]">arrow_back</span>
+</button>
+<h1 class="font-notoSerif text-xl tracking-wide font-bold text-[#144227]">瞬时康养</h1>
+</div>
+<div class="w-10 h-10 rounded-full bg-surface-container-high overflow-hidden">
+<img alt="用户头像" data-alt="minimalist profile avatar of a calm person with a soft artistic filter" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC3tB5QnzUO6k87Ot47O_i3jhhnfwUSgz2yfdSRcIlbFs0ohUbtQpknZbaRMbwTpXXl4uecDOFvMiWbIwM81HLfh_qLrwDdj_1OXf6S5mLmU_ndbjlwKnKySckkUQctRyeOxGcDzfpBArNvOucXak8LxPWO2qzSld0SDCM7-vMluLPjfAJ7xCToEGAnKuXxo2KloOqX-AuKoFbxuGcyfOdwxxp90YJAAq7k8rJ_-6nIg8EAulUC14lfDOEv5eSoCGBTD2mXWZVcojQ"/>
+</div>
+</header>
+<main class="pt-24 pb-32 px-6 max-w-4xl mx-auto">
+<!-- Hero Section: Editorial Layout -->
+<section class="mb-16">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div>
+<span class="text-secondary font-manrope tracking-[0.2em] text-sm mb-2 block">QI GONG TUTORIAL</span>
+<h2 class="font-notoSerif text-5xl md:text-6xl text-primary font-bold leading-tight">八段锦 · 第三式</h2>
+<h3 class="font-notoSerif text-2xl text-secondary mt-4">调理脾胃须单举</h3>
+</div>
+<div class="flex items-center gap-3 bg-surface-container-low px-4 py-2 rounded-full">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">timer</span>
+<span class="font-manrope text-primary font-semibold">12 分钟</span>
+</div>
+</div>
+<div class="mt-10 relative group">
+<div class="aspect-[16/9] w-full rounded-2xl overflow-hidden bg-surface-container-high relative">
+<img class="w-full h-full object-cover mix-blend-multiply opacity-80" data-alt="minimalist ink wash illustration of a person performing traditional qigong movements in a serene mountain setting with soft morning mist" src="https://lh3.googleusercontent.com/aida-public/AB6AXuApzuLDFlLDmxjRni6fuakshFi0i-GkLbRxYpcf8aKLFXmYQkb5NN_wott8CXArSI_Dn7qa_i4UIiVnno2-vbC13n7vZVuZy7WV7KlEHHdAnh8Z3g_hS1cF2D91ebPPPuF3QbrRzZvj5kesNnAgwLIrgYFJnfSNmmCsftAUQwRplMshOZsvKh9YPogLZb0evL2zb9UIa9f2Um-Blb2qb7ZL1MJifDELTLD_UCktVxZLrCz1oE-C76ZL6z2IBsBlQT1QsoSCwZiMK_o"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent"></div>
+<button class="absolute inset-0 m-auto w-20 h-20 rounded-full bg-surface/90 backdrop-blur-md flex items-center justify-center shadow-lg transition-transform hover:scale-110 active:scale-95">
+<span class="material-symbols-outlined text-primary text-4xl" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+</div>
+<!-- Floating Progress Bar -->
+<div class="absolute -bottom-4 left-1/2 -translate-x-1/2 w-[90%] bg-surface-container-lowest p-4 rounded-xl shadow-[0_8px_32px_rgba(20,66,39,0.06)] border border-outline-variant/10">
+<div class="flex justify-between items-center mb-2 px-1">
+<span class="text-xs font-manrope text-secondary/70">PROGRESS</span>
+<span class="text-xs font-manrope text-primary font-bold">3 / 8 节</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[37.5%] rounded-full"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Description & Breathing -->
+<section class="grid grid-cols-1 md:grid-cols-12 gap-12 mb-20 items-start">
+<div class="md:col-span-7">
+<p class="font-notoSerif text-xl leading-relaxed text-on-surface/80">
+                    通过左右单臂的上举与下按，牵拉腹腔，调理脾胃气机。此动作能舒展胸腹，使经络通畅，改善消化功能。
+                </p>
+<div class="mt-12 space-y-8">
+<div class="flex gap-6 group">
+<div class="flex-shrink-0 w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center font-notoSerif text-xl">一</div>
+<div class="pt-2">
+<h4 class="font-notoSerif text-xl text-primary font-bold mb-2">站立，左手翻掌上举</h4>
+<p class="text-secondary leading-relaxed">双脚平站与肩同宽，左手由体前向上托起，掌心向上，指尖向右。</p>
+</div>
+</div>
+<div class="flex gap-6 group">
+<div class="flex-shrink-0 w-12 h-12 rounded-full bg-surface-container-highest text-primary flex items-center justify-center font-notoSerif text-xl">二</div>
+<div class="pt-2">
+<h4 class="font-notoSerif text-xl text-primary font-bold mb-2">右手翻掌下按</h4>
+<p class="text-secondary leading-relaxed">右手由体侧向下按，掌心向下，指尖向前，指尖微翘。</p>
+</div>
+</div>
+<div class="flex gap-6 group">
+<div class="flex-shrink-0 w-12 h-12 rounded-full bg-surface-container-highest text-primary flex items-center justify-center font-notoSerif text-xl">三</div>
+<div class="pt-2">
+<h4 class="font-notoSerif text-xl text-primary font-bold mb-2">配合呼吸，上举吸气</h4>
+<p class="text-secondary leading-relaxed">上托下按时深吸气，感觉腹部微收，气沉丹田，身形拔高。</p>
+</div>
+</div>
+<div class="flex gap-6 group">
+<div class="flex-shrink-0 w-12 h-12 rounded-full bg-surface-container-highest text-primary flex items-center justify-center font-notoSerif text-xl">四</div>
+<div class="pt-2">
+<h4 class="font-notoSerif text-xl text-primary font-bold mb-2">换手重复</h4>
+<p class="text-secondary leading-relaxed">两手交替进行，动作连贯圆润，如行云流水。</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Breathing Rhythm Module (Glassmorphism AI Style) -->
+<div class="md:col-span-5 sticky top-32">
+<div class="bg-surface-container-low/80 backdrop-blur-xl p-8 rounded-3xl border border-white/40 shadow-sm relative overflow-hidden">
+<div class="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 bg-tertiary-fixed-dim/20 rounded-full blur-3xl"></div>
+<h5 class="font-notoSerif text-lg text-primary mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">air</span>
+                        呼吸节拍指导
+                    </h5>
+<div class="flex flex-col items-center justify-center py-8">
+<!-- Breathing Indicator Animation Mock -->
+<div class="w-40 h-40 rounded-full border-4 border-primary/10 flex items-center justify-center relative">
+<div class="w-32 h-32 rounded-full bg-primary/5 flex items-center justify-center">
+<div class="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center animate-pulse">
+<span class="font-notoSerif text-primary font-bold text-2xl">吸气</span>
+</div>
+</div>
+<!-- Orbiting Dot -->
+<div class="absolute inset-0 animate-spin" style="animation-duration: 4s;">
+<div class="w-4 h-4 bg-tertiary-fixed-dim rounded-full absolute -top-2 left-1/2 -translate-x-1/2 shadow-lg shadow-tertiary/20"></div>
+</div>
+</div>
+<div class="mt-8 grid grid-cols-2 gap-4 w-full">
+<div class="bg-surface-container-lowest p-4 rounded-2xl text-center">
+<span class="block text-xs text-secondary/60 mb-1 uppercase tracking-widest font-manrope">INHALING</span>
+<span class="font-manrope text-lg font-bold text-primary">4s</span>
+</div>
+<div class="bg-surface-container-lowest p-4 rounded-2xl text-center">
+<span class="block text-xs text-secondary/60 mb-1 uppercase tracking-widest font-manrope">HOLDING</span>
+<span class="font-manrope text-lg font-bold text-primary">2s</span>
+</div>
+</div>
+</div>
+<p class="text-sm text-secondary italic leading-relaxed text-center px-4">
+                        "气随手行，意随气走。感受双掌间拉伸的温热。"
+                    </p>
+</div>
+<button class="w-full mt-6 py-4 bg-primary text-white rounded-xl font-manrope font-semibold flex items-center justify-center gap-3 hover:opacity-90 transition-opacity active:scale-[0.98]">
+                    开始全屏教学
+                    <span class="material-symbols-outlined">fullscreen</span>
+</button>
+</div>
+</section>
+<!-- Bento Grid Insights -->
+<section class="mb-12">
+<h3 class="font-notoSerif text-2xl text-primary mb-8 px-2">功法要点</h3>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="md:col-span-2 bg-surface-container p-8 rounded-3xl flex flex-col justify-between min-h-[240px]">
+<div>
+<span class="material-symbols-outlined text-tertiary-fixed-dim text-4xl mb-4">clinical_notes</span>
+<h4 class="font-notoSerif text-xl font-bold text-primary">中医原理</h4>
+<p class="mt-4 text-secondary leading-relaxed max-w-md">
+                            本式通过上举下按，使左右胸肋交替扩张与收缩，直接作用于脾胃经络，有助于中焦气机升降。
+                        </p>
+</div>
+<div class="mt-6 flex items-center gap-2 text-primary font-semibold text-sm">
+<span>阅读研究报告</span>
+<span class="material-symbols-outlined text-xs">arrow_forward</span>
+</div>
+</div>
+<div class="bg-secondary-container p-8 rounded-3xl flex flex-col justify-center text-center">
+<span class="text-4xl mb-4">🧘</span>
+<h4 class="font-notoSerif text-lg font-bold text-on-secondary-container">身心合一</h4>
+<p class="mt-2 text-on-secondary-container/80 text-sm">
+                        保持面部放松，面带微笑。
+                    </p>
+</div>
+<div class="bg-surface-container-high p-8 rounded-3xl flex flex-col justify-center border border-outline-variant/10">
+<h4 class="font-notoSerif text-lg font-bold text-primary">常见误区</h4>
+<ul class="mt-4 space-y-3 text-sm text-secondary">
+<li class="flex items-start gap-2">
+<span class="material-symbols-outlined text-error text-sm">close</span>
+                            肩膀耸起过度
+                        </li>
+<li class="flex items-start gap-2">
+<span class="material-symbols-outlined text-error text-sm">close</span>
+                            手臂未完全伸直
+                        </li>
+</ul>
+</div>
+<div class="md:col-span-2 bg-[#fdf9f4] p-8 rounded-3xl border border-primary/10 relative overflow-hidden">
+<img class="absolute inset-0 w-full h-full object-cover opacity-10" data-alt="close up of fine chinese tea leaves and a ceramic teapot on a textured paper background, serene still life" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB5q8nMl6hrbQ78Mm9MG8FVILR4iE2bh5ghr8J_Xc8k8OqKaERV4DR3WEckoJVqJo8cgUY9x9gsaU1deZJV2yXkoehwDg_XcSwlIwVNhI6UJKhK8flHKvsehXDbUFjeDL97XPxJ4npz1PxDkL7pyEe5v6fw1IZmvf7fV7SzMOJKOA3D0EfH7LeGySFRxAx846wPPRKa9PyhxoeYz5K3TNnCcZyu_-33FcSQq8A4i8GkROPYz8AJHGv_iyIWJKPl5ohNddNUfNglAqk"/>
+<div class="relative z-10">
+<h4 class="font-notoSerif text-xl font-bold text-primary">晨起练习建议</h4>
+<p class="mt-4 text-secondary max-w-md">
+                            建议在日出后一小时内练习，此时脾胃经气最为旺盛。练习前可饮少量温水。
+                        </p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Shell -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 bg-[#fdf9f4]/80 dark:bg-[#1c1c19]/80 backdrop-blur-xl shadow-[0_-4px_24px_rgba(28,28,25,0.04)]">
+<a class="flex flex-col items-center justify-center text-[#74593c] dark:text-[#6B7B7D] opacity-70 hover:opacity-100 transition-opacity" href="#">
+<span class="material-symbols-outlined">restaurant</span>
+<span class="font-notoSerif text-[12px] tracking-widest mt-1">食疗</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#144227] dark:text-[#e4c285] bg-[#f7f3ee] dark:bg-[#2d2d2a] rounded-xl px-4 py-1 active:transform active:scale-90 duration-300" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">self_care</span>
+<span class="font-notoSerif text-[12px] tracking-widest mt-1">功法</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#74593c] dark:text-[#6B7B7D] opacity-70 hover:opacity-100 transition-opacity" href="#">
+<span class="material-symbols-outlined">family_restroom</span>
+<span class="font-notoSerif text-[12px] tracking-widest mt-1">合家</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#74593c] dark:text-[#6B7B7D] opacity-70 hover:opacity-100 transition-opacity" href="#">
+<span class="material-symbols-outlined">military_tech</span>
+<span class="font-notoSerif text-[12px] tracking-widest mt-1">荣誉</span>
+</a>
+</nav>
+</body></html>

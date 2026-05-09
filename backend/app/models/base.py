@@ -2,6 +2,8 @@
 顺时 ShunShi - 数据库模型基础层
 SQLAlchemy 2.0 声明式基类 + 通用 Mixin
 """
+from __future__ import annotations
+
 import uuid
 from datetime import datetime, timezone
 from typing import Optional

@@ -6,6 +6,7 @@
 日期: 2026-03-13
 """
 
+import os
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -34,10 +35,25 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# CORS 配置
+# CORS — 仅允许生产域名
+_CORS_ORIGINS = os.getenv(
+    "CORS_ALLOWED_ORIGINS",
+    "https://shunshi.app,https://www.shunshi.app,https://api.shunshi.app"
+).split(",")
+
+if os.getenv("CORS_ALLOW_LOCALHOST", "").lower() == "true":
+    _CORS_ORIGINS.extend([
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "http://localhost:8080",
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:5173",
+        "http://127.0.0.1:8080",
+    ])
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=_CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

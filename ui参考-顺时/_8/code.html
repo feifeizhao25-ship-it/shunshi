@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&amp;family=Manrope:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-tertiary-fixed-variant": "#5a4312",
+              "inverse-on-surface": "#f4f0eb",
+              "primary": "#144227",
+              "on-tertiary-container": "#e1bf82",
+              "surface-tint": "#3b684a",
+              "on-primary-fixed-variant": "#224f33",
+              "surface": "#fdf9f4",
+              "tertiary-fixed-dim": "#e4c285",
+              "surface-variant": "#e6e2dd",
+              "secondary-fixed-dim": "#e4c09c",
+              "secondary": "#74593c",
+              "tertiary-container": "#654d1b",
+              "primary-fixed": "#bceec8",
+              "on-secondary": "#ffffff",
+              "surface-container-high": "#ebe8e3",
+              "error-container": "#ffdad6",
+              "surface-container-highest": "#e6e2dd",
+              "on-secondary-fixed": "#2a1702",
+              "inverse-surface": "#31302d",
+              "on-tertiary-fixed": "#261900",
+              "inverse-primary": "#a1d2ad",
+              "tertiary": "#4c3605",
+              "surface-container-low": "#f7f3ee",
+              "on-secondary-fixed-variant": "#5b4227",
+              "secondary-fixed": "#ffddbb",
+              "surface-container": "#f1ede8",
+              "outline-variant": "#c1c9c0",
+              "on-primary": "#ffffff",
+              "on-error": "#ffffff",
+              "surface-dim": "#ddd9d5",
+              "primary-fixed-dim": "#a1d2ad",
+              "tertiary-fixed": "#ffdea4",
+              "primary-container": "#2d5a3d",
+              "on-error-container": "#93000a",
+              "on-background": "#1c1c19",
+              "on-secondary-container": "#795d40",
+              "error": "#ba1a1a",
+              "surface-bright": "#fdf9f4",
+              "on-surface-variant": "#414942",
+              "on-tertiary": "#ffffff",
+              "on-primary-container": "#9ed0ab",
+              "outline": "#717971",
+              "secondary-container": "#ffd9b4",
+              "surface-container-lowest": "#ffffff",
+              "on-primary-fixed": "#00210f",
+              "on-surface": "#1c1c19",
+              "background": "#fdf9f4"
+            },
+            fontFamily: {
+              "headline": ["Noto Serif", "serif"],
+              "body": ["Manrope", "sans-serif"],
+              "label": ["Manrope", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .ink-wash-gradient {
+            background: linear-gradient(180deg, #fdf9f4 0%, #f7f3ee 100%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary/10">
+<!-- Top Navigation Shell -->
+<header class="bg-[#fdf9f4] dark:bg-stone-900 sticky top-0 z-40">
+<div class="flex justify-between items-center w-full px-6 py-4 max-w-lg mx-auto">
+<h1 class="font-serif italic text-[#144227] dark:text-emerald-500 text-xl">ShunShi AI</h1>
+<div class="flex items-center gap-4">
+<button class="text-[#144227] dark:text-emerald-500 hover:bg-[#f7f3ee] p-2 rounded-full transition-colors active:scale-95 duration-200">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+</div>
+</div>
+<div class="bg-[#f7f3ee] dark:bg-stone-800 h-px w-full"></div>
+</header>
+<main class="max-w-lg mx-auto px-6 pt-8 pb-32">
+<!-- User Profile Card -->
+<section class="relative mb-10">
+<div class="flex items-center gap-6">
+<div class="relative">
+<div class="w-20 h-20 rounded-full overflow-hidden border-2 border-white shadow-sm">
+<img alt="User profile portrait" class="w-full h-full object-cover" data-alt="Close-up portrait of a serene woman with a natural look, soft morning light, editorial lifestyle photography style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB_CfuRyDM4DsAFLi_8SRWk5P8tkTanlp16_JPGtevFySTceM12eK0Oo0o74VpcSL2kXpKko73QcEYly5RqHBXyLW56fmlYWK_-LmI6zU8tPDQ1PCr0nQ_1Sr0G97R3KAkBZrdGu6Pkwg46ScL6apULV3z75IFs7FCJqO2amOtKMH9Ewqy0Hg-HSaC0vFf99Id4Cx_cbMzaRt-IUH50WQnuw5R_cpuzVJjX9RVmBHPrnMfip2nZlTJADb36w9mRDWsxF42AdKvQFiI"/>
+</div>
+<div class="absolute -bottom-1 -right-1 bg-tertiary text-white p-1 rounded-full border-2 border-surface flex items-center justify-center">
+<span class="material-symbols-outlined text-[14px]" data-icon="verified" style="font-variation-settings: 'FILL' 1;">verified</span>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<h2 class="font-serif text-2xl text-primary font-bold tracking-tight">顺时小友</h2>
+<div class="flex items-center gap-2">
+<span class="bg-secondary-container text-on-secondary-container text-[10px] px-2 py-0.5 rounded-full font-label tracking-widest flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]" data-icon="workspace_premium" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+                            年卡会员
+                        </span>
+</div>
+</div>
+</div>
+</section>
+<!-- Assets Bento Grid -->
+<section class="grid grid-cols-3 gap-3 mb-12">
+<div class="bg-surface-container-lowest p-4 rounded-xl text-center hover:bg-surface-container-low transition-colors duration-300">
+<div class="text-xs text-secondary font-label mb-1">积分</div>
+<div class="text-xl font-serif font-bold text-primary">2560</div>
+</div>
+<div class="bg-surface-container-lowest p-4 rounded-xl text-center hover:bg-surface-container-low transition-colors duration-300">
+<div class="text-xs text-secondary font-label mb-1">优惠券</div>
+<div class="text-xl font-serif font-bold text-primary">3 <span class="text-xs font-normal">张</span></div>
+</div>
+<div class="bg-surface-container-lowest p-4 rounded-xl text-center hover:bg-surface-container-low transition-colors duration-300">
+<div class="text-xs text-secondary font-label mb-1">收藏</div>
+<div class="text-xl font-serif font-bold text-primary">12</div>
+</div>
+</section>
+<!-- Core Functions Section -->
+<section class="space-y-4 mb-12">
+<div class="flex flex-col gap-2">
+<!-- Function Item -->
+<button class="w-full flex items-center justify-between p-5 bg-surface-container-low rounded-xl group transition-all duration-200 active:scale-[0.98]">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-primary/5 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="family_restroom">family_restroom</span>
+</div>
+<span class="text-on-surface font-medium">家庭养生管理</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors" data-icon="chevron_right">chevron_right</span>
+</button>
+<button class="w-full flex items-center justify-between p-5 bg-surface-container-low rounded-xl group transition-all duration-200 active:scale-[0.98]">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-primary/5 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="military_tech">military_tech</span>
+</div>
+<span class="text-on-surface font-medium">我的成就勋章</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors" data-icon="chevron_right">chevron_right</span>
+</button>
+<!-- Invite Banner (Asymmetric Style) -->
+<div class="relative overflow-hidden bg-primary p-6 rounded-xl mt-4 group">
+<div class="relative z-10">
+<h3 class="text-on-primary font-serif text-lg mb-1">邀请好友领会员</h3>
+<p class="text-on-primary-container text-xs opacity-80 mb-4">与友偕行，共享颐养时光</p>
+<button class="bg-surface text-primary px-4 py-2 rounded-lg text-sm font-bold active:scale-95 transition-transform">
+                            立即邀请
+                        </button>
+</div>
+<div class="absolute -right-4 -bottom-4 text-white/10 scale-[2.5] pointer-events-none">
+<span class="material-symbols-outlined text-8xl" data-icon="park">park</span>
+</div>
+</div>
+<div class="mt-6 space-y-2">
+<button class="w-full flex items-center justify-between p-4 bg-transparent border-b border-outline-variant/10 group active:opacity-60">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-secondary" data-icon="settings">settings</span>
+<span class="text-on-surface">设置</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant text-sm" data-icon="chevron_right">chevron_right</span>
+</button>
+<button class="w-full flex items-center justify-between p-4 bg-transparent border-b border-outline-variant/10 group active:opacity-60">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-secondary" data-icon="headset_mic">headset_mic</span>
+<span class="text-on-surface">联系客服</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant text-sm" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Brand Motto -->
+<footer class="text-center pt-8 pb-12">
+<div class="inline-block relative">
+<p class="font-serif text-secondary italic tracking-[0.2em] text-sm opacity-60">
+                    顺应天时，颐养身心
+                </p>
+<div class="absolute -left-8 top-1/2 w-4 h-px bg-outline-variant/30"></div>
+<div class="absolute -right-8 top-1/2 w-4 h-px bg-outline-variant/30"></div>
+</div>
+</footer>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 bg-[#fdf9f4]/90 dark:bg-stone-900/90 backdrop-blur-xl shadow-[0_-4px_24px_rgba(28,28,25,0.04)] rounded-t-[2rem] border-t border-[#c1c9c0]/20">
+<a class="flex flex-col items-center justify-center text-[#74593c] dark:text-stone-400 opacity-70 hover:opacity-100 transition-opacity" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="home_wellness">home_health</span>
+<span class="font-serif text-[10px] tracking-widest uppercase">首页</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#74593c] dark:text-stone-400 opacity-70 hover:opacity-100 transition-opacity" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="spa">spa</span>
+<span class="font-serif text-[10px] tracking-widest uppercase">养生</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#74593c] dark:text-stone-400 opacity-70 hover:opacity-100 transition-opacity" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="auto_awesome">auto_awesome</span>
+<span class="font-serif text-[10px] tracking-widest uppercase">AI助手</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#74593c] dark:text-stone-400 opacity-70 hover:opacity-100 transition-opacity" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="menu_book">menu_book</span>
+<span class="font-serif text-[10px] tracking-widest uppercase">日记</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-[#144227] text-white dark:bg-emerald-800 rounded-xl px-3 py-1.5 transition-all scale-95" href="#">
+<span class="material-symbols-outlined mb-0.5" data-icon="person_2" style="font-variation-settings: 'FILL' 1;">person_2</span>
+<span class="font-serif text-[10px] tracking-widest uppercase">我的</span>
+</a>
+</nav>
+</body></html>

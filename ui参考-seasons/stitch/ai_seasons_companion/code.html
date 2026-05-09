@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,500;0,700;1,400&amp;family=Manrope:wght@200;300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-container-highest": "#e4e2de",
+              "primary-fixed": "#d9eaa3",
+              "primary": "#56642b",
+              "on-tertiary": "#ffffff",
+              "surface-variant": "#e4e2de",
+              "tertiary-fixed-dim": "#d2c5b2",
+              "tertiary": "#665d4e",
+              "secondary-fixed": "#ffdbcf",
+              "surface": "#fbf9f5",
+              "on-primary-fixed": "#161f00",
+              "secondary": "#95482b",
+              "error": "#ba1a1a",
+              "on-tertiary-fixed-variant": "#4e4637",
+              "on-primary-fixed-variant": "#3e4c16",
+              "inverse-surface": "#30312e",
+              "background": "#fbf9f5",
+              "on-secondary": "#ffffff",
+              "inverse-primary": "#bdce89",
+              "on-surface-variant": "#46483c",
+              "surface-tint": "#56642b",
+              "surface-container-lowest": "#ffffff",
+              "outline-variant": "#c6c8b8",
+              "on-secondary-fixed-variant": "#773116",
+              "error-container": "#ffdad6",
+              "primary-fixed-dim": "#bdce89",
+              "on-tertiary-container": "#332b1e",
+              "surface-dim": "#dbdad6",
+              "surface-container-low": "#f5f3ef",
+              "on-background": "#1b1c1a",
+              "primary-container": "#8a9a5b",
+              "outline": "#76786b",
+              "on-tertiary-fixed": "#211b0f",
+              "on-secondary-container": "#763015",
+              "surface-container-high": "#eae8e4",
+              "tertiary-fixed": "#eee1cd",
+              "surface-container": "#efeeea",
+              "on-primary": "#ffffff",
+              "on-surface": "#1b1c1a",
+              "tertiary-container": "#9d9281",
+              "inverse-on-surface": "#f2f0ed",
+              "secondary-fixed-dim": "#ffb59b",
+              "secondary-container": "#fc9a77",
+              "on-secondary-fixed": "#380d00",
+              "surface-bright": "#fbf9f5",
+              "on-primary-container": "#253000",
+              "on-error-container": "#93000a",
+              "on-error": "#ffffff"
+            },
+            fontFamily: {
+              "headline": ["Noto Serif"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "1.5rem", "2xl": "2rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 4px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #e4e2de;
+        border-radius: 10px;
+      }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-[#fbf9f5]/80 backdrop-blur-xl shadow-[0_20px_40px_rgba(27,28,26,0.05)]">
+<div class="flex items-center justify-between px-6 h-16 w-full">
+<button class="text-[#56642b] hover:opacity-80 transition-opacity active:scale-95 duration-200">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+<h1 class="text-xl font-headline italic text-[#1b1c1a] tracking-tight">Digital Sanctuary</h1>
+<div class="w-8 h-8 rounded-full bg-surface-container-highest overflow-hidden active:scale-95 duration-200 cursor-pointer">
+<img alt="User profile" class="w-full h-full object-cover" data-alt="Close-up portrait of a serene woman with natural lighting in a peaceful outdoor setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3fEj6Evh-9TlKsMur8GkJzL8Zv9zlvoDbFLEKHKc0-_jiuyth1rijIHdVimt1GWQxrjk3EX6QBNdvSlfuvxuGYCVrFUVNXtgrXkyx-nufQsZ4zxor10WYWph4dxhH1_Ltlo4z5eoX2U0uz5-o3SpcDV64tiH33JyBN9jmXkqsNOU0K4_CklYbt1STP-W7jTpYo9OH09XcFmp6UHOmTNNqvfCYvxPI-vAfSsbBurm4uW2iT0c3g2bm6jm1Sa9x8Z8Ey3CRUoYnBi8"/>
+</div>
+</div>
+</header>
+<main class="flex-grow pt-20 pb-28 px-4 md:px-0 max-w-4xl mx-auto w-full flex flex-col">
+<!-- Chat History Area -->
+<div class="flex-grow overflow-y-auto custom-scrollbar space-y-10 py-4">
+<!-- Greeting -->
+<div class="flex flex-col items-center text-center mb-12 px-6">
+<h2 class="font-headline text-3xl md:text-4xl text-on-surface mb-3">Good afternoon, Seeker</h2>
+<p class="text-on-surface-variant font-light max-w-md">I am SEASONS, your companion for presence and nourishment. How does your soul feel today?</p>
+</div>
+<!-- AI Message -->
+<div class="flex gap-4 items-start max-w-[85%]">
+<div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-primary" data-icon="auto_awesome">auto_awesome</span>
+</div>
+<div class="bg-surface-container-low rounded-2xl p-5 text-on-surface leading-relaxed shadow-sm">
+                    Welcome back. I've been reflecting on the transition of the light this morning. It feels like a perfect day to ground yourself. Would you like to explore a morning ritual or perhaps something nourishing for the body?
+                </div>
+</div>
+<!-- User Message -->
+<div class="flex gap-4 items-start justify-end max-w-[85%] ml-auto">
+<div class="bg-primary text-on-primary rounded-2xl p-5 shadow-md leading-relaxed">
+                    I'm feeling a bit restless today. Maybe a recipe that feels like a warm hug?
+                </div>
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="person">person</span>
+</div>
+</div>
+<!-- AI Message with Recommendation Card -->
+<div class="flex gap-4 items-start max-w-[90%] md:max-w-[85%]">
+<div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-primary" data-icon="auto_awesome">auto_awesome</span>
+</div>
+<div class="space-y-6">
+<div class="bg-surface-container-low rounded-2xl p-5 text-on-surface leading-relaxed shadow-sm">
+                        I understand that restlessness. It's often just energy looking for a place to rest. I recommend this Spiced Root Lassi. It's grounded in earth tones and carries a gentle heat to soothe the spirit.
+                    </div>
+<!-- Recommendation Card (Bento/Editorial Style) -->
+<div class="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-[0_10px_30px_rgba(27,28,26,0.03)] group transition-all hover:shadow-lg">
+<div class="relative h-48 w-full">
+<img alt="Spiced drink" class="w-full h-full object-cover" data-alt="A steaming ceramic mug of spiced chai with cinnamon sticks and star anise on a rustic wooden table with soft morning sun" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAUZzfYMgzjB465YSrgm82WKzzM5QuRLMSaqKQ7Jl4m2CCMdve0Uf8YTqt2xcqJDqlMvudcrWyh2QVIbtw_qPyODqoKZZPWnfzctPvNBsK2WaygsJr5p0w3hl21jWcIyiKkH3sMcVO-ejrWrwdrBTKnewwPEE89iOOk6m9dsrVcdzRMYcTteLqL5edVZN_VRACClY0H8Pr5C3aH-Y10SurQY7bqGxurhvrOvGPH5xCs6eCgIIBW_Bn3baDcgxInn6p3NwDblnQ_CSM"/>
+<div class="absolute top-4 left-4">
+<span class="bg-secondary/90 backdrop-blur-md text-white text-[10px] font-label uppercase tracking-widest px-3 py-1 rounded-full">Practice: Nourish</span>
+</div>
+</div>
+<div class="p-6">
+<h3 class="font-headline text-xl text-on-surface mb-2">Golden Earth Elixir</h3>
+<p class="text-sm text-on-surface-variant mb-4">A blend of turmeric, ginger, and organic honey swirled into warm almond milk.</p>
+<div class="flex items-center justify-between border-t border-outline-variant/10 pt-4">
+<span class="text-xs font-label text-primary font-bold">10 MIN PREP</span>
+<button class="flex items-center gap-2 text-primary text-sm font-semibold hover:opacity-70 transition-opacity">
+                                    View Ritual <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Placeholder for spacing -->
+<div class="h-4"></div>
+</div>
+</main>
+<!-- Input Area (Fixed above NavBar) -->
+<div class="fixed bottom-24 left-0 w-full px-4 md:px-0 z-40">
+<div class="max-w-2xl mx-auto">
+<div class="relative flex items-center bg-surface-container-high rounded-full p-2 shadow-lg backdrop-blur-md border border-white/20">
+<button class="p-3 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="attachment">attachment</span>
+</button>
+<input class="flex-grow bg-transparent border-none focus:ring-0 text-on-surface placeholder:text-on-surface-variant/50 px-2 font-light" placeholder="Share your thoughts with SEASONS..." type="text"/>
+<button class="bg-gradient-to-br from-[#56642b] to-[#8a9a5b] text-white p-3 rounded-full shadow-md active:scale-90 transition-transform duration-300">
+<span class="material-symbols-outlined" data-icon="send">send</span>
+</button>
+</div>
+<p class="text-center text-[10px] text-on-surface-variant/40 mt-3 uppercase tracking-widest font-label">SEASONS listens with presence and without judgment</p>
+</div>
+</div>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-6 pt-3 bg-[#fbf9f5]/80 backdrop-blur-xl rounded-t-[1.5rem] z-50 shadow-[0_-10px_30px_rgba(27,28,26,0.03)]">
+<a class="flex flex-col items-center justify-center text-[#1b1c1a]/40 px-5 py-2 hover:text-[#56642b] transition-opacity active:scale-90 duration-300" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="spa">spa</span>
+<span class="font-label text-[10px] font-semibold uppercase tracking-widest">Guidance</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#1b1c1a]/40 px-5 py-2 hover:text-[#56642b] transition-opacity active:scale-90 duration-300" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="restaurant_menu">restaurant_menu</span>
+<span class="font-label text-[10px] font-semibold uppercase tracking-widest">Nourish</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-gradient-to-br from-[#56642b] to-[#8a9a5b] text-white rounded-[1.5rem] px-5 py-2 active:scale-90 transition-transform duration-300" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="auto_awesome" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+<span class="font-label text-[10px] font-semibold uppercase tracking-widest">Growth</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#1b1c1a]/40 px-5 py-2 hover:text-[#56642b] transition-opacity active:scale-90 duration-300" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="settings">settings</span>
+<span class="font-label text-[10px] font-semibold uppercase tracking-widest">Settings</span>
+</a>
+</nav>
+</body></html>

@@ -14,3 +14,9 @@ node_modules/
 *.so
 *.dylib
 .DS_Store
+.dart_tool/
+build/
+build-output/
+.idea/
+.vscode/
+Thumbs.db

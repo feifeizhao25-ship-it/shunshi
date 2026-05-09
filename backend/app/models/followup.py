@@ -2,6 +2,8 @@
 顺时 ShunShi - 跟进提醒模型
 包含 1 张表: FollowUp
 """
+from __future__ import annotations
+
 from datetime import datetime
 from typing import Optional
 
@@ -23,7 +25,7 @@ class FollowUp(IDMixin, Base):
     __tablename__ = "sa_follow_ups"
 
     user_id: Mapped[str] = mapped_column(
-        ForeignKey("sa_users.id", ondelete="CASCADE"),
+        ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False, index=True, comment="关联用户 ID"
     )
     intent: Mapped[str] = mapped_column(

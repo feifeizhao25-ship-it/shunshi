@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>春分 - 顺时 AI</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&amp;family=Manrope:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-tertiary-fixed-variant": "#5a4312",
+                        "inverse-on-surface": "#f4f0eb",
+                        "primary": "#144227",
+                        "on-tertiary-container": "#e1bf82",
+                        "surface-tint": "#3b684a",
+                        "on-primary-fixed-variant": "#224f33",
+                        "surface": "#fdf9f4",
+                        "tertiary-fixed-dim": "#e4c285",
+                        "surface-variant": "#e6e2dd",
+                        "secondary-fixed-dim": "#e4c09c",
+                        "secondary": "#74593c",
+                        "tertiary-container": "#654d1b",
+                        "primary-fixed": "#bceec8",
+                        "on-secondary": "#ffffff",
+                        "surface-container-high": "#ebe8e3",
+                        "error-container": "#ffdad6",
+                        "surface-container-highest": "#e6e2dd",
+                        "on-secondary-fixed": "#2a1702",
+                        "inverse-surface": "#31302d",
+                        "on-tertiary-fixed": "#261900",
+                        "inverse-primary": "#a1d2ad",
+                        "tertiary": "#4c3605",
+                        "surface-container-low": "#f7f3ee",
+                        "on-secondary-fixed-variant": "#5b4227",
+                        "secondary-fixed": "#ffddbb",
+                        "surface-container": "#f1ede8",
+                        "outline-variant": "#c1c9c0",
+                        "on-primary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "surface-dim": "#ddd9d5",
+                        "primary-fixed-dim": "#a1d2ad",
+                        "tertiary-fixed": "#ffdea4",
+                        "primary-container": "#2d5a3d",
+                        "on-error-container": "#93000a",
+                        "on-background": "#1c1c19",
+                        "on-secondary-container": "#795d40",
+                        "error": "#ba1a1a",
+                        "surface-bright": "#fdf9f4",
+                        "on-surface-variant": "#414942",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-container": "#9ed0ab",
+                        "outline": "#717971",
+                        "secondary-container": "#ffd9b4",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed": "#00210f",
+                        "on-surface": "#1c1c19",
+                        "background": "#fdf9f4"
+                    },
+                    fontFamily: {
+                        "headline": ["Noto Serif SC", "serif"],
+                        "body": ["Manrope", "sans-serif"],
+                        "label": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #fdf9f4;
+            color: #1c1c19;
+            font-family: 'Manrope', sans-serif;
+        }
+        .serif-text {
+            font-family: 'Noto Serif SC', serif;
+        }
+        .ink-mask {
+            mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface selection:bg-primary-fixed selection:text-on-primary-fixed overflow-x-hidden">
+<!-- Top Navigation Anchor (Manual for Details Screen Suppression Rules) -->
+<header class="fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-6 py-4 max-w-lg mx-auto bg-surface/80 backdrop-blur-md">
+<button class="w-10 h-10 flex items-center justify-center rounded-xl bg-surface-container-low text-primary hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<div class="font-headline italic text-primary text-xl">ShunShi AI</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-xl bg-surface-container-low text-primary hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined">share</span>
+</button>
+</header>
+<main class="max-w-lg mx-auto pb-24">
+<!-- Hero Section: Ink Wash Illustration -->
+<section class="relative w-full h-[530px] overflow-hidden">
+<img alt="Spring equinox landscape" class="w-full h-full object-cover ink-mask grayscale-[0.3] brightness-95" data-alt="Traditional Chinese ink wash painting of delicate willow branches over a misty lake at dawn with soft green and grey tones" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCa3Nsp2nGK3bV4KBV5R1vHpvWFjILmqBj4CM1ZrmLknWji8hmehtk0Z-aqh49rIDsPdmTpjZ02LWhHKq1WLi4w-uxps35DZdY4bqJUoH2zM6thh8ccozZ0T3dAD9Qx02lvk64eTUv3wH8A4JC85u-5wxcfWiR9BeIVJZzq5XwFsFYcpQ87O72WLE-j4EPdTlhtNROw4nGggxai6KntStRUNnJ3rWLHU4wBRgT2Iqwt46brRMq4QiMJdvjoXW-2kcAPe9sUHolN7n0"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent"></div>
+<div class="absolute bottom-12 left-8 right-8">
+<div class="inline-block px-3 py-1 mb-4 bg-primary text-on-primary text-[10px] tracking-[0.2em] font-medium uppercase rounded-sm">
+                    春季 · 第四节气
+                </div>
+<h1 class="font-headline text-6xl tracking-tight text-on-surface mb-2">春分</h1>
+<p class="font-headline text-xl text-secondary italic">Spring Equinox</p>
+</div>
+</section>
+<!-- Cultural Insight Section -->
+<section class="px-8 mb-16 mt-[-2rem] relative z-10">
+<div class="bg-surface-container-lowest p-8 rounded-xl shadow-sm border border-outline-variant/10">
+<div class="flex items-center gap-3 mb-6">
+<span class="h-px w-8 bg-tertiary-fixed-dim"></span>
+<span class="font-headline text-tertiary tracking-widest text-sm">节气内涵</span>
+</div>
+<p class="font-headline text-2xl leading-relaxed text-on-surface mb-4">
+                    “昼夜均而寒暑平。”
+                </p>
+<p class="text-on-surface-variant leading-loose text-lg font-body">
+                    春分，是春季九十日之半。此日太阳直射赤道，阴阳相半，万物生长进入最为繁茂的阶段。于身心而言，正是调和阴阳、顺应生发的黄金时刻。
+                </p>
+</div>
+</section>
+<!-- Core Solutions: Bento Grid Style -->
+<section class="px-8 space-y-8">
+<div class="flex items-center gap-3">
+<span class="h-px w-8 bg-tertiary-fixed-dim"></span>
+<span class="font-headline text-tertiary tracking-widest text-sm">顺时生活方案</span>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<!-- Food Wisdom -->
+<div class="col-span-2 bg-surface-container-low p-6 rounded-xl flex flex-col justify-between min-h-[180px]">
+<div>
+<div class="flex items-center gap-2 mb-4 text-primary">
+<span class="material-symbols-outlined text-xl">restaurant</span>
+<span class="font-label text-xs tracking-widest uppercase">饮食之道</span>
+</div>
+<h3 class="font-headline text-xl mb-3 text-on-surface">食春鲜 · 助生发</h3>
+<p class="text-on-surface-variant text-sm leading-relaxed mb-4">推荐食用香椿、豆芽、春笋等时令蔬菜，以辛甘发散之品，助益脾气。</p>
+</div>
+<div class="flex gap-2">
+<span class="px-3 py-1 bg-surface-container-highest rounded-full text-xs text-secondary border border-outline-variant/20">香椿炒蛋</span>
+<span class="px-3 py-1 bg-surface-container-highest rounded-full text-xs text-secondary border border-outline-variant/20">凉拌豆芽</span>
+</div>
+</div>
+<!-- Living Rhythm -->
+<div class="bg-secondary-container/30 p-6 rounded-xl flex flex-col justify-between">
+<div class="flex items-center gap-2 mb-4 text-secondary">
+<span class="material-symbols-outlined text-xl">bedtime</span>
+<span class="font-label text-xs tracking-widest uppercase">起居之律</span>
+</div>
+<div>
+<h3 class="font-headline text-lg mb-2 text-on-surface">夜卧早起</h3>
+<p class="text-on-surface-variant text-xs leading-relaxed">早起以顺应阳气生发，披发缓行，广步于庭。</p>
+</div>
+</div>
+<!-- Exercise Practice -->
+<div class="bg-primary-container text-on-primary-container p-6 rounded-xl flex flex-col justify-between">
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-xl">self_improvement</span>
+<span class="font-label text-xs tracking-widest uppercase text-on-primary-container/70">功法练习</span>
+</div>
+<div>
+<h3 class="font-headline text-lg mb-2">八段锦 · 第三式</h3>
+<p class="text-on-primary-container/80 text-xs leading-relaxed">调理脾胃须单举。调理脾胃气机，促进中焦运化。</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Recommended Audio: Glassmorphism Card -->
+<section class="px-8 mt-12">
+<div class="relative overflow-hidden p-8 rounded-2xl bg-surface-container-low/80 backdrop-blur-xl border border-white/40">
+<div class="absolute -top-12 -right-12 w-32 h-32 bg-primary/5 rounded-full blur-3xl"></div>
+<div class="flex items-center justify-between mb-6">
+<div class="flex items-center gap-2 text-primary">
+<span class="material-symbols-outlined">graphic_eq</span>
+<span class="font-label text-xs tracking-widest uppercase">静心冥想</span>
+</div>
+<span class="text-[10px] text-on-surface-variant/60 font-label">12:00 MIN</span>
+</div>
+<h3 class="font-headline text-2xl mb-4 text-on-surface">春分 · 阴阳平衡引导</h3>
+<p class="text-on-surface-variant text-sm mb-8 leading-relaxed">随着柔和的春雨声，引导意识在身体内达成动态平衡，如同春分的昼夜一般和谐。</p>
+<div class="flex items-center gap-4">
+<button class="w-14 h-14 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-lg active:scale-95 transition-all">
+<span class="material-symbols-outlined text-3xl">play_arrow</span>
+</button>
+<div class="flex-1 h-[2px] bg-outline-variant/30 rounded-full relative">
+<div class="absolute top-0 left-0 w-1/3 h-full bg-primary"></div>
+<div class="absolute top-1/2 left-1/3 -translate-y-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-primary"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Bottom Spacing -->
+<div class="h-24"></div>
+</main>
+<!-- Floating Action: Share (Contextual Suppression of BottomNavBar as per Rules) -->
+<footer class="fixed bottom-8 left-1/2 -translate-x-1/2 w-auto flex justify-center z-50">
+<button class="px-8 py-4 bg-primary text-on-primary rounded-full flex items-center gap-3 shadow-2xl active:scale-95 duration-200 transition-all group">
+<span class="material-symbols-outlined group-hover:rotate-12 transition-transform">share_windows</span>
+<span class="font-body font-medium tracking-wide">分享这份顺时灵感</span>
+</button>
+</footer>
+<!-- Bottom Nav Bar Anchor (Hidden on detailed task-focused screen) -->
+<!-- [Supressed as per Section 2: Shell Visibility & Relevance Filter] -->
+</body></html>

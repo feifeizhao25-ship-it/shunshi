@@ -23,6 +23,7 @@ from fastapi import APIRouter, HTTPException, UploadFile, File, Form, Query
 from fastapi.responses import Response, JSONResponse
 from pydantic import BaseModel, Field
 
+from sqlalchemy import text
 from app.services.speech_service import (
     SpeechService,
     get_speech_service,

@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+
+<html class="light" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&amp;family=Manrope:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-bright": "#fdf9f4",
+              "on-secondary": "#ffffff",
+              "secondary-fixed-dim": "#e4c09c",
+              "on-tertiary": "#ffffff",
+              "on-background": "#1c1c19",
+              "inverse-primary": "#a1d2ad",
+              "on-primary": "#ffffff",
+              "surface-container-highest": "#e6e2dd",
+              "surface-tint": "#3b684a",
+              "on-surface-variant": "#414942",
+              "primary": "#144227",
+              "on-primary-container": "#9ed0ab",
+              "tertiary-fixed": "#ffdea4",
+              "surface-container-low": "#f7f3ee",
+              "secondary-fixed": "#ffddbb",
+              "tertiary": "#4c3605",
+              "surface-dim": "#ddd9d5",
+              "secondary-container": "#ffd9b4",
+              "on-tertiary-fixed-variant": "#5a4312",
+              "surface-container-lowest": "#ffffff",
+              "tertiary-fixed-dim": "#e4c285",
+              "error-container": "#ffdad6",
+              "on-error": "#ffffff",
+              "tertiary-container": "#654d1b",
+              "on-surface": "#1c1c19",
+              "secondary": "#74593c",
+              "outline": "#717971",
+              "primary-container": "#2d5a3d",
+              "surface-container": "#f1ede8",
+              "error": "#ba1a1a",
+              "outline-variant": "#c1c9c0",
+              "primary-fixed": "#bceec8",
+              "on-error-container": "#93000a",
+              "inverse-on-surface": "#f4f0eb",
+              "on-primary-fixed": "#00210f",
+              "on-secondary-fixed-variant": "#5b4227",
+              "on-tertiary-container": "#e1bf82",
+              "on-secondary-container": "#795d40",
+              "surface-variant": "#e6e2dd",
+              "surface-container-high": "#ebe8e3",
+              "on-tertiary-fixed": "#261900",
+              "on-primary-fixed-variant": "#224f33",
+              "inverse-surface": "#31302d",
+              "on-secondary-fixed": "#2a1702",
+              "primary-fixed-dim": "#a1d2ad",
+              "surface": "#fdf9f4",
+              "background": "#fdf9f4"
+            },
+            fontFamily: {
+              "headline": ["Noto Serif SC", "serif"],
+              "body": ["Manrope", "sans-serif"],
+              "label": ["Manrope", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body { font-family: 'Manrope', sans-serif; }
+        h1, h2, h3 { font-family: 'Noto Serif SC', serif; }
+        .glass-module {
+            background: rgba(247, 243, 238, 0.8);
+            backdrop-filter: blur(20px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface min-h-screen">
+<!-- TopAppBar -->
+<header class="fixed top-0 z-50 w-full bg-[#fdf9f4] dark:bg-stone-950">
+<div class="flex justify-between items-center px-6 py-4 w-full max-w-screen-xl mx-auto">
+<button class="hover:bg-[#f7f3ee] dark:hover:bg-stone-800 transition-colors rounded-full p-2 scale-95 active:duration-150">
+<span class="material-symbols-outlined text-[#144227] dark:text-emerald-500">menu</span>
+</button>
+<h1 class="font-serif italic tracking-wide text-[#144227] dark:text-emerald-400 text-2xl font-bold tracking-tighter">顺时 ShunShi</h1>
+<div class="w-10 h-10 rounded-full bg-surface-container overflow-hidden">
+<img alt="User profile avatar" class="w-full h-full object-cover" data-alt="close-up portrait of a serene person with clean aesthetic, soft natural lighting and neutral background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB5t901TeZMFFDoww98mEcRbWvpUjJ5zrchhKyenGeT2wwlxf_FsLBZn4pP1qUISBs8BwLmDtkHgNhX7M1U6l7qFM0Tln7QK-x8tIbtFjNcxc3YEKnG8OXlNh86xGLqyhNtGboMvncLObQt8H0D5taqCm0NbWMaLTvXkI3GDkioLOpAuijWDKDgkoUMF5S_TtejbdRtwnzEVzvpuoTXfa2KJEJb36zOxvg-0cz-AeO6MeB303wnBzw-DVFChGu1E5aFGpZURtsO1cM"/>
+</div>
+</div>
+<div class="bg-[#f7f3ee] dark:bg-stone-900 h-[1px] w-full opacity-50"></div>
+</header>
+<main class="pt-24 pb-32 max-w-screen-md mx-auto px-6">
+<!-- Header & Search -->
+<section class="mb-12">
+<div class="flex justify-between items-end mb-8">
+<div>
+<span class="text-secondary font-medium tracking-widest text-sm uppercase block mb-2">Community</span>
+<h2 class="text-4xl font-bold text-primary">养生圈</h2>
+</div>
+</div>
+<div class="relative group">
+<input class="w-full bg-surface-container-low border-none rounded-xl py-4 pl-12 pr-4 text-on-surface placeholder:text-outline focus:ring-2 focus:ring-primary/20 transition-all" placeholder="寻找春季养生灵感..." type="text"/>
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary">search</span>
+</div>
+</section>
+<!-- Filter Tabs -->
+<nav class="flex space-x-8 mb-12 overflow-x-auto pb-2 no-scrollbar">
+<a class="text-primary font-bold border-b-2 border-primary pb-2 whitespace-nowrap" href="#">精选</a>
+<a class="text-secondary hover:text-primary transition-colors pb-2 whitespace-nowrap" href="#">动态</a>
+<a class="text-secondary hover:text-primary transition-colors pb-2 whitespace-nowrap" href="#">挑战打卡</a>
+<a class="text-secondary hover:text-primary transition-colors pb-2 whitespace-nowrap" href="#">食疗分享</a>
+</nav>
+<!-- Feed -->
+<div class="space-y-16">
+<!-- Post 1: Editorial Style -->
+<article class="group">
+<div class="flex items-center justify-between mb-6">
+<div class="flex items-center space-x-4">
+<img alt="Avatar" class="w-12 h-12 rounded-full object-cover" data-alt="soft portrait of a woman looking peaceful, natural light, minimalist style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDIuyFCCQBK6dr_LbNW9g8GnTpru5DphJg693seHrh8lZNlSI6RhdOJT3TR8t4Ql_L9JJht8jAVC2yJJI-L3-vi09eVVlsi3x_GWzQRcje6LZgMzlAQbQBPGqb0vY3fsYKSQe5ArpOrVDo-sg1mht5M5W1x8G__5Z8USTgt-NMQSDtXJn4NyLgoaTD6PtvlNoKXkInRWLx5ufock52LCJ8Vdfjbhw_wPDOJter0cthbWQWzO23vY748mcjI-Jc-ksIY8MDSo6iyD6U"/>
+<div>
+<h3 class="font-bold text-on-surface leading-tight">云水禅心</h3>
+<span class="inline-block px-2 py-0.5 bg-secondary-container text-on-secondary-container text-[10px] rounded-md font-medium">气虚质</span>
+</div>
+</div>
+<button class="text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</div>
+<div class="mb-6">
+<p class="text-on-surface leading-relaxed text-lg mb-6">
+                        今日立春，晨起尝试了黄芪炖鸡，加入了几枚大枣。温补而不燥，感觉精神确实好多了。
+                    </p>
+<div class="grid grid-cols-12 gap-4">
+<div class="col-span-8 overflow-hidden rounded-2xl">
+<img alt="Chicken soup" class="w-full h-80 object-cover hover:scale-105 transition-transform duration-700" data-alt="traditional chinese medicinal chicken soup with red dates and goji berries in a clay pot, soft morning sunlight, top view" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDQjJlRJht9xLRcfl908nKmKBUacqsfwV5X3EMHvNlKgP5xqviJ9T9x9qoe817sJ_aV6uVrsy1vOuROYx8h-OwCW521vl3gtMX-eQWEZgWmw-qX9lVNaoPQRTCE4MYX1ehvL2-ZLQ--RJWmcgWFgY2uXtR8JD0JgtYjKTUcJ-i_V9OoXLAQ8rmBuTxDU5uG6ydTvk3ujfP47huE-3S5N6JopNPDAGaAxXgsppn06QOjs05iFfm-V7szTi6z7C71TN0mqU9hwHu0gcg"/>
+</div>
+<div class="col-span-4 flex flex-col gap-4">
+<div class="h-1/2 overflow-hidden rounded-2xl">
+<img alt="Herbal ingredients" class="w-full h-full object-cover hover:scale-105 transition-transform duration-700" data-alt="close up of dried astragalus slices and red dates on a wooden table, artistic composition, moody lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAkv_JYxZ9ALlrrzd1ZK0JlAYIdjqavSS2qGcx0eY445zriugrn1x9PogGy6OKad7qXdMU799elxvdgVCexxpl353RyFRTsJ_VbFZnG0IyJfvlMlqPKIJ7ISGMxMRHjR4R6Ujxmr8NIkyUFHG6VqNA21nIv2VJ6X6tiQ7WRVwdCl7Z1jy4SrY3ZolK_YoHCzLQJeIMehdG5joofL3Wi_iv14fK84151NV856pn1lEKn-bM9RLJidTR0Jz7AnR-Ng5sHGUpDvSHxHx8"/>
+</div>
+<div class="h-1/2 overflow-hidden rounded-2xl">
+<img alt="Tea ceremony" class="w-full h-full object-cover hover:scale-105 transition-transform duration-700" data-alt="steaming cup of herbal tea next to a window, soft focus garden background, peaceful atmosphere" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBqxzZHyOJSGUG_CIC72ePG-bhZXmUuSV3wmTPsMjUp0cyltaKVmms98bKwZatsmqoE5_c_88lBL1yGqazGBWcfk0eEhdODnEpW1W_zXe11nbVvHYi96oVXJ6R58h60S_9-PxwYDfexpGLmbAnb-_JwQIUiC3NmVgMEL3cXXz-KCgESiuxetsd2km67h1uEFkJqb67uezKSgzY-KYpS7xeumKcr9M3xvnbmpX_JvxCUhN6iKqgFtdfvgwPKQx--vwHJcrBrjzJTS9M"/>
+</div>
+</div>
+</div>
+</div>
+<div class="flex items-center space-x-8 text-secondary">
+<button class="flex items-center space-x-2 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-xl">favorite</span>
+<span class="text-sm font-medium">128</span>
+</button>
+<button class="flex items-center space-x-2 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-xl">chat_bubble</span>
+<span class="text-sm font-medium">24</span>
+</button>
+<button class="flex items-center space-x-2 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-xl">share</span>
+<span class="text-sm font-medium">分享</span>
+</button>
+</div>
+</article>
+<!-- Post 2: AI Companion/Featured Insight -->
+<article class="glass-module p-8 rounded-3xl border border-white/20 shadow-sm relative overflow-hidden">
+<div class="absolute top-0 right-0 p-4">
+<span class="text-[10px] tracking-widest text-primary/40 font-bold uppercase">Featured Insight</span>
+</div>
+<div class="flex items-center space-x-4 mb-6">
+<div class="w-12 h-12 bg-primary-container rounded-full flex items-center justify-center text-on-primary-container">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+</div>
+<div>
+<h3 class="font-bold text-primary">顺时 AI 指导</h3>
+<span class="text-xs text-secondary italic">建议关注：春季疏肝</span>
+</div>
+</div>
+<p class="text-primary leading-relaxed mb-6 font-serif text-xl italic">
+                    “春季养生，重在生发。建议多食青绿色蔬菜，晚睡早起，披发缓行，以使志生。”
+                </p>
+<div class="flex flex-wrap gap-2">
+<span class="px-3 py-1 bg-white/50 rounded-full text-xs text-primary border border-primary/10">#立春</span>
+<span class="px-3 py-1 bg-white/50 rounded-full text-xs text-primary border border-primary/10">#疏肝理气</span>
+</div>
+</article>
+<!-- Post 3: Daily Challenge -->
+<article class="group">
+<div class="flex items-center justify-between mb-6">
+<div class="flex items-center space-x-4">
+<img alt="Avatar" class="w-12 h-12 rounded-full object-cover" data-alt="portrait of a man with a calm expression, soft natural background, clean minimalist aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBs8ES9a9bCenWRTv7HTDxAKTI_DjzAneGfXH9RWMG5PxqOunvta-3d6vopn4BHZ-KBmHUg8vOqxxMniS0BIhwOCJMarK7cZF9URfiIVhXL3sxq1LFeks1coqoRi2QlAdQJga1zAjVOwbImfLR3qL1XyFIEtlXyRWFy4phzO2z5tJa18lRs0ro6t4TPF91WNVSznAESf6xqxX6ox_-bZzzwvomzueSf5YRWxXD6DI2BJmvLzXp_VEEPJo_6zc5jKzPtfSK4iWENVsY"/>
+<div>
+<h3 class="font-bold text-on-surface leading-tight">松风听泉</h3>
+<span class="inline-block px-2 py-0.5 bg-surface-container-high text-on-surface-variant text-[10px] rounded-md font-medium">阳虚质</span>
+</div>
+</div>
+<button class="text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</div>
+<div class="mb-6">
+<div class="bg-secondary-container/30 p-4 rounded-xl mb-4 border-l-4 border-secondary flex items-center justify-between">
+<div class="flex items-center space-x-3">
+<span class="material-symbols-outlined text-secondary">emoji_events</span>
+<span class="font-bold text-secondary">参与了「百日养生挑战」</span>
+</div>
+<span class="text-xs font-bold text-secondary">第 42 天</span>
+</div>
+<p class="text-on-surface leading-relaxed text-lg mb-6">
+                        坚持每天晚间艾灸足三里，感觉双腿的沉重感明显消失了，睡眠也踏实了很多。
+                    </p>
+<div class="rounded-2xl overflow-hidden aspect-video">
+<img alt="Moxibustion" class="w-full h-full object-cover" data-alt="traditional moxibustion treatment scene, aromatic smoke rising gently, warm low lighting, serene atmosphere" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAH9whTp80SioMpPN6AHRlg7-G2nQCzR0wzCqsvDow6n78_Iprg6zKACbEwFfGGXLwfBk7-lp3BlHo3BnGXe_KWXlSNt_iVoqyQU8zc6AU_j4kJox-l-TblRzUqvsdS8Qz9fOlYjoIHhXnxmVWQ2UxEEfy572GkzHS5_MakY2U-6lAvGrc27vH5poM-vdit2QgTDruhMwdlBmShAumqqwKo2mKpdE1cqNkMfF9BcHjCWKz-s7QNgmePExvQ_OwDTPvTTsPveOqfmp0"/>
+</div>
+</div>
+<div class="flex items-center space-x-8 text-secondary">
+<button class="flex items-center space-x-2 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-xl">favorite</span>
+<span class="text-sm font-medium">352</span>
+</button>
+<button class="flex items-center space-x-2 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-xl">chat_bubble</span>
+<span class="text-sm font-medium">89</span>
+</button>
+<button class="flex items-center space-x-2 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-xl">share</span>
+<span class="text-sm font-medium">分享</span>
+</button>
+</div>
+</article>
+</div>
+</main>
+<!-- FAB -->
+<button class="fixed right-6 bottom-28 w-14 h-14 bg-primary text-white rounded-2xl shadow-2xl flex items-center justify-center group active:scale-95 transition-all">
+<span class="material-symbols-outlined text-2xl">add</span>
+</button>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 bg-[#fdf9f4]/80 dark:bg-stone-950/80 backdrop-blur-xl shadow-[0_-4px_24px_rgba(28,28,25,0.04)] border-t border-[#c1c9c0]/20">
+<a class="flex flex-col items-center justify-center text-[#74593c] dark:text-stone-400 px-4 py-1.5 hover:opacity-80 transition-opacity" href="#">
+<span class="material-symbols-outlined">schedule</span>
+<span class="font-sans text-[11px] font-medium tracking-[0.05rem]">十二时辰</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-[#144227] text-white rounded-xl px-4 py-1.5 hover:opacity-80 transition-opacity" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">group</span>
+<span class="font-sans text-[11px] font-medium tracking-[0.05rem]">社区</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#74593c] dark:text-stone-400 px-4 py-1.5 hover:opacity-80 transition-opacity" href="#">
+<span class="material-symbols-outlined">emoji_events</span>
+<span class="font-sans text-[11px] font-medium tracking-[0.05rem]">挑战</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#74593c] dark:text-stone-400 px-4 py-1.5 hover:opacity-80 transition-opacity" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-sans text-[11px] font-medium tracking-[0.05rem]">设置</span>
+</a>
+</nav>
+</body></html>

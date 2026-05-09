@@ -28,11 +28,13 @@ from app.prompts.registry import prompt_registry
 from app.prompts.store import prompt_store
 from app.core.intent_detector import intent_detector, INTENT_SYSTEM_PROMPTS
 from app.core.safety_filter import safety_filter as _legacy_safety_filter, SafetyLevel as _LegacySafetyLevel
+from app.middleware.llm_quota import llm_quota
 # 优先使用新的 SafetyGuard 模块
 from app.safety.guard import safety_guard, SafetyLevel, SafetyResult
 from app.skills.executor import init_skill_executor
 from app.services.response_parser import parse_ai_response
 from app.services.presence_level import calculate_presence_level
+from sqlalchemy import text
 
 # 模型路由器
 model_router = ModelRouter()
@@ -266,8 +268,10 @@ def _generate_follow_up(intent: str) -> Optional[dict]:
 # ============ Models ============
 
 class ChatRequest(BaseModel):
+    model_config = {"extra": "ignore"}  # 允许额外字段，兼容旧测试
     message: str
     conversation_id: Optional[str] = None
+    user_id: Optional[str] = None  # 兼容测试脚本通过 body 传 user_id
 
 class Message(BaseModel):
     id: str
@@ -288,13 +292,32 @@ class ChatResponse(BaseModel):
 
 # ============ API Endpoints ============
 
-@router.post("", response_model=dict)
+@router.post("", response_model=dict, summary="发送聊天消息", description="发送消息给AI，经过安全过滤、意图识别、模型路由后返回AI回复，支持RAG知识增强和fallback降级")
 async def chat(
-    message: str = Query(...),
+    request: ChatRequest = None,
+    message: str = Query(None),
     conversation_id: Optional[str] = Query(None),
     user_id: str = Query("user-001")
 ):
+    # 同时支持 JSON body 和 Query 参数
+    if request and request.message:
+        message = request.message
+        if request.conversation_id:
+            conversation_id = request.conversation_id
+        if request.user_id:
+            user_id = request.user_id
+    if not message:
+        raise HTTPException(status_code=422, detail="message is required")
     """发送消息"""
+    # LLM 配额检查
+    try:
+        from ..middleware.llm_quota import llm_quota
+        if not llm_quota.check_quota(user_id, "free"):
+            raise HTTPException(status_code=429, detail="今日AI对话次数已达上限，明天再来哦")
+    except HTTPException:
+        raise
+    except Exception:
+        pass
     # 创建或获取会话
     if not conversation_id:
         conversation_id = f"conv_{user_id}_{datetime.now().strftime('%Y%m%d%H%M%S')}"
@@ -373,7 +396,15 @@ async def chat(
             }
         }
     
-    # ============ Step 2: Intent Detection ============
+    # ============ Step 2: LLM Quota Check ============
+    tier = "paid" if user_id and not user_id.startswith("guest_") else "free"
+    if not llm_quota.check_quota(user_id, tier):
+        raise HTTPException(
+            status_code=429,
+            detail="今日AI对话次数已达上限，明天再来哦",
+        )
+
+    # ============ Step 3: Intent Detection ============
     intent_result = intent_detector.detect(message)
     logger.info(f"[Chat] Intent: {intent_result.intent} (confidence: {intent_result.confidence})")
     
@@ -401,9 +432,24 @@ async def chat(
     context_messages = _build_context_window(system_prompt, history, message)
     
     # ============ Step 5: Route Model Selection ============
+    # 从数据库查询用户订阅等级
+    try:
+        from app.database.db import get_db
+        db = get_db()
+        row = db.execute(
+            "SELECT subscription_plan FROM users WHERE id = ?",
+            (user_id,)
+        ).fetchone()
+        user_tier_str = row["subscription_plan"] if row else "free"
+    except Exception:
+        user_tier_str = "free"
+    
+    tier_map = {"free": UserTier.FREE, "yangxin": UserTier.PREMIUM, "yiyang": UserTier.PREMIUM, "jiahe": UserTier.FAMILY}
+    user_tier = tier_map.get(user_tier_str, UserTier.FREE)
+    
     routing_context = RoutingContext(
         user_id=user_id,
-        user_tier=UserTier.FREE,
+        user_tier=user_tier,
         api_path="/chat/send",
         prompt=message,
     )
@@ -412,12 +458,16 @@ async def chat(
 
     # ============ Step 5.5: RAG Knowledge Enhancement ============
     try:
-        from app.rag.retriever import retrieve as rag_retrieve
-        relevant_chunks = rag_retrieve(message, lang='cn', top_k=3)
-        if relevant_chunks:
-            knowledge_context = "\n\n".join([c['content'][:500] for c in relevant_chunks])
-            system_prompt += f"\n\n--- 参考知识（来自顺时知识库，请结合这些信息回答） ---\n{knowledge_context}"
-            logger.info(f"[Chat] RAG 注入 {len(relevant_chunks)} 个知识 chunks")
+        from app.main import _rag_ready
+        if not _rag_ready:
+            logger.info("[Chat] RAG 未就绪，跳过知识注入")
+        else:
+            from app.rag.retriever import retrieve as rag_retrieve
+            relevant_chunks = rag_retrieve(message, lang='cn', top_k=3)
+            if relevant_chunks:
+                knowledge_context = "\n\n".join([c['content'][:500] for c in relevant_chunks])
+                system_prompt += f"\n\n--- 参考知识（来自顺时知识库，请结合这些信息回答） ---\n{knowledge_context}"
+                logger.info(f"[Chat] RAG 注入 {len(relevant_chunks)} 个知识 chunks")
     except Exception as rag_err:
         logger.warning(f"[Chat] RAG 检索失败，跳过知识注入: {rag_err}")
 
@@ -432,13 +482,13 @@ async def chat(
         fb_result: FallbackResult = await fallback_chain.chat(
             user_id=user_id,
             messages=context_messages,
-            primary_provider="siliconflow",
+            primary_provider="deepseek",
             primary_model=selected_model,
             skill_chain=[intent_result.intent] if intent_result else [],
             route_decision=f"model_router_selected={selected_model}",
             temperature=0.7,
             max_tokens=4096,
-            user_tier="free",  # TODO: 从用户数据获取
+            user_tier=user_tier_str,
         )
         
         if fb_result.response_text:
@@ -528,7 +578,7 @@ async def chat(
     }
 
 
-@router.get("/conversations", response_model=dict)
+@router.get("/conversations", response_model=dict, summary="获取会话列表", description="返回当前用户的所有会话，按时间倒序排列")
 async def get_conversations(
     user_id: str = Query("user-001"),
     limit: int = Query(20, ge=1, le=100)
@@ -550,7 +600,7 @@ async def get_conversations(
         }
     }
 
-@router.get("/conversations/{conversation_id}", response_model=dict)
+@router.get("/conversations/{conversation_id}", response_model=dict, summary="获取会话详情", description="返回指定会话的完整信息，包括所有消息")
 async def get_conversation(
     conversation_id: str,
     user_id: str = Query("user-001")
@@ -569,7 +619,7 @@ async def get_conversation(
         "data": conv
     }
 
-@router.delete("/conversations/{conversation_id}", response_model=dict)
+@router.delete("/conversations/{conversation_id}", response_model=dict, summary="删除会话", description="删除指定的聊天会话及其所有消息")
 async def delete_conversation(
     conversation_id: str,
     user_id: str = Query("user-001")
@@ -583,7 +633,7 @@ async def delete_conversation(
     
     return {"success": True, "message": "会话已删除"}
 
-@router.get("/history/{conversation_id}", response_model=dict)
+@router.get("/history/{conversation_id}", response_model=dict, summary="获取历史消息", description="返回指定会话的最近N条消息记录")
 async def get_history(
     conversation_id: str,
     user_id: str = Query("user-001"),

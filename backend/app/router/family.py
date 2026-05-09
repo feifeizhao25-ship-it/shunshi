@@ -5,6 +5,7 @@ from typing import List, Optional
 from datetime import datetime, timedelta
 import random
 import string
+from sqlalchemy import text
 
 from app.database.db import get_db
 
@@ -168,9 +169,13 @@ async def update_member_status(
     """更新成员状态"""
     db = get_db()
     
-    row = db.execute(
-        "UPDATE family_relations SET status = ?, updated_at = ? WHERE id = ? AND user_id = ? RETURNING *",
+    db.execute(
+        "UPDATE family_relations SET status = ?, updated_at = ? WHERE id = ? AND user_id = ?",
         (status, datetime.now().isoformat(), member_id, user_id)
+    )
+    row = db.execute(
+        "SELECT * FROM family_relations WHERE id = ? AND user_id = ?",
+        (member_id, user_id)
     ).fetchone()
     
     if not row:

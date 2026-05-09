@@ -3,15 +3,27 @@
 提供多供应商AI模型调用支持
 
 供应商:
+- Deepseek (直连, DeepSeek-V4/R1)
 - SiliconFlow (国内版主力)
 - OpenRouter (国内+国际版双通道)
 
 环境变量:
+- DEEPSEEK_API_KEY
+- DEEPSEEK_BASE_URL
 - SILICONFLOW_API_KEY
 - SILICONFLOW_BASE_URL
 - OPENROUTER_API_KEY
 - OPENROUTER_BASE_URL
 """
+
+from app.llm.deepseek import (
+    DeepseekClient,
+    get_deepseek_client,
+    chat_deepseek,
+    chat_deepseek_stream,
+    DeepseekChatResponse,
+    DeepseekUsageInfo,
+)
 
 from app.llm.siliconflow import (
     SiliconFlowClient,

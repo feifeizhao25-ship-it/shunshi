@@ -8,6 +8,7 @@ from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
 
 from app.services.memory_system import memory_system, MemoryType
+from sqlalchemy import text
 
 router = APIRouter(prefix="/api/v1/memory", tags=["记忆系统"])
 

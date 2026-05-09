@@ -14,9 +14,9 @@
 日期: 2026-03-17
 """
 
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any, List, Union
 from fastapi import APIRouter, HTTPException, Query
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from ..skills.skill_registry import skill_registry
 from ..skills.orchestrator import SkillOrchestrator, SkillExecutionResult
@@ -36,6 +36,15 @@ class SkillSummary(BaseModel):
     recommended_model: str
     is_premium: bool
     tags: List[str] = []
+
+    @field_validator('tags', mode='before')
+    @classmethod
+    def validate_tags(cls, v):
+        if isinstance(v, str):
+            return [v]
+        if v is None:
+            return []
+        return v
 
 
 class SkillDetail(BaseModel):

@@ -2,6 +2,8 @@
 顺时 ShunShi - 节气相关模型
 包含 2 张表: SolarTerm, SolarTermContent
 """
+from __future__ import annotations
+
 import enum
 from datetime import date
 from typing import Optional

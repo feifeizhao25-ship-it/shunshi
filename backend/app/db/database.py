@@ -3,11 +3,17 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, scoped_session
 import os
+from pathlib import Path
 
-DATABASE_URL = os.getenv(
-    "DATABASE_URL",
-    "postgresql://shunshi:shunshi2026@localhost:5432/shunshi"
-)
+if os.environ.get("APP_ENV") == "testing":
+    # 测试环境：确保 ORM 和原生 sqlite3 使用同一个数据库文件
+    DB_PATH = Path(__file__).resolve().parent.parent.parent / "tests" / "test_shunshi.db"
+    DATABASE_URL = f"sqlite:///{DB_PATH}"
+else:
+    DATABASE_URL = os.getenv(
+        "DATABASE_URL",
+        "postgresql://shunshi:shunshi2026@localhost:5432/shunshi"
+    )
 
 engine = create_engine(
     DATABASE_URL,
@@ -36,4 +42,7 @@ def init_db():
     """Import all models to register them with Base."""
     from app.models import user, solar_term, constitution, recipe, tea, acupoint
     from app.models import exercise, chat, journal, article, audio, membership, reminder
+    from app.models import content, conversation, diary, family, followup
+    from app.models import gamification, notification, onboarding, subscription
+    from app.models import wearable, wellness_tracking, audit
     Base.metadata.create_all(bind=engine)

@@ -1,0 +1,54 @@
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import '../../../../design_system/theme.dart';
+import '../../../../design_system/theme_helper.dart';
+
+class HomeBottomNav extends StatelessWidget {
+  const HomeBottomNav({super.key});
+
+  @override
+  Widget build(BuildContext context) => Container(
+    decoration: BoxDecoration(
+      color: Colors.white,
+      border: Border(top: BorderSide(color: const Color(0xFFE5E5EA), width: 0.5)),
+    ),
+    child: SafeArea(
+      top: false,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _navItem(context, Icons.home_rounded, '首页', true, () {}),
+            _navItem(context, Icons.chat_bubble_outline_rounded, '对话', false, () => context.push('/chat')),
+            _navItem(context, Icons.book_outlined, '记录', false, () => context.push('/diary')),
+            _navItem(context, Icons.person_outline_rounded, '我的', false, () => context.push('/profile')),
+          ],
+        ),
+      ),
+    ),
+  );
+
+  Widget _navItem(BuildContext context, IconData icon, String label, bool active, VoidCallback onTap) =>
+    GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: active ? ShunShiColors.primary : AppColors.textTertiary(context), size: 24),
+            const SizedBox(height: 2),
+            Text(label,
+              style: TextStyle(
+                fontFamily: ShunShiTypography.sansFamily,
+                color: active ? ShunShiColors.primary : AppColors.textTertiary(context),
+                fontSize: 10, fontWeight: active ? FontWeight.w600 : FontWeight.w400,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+}

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Home Hub</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,600;0,700;1,400&amp;family=Manrope:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-primary": "#ffffff",
+              "on-primary-container": "#253000",
+              "tertiary": "#665d4e",
+              "surface-variant": "#e4e2de",
+              "on-tertiary-container": "#332b1e",
+              "inverse-surface": "#30312e",
+              "error": "#ba1a1a",
+              "outline-variant": "#c6c8b8",
+              "error-container": "#ffdad6",
+              "surface-container-highest": "#e4e2de",
+              "secondary-fixed-dim": "#ffb59b",
+              "on-tertiary-fixed": "#211b0f",
+              "on-error": "#ffffff",
+              "on-error-container": "#93000a",
+              "surface-container-high": "#eae8e4",
+              "on-secondary-fixed": "#380d00",
+              "surface-tint": "#56642b",
+              "primary-container": "#8a9a5b",
+              "primary-fixed-dim": "#bdce89",
+              "on-primary-fixed": "#161f00",
+              "surface-container-lowest": "#ffffff",
+              "inverse-primary": "#bdce89",
+              "on-secondary": "#ffffff",
+              "secondary": "#95482b",
+              "inverse-on-surface": "#f2f0ed",
+              "secondary-container": "#fc9a77",
+              "surface": "#fbf9f5",
+              "on-secondary-container": "#763015",
+              "on-surface": "#1b1c1a",
+              "secondary-fixed": "#ffdbcf",
+              "background": "#fbf9f5",
+              "on-background": "#1b1c1a",
+              "surface-dim": "#dbdad6",
+              "on-primary-fixed-variant": "#3e4c16",
+              "primary-fixed": "#d9eaa3",
+              "on-tertiary-fixed-variant": "#4e4637",
+              "tertiary-fixed-dim": "#d2c5b2",
+              "on-tertiary": "#ffffff",
+              "tertiary-container": "#9d9281",
+              "primary": "#56642b",
+              "on-surface-variant": "#46483c",
+              "surface-bright": "#fbf9f5",
+              "surface-container-low": "#f5f3ef",
+              "on-secondary-fixed-variant": "#773116",
+              "outline": "#76786b",
+              "tertiary-fixed": "#eee1cd",
+              "surface-container": "#efeeea"
+            },
+            fontFamily: {
+              "headline": ["Noto Serif"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "1.5rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Manrope', sans-serif; }
+        .serif { font-family: 'Noto Serif', serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full px-6 py-4 flex justify-between items-center bg-[#fbf9f5]/80 dark:bg-[#1b1c1a]/80 backdrop-blur-xl z-50">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-[#56642b] dark:text-[#8a9a5b]">menu</span>
+<h1 class="text-2xl font-['Noto_Serif'] italic text-[#56642b] dark:text-[#8a9a5b] font-semibold tracking-tight">SEASONS</h1>
+</div>
+<div class="w-10 h-10 rounded-full bg-surface-container-highest overflow-hidden border border-outline-variant/15">
+<img alt="User profile photo" class="w-full h-full object-cover" data-alt="Close up portrait of a serene woman with natural hair and soft lighting, representing a calm lifestyle brand persona" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBI-62gtn_VsH7xuxiRNYo2h63cw13bwV_DLZ0uTdf5WECPVIfZuAC8KoCIsdfdDyroF9EpWuQ5lvNDY-h_4lbZtKlT-QsCPlW3VYmaN2fvG6fqB2xx00TUN11rlWL6LJLC5usj_XSokJzED536nUmM-VVytpOxvyfBTt3ktlOG3LNA4vnpP7SlStQaQjLaPSjYVhljxrL_khqzcc58W7HmE0rqxKgjZyNkMgaNYMITboseQQqZLjbk82ysjePjQFcEWmHV2m9hGdQ"/>
+</div>
+</header>
+<main class="pt-24 px-6 max-w-2xl mx-auto space-y-12">
+<!-- Welcome Header -->
+<section class="space-y-2">
+<p class="font-label text-xs uppercase tracking-[0.2em] text-primary/70 font-bold">Today's Rhythm</p>
+<h2 class="serif text-3xl md:text-4xl text-on-surface font-bold leading-tight">Good Morning, Sarah. <span class="italic block md:inline">It's Mid-Spring.</span></h2>
+</section>
+<!-- Main Seasonal Card (Bento Style) -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+<div class="md:col-span-12 relative overflow-hidden bg-surface-container-low rounded-xl group p-1">
+<div class="relative bg-surface rounded-[1.25rem] overflow-hidden flex flex-col md:flex-row h-full">
+<div class="md:w-1/2 p-8 flex flex-col justify-center space-y-4">
+<div class="inline-flex px-3 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed-variant text-[10px] font-bold tracking-widest uppercase w-fit">Seasonal Wisdom</div>
+<h3 class="serif text-2xl font-semibold text-primary">Nurturing Renewal</h3>
+<p class="text-on-surface-variant leading-relaxed">Focus on light, bitter greens and mindful movement to align with the awakening earth.</p>
+<button class="bg-gradient-to-r from-primary to-primary-container text-on-primary px-6 py-3 rounded-xl w-fit font-bold text-sm hover:opacity-90 transition-opacity flex items-center gap-2">
+                            Explore Principle
+                            <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+<div class="md:w-1/2 h-64 md:h-auto relative overflow-hidden">
+<img alt="Blossoming flowers" class="absolute inset-0 w-full h-full object-cover" data-alt="Beautiful soft focus macro shot of spring cherry blossoms against a clear pale blue sky, bright airy aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB4tyR1p7OGB_sex8-nnFp1KipzaABEbfmX-Lz4BLczrkwR6Zkv_g8gMf0q4N7yXI_ilgLQTdhqn0o4ZX9V2onf69flrltsgyCmqjF5CYah3z56p0np8-QavVnjrVNcM99poOiSA0qmVMBHpbPzuvvYW0PIjpDQzHlD65ftT61_K78q30lfkQXWEaksEu79f6LavHEM34F7xnu75j7wjb5bNESlkRV1DnOTvyA7TrSINm_qu4Dj7nN7vun6zZO81F_AqynHja-_la0"/>
+<div class="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-l from-transparent to-surface/20"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- AI Insight & Quick Actions Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+<!-- Daily AI Insight -->
+<section class="bg-surface-container-high rounded-xl p-8 space-y-4 relative overflow-hidden">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">colors_spark</span>
+</div>
+<h4 class="font-bold text-xs uppercase tracking-widest text-on-surface-variant">SEASONS Companion</h4>
+</div>
+<p class="serif text-lg leading-relaxed italic text-on-surface">
+                    "Since it's a bit damp today, a warming ginger tea might help balance your 'Cold Sensitive' energy."
+                </p>
+<div class="pt-2 flex gap-2">
+<span class="inline-block h-1 w-8 rounded-full bg-primary/20"></span>
+<span class="inline-block h-1 w-2 rounded-full bg-primary/10"></span>
+</div>
+</section>
+<!-- Quick Actions -->
+<section class="space-y-4">
+<h4 class="font-bold text-xs uppercase tracking-widest text-primary px-2">Quick Rituals</h4>
+<div class="space-y-3">
+<!-- Action 1 -->
+<div class="flex items-center p-4 bg-surface rounded-xl hover:bg-surface-container-low transition-colors group cursor-pointer border border-outline-variant/5">
+<div class="w-12 h-12 rounded-lg bg-secondary-container/30 flex items-center justify-center text-on-secondary-container mr-4">
+<span class="material-symbols-outlined">edit_note</span>
+</div>
+<div class="flex-1">
+<p class="font-bold text-sm">Daily Reflection</p>
+<p class="text-xs text-on-surface-variant">Journaling</p>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+<!-- Action 2 -->
+<div class="flex items-center p-4 bg-surface rounded-xl hover:bg-surface-container-low transition-colors group cursor-pointer border border-outline-variant/5">
+<div class="w-12 h-12 rounded-lg bg-primary-container/30 flex items-center justify-center text-on-primary-fixed-variant mr-4">
+<span class="material-symbols-outlined">self_improvement</span>
+</div>
+<div class="flex-1">
+<p class="font-bold text-sm">Current Practice</p>
+<p class="text-xs text-on-surface-variant">Morning Yoga • 15m</p>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+</div>
+</section>
+</div>
+<!-- Featured Editorial Content (Additional Contextual Element) -->
+<section class="pt-8">
+<div class="flex justify-between items-end mb-6">
+<h4 class="serif text-2xl font-bold">Seasonal Library</h4>
+<a class="text-primary text-sm font-bold border-b border-primary/20 pb-1" href="#">See All</a>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="space-y-3">
+<div class="aspect-[4/5] rounded-xl overflow-hidden bg-surface-container">
+<img alt="Library item" class="w-full h-full object-cover" data-alt="Top down photo of a rustic bowl filled with fresh seasonal greens and herbs on a linen cloth" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJbuAvbJzp_ybxbhZz_VC3c7qrbYtJ7tDXmHcnfYo1zIlkMD1qco1zzS_OD4V7CDtQMei-feCpaMOdN3ZVmp2g-Kh0ZrrMTbYlHCcWhpjvLnpnDK9Ac5wu56mMKjtMzdqGMDuvnS5vCBxJ-Z0ARrcWLXj8AsAw3UYHv6poo5lf_TnQOY-48IOziKtfbIszXXd4CJ4IQmzd3U8-TvbtrcxTgSdlVSCByZrT2nCEdCCVvARouNh1ct_dEepmF0pLL0eaD78jsXyZQKQ"/>
+</div>
+<p class="font-bold text-sm">Bitters &amp; Health</p>
+</div>
+<div class="space-y-3 pt-8">
+<div class="aspect-[4/5] rounded-xl overflow-hidden bg-surface-container">
+<img alt="Library item" class="w-full h-full object-cover" data-alt="A small sprout growing out of dark fertile earth, illuminated by soft morning sunlight" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBawQfRNzmjyUiq92KjHVTO_SySvSND4_amDUMUfCMs1uwEyYhZoD9sPxcVhoYsxsk44SwRmehZMyN3VvWRTMTrTU5Nz6t_hY8rzg_O-rurHMf-CgMrgpClvbBpTeKKEFenoz1PiDV8T44amiLCgGdCLWLWCEm7d820Q1zhcCI3qQNbUuioK-lYH5Xns3JEyrsDeT6lpzCX_m1L0K0Qo6AwYsNJnO7msU0HngzU78XrHy1hj7btey4UA5tiC0vsHUth00lIseO5Ynk"/>
+</div>
+<p class="font-bold text-sm">Growth Cycles</p>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-2 bg-[#fbf9f5]/80 dark:bg-[#1b1c1a]/80 backdrop-blur-xl rounded-t-[1.5rem] border-t border-[#c6c8b8]/15 shadow-[0_-20px_40px_rgba(27,28,26,0.05)]">
+<!-- Home (Active) -->
+<a class="flex flex-col items-center justify-center bg-[#8a9a5b]/10 text-[#56642b] dark:text-[#8a9a5b] rounded-2xl px-4 py-2 scale-90 transition-transform duration-300" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home_max</span>
+<span class="font-['Manrope'] text-[10px] uppercase tracking-widest font-bold mt-1">Home</span>
+</a>
+<!-- Library -->
+<a class="flex flex-col items-center justify-center text-[#1b1c1a]/40 dark:text-[#fbf9f5]/40 px-4 py-2 hover:text-[#56642b] dark:hover:text-[#8a9a5b]" href="#">
+<span class="material-symbols-outlined">auto_stories</span>
+<span class="font-['Manrope'] text-[10px] uppercase tracking-widest font-bold mt-1">Library</span>
+</a>
+<!-- AI Assistant -->
+<a class="flex flex-col items-center justify-center text-[#1b1c1a]/40 dark:text-[#fbf9f5]/40 px-4 py-2 hover:text-[#56642b] dark:hover:text-[#8a9a5b]" href="#">
+<span class="material-symbols-outlined">perm_identity</span>
+<span class="font-['Manrope'] text-[10px] uppercase tracking-widest font-bold mt-1 text-center">AI Assistant</span>
+</a>
+<!-- Profile -->
+<a class="flex flex-col items-center justify-center text-[#1b1c1a]/40 dark:text-[#fbf9f5]/40 px-4 py-2 hover:text-[#56642b] dark:hover:text-[#8a9a5b]" href="#">
+<span class="material-symbols-outlined">person_2</span>
+<span class="font-['Manrope'] text-[10px] uppercase tracking-widest font-bold mt-1">Profile</span>
+</a>
+</nav>
+</body></html>

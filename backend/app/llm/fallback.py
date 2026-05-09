@@ -77,7 +77,10 @@ def _get_provider_client(provider_name: str):
 
     不直接 import 在模块顶层，避免循环依赖。
     """
-    if provider_name == "siliconflow":
+    if provider_name == "deepseek":
+        from app.llm.deepseek import get_deepseek_client
+        return get_deepseek_client()
+    elif provider_name == "siliconflow":
         from app.llm.siliconflow import get_client
         return get_client()
     elif provider_name == "openrouter":
@@ -148,15 +151,16 @@ class ModelFallbackChain:
     def _build_chain(self) -> Dict[str, List[str]]:
         """定义 fallback 链: provider -> [备选 provider 列表]"""
         return {
-            "siliconflow": ["openrouter"],
-            "openrouter": ["siliconflow"],
+            "deepseek": ["siliconflow", "openrouter"],
+            "siliconflow": ["deepseek", "openrouter"],
+            "openrouter": ["deepseek", "siliconflow"],
         }
 
     async def chat(
         self,
         user_id: str,
         messages: list,
-        primary_provider: str = "siliconflow",
+        primary_provider: str = "deepseek",
         primary_model: str = None,
         skill_chain: list = None,
         route_decision: str = None,
@@ -181,7 +185,7 @@ class ModelFallbackChain:
         last_error: Optional[Exception] = None
 
         if primary_model is None:
-            primary_model = "deepseek-v3.2"
+            primary_model = "deepseek-chat"
 
         # 确定模型候选列表: 先用目标模型，超预算用 fallback_model
         model_candidates = [primary_model]

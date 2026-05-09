@@ -24,7 +24,8 @@ RUN pip install --no-cache-dir \
     aiosqlite \
     python-alipay-sdk \
     firebase-admin \
-    apns2
+    apns2 \
+    gunicorn
 
 # 复制应用代码
 COPY . .
@@ -45,7 +46,18 @@ ENV PYTHONUNBUFFERED=1 \
 
 # 健康检查
 HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
-    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:4000/health')"
+    CMD python3 -c "import urllib.request; urllib.request.urlopen('http://localhost:4000/health')"
 
-# 启动
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "4000", "--workers", "2"]
+# 生产环境: gunicorn + uvicorn worker (4 workers, auto-restart after 10k requests)
+# 开发环境覆盖: docker run ... --entrypoint uvicorn shunshi-backend app.main:app --reload
+CMD ["gunicorn", "app.main:app", "-k", "uvicorn.workers.UvicornWorker", \
+     "--bind", "0.0.0.0:4000", \
+     "--workers", "4", \
+     "--worker-connections", "1000", \
+     "--max-requests", "10000", \
+     "--max-requests-jitter", "1000", \
+     "--timeout", "120", \
+     "--keep-alive", "5", \
+     "--access-logfile", "-", \
+     "--error-logfile", "-", \
+     "--preload"]

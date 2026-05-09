@@ -2,6 +2,8 @@
 顺时 ShunShi - 家庭关系模型
 包含 1 张表: FamilyRelation
 """
+from __future__ import annotations
+
 from datetime import datetime
 from typing import Optional
 
@@ -18,11 +20,11 @@ class FamilyRelation(IDMixin, Base):
     __tablename__ = "sa_family_relations"
 
     inviter_id: Mapped[str] = mapped_column(
-        ForeignKey("sa_users.id", ondelete="CASCADE"),
+        ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False, index=True, comment="邀请人 ID"
     )
     invitee_id: Mapped[str] = mapped_column(
-        ForeignKey("sa_users.id", ondelete="CASCADE"),
+        ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False, index=True, comment="被邀请人 ID"
     )
     relation_type: Mapped[str] = mapped_column(

@@ -67,8 +67,7 @@ class SchemaValidator:
             for match in matches:
                 try:
                     return json.loads(match)
-                except:
-                    continue
+                except Exception as e:                    continue
         
         # 最后尝试: 整个文本作为 JSON
         return json.loads(text)
@@ -210,8 +209,7 @@ class PresenceLevelHandler:
                 return "busy"
             else:
                 return "offline"
-        except:
-            return "normal"
+        except Exception as e:            return "normal"
 
 
 # 全局实例

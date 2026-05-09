@@ -2,6 +2,8 @@
 顺时 ShunShi - 体质相关模型
 包含 3 张表: Constitution, ConstitutionQuestion, ConstitutionResult
 """
+from __future__ import annotations
+
 from datetime import datetime
 from typing import Optional
 
@@ -75,7 +77,7 @@ class ConstitutionResult(IDMixin, Base):
     __tablename__ = "sa_constitution_results"
 
     user_id: Mapped[str] = mapped_column(
-        ForeignKey("sa_users.id", ondelete="CASCADE"),
+        ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False, index=True, comment="关联用户 ID"
     )
     primary_type: Mapped[str] = mapped_column(

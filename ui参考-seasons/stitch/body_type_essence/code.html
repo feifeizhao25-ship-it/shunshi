@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@300;400;700&amp;family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "error-container": "#ffdad6",
+              "on-tertiary-fixed-variant": "#4e4637",
+              "on-secondary": "#ffffff",
+              "on-primary-container": "#253000",
+              "on-primary-fixed-variant": "#3e4c16",
+              "on-tertiary-fixed": "#211b0f",
+              "tertiary-fixed-dim": "#d2c5b2",
+              "tertiary": "#665d4e",
+              "surface": "#fbf9f5",
+              "primary-fixed": "#d9eaa3",
+              "inverse-on-surface": "#f2f0ed",
+              "surface-container-lowest": "#ffffff",
+              "background": "#fbf9f5",
+              "surface-container": "#efeeea",
+              "surface-container-highest": "#e4e2de",
+              "error": "#ba1a1a",
+              "tertiary-fixed": "#eee1cd",
+              "secondary-fixed": "#ffdbcf",
+              "surface-container-low": "#f5f3ef",
+              "on-secondary-fixed": "#380d00",
+              "on-primary-fixed": "#161f00",
+              "on-error": "#ffffff",
+              "primary-fixed-dim": "#bdce89",
+              "on-secondary-fixed-variant": "#773116",
+              "tertiary-container": "#9d9281",
+              "inverse-primary": "#bdce89",
+              "secondary-container": "#fc9a77",
+              "on-primary": "#ffffff",
+              "secondary": "#95482b",
+              "on-surface": "#1b1c1a",
+              "surface-container-high": "#eae8e4",
+              "outline-variant": "#c6c8b8",
+              "on-tertiary": "#ffffff",
+              "surface-bright": "#fbf9f5",
+              "outline": "#76786b",
+              "on-error-container": "#93000a",
+              "primary": "#56642b",
+              "inverse-surface": "#30312e",
+              "surface-variant": "#e4e2de",
+              "surface-tint": "#56642b",
+              "primary-container": "#8a9a5b",
+              "on-tertiary-container": "#332b1e",
+              "on-surface-variant": "#46483c",
+              "on-background": "#1b1c1a",
+              "surface-dim": "#dbdad6",
+              "secondary-fixed-dim": "#ffb59b",
+              "on-secondary-container": "#763015"
+            },
+            fontFamily: {
+              "headline": ["Noto Serif"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .radar-grid {
+            clip-path: polygon(50% 0%, 90% 20%, 100% 60%, 75% 100%, 25% 100%, 0% 60%, 10% 20%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body selection:bg-primary-container/30">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-[#fbf9f5]/80 dark:bg-stone-900/80 backdrop-blur-xl flex justify-between items-center px-6 h-16 w-full">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest overflow-hidden">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="close-up portrait of a serene woman with natural skin and soft lighting in a minimalist setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDq53eEqni6d_0uZ8GRjjb1mMrHnd7bIFvB4vUqvdT4h2XbYrglZ3dZ1EEQVn-Gr5TDc_MIxWZiXc1DfbDOMtryGX4sV7btCpiy5qoS3FI95xikY_x09u5UxOmTUsJKM6SF4N-E9G0qVodPFHvMdNqbCRHoVzTFLn9c4F9eFGxcJHosm3UJdwgMaUeJiBBlOwA95yvB8BUQvBreNhneHfo7fxAqHcysyQbuNmGg0PDtrcNpsKyjHtQfiwnStDSVLnjjgE7ExQUGBLU"/>
+</div>
+<span class="text-2xl font-['Noto_Serif'] tracking-[0.2em] text-[#56642b] dark:text-[#8a9a5b] uppercase">SEASONS</span>
+</div>
+<button class="text-[#56642b] dark:text-[#8a9a5b] hover:opacity-70 transition-opacity active:scale-95 duration-200">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+</header>
+<main class="pt-24 pb-32 px-6 max-w-4xl mx-auto">
+<!-- Hero Section -->
+<section class="mb-12">
+<h2 class="font-label text-label-sm uppercase tracking-widest text-primary mb-2">Your Essence</h2>
+<h1 class="font-headline text-4xl md:text-5xl lg:text-6xl text-on-surface mb-6 leading-tight">Your Seasonal Essence: Balanced</h1>
+<p class="font-body text-lg text-on-surface-variant max-w-2xl leading-relaxed">
+                Your constitution mirrors the transition between Spring and Autumn. You possess a resilient core with a fluid adaptability to external shifts.
+            </p>
+</section>
+<!-- Radar Chart & Metrics Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6 mb-16">
+<!-- Radar Chart Illustration -->
+<div class="md:col-span-7 bg-surface-container-low rounded-[2rem] p-8 flex flex-col items-center justify-center relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-8 opacity-10">
+<span class="material-symbols-outlined text-9xl" data-icon="filter_vintage">filter_vintage</span>
+</div>
+<div class="relative w-64 h-64 md:w-80 md:h-80 flex items-center justify-center">
+<!-- Custom SVG Radar Base -->
+<svg class="w-full h-full transform -rotate-90" viewbox="0 0 100 100">
+<circle class="stroke-outline-variant/20" cx="50" cy="50" fill="none" r="45" stroke-width="0.5"></circle>
+<circle class="stroke-outline-variant/20" cx="50" cy="50" fill="none" r="30" stroke-width="0.5"></circle>
+<circle class="stroke-outline-variant/20" cx="50" cy="50" fill="none" r="15" stroke-width="0.5"></circle>
+<!-- Heptagon Web -->
+<path class="stroke-outline-variant/30" d="M50 5 L89 25 L98 68 L72 95 L28 95 L2 68 L11 25 Z" fill="none" stroke-width="1"></path>
+<!-- Data Shape -->
+<path class="drop-shadow-lg" d="M50 20 L75 35 L85 60 L60 80 L35 75 L20 55 L30 30 Z" fill="url(#grad)"></path>
+<defs>
+<lineargradient id="grad" x1="0%" x2="100%" y1="0%" y2="100%">
+<stop offset="0%" style="stop-color:#56642b;stop-opacity:0.8"></stop>
+<stop offset="100%" style="stop-color:#8a9a5b;stop-opacity:0.8"></stop>
+</lineargradient>
+</defs>
+</svg>
+<!-- Floating Labels -->
+<span class="absolute top-0 font-label text-[10px] tracking-widest uppercase text-primary">Vitality</span>
+<span class="absolute top-1/4 -right-4 font-label text-[10px] tracking-widest uppercase text-primary">Circulation</span>
+<span class="absolute bottom-1/4 -right-4 font-label text-[10px] tracking-widest uppercase text-primary">Digestion</span>
+<span class="absolute -bottom-4 font-label text-[10px] tracking-widest uppercase text-primary">Resilience</span>
+<span class="absolute bottom-1/4 -left-4 font-label text-[10px] tracking-widest uppercase text-primary">Metabolism</span>
+<span class="absolute top-1/4 -left-4 font-label text-[10px] tracking-widest uppercase text-primary">Sleep Quality</span>
+</div>
+<div class="mt-8 text-center">
+<p class="font-headline text-xl text-primary italic">"Harmony in Flux"</p>
+</div>
+</div>
+<!-- Quick Metrics -->
+<div class="md:col-span-5 flex flex-col gap-6">
+<div class="bg-secondary-fixed p-6 rounded-[2rem] flex flex-col justify-between h-full">
+<span class="material-symbols-outlined text-on-secondary-container" data-icon="wb_sunny">wb_sunny</span>
+<div>
+<h3 class="font-headline text-2xl text-on-secondary-container">Solar Dominance</h3>
+<p class="text-sm text-on-secondary-container/80 mt-2">Your energy peaks with the rising sun. Morning rituals are your strongest foundation.</p>
+</div>
+</div>
+<div class="bg-surface-container-high p-6 rounded-[2rem] flex flex-col justify-between h-full">
+<span class="material-symbols-outlined text-primary" data-icon="spa">spa</span>
+<div>
+<h3 class="font-headline text-2xl text-primary">Terrene Stability</h3>
+<p class="text-sm text-on-surface-variant mt-2">Grounded and deliberate. Your body recovers best through stillness and earthy textures.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Your Natural Rhythm -->
+<section class="mb-20">
+<div class="flex items-center gap-4 mb-8">
+<div class="h-[1px] flex-grow bg-outline-variant/30"></div>
+<h2 class="font-headline text-3xl">Your Natural Rhythm</h2>
+<div class="h-[1px] flex-grow bg-outline-variant/30"></div>
+</div>
+<div class="flex flex-col md:flex-row gap-12 items-center">
+<div class="w-full md:w-1/2">
+<img class="rounded-[2rem] shadow-sm w-full h-[400px] object-cover" data-alt="soft focus close-up of delicate green fern leaves with morning dew in a misty forest garden" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwwzSREAAnrcIYLck70ZmsPIzFEZvR1MocybtXAlkiJMP0gog6nSsbWjiqCf4gK6owYRMAsxpECCPZxzG4q-RdGgc6sQKfi_XQCOpvd8siKOBiNgcCXrCSbUBW0BD85omn9SVnCTpSZJ9uKIek3GnVN_D5B6TotlBRzZbgnBmrkTY6kM7nBx27cp8IMNlG28mMJj9WYJ-GuB9GGFZQsrZ2Ha7dZdp-lHVJCf-nAoPfdN5gf6_FWONvPeAVp-SMeCa04yC9yzZtGSE"/>
+</div>
+<div class="w-full md:w-1/2 -ml-0 md:-ml-8 md:mt-12 bg-surface-container-lowest p-8 md:p-12 rounded-[2rem] shadow-[0_20px_40px_rgba(27,28,26,0.05)]">
+<p class="font-body text-on-surface-variant leading-relaxed mb-6">
+                        The Balanced type is rare, characterized by a symmetry of fire and earth. You don't experience the drastic highs or lows of more singular constitutions, but you are sensitive to seasonal transitions.
+                    </p>
+<ul class="space-y-4">
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary mt-1" data-icon="check_circle">check_circle</span>
+<span class="text-on-surface">Optimal resting heart rate during twilight hours.</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary mt-1" data-icon="check_circle">check_circle</span>
+<span class="text-on-surface">Digestive fire is strongest between 11 AM and 2 PM.</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary mt-1" data-icon="check_circle">check_circle</span>
+<span class="text-on-surface">Cognitive peak occurs in the second hour after waking.</span>
+</li>
+</ul>
+</div>
+</div>
+</section>
+<!-- Seasonal Adjustments -->
+<section class="mb-20">
+<h2 class="font-headline text-3xl mb-10 text-center">Seasonal Adjustments</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<!-- Spring -->
+<div class="relative group cursor-pointer">
+<div class="absolute inset-0 bg-primary/5 rounded-[2rem] transition-all group-hover:scale-105"></div>
+<div class="relative p-8">
+<div class="flex justify-between items-start mb-6">
+<div class="bg-primary-fixed p-3 rounded-full text-on-primary-fixed">
+<span class="material-symbols-outlined" data-icon="eco">eco</span>
+</div>
+<span class="font-label text-[10px] tracking-widest text-primary uppercase">Active Season</span>
+</div>
+<h3 class="font-headline text-2xl mb-4">Spring: Activation</h3>
+<p class="text-on-surface-variant text-sm leading-relaxed">
+                            During the vernal shift, your body craves movement. Focus on lymphatic drainage and bitter greens to shed the stagnation of winter.
+                        </p>
+</div>
+</div>
+<!-- Winter -->
+<div class="relative group cursor-pointer">
+<div class="absolute inset-0 bg-secondary/5 rounded-[2rem] transition-all group-hover:scale-105"></div>
+<div class="relative p-8">
+<div class="flex justify-between items-start mb-6">
+<div class="bg-secondary-fixed p-3 rounded-full text-on-secondary-fixed">
+<span class="material-symbols-outlined" data-icon="ac_unit">ac_unit</span>
+</div>
+<span class="font-label text-[10px] tracking-widest text-secondary uppercase">Rest Season</span>
+</div>
+<h3 class="font-headline text-2xl mb-4">Winter: Conservation</h3>
+<p class="text-on-surface-variant text-sm leading-relaxed">
+                            Your metabolism naturally slows. Prioritize root vegetables, warming spices like cardamom, and heavy fabrics to preserve your inner heat.
+                        </p>
+</div>
+</div>
+</div>
+</section>
+<!-- Primary Foods -->
+<section class="mb-12">
+<h2 class="font-headline text-3xl mb-8">Primary Foods to Focus On</h2>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+<div class="bg-surface-container rounded-2xl p-4 text-center hover:bg-surface-container-high transition-colors">
+<div class="w-full aspect-square rounded-xl mb-3 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="close-up of fresh green asparagus spears on a light textured background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCzBWDjdR717r5Yn4rxnzE6AqAiWN_DV41iRWtspXYWFctAT-pYfhPQiOz9JVtANxZ-fHOhz08yuWpT90RvTNXDpvCz1l6QgDsbLOWdKaRJcHGfGi6Ys5i-pMTWaUEGtsEWNyaz4ywe7Ihe7kBU2aVGYaTZJ5WPqv4VE5qpiYK5FDDJaN5Se94sl-VEFrDKLyk8pWGxi9geCFYIPDrdp5eq1igvpDvfDGRDLwS4ctPjFkhpw9P_u0PX6_XMzRkxh0ysVvxjcKgJ8xA"/>
+</div>
+<span class="font-label text-[10px] uppercase tracking-widest text-primary">Young Greens</span>
+</div>
+<div class="bg-surface-container rounded-2xl p-4 text-center hover:bg-surface-container-high transition-colors">
+<div class="w-full aspect-square rounded-xl mb-3 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="macro shot of vibrant orange honey drizzling from a wooden dipper with golden light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCNlErSSoaWxQ2w6-Cmw6ritLn8Hi1nGnClWC5UkjIMjiz8ngu1n-LpIH2AsQ-qtP9MdX2qrI9VZYby4-7GlCbodjnbKag9-XDzVJ-0iNcfWcQ_Uk9ijFC1DpbHF5noU4_KFrh0-CMuH3H--5OF5Y9oWyfwhOK_l4cJzjJwM2BvXHXBiZEJOmfo622n-9wdf1w74aYAqi1JzHRNwOw3C2q2cXzxQzNkXNxTHeQJ-2y1YPnLVide6K019K_jcXfURb-8mKVgGSiDSOI"/>
+</div>
+<span class="font-label text-[10px] uppercase tracking-widest text-primary">Raw Honey</span>
+</div>
+<div class="bg-surface-container rounded-2xl p-4 text-center hover:bg-surface-container-high transition-colors">
+<div class="w-full aspect-square rounded-xl mb-3 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="halved fresh figs showing deep red interior seeds on a neutral ceramic plate" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBOnIKoDVYPpGBG0479O7W70PeahxHDhzwCu-bkmbH6On8rFyYJQcxU0FMKv4adiX1fo0zOhGDOLlXYUbKsh_G9FVolW92bbxOXVkMKO8Uz0MPlCWuKvpXUtpvO_iJ2PfphtndbMHVLuAjtcqIMrZ7l3n1JRKnfBu8k1UDElNvvfT-eZeQ5xfyVDYUNKy6k2xXW5wzOAL9o0DqXs9KX1IUq4jxcjnwFJNliOdpO9HtcQ2sMPfWTfv9ih4tNxgrMkQ6nuEJJ4e-Rir8"/>
+</div>
+<span class="font-label text-[10px] uppercase tracking-widest text-primary">Deep Berries</span>
+</div>
+<div class="bg-surface-container rounded-2xl p-4 text-center hover:bg-surface-container-high transition-colors">
+<div class="w-full aspect-square rounded-xl mb-3 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="a bowl of toasted ancient grains like quinoa and farro with soft overhead lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCeQKu2QJhPeG1Y_K7Vf8pODa2-DWg3xLfkh7_tN34i8yrsoFZh2PjC5UWmToDX5y45uLHTPzHkkS7oPfJbC1K7Kw0V1DlMy0IXVmYLHOpIaadQF7iTleRhYh-IDc-O5jRCqQ0D968vrW_Iu6r339RKDe6-KmoNkmfsxlTFUVwwDd0bPKcUS_TQFOXTGs_44afHLq2_pG7sScHPjChSDAa71_FvUz1YF6X5YOwbBpuMlOjcUWE1pQQHzx8urBWadMMt7bbdMAAec28"/>
+</div>
+<span class="font-label text-[10px] uppercase tracking-widest text-primary">Ancient Grains</span>
+</div>
+</div>
+<!-- Call to Action -->
+<div class="mt-16 text-center">
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary px-10 py-5 rounded-full font-label text-sm uppercase tracking-[0.2em] shadow-lg hover:opacity-90 transition-all active:scale-95">
+                    Generate Weekly Rituals
+                </button>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-6 pt-3 bg-[#fbf9f5]/80 dark:bg-stone-900/80 backdrop-blur-xl border-t border-[#c6c8b8]/15 shadow-[0_-10px_30px_rgba(27,28,26,0.03)] rounded-t-[1.5rem] z-50">
+<a class="flex flex-col items-center justify-center text-[#1b1c1a]/40 dark:text-stone-500 hover:text-[#56642b] transition-colors" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="spa">spa</span>
+<span class="font-['Manrope'] text-[10px] font-medium uppercase tracking-widest">Sanctuary</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#56642b] dark:text-[#8a9a5b] bg-[#8a9a5b]/10 rounded-2xl px-4 py-1" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="wb_sunny">wb_sunny</span>
+<span class="font-['Manrope'] text-[10px] font-medium uppercase tracking-widest">Season</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#1b1c1a]/40 dark:text-stone-500 hover:text-[#56642b] transition-colors" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="self_improvement">self_improvement</span>
+<span class="font-['Manrope'] text-[10px] font-medium uppercase tracking-widest">Check-in</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#1b1c1a]/40 dark:text-stone-500 hover:text-[#56642b] transition-colors" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="filter_vintage">filter_vintage</span>
+<span class="font-['Manrope'] text-[10px] font-medium uppercase tracking-widest">Growth</span>
+</a>
+</nav>
+</body></html>

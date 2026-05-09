@@ -1,0 +1,17 @@
+// Sentry Configuration for ShunShi
+// Add your Sentry DSN after creating project at https://sentry.io
+
+{
+  "dsn": "YOUR_SENTRY_DSN_HERE",
+  "environment": "production",
+  "release": "com.shunshi.app@1.0.0",
+  "sampleRate": 1.0,
+  "autoSessionTracking": true,
+  "attachStacktrace": true,
+  "sendDefaultPii": false,
+  "maxBreadcrumbs": 50,
+  "ignoreErrors": [
+    "SocketException",
+    "HandshakeException"
+  ]
+}

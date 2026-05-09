@@ -117,7 +117,7 @@ class SkillExecutor:
             SkillName.DAILY_RHYTHM_PLAN: {
                 "name": "daily_rhythm_plan",
                 "description": "每日养生计划",
-                "model": "deepseek-v3.2",
+                "model": "deepseek-chat",
                 "input_schema": {
                     "user_stage": "youth|adult|middle_age|elder",
                     "season": "spring|summer|autumn|winter",
@@ -241,7 +241,7 @@ class SkillExecutor:
             SkillName.OFFICE_MICRO_BREAK: {
                 "name": "office_micro_break",
                 "description": "办公室微运动",
-                "model": "deepseek-v3.2",
+                "model": "deepseek-chat",
                 "input_schema": {
                     "work_type": "office_type",
                     "duration_minutes": "时长",
@@ -407,8 +407,8 @@ class SkillExecutor:
         )
 
     async def _call_llm(self, model: str, prompt: str) -> str:
-        """调用 LLM 获取 Skill 执行结果"""
-        from app.llm.siliconflow import ChatMessage, MessageRole
+        """调用 LLM 获取 Skill 执行结果（Deepseek 直连）"""
+        from app.llm.deepseek import get_deepseek_client
         
         system_prompt = (
             "你是顺时，一个温暖贴心的 AI 养生健康陪伴助手。\n"
@@ -417,18 +417,19 @@ class SkillExecutor:
         )
         
         messages = [
-            ChatMessage(role=MessageRole.SYSTEM, content=system_prompt),
-            ChatMessage(role=MessageRole.USER, content=prompt),
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": prompt},
         ]
         
-        response = await self.llm_client.chat_completion(
-            model=model,
+        client = get_deepseek_client()
+        response = await client.chat(
             messages=messages,
+            model=model,
             temperature=0.7,
             max_tokens=4096,
         )
         
-        return response.choices[0].get("message", {}).get("content", "")
+        return response.content
     
     def _build_prompt(self, config: Dict, skill_input: SkillInput) -> str:
         """构建 Prompt"""

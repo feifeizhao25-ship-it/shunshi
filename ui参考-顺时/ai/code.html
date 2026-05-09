@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+
+<html class="light" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>顺时AI助手 - 身心调护对话</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,300;0,400;0,700;1,400&amp;family=Manrope:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-tertiary-fixed": "#261900",
+              "on-tertiary-container": "#e1bf82",
+              "tertiary-fixed": "#ffdea4",
+              "surface-container": "#f1ede8",
+              "on-background": "#1c1c19",
+              "surface-bright": "#fdf9f4",
+              "on-error": "#ffffff",
+              "secondary-fixed": "#ffddbb",
+              "on-surface": "#1c1c19",
+              "surface-dim": "#ddd9d5",
+              "surface": "#fdf9f4",
+              "background": "#fdf9f4",
+              "primary-fixed": "#bceec8",
+              "on-primary": "#ffffff",
+              "inverse-on-surface": "#f4f0eb",
+              "on-tertiary": "#ffffff",
+              "inverse-surface": "#31302d",
+              "surface-container-highest": "#e6e2dd",
+              "secondary-container": "#ffd9b4",
+              "on-error-container": "#93000a",
+              "error": "#ba1a1a",
+              "surface-container-lowest": "#ffffff",
+              "outline-variant": "#c1c9c0",
+              "primary": "#144227",
+              "on-primary-fixed": "#00210f",
+              "surface-variant": "#e6e2dd",
+              "inverse-primary": "#a1d2ad",
+              "primary-container": "#2d5a3d",
+              "on-secondary-container": "#795d40",
+              "surface-container-low": "#f7f3ee",
+              "on-primary-fixed-variant": "#224f33",
+              "error-container": "#ffdad6",
+              "tertiary": "#4c3605",
+              "on-secondary": "#ffffff",
+              "on-secondary-fixed": "#2a1702",
+              "surface-tint": "#3b684a",
+              "tertiary-container": "#654d1b",
+              "secondary-fixed-dim": "#e4c09c",
+              "outline": "#717971",
+              "on-secondary-fixed-variant": "#5b4227",
+              "tertiary-fixed-dim": "#e4c285",
+              "primary-fixed-dim": "#a1d2ad",
+              "secondary": "#74593c",
+              "on-tertiary-fixed-variant": "#5a4312",
+              "on-surface-variant": "#414942",
+              "surface-container-high": "#ebe8e3",
+              "on-primary-container": "#9ed0ab"
+            },
+            fontFamily: {
+              "headline": ["Noto Serif"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      body {
+        font-family: 'Manrope', 'Noto Sans SC', sans-serif;
+        background-color: #fdf9f4;
+      }
+      .serif-text {
+        font-family: 'Noto Serif', 'Noto Serif SC', serif;
+      }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="bg-[#fdf9f4] dark:bg-stone-900 sticky top-0 z-40">
+<div class="flex justify-between items-center w-full px-8 py-4 max-w-7xl mx-auto">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Abstract organic ink-wash shape in deep green and warm apricot tones representing a zen-like profile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD_0M5fBm0ziIJgyBpqXhZO8hBQN2h5M9pFfyqO6S-JYrTB9gc2_XcSfUoDUp2k6yU2L20E9KnWeW5Ozf5PJulQiIKLs22qvk8Gul1He8EdnQoQG42nDKmmaKSisKCFTipU9-1nnmCzdC0DyO09-gnbEPv8HH19smip61wA6V8eQxdrgMaBDn8jIqRj1703HDb9vrzNQ5uD-WJlDj1OvCKT1n4VE8HuJue6WP2NgMl7tdrXrLEkILgrFZFgZct-bAUGeb3MEqFLXA8"/>
+</div>
+<div>
+<h1 class="font-serif text-2xl font-light tracking-tight dark:text-stone-100 text-[#144227]">顺时AI助手</h1>
+<div class="flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+<p class="text-[10px] uppercase tracking-widest text-on-surface-variant opacity-70 font-label">温暖陪伴</p>
+</div>
+</div>
+</div>
+<div class="flex gap-4 items-center">
+<span class="material-symbols-outlined text-[#144227] dark:text-emerald-500 cursor-pointer hover:bg-[#f7f3ee] p-2 rounded-full transition-colors" data-icon="notifications">notifications</span>
+<span class="material-symbols-outlined text-[#144227] dark:text-emerald-500 cursor-pointer hover:bg-[#f7f3ee] p-2 rounded-full transition-colors" data-icon="more_vert">more_vert</span>
+</div>
+</div>
+<div class="bg-[#f7f3ee] dark:bg-stone-800 h-px w-full opacity-50"></div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow max-w-4xl mx-auto w-full px-6 py-12 mb-32">
+<!-- Welcome Section (Editorial) -->
+<div class="mb-16">
+<span class="font-label text-xs uppercase tracking-[0.2em] text-secondary mb-4 block">二十四节气</span>
+<h2 class="font-headline text-5xl md:text-6xl text-primary leading-tight max-w-2xl">
+                当前：<span class="italic">处暑</span> (秋分)
+            </h2>
+<p class="mt-6 font-body text-lg text-on-surface-variant leading-relaxed max-w-xl opacity-80">
+                昼夜平分，万物开始由阳转阴，向冬日的宁静过渡。秋凉渐起，你近来可好？
+            </p>
+</div>
+<!-- Chat History -->
+<div class="flex flex-col gap-10">
+<!-- User Message -->
+<div class="flex justify-end ml-12">
+<div class="bg-surface-container-high px-6 py-4 rounded-xl rounded-tr-none max-w-lg shadow-sm">
+<p class="font-body text-on-surface leading-relaxed">
+                        最近换季感觉有些疲倦，有什么调理建议吗？
+                    </p>
+<span class="block text-[10px] text-on-surface-variant mt-2 opacity-60 font-label">上午 10:14</span>
+</div>
+</div>
+<!-- AI Response (Glassmorphism AI Module) -->
+<div class="flex mr-12 items-start gap-4">
+<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center shrink-0 mt-1">
+<span class="material-symbols-outlined text-on-primary-container text-sm" data-icon="smart_toy">smart_toy</span>
+</div>
+<div class="relative">
+<div class="bg-secondary-container/20 backdrop-blur-xl border border-secondary-container/10 p-8 rounded-xl rounded-tl-none max-w-2xl">
+<p class="font-headline text-2xl text-primary mb-4 italic">深秋调护指南</p>
+<div class="font-body text-on-surface leading-relaxed space-y-4">
+<p>
+                                在<span class="text-secondary font-medium italic">秋分</span>时节感到能量波动是很自然的。这是岁时的转折点，大地之气开始内敛。
+                            </p>
+<!-- Asymmetric Layout within Bubble -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 my-6">
+<div class="bg-surface-container-lowest p-5 rounded-lg">
+<span class="material-symbols-outlined text-secondary mb-2" data-icon="restaurant">restaurant</span>
+<h4 class="font-label font-bold text-sm uppercase tracking-wider mb-2">滋养</h4>
+<p class="text-sm opacity-80">重点摄入生津润燥的食材，如银耳、梨和蜂蜜，以对抗“秋燥”。</p>
+</div>
+<div class="bg-surface-container-lowest p-5 rounded-lg mt-4 md:mt-8">
+<span class="material-symbols-outlined text-secondary mb-2" data-icon="bedtime">bedtime</span>
+<h4 class="font-label font-bold text-sm uppercase tracking-wider mb-2">休养</h4>
+<p class="text-sm opacity-80">尝试提早一小时入睡。顺应日落提早的节奏，以蓄养精气。</p>
+</div>
+</div>
+<p>
+                                小小的仪式感，比如睡前用生姜泡脚，能帮助安神稳气。要试试针对节气转换的冥想呼吸练习吗？
+                            </p>
+</div>
+<span class="block text-[10px] text-on-surface-variant mt-6 opacity-60 font-label">刚刚</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Chat Input Footer (Pinned) -->
+<div class="fixed bottom-[88px] left-0 w-full z-30 px-6 pointer-events-none">
+<div class="max-w-3xl mx-auto w-full pointer-events-auto">
+<div class="bg-surface-container-low/95 backdrop-blur-md rounded-2xl shadow-xl border border-outline-variant/10 p-3 flex items-center gap-3">
+<button class="w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined" data-icon="add_circle">add_circle</span>
+</button>
+<div class="flex-grow relative">
+<input class="w-full bg-transparent border-none focus:ring-0 font-body text-on-surface placeholder:text-on-surface-variant/40 py-2" placeholder="想聊聊什么？" type="text"/>
+</div>
+<div class="flex items-center gap-2">
+<button class="w-10 h-10 flex items-center justify-center rounded-full text-secondary hover:bg-secondary-container/30 transition-colors">
+<span class="material-symbols-outlined" data-icon="mic">mic</span>
+</button>
+<button class="bg-primary text-on-primary w-10 h-10 flex items-center justify-center rounded-xl shadow-lg hover:scale-105 active:scale-95 transition-all">
+<span class="material-symbols-outlined" data-icon="send">send</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-6 pt-3 bg-[#fdf9f4]/80 dark:bg-stone-900/80 backdrop-blur-xl z-50 rounded-t-xl border-t border-[#c1c9c0]/20 shadow-[0_-4px_24px_rgba(28,28,25,0.04)]">
+<a class="flex flex-col items-center justify-center text-[#6B7B7D] dark:text-stone-500 opacity-70 hover:text-[#144227] transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-serif text-[10px] uppercase tracking-[0.05rem] font-medium mt-1">首页</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#6B7B7D] dark:text-stone-500 opacity-70 hover:text-[#144227] transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="menu_book">menu_book</span>
+<span class="font-serif text-[10px] uppercase tracking-[0.05rem] font-medium mt-1">养生</span>
+</a>
+<!-- Active Tab: AI Assistant -->
+<a class="flex flex-col items-center justify-center text-[#144227] dark:text-emerald-400 scale-110 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="smart_toy" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+<span class="font-serif text-[10px] uppercase tracking-[0.05rem] font-medium mt-1">AI助手</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#6B7B7D] dark:text-stone-500 opacity-70 hover:text-[#144227] transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="edit_note">edit_note</span>
+<span class="font-serif text-[10px] uppercase tracking-[0.05rem] font-medium mt-1">日记</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#6B7B7D] dark:text-stone-500 opacity-70 hover:text-[#144227] transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-serif text-[10px] uppercase tracking-[0.05rem] font-medium mt-1">我的</span>
+</a>
+</nav>
+</body></html>

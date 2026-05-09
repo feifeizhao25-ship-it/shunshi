@@ -2,6 +2,8 @@
 顺时 ShunShi - 通知模型
 包含 1 张表: Notification
 """
+from __future__ import annotations
+
 from datetime import datetime
 from typing import Optional
 
@@ -18,7 +20,7 @@ class Notification(IDMixin, Base):
     __tablename__ = "sa_notifications"
 
     user_id: Mapped[str] = mapped_column(
-        ForeignKey("sa_users.id", ondelete="CASCADE"),
+        ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False, index=True, comment="关联用户 ID"
     )
     type: Mapped[str] = mapped_column(

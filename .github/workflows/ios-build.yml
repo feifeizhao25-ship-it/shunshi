@@ -1,0 +1,57 @@
+name: Build iOS Archive
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build-ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.29.0'
+          channel: 'stable'
+
+      - name: Install dependencies
+        working-directory: ios-cn
+        run: flutter pub get
+
+      - name: Setup CocoaPods
+        working-directory: ios-cn/ios
+        run: pod install --repo-update
+
+      - name: Build iOS Archive
+        working-directory: ios-cn
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_PROVISIONING_PROFILE: ${{ secrets.APPLE_PROVISIONING_PROFILE }}
+        run: |
+          # 导入证书
+          echo "$APPLE_CERTIFICATE" | base64 -d > certificate.p12
+          security create-keychain -p "" build.keychain
+          security import certificate.p12 -k build.keychain -P "$APPLE_CERTIFICATE_PASSWORD" -T /usr/bin/codesign
+          security set-keychain-settings -t 3600 -u build.keychain
+          security unlock-keychain -p "" build.keychain
+          security list-keychains -s build.keychain
+          
+          # 导入 Provisioning Profile
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          echo "$APPLE_PROVISIONING_PROFILE" | base64 -d > ~/Library/MobileDevice/Provisioning\ Profiles/profile.mobileprovision
+          
+          # 构建 Archive
+          flutter build ipa --release \
+            --export-options-plist=ios/Runner/ExportOptions.plist
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: shunshi-ios-ipa
+          path: ios-cn/build/ios/ipa/*.ipa
+          retention-days: 30

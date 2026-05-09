@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+
+<html class="light" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>顺时 ShunShi - 酉时养生</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&amp;family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-bright": "#fdf9f4",
+                        "on-secondary": "#ffffff",
+                        "secondary-fixed-dim": "#e4c09c",
+                        "on-tertiary": "#ffffff",
+                        "on-background": "#1c1c19",
+                        "inverse-primary": "#a1d2ad",
+                        "on-primary": "#ffffff",
+                        "surface-container-highest": "#e6e2dd",
+                        "surface-tint": "#3b684a",
+                        "on-surface-variant": "#414942",
+                        "primary": "#144227",
+                        "on-primary-container": "#9ed0ab",
+                        "tertiary-fixed": "#ffdea4",
+                        "surface-container-low": "#f7f3ee",
+                        "secondary-fixed": "#ffddbb",
+                        "tertiary": "#4c3605",
+                        "surface-dim": "#ddd9d5",
+                        "secondary-container": "#ffd9b4",
+                        "on-tertiary-fixed-variant": "#5a4312",
+                        "on-surface": "#1c1c19",
+                        "secondary": "#74593c",
+                        "outline": "#717971",
+                        "primary-container": "#2d5a3d",
+                        "surface-container": "#f1ede8",
+                        "error": "#ba1a1a",
+                        "outline-variant": "#c1c9c0",
+                        "primary-fixed": "#bceec8",
+                        "on-error-container": "#93000a",
+                        "inverse-on-surface": "#f4f0eb",
+                        "on-primary-fixed": "#00210f",
+                        "on-secondary-fixed-variant": "#5b4227",
+                        "on-tertiary-container": "#e1bf82",
+                        "on-secondary-container": "#795d40",
+                        "surface-variant": "#e6e2dd",
+                        "surface-container-high": "#ebe8e3",
+                        "on-tertiary-fixed": "#261900",
+                        "on-primary-fixed-variant": "#224f33",
+                        "inverse-surface": "#31302d",
+                        "on-secondary-fixed": "#2a1702",
+                        "primary-fixed-dim": "#a1d2ad",
+                        "surface": "#fdf9f4",
+                        "background": "#fdf9f4"
+                    },
+                    fontFamily: {
+                        "headline": ["Noto Serif SC", "serif"],
+                        "body": ["Manrope", "sans-serif"],
+                        "label": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Manrope', sans-serif;
+            background-color: #fdf9f4;
+            color: #1c1c19;
+            -webkit-font-smoothing: antialiased;
+        }
+        .font-serif { font-family: 'Noto Serif SC', serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+        .ink-gradient {
+            background: linear-gradient(180deg, rgba(20, 66, 39, 0) 0%, rgba(20, 66, 39, 0.05) 100%);
+        }
+        .glass-module {
+            background: rgba(247, 243, 238, 0.8);
+            backdrop-filter: blur(20px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- TopAppBar -->
+<header class="fixed top-0 z-50 w-full bg-[#fdf9f4] dark:bg-stone-950">
+<div class="flex justify-between items-center px-6 py-4 w-full max-w-screen-xl mx-auto">
+<div class="flex items-center gap-4">
+<button class="hover:bg-[#f7f3ee] dark:hover:bg-stone-800 transition-colors p-2 rounded-full active:scale-95">
+<span class="material-symbols-outlined text-[#144227] dark:text-emerald-500">menu</span>
+</button>
+<h1 class="text-2xl font-bold tracking-tighter text-[#144227] dark:text-emerald-500 font-serif">顺时 ShunShi</h1>
+</div>
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full overflow-hidden border border-outline-variant/20">
+<img alt="User Profile" data-alt="close-up portrait of a serene person with soft lighting, minimalist aesthetic, warm skin tones" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAlZbd82JZ4IhToXu00gzfyxo28cnDFwvP-Z6cdBoNFE4UzsWqqRfHnXjbSxpNTbpuE2YQj8sLCPQWSZ1z3zfgmH7iPwBSSWydiStIe9P5tPIBZ_1wqyLZ6iIlENJwFSZZFAPdw2iVvE7V28cABiKLqqCXBlgTTXuILu9yUxi-v4hcQ4TDk9KT9oTzS2AM1x25ZrJbwWhfsbYLsjQXWr6RUsBZs0kX4J1o1N6zdgzDKxF-v_3VsAloSXyf5QLIZqPNoTWAZS7BwSBk"/>
+</div>
+</div>
+</div>
+<div class="bg-[#f7f3ee] dark:bg-stone-900 h-[1px] w-full opacity-50"></div>
+</header>
+<main class="pt-24 pb-32 px-6 max-w-screen-md mx-auto min-h-screen">
+<!-- Seasonal Context / Breadcrumb-like indicator -->
+<div class="mb-12 flex justify-between items-end">
+<div class="space-y-1">
+<span class="text-secondary font-label tracking-[0.1em] text-sm uppercase">17:00 - 19:00</span>
+<h2 class="text-5xl md:text-6xl font-black font-serif text-primary leading-tight tracking-tighter">
+                    酉时 · <span class="text-secondary">肾经当令</span>
+</h2>
+</div>
+<div class="hidden md:block pb-2">
+<div class="bg-secondary-container px-4 py-1 rounded-full text-on-secondary-container text-xs font-bold font-label">
+                    立春 · 孟春之节
+                </div>
+</div>
+</div>
+<!-- Hero: Kidney Meridian Illustration (Asymmetric Layout) -->
+<section class="relative mb-16">
+<div class="aspect-[4/5] md:aspect-[16/9] w-full rounded-2xl overflow-hidden bg-surface-container-low relative">
+<img alt="Artistic meridian flow" class="w-full h-full object-cover opacity-80 mix-blend-multiply filter grayscale-[0.3]" data-alt="abstract artistic illustration of energy flowing in organic lines resembling tree branches and roots, deep ink green and warm gold colors, ethereal lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAOd47nyUG6Ivu9yjABNLpXG35r82YR7tfyvJl0Cx0V8sU220N5CkUcTEEAwsEqJ3ovOAmsOB74wz2ZYLFJF7Tb3eUIN0sQBsitHo9PjqiTSNy2iM-YpzU8NHnGTEperP_GxwOzOHAj-cSNHQeV017m9tNCK7Mars7pkFEsMfQh7BxS1SJ3vVg-wLjXdXQOGBvzRFbzP2EhpEJChzYVlhyut-Or_RVrwvIjTCJgvl9ozcBKB4T9W9XI9QHoev3XLfCcZb66kqNgpU8"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-bright/80 via-transparent to-transparent"></div>
+<!-- Overlay Legend -->
+<div class="absolute bottom-8 left-8 right-8">
+<div class="glass-module p-6 rounded-xl border border-white/20 shadow-sm inline-block max-w-xs">
+<p class="text-xs text-secondary font-label mb-1">养生精要 Wellness Principle</p>
+<p class="text-xl font-serif text-primary">滋阴补肾，清热降火</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Recommended Actions Grid (Bento Style) -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
+<div class="bg-surface-container-lowest p-8 rounded-2xl space-y-4 hover:translate-y-[-4px] transition-transform duration-300">
+<div class="w-12 h-12 rounded-xl bg-primary/5 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-3xl">water_drop</span>
+</div>
+<h3 class="text-xl font-serif text-primary">补充水分</h3>
+<p class="text-on-surface-variant leading-relaxed">酉时肾脏排毒最为旺盛，适量饮用温水有助于辅助肾脏代谢，清涤胞宫。</p>
+</div>
+<div class="bg-surface-container-lowest p-8 rounded-2xl space-y-4 hover:translate-y-[-4px] transition-transform duration-300">
+<div class="w-12 h-12 rounded-xl bg-primary/5 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-3xl">accessibility_new</span>
+</div>
+<h3 class="text-xl font-serif text-primary">轻拍足跟</h3>
+<p class="text-on-surface-variant leading-relaxed">足少阴肾经起于足底，轻拍足跟或拉伸下肢筋骨，可有效激发肾经经气。</p>
+</div>
+</div>
+<!-- AI Assistant Module (Glassmorphism) -->
+<section class="glass-module p-8 rounded-3xl border border-white/30 shadow-2xl shadow-primary/5 mb-16 relative overflow-hidden">
+<div class="absolute -top-12 -right-12 w-32 h-32 bg-secondary/10 rounded-full blur-3xl"></div>
+<div class="flex items-start gap-6">
+<div class="flex-shrink-0 relative">
+<div class="w-14 h-14 rounded-full bg-primary flex items-center justify-center text-white">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">temp_preferences_custom</span>
+</div>
+<div class="absolute -bottom-1 -right-1 w-5 h-5 bg-tertiary-fixed-dim rounded-full border-2 border-surface flex items-center justify-center">
+<div class="w-2 h-2 bg-on-tertiary-fixed rounded-full animate-pulse"></div>
+</div>
+</div>
+<div class="space-y-3">
+<h4 class="font-serif text-lg text-primary">顺时 AI 助手</h4>
+<p class="text-on-surface leading-relaxed italic">
+                        “酉时是人体精华积聚的时段，最宜收敛心神。放下全日的奔忙，让身体在安静中完成一次深度的自我修复。”
+                    </p>
+</div>
+</div>
+</section>
+<!-- CTA Action -->
+<div class="flex justify-center mb-20">
+<button class="group flex items-center gap-3 bg-primary text-on-primary px-8 py-4 rounded-xl font-bold transition-all hover:bg-primary-container active:scale-95">
+<span>查看完整时辰养生表</span>
+<span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 bg-[#fdf9f4]/80 dark:bg-stone-950/80 backdrop-blur-xl shadow-[0_-4px_24px_rgba(28,28,25,0.04)] border-t border-[#c1c9c0]/20">
+<!-- 十二时辰 - Active -->
+<a class="flex flex-col items-center justify-center bg-[#144227] text-white rounded-xl px-4 py-1.5 scale-98 transition-opacity" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">schedule</span>
+<span class="font-sans text-[11px] font-medium tracking-[0.05rem]">十二时辰</span>
+</a>
+<!-- 社区 -->
+<a class="flex flex-col items-center justify-center text-[#74593c] dark:text-stone-400 px-4 py-1.5 hover:opacity-80 transition-opacity" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-sans text-[11px] font-medium tracking-[0.05rem]">社区</span>
+</a>
+<!-- 挑战 -->
+<a class="flex flex-col items-center justify-center text-[#74593c] dark:text-stone-400 px-4 py-1.5 hover:opacity-80 transition-opacity" href="#">
+<span class="material-symbols-outlined">emoji_events</span>
+<span class="font-sans text-[11px] font-medium tracking-[0.05rem]">挑战</span>
+</a>
+<!-- 设置 -->
+<a class="flex flex-col items-center justify-center text-[#74593c] dark:text-stone-400 px-4 py-1.5 hover:opacity-80 transition-opacity" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-sans text-[11px] font-medium tracking-[0.05rem]">设置</span>
+</a>
+</nav>
+</body></html>

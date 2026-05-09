@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Digital Sanctuary - Profile &amp; Settings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,500;0,700;1,400&amp;family=Manrope:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-container-highest": "#e4e2de",
+              "primary-fixed": "#d9eaa3",
+              "primary": "#56642b",
+              "on-tertiary": "#ffffff",
+              "surface-variant": "#e4e2de",
+              "tertiary-fixed-dim": "#d2c5b2",
+              "tertiary": "#665d4e",
+              "secondary-fixed": "#ffdbcf",
+              "surface": "#fbf9f5",
+              "on-primary-fixed": "#161f00",
+              "secondary": "#95482b",
+              "error": "#ba1a1a",
+              "on-tertiary-fixed-variant": "#4e4637",
+              "on-primary-fixed-variant": "#3e4c16",
+              "inverse-surface": "#30312e",
+              "background": "#fbf9f5",
+              "on-secondary": "#ffffff",
+              "inverse-primary": "#bdce89",
+              "on-surface-variant": "#46483c",
+              "surface-tint": "#56642b",
+              "surface-container-lowest": "#ffffff",
+              "outline-variant": "#c6c8b8",
+              "on-secondary-fixed-variant": "#773116",
+              "error-container": "#ffdad6",
+              "primary-fixed-dim": "#bdce89",
+              "on-tertiary-container": "#332b1e",
+              "surface-dim": "#dbdad6",
+              "surface-container-low": "#f5f3ef",
+              "on-background": "#1b1c1a",
+              "primary-container": "#8a9a5b",
+              "outline": "#76786b",
+              "on-tertiary-fixed": "#211b0f",
+              "on-secondary-container": "#763015",
+              "surface-container-high": "#eae8e4",
+              "tertiary-fixed": "#eee1cd",
+              "surface-container": "#efeeea",
+              "on-primary": "#ffffff",
+              "on-surface": "#1b1c1a",
+              "tertiary-container": "#9d9281",
+              "inverse-on-surface": "#f2f0ed",
+              "secondary-fixed-dim": "#ffb59b",
+              "secondary-container": "#fc9a77",
+              "on-secondary-fixed": "#380d00",
+              "surface-bright": "#fbf9f5",
+              "on-primary-container": "#253000",
+              "on-error-container": "#93000a",
+              "on-error": "#ffffff"
+            },
+            fontFamily: {
+              "headline": ["Noto Serif"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #fbf9f5;
+            color: #1b1c1a;
+            -webkit-font-smoothing: antialiased;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-body selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-[#fbf9f5]/80 backdrop-blur-xl shadow-[0_20px_40px_rgba(27,28,26,0.05)]">
+<div class="flex items-center justify-between px-6 h-16 w-full">
+<div class="flex items-center gap-4">
+<button class="text-[#56642b] hover:opacity-80 transition-opacity active:scale-95 duration-200">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+<h1 class="text-xl font-['Noto_Serif'] italic text-[#1b1c1a]">Digital Sanctuary</h1>
+</div>
+<div class="h-10 w-10 rounded-full overflow-hidden bg-surface-container-high">
+<img alt="User profile" class="h-full w-full object-cover" data-alt="Close-up portrait of a serene woman with natural lighting and soft earth-toned background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAQG2wGtw5dFIHCnGTkFd3FKDHc3MxoQ7H-zErc2RMkfsbdT1GWLV_OpcuOdM5069mLPLrawbeNSX4u6rTjrgnOeMCEHquwVFEDsuxgGNyMXD5Uj5H_rxS46KoJEC6Mg7SFu0juklA5uyVFdSl9gQpXmwC1EGuWQGX6K7858fRS5e7kbsFouqY3OfkPQUeQYEjNdKscxrd-1XBwtrTpMXV6zOSNrjXRzu1y5soENx3TpuhTLoXTS7cFWTXo9O3lJ3CZhPhQu8qiN4s"/>
+</div>
+</div>
+</header>
+<main class="pt-24 pb-32 px-6 max-w-3xl mx-auto">
+<!-- Profile Overview Section -->
+<section class="mb-12">
+<div class="flex flex-col md:flex-row items-center md:items-start gap-8">
+<div class="relative">
+<div class="w-32 h-32 rounded-full overflow-hidden ring-4 ring-primary/10">
+<img alt="Seeker of Calm avatar" class="w-full h-full object-cover" data-alt="Artistic profile photo of a person meditating in a garden with soft morning mist and green foliage" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBgPrl8RGKksUV2GtLBqtH__ypqDcGQJNHu8CiRI5k5C_nW3JNSkf3v_c1I1xhp4sEi_qqMBZTfs0PLiDwqSNJpxfgEKwTn2X81qvyjSByBwbcmGratnudAKgFNUzGHbnAYTTkzcBYA2jDPKJjg6Cbe35YHy0BQ8SoBHplzVd4CRohyS38e3GeP_3AS8a75YEOjo1JyoaeN1InBMuKUTeUVmenLrGr-BHAMDESc-qSUp1vhnYUy_jYnsdB3BGTByr_EdO4Hp4oFl1U"/>
+</div>
+<div class="absolute bottom-1 right-1 bg-secondary text-white p-2 rounded-full shadow-lg">
+<span class="material-symbols-outlined text-sm" data-icon="edit" data-weight="fill" style="font-variation-settings: 'FILL' 1;">edit</span>
+</div>
+</div>
+<div class="flex-1 text-center md:text-left">
+<h2 class="font-headline text-4xl font-medium tracking-tight mb-1">Seeker of Calm</h2>
+<p class="font-body text-on-surface-variant font-light tracking-wide mb-4">Spring Equinox Member since 2023</p>
+<div class="flex flex-wrap justify-center md:justify-start gap-3">
+<span class="bg-primary-fixed text-on-primary-fixed-variant px-4 py-1.5 rounded-full text-xs font-semibold tracking-wider uppercase">Nature Guide</span>
+<span class="bg-surface-container-highest text-on-surface-variant px-4 py-1.5 rounded-full text-xs font-semibold tracking-wider uppercase">Mindful Eater</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Settings Grid -->
+<div class="space-y-10">
+<!-- Global Preferences -->
+<section>
+<h3 class="font-headline text-2xl mb-6 text-primary">Global Preferences</h3>
+<div class="bg-surface-container-low rounded-xl overflow-hidden p-6 space-y-8">
+<!-- Hemisphere -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary" data-icon="public">public</span>
+<div>
+<p class="font-medium text-on-surface">Hemisphere</p>
+<p class="text-sm text-on-surface-variant">Influences seasonal rituals and content</p>
+</div>
+</div>
+<div class="flex bg-surface-container-highest p-1 rounded-full">
+<button class="px-6 py-2 rounded-full text-sm font-semibold transition-all bg-primary text-white shadow-md">Northern</button>
+<button class="px-6 py-2 rounded-full text-sm font-semibold transition-all text-on-surface-variant hover:text-on-surface">Southern</button>
+</div>
+</div>
+<!-- Units -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary" data-icon="straighten">straighten</span>
+<div>
+<p class="font-medium text-on-surface">Measurement Units</p>
+<p class="text-sm text-on-surface-variant">Weight, distance, and temperature</p>
+</div>
+</div>
+<select class="bg-surface-container-high border-none rounded-xl py-2 px-4 text-sm font-medium focus:ring-2 focus:ring-primary/20 transition-all">
+<option selected="">Metric (kg, km, °C)</option>
+<option>Imperial (lb, mi, °F)</option>
+</select>
+</div>
+<!-- Locale -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary" data-icon="language">language</span>
+<div>
+<p class="font-medium text-on-surface">Language &amp; Locale</p>
+<p class="text-sm text-on-surface-variant">Select your primary dialect</p>
+</div>
+</div>
+<select class="bg-surface-container-high border-none rounded-xl py-2 px-4 text-sm font-medium focus:ring-2 focus:ring-primary/20 transition-all">
+<option selected="">English (Global)</option>
+<option>Español</option>
+<option>Français</option>
+<option>日本語</option>
+</select>
+</div>
+</div>
+</section>
+<!-- Dietary Restrictions -->
+<section>
+<div class="flex items-end justify-between mb-6">
+<div>
+<h3 class="font-headline text-2xl text-primary">Nourishment Logic</h3>
+<p class="font-body text-sm text-on-surface-variant mt-1">Personalize your recipe discovery experience</p>
+</div>
+</div>
+<div class="bg-surface-container-low rounded-xl p-6">
+<p class="font-label text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface-variant mb-4">Select all that apply</p>
+<div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+<!-- Vegan -->
+<label class="group relative flex items-center gap-3 p-4 rounded-xl bg-surface-container-lowest cursor-pointer transition-all hover:bg-white active:scale-95">
+<input checked="" class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary/20 transition-all" type="checkbox"/>
+<span class="font-medium text-sm text-on-surface">Vegan</span>
+</label>
+<!-- Halal -->
+<label class="group relative flex items-center gap-3 p-4 rounded-xl bg-surface-container-lowest cursor-pointer transition-all hover:bg-white active:scale-95">
+<input class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary/20 transition-all" type="checkbox"/>
+<span class="font-medium text-sm text-on-surface">Halal</span>
+</label>
+<!-- Gluten Free -->
+<label class="group relative flex items-center gap-3 p-4 rounded-xl bg-surface-container-lowest cursor-pointer transition-all hover:bg-white active:scale-95">
+<input checked="" class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary/20 transition-all" type="checkbox"/>
+<span class="font-medium text-sm text-on-surface">Gluten Free</span>
+</label>
+<!-- Dairy Free -->
+<label class="group relative flex items-center gap-3 p-4 rounded-xl bg-surface-container-lowest cursor-pointer transition-all hover:bg-white active:scale-95">
+<input class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary/20 transition-all" type="checkbox"/>
+<span class="font-medium text-sm text-on-surface">Dairy Free</span>
+</label>
+<!-- Nut Allergy -->
+<label class="group relative flex items-center gap-3 p-4 rounded-xl bg-surface-container-lowest cursor-pointer transition-all hover:bg-white active:scale-95">
+<input class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary/20 transition-all" type="checkbox"/>
+<span class="font-medium text-sm text-on-surface">Nut Free</span>
+</label>
+<!-- Kosher -->
+<label class="group relative flex items-center gap-3 p-4 rounded-xl bg-surface-container-lowest cursor-pointer transition-all hover:bg-white active:scale-95">
+<input class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary/20 transition-all" type="checkbox"/>
+<span class="font-medium text-sm text-on-surface">Kosher</span>
+</label>
+</div>
+</div>
+</section>
+<!-- Dangerous Area / Destructive Actions -->
+<section class="mt-8">
+<div class="flex flex-col gap-4">
+<button class="w-full text-center py-4 rounded-xl border border-outline-variant/30 text-error font-medium transition-colors hover:bg-error/5 active:scale-[0.98]">
+                        Sign Out of Sanctuary
+                    </button>
+<button class="w-full text-center py-4 text-on-surface-variant/60 text-xs font-medium uppercase tracking-widest hover:text-on-surface transition-colors">
+                        Deactivate Calm Account
+                    </button>
+</div>
+</section>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 bg-[#fbf9f5]/80 backdrop-blur-xl rounded-t-[1.5rem] shadow-[0_-10px_30px_rgba(27,28,26,0.03)]">
+<div class="flex justify-around items-center px-4 pb-6 pt-3">
+<a class="flex flex-col items-center justify-center text-[#1b1c1a]/40 px-5 py-2 hover:text-[#56642b] active:scale-90 transition-all duration-300" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="spa">spa</span>
+<span class="font-['Manrope'] text-[10px] font-semibold uppercase tracking-widest">Guidance</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#1b1c1a]/40 px-5 py-2 hover:text-[#56642b] active:scale-90 transition-all duration-300" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="restaurant_menu">restaurant_menu</span>
+<span class="font-['Manrope'] text-[10px] font-semibold uppercase tracking-widest">Nourish</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#1b1c1a]/40 px-5 py-2 hover:text-[#56642b] active:scale-90 transition-all duration-300" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="auto_awesome">auto_awesome</span>
+<span class="font-['Manrope'] text-[10px] font-semibold uppercase tracking-widest">Growth</span>
+</a>
+<!-- Active Tab: Settings -->
+<a class="flex flex-col items-center justify-center bg-gradient-to-br from-[#56642b] to-[#8a9a5b] text-white rounded-[1.5rem] px-5 py-2 shadow-lg active:scale-90 transition-all duration-300" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="settings" data-weight="fill" style="font-variation-settings: 'FILL' 1;">settings</span>
+<span class="font-['Manrope'] text-[10px] font-semibold uppercase tracking-widest">Settings</span>
+</a>
+</div>
+</nav>
+</body></html>

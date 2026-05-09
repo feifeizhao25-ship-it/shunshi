@@ -45,7 +45,9 @@ SILICONFLOW_BASE_URL = "https://api.siliconflow.cn/v1"
 
 # 模型映射 (配置名 → SiliconFlow 模型名)
 MODEL_NAME_MAP = {
-    "deepseek-v3.2": "deepseek-ai/DeepSeek-V3.2",
+    "deepseek-v4-pro": "deepseek-ai/DeepSeek-V4-Pro",
+    "deepseek-v4-flash": "deepseek-ai/DeepSeek-V4-Flash",
+    "deepseek-v3.2": "deepseek-ai/DeepSeek-V4-Pro",  # v3.2 已下架，映射到 v4-pro
     "glm-4.6": "zai-org/GLM-4.6",
     "qwen3-235b": "Qwen/Qwen3-235B-A22B-Thinking-2507",
     "kimi-k2-thinking": "moonshotai/Kimi-K2-Thinking",
@@ -345,8 +347,7 @@ class SiliconFlowClient:
                                 content = chunk.get("choices", [{}])[0].get("delta", {}).get("content", "")
                                 if content:
                                     yield content
-                            except:
-                                pass
+                            except Exception as e:                                pass
 
 
 # ==================== 便捷函数 ====================

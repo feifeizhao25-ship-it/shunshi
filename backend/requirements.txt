@@ -1,36 +1,49 @@
 # 顺时后端 Python 依赖
 # Core
-fastapi
-uvicorn[standard]
-pydantic
-aiohttp
-httpx
+fastapi==0.115.0
+uvicorn[standard]==0.32.0
+pydantic==2.9.0
+aiohttp==3.10.0
+httpx==0.27.0
+python-dotenv==1.0.0
+starlette==0.37.2
 
 # Auth security
-bcrypt>=4.0.0
-PyJWT>=2.8.0
-python-jose[cryptography]>=3.3.0
-passlib[bcrypt]>=1.7.4
+bcrypt==4.2.0
+PyJWT==2.9.0
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
 
 # Database
-sqlalchemy[asyncio]>=2.0.0
-aiosqlite>=0.19.0
-asyncpg>=0.29.0
-psycopg2-binary>=2.9.0
-alembic>=1.13.0
+sqlalchemy[asyncio]==2.0.35
+aiosqlite==0.20.0
+asyncpg==0.29.0
+psycopg2-binary==2.9.9
+alembic==1.13.0
 
 # Cache
-redis>=5.0.0
+redis==5.0.0
 
 # Payment - 支付宝 (CN)
-python-alipay-sdk>=3.0.0
+python-alipay-sdk==3.0.0
 
 # Payment - Stripe (GL)
-stripe>=10.0.0
+stripe==10.0.0
 
-# Push notifications (可选 - 无凭据时自动降级为 mock)
-firebase-admin>=6.0.0
-apns2>=0.7.0
+# Push notifications
+firebase-admin==6.0.0
+apns2==0.7.0
 
 # Monitoring
-prometheus_client>=0.20.0
+prometheus_client==0.21.0
+aiofiles==24.1.0
+
+# Vector Database & Semantic Search
+chromadb==0.5.0
+sentence-transformers==3.0.0
+
+# Testing
+pytest==8.3.0
+pytest-asyncio==0.24.0
+pytest-cov==5.0.0
+torch

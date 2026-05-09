@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Wellness Library - SEASONS</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,600;0,700;1,400;1,600&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-primary": "#ffffff",
+              "on-primary-container": "#253000",
+              "tertiary": "#665d4e",
+              "surface-variant": "#e4e2de",
+              "on-tertiary-container": "#332b1e",
+              "inverse-surface": "#30312e",
+              "error": "#ba1a1a",
+              "outline-variant": "#c6c8b8",
+              "error-container": "#ffdad6",
+              "surface-container-highest": "#e4e2de",
+              "secondary-fixed-dim": "#ffb59b",
+              "on-tertiary-fixed": "#211b0f",
+              "on-error": "#ffffff",
+              "on-error-container": "#93000a",
+              "surface-container-high": "#eae8e4",
+              "on-secondary-fixed": "#380d00",
+              "surface-tint": "#56642b",
+              "primary-container": "#8a9a5b",
+              "primary-fixed-dim": "#bdce89",
+              "on-primary-fixed": "#161f00",
+              "surface-container-lowest": "#ffffff",
+              "inverse-primary": "#bdce89",
+              "on-secondary": "#ffffff",
+              "secondary": "#95482b",
+              "inverse-on-surface": "#f2f0ed",
+              "secondary-container": "#fc9a77",
+              "surface": "#fbf9f5",
+              "on-secondary-container": "#763015",
+              "on-surface": "#1b1c1a",
+              "secondary-fixed": "#ffdbcf",
+              "background": "#fbf9f5",
+              "on-background": "#1b1c1a",
+              "surface-dim": "#dbdad6",
+              "on-primary-fixed-variant": "#3e4c16",
+              "primary-fixed": "#d9eaa3",
+              "on-tertiary-fixed-variant": "#4e4637",
+              "tertiary-fixed-dim": "#d2c5b2",
+              "on-tertiary": "#ffffff",
+              "tertiary-container": "#9d9281",
+              "primary": "#56642b",
+              "on-surface-variant": "#46483c",
+              "surface-bright": "#fbf9f5",
+              "surface-container-low": "#f5f3ef",
+              "on-secondary-fixed-variant": "#773116",
+              "outline": "#76786b",
+              "tertiary-fixed": "#eee1cd",
+              "surface-container": "#efeeea"
+            },
+            fontFamily: {
+              "headline": ["Noto Serif"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "1.5rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      ::-webkit-scrollbar { display: none; }
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body selection:bg-secondary-fixed selection:text-on-secondary-fixed antialiased">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full px-6 py-4 flex justify-between items-center bg-[#fbf9f5]/80 dark:bg-[#1b1c1a]/80 backdrop-blur-xl z-50 bg-gradient-to-b from-[#f5f3ef] to-transparent dark:from-[#1b1c1a]">
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-[#56642b] dark:text-[#8a9a5b] hover:opacity-80 transition-opacity active:scale-95 duration-200">menu</button>
+<h1 class="text-2xl font-['Noto_Serif'] italic text-[#56642b] dark:text-[#8a9a5b] font-semibold tracking-tight">SEASONS</h1>
+</div>
+<div class="w-10 h-10 rounded-full bg-surface-container-high overflow-hidden border border-outline-variant/15">
+<img alt="User profile" data-alt="Portrait of a serene woman with soft natural lighting, high-end editorial photography style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5Fb0tyJnE65fUEZlJ-cIw3_daPaWMG7OB8dBf_g6MiX1Ctb9MedT9sxkK7xcpmLANCS_PChBaH7urkypzp5vr-SeXh_O46yvtQo6E2MMqdKprarqutVhU64JBICmOhXWScJmaUtRQrUCh7SQj_9tfAgCujktelfYDhjLl3RzSHjP6sJrGEeFcNgRSz2jCDqq8lilFtiyv_lOpd2b8qscUFUHiDbtK55DEdy5JnqcfBfEhP0p5fjvEfgW40314qI_12yjXwKKNU7s"/>
+</div>
+</header>
+<main class="pt-24 pb-32 px-6 max-w-5xl mx-auto">
+<!-- Search & Header Section -->
+<section class="mb-12">
+<h2 class="font-headline text-[3.5rem] leading-[1.2] mb-8 text-on-surface">Wellness Library</h2>
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-6 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full bg-surface-container-high border-none rounded-xl py-5 pl-16 pr-6 focus:ring-2 focus:ring-primary/20 bg-surface-container-high transition-all text-on-surface placeholder:text-outline/60" placeholder="Search recipes or practices..." type="text"/>
+</div>
+</section>
+<!-- Filter Bar -->
+<section class="mb-12 -mx-6 px-6 overflow-x-auto flex gap-3 no-scrollbar">
+<button class="whitespace-nowrap px-6 py-2.5 rounded-full bg-primary text-on-primary font-label font-bold text-[10px] uppercase tracking-widest transition-transform active:scale-95">All Sources</button>
+<button class="whitespace-nowrap px-6 py-2.5 rounded-full bg-surface-container-low text-on-surface-variant font-label font-bold text-[10px] uppercase tracking-widest hover:bg-surface-container-high transition-colors">Vegetarian</button>
+<button class="whitespace-nowrap px-6 py-2.5 rounded-full bg-surface-container-low text-on-surface-variant font-label font-bold text-[10px] uppercase tracking-widest hover:bg-surface-container-high transition-colors">Vegan</button>
+<button class="whitespace-nowrap px-6 py-2.5 rounded-full bg-surface-container-low text-on-surface-variant font-label font-bold text-[10px] uppercase tracking-widest hover:bg-surface-container-high transition-colors">Gluten-Free</button>
+<button class="whitespace-nowrap px-6 py-2.5 rounded-full bg-surface-container-low text-on-surface-variant font-label font-bold text-[10px] uppercase tracking-widest hover:bg-surface-container-high transition-colors">Sleep</button>
+<button class="whitespace-nowrap px-6 py-2.5 rounded-full bg-surface-container-low text-on-surface-variant font-label font-bold text-[10px] uppercase tracking-widest hover:bg-surface-container-high transition-colors">Movement</button>
+</section>
+<!-- Content Grid (Editorial Bento) -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+<!-- Featured Content (Wide) -->
+<article class="md:col-span-8 group cursor-pointer">
+<div class="relative rounded-xl overflow-hidden aspect-[16/10] bg-surface-container-low mb-4">
+<img alt="Spring Asparagus &amp; Pea Risotto" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="Gourmet spring asparagus and pea risotto served in a rustic ceramic bowl on a linen tablecloth, soft natural morning light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBb6MYO7UkgSQhUwR98Cr0B1X0Pm82a9xCrXoO5-cEnaeM6k95lm0kpm9nW36chJFZa5Hbjrkl50rkgvpsnAs_X-weT_0BCLr_oRw9TC2X9FSoDJSVp7ZfsLhGsTgig1z_2XiZMthM1HxajWn461Z-GwnVu8Hy20GMASuXOw-Y559tK3Igl5nqoch20ABPpCY83m51oj9vBfPxwRDLxJrN8V7-S1tjj74RmjuF6Q3ryxYuvqp62wYlKMBZTD3DvjGafnTcXyRA4Az4"/>
+<div class="absolute top-4 left-4 flex gap-2">
+<span class="bg-surface/90 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tighter text-secondary">Vegetarian</span>
+<span class="bg-surface/90 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tighter text-primary">Recipe</span>
+</div>
+</div>
+<div class="pl-4">
+<h3 class="font-headline text-2xl mb-2 text-on-surface group-hover:text-primary transition-colors">Spring Asparagus &amp; Pea Risotto</h3>
+<p class="text-on-surface-variant leading-relaxed max-w-md">A gentle, grounding meal designed to celebrate the first harvest of the season. Rich in vibrant greens and warming arborio rice.</p>
+</div>
+</article>
+<!-- Practice Card (Square) -->
+<article class="md:col-span-4 group cursor-pointer">
+<div class="relative rounded-xl overflow-hidden aspect-square bg-surface-container-low mb-4">
+<img alt="10-Min Solar Plexus Flow" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="Person practicing a peaceful yoga flow in a sun-drenched minimalist room with organic textures and soft shadows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBMn-4F04GdzUiMgfD0-2x8bo39XbfC6fhTVjWe6u1dnNzPVb5ifNpXeQS5F4PmrotqLq5jnYuq4xx_dlYXIGA-PptXx7q7gteTq6eSv0FefHhByoSy5UKi_aMAmo_bBQdIoZvc5nw0FkVfWdvmnpSRiocmy6ojpFwpnZ2qymVjK0XDsdUJ0CLyyKob9x20F7VLRb3lzIYDUaRlzubU8ZRnzzoXkVkpzk7cCjeCmgA4HwxOrHU3SpxNnG2xNU1e1m8whbjyQGL9SL8"/>
+<div class="absolute top-4 left-4">
+<span class="bg-surface/90 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tighter text-primary">Movement</span>
+</div>
+</div>
+<div class="pl-2">
+<h3 class="font-headline text-xl mb-1 text-on-surface">10-Min Solar Plexus Flow</h3>
+<div class="flex items-center gap-2 text-on-surface-variant/70 text-sm">
+<span class="material-symbols-outlined text-sm">schedule</span>
+<span class="font-label">12 mins</span>
+<span class="mx-1">•</span>
+<span class="font-label">Beginner</span>
+</div>
+</div>
+</article>
+<!-- Secondary Recipe (Vertical) -->
+<article class="md:col-span-4 group cursor-pointer">
+<div class="relative rounded-xl overflow-hidden aspect-[4/5] bg-surface-container-low mb-4">
+<img alt="Mediterranean Harvest Bowl" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="A vibrant mediterranean harvest bowl with roasted vegetables, hummus, and fresh herbs on a stoneware plate" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDAs2HUlQvStmqfQCQsm1h6ufJPB1qLJ0nWjPBKOLihjzsnM_DOenDAbY02aDiN7zvk6sw6GD4ghUtzdrGnHVEYve5dSosbLPinde8Nttgv3YlGFaACxpt7ExzzU3SEbF4bpGU4XEmdTll01aCEdc05ArL6N9pHuVBhNRLC04SH5zIBMW_5ORauRKIGDY-pAb3B_iKTWCZ3HZ7yuxGsvBYX3TS06mM1HVkF7y6cYp5VrFCEm8H9bfaytz1qo2mtpxIkhdHYW5dQf8Y"/>
+<div class="absolute top-4 left-4 flex gap-2">
+<span class="bg-surface/90 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tighter text-secondary">Vegan</span>
+</div>
+</div>
+<div class="pl-2">
+<h3 class="font-headline text-xl mb-1 text-on-surface">Harvest Grain Bowl</h3>
+<p class="text-sm text-on-surface-variant/80 font-label uppercase tracking-widest font-bold">Gut-Health Focus</p>
+</div>
+</article>
+<!-- Practice Card (Wide) -->
+<article class="md:col-span-8 group cursor-pointer relative">
+<div class="relative rounded-xl overflow-hidden aspect-[16/8] bg-surface-container-low mb-4">
+<img alt="Deep Sleep Nidra" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="Atmospheric shot of a candlelit bedroom with cozy textures, linen sheets, and warm ambient light, very peaceful" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwlOEIRLrUA0rJBOXdiROn2Y6ro1rjX9p4Ys-k1gZrTOm07Plpk33rTjm_qAFHHHg8ClfpOHdLNI8JfvjlFE5NA_Q7aOuKo4nQTAMfk0FibFT-55e_1jWQR5WOvXukpyE00w9vZVjCthsS80E55b321ALEm5bIMkQT8LgBj_40r_kYX3c90dCKihgFOehmmCN5jabRjfwHqJDXApY4AWJ5bFga2ET7WNtz2vlJbCs8c65ftDhI6rBiukM059BGgQsRigrRPSFF6Yk"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+<div class="absolute bottom-6 left-6 text-white">
+<span class="bg-secondary/80 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tighter mb-2 inline-block">Sleep</span>
+<h3 class="font-headline text-2xl">Yoga Nidra for Deep Rest</h3>
+</div>
+</div>
+</article>
+</div>
+<!-- Featured Ingredient Section (Asymmetric) -->
+<section class="mt-20 flex flex-col md:flex-row gap-12 items-center">
+<div class="md:w-1/2 relative">
+<div class="aspect-[3/4] rounded-xl overflow-hidden shadow-[0_20px_40px_rgba(27,28,26,0.05)]">
+<img alt="Featured: Honey" class="w-full h-full object-cover" data-alt="Close up of raw organic honey dripping from a wooden dipper into a ceramic jar, warm golden tones" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCyehbr2N39JPVoliZ_r0Z7K2ozfIFOvaK77MnwJV9_lOOVQR5beoQLdl3UUu2om8bRZBexauWEdQmPmGD56bjM17qeuItqpDnFyt8UhHDfK-r2tF_IIUqezvVDDfQLSTG4qO-Jzn0OaJdicfyXnwKiTF70WKG4crgirq-UdTgMAtKRKcETJ2M6PZArF9lA621wVjGUJe5hcmCRV8bTsL31Lt9kJ6K3iGhuAHlGAkg65y1VaVgMwkUslAkK_CHTdFm8E9g8qtlePj4"/>
+</div>
+<div class="absolute -bottom-6 -right-6 bg-surface-container-highest p-8 rounded-xl max-w-xs border border-outline-variant/15">
+<h4 class="font-headline italic text-lg mb-2">The Alchemy of Raw Honey</h4>
+<p class="text-xs text-on-surface-variant font-body">Ancient wisdom meets modern immunity. Discover our guide on artisanal honey sourcing.</p>
+</div>
+</div>
+<div class="md:w-1/2 md:pl-12">
+<span class="font-label font-bold text-[10px] uppercase tracking-[0.2em] text-primary mb-4 block">Seasonal Insight</span>
+<h3 class="font-headline text-3xl mb-6">Embracing the Slow Kitchen</h3>
+<p class="text-on-surface-variant leading-relaxed mb-8">Cooking as a meditative practice allows us to reconnect with the rhythms of the earth. We focus on single-source ingredients and mindful preparation techniques that nourish both body and spirit.</p>
+<button class="bg-gradient-to-r from-primary to-primary-container text-on-primary px-10 py-4 rounded-xl font-label font-bold text-sm tracking-widest uppercase hover:opacity-90 transition-opacity">Read the Guide</button>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-2 bg-[#fbf9f5]/80 dark:bg-[#1b1c1a]/80 backdrop-blur-xl rounded-t-[1.5rem] border-t border-[#c6c8b8]/15 shadow-[0_-20px_40px_rgba(27,28,26,0.05)]">
+<a class="flex flex-col items-center justify-center text-[#1b1c1a]/40 dark:text-[#fbf9f5]/40 px-4 py-2 hover:text-[#56642b] dark:hover:text-[#8a9a5b] active:scale-90 transition-transform duration-300" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="home_max">home_max</span>
+<span class="font-['Manrope'] text-[10px] uppercase tracking-widest font-bold">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-[#8a9a5b]/10 text-[#56642b] dark:text-[#8a9a5b] rounded-2xl px-4 py-2 active:scale-90 transition-transform duration-300" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="auto_stories">auto_stories</span>
+<span class="font-['Manrope'] text-[10px] uppercase tracking-widest font-bold">Library</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#1b1c1a]/40 dark:text-[#fbf9f5]/40 px-4 py-2 hover:text-[#56642b] dark:hover:text-[#8a9a5b] active:scale-90 transition-transform duration-300" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="temp_identity">perm_identity</span>
+<span class="font-['Manrope'] text-[10px] uppercase tracking-widest font-bold">AI Assistant</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#1b1c1a]/40 dark:text-[#fbf9f5]/40 px-4 py-2 hover:text-[#56642b] dark:hover:text-[#8a9a5b] active:scale-90 transition-transform duration-300" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="person_2">person_2</span>
+<span class="font-['Manrope'] text-[10px] uppercase tracking-widest font-bold">Profile</span>
+</a>
+</nav>
+</body></html>

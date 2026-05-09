@@ -53,7 +53,9 @@ OPENROUTER_BASE_URL = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/ap
 
 # 国内版模型映射 (配置名 → OpenRouter 模型名)
 CN_MODEL_MAP = {
-    "deepseek-v3.2": "deepseek/deepseek-v3.2",
+    "deepseek-v4-pro": "deepseek/deepseek-v4-pro",
+    "deepseek-v4-flash": "deepseek/deepseek-v4-flash",
+    "deepseek-v3.2": "deepseek/deepseek-v4-pro",  # v3.2 已下架，映射到 v4-pro
     "glm-4.6": "z-ai/glm-4.6",
     "qwen3-235b": "qwen/qwen3-max-thinking",
     "kimi-k2-thinking": "moonshotai/kimi-k2-thinking",
@@ -326,8 +328,7 @@ class OpenRouterClient:
                                 content = chunk.get("choices", [{}])[0].get("delta", {}).get("content", "")
                                 if content:
                                     yield content
-                            except:
-                                pass
+                            except Exception as e:                                pass
 
 
 # ==================== 便捷函数 ====================

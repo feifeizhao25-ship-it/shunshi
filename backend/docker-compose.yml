@@ -15,7 +15,7 @@ services:
     environment:
       POSTGRES_DB: ${DB_NAME:-shunshi}
       POSTGRES_USER: ${DB_USER:-shunshi}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-shunshi123}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./migrations/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
@@ -47,9 +47,9 @@ services:
       --appendonly yes
       --maxmemory 256mb
       --maxmemory-policy allkeys-lru
-      --requirepass ${REDIS_PASSWORD:-}
+      ${REDIS_PASSWORD:+--requirepass $REDIS_PASSWORD}
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD-SHELL", "redis-cli ${REDIS_PASSWORD:+-a $REDIS_PASSWORD} ping | grep PONG"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -74,7 +74,7 @@ services:
     env_file:
       - .env
     environment:
-      DATABASE_URL: postgresql+psycopg2://${DB_USER:-shunshi}:${DB_PASSWORD:-shunshi123}@postgres:5432/${DB_NAME:-shunshi}
+      DATABASE_URL: postgresql+psycopg2://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
       REDIS_URL: redis://redis:6379/0
     depends_on:
       postgres:
@@ -108,11 +108,11 @@ services:
     env_file:
       - .env
     environment:
-      DATABASE_URL: postgresql+psycopg2://${DB_USER:-shunshi}:${DB_PASSWORD:-shunshi123}@postgres:5432/${DB_NAME:-shunshi}
+      DATABASE_URL: postgresql+psycopg2://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
     depends_on:
       postgres:
         condition: service_healthy
-    entrypoint: ["alembic", "-x", "url=postgresql+psycopg2://${DB_USER:-shunshi}:${DB_PASSWORD:-shunshi123}@postgres:5432/${DB_NAME:-shunshi}", "upgrade", "head"]
+    entrypoint: ["alembic", "-x", "url=postgresql+psycopg2://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}", "upgrade", "head"]
     networks:
       - backend-net
     profiles:

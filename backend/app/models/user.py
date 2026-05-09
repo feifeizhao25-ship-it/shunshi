@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """User models."""
 from sqlalchemy import Column, String, Integer, SmallInteger, Boolean, Date, Time, TIMESTAMP, Text, JSON
 from sqlalchemy.dialects.postgresql import UUID

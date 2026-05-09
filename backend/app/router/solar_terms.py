@@ -658,7 +658,7 @@ class SolarTermSummary(BaseModel):
 
 # ============ API Endpoints ============
 
-@router.get("", response_model=dict)
+@router.get("", response_model=dict, summary="获取所有节气", description="分页返回24节气列表，支持中英文locale切换")
 async def get_solar_terms(
     locale: str = Query("zh-CN", description="语言: zh-CN/en-US"),
     page: int = Query(1, ge=1),
@@ -671,21 +671,19 @@ async def get_solar_terms(
     
     return {
         "success": True,
-        "data": {
-            "items": items,
-            "total": len(SOLAR_TERMS),
-            "page": page,
-            "limit": limit
-        }
+        "data": items,
+        "total": len(SOLAR_TERMS),
+        "page": page,
+        "limit": limit
     }
 
-@router.get("/current", response_model=dict)
+@router.get("/current", response_model=dict, summary="当前节气", description="返回当前所处的节气信息")
 async def get_current(locale: str = Query("zh-CN", description="语言: zh-CN/en-US")):
     """获取当前节气"""
     current = get_current_solar_term()
     return {"success": True, "data": _localize_term(current, locale)}
 
-@router.get("/today", response_model=dict)
+@router.get("/today", response_model=dict, summary="今日节气建议", description="返回当前节气及前后节气信息，附带七日养生建议")
 async def get_today_solar_term(locale: str = Query("zh-CN", description="语言: zh-CN/en-US")):
     """获取今日节气和建议"""
     current = get_current_solar_term()
@@ -717,7 +715,7 @@ async def get_today_solar_term(locale: str = Query("zh-CN", description="语言:
         }
     }
 
-@router.get("/upcoming", response_model=dict)
+@router.get("/upcoming", response_model=dict, summary="即将到来的节气", description="返回未来7天内即将到来的节气列表")
 async def get_upcoming_solar_term(locale: str = Query("zh-CN", description="语言: zh-CN/en-US")):
     """获取即将到来的节气（7天内）"""
     now = datetime.now()
@@ -758,7 +756,27 @@ async def get_upcoming_solar_term(locale: str = Query("zh-CN", description="语�
         }
     }
 
-@router.get("/notifications", response_model=dict)
+@router.get("/schedule", response_model=dict, summary="全年节气日程", description="返回指定年份24节气的日期日程表")
+async def get_solar_terms_schedule(
+    year: int = Query(None),
+    locale: str = Query("zh-CN", description="语言: zh-CN/en-US"),
+):
+    """获取全年节气日程"""
+    target_year = year or datetime.now().year
+    schedule = []
+    for term in SOLAR_TERMS:
+        schedule.append({
+            "id": term["id"],
+            "name": term["name"],
+            "date": f"{target_year}-{term['start_date']}",
+            "start_date": f"{target_year}-{term['start_date']}",
+            "end_date": f"{target_year}-{term['end_date']}",
+            "emoji": term.get("emoji", ""),
+        })
+    return {"success": True, "data": schedule}
+
+
+@router.get("/notifications", response_model=dict, summary="节气通知", description="生成即将到来节气的推送提醒文案")
 async def get_solar_term_notifications(locale: str = Query("zh-CN", description="语言: zh-CN/en-US")):
     """节气通知内容生成 - 返回即将到来节气的提醒文案"""
     now = datetime.now()
@@ -820,13 +838,13 @@ async def get_solar_term_notifications(locale: str = Query("zh-CN", description=
         }
     }
 
-@router.get("/enhanced/current")
+@router.get("/enhanced/current", summary="增强版当前节气", description="返回当前节气含倒计时和进度信息")
 async def get_enhanced_current_term():
     """获取当前节气（含倒计时和进度）"""
     return {"success": True, "data": solar_term_enhanced_service.get_current_term()}
 
 
-@router.get("/enhanced/all")
+@router.get("/enhanced/all", summary="增强版所有节气", description="返回所有节气含当前/过去/未来状态和高亮标记")
 async def get_all_terms_with_status(
     locale: str = Query("zh-CN", description="语言: zh-CN/en-US"),
 ):
@@ -834,7 +852,7 @@ async def get_all_terms_with_status(
     terms = solar_term_enhanced_service.get_all_terms_with_status(locale)
     return {"success": True, "data": {"terms": terms, "total": len(terms)}}
 
-@router.get("/enhanced/{term_name}")
+@router.get("/enhanced/{term_name}", summary="节气详细养生方案", description="返回指定节气的详细养生方案，包括食疗/茶饮/运动/穴位/睡眠/作息")
 async def get_enhanced_term_detail(
     term_name: str,
     locale: str = Query("zh-CN", description="语言: zh-CN/en-US"),
@@ -846,10 +864,68 @@ async def get_enhanced_term_detail(
         raise HTTPException(status_code=404, detail=str(e))
 
 
-@router.get("/{name}", response_model=dict)
-async def get_solar_term(name: str, locale: str = Query("zh-CN", description="语言: zh-CN/en-US")):
-    """获取指定节气详情"""
+@router.get("/wisdom", response_model=dict, summary="季节养生智慧", description="返回春/夏/秋/冬四季的养生智慧和核心建议")
+async def get_season_wisdom(
+    season: str = Query("spring", description="季节: spring/summer/autumn/winter"),
+    locale: str = Query("zh-CN", description="语言: zh-CN/en-US"),
+):
+    """获取季节养生智慧"""
+    wisdom_map = {
+        "spring": {"season": "春季", "wisdom": "春生万物，宜养肝疏肝，多食绿色蔬菜，早睡早起。", "suggestions": ["多食绿色蔬菜", "早睡早起", "适度运动生发阳气"]},
+        "summer": {"season": "夏季", "wisdom": "夏长繁茂，宜养心清火，多食苦味食物，午睡养心。", "suggestions": ["多食苦味食物", "午睡养心", "避免暴晒"]},
+        "autumn": {"season": "秋季", "wisdom": "秋收肃降，宜养肺润燥，多食白色食物，早睡早起。", "suggestions": ["多食白色食物", "早睡早起", "适度运动收敛神气"]},
+        "winter": {"season": "冬季", "wisdom": "冬藏闭蛰，宜养肾藏精，多食黑色食物，早睡晚起。", "suggestions": ["多食黑色食物", "早睡晚起", "避免过度劳累"]},
+    }
+    data = wisdom_map.get(season, wisdom_map["spring"])
+    return {"success": True, "data": data}
+
+
+@router.get("/{name}/recommendations", response_model=dict, summary="节气推荐内容", description="返回指定节气的推荐食疗、茶饮、运动、穴位、睡眠、作息方案")
+async def get_solar_term_recommendations(
+    name: str,
+    locale: str = Query("zh-CN", description="语言: zh-CN/en-US"),
+):
+    """获取节气推荐内容"""
+    # 支持通过 id (st-001) 或名称 (立春) 查找
+    term_name = name
     term = get_solar_term_by_name(name)
+    if not term:
+        # 尝试通过 id 匹配
+        for t in SOLAR_TERMS:
+            if t["id"] == name:
+                term = t
+                term_name = t["name"]
+                break
+    if not term:
+        raise HTTPException(status_code=404, detail="节气不存在")
+    try:
+        detail = solar_term_enhanced_service.get_term_detail(term_name, locale)
+        # 扁平化输出兼容测试期望
+        wp = detail.get("wellness_plan", {})
+        result = {
+            "term": detail.get("term", {}),
+            "diet": wp.get("diet", []),
+            "tea": wp.get("tea", []),
+            "exercise": wp.get("exercise", []),
+            "acupoints": wp.get("acupoints", []),
+            "sleep": wp.get("sleep", []),
+            "routine": wp.get("routine", {}),
+        }
+        return {"success": True, "data": result}
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+
+@router.get("/{name}", response_model=dict, summary="节气详情", description="获取指定节气详情，支持通过id(st-001)或中英文名称查询")
+async def get_solar_term(name: str, locale: str = Query("zh-CN", description="语言: zh-CN/en-US")):
+    """获取指定节气详情（支持 id 或名称）"""
+    term = get_solar_term_by_name(name)
+    if not term:
+        # Try matching by id
+        for t in SOLAR_TERMS:
+            if t["id"] == name:
+                term = t
+                break
     if not term:
         # Try matching by en_name
         en_match = None

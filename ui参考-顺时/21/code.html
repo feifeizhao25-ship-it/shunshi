@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+
+<html class="light" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&amp;family=Manrope:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-bright": "#fdf9f4",
+                        "on-secondary": "#ffffff",
+                        "secondary-fixed-dim": "#e4c09c",
+                        "on-tertiary": "#ffffff",
+                        "on-background": "#1c1c19",
+                        "inverse-primary": "#a1d2ad",
+                        "on-primary": "#ffffff",
+                        "surface-container-highest": "#e6e2dd",
+                        "surface-tint": "#3b684a",
+                        "on-surface-variant": "#414942",
+                        "primary": "#144227",
+                        "on-primary-container": "#9ed0ab",
+                        "tertiary-fixed": "#ffdea4",
+                        "surface-container-low": "#f7f3ee",
+                        "secondary-fixed": "#ffddbb",
+                        "tertiary": "#4c3605",
+                        "surface-dim": "#ddd9d5",
+                        "secondary-container": "#ffd9b4",
+                        "on-tertiary-fixed-variant": "#5a4312",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-fixed-dim": "#e4c285",
+                        "error-container": "#ffdad6",
+                        "on-error": "#ffffff",
+                        "tertiary-container": "#654d1b",
+                        "on-surface": "#1c1c19",
+                        "secondary": "#74593c",
+                        "outline": "#717971",
+                        "primary-container": "#2d5a3d",
+                        "surface-container": "#f1ede8",
+                        "error": "#ba1a1a",
+                        "outline-variant": "#c1c9c0",
+                        "primary-fixed": "#bceec8",
+                        "on-error-container": "#93000a",
+                        "inverse-on-surface": "#f4f0eb",
+                        "on-primary-fixed": "#00210f",
+                        "on-secondary-fixed-variant": "#5b4227",
+                        "on-tertiary-container": "#e1bf82",
+                        "on-secondary-container": "#795d40",
+                        "surface-variant": "#e6e2dd",
+                        "surface-container-high": "#ebe8e3",
+                        "on-tertiary-fixed": "#261900",
+                        "on-primary-fixed-variant": "#224f33",
+                        "inverse-surface": "#31302d",
+                        "on-secondary-fixed": "#2a1702",
+                        "primary-fixed-dim": "#a1d2ad",
+                        "surface": "#fdf9f4",
+                        "background": "#fdf9f4"
+                    },
+                    fontFamily: {
+                        "headline": ["Noto Serif SC", "serif"],
+                        "body": ["Manrope", "sans-serif"],
+                        "label": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .ink-wash-gradient {
+            background: linear-gradient(to bottom, rgba(20, 66, 39, 0.05) 0%, rgba(253, 249, 244, 0) 100%);
+        }
+        body {
+            font-family: 'Manrope', sans-serif;
+            background-color: #fdf9f4;
+            color: #1c1c19;
+        }
+        h1, h2, h3 {
+            font-family: 'Noto Serif SC', serif;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 right-0 z-50 bg-[#fdf9f4] dark:bg-stone-950">
+<div class="flex justify-between items-center px-6 py-4 w-full max-w-screen-xl mx-auto">
+<button class="text-[#144227] dark:text-emerald-500 hover:bg-[#f7f3ee] dark:hover:bg-stone-800 transition-colors p-2 rounded-full">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="text-2xl font-bold tracking-tighter text-[#144227] dark:text-emerald-500 font-serif italic tracking-wide">
+                顺时 ShunShi
+            </h1>
+<div class="w-10 h-10 rounded-full overflow-hidden border border-outline-variant/20">
+<img alt="User Profile" data-alt="Close up portrait of a serene woman with a natural look and soft ambient lighting on a warm background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBIGOR92Vp0NJ1ix0JE9mDY-a39pewyjPSk8xBD5k-80s-wzeWasUZ_syTPbxpzAOnibT6UHeI_KutGCILYdDWwaU89VxVYwZjBFEIGQCzvQf6Ss0vWBhVS59HXnSIATKPyGwKYVgXgcAXnyIcYPahH1Gu4lab97j4odKFgOzbtFkdOmDmdGyA1bOzQSefq1Ortjta5o7luu4V6lwLGJE1LbHdKLWVRfXlpIUyVsBIqPPj05YawbQIxrKTEPQBUMI30mGgvGT4xcmI"/>
+</div>
+</div>
+<div class="bg-[#f7f3ee] dark:bg-stone-900 h-[1px] w-full opacity-50"></div>
+</header>
+<main class="pt-24 pb-32 max-w-screen-xl mx-auto px-6">
+<!-- Hero Section: Challenge Title -->
+<section class="mb-12 relative overflow-hidden rounded-3xl h-64 flex flex-col justify-end p-8 bg-primary text-white">
+<div class="absolute inset-0 opacity-40">
+<img alt="Nature Background" class="w-full h-full object-cover" data-alt="Soft ethereal landscape of misty green mountains and traditional Chinese ink painting style clouds at dawn" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCITW2qZli35_DHChV1Azq53L3t000qy7y7a6Ree952jMEwKdx1Cbj2bjZe4BMyA5gCAqfcAaKgW66Kcl2ZpjRZ6t00hLLWGoM-J_q87o47ACx74xKnwiOUVhzERj2NJHUqQ1tXc5EFr49FbNPaEWZzzSuwuyJfjCtio9BLfvOX3r-qOiYCoMAO8E00FKn8BjOzT0brNtpEtc7v41RIsA3SjKBiaG_v6PhSF9FLzmhhMvjjll5xqIrRlEjSlI8rSmZf-u39W1GBjhg"/>
+</div>
+<div class="relative z-10">
+<div class="inline-block px-3 py-1 bg-tertiary-fixed text-on-tertiary-fixed text-xs font-bold rounded mb-3 tracking-widest uppercase">
+                    21天养成计划
+                </div>
+<h2 class="text-4xl md:text-5xl font-bold mb-2">21天祛湿挑战营</h2>
+<p class="text-on-primary-container font-light">已参加人数: 1,280</p>
+</div>
+</section>
+<!-- Progress Section -->
+<section class="mb-16">
+<div class="flex justify-between items-end mb-4">
+<h3 class="text-xl text-primary">挑战进度</h3>
+<span class="text-secondary font-medium tracking-wide">当前第7天 / 21天</span>
+</div>
+<div class="w-full h-3 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary w-1/3 rounded-full transition-all duration-1000"></div>
+</div>
+<div class="flex justify-between mt-3 text-[10px] text-outline tracking-tighter uppercase font-bold">
+<span>START</span>
+<span>FINISH</span>
+</div>
+</section>
+<!-- Main Content Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- Daily Tasks (Left Column / spans 2 on desktop) -->
+<div class="md:col-span-2 space-y-6">
+<h3 class="text-2xl text-primary mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined">today</span>
+                    今日打卡任务
+                </h3>
+<div class="space-y-4">
+<!-- Task 1 -->
+<div class="group flex items-center justify-between p-6 bg-surface-container-lowest rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300">
+<div class="flex items-center gap-5">
+<div class="w-12 h-12 flex items-center justify-center bg-primary text-white rounded-xl">
+<span class="material-symbols-outlined">local_drink</span>
+</div>
+<div>
+<h4 class="text-lg font-bold text-on-surface">1. 早起空腹一杯温开水</h4>
+<p class="text-sm text-primary font-medium">已完成</p>
+</div>
+</div>
+<div class="text-primary">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+</div>
+<!-- Task 2 -->
+<div class="group flex items-center justify-between p-6 bg-surface-container-lowest rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300">
+<div class="flex items-center gap-5">
+<div class="w-12 h-12 flex items-center justify-center bg-surface-container text-secondary rounded-xl">
+<span class="material-symbols-outlined">self_improvement</span>
+</div>
+<div>
+<h4 class="text-lg font-bold text-on-surface">2. 八段锦练习15分钟</h4>
+<p class="text-sm text-outline">未打卡</p>
+</div>
+</div>
+<button class="px-6 py-2.5 bg-primary text-white rounded-lg font-bold hover:scale-95 transition-transform active:duration-150">
+                            去打卡
+                        </button>
+</div>
+<!-- Task 3 -->
+<div class="group flex items-center justify-between p-6 bg-surface-container-lowest rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300">
+<div class="flex items-center gap-5">
+<div class="w-12 h-12 flex items-center justify-center bg-surface-container text-secondary rounded-xl">
+<span class="material-symbols-outlined">restaurant</span>
+</div>
+<div>
+<h4 class="text-lg font-bold text-on-surface">3. 晚餐不吃生冷食物</h4>
+<p class="text-sm text-outline">待记录</p>
+</div>
+</div>
+<button class="px-6 py-2.5 bg-secondary-container text-on-secondary-container rounded-lg font-bold hover:opacity-80 transition-opacity">
+                            待记录
+                        </button>
+</div>
+</div>
+</div>
+<!-- Sidebar Info (Right Column) -->
+<div class="space-y-8">
+<!-- Rewards Card -->
+<div class="p-8 bg-tertiary-container text-on-tertiary-container rounded-3xl relative overflow-hidden">
+<div class="absolute -right-4 -top-4 opacity-10">
+<span class="material-symbols-outlined text-9xl">military_tech</span>
+</div>
+<h3 class="text-xl mb-6 font-bold flex items-center gap-2">
+<span class="material-symbols-outlined">card_giftcard</span>
+                        挑战奖励
+                    </h3>
+<div class="space-y-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-tertiary-fixed-dim flex items-center justify-center text-on-tertiary-fixed">
+<span class="material-symbols-outlined text-sm">stars</span>
+</div>
+<span class="text-lg font-serif">节气大师勋章</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-tertiary-fixed-dim flex items-center justify-center text-on-tertiary-fixed">
+<span class="material-symbols-outlined text-sm">add_circle</span>
+</div>
+<span class="text-lg font-serif">500积分</span>
+</div>
+</div>
+</div>
+<!-- Leaderboard Preview -->
+<div class="p-8 bg-surface-container-low rounded-3xl">
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-xl text-primary font-bold">好友榜</h3>
+<span class="text-sm text-secondary">查看全部</span>
+</div>
+<div class="space-y-6">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-stone-200 overflow-hidden">
+<img alt="Friend 1" data-alt="Close-up portrait of a cheerful young man with short hair and a warm smile in natural outdoor light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAuef3kIRKVvXgbwfPntMHVzac2id_HLMsOkKlovVPV2BDAx7p0F8F-akgb_bBMb8rxAMF0uwMtyjcv6LgdWvPeXAVPUi4gw98wZOPhcCTG2h65ZrVJnamBW6J0ADrOwGWn-RGHE__9C0x-kM34tsr0DydWANKcCQUoho7YAUUnF80jkaKQVYgE2xrX9bmTLUyCxpSCMEEhGmXftxz5RQ0vVIquQ-oB8Q7p9vfTCTjzJrxHBznDzHjGkZyv9i5qOGrDWrgxPEZXucs"/>
+</div>
+<span class="font-bold">云水禅心</span>
+</div>
+<span class="text-primary font-bold">第1名</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-stone-200 overflow-hidden">
+<img alt="Friend 2" data-alt="Portrait of a young woman with long dark hair, soft features and contemplative expression in soft studio lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC7H7vFMGvxnSFdE4gU8uFBzgtjeyLy1Z8HfdOnFskhl2soLek06YeAGTuCbx1O2DX6lP2Qxcrh2PR-qSfHuByotYKH-GL-KmJtyhZWZ1zjSrky3de7eGtcd0TrdCyf0D71MR6WZ5o9oVaAHRNjbZfvHBUwUdsU4yYg0bFDhMfvTQ4pxGfgcA13X9Kxjv1bxLCrDZmX1MKYA1YT4OfnbyJEYjPpei93AEpm6nlmfWA-IlWoxTk1OgTYnUrVDkIRp8ssfgN3i_fuR1w"/>
+</div>
+<span class="font-bold">林间小鹿</span>
+</div>
+<span class="text-secondary font-medium">第3名</span>
+</div>
+<div class="flex items-center justify-between opacity-60">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-stone-200 overflow-hidden">
+<img alt="Friend 3" data-alt="Medium shot of a smiling man with spectacles and relaxed posture against a blurred architectural background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuABLJMJEeLzdwuMSjE4Zzwzh_N_BFsN7-iew8gT-OtqEO96Vua2hmvoA7TIuBXQ8eG-sWo9GkvEz85xjtk6dGpy9FtemCL3EVbNlfAoPnXdVywf4KhA34KWPzexHMZbtKt-dP0SLTKBk2erI2NGaqGBzepat3OjcVHEBhOHtezscFBfeBisPiOCZiwrDImutNUzzhYGemgSyrCjxNFHtNK94JmDU_81z1hfr3uj_A9rNUfEYwsYQgDJZcFullv2aARsRiwrQnIukfw"/>
+</div>
+<span class="font-bold">岁月静好</span>
+</div>
+<span class="text-outline">第12名</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- AI Companion / Insight Module -->
+<section class="mt-16 p-8 bg-surface-container-low/80 backdrop-blur-xl rounded-3xl border border-outline-variant/10">
+<div class="flex items-start gap-6">
+<div class="w-16 h-16 shrink-0 bg-primary-container rounded-2xl flex items-center justify-center text-on-primary-container">
+<span class="material-symbols-outlined text-4xl">auto_awesome</span>
+</div>
+<div>
+<h3 class="text-xl font-bold text-primary mb-2">顺时小助手 · 温馨提示</h3>
+<p class="text-secondary leading-relaxed font-body">
+                        今日已至第7天，坚持是祛湿的关键。建议在打卡八段锦练习时，配合深长的腹式呼吸。晚间若感乏力，可用温水泡脚20分钟，助眠又排湿。
+                    </p>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 bg-[#fdf9f4]/80 dark:bg-stone-950/80 backdrop-blur-xl shadow-[0_-4px_24px_rgba(28,28,25,0.04)] border-t border-[#c1c9c0]/20">
+<a class="flex flex-col items-center justify-center text-[#74593c] dark:text-stone-400 px-4 py-1.5 hover:opacity-80 transition-opacity" href="#">
+<span class="material-symbols-outlined">schedule</span>
+<span class="font-sans text-[11px] font-medium tracking-[0.05rem]">十二时辰</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#74593c] dark:text-stone-400 px-4 py-1.5 hover:opacity-80 transition-opacity" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-sans text-[11px] font-medium tracking-[0.05rem]">社区</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-[#144227] text-white rounded-xl px-4 py-1.5 hover:opacity-80 transition-opacity" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">emoji_events</span>
+<span class="font-sans text-[11px] font-medium tracking-[0.05rem]">挑战</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#74593c] dark:text-stone-400 px-4 py-1.5 hover:opacity-80 transition-opacity" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-sans text-[11px] font-medium tracking-[0.05rem]">设置</span>
+</a>
+</nav>
+</body></html>

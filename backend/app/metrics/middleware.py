@@ -78,6 +78,20 @@ if _PROMETHEUS_AVAILABLE:
         "subscriptions_active",
         "Number of active subscriptions",
     )
+
+    # ==================== LLM Token 消耗指标 ====================
+
+    llm_tokens_total = Counter(
+        "llm_tokens_total",
+        "Total LLM tokens consumed",
+        ["model", "type"],  # type: input/output
+    )
+
+    llm_cost_total = Counter(
+        "llm_cost_total",
+        "Total LLM cost in CNY",
+        ["model"],
+    )
 else:
     # Mock objects when prometheus_client is not available
     class _NoOp:
@@ -101,6 +115,8 @@ else:
     active_users = _NoOp()
     chat_messages_total = _NoOp()
     subscriptions_active = _NoOp()
+    llm_tokens_total = _NoOp()
+    llm_cost_total = _NoOp()
 
 
 def get_metrics():
@@ -192,3 +208,12 @@ def track_llm_request(model: str, duration_seconds: float):
     if _PROMETHEUS_AVAILABLE:
         llm_requests_total.labels(model=model).inc()
         llm_request_duration_seconds.labels(model=model).observe(duration_seconds)
+
+
+def track_llm_tokens(model: str, input_tokens: int, output_tokens: int, cost: float = 0.0):
+    """记录 LLM token 消耗"""
+    if _PROMETHEUS_AVAILABLE:
+        llm_tokens_total.labels(model=model, type="input").inc(input_tokens)
+        llm_tokens_total.labels(model=model, type="output").inc(output_tokens)
+        if cost > 0:
+            llm_cost_total.labels(model=model).inc(cost)

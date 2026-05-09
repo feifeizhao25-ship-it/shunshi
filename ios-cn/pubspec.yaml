@@ -1,0 +1,117 @@
+name: shunshi
+description: "顺时 ShunShi - AI 养生陪伴系统"
+publish_to: 'none'
+version: 1.0.0+2
+
+environment:
+  sdk: ^3.10.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  
+  # State Management
+  flutter_riverpod: ^2.6.1
+  riverpod_annotation: ^2.6.1
+  
+  # Navigation
+  go_router: ^14.8.1
+  
+  # Network
+  dio: ^5.8.0+1
+  
+  # Local Storage
+  shared_preferences: ^2.5.3
+  flutter_secure_storage: ^9.2.4
+  
+  # Data Models
+  freezed_annotation: ^3.0.0
+  json_annotation: ^4.9.0
+  
+  # UI
+  cached_network_image: ^3.4.1
+  shimmer: ^3.0.0
+  flutter_svg: ^2.2.4
+  
+  # Utils
+  intl: ^0.20.2
+  uuid: ^4.5.1
+  connectivity_plus: ^6.1.4
+  flutter_local_notifications: ^18.0.1
+  timezone: ^0.10.0
+  sign_in_with_apple: ^6.0.0
+  google_sign_in: ^6.2.2
+  
+  # In-App Purchase (Apple StoreKit + Google Billing)
+  in_app_purchase: ^3.2.0
+  in_app_purchase_android: ^0.4.0+8
+  
+  # Voice Input
+  speech_to_text: ^7.0.0
+  permission_handler: ^11.3.1
+  # Image Picker
+  image_picker: ^1.1.2
+  path_provider: ^2.1.5
+  video_player: ^2.9.2
+
+  # Audio Recording (voice messages)
+  record: ^6.2.0
+
+  # Audio Player
+  just_audio: ^0.9.36
+  fl_chart: ^0.69.0
+
+  http: ^1.2.0
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  
+  # Code Generation
+  build_runner: ^2.4.15
+  freezed: ^3.1.0
+  json_serializable: ^6.9.4
+  riverpod_generator: ^2.6.5
+  
+  # Testing
+  mocktail: ^1.0.4
+  integration_test:
+    sdk: flutter
+
+  # App Icon Generation
+  flutter_launcher_icons: ^0.14.3
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/app_icon.png"
+
+  # Linting
+  custom_lint: ^0.7.0
+  riverpod_lint: ^2.6.5
+
+flutter:
+  uses-material-design: true
+  
+  assets:
+    - assets/images/
+    - assets/images/wellness/
+    - assets/icons/
+    - assets/images/acupoints/
+    - assets/images/foods/
+
+  fonts:
+    - family: NotoSerifSC
+      fonts:
+        - asset: assets/fonts/NotoSerifCJKsc-Regular.otf
+        - asset: assets/fonts/NotoSerifCJKsc-Bold.otf
+          weight: 700
+    - family: Manrope
+      fonts:
+        - asset: assets/fonts/Manrope-Variable.ttf
+    - family: NotoSansCJK
+      fonts:
+        - asset: assets/fonts/NotoSansCJKsc-Regular.otf
+        - asset: assets/fonts/NotoSansCJKsc-Bold.otf
+          weight: 700

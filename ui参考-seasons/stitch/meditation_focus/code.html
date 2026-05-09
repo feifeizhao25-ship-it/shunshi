@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SEASONS - Breathing into Change</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@300;400;700&amp;family=Manrope:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "error-container": "#ffdad6",
+              "on-tertiary-fixed-variant": "#4e4637",
+              "on-secondary": "#ffffff",
+              "on-primary-container": "#253000",
+              "on-primary-fixed-variant": "#3e4c16",
+              "on-tertiary-fixed": "#211b0f",
+              "tertiary-fixed-dim": "#d2c5b2",
+              "tertiary": "#665d4e",
+              "surface": "#fbf9f5",
+              "primary-fixed": "#d9eaa3",
+              "inverse-on-surface": "#f2f0ed",
+              "surface-container-lowest": "#ffffff",
+              "background": "#fbf9f5",
+              "surface-container": "#efeeea",
+              "surface-container-highest": "#e4e2de",
+              "error": "#ba1a1a",
+              "tertiary-fixed": "#eee1cd",
+              "secondary-fixed": "#ffdbcf",
+              "surface-container-low": "#f5f3ef",
+              "on-secondary-fixed": "#380d00",
+              "on-primary-fixed": "#161f00",
+              "on-error": "#ffffff",
+              "primary-fixed-dim": "#bdce89",
+              "on-secondary-fixed-variant": "#773116",
+              "tertiary-container": "#9d9281",
+              "inverse-primary": "#bdce89",
+              "secondary-container": "#fc9a77",
+              "on-primary": "#ffffff",
+              "secondary": "#95482b",
+              "on-surface": "#1b1c1a",
+              "surface-container-high": "#eae8e4",
+              "outline-variant": "#c6c8b8",
+              "on-tertiary": "#ffffff",
+              "surface-bright": "#fbf9f5",
+              "outline": "#76786b",
+              "on-error-container": "#93000a",
+              "primary": "#56642b",
+              "inverse-surface": "#30312e",
+              "surface-variant": "#e4e2de",
+              "surface-tint": "#56642b",
+              "primary-container": "#8a9a5b",
+              "on-tertiary-container": "#332b1e",
+              "on-surface-variant": "#46483c",
+              "on-background": "#1b1c1a",
+              "surface-dim": "#dbdad6",
+              "secondary-fixed-dim": "#ffb59b",
+              "on-secondary-container": "#763015"
+            },
+            fontFamily: {
+              "headline": ["Noto Serif"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .player-gradient {
+            background: linear-gradient(180deg, #56642b 0%, #3e4c16 100%);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(24px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface font-body text-on-surface antialiased overflow-hidden">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-[#fbf9f5]/80 dark:bg-stone-900/80 backdrop-blur-xl flex justify-between items-center px-6 h-16 w-full">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center overflow-hidden">
+<img alt="Profile" class="w-full h-full object-cover" data-alt="close-up portrait of a calm woman with natural light and soft shadows against a warm beige background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDcjdscLnivJFGVGJxcWs-gTldQY8tw-kbjgssiKNUVJpZ9mqNUxrY9TEpM5jRv-wn1ZZ84WcRR18V-14ZzM3J1n9eL3cmJNt-xIa564Q5pXA2nWaUp7WgX10oLx2yLNasFGUV56YVfMmCfRsI3U44QQ9LuXL865OCOl_vRx2i77Le4jD0OFcfzT-9Ip8VChAAiRBgWZ_mQzpms7KXvi4cutJO-414xzrZ_a7jBXIfcVYw1SZHUPo-b25GrRLFOzbkQFWYKXAINihM"/>
+</div>
+</div>
+<h1 class="text-2xl font-['Noto_Serif'] tracking-[0.2em] text-[#56642b] dark:text-[#8a9a5b] uppercase">SEASONS</h1>
+<button class="hover:opacity-70 transition-opacity active:scale-95 duration-200">
+<span class="material-symbols-outlined text-[#56642b] dark:text-[#8a9a5b]">settings</span>
+</button>
+</header>
+<!-- Main Player Canvas -->
+<main class="min-h-screen player-gradient pt-24 pb-32 px-8 flex flex-col items-center justify-center relative">
+<!-- Background Texture Overlays -->
+<div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCJ5XkGLQRyDMtIxoN2YxaXSQfioSGHr0K4ekLGnbEAYZ9kmrV4P_jqCewaBIzC-korIGGTftijS1HxBZGODzRzdXi4Q619dnuPrD-1iPo4ErJoTqFmXDMrXMtO3_rUqIda2fx7eaGhkiWz_pWube21f2TO7J-c7rB1nNgGxBU2vKKJsLupXfXH1TEMq88fgVDkcXNBM-KAYmkfniOSfyJFaLuElrOspN9Ga6HsxxPk1cgudGYUNM9dcL5bl2tMMm_v10iuIYKoNaE');"></div>
+<!-- Album Art Section (Editorial Asymmetry) -->
+<div class="relative w-full max-w-sm aspect-square mb-12 group">
+<div class="absolute inset-0 bg-primary opacity-20 blur-3xl transform -translate-y-4 scale-95"></div>
+<img alt="Meditation Backdrop" class="w-full h-full object-cover rounded-[2rem] shadow-2xl z-10 relative transform hover:scale-[1.02] transition-transform duration-700" data-alt="serene mountain lake at dawn with mirror-like water reflection and soft mist rolling over green pine hills" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2OVWA_BPTi8p3SqHac0l1T8GQIzFvTamtjNa9S0OO78hWVVYobHARkdfbBW9XHDkHpH89V67Ur047-qmgSh7MszZb0psQFMBHvZYePP9NzZQWbs0w_2vyu7wQM4VQLjAfM8GFrxOYeq9F_KlMMZkeW2twf1EDpH0bR8DYaaReYAVgusLeQHlTZ4iW7KfY4WYUpeT4d8sYLFzaPkCqtC-MpoWZGBJlRFpt_Dv7Bn9Tu9VnmBsBo5UvgKDiffay0eb6KOK0BJuoIdI"/>
+<!-- Dynamic Light Overlay -->
+<div class="absolute inset-0 rounded-[2rem] bg-gradient-to-tr from-white/10 to-transparent pointer-events-none"></div>
+</div>
+<!-- Typography & Title -->
+<div class="text-center space-y-2 mb-10 w-full">
+<h2 class="font-headline text-3xl text-surface font-light tracking-wide">Breathing into Change</h2>
+<p class="font-label text-xs uppercase tracking-[0.3em] text-surface/60">10 Min • Grounding</p>
+</div>
+<!-- Controls Container -->
+<div class="w-full max-w-md space-y-12">
+<!-- Seeker Bar -->
+<div class="space-y-4">
+<div class="relative h-1 w-full bg-surface/20 rounded-full overflow-hidden">
+<div class="absolute top-0 left-0 h-full w-1/3 bg-surface rounded-full"></div>
+</div>
+<div class="flex justify-between font-label text-[10px] tracking-widest text-surface/50 uppercase">
+<span>03:42</span>
+<span>10:00</span>
+</div>
+</div>
+<!-- Playback Controls -->
+<div class="flex items-center justify-center gap-12 text-surface">
+<button class="hover:opacity-70 active:scale-90 transition-all">
+<span class="material-symbols-outlined text-3xl">replay_10</span>
+</button>
+<button class="w-20 h-20 bg-surface rounded-full flex items-center justify-center text-primary shadow-xl hover:scale-105 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+<button class="hover:opacity-70 active:scale-90 transition-all">
+<span class="material-symbols-outlined text-3xl">forward_10</span>
+</button>
+</div>
+<!-- Atmosphere Toggles -->
+<div class="pt-8 border-t border-surface/10">
+<p class="font-label text-[10px] tracking-[0.2em] text-surface/40 uppercase mb-6 text-center">Atmosphere Layer</p>
+<div class="flex justify-center gap-4">
+<button class="glass-card px-6 py-3 rounded-full flex items-center gap-2 text-surface border border-white/10 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-sm">water_drop</span>
+<span class="font-label text-[10px] uppercase tracking-widest">Soft Rain</span>
+</button>
+<button class="px-6 py-3 rounded-full flex items-center gap-2 text-surface/60 border border-white/5 bg-white/5 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-sm">forest</span>
+<span class="font-label text-[10px] uppercase tracking-widest">Morning Forest</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-6 pt-3 bg-[#fbf9f5]/80 dark:bg-stone-900/80 backdrop-blur-xl z-50 rounded-t-[1.5rem] border-t border-[#c6c8b8]/15 shadow-[0_-10px_30px_rgba(27,28,26,0.03)]">
+<a class="flex flex-col items-center justify-center text-[#1b1c1a]/40 dark:text-stone-500 hover:text-[#56642b] dark:hover:text-[#8a9a5b] transition-colors active:scale-90 duration-300 ease-out" href="#">
+<span class="material-symbols-outlined">spa</span>
+<span class="font-['Manrope'] text-[10px] font-medium uppercase tracking-widest mt-1">Sanctuary</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#1b1c1a]/40 dark:text-stone-500 hover:text-[#56642b] dark:hover:text-[#8a9a5b] transition-colors active:scale-90 duration-300 ease-out" href="#">
+<span class="material-symbols-outlined">wb_sunny</span>
+<span class="font-['Manrope'] text-[10px] font-medium uppercase tracking-widest mt-1">Season</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#56642b] dark:text-[#8a9a5b] bg-[#8a9a5b]/10 rounded-2xl px-4 py-1 active:scale-90 duration-300 ease-out" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">self_improvement</span>
+<span class="font-['Manrope'] text-[10px] font-medium uppercase tracking-widest mt-1">Check-in</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#1b1c1a]/40 dark:text-stone-500 hover:text-[#56642b] dark:hover:text-[#8a9a5b] transition-colors active:scale-90 duration-300 ease-out" href="#">
+<span class="material-symbols-outlined">filter_vintage</span>
+<span class="font-['Manrope'] text-[10px] font-medium uppercase tracking-widest mt-1">Growth</span>
+</a>
+</nav>
+</body></html>

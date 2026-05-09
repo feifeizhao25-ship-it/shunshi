@@ -350,8 +350,8 @@ class PromptStore:
         """获取灰度版本内容（非活跃的最新版本）"""
         conn = get_db()
         row = conn.execute(
-            "SELECT content FROM prompt_versions WHERE prompt_key = ? AND is_active = 0 "
-            "ORDER BY version DESC LIMIT 1",
+            text("SELECT content FROM prompt_versions WHERE prompt_key = ? AND is_active = 0 "
+            "ORDER BY version DESC LIMIT 1"),
             (key,),
         ).fetchone()
         return row["content"] if row else None
@@ -401,8 +401,8 @@ class PromptStore:
 
         # 激活目标版本
         conn.execute(
-            "UPDATE prompt_versions SET is_active = 1, created_at = ? "
-            "WHERE prompt_key = ? AND version = ?",
+            text("UPDATE prompt_versions SET is_active = 1, created_at = ? "
+                 "WHERE prompt_key = ? AND version = ?"),
             (now, key, target_version),
         )
         conn.commit()

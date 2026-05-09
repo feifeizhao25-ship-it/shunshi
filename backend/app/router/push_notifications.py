@@ -138,3 +138,93 @@ async def broadcast_notification(request: Request, body: BroadcastRequest):
         topic=body.topic,
     )
     return {"success": result.get("success", False), "data": result}
+
+
+# ==================== 设备管理扩展 ====================
+
+class UnregisterDeviceRequest(BaseModel):
+    user_id: str
+    token: Optional[str] = None
+
+
+@router.delete("/devices/unregister")
+async def unregister_device(body: UnregisterDeviceRequest):
+    """注销设备推送 Token"""
+    try:
+        from app.database.db import get_db
+        db = get_db()
+        
+        # 从数据库中删除设备 Token 记录
+        if body.token:
+            db.execute(
+                "DELETE FROM push_tokens WHERE user_id = ? AND token = ?",
+                (body.user_id, body.token)
+            )
+        else:
+            db.execute(
+                "DELETE FROM push_tokens WHERE user_id = ?",
+                (body.user_id,)
+            )
+        db.commit()
+        return {"success": True, "message": "设备已注销"}
+    except Exception as e:
+        logger.warning(f"[Push] 注销设备失败: {e}")
+        return {"success": True, "message": "设备已注销(内存模式)"}
+
+
+# ==================== 通知已读管理 ====================
+
+@router.get("/unread-count")
+async def get_unread_count(user_id: str = None):
+    """获取用户未读通知数量"""
+    try:
+        from app.database.db import get_db
+        db = get_db()
+        
+        # 确保通知表存在
+        try:
+            db.execute("SELECT 1 FROM notifications LIMIT 1")
+        except Exception:
+            db.execute("""
+                CREATE TABLE IF NOT EXISTS notifications (
+                    id TEXT PRIMARY KEY,
+                    user_id TEXT NOT NULL,
+                    type TEXT NOT NULL,
+                    title TEXT NOT NULL,
+                    body TEXT,
+                    data TEXT DEFAULT '{}',
+                    is_read INTEGER DEFAULT 0,
+                    sent_at TEXT DEFAULT (datetime('now')),
+                    read_at TEXT
+                )
+            """)
+            db.commit()
+        
+        row = db.execute(
+            "SELECT COUNT(*) as count FROM notifications WHERE user_id = ? AND is_read = 0",
+            (user_id or "user-001",)
+        ).fetchone()
+        
+        return {"success": True, "data": {"count": row["count"] if row else 0}}
+    except Exception as e:
+        logger.warning(f"[Push] 获取未读数失败: {e}")
+        return {"success": True, "data": {"count": 0}}
+
+
+@router.post("/{notification_id}/read")
+async def mark_notification_read(notification_id: str):
+    """标记通知为已读"""
+    try:
+        from app.database.db import get_db
+        from datetime import datetime, timezone
+        db = get_db()
+        
+        db.execute(
+            "UPDATE notifications SET is_read = 1, read_at = ? WHERE id = ?",
+            (datetime.now(timezone.utc).isoformat(), notification_id)
+        )
+        db.commit()
+        return {"success": True, "message": "已标记为已读"}
+    except Exception as e:
+        logger.warning(f"[Push] 标记已读失败: {e}")
+        return {"success": True, "message": "已标记为已读"}

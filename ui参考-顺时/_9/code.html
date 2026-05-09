@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&amp;family=Manrope:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-tertiary-fixed-variant": "#5a4312",
+              "inverse-on-surface": "#f4f0eb",
+              "primary": "#144227",
+              "on-tertiary-container": "#e1bf82",
+              "surface-tint": "#3b684a",
+              "on-primary-fixed-variant": "#224f33",
+              "surface": "#fdf9f4",
+              "tertiary-fixed-dim": "#e4c285",
+              "surface-variant": "#e6e2dd",
+              "secondary-fixed-dim": "#e4c09c",
+              "secondary": "#74593c",
+              "tertiary-container": "#654d1b",
+              "primary-fixed": "#bceec8",
+              "on-secondary": "#ffffff",
+              "surface-container-high": "#ebe8e3",
+              "error-container": "#ffdad6",
+              "surface-container-highest": "#e6e2dd",
+              "on-secondary-fixed": "#2a1702",
+              "inverse-surface": "#31302d",
+              "on-tertiary-fixed": "#261900",
+              "inverse-primary": "#a1d2ad",
+              "tertiary": "#4c3605",
+              "surface-container-low": "#f7f3ee",
+              "on-secondary-fixed-variant": "#5b4227",
+              "secondary-fixed": "#ffddbb",
+              "surface-container": "#f1ede8",
+              "outline-variant": "#c1c9c0",
+              "on-primary": "#ffffff",
+              "on-error": "#ffffff",
+              "surface-dim": "#ddd9d5",
+              "primary-fixed-dim": "#a1d2ad",
+              "tertiary-fixed": "#ffdea4",
+              "primary-container": "#2d5a3d",
+              "on-error-container": "#93000a",
+              "on-background": "#1c1c19",
+              "on-secondary-container": "#795d40",
+              "error": "#ba1a1a",
+              "surface-bright": "#fdf9f4",
+              "on-surface-variant": "#414942",
+              "on-tertiary": "#ffffff",
+              "on-primary-container": "#9ed0ab",
+              "outline": "#717971",
+              "secondary-container": "#ffd9b4",
+              "surface-container-lowest": "#ffffff",
+              "on-primary-fixed": "#00210f",
+              "on-surface": "#1c1c19",
+              "background": "#fdf9f4"
+            },
+            fontFamily: {
+              "headline": ["Noto Serif SC", "serif"],
+              "body": ["Manrope", "sans-serif"],
+              "label": ["Manrope", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Manrope', sans-serif;
+            background-color: #fdf9f4;
+            color: #1c1c19;
+        }
+        .serif-text {
+            font-family: 'Noto Serif SC', serif;
+        }
+        .ink-gradient {
+            background: linear-gradient(135deg, #144227 0%, #2d5a3d 100%);
+        }
+        .glass-module {
+            background: rgba(247, 243, 238, 0.8);
+            backdrop-filter: blur(20px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="min-h-screen pb-24">
+<!-- Top AppBar (from JSON) -->
+<nav class="sticky top-0 z-50 bg-[#fdf9f4] dark:bg-stone-900 flex justify-between items-center w-full px-6 py-4 max-w-lg mx-auto">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container overflow-hidden">
+<img alt="Avatar" data-alt="minimalist aesthetic portrait of a person in a serene setting with soft natural light and warm tones" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD974j6Asjw1fId68BWIFGZRwvSw2d_d8ZsK-IEV38ENp8lWLuHin6HznFKIkPONle4V7hClQXojywvibtuNsz63YuJhde6DsNA3Aele2xN22J4cUMFjS81co2YfM_Mfc5tuuJ_iYMKD2FO8bxYnLZorVNWat8ZWXWNwl17cW1mST6XWhn25gmYdBBE2cSPKOEkWrWqTom0ZaKd9jUkE4Dj32HLkSPn4RYnfAO9RihHNMyox2529p7vKleVtdLO7sxHTEYFs0Xq_j0"/>
+</div>
+<span class="font-serif italic text-[#144227] dark:text-emerald-500 text-xl">ShunShi AI</span>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-[#144227] dark:text-emerald-500 text-2xl" data-icon="notifications">notifications</button>
+</div>
+</nav>
+<div class="bg-[#f7f3ee] dark:bg-stone-800 h-px w-full max-w-lg mx-auto"></div>
+<main class="max-w-lg mx-auto px-6 pt-10">
+<!-- Header Section: Test Conclusion -->
+<header class="mb-12">
+<span class="text-secondary font-label tracking-widest text-sm mb-2 block">体质测试报告 · 2024年春分</span>
+<h1 class="serif-text text-4xl font-bold text-primary leading-tight tracking-tight">
+                您的体质：<br/>气虚质（兼有痰湿）
+            </h1>
+<div class="mt-6 flex flex-wrap gap-2">
+<span class="px-4 py-1.5 rounded-full bg-secondary-container text-on-secondary-container text-xs font-label tracking-wider">补气</span>
+<span class="px-4 py-1.5 rounded-full bg-secondary-container text-on-secondary-container text-xs font-label tracking-wider">祛湿</span>
+<span class="px-4 py-1.5 rounded-full bg-primary-container text-on-primary-container text-xs font-label tracking-wider">忌寒凉</span>
+</div>
+</header>
+<!-- Visual Analysis: Radar-like Distribution -->
+<section class="mb-12">
+<div class="bg-surface-container-lowest p-8 rounded-3xl">
+<h3 class="serif-text text-lg text-primary mb-6">体质强弱分布</h3>
+<div class="space-y-4">
+<!-- Progress Bars as Distribution -->
+<div class="group">
+<div class="flex justify-between text-xs mb-1.5 font-label text-secondary">
+<span>气虚质</span>
+<span class="font-bold">85%</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full" style="width: 85%"></div>
+</div>
+</div>
+<div class="group">
+<div class="flex justify-between text-xs mb-1.5 font-label text-secondary">
+<span>痰湿质</span>
+<span class="font-bold">62%</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary-container rounded-full" style="width: 62%"></div>
+</div>
+</div>
+<div class="group">
+<div class="flex justify-between text-xs mb-1.5 font-label text-secondary">
+<span>阳虚质</span>
+<span class="font-bold">45%</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-outline-variant rounded-full" style="width: 45%"></div>
+</div>
+</div>
+<div class="group">
+<div class="flex justify-between text-xs mb-1.5 font-label text-secondary">
+<span>平和质（基准）</span>
+<span class="font-bold">30%</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-outline-variant/30 rounded-full" style="width: 30%"></div>
+</div>
+</div>
+</div>
+<div class="mt-8 pt-6 border-t border-outline-variant/20 flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="info">info</span>
+<p class="text-[11px] text-secondary/80 leading-relaxed font-body">
+                        测试结果基于您的近期身心状态。体质受环境与季节影响，建议每 24 节气重新评估。
+                    </p>
+</div>
+</div>
+</section>
+<!-- AI Warm Companion Module -->
+<section class="mb-12">
+<div class="glass-module p-8 rounded-3xl relative overflow-hidden">
+<div class="absolute -top-10 -right-10 w-32 h-32 bg-tertiary-fixed-dim/20 rounded-full blur-3xl"></div>
+<div class="flex items-center gap-3 mb-4">
+<span class="material-symbols-outlined text-tertiary" data-icon="auto_awesome" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+<h3 class="serif-text text-xl text-primary">AI 调养总评</h3>
+</div>
+<p class="text-on-surface-variant leading-loose text-base font-body">
+                    春季生发，您的“气虚”特征表现为易倦乏力，如细雨下的嫩芽需温言呵护。结合“痰湿”兼挟，体内水饮运化稍显迟滞。当下应以“温补脾气”为主，辅以“化痰祛湿”。切记，温和的早睡与清淡的饮食，是为您这卷生命画卷注入生气的最佳笔触。
+                </p>
+</div>
+</section>
+<!-- Recommended Solutions: Grid/Bento Layout -->
+<section class="mb-12">
+<div class="flex items-end justify-between mb-6">
+<h3 class="serif-text text-2xl text-primary">专属调养方案</h3>
+<span class="text-xs text-secondary font-label border-b border-secondary/30 pb-0.5">查看全部</span>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<!-- Recommended Recipe -->
+<div class="col-span-2 bg-white rounded-3xl overflow-hidden shadow-sm flex">
+<div class="w-1/3 h-40 relative">
+<img alt="Recipe" class="w-full h-full object-cover" data-alt="a bowl of warm herbal soup with ginger and dates, overhead shot, soft natural light, minimalist zen style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBSSicTVhEcKPLT45lpvdFrYMgGLIMAIipvRqwiGGm086gvIKxSL_0E3Vp9tAyvSN3axclx182pWkow5RjqOIhVnScko6hDG-Tsr5wWMHP4Cd1griU4zIonWNXlTPwj4FEQqhLCWihykwGmRJOWQLcCBpP_T5bY0uEUnP68mbdBbG_LSLtjwVVxzjErIDnlPXeJBPpWATM-4Dg7ktuPKXH3BraGtvDjkg5JaZFUis15szps6tgxbcWONJhkqEnaYZjoGIhqa8QDCAU"/>
+</div>
+<div class="w-2/3 p-5 flex flex-col justify-center">
+<span class="text-[10px] uppercase tracking-widest text-secondary mb-1">推荐食谱</span>
+<h4 class="serif-text text-lg font-bold text-primary mb-2">黄芪炖鸡汤</h4>
+<p class="text-xs text-on-surface-variant mb-3">益气固表，温中补虚，适合气虚质人群。</p>
+<button class="text-primary font-bold text-xs flex items-center gap-1">
+                            开始烹饪 <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Recommended Acupoints -->
+<div class="bg-surface-container-low p-6 rounded-3xl flex flex-col justify-between aspect-square">
+<div>
+<span class="material-symbols-outlined text-primary mb-4" data-icon="spa">spa</span>
+<h4 class="serif-text text-lg font-bold text-primary">推荐穴位</h4>
+<p class="text-xs text-on-surface-variant mt-2">足三里 · 补中益气</p>
+</div>
+<button class="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm self-end">
+<span class="material-symbols-outlined text-primary text-sm" data-icon="play_arrow">play_arrow</span>
+</button>
+</div>
+<!-- Recommended Qigong -->
+<div class="bg-surface-container-low p-6 rounded-3xl flex flex-col justify-between aspect-square">
+<div>
+<span class="material-symbols-outlined text-primary mb-4" data-icon="self_improvement">self_improvement</span>
+<h4 class="serif-text text-lg font-bold text-primary">推荐功法</h4>
+<p class="text-xs text-on-surface-variant mt-2">八段锦 · 调理脾胃</p>
+</div>
+<button class="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm self-end">
+<span class="material-symbols-outlined text-primary text-sm" data-icon="play_arrow">play_arrow</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Secondary CTA -->
+<div class="mb-20 text-center">
+<p class="text-sm text-secondary italic mb-4">“静养其身，动养其气。”</p>
+<button class="ink-gradient text-white w-full py-4 rounded-xl font-bold shadow-lg shadow-primary/10 tracking-widest">
+                生成详细调养日历
+            </button>
+</div>
+</main>
+<!-- BottomNavBar (from JSON) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 bg-[#fdf9f4]/90 dark:bg-stone-900/90 backdrop-blur-xl rounded-t-[2rem] border-t border-[#c1c9c0]/20 shadow-[0_-4px_24px_rgba(28,28,25,0.04)]">
+<a class="flex flex-col items-center justify-center text-[#74593c] dark:text-stone-400 opacity-70 hover:opacity-100 transition-opacity" href="#">
+<span class="material-symbols-outlined" data-icon="home_wellness">home_health</span>
+<span class="font-serif text-[10px] tracking-widest uppercase mt-1">首页</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#74593c] dark:text-stone-400 opacity-70 hover:opacity-100 transition-opacity" href="#">
+<span class="material-symbols-outlined" data-icon="spa">spa</span>
+<span class="font-serif text-[10px] tracking-widest uppercase mt-1">养生</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#74593c] dark:text-stone-400 opacity-70 hover:opacity-100 transition-opacity" href="#">
+<span class="material-symbols-outlined" data-icon="auto_awesome">auto_awesome</span>
+<span class="font-serif text-[10px] tracking-widest uppercase mt-1">AI助手</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#74593c] dark:text-stone-400 opacity-70 hover:opacity-100 transition-opacity" href="#">
+<span class="material-symbols-outlined" data-icon="menu_book">menu_book</span>
+<span class="font-serif text-[10px] tracking-widest uppercase mt-1">日记</span>
+</a>
+<!-- "我的" Active State based on "Constitution Result" being a personal profile aspect -->
+<a class="flex flex-col items-center justify-center bg-[#144227] text-white dark:bg-emerald-800 rounded-xl px-3 py-1.5 transition-all scale-95" href="#">
+<span class="material-symbols-outlined" data-icon="person_2" style="font-variation-settings: 'FILL' 1;">person_2</span>
+<span class="font-serif text-[10px] tracking-widest uppercase mt-1">我的</span>
+</a>
+</nav>
+</body></html>

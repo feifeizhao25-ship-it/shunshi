@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,500;0,700;1,400&amp;family=Manrope:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "tertiary-fixed": "#eee1cd",
+              "surface-dim": "#dbdad6",
+              "on-primary-fixed": "#161f00",
+              "on-primary": "#ffffff",
+              "surface-container-low": "#f5f3ef",
+              "tertiary-container": "#9d9281",
+              "surface-variant": "#e4e2de",
+              "surface-container-lowest": "#ffffff",
+              "on-tertiary": "#ffffff",
+              "primary-fixed": "#d9eaa3",
+              "tertiary-fixed-dim": "#d2c5b2",
+              "outline": "#76786b",
+              "error-container": "#ffdad6",
+              "surface-bright": "#fbf9f5",
+              "on-error": "#ffffff",
+              "secondary-container": "#fc9a77",
+              "inverse-on-surface": "#f2f0ed",
+              "secondary-fixed-dim": "#ffb59b",
+              "on-background": "#1b1c1a",
+              "surface-container-highest": "#e4e2de",
+              "inverse-surface": "#30312e",
+              "on-surface-variant": "#46483c",
+              "on-secondary": "#ffffff",
+              "tertiary": "#665d4e",
+              "on-tertiary-container": "#332b1e",
+              "on-primary-container": "#253000",
+              "on-surface": "#1b1c1a",
+              "inverse-primary": "#bdce89",
+              "primary": "#56642b",
+              "outline-variant": "#c6c8b8",
+              "secondary-fixed": "#ffdbcf",
+              "on-error-container": "#93000a",
+              "background": "#fbf9f5",
+              "on-secondary-fixed-variant": "#773116",
+              "surface": "#fbf9f5",
+              "on-primary-fixed-variant": "#3e4c16",
+              "surface-container": "#efeeea",
+              "on-secondary-container": "#763015",
+              "error": "#ba1a1a",
+              "primary-fixed-dim": "#bdce89",
+              "on-secondary-fixed": "#380d00",
+              "surface-container-high": "#eae8e4",
+              "secondary": "#95482b",
+              "primary-container": "#8a9a5b",
+              "on-tertiary-fixed": "#211b0f",
+              "surface-tint": "#56642b",
+              "on-tertiary-fixed-variant": "#4e4637"
+            },
+            fontFamily: {
+              "headline": ["Noto Serif"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #1b1c1a; /* Enforcing dark base for Sleep Sanctuary */
+        }
+        .glow-soft {
+            box-shadow: 0 0 60px 10px rgba(138, 154, 91, 0.15);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-body text-on-background selection:bg-primary-container/30">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-6 py-4 w-full bg-stone-900/80 backdrop-blur-xl shadow-[0_20px_40px_rgba(27,28,26,0.05)]">
+<div class="flex items-center gap-4">
+<button class="text-[#a3b17c] hover:opacity-80 transition-opacity active:scale-95 duration-200">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="font-['Noto_Serif'] text-xl italic text-[#8A9A5B]">Digital Sanctuary</h1>
+</div>
+<div class="w-8 h-8 rounded-full overflow-hidden bg-stone-800 border border-outline-variant/20">
+<img alt="User profile" data-alt="Close-up portrait of a calm person with soft lighting and a neutral expression, high-end editorial style photography" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCFPDtm-FVn7UoeQ8H3n0LMoAOO5bXkDMQM1ex1oj8KVt5o3lIJ9stTmf4s5PbC6l4Lqx77V1_hJC-B4G62_smbRTSKra6gc7DLQTX9uDAT4hOqfZUJiFwl_JzJKxdNO-T6Qi3XfLJLcmFHPD_9-Eu12eE67SBScSvCc_rULlP0vCRH5j-oo-uVoa2Ta2pI8y3xNuzkzEiD-wUmqijmtxfIAGqgpG3fPtQ-oy6lsbAAZaqJkiFsNyYeYFzxEhzIkpS4SmhUjDA-Pr8"/>
+</div>
+</header>
+<main class="pt-24 pb-32 px-6 min-h-screen bg-gradient-to-b from-stone-950 to-stone-900 text-stone-100">
+<!-- Hero Section: Active Soundscape -->
+<section class="mb-12 relative overflow-hidden rounded-[2rem] p-8 aspect-[4/5] md:aspect-video flex flex-col justify-end group">
+<div class="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-900/40 to-transparent z-10"></div>
+<img class="absolute inset-0 w-full h-full object-cover transition-scale duration-700 group-hover:scale-105" data-alt="Mist-covered coniferous forest at night under a faint moonlight with ethereal atmosphere and deep blue and green tones" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCLM_eUhojHb6zXRAIqhUQupJnT_MebenEOaPYrGuqtRukplFIq96rygQe-xjMSbKVTDTabhTT50sk4BNT8DlZyR6loNwJBvW4HTGoyM9Xhm-AKJf5iyV0j9HRSxsoWSvth_BLiKNw7NPJm3gFO1DHddq5dFt-f0pYxL1h9M23a-kJggZu-xqmO8J8TG0Rp-GT5zbuwG764u4uSQaqF_GlV2ukm-YNI7g7XepZps4xgfNO_OJEPlfXTVszoimT36pfMHCUF0AFuThw"/>
+<div class="relative z-20">
+<span class="font-label text-[10px] uppercase tracking-[0.2em] text-[#8A9A5B] font-bold mb-2 block">Currently Playing</span>
+<h2 class="font-headline text-4xl md:text-5xl mb-6 leading-tight">Midnight Rainfall</h2>
+<div class="flex items-center gap-6">
+<button class="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-primary-container flex items-center justify-center text-white shadow-xl hover:scale-105 active:scale-90 transition-all">
+<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">pause</span>
+</button>
+<div class="flex-1 max-w-xs">
+<div class="h-1 bg-stone-700 rounded-full w-full mb-2">
+<div class="h-full bg-primary-container rounded-full w-2/3 shadow-[0_0_10px_rgba(138,154,91,0.5)]"></div>
+</div>
+<div class="flex justify-between font-label text-[10px] text-stone-400">
+<span>12:45</span>
+<span>20:00</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Ambient Sound Mixer -->
+<section class="mb-16">
+<h3 class="font-headline text-2xl mb-8 flex items-center gap-3">
+<span class="material-symbols-outlined text-[#8A9A5B]">graphic_eq</span>
+                Nature's Layer
+            </h3>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<div class="bg-stone-800/50 backdrop-blur-md p-6 rounded-[1.5rem] border border-stone-700/30 flex flex-col items-center gap-4 hover:bg-stone-800 transition-colors">
+<div class="w-12 h-12 rounded-2xl bg-stone-700/50 flex items-center justify-center text-[#a3b17c]">
+<span class="material-symbols-outlined text-3xl">water_drop</span>
+</div>
+<span class="font-label text-[11px] uppercase tracking-widest font-bold">Rain</span>
+<input class="w-full accent-[#8A9A5B] bg-stone-700 h-1 rounded-full appearance-none cursor-pointer" type="range"/>
+</div>
+<div class="bg-stone-800/50 backdrop-blur-md p-6 rounded-[1.5rem] border border-stone-700/30 flex flex-col items-center gap-4 hover:bg-stone-800 transition-colors">
+<div class="w-12 h-12 rounded-2xl bg-stone-700/50 flex items-center justify-center text-[#a3b17c]">
+<span class="material-symbols-outlined text-3xl">forest</span>
+</div>
+<span class="font-label text-[11px] uppercase tracking-widest font-bold">Forest</span>
+<input class="w-full accent-[#8A9A5B] bg-stone-700 h-1 rounded-full appearance-none cursor-pointer" type="range"/>
+</div>
+<div class="bg-stone-800/50 backdrop-blur-md p-6 rounded-[1.5rem] border border-stone-700/30 flex flex-col items-center gap-4 hover:bg-stone-800 transition-colors">
+<div class="w-12 h-12 rounded-2xl bg-stone-700/50 flex items-center justify-center text-[#a3b17c]">
+<span class="material-symbols-outlined text-3xl">tsunami</span>
+</div>
+<span class="font-label text-[11px] uppercase tracking-widest font-bold">Waves</span>
+<input class="w-full accent-[#8A9A5B] bg-stone-700 h-1 rounded-full appearance-none cursor-pointer" type="range"/>
+</div>
+</div>
+</section>
+<!-- Sleep Stories -->
+<section class="mb-12">
+<div class="flex justify-between items-end mb-8">
+<div>
+<h3 class="font-headline text-2xl">Bedtime Tales</h3>
+<p class="text-stone-400 font-body text-sm mt-1">Gently drift into the world of dreams.</p>
+</div>
+<button class="text-[#8A9A5B] font-label text-[10px] uppercase tracking-widest font-bold hover:opacity-70">View All</button>
+</div>
+<!-- Bento Grid Style Stories -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+<!-- Story 1 -->
+<div class="group cursor-pointer">
+<div class="relative aspect-[3/4] rounded-[1.5rem] overflow-hidden mb-4">
+<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Close up of pine needles in a dense forest with dramatic moody lighting and deep greens" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAhbkZFTujkutzaaX5ob9sGI7t9MnQpafI4pR4dSBCwZ5OjemFqjmbY6h-xqH4IP6s_RVmjBDKWXNQqXCB98hRqgFL1mQhMW5QfpIIMIs887-qqgJXGTWqDJKV7xBaSzd9kzsjzyBuhZ1N8JO9yBM4p2t7idaHFFnGo4JHX2ZW9QPSNIneS-iOSSUk-LXovKHLZdwZsGqCH1cHeGLZq5Tl-d8ZhpGAgIRV9Tn396Iv4vO8IDL8qfMQYpzmB1qLYjir9sjAouiG2hdw"/>
+<div class="absolute top-4 right-4 bg-stone-900/60 backdrop-blur-md px-2 py-1 rounded-lg">
+<span class="font-label text-[10px] text-stone-200">24m</span>
+</div>
+<div class="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+<span class="material-symbols-outlined text-5xl text-white">play_circle</span>
+</div>
+</div>
+<h4 class="font-headline text-lg group-hover:text-[#a3b17c] transition-colors">Whispering Pines</h4>
+<p class="text-xs text-stone-500 font-medium">Narrated by Elena Thorne</p>
+</div>
+<!-- Story 2 -->
+<div class="group cursor-pointer">
+<div class="relative aspect-[3/4] rounded-[1.5rem] overflow-hidden mb-4">
+<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Crashing ocean waves on a rocky shore at twilight with bioluminescent glow and soft white foam" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB-r6gxXqcLlocO962f6UwyZjTIYIimI4XvZvihiEO8gPvQKiwLHEdEmssI0fXj6OXlEEGlSQ2GxXFk04B43uDv9yr91CmgYwzn5rkyfCoevaQ3mhPLbck34hXeOT3B1d3cR0xIahgLnMkwF0pHJSpbJFLWImH03VSTvQN8HDlKnSMdK0_DRB8z_Y-KvchexVIp7wVQs_zWWpZmmh4KR1_q7LTwBXB23GlImDqy-2Miw36dngrTGq9XRz5boPminc4k7J4rLAwcthc"/>
+<div class="absolute top-4 right-4 bg-stone-900/60 backdrop-blur-md px-2 py-1 rounded-lg">
+<span class="font-label text-[10px] text-stone-200">32m</span>
+</div>
+<div class="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+<span class="material-symbols-outlined text-5xl text-white">play_circle</span>
+</div>
+</div>
+<h4 class="font-headline text-lg group-hover:text-[#a3b17c] transition-colors">Coastal Nightfall</h4>
+<p class="text-xs text-stone-500 font-medium">Narrated by Marcus Dale</p>
+</div>
+<!-- Story 3 -->
+<div class="group cursor-pointer hidden md:block">
+<div class="relative aspect-[3/4] rounded-[1.5rem] overflow-hidden mb-4">
+<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Calm mountain lake reflecting the night sky filled with stars and a glowing milky way" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGS7eH4-RrKy3qlcgPyUtASV06hWPwxvgwfuIvlgzzrjm0GErS7hpnxGPN-dsfKhNkCV5Lk7XSD6jvspayhHoxqQGNNBBReB8fVLcm97Yaksy3nTYjKKCD908lMJTtXoW8hE5Bo0HVsNbsOy9dxM-XNBhywYUQXoEaQs6plpM9_nMbBqwqbtuQIubbTxjcTy-2IAlzXljeExj03u-NqflYKqIBOsZivYgW1h67ST7AB1z0C1MoD40KPbTvrftL4pA6kdCJQ_dubeE"/>
+<div class="absolute top-4 right-4 bg-stone-900/60 backdrop-blur-md px-2 py-1 rounded-lg">
+<span class="font-label text-[10px] text-stone-200">18m</span>
+</div>
+<div class="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+<span class="material-symbols-outlined text-5xl text-white">play_circle</span>
+</div>
+</div>
+<h4 class="font-headline text-lg group-hover:text-[#a3b17c] transition-colors">The Glass Lake</h4>
+<p class="text-xs text-stone-500 font-medium">Narrated by Sarah Jenks</p>
+</div>
+<!-- Story 4 -->
+<div class="group cursor-pointer hidden md:block">
+<div class="relative aspect-[3/4] rounded-[1.5rem] overflow-hidden mb-4">
+<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Snow covered mountain peaks at night with a soft celestial glow and deep purple shadows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCIqQGA5-LlOJ40FYfPbkK9t20bLerKoEkeXmrMvtlj1MPzj9G6F8ei2G3rru-qM7oF2gm2da3WpTMlcRkuLdvC6DAYYi5hDlc0jfCryiCuOKQFH3YpSZosYsi72jhpr8vU1BoX3FJTKVb1ZFqdw5Dk4uUzW2gBI8pilLYek8tckZKZ2AYt8G-k-DT_q6b1FMIO7LqX1Py8-ke6EIjTUxqqCpaRqyG0TibCg2fUSAzkwfOlSorhrc6Zky64wOwP925RGlVPp591FVo"/>
+<div class="absolute top-4 right-4 bg-stone-900/60 backdrop-blur-md px-2 py-1 rounded-lg">
+<span class="font-label text-[10px] text-stone-200">45m</span>
+</div>
+<div class="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+<span class="material-symbols-outlined text-5xl text-white">play_circle</span>
+</div>
+</div>
+<h4 class="font-headline text-lg group-hover:text-[#a3b17c] transition-colors">Summit Silence</h4>
+<p class="text-xs text-stone-500 font-medium">Narrated by David Atten</p>
+</div>
+</div>
+</section>
+<!-- Quick Controls -->
+<section class="mb-12">
+<div class="bg-stone-800/30 p-8 rounded-[2rem] border border-stone-700/20 glow-soft">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-8">
+<div class="flex items-center gap-4">
+<div class="p-3 bg-secondary-container/20 rounded-2xl">
+<span class="material-symbols-outlined text-secondary-container">alarm</span>
+</div>
+<div>
+<h4 class="font-headline text-lg">Sleep Timer</h4>
+<p class="text-sm text-stone-400">Stopping in 45 minutes</p>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="px-4 py-2 rounded-xl bg-stone-700 text-stone-100 font-label text-[10px] tracking-widest uppercase font-bold hover:bg-stone-600 transition-colors">+15m</button>
+<button class="px-4 py-2 rounded-xl bg-stone-700 text-stone-100 font-label text-[10px] tracking-widest uppercase font-bold hover:bg-stone-600 transition-colors">+30m</button>
+<button class="px-6 py-2 rounded-xl bg-secondary-container text-on-secondary-container font-label text-[10px] tracking-widest uppercase font-bold shadow-lg shadow-secondary-container/20 hover:opacity-90 transition-opacity">Cancel</button>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-6 pt-2 bg-stone-900/80 backdrop-blur-xl z-50 rounded-t-[1.5rem] shadow-[0_-10px_30px_rgba(27,28,26,0.03)]">
+<a class="flex flex-col items-center justify-center text-[#56642b] dark:text-[#8A9A5B] bg-stone-700/50 rounded-2xl px-4 py-2 active:scale-90 duration-300 ease-out" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">bedtime</span>
+<span class="font-['Manrope'] text-[10px] uppercase tracking-widest font-bold mt-1">Sanctuary</span>
+</a>
+<a class="flex flex-col items-center justify-center text-stone-400 dark:text-stone-500 px-4 py-2 hover:text-[#8A9A5B] transition-all active:scale-90 duration-300 ease-out" href="#">
+<span class="material-symbols-outlined">shopping_basket</span>
+<span class="font-['Manrope'] text-[10px] uppercase tracking-widest font-bold mt-1">Season</span>
+</a>
+<a class="flex flex-col items-center justify-center text-stone-400 dark:text-stone-500 px-4 py-2 hover:text-[#8A9A5B] transition-all active:scale-90 duration-300 ease-out" href="#">
+<span class="material-symbols-outlined">self_improvement</span>
+<span class="font-['Manrope'] text-[10px] uppercase tracking-widest font-bold mt-1">Check-in</span>
+</a>
+<a class="flex flex-col items-center justify-center text-stone-400 dark:text-stone-500 px-4 py-2 hover:text-[#8A9A5B] transition-all active:scale-90 duration-300 ease-out" href="#">
+<span class="material-symbols-outlined">military_tech</span>
+<span class="font-['Manrope'] text-[10px] uppercase tracking-widest font-bold mt-1">Growth</span>
+</a>
+</nav>
+</body></html>

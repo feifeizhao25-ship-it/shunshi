@@ -3,13 +3,14 @@
 基于中医九种体质理论，提供问卷评估和个性化养生建议
 """
 from fastapi import APIRouter, HTTPException, Query
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List, Optional, Dict
 from datetime import datetime
 
 from app.database.db import get_db
+from sqlalchemy import text
 
-router = APIRouter(tags=["体质辨识"])
+router = APIRouter(tags=["体质辨识"])  # prefix 在 main.py 中统一注册
 
 
 # ==================== 九种体质定义 ====================
@@ -651,23 +652,155 @@ def _ensure_user(db, user_id: str):
         db.commit()
 
 
-@router.get("/questions", response_model=List[QuestionItem])
+class AnalyzeRequest(BaseModel):
+    """体质分析请求（简化版，基于症状描述或问卷答案）"""
+    user_id: str
+    symptoms: Optional[str] = Field(default="", description="症状描述，如：手脚冰凉、容易疲劳、口干舌燥")
+    answers: Optional[Dict[str, str]] = Field(default=None, description="可选：问卷答案 {题号: 选项值}")
+
+
+class AnalyzeResponse(BaseModel):
+    """体质分析响应"""
+    primary_type: str
+    primary_name: str
+    confidence: str
+    description: str
+    diet_advice: str
+    tea_advice: str
+    exercise_advice: str
+    avoid_list: List[str]
+    disclaimer: str
+
+
+@router.post("/analyze", response_model=dict, summary="体质轻推断", description="基于症状描述快速推断体质倾向，返回个性化养生建议（仅供参考，不替代专业中医诊断）")
+async def analyze_constitution(request: AnalyzeRequest):
+    """
+    体质轻推断分析
+    
+    基于症状描述快速推断体质倾向，返回养生建议。
+    注意：此结果仅供参考，不能替代专业中医诊断。
+    """
+    symptoms = (request.symptoms or "").lower()
+    
+    # 简单的关键词匹配推断
+    scores = {key: 0 for key in CONSTITUTION_KEYS}
+    
+    keywords = {
+        "pinghe": ["精力充沛", "睡眠好", "食欲好", "面色红润"],
+        "qixu": ["疲劳", "乏力", "气短", "容易出汗", "易感冒", "声音低弱"],
+        "yangxu": ["手脚凉", "怕冷", "畏寒", "精神不振", "喜热", "腹泻"],
+        "yinxu": ["口干", "咽干", "手足心热", "盗汗", "失眠", "便秘"],
+        "tanshi": ["肥胖", "腹部肥满", "口黏", "痰多", "身体沉重"],
+        "shire": ["口苦", "口干", "面油", "长痘", "大便黏", "小便黄"],
+        "xueyu": ["面色暗", "瘀斑", "口唇暗", "疼痛", "眼眶黑"],
+        "qiyu": ["抑郁", "烦闷", "多愁善感", "胸胁胀", "叹息"],
+        "tebing": ["过敏", "哮喘", "荨麻疹", "打喷嚏", "鼻塞"],
+    }
+    
+    for ctype, words in keywords.items():
+        for w in words:
+            if w in symptoms:
+                scores[ctype] += 1
+    
+    # 如果有问卷答案，使用 score_map 加权
+    if request.answers:
+        for qid, val in request.answers.items():
+            try:
+                q_num = int(qid.replace("q", "")) if qid.startswith("q") else int(qid)
+                if 1 <= q_num <= len(QUESTIONS):
+                    for option in QUESTIONS[q_num - 1]["options"]:
+                        if option["text"] == val:
+                            for ctype, score in option.get("score_map", {}).items():
+                                if ctype in scores:
+                                    scores[ctype] += score
+            except (ValueError, IndexError, KeyError):
+                continue
+    
+    # 排序找出主导体质
+    sorted_scores = sorted(scores.items(), key=lambda x: x[1], reverse=True)
+    primary = sorted_scores[0][0]
+    info = CONSTITUTION_TYPES[primary]
+    
+    # 计算置信度
+    total = sum(scores.values())
+    confidence = "高" if sorted_scores[0][1] >= 3 else ("中" if sorted_scores[0][1] >= 1 else "低")
+    
+    return {
+        "success": True,
+        "data": {
+            "primary_type": primary,
+            "primary_name": info["name"],
+            "confidence": confidence,
+            "description": info["description"],
+            "characteristics": info["characteristics"],
+            "diet_advice": info["diet_advice"],
+            "tea_advice": info["tea_advice"],
+            "exercise_advice": info["exercise_advice"],
+            "avoid_list": info["avoid_list"],
+            "disclaimer": "此结果为AI轻推断，仅供参考，不能替代专业中医诊断。如有明显不适，请到正规医院中医科就诊。",
+        }
+    }
+
+
+@router.get("/questions", response_model=dict, summary="获取问卷题目", description="返回25道中医体质评估问卷题目及选项")
 async def get_questions(
-    version: str = Query("v1", description="问卷版本")
+    version: str = Query("v1", description="问卷版本"),
+    limit: int = Query(None),
 ):
     """获取问卷题目"""
-    # 预留版本控制，目前只有一个版本
     result = []
     for q in QUESTIONS:
-        result.append(QuestionItem(
-            id=q["id"],
-            question=q["question"],
-            options=[opt["text"] for opt in q["options"]],
-        ))
-    return result
+        result.append({
+            "id": q["id"],
+            "text": q["question"],
+            "content": q["question"],
+            "options": [{"text": opt["text"], "value": opt.get("value", opt["text"])} for opt in q["options"]],
+        })
+    if limit and limit > 0:
+        result = result[:limit]
+    return {"success": True, "data": {"questions": result, "total": len(result)}}
 
 
-@router.post("/submit", response_model=SubmitResponse)
+class AssessRequest(BaseModel):
+    """体质评估请求（兼容测试格式）"""
+    answers: List[Dict] = Field(default_factory=list, description="答案列表")
+
+
+@router.post("/assess", response_model=dict, summary="体质评估(兼容)", description="兼容测试格式的体质评估端点，接受答案列表并返回评估结果")
+async def assess_constitution(request: AssessRequest):
+    """体质评估（兼容测试格式）"""
+    answers = request.answers
+    if not answers:
+        return {"success": True, "data": {"constitution": "平和质", "result": "平和质", "scores": {}}}
+    
+    # 转换测试格式的答案
+    converted_answers = []
+    for ans in answers:
+        qid = ans.get("question_id", "")
+        score = ans.get("score", 0)
+        # 将 q1, q2 等转换为 1, 2
+        try:
+            if isinstance(qid, str) and qid.startswith("q"):
+                qid = int(qid[1:])
+        except Exception as e:            pass
+        # 根据 score 选择选项索引
+        option_index = 0 if score >= 3 else (1 if score >= 1 else 2)
+        converted_answers.append(AnswerItem(question_id=qid, option_index=option_index))
+    
+    # 复用 submit 逻辑
+    req = SubmitRequest(user_id="test-user", answers=converted_answers)
+    result = await submit_questionnaire(req)
+    return {"success": True, "data": {
+        "constitution": result.primary_type,
+        "result": result.primary_type,
+        "scores": {s.type: s.score for s in result.scores},
+        "recommendations": result.advice[:3] if result.advice else [],
+        "diet_advice": "; ".join(result.advice[:2]) if result.advice else "",
+        "exercise_advice": "; ".join(result.advice[2:4]) if result.advice else "",
+    }}
+
+
+@router.post("/submit", response_model=SubmitResponse, summary="提交问卷", description="提交25道体质问卷答案，计算9种体质分数并生成个性化养生建议")
 async def submit_questionnaire(request: SubmitRequest):
     """
     提交问卷答案，计算体质评估结果
@@ -749,7 +882,7 @@ async def submit_questionnaire(request: SubmitRequest):
     )
 
 
-@router.get("/result/{user_id}", response_model=ResultResponse)
+@router.get("/result/{user_id}", response_model=ResultResponse, summary="获取评估结果", description="返回指定用户最近一次体质评估结果")
 async def get_result(user_id: str):
     """获取用户最近一次体质评估结果"""
     db = get_db()
@@ -778,18 +911,31 @@ async def get_result(user_id: str):
     )
 
 
-@router.get("/types", response_model=List[ConstitutionTypeSummary])
+@router.get("", response_model=dict, summary="体质列表", description="返回9种中医体质类型的名称和描述")
+async def list_constitutions():
+    """获取体质列表（兼容测试格式）"""
+    result = []
+    for key, info in CONSTITUTION_TYPES.items():
+        result.append({
+            "id": key,
+            "name": info["name"],
+            "description": info["description"],
+        })
+    return {"success": True, "data": result}
+
+
+@router.get("/types", response_model=List[ConstitutionTypeSummary], summary="体质类型定义", description="获取9种体质的详细定义，包含特点、饮食推荐和生活方式建议")
 async def get_constitution_types():
     """获取9种体质定义列表（从数据库读取）"""
     try:
         from app.db.database import Session
         db = Session()
         try:
-            result = db.execute(text("""
+            result = db.execute("""
                 SELECT code, name_cn, name_en, description,
                        characteristics, diet_recommendations, lifestyle_advice
                 FROM constitution_types ORDER BY id
-            """))
+            """)
             rows = result.fetchall()
             if rows:
                 return [
@@ -822,11 +968,12 @@ async def get_constitution_types():
     return result
 
 
-@router.get("/types/{name}", response_model=ConstitutionTypeDetail)
+@router.get("/types/{name}", response_model=ConstitutionTypeDetail, summary="体质类型详情", description="获取指定体质的完整信息，含饮食/茶饮/运动建议和禁忌")
 async def get_constitution_detail(name: str):
     """获取单个体质详情（含饮食/茶饮/运动建议，从数据库读取）"""
     try:
         from app.db.database import Session
+        from sqlalchemy.sql import text
         db = Session()
         try:
             row = db.execute(text("""
@@ -842,7 +989,7 @@ async def get_constitution_detail(name: str):
                     if val is None: return []
                     if isinstance(val, list): return val
                     try: return eval(val)
-                    except: return []
+                    except Exception: return []
 
                 diet_advice = ""
                 tea_advice = ""
@@ -892,3 +1039,50 @@ async def get_constitution_detail(name: str):
         exercise_advice=info["exercise_advice"],
         avoid_list=info["avoid_list"],
     )
+
+
+# ============ 兼容测试端点 ============
+
+@router.get("/{type_name}", response_model=dict, summary="体质详情(兼容)", description="兼容测试格式的体质详情查询，返回名称、描述、特点和饮食建议")
+async def get_constitution_by_type(type_name: str):
+    """获取单个体质详情（兼容测试格式）"""
+    if type_name not in CONSTITUTION_TYPES:
+        raise HTTPException(status_code=404, detail="体质类型不存在")
+    info = CONSTITUTION_TYPES[type_name]
+    return {
+        "success": True,
+        "data": {
+            "id": type_name,
+            "name": info["name"],
+            "description": info["description"],
+            "characteristics": info.get("characteristics", []),
+            "diet_advice": info.get("diet_advice", ""),
+            "exercise_advice": info.get("exercise_advice", ""),
+        }
+    }
+
+
+@router.get("/{type_name}/foods", response_model=dict, summary="体质推荐食物", description="返回指定体质类型的推荐食物列表")
+async def get_constitution_foods(type_name: str):
+    """获取体质推荐食物"""
+    if type_name not in CONSTITUTION_TYPES:
+        raise HTTPException(status_code=404, detail="体质类型不存在")
+    info = CONSTITUTION_TYPES[type_name]
+    foods = info.get("diet_recommendations", []) or info.get("diet_advice", "").split("。") or []
+    return {
+        "success": True,
+        "data": [{"name": f.strip(), "benefit": "推荐食用"} for f in foods if f.strip()]
+    }
+
+
+@router.get("/{type_name}/exercises", response_model=dict, summary="体质推荐运动", description="返回指定体质类型的推荐运动列表")
+async def get_constitution_exercises(type_name: str):
+    """获取体质推荐运动"""
+    if type_name not in CONSTITUTION_TYPES:
+        raise HTTPException(status_code=404, detail="体质类型不存在")
+    info = CONSTITUTION_TYPES[type_name]
+    exercises = info.get("exercise_recommendations", []) or info.get("exercise_advice", "").split("。") or []
+    return {
+        "success": True,
+        "data": [{"name": e.strip(), "benefit": "推荐运动"} for e in exercises if e.strip()]
+    }

@@ -22,6 +22,7 @@ from pydantic import BaseModel, Field
 from datetime import datetime
 import hashlib
 import json
+from sqlalchemy import text
 
 
 # ==================== 模型枚举 ====================

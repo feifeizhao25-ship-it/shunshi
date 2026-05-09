@@ -8,6 +8,7 @@ Mock 模式: STRIPE_MODE=mock 或无有效密钥时自动降级
   harmony   ($19.99/月) - 个人增强版
   family    ($29.99/月) - 家庭版
 """
+from __future__ import annotations
 import os
 import json
 import uuid
@@ -184,12 +185,8 @@ class StripeService:
                 mode=self.mode,
             )
         else:
-            session_id = f"cs_test_{uuid.uuid4().hex[:24]}"
-            return CheckoutResult(
-                checkout_url=f"https://checkout.stripe.com/c/pay/{session_id}?mock=1",
-                session_id=session_id,
-                mode="test",
-            )
+            logger.warning("Stripe key not configured, payment disabled")
+            raise RuntimeError("支付服务未配置，请联系管理员")
 
     def create_portal_session(
         self,
@@ -205,10 +202,8 @@ class StripeService:
             )
             return PortalResult(portal_url=session.url, mode=self.mode)
         else:
-            return PortalResult(
-                portal_url="https://billing.stripe.com/p/mock_portal",
-                mode="test",
-            )
+            logger.warning("Stripe key not configured, billing portal disabled")
+            raise RuntimeError("支付服务未配置，请联系管理员")
 
     def verify_webhook(
         self,
@@ -365,6 +360,100 @@ class StripeService:
             }
             for plan in STRIPE_PRODUCTS.values()
         ]
+
+
+# ==================== PaymentGateway 适配器 ====================
+
+
+class StripeGateway:
+    """Stripe PaymentGateway 适配器 — 委托给 StripeService 单例"""
+
+    def __init__(self) -> None:
+        self._svc = stripe_service
+
+    async def create_order(self, user_id: str, amount: float, currency: str,
+                           description: str, metadata: dict = None) -> "PaymentResult":  # noqa: F821
+        """创建支付订单（Stripe Checkout Session）"""
+        try:
+            # metadata 中传递 plan_id 以复用现有 checkout 逻辑
+            plan_id = (metadata or {}).get("plan_id", "serenity")
+            result = self._svc.create_checkout_session(
+                plan_id=plan_id, user_id=user_id,
+            )
+            from .payment_gateway import PaymentResult
+            return PaymentResult(
+                success=True,
+                order_id=result.session_id,
+                transaction_id=result.session_id,
+                amount=amount,
+                currency=currency,
+                message="Checkout session created",
+                raw_response={"checkout_url": result.checkout_url, "mode": result.mode},
+            )
+        except Exception as e:
+            from .payment_gateway import PaymentResult
+            return PaymentResult(
+                success=False, order_id="", amount=amount, currency=currency,
+                message=str(e),
+            )
+
+    async def verify_callback(self, request_data: dict) -> "PaymentResult":  # noqa: F821
+        """验证支付回调 — 委托给 handle_webhook_event"""
+        from .payment_gateway import PaymentResult
+        try:
+            result = self._svc.handle_webhook_event(request_data)
+            return PaymentResult(
+                success=result.success,
+                order_id="",
+                message=result.error or "processed",
+                raw_response={"event_type": result.event_type, "user_id": result.user_id},
+            )
+        except Exception as e:
+            return PaymentResult(success=False, order_id="", message=str(e))
+
+    async def query_order(self, order_id: str) -> "PaymentResult":  # noqa: F821
+        """查询订单状态 — Stripe 不直接支持 out_trade_no 查询，返回 stub"""
+        from .payment_gateway import PaymentResult
+        return PaymentResult(
+            success=True, order_id=order_id,
+            message="Stripe order query via session_id — use webhook events instead",
+        )
+
+    async def refund(self, order_id: str, amount: float, reason: str = "") -> "RefundResult":  # noqa: F821
+        """发起退款 — Stripe refund 需 SDK，stub 实现"""
+        from .payment_gateway import RefundResult
+        if self._svc._configured:
+            try:
+                import stripe as _stripe
+                session = _stripe.checkout.Session.retrieve(order_id)
+                payment_intent = session.payment_intent
+                refund_obj = _stripe.Refund.create(
+                    payment_intent=payment_intent,
+                    amount=int(amount * 100),  # Stripe uses cents
+                    reason="requested_by_customer",
+                    metadata={"reason": reason},
+                )
+                return RefundResult(
+                    success=True, refund_id=refund_obj.id,
+                    amount=amount, message="Refund issued",
+                )
+            except Exception as e:
+                return RefundResult(success=False, amount=amount, message=str(e))
+        return RefundResult(success=False, amount=amount, message="Stripe not configured")
+
+    async def verify_webhook(self, headers: dict, body: bytes) -> "PaymentResult":  # noqa: F821
+        """验证 Webhook 签名"""
+        from .payment_gateway import PaymentResult
+        try:
+            sig = headers.get("stripe-signature", headers.get("Stripe-Signature", ""))
+            event = self._svc.verify_webhook(payload=body, sig_header=sig)
+            return PaymentResult(
+                success=True, order_id="",
+                message="Webhook verified",
+                raw_response=event,
+            )
+        except Exception as e:
+            return PaymentResult(success=False, order_id="", message=str(e))
 
 
 # ==================== 单例 ====================

@@ -1,0 +1,20 @@
+# 顺时后端日志轮转配置
+# 安装: sudo cp logrotate-shunshi /etc/logrotate.d/shunshi
+# 测试: sudo logrotate -d /etc/logrotate.d/shunshi
+
+/app/logs/*.log {
+    daily
+    rotate 30
+    compress
+    delaycompress
+    missingok
+    notifempty
+    create 0644 appuser appuser
+    dateext
+    dateformat -%Y%m%d-%s
+    sharedscripts
+    postrotate
+        # 通知 gunicorn 重新打开日志文件
+        kill -USR1 $(cat /tmp/gunicorn.pid 2>/dev/null) 2>/dev/null || true
+    endscript
+}

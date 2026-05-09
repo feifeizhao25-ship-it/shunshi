@@ -6,6 +6,7 @@ Mock 模式: ALIPAY_MODE=mock 时返回模拟数据
 产品 ID 矩阵:
   养心月付 / 养心年付 / 益阳月付 / 益阳年付 / 佳和月付 / 佳和年付
 """
+from __future__ import annotations
 import os
 import time
 import uuid
@@ -214,9 +215,9 @@ class AlipayService:
             )
             logger.info(f"[Alipay] 创建订单: {order_no}, sku={product_sku}")
         else:
-            # Mock 模式
-            pay_url = f"https://openapi.alipay.com/gateway.do?mock=1&order={order_no}"
-            logger.info(f"[Alipay] Mock 订单: {order_no}, sku={product_sku}")
+            # Mock 模式 — 优雅降级
+            logger.warning("Alipay APP_ID/PRIVATE_KEY not configured, payment disabled")
+            raise RuntimeError("支付服务未配置，请联系管理员")
 
         return AlipayOrderResult(
             order_no=order_no,
@@ -240,14 +241,9 @@ class AlipayService:
                 buyer_id=result.get("buyer_id", ""),
             )
         else:
-            # Mock
-            return AlipayQueryResult(
-                order_no=order_no,
-                trade_no=f"2026031822001{uuid.uuid4().hex[:12]}",
-                trade_status="TRADE_SUCCESS",
-                total_amount="29.90",
-                buyer_id="2088102146225135",
-            )
+            # Mock 模式 — 优雅降级
+            logger.warning("Alipay not configured, query disabled")
+            raise RuntimeError("支付服务未配置，请联系管理员")
 
     def refund(
         self,
@@ -273,12 +269,8 @@ class AlipayService:
                 refund_status="SUCCESS" if result.get("code") == "10000" else "FAILED",
             )
         else:
-            return AlipayRefundResult(
-                order_no=order_no,
-                refund_no=refund_no,
-                refund_amount=refund_amount,
-                refund_status="SUCCESS",
-            )
+            logger.warning("Alipay not configured, refund disabled")
+            raise RuntimeError("支付服务未配置，请联系管理员")
 
     def verify_notify(self, params: dict) -> AlipayNotifyData:
         """验证支付宝回调签名并解析数据"""
@@ -303,6 +295,106 @@ class AlipayService:
             passback_params=params.get("passback_params", ""),
             gmt_payment=params.get("gmt_payment", ""),
         )
+
+
+# ==================== PaymentGateway 适配器 ====================
+
+
+class AlipayGateway:
+    """Alipay PaymentGateway 适配器 — 委托给 AlipayService 单例"""
+
+    def __init__(self) -> None:
+        self._svc = alipay_service
+
+    async def create_order(self, user_id: str, amount: float, currency: str,
+                           description: str, metadata: dict = None) -> "PaymentResult":  # noqa: F821
+        """创建支付订单"""
+        from .payment_gateway import PaymentResult
+        try:
+            sku = (metadata or {}).get("sku", "yangxin_monthly")
+            result = self._svc.create_order(product_sku=sku, user_id=user_id)
+            return PaymentResult(
+                success=True,
+                order_id=result.order_no,
+                transaction_id=result.order_no,
+                amount=float(result.total_amount),
+                currency=currency,
+                message="Alipay order created",
+                raw_response={"pay_url": result.pay_url, "mode": result.mode},
+            )
+        except Exception as e:
+            return PaymentResult(
+                success=False, order_id="", amount=amount, currency=currency,
+                message=str(e),
+            )
+
+    async def verify_callback(self, request_data: dict) -> "PaymentResult":  # noqa: F821
+        """验证支付回调"""
+        from .payment_gateway import PaymentResult
+        try:
+            notify = self._svc.verify_notify(params=dict(request_data))
+            return PaymentResult(
+                success=notify.trade_status == "TRADE_SUCCESS",
+                order_id=notify.out_trade_no,
+                transaction_id=notify.trade_no,
+                amount=float(notify.total_amount),
+                currency="CNY",
+                message=notify.trade_status,
+                raw_response=notify.model_dump(),
+            )
+        except Exception as e:
+            return PaymentResult(success=False, order_id="", message=str(e))
+
+    async def query_order(self, order_id: str) -> "PaymentResult":  # noqa: F821
+        """查询订单状态"""
+        from .payment_gateway import PaymentResult
+        try:
+            result = self._svc.query_order(order_no=order_id)
+            return PaymentResult(
+                success=result.trade_status == "TRADE_SUCCESS",
+                order_id=result.order_no,
+                transaction_id=result.trade_no,
+                amount=float(result.total_amount),
+                currency="CNY",
+                message=result.trade_status,
+            )
+        except Exception as e:
+            return PaymentResult(success=False, order_id=order_id, message=str(e))
+
+    async def refund(self, order_id: str, amount: float, reason: str = "") -> "RefundResult":  # noqa: F821
+        """发起退款"""
+        from .payment_gateway import RefundResult
+        try:
+            result = self._svc.refund(
+                order_no=order_id, refund_amount=str(amount), refund_reason=reason,
+            )
+            return RefundResult(
+                success=result.refund_status == "SUCCESS",
+                refund_id=result.refund_no,
+                amount=float(result.refund_amount),
+                message=result.refund_status,
+            )
+        except Exception as e:
+            return RefundResult(success=False, amount=amount, message=str(e))
+
+    async def verify_webhook(self, headers: dict, body: bytes) -> "PaymentResult":  # noqa: F821
+        """验证 Webhook 签名 — 支付宝通过回调参数验签"""
+        from .payment_gateway import PaymentResult
+        try:
+            import json
+            data = json.loads(body) if isinstance(body, bytes) else body
+            notify = self._svc.verify_notify(params=dict(data))
+            return PaymentResult(
+                success=notify.trade_status == "TRADE_SUCCESS",
+                order_id=notify.out_trade_no,
+                transaction_id=notify.trade_no,
+                amount=float(notify.total_amount),
+                currency="CNY",
+                message=notify.trade_status,
+                raw_response=notify.model_dump(),
+            )
+        except Exception as e:
+            return PaymentResult(success=False, order_id="", message=str(e))
 
 
 # ==================== 单例 ====================

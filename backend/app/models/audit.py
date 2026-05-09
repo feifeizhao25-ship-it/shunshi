@@ -2,6 +2,8 @@
 顺时 ShunShi - 审计与配置相关模型
 包含 3 张表: AiAuditLog, PromptVersion, FeatureFlag
 """
+from __future__ import annotations
+
 from decimal import Decimal
 from datetime import datetime
 from typing import Optional
@@ -19,7 +21,7 @@ class AiAuditLog(IDMixin, Base):
     __tablename__ = "sa_ai_audit_logs"
 
     user_id: Mapped[str] = mapped_column(
-        ForeignKey("sa_users.id", ondelete="SET NULL"),
+        ForeignKey("users.id", ondelete="SET NULL"),
         nullable=True, index=True, comment="关联用户 ID"
     )
     session_id: Mapped[Optional[str]] = mapped_column(

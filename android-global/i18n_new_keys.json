@@ -1,0 +1,1875 @@
+{
+  "new_keys": {
+    "achievement_badges": "Achievement Badges",
+    "track_every_step_of_your_wellness_journe": "Track every step of your wellness journey",
+    "points": "Points",
+    "current_level_beginner": "Current Level: Beginner",
+    "next_intermediate": "Next: Intermediate",
+    "440_points_to_next_level": "440 points to next level",
+    "earned_glory": "Earned Glory",
+    "3_8_unlocked": "3 / 8 Unlocked",
+    "path_to_mastery": "Path to Mastery",
+    "keep_waking_early_for_3_more_days_to_ear": "Keep waking early for 3 more days to earn the \"Dawn Awakening\" hidden badge.",
+    "achievements": "Achievements",
+    "track_every_step_of_your_wellness_journe_2": "Track every step of your wellness journey",
+    "current_progress": "Current Progress",
+    "badges_earned": "Badges Earned",
+    "current_total": "$current / $total",
+    "100day_wellness_challenge": "100-Day Wellness Challenge",
+    "complete_movement_set": "Complete Movement Set",
+    "24_solar_terms_wellness": "24 Solar Terms Wellness",
+    "early_riser": "Early Riser",
+    "practice_starter": "Practice Starter",
+    "food_therapy_expert": "Food Therapy Expert",
+    "100day_commitment": "100-Day Commitment",
+    "solar_term_master": "Solar Term Master",
+    "community_star": "Community Star",
+    "loading_2": "Loading...",
+    "retry_2": "Retry",
+    "your_essence": "Your Essence",
+    "your_seasonal_essence_balanced": "Your Seasonal Essence: Balanced",
+    "harmony_in_flux": "\"Harmony in Flux\"",
+    "solar_dominance": "Solar Dominance",
+    "terrene_stability": "Terrene Stability",
+    "your_essence_2": "Your Essence",
+    "your_seasonal_essence_balanced_2": "Your Seasonal Essence: Balanced",
+    "harmony_in_flux_2": "\"Harmony in Flux\"",
+    "your_natural_rhythm": "Your Natural Rhythm",
+    "now_broadcasting": "Now broadcasting...",
+    "continue_deep_conversations_unlock_with": "Continue deep conversations — unlock with one tap in the Nourish Heart edition",
+    "unlock": "Unlock",
+    "reference_s": "Reference: $s",
+    "we_care_about_you": "We care about you",
+    "why_this_matters": "Why this matters",
+    "how_to_do_it": "How to do it",
+    "seasons_uses_ai_this_is_not_therapy_or_m": "SEASONS uses AI. This is not therapy or medical advice.",
+    "daily_free_messages_used_up": "Daily free messages used up",
+    "upgrade_now": "Upgrade Now",
+    "later": "Later",
+    "health_safety_notice": "Health Safety Notice",
+    "i_understand": "I Understand",
+    "speech_recognition_failed_e": "Speech recognition failed: $e",
+    "failed_to_start_recording_please_check_m": "Failed to start recording, please check microphone permission",
+    "recording_failed_e": "Recording failed: $e",
+    "quick_topics": "Quick Topics",
+    "seasons_ai_assistant": "SEASONS AI Assistant",
+    "warm_companion": "Warm Companion",
+    "premium": "Premium",
+    "quotaremaining_quotalimit": "$_quotaRemaining/$_quotaLimit",
+    "clear_chat": "Clear Chat",
+    "current__currentsolarterm": "Current: $_currentSolarTerm",
+    "crisis_hotline": "Crisis Hotline",
+    "4001619995_24h_mental_health_helpline": "400-161-9995 · 24h Mental Health Helpline",
+    "see_a_doctor": "See a Doctor",
+    "please_consult_a_medical_professional": "Please consult a medical professional",
+    "solar_term_care_tips": "Solar Term Care Tips",
+    "follow_natural_rhythms_harmonize_body_an": "Follow natural rhythms, harmonize body and mind",
+    "dietary_care": "Dietary Care",
+    "try_snow_fungus_and_lily_bulb_to_moisten": "Try snow fungus and lily bulb to moisten dryness",
+    "rest_routine": "Rest & Routine",
+    "sleep_early_rise_early_follow_natural_rh": "Sleep early, rise early, follow natural rhythms",
+    "morning_stillness": "Morning Stillness",
+    "12_day_flow": "12 Day Flow",
+    "current_streak": "Current Streak",
+    "how_is_your_energy_flowing_today": "How is your energy flowing today?",
+    "take_a_quiet_moment_to_listen_to_your_in": "Take a quiet moment to listen to your internal landscape.",
+    "energy_level": "Energy Level",
+    "current_mood": "Current Mood",
+    "checkin_saved": "Check-in saved",
+    "complete_checkin": "Complete Check-in",
+    "seasons_shunshi": "SEASONS ShunShi",
+    "wellness_circle": "Wellness Circle",
+    "search_wellness_content": "Search wellness content...",
+    "seasons_ai_guidance": "SEASONS AI Guidance",
+    "tip_focus_on_spring_liver_care": "Tip: Focus on — Spring Liver care",
+    "likes": "$likes",
+    "comments": "$comments",
+    "share_2": "Share",
+    "no_questions_available": "No questions available",
+    "constitution_analysis": "Constitution Analysis",
+    "your_constitution_type": "Your Constitution Type",
+    "constitution_score": "Constitution Score",
+    "wellness_tips": "Wellness Tips",
+    "retake": "Retake",
+    "done_2": "Done",
+    "constitution_report_2": "Constitution Report",
+    "constitution_report_spring_equinox_2024": "Constitution Report · Spring Equinox 2024",
+    "your_constitution_qi_deficient_with_phle": "Your Constitution: Qi Deficient (with Phlegm-Damp)",
+    "constitution_scores": "Constitution Scores",
+    "ai_wellness_rating": "AI Wellness Rating",
+    "personalized_wellness_plan": "Personalized Wellness Plan",
+    "rest_the_body_move_the_qi": "\"Rest the body, move the Qi.\"",
+    "generate_detailed_calendar": "Generate Detailed Calendar",
+    "body_type_report": "Body Type Report",
+    "body_type_report__getcurrentseason": "Body Type Report · ${_getCurrentSeason()}",
+    "your_body_type_name": "Your Body Type: $name",
+    "body_type_score_distribution": "Body Type Score Distribution",
+    "ai_wellness_summary": "AI Wellness Summary",
+    "personalized_wellness_plan_2": "Personalized Wellness Plan",
+    "rest_the_body_move_to_nourish_qi": "\"Rest the body, move to nourish Qi.\"",
+    "generating_wellness_calendar": "Generating wellness calendar...",
+    "generate_wellness_calendar": "Generate Wellness Calendar",
+    "shunshi_ai": "ShunShi AI",
+    "constitution_report_nowyear_seasonlabel": "Constitution Report · ${now.year} $seasonLabel",
+    "your_constitution": "Your Constitution:",
+    "stillness_nourishes_the_body_movement_no": "\"Stillness nourishes the body, movement nourishes Qi.\"",
+    "generate_care_calendar": "Generate Care Calendar",
+    "constitution_strength": "Constitution Strength",
+    "results_reflect_your_recent_state_reasse": "Results reflect your recent state. Reassess each solar term.",
+    "ai_wellness_summary_2": "AI Wellness Summary",
+    "personalized_care_plan": "Personalized Care Plan",
+    "view_all_2": "View All",
+    "recommended_recipe": "Recommended Recipe",
+    "astragalus_chicken_soup": "Astragalus Chicken Soup",
+    "tonifies_qi_and_warms_the_middleideal_fo": "Tonifies Qi and warms the middle，Ideal for Qi Deficiency。",
+    "start_cooking": "Start Cooking",
+    "recommended_acupoint": "Recommended Acupoint",
+    "zusanli_st36_tonify_middle_jiao_qi": "Zusanli ST36 · Tonify Middle Jiao Qi",
+    "recommended_exercise": "Recommended Exercise",
+    "baduanjin_regulate_spleen_stomach": "Baduanjin · Regulate Spleen & Stomach",
+    "copied_title": "Copied: $title",
+    "diary_saved": "Diary saved",
+    "save_failed_please_retry": "Save failed, please retry",
+    "wellness_diary": "Wellness Diary",
+    "follow_the_seasons_listen_to_your_body_r": "\"Follow the seasons, listen to your body rhythm.\"",
+    "sleep_quality": "Sleep Quality",
+    "mood_map": "Mood Map",
+    "daily_rituals": "Daily Rituals",
+    "save_diary": "Save Diary",
+    "ai_insights": "AI Insights",
+    "recent_entries": "Recent Entries",
+    "weekly_report": "Weekly Report",
+    "no_data_2": "No data",
+    "sleep_report_2": "Sleep Report",
+    "try_this_tonight": "Try this tonight",
+    "sleep_score": "Sleep Score",
+    "score": "$score",
+    "log_a_few_more_days_to_unlock_your_perso": "Log a few more days to unlock your personalized sleep analysis ✨",
+    "good_morning_seasons_friend": "Good morning, SEASONS friend",
+    "monthday_u2022_grain_rain": "$month/$day \\u2022 Grain Rain",
+    "ai_insights_2": "AI Insights",
+    "generating": "Generating...",
+    "dietrecommended": "Dietrecommended",
+    "view": "View",
+    "wellness_library": "Wellness Library",
+    "search_results__searchresultslength": "Search Results (${_searchResults.length})",
+    "no_relevant_results_found": "No relevant results found",
+    "featurededit": "FeaturedEdit",
+    "view_all_3": "View All",
+    "editors_choice": "Editor's Choice",
+    "page_not_found": "Page not found",
+    "go_home": "Go Home",
+    "qi_gong_tutorial": "QI GONG TUTORIAL",
+    "regulate_spleenstomach_singlearm_raise": "Regulate Spleen-Stomach: Single-Arm Raise",
+    "12min": "12min",
+    "start_fullscreen_teaching": "Start Full-Screen Teaching",
+    "my_family": "My Family",
+    "invite_family": "Invite Family",
+    "privacy_only_status_level_is_shared_no_d": "Privacy: Only status level is shared, no detailed data exposed",
+    "no_family_members_yet": "No family members yet",
+    "invite_code_copied_to_clipboard": "Invite code copied to clipboard",
+    "invite_content_copied_paste_and_send_to": "Invite content copied — paste and send to family member",
+    "family_management": "Family Management",
+    "invite_code": "Invite Code",
+    "copy_invite_code": "Copy Invite Code",
+    "share_with_family": "Share with Family",
+    "joined_family": "Joined Family",
+    "regenerate_invite_code": "Regenerate Invite Code",
+    "status_info": "Status Info",
+    "privacy_protection_you_can_only_see_stat": "Privacy Protection: You can only see status-level information",
+    "care_reminder_sent": "Care reminder sent",
+    "send_care_reminder": "Send Care Reminder",
+    "they_will_see_the_same_status_card": "They will see the same status card",
+    "view_profile_status_their_view": "View Profile Status (Their View)",
+    "health_insights": "Health Insights",
+    "ai_tip_spring_is_windy_strengthen_your_d": "AI Tip: \\\"Spring is windy, strengthen your defensive Qi to prevent colds.\\\"",
+    "start_cooking_2": "Start Cooking",
+    "want_to_learn_more": "Want to learn more?",
+    "consult_the_ai_seasons_assistant_for_per": "Consult the AI SEASONS assistant for personalized diet suggestions",
+    "num": "$num",
+    "growth_milestones": "Growth Milestones",
+    "your_journey_of_mindful_growth": "Your journey of mindful growth",
+    "totalxp": "$totalXp",
+    "experience_points": "Experience Points",
+    "level_mindful_seeker": "Level: Mindful Seeker",
+    "next_inner_sage_570_xp_remaining": "Next: Inner Sage — 570 XP remaining",
+    "unlocked": "Unlocked",
+    "journey_ahead": "Journey Ahead",
+    "mxp": "+${m.xp}",
+    "digital_sanctuary": "Digital Sanctuary",
+    "your_growth_journey": "Your Growth Journey",
+    "current_season": "Current Season",
+    "spring_equinox_alignment": "Spring Equinox Alignment",
+    "85_towards_harvest": "85% TOWARDS HARVEST",
+    "reflective_milestones": "Reflective Milestones",
+    "gently_nurtured_achievements": "Gently nurtured achievements",
+    "gentle_guidance": "Gentle Guidance",
+    "daily_whisper": "Daily Whisper",
+    "a_rhythm_of_reminders_tailored_to_your_c": "A rhythm of reminders tailored to your current season and constitution.",
+    "personalized_for_your_cycle": "Personalized for your cycle",
+    "morning_ritual": "Morning Ritual",
+    "seasonal_tip": "Seasonal Tip",
+    "vatapitta_balance": "Vata-Pitta Balance",
+    "daily_whisper_2": "Daily Whisper",
+    "gentle_guidance_2": "Gentle Guidance",
+    "a_rhythm_of_reminders_tailored_to_your_c_2": "A rhythm of reminders tailored to your current season and constitution.",
+    "vatapitta_balance_2": "Vata-Pitta Balance",
+    "body_type_insight": "Body Type Insight",
+    "personalized_for_your_cycle_2": "Personalized for your cycle",
+    "deepen_insight": "Deepen Insight",
+    "morning_ritual_2": "Morning Ritual",
+    "seasonal_tip_2": "Seasonal Tip",
+    "flow_state": "Flow State",
+    "recorded_keep_it_up": "Recorded! Keep it up 💪",
+    "submit_failed_please_retry": "Submit failed, please retry",
+    "daily_checkin": "Daily Check-in",
+    "how_do_you_feel_today": "How do you feel today?",
+    "record_your_body_and_heart_state_for_mor": "Record your body and heart state for more precise suggestions",
+    "what_would_you_like_to_record_today": "What would you like to record today?",
+    "submit_checkin": "Submit Check-in",
+    "mood": "Mood",
+    "sleep_quality_2": "Sleep Quality",
+    "energy_level_2": "Energy Level",
+    "hello__username": "Hello, $_userName",
+    "no_new_notifications": "No new notifications",
+    "wellness_focus": "Wellness Focus",
+    "nourish_yin_clear_heat_support_kidney_en": "Nourish yin, clear heat, support kidney energy",
+    "constitution_assessment": "Constitution Assessment",
+    "discover_your_body_type_for_personalized": "Discover your body type for personalized wellness",
+    "daily_checkin_2": "Daily Check-in",
+    "track_mood_sleep_and_energy_patterns": "Track mood, sleep, and energy patterns",
+    "recommendations": "Recommendations",
+    "ai_wellness_assistant": "AI Wellness Assistant",
+    "personalized_guidance_for_this_season": "Personalized guidance for this season",
+    "view_full_seasonal_guide": "View Full Seasonal Guide",
+    "explore_more": "Explore More",
+    "based_on_your_constitution": "Based on your constitution",
+    "coming_soon_2": "Coming soon",
+    "your_body_may_need_a_slower_evening_toda": "Your body may need a slower evening today",
+    "daily_insight": "Daily insight",
+    "gentle_suggestions": "Gentle suggestions",
+    "talk_to_seasons": "Talk to Seasons",
+    "your_ai_companion_for_seasonal_living": "Your AI companion for seasonal living",
+    "explore_seasonal_rituals": "Explore seasonal rituals",
+    "take_three_slower_breaths": "Take three slower breaths",
+    "make_a_warm_drink_tonight": "Make a warm drink tonight",
+    "dim_the_lights_20_minutes_earlier": "Dim the lights 20 minutes earlier",
+    "seasonal_wisdom": "Seasonal Wisdom",
+    "explore_principle": "Explore Principle",
+    "gentle_reminder": "Gentle Reminder",
+    "seasons_companion": "SEASONS Companion",
+    "companiontip": "\"$_companionTip\"",
+    "quick_rituals": "Quick Rituals",
+    "seasonal_library": "Seasonal Library",
+    "see_all": "See All",
+    "todays_rhythm": "Today's Rhythm",
+    "its__seasondisplayname_season": "It's ${_seasonDisplayName(_season)}.",
+    "good_morning_seasons_friend_2": "Good Morning, SEASONS Friend",
+    "solar_term_reminder": "Solar Term Reminder",
+    "spring_equinox": "Spring Equinox",
+    "12_days_until_qingming": "12 days until Qingming",
+    "seasonal_rituals": "Seasonal Rituals",
+    "view_all_4": "View All",
+    "3_habits_completed_today": "3 habits completed today",
+    "consistency_bridges_intentions_and_healt": "Consistency bridges intentions and health. Keep it up!",
+    "check_in": "Check In",
+    "recommended_for_you": "Recommended for You",
+    "recipe": "Recipe",
+    "spring_vegetable_porridge": "Spring Vegetable Porridge",
+    "a_light_warming_meal_designed_for_gentle": "A light, warming meal designed for gentle detox after winter.",
+    "philosophy_balance": "Philosophy & Balance",
+    "finding_balance_in_the_new_season_spring": "Finding Balance in the New Season: Spring Equinox Living Guide",
+    "8_min_read": "8 min read",
+    "traditional_wellness_arts": "Traditional Wellness Arts",
+    "read_more": "Read More",
+    "healing_sounds": "Healing Sounds",
+    "mountain_streams_bamboo": "Mountain Streams & Bamboo",
+    "nourish_yang_in_spring_and_summernnouris": "\"Nourish Yang in spring and summer,\\nNourish Yin in autumn and winter.\"",
+    "huangdi_neijing": "Huangdi Neijing",
+    "dietary_wisdom": "Dietary Wisdom",
+    "seasonal_tea": "Seasonal Tea",
+    "meridian_clearing": "Meridian Clearing",
+    "movement_practice": "Movement Practice",
+    "a_glass_of_warm_water_the_first_step_to": "A glass of warm water — the first step to nourishing Yang",
+    "water_reminder_complete_your_first_actio": "Water Reminder → Complete your first action today",
+    "chen_79_stomach_is_active_a_light_breakf": "Chen (7-9) Stomach is active — a light breakfast nourishes the Spleen-Stomach",
+    "view_seasonal_recipes": "View Seasonal Recipes →",
+    "wu_1113_heart_is_active_rest_for_15_min": "Wu (11-13) Heart is active — rest for 15 min to nourish the Heart",
+    "meditationqigong": "MeditationQigong →",
+    "shen_1517_bladder_is_active_drink_more_w": "Shen (15-17) Bladder is active — drink more water to detoxify",
+    "log_water_intake": "Log Water Intake →",
+    "xu_1921_pericardium_take_a_walk_to_relax": "Xu (19-21) Pericardium — take a walk to relax body and mind",
+    "take_a_walk": "Take a Walk →",
+    "hai_2123_triple_burner_sleep_early_to_no": "Hai (21-23) Triple Burner — sleep early to nourish Yin",
+    "presleep_log": "Pre-Sleep Log →",
+    "start_your_first_action_today": "Start Your First Action Today",
+    "solar_term_wellness_starts_from_morning": "Solar Term Wellness starts from morning",
+    "afternoon_wu_1113_wellness_continues": "Afternoon Wu (11-13) — wellness continues",
+    "time_to_nourish_yin_prepare_for_sleep": "Time to nourish Yin, prepare for sleep",
+    "todays_wellness_in_progress": "Today's Wellness in Progress",
+    "view_todays_pick_u2192": "View Today's Pick \\u2192",
+    "continue_todays_plan_u2192": "Continue Today's Plan \\u2192",
+    "how_are_you_feeling_right_now": "How are you feeling right now?",
+    "unlock_personalized_wellness": "Unlock Personalized Wellness",
+    "exclusive_body_type_plans_longterm_track": "Exclusive Body Type Plans · Long-term Tracking · AI Insights",
+    "7dayfree": "7dayFree",
+    "currentterm_shichen": "$currentTerm · $shiChen",
+    "late_summer_harvest": "Late Summer Harvest",
+    "the_seasonal_directory": "The Seasonal Directory",
+    "aligning_your_plate_with_the_rhythms_of": "Aligning your plate with the rhythms of the earth.",
+    "search_ingredients": "Search ingredients...",
+    "in_peak": "In Peak",
+    "wellness_benefits": "Wellness Benefits",
+    "body_type_alignment": "Body Type Alignment",
+    "view_rituals": "View Rituals",
+    "late_summer_phase": "Late Summer Phase",
+    "harvesting_the_light": "Harvesting the Light",
+    "take_a_moment_to_center_yourself_the_ear": "Take a moment to center yourself. The earth is slowing, and so may you.",
+    "current_internal_climate": "Current Internal Climate",
+    "daily_gratitude": "Daily Gratitude",
+    "seasonal_reflection": "Seasonal Reflection",
+    "reflection_saved": "Reflection saved",
+    "save_reflection": "Save Reflection",
+    "late_summer_phase_2": "Late Summer Phase",
+    "harvesting_the_light_2": "Harvesting the Light",
+    "take_a_moment_to_center_yourself_the_ear_2": "Take a moment to center yourself. The earth is slowing, and so may you.",
+    "current_internal_climate_2": "Current Internal Climate",
+    "daily_gratitude_2": "Daily Gratitude",
+    "seasonal_reflection_2": "Seasonal Reflection",
+    "prompt_what_are_you_shedding": "Prompt: What are you shedding?",
+    "write_your_reflection": "Write your reflection...",
+    "personal_intentions": "Personal Intentions",
+    "privacy_policy": "Privacy Policy",
+    "terms_of_service": "Terms of Service",
+    "wellness_library_2": "Wellness Library",
+    "your_collection_of_calm": "Your collection of calm",
+    "see_all_2": "See All →",
+    "wellness_library_3": "Wellness Library",
+    "no_content_found_for_this_filter": "No content found for this filter",
+    "breathing_into_change": "Breathing into Change",
+    "10_min_grounding": "10 Min · Grounding",
+    "atmosphere_layer": "Atmosphere Layer",
+    "meridian_overview": "Meridian Overview",
+    "massage_steps": "Massage Steps",
+    "where_there_is_flow_there_is_no_pain": "\"Where there is flow, there is no pain.\"",
+    "session_in_progress": "Session in Progress",
+    "late_summer_transition": "Late Summer Transition",
+    "gentle_flow_ritual": "Gentle Flow Ritual",
+    "spatial_audio_active": "Spatial Audio Active",
+    "save_to_rituals": "Save to Rituals",
+    "step_index_1_of__stepslength": "Step ${index + 1} of ${_steps.length}",
+    "your_first_daily_insight": "YOUR FIRST DAILY INSIGHT",
+    "there_are_no_wrong_answers": "There are no wrong answers.",
+    "we": "We\\",
+    "this_helps_us_personalise_content_for_yo": "This helps us personalise content for you.",
+    "you_can_always_change_this_later": "You can always change this later.",
+    "live_in_harmony_with_the_seasons_nurture": "Live in harmony with the seasons, nurture body and heart",
+    "start": "Start",
+    "what_do_you_care_most_about": "What do you care most about?",
+    "choose_one_we_will_customize_a_plan_for": "Choose one — we will customize a plan for you",
+    "ready": "Ready!",
+    "start_experience": "Start Experience",
+    "aboutseasons": "AboutSEASONS",
+    "seasons_shunshi_2": "SEASONS ShunShi",
+    "live_in_harmony_with_time_nourish_the_he": "Live in Harmony with Time, Nourish the Heart",
+    "20242026_seasons_shunshi": "© 2024-2026 SEASONS ShunShi",
+    "family_management_2": "Family Management",
+    "invite_family_to_wellness_together": "Invite Family to Wellness Together",
+    "share_invite_code_so_family_can_get_pers": "Share invite code so family can get personalized health suggestions:",
+    "copy_invite_code_to_share_with_family": "Copy invite code to share with family",
+    "added_family_members": "Added Family Members",
+    "no_family_members_added_yet": "No family members added yet",
+    "share_invite_code_to_add_family_members": "Share invite code to add family members",
+    "invite_code_copied": "Invite code copied",
+    "thank_you_for_your_feedback_we_take_it_s": "Thank you for your feedback — we take it seriously!",
+    "feedback_2": "Feedback",
+    "tell_us_what_you_think": "Tell us what you think",
+    "submitfeedback": "SubmitFeedback",
+    "gdpr_privacy_policy": "GDPR Privacy Policy",
+    "seasons_live_in_harmony_with_nature": "SEASONS — Live in harmony with nature",
+    "we_do_not_collect": "We do NOT collect:",
+    "delete_all_my_data": "Delete All My Data",
+    "delete_all_data": "Delete All Data?",
+    "cancel_2": "Cancel",
+    "all_data_has_been_deleted": "All data has been deleted.",
+    "delete_2": "Delete",
+    "digital_sanctuary_2": "Digital Sanctuary",
+    "seeker_of_calm": "Seeker of Calm",
+    "spring_equinox_member_since_2023": "Spring Equinox Member since 2023",
+    "global_preferences": "Global Preferences",
+    "sign_out_of_sanctuary": "Sign Out of Sanctuary",
+    "deactivate_calm_account": "Deactivate Calm Account",
+    "hemisphere": "Hemisphere",
+    "influences_seasonal_rituals_and_content": "Influences seasonal rituals and content",
+    "measurement_units": "Measurement Units",
+    "weight_distance_and_temperature": "Weight, distance, and temperature",
+    "language_locale": "Language & Locale",
+    "select_your_primary_dialect": "Select your primary dialect",
+    "nourishment_logic": "Nourishment Logic",
+    "personalize_your_recipe_discovery_experi": "Personalize your recipe discovery experience",
+    "data_exported_successfully": "Data exported successfully",
+    "export_failed_please_retry": "Export failed, please retry",
+    "delete_all_data_2": "Delete All Data?",
+    "this_cannot_be_undone_all_data_will_be_p": "This cannot be undone. All data will be permanently deleted.",
+    "cancel_3": "Cancel",
+    "all_data_deleted": "All data deleted",
+    "deletion_failed": "Deletion failed",
+    "confirm_deletion": "Confirm Deletion",
+    "clear_ai_memory": "Clear AI Memory?",
+    "the_ai_will_no_longer_remember_conversat": "The AI will no longer remember conversations. Constitution results are kept.",
+    "ai_memory_cleared": "AI memory cleared",
+    "confirm_clear": "Confirm Clear",
+    "data_privacy": "Data & Privacy",
+    "your_data": "Your Data",
+    "privacy_policy_2": "Privacy Policy",
+    "questions_about_your_data": "Questions about your data?",
+    "privacyshunshiapp": "privacy@shunshi.app",
+    "export_my_data": "Export My Data",
+    "download_all_your_personal_data_json_for": "Download all your personal data (JSON format)",
+    "delete_all_data_3": "Delete All Data",
+    "permanently_delete_all_your_data_irrever": "Permanently delete all your data (irreversible)",
+    "clear_ai_memory_2": "Clear AI Memory",
+    "clear_the_ai_assistant_memory": "Clear the AI assistant memory",
+    "back_2": "Back",
+    "birthyear": "$_birthYear",
+    "main_health_concerns_optional": "Main health concerns (optional)",
+    "not_sure_help_me_take_the_test": "Not sure, help me take the test",
+    "describe_your_physical_condition_optiona": "Describe your physical condition (optional)",
+    "hello_what_should_we_call_you": "Hello, what should we call you?",
+    "we_will_greet_you_by_this_name": "We will greet you by this name",
+    "what_is_your_gender": "What is your gender?",
+    "used_for_personalized_wellness_tips": "Used for personalized wellness tips",
+    "which_year_were_you_born_in": "Which year were you born in?",
+    "used_to_recommend_wellness_plans_suitabl": "Used to recommend wellness plans suitable for your age",
+    "discover_your_body_type": "Discover Your Body Type",
+    "select_your_tcm_body_type_to_get_persona": "Select your TCM Body Type to get personalized wellness tips",
+    "wellnessrecords": "WellnessRecords",
+    "today": "Today",
+    "sleep_stats": "Sleep Stats",
+    "avg_sleep": "Avg Sleep",
+    "quality_score": "Quality Score",
+    "mood_trends": "Mood Trends",
+    "skip_today": "Skip today",
+    "saved": "Saved",
+    "be_gentle_with_yourself_today": "Be gentle with yourself today",
+    "grateful": "Grateful",
+    "calm": "Calm",
+    "happy": "Happy",
+    "tired": "Tired",
+    "reflective": "Reflective",
+    "wellness_report_2": "Wellness Report",
+    "personal_assessment": "Personal Assessment",
+    "your_rhythm_balanced_vibrant": "Your Rhythm: Balanced & Vibrant.",
+    "late_spring_focus": "Late Spring Focus",
+    "learn_more_2": "Learn More",
+    "recommended": "Recommended",
+    "morning_sunlight": "Morning Sunlight",
+    "explore_your_late_spring_plan": "Explore Your Late Spring Plan",
+    "revised_may_12_2024": "Revised May 12, 2024",
+    "wellness_report_3": "Wellness Report",
+    "spring_equinox_week_3": "Spring Equinox · Week 3",
+    "season_focus": "Season Focus",
+    "personalized_recommendation": "Personalized Recommendation",
+    "nourish": "Nourish",
+    "move": "Move",
+    "other_seasons": "Other Seasons",
+    "help_support": "Help & Support",
+    "supportseasonsapp": "support@seasons.app",
+    "we_typically_respond_within_24_hours": "We typically respond within 24 hours",
+    "seasons_safety_commitment": "SEASONS Safety Commitment",
+    "email_us_at_supportseasonsapp": "Email us at support@seasons.app",
+    "restore_purchases": "Restore Purchases",
+    "got_it": "Got it",
+    "response_in_24h": "Response in 24h",
+    "subscription": "Subscription",
+    "getting_started": "Getting Started",
+    "subscription_billing": "Subscription & Billing",
+    "privacy_data": "Privacy & Data",
+    "ai_companion_2": "AI Companion",
+    "family_accounts": "Family & Accounts",
+    "technical_issues": "Technical Issues",
+    "email_us": "Email Us",
+    "restore": "Restore",
+    "notificationssettings": "NotificationsSettings",
+    "reminder_time": "Reminder Time",
+    "solar_term_alerts": "Solar Term Alerts",
+    "get_notified_at_each_solar_term": "Get notified at each solar term",
+    "daily_checkin_reminder": "Daily Check-in Reminder",
+    "daily_wellness_checkin_reminder": "Daily wellness check-in reminder",
+    "exercise_reminder": "Exercise Reminder",
+    "remind_you_to_complete_daily_exercise": "Remind you to complete daily exercise",
+    "sleep_reminder": "Sleep Reminder",
+    "remind_you_to_rest_on_time": "Remind you to rest on time",
+    "health_info_push": "Health Info Push",
+    "push_wellness_knowledge_and_solar_term_u": "Push wellness knowledge and solar term updates",
+    "settings": "Settings",
+    "control_what_seasons_remembers_about_you": "Control what SEASONS remembers about you",
+    "you_are_talking_to_ai": "You are talking to AI",
+    "memory": "Memory",
+    "daily_reminders": "Daily Reminders",
+    "export_my_data_2": "Export My Data",
+    "download_all_your_reflections_and_prefer": "Download all your reflections and preferences",
+    "clear_memory": "Clear Memory",
+    "remove_all_stored_preferences_and_summar": "Remove all stored preferences and summaries",
+    "delete_account": "Delete Account",
+    "permanently_remove_all_your_data": "Permanently remove all your data",
+    "crisis_support": "Crisis Support",
+    "if_you_are_in_crisis_please_seek_realwor": "If you are in crisis, please seek real-world support",
+    "privacy_policy_3": "Privacy Policy",
+    "terms_of_service_2": "Terms of Service",
+    "help_support_2": "Help & Support",
+    "export_your_data": "Export your data?",
+    "cancel_4": "Cancel",
+    "export": "Export",
+    "data_export_ready_sharing_file": "Data export ready. Sharing file...",
+    "export_failed_please_try_again": "Export failed. Please try again.",
+    "clear_all_memory": "Clear all memory?",
+    "memory_cleared": "Memory cleared",
+    "clear": "Clear",
+    "delete_your_account": "Delete your account?",
+    "delete_3": "Delete",
+    "account_deleted_sorry_to_see_you_go": "Account deleted. Sorry to see you go.",
+    "failed_to_delete_account_please_try_agai": "Failed to delete account. Please try again.",
+    "if_you_are_in_crisis": "If you are in crisis",
+    "if_you_are_in_immediate_danger_contact_y": "If you are in immediate danger, contact your local emergency services.",
+    "close_2": "Close",
+    "seasonal_essentials": "Seasonal Essentials",
+    "from_your_kitchen": "From your kitchen",
+    "add_6_items": "Add 6 items",
+    "add_item": "Add Item",
+    "cancel_5": "Cancel",
+    "add": "Add",
+    "wellness_skills": "Wellness Skills",
+    "choose_a_practice": "Choose a practice",
+    "each_skill_provides_evidencebased_struct": "Each skill provides evidence-based, structured guidance.",
+    "back_to_skills": "Back to skills",
+    "what_you_could_do": "What you could do",
+    "how_to_start": "How to start",
+    "digital_sanctuary_3": "Digital Sanctuary",
+    "currently_playing": "Currently Playing",
+    "midnight_rainfall": "Midnight Rainfall",
+    "bedtime_tales": "Bedtime Tales",
+    "gently_drift_into_the_world_of_dreams": "Gently drift into the world of dreams.",
+    "view_all_5": "View All",
+    "natures_layer": "Nature's Layer",
+    "sleep_sanctuary": "Sleep Sanctuary",
+    "nightfall_stillness": "Nightfall Stillness",
+    "30_min_deep_sleep": "30 Min · Deep Sleep",
+    "sleep_stories": "Sleep Stories",
+    "constitution_test_result": "Constitution Test Result",
+    "your_constitution_type_2": "Your Constitution Type",
+    "share_link_copied": "Share link copied",
+    "share_result": "Share Result",
+    "retake_test": "Retake Test",
+    "share_this_seasons_inspiration": "Share this SEASONS inspiration",
+    "shunshi_ai_2": "ShunShi AI",
+    "solar_term_essence": "Solar Term Essence",
+    "seasons_living_guide": "SEASONS Living Guide",
+    "dietary_wisdom_2": "Dietary Wisdom",
+    "daily_rhythm": "Daily Rhythm",
+    "movement_practice_2": "Movement Practice",
+    "mindful_meditation": "Mindful Meditation",
+    "seasons_ai": "SEASONS AI",
+    "share_link_copied_2": "Share link copied",
+    "solar_term_essence_2": "Solar Term Essence",
+    "infoquote": "「${info.quote}」",
+    "seasons_living_guide_2": "SEASONS Living Guide",
+    "ask_seasons_ai_about_personalized_termna": "Ask SEASONS AI about personalized $termName wellness plan",
+    "solar_term_wellness_goes_further": "Solar term wellness goes further",
+    "ask_seasons_ai_for_a_personalized_wellne": "Ask SEASONS AI for a personalized wellness plan for the current solar term",
+    "share_this_seasonal_inspiration": "Share this seasonal inspiration",
+    "todaytermname": "Today：${term.name}",
+    "termpoem": "「${term.poem}」",
+    "2026yeartermdate_termseasonlabel_termdur": "2026year${term.date} · ${term.seasonLabel} · ${term.durationDays}day",
+    "24_solar_terms": "24 Solar Terms",
+    "recommended_2": "Recommended",
+    "view_details": "View Details",
+    "wellness_tips_2": "Wellness Tips",
+    "view_all_6": "View All",
+    "diet_dos_don": "Diet Dos & Don\\",
+    "acupressure": "Acupressure",
+    "exercisesuggestion": "Exercisesuggestion:",
+    "emotionswellness": "EmotionsWellness",
+    "live_in_rhythm_with_nature": "Live in rhythm with nature",
+    "membership": "Membership",
+    "12k": "+12k",
+    "over_12000_members_have_chosen_annual_pl": "Over 12,000 members have chosen annual plans",
+    "subscribe_now": "Subscribe Now",
+    "by_subscribing_you_agree_to_the_terms_of": "By subscribing you agree to the Terms of Service and Privacy Policy",
+    "premium_membership": "PREMIUM MEMBERSHIP",
+    "shunshi_ai_3": "ShunShi AI",
+    "svip_benefits": "SVIP Benefits",
+    "start_your_smart_wellness_journey": "Start your smart wellness journey",
+    "128_personalized_health_suggestions_read": "128 personalized health suggestions ready for you",
+    "annual_plan": "Annual Plan",
+    "first_year_deal_only_054day": "First year deal · Only ¥0.54/day",
+    "monthly_plan": "Monthly Plan",
+    "flexible_cancel_anytime": "Flexible · Cancel anytime",
+    "family_plan": "Family Plan",
+    "3_members_health_sharing": "3 members · Health sharing",
+    "member_benefits": "Member Benefits",
+    "checkout": "Checkout",
+    "retry_3": "Retry",
+    "complete_your_subscription": "Complete Your Subscription",
+    "you_will_be_redirected_to_stripe_to_comp": "You will be redirected to Stripe to complete payment securely.",
+    "secure_payment": "Secure Payment",
+    "powered_by_stripe": "Powered by Stripe",
+    "opening_stripe_checkout__checkouturl": "Opening Stripe checkout: $_checkoutUrl",
+    "proceed_to_payment": "Proceed to Payment",
+    "welcome_to_seasons": "Welcome to SEASONS.",
+    "based_on_your_current_ip": "Based on your current IP",
+    "or_select_manually": "Or select manually",
+    "northern": "Northern",
+    "southern": "Southern",
+    "get_started_2": "Get Started",
+    "by_continuing_you_agree_to_our_seasonal": "By continuing, you agree to our Seasonal Living Principles and Privacy Policy.",
+    "lets_find_your_rhythm": "Let's find your rhythm.",
+    "acupressure_wellness": "Acupressure Wellness",
+    "select_area": "Select Area",
+    "all": "All",
+    "retry_4": "Retry",
+    "no_content_yet": "No content yet",
+    "massage_steps_2": "Massage Steps:",
+    "s": "• $s",
+    "label": "$label:",
+    "product_boundaries": "Product Boundaries",
+    "what_seasons_is_not": "What SEASONS Is Not",
+    "our_product_boundaries_to_keep_you_safe": "Our product boundaries to keep you safe",
+    "if_you_are_experiencing": "If you are experiencing",
+    "seasons_may_you_live_in_harmony_with_nat": "SEASONS - May you live in harmony with nature",
+    "seasons_does_not_provide": "SEASONS Does Not Provide",
+    "the_following_are_outside_our_scope_and": "The following are outside our scope and may pose health risks",
+    "medical_diagnosis": "Medical Diagnosis",
+    "drug_recommendations": "Drug Recommendations",
+    "symptom_analysis": "Symptom Analysis",
+    "health_scores": "Health Scores",
+    "mood_scoring": "Mood Scoring",
+    "what_seasons_provides": "What SEASONS Provides",
+    "we_focus_on_areas_that_help_you_live_bet": "We focus on areas that help you live better",
+    "lifestyle_advice": "Lifestyle Advice",
+    "solar_term_wellness": "Solar Term Wellness",
+    "emotional_companionship": "Emotional Companionship",
+    "sleep_improvement": "Sleep Improvement",
+    "food_therapy_teas": "Food Therapy & Teas",
+    "food_therapyrecommended": "Food Therapyrecommended",
+    "select_season": "Select Season",
+    "body_type": "Body Type",
+    "retry_5": "Retry",
+    "no_content_yet_2": "No content yet",
+    "emotional_support": "Emotional Support",
+    "chat_with_seasons": "Chat with SEASONS",
+    "always_here_to_listen": "Always here to listen",
+    "mindful_breathing_guide": "Mindful Breathing Guide",
+    "follow_the_rhythm_relax_body_and_mind": "Follow the rhythm, relax body and mind",
+    "how_are_you_feeling_right_now_2": "How are you feeling right now?",
+    "mindful_breathing_guide_2": "🌬️ Mindful Breathing Guide",
+    "close_3": "Close",
+    "start_guide": "Start Guide",
+    "relief_methods": "Relief Methods",
+    "sleep_improvement_2": "Sleep Improvement",
+    "how_was_your_sleep_last_night": "How was your sleep last night?",
+    "suggested_categories": "Suggested Categories",
+    "all_2": "All",
+    "retry_6": "Retry",
+    "no_content_yet_3": "No content yet",
+    "specific_steps": "Specific Steps",
+    "got_it_2": "Got it",
+    "tearecommended": "Tearecommended",
+    "best_time_to_drink": "Best Time to Drink",
+    "select_season_2": "Select Season",
+    "retry_7": "Retry",
+    "no_content_yet_4": "No content yet",
+    "ingredients_ingredients": "Ingredients: $ingredients",
+    "brewing_steps": "Brewing: $steps",
+    "got_it_3": "Got it",
+    "discover_your_body_type_2": "Discover Your Body Type",
+    "tcm_body_type_identification_find_the_we": "TCM Body Type identification — find the wellness path best suited for you",
+    "start_test": "Start Test",
+    "9_body_types": "9 Body Types",
+    "question_currentindex_1_questionslength": "Question ${currentIndex + 1} / ${questions.length}",
+    "previous": "Previous",
+    "your_constitution_type_is": "Your Constitution Type is",
+    "test_date_datetimenowtostringsubstring0": "Test Date: ${DateTime.now().toString().substring(0, 16)}",
+    "constitution_scores_2": "Constitution Scores",
+    "deviation": "Deviation",
+    "tendency": "Tendency",
+    "precautions": "Precautions",
+    "unlock_full_constitution_report": "Unlock Full Constitution Report",
+    "diet_tea_exercise_acupoints_seasonal_pla": "Diet · Tea · Exercise · Acupoints · Seasonal Plans",
+    "unlock_report": "Unlock Report",
+    "retest": "Retest",
+    "view_details_2": "View Details",
+    "share_result_2": "Share Result",
+    "score_pts": "$score pts",
+    "precautions_davoidlist": "Precautions: ${d.avoidList}"
+  },
+  "files": [
+    [
+      "achievement/achievement_page_v2.dart",
+      [
+        "Achievement Badges",
+        "Track every step of your wellness journey",
+        "Points",
+        "Current Level: Beginner",
+        "Next: Intermediate",
+        "440 points to next level",
+        "Earned Glory",
+        "3 / 8 Unlocked",
+        "Path to Mastery",
+        "Keep waking early for 3 more days to earn the \"Dawn Awakening\" hidden badge."
+      ]
+    ],
+    [
+      "achievements/achievements_page.dart",
+      [
+        "Achievements",
+        "Track every step of your wellness journey",
+        "Current Progress",
+        "Badges Earned",
+        "$current / $total",
+        "100-Day Wellness Challenge",
+        "Complete Movement Set",
+        "24 Solar Terms Wellness",
+        "Early Riser",
+        "Practice Starter",
+        "Food Therapy Expert",
+        "100-Day Commitment",
+        "Solar Term Master",
+        "Community Star"
+      ]
+    ],
+    [
+      "audio/audio_player_page.dart",
+      [
+        "Loading...",
+        "Retry"
+      ]
+    ],
+    [
+      "body_type/body_type_essence_page.dart",
+      [
+        "Your Essence",
+        "Your Seasonal Essence: Balanced",
+        "\"Harmony in Flux\"",
+        "Solar Dominance",
+        "Terrene Stability"
+      ]
+    ],
+    [
+      "body_type/body_type_essence_v2.dart",
+      [
+        "Your Essence",
+        "Your Seasonal Essence: Balanced",
+        "\"Harmony in Flux\"",
+        "Your Natural Rhythm"
+      ]
+    ],
+    [
+      "chat/chat_widgets.dart",
+      [
+        "Now broadcasting...",
+        "Continue deep conversations — unlock with one tap in the Nourish Heart edition",
+        "Unlock",
+        "Reference: $s"
+      ]
+    ],
+    [
+      "chat/seasons_chat_page.dart",
+      [
+        "We care about you",
+        "Why this matters",
+        "How to do it",
+        "SEASONS uses AI. This is not therapy or medical advice."
+      ]
+    ],
+    [
+      "chat_page.dart",
+      [
+        "Daily free messages used up",
+        "Upgrade Now",
+        "Later",
+        "Health Safety Notice",
+        "I Understand",
+        "Speech recognition failed: $e",
+        "Failed to start recording, please check microphone permission",
+        "Recording failed: $e",
+        "Quick Topics",
+        "SEASONS AI Assistant",
+        "Warm Companion",
+        "Premium",
+        "$_quotaRemaining/$_quotaLimit",
+        "Clear Chat",
+        "Current: $_currentSolarTerm",
+        "Crisis Hotline",
+        "400-161-9995 · 24h Mental Health Helpline",
+        "See a Doctor",
+        "Please consult a medical professional",
+        "Solar Term Care Tips",
+        "Follow natural rhythms, harmonize body and mind",
+        "Dietary Care",
+        "Try snow fungus and lily bulb to moisten dryness",
+        "Rest & Routine",
+        "Sleep early, rise early, follow natural rhythms"
+      ]
+    ],
+    [
+      "checkin/daily_checkin_page.dart",
+      [
+        "Morning Stillness",
+        "12 Day Flow",
+        "Current Streak",
+        "How is your energy flowing today?",
+        "Take a quiet moment to listen to your internal landscape.",
+        "Energy Level",
+        "Current Mood",
+        "Check-in saved",
+        "Complete Check-in"
+      ]
+    ],
+    [
+      "community/community_page_v2.dart",
+      [
+        "SEASONS ShunShi",
+        "Wellness Circle",
+        "Search wellness content...",
+        "SEASONS AI Guidance",
+        "Tip: Focus on — Spring Liver care",
+        "$likes",
+        "$comments",
+        "Share"
+      ]
+    ],
+    [
+      "constitution/constitution_test_v2.dart",
+      [
+        "No questions available",
+        "Constitution Analysis",
+        "Your Constitution Type",
+        "Constitution Score",
+        "Wellness Tips",
+        "Retake",
+        "Done"
+      ]
+    ],
+    [
+      "constitution_report/constitution_report_page_v2.dart",
+      [
+        "Constitution Report",
+        "Constitution Report · Spring Equinox 2024",
+        "Your Constitution: Qi Deficient (with Phlegm-Damp)",
+        "Constitution Scores",
+        "AI Wellness Rating",
+        "Personalized Wellness Plan",
+        "\"Rest the body, move the Qi.\"",
+        "Generate Detailed Calendar"
+      ]
+    ],
+    [
+      "constitution_report/constitution_report_page_v3.dart",
+      [
+        "Body Type Report",
+        "Body Type Report · ${_getCurrentSeason()}",
+        "Your Body Type: $name",
+        "Body Type Score Distribution",
+        "AI Wellness Summary",
+        "Personalized Wellness Plan",
+        "\"Rest the body, move to nourish Qi.\"",
+        "Generating wellness calendar...",
+        "Generate Wellness Calendar"
+      ]
+    ],
+    [
+      "constitution_report/constitution_result_page.dart",
+      [
+        "ShunShi AI",
+        "Constitution Report · ${now.year} $seasonLabel",
+        "Your Constitution:",
+        "\"Stillness nourishes the body, movement nourishes Qi.\"",
+        "Generate Care Calendar",
+        "Constitution Strength",
+        "Results reflect your recent state. Reassess each solar term.",
+        "AI Wellness Summary",
+        "Personalized Care Plan",
+        "View All",
+        "Recommended Recipe",
+        "Astragalus Chicken Soup",
+        "Tonifies Qi and warms the middle，Ideal for Qi Deficiency。",
+        "Start Cooking",
+        "Recommended Acupoint",
+        "Zusanli ST36 · Tonify Middle Jiao Qi",
+        "Recommended Exercise",
+        "Baduanjin · Regulate Spleen & Stomach"
+      ]
+    ],
+    [
+      "content/content_detail_page.dart",
+      [
+        "Copied: $title"
+      ]
+    ],
+    [
+      "diary/diary_page_v2.dart",
+      [
+        "Diary saved",
+        "Save failed, please retry",
+        "Wellness Diary",
+        "\"Follow the seasons, listen to your body rhythm.\"",
+        "Sleep Quality",
+        "Mood Map",
+        "Daily Rituals",
+        "Save Diary",
+        "AI Insights",
+        "Recent Entries"
+      ]
+    ],
+    [
+      "diary/diary_report_page.dart",
+      [
+        "Weekly Report",
+        "No data"
+      ]
+    ],
+    [
+      "diary/sleep_report_page.dart",
+      [
+        "Sleep Report",
+        "Try this tonight",
+        "Sleep Score",
+        "$score",
+        "Log a few more days to unlock your personalized sleep analysis ✨"
+      ]
+    ],
+    [
+      "diary/wellness_diary_page.dart",
+      [
+        "Good morning, SEASONS friend",
+        "$month/$day \\u2022 Grain Rain",
+        "AI Insights",
+        "Generating..."
+      ]
+    ],
+    [
+      "diet/diet_recommend_page.dart",
+      [
+        "Dietrecommended",
+        "View"
+      ]
+    ],
+    [
+      "discover/discover_page.dart",
+      [
+        "Wellness Library",
+        "Search Results (${_searchResults.length})",
+        "No relevant results found",
+        "FeaturedEdit",
+        "View All",
+        "Editor's Choice"
+      ]
+    ],
+    [
+      "error/error_page.dart",
+      [
+        "Page not found",
+        "Go Home"
+      ]
+    ],
+    [
+      "exercise/exercise_detail_page.dart",
+      [
+        "QI GONG TUTORIAL",
+        "Regulate Spleen-Stomach: Single-Arm Raise",
+        "12min",
+        "Start Full-Screen Teaching"
+      ]
+    ],
+    [
+      "family/family_home_page.dart",
+      [
+        "My Family",
+        "Invite Family",
+        "Privacy: Only status level is shared, no detailed data exposed",
+        "No family members yet"
+      ]
+    ],
+    [
+      "family/family_invite_page.dart",
+      [
+        "Invite code copied to clipboard",
+        "Invite content copied — paste and send to family member",
+        "Family Management",
+        "Invite Code",
+        "Copy Invite Code",
+        "Share with Family",
+        "Joined Family",
+        "Regenerate Invite Code"
+      ]
+    ],
+    [
+      "family/family_member_detail_page.dart",
+      [
+        "Status Info",
+        "Privacy Protection: You can only see status-level information",
+        "Care reminder sent",
+        "Send Care Reminder",
+        "They will see the same status card",
+        "View Profile Status (Their View)"
+      ]
+    ],
+    [
+      "food/food_detail_page.dart",
+      [
+        "Health Insights",
+        "AI Tip: \\\"Spring is windy, strengthen your defensive Qi to prevent colds.\\\"",
+        "Start Cooking",
+        "Want to learn more?",
+        "Consult the AI SEASONS assistant for personalized diet suggestions",
+        "$num"
+      ]
+    ],
+    [
+      "growth/growth_milestones_page.dart",
+      [
+        "Growth Milestones",
+        "Your journey of mindful growth",
+        "$totalXp",
+        "Experience Points",
+        "Level: Mindful Seeker",
+        "Next: Inner Sage — 570 XP remaining",
+        "Unlocked",
+        "Journey Ahead",
+        "+${m.xp}"
+      ]
+    ],
+    [
+      "growth/growth_milestones_v2.dart",
+      [
+        "Digital Sanctuary",
+        "Your Growth Journey",
+        "Current Season",
+        "Spring Equinox Alignment",
+        "85% TOWARDS HARVEST",
+        "Reflective Milestones",
+        "Gently nurtured achievements"
+      ]
+    ],
+    [
+      "guidance/gentle_guidance_page.dart",
+      [
+        "Gentle Guidance",
+        "Daily Whisper",
+        "A rhythm of reminders tailored to your current season and constitution.",
+        "Personalized for your cycle",
+        "Morning Ritual",
+        "Seasonal Tip",
+        "Vata-Pitta Balance"
+      ]
+    ],
+    [
+      "guidance/gentle_guidance_v2.dart",
+      [
+        "Daily Whisper",
+        "Gentle Guidance",
+        "A rhythm of reminders tailored to your current season and constitution.",
+        "Vata-Pitta Balance",
+        "Body Type Insight",
+        "Personalized for your cycle",
+        "Deepen Insight",
+        "Morning Ritual",
+        "Seasonal Tip",
+        "Flow State"
+      ]
+    ],
+    [
+      "home/daily_checkin_page.dart",
+      [
+        "Recorded! Keep it up 💪",
+        "Submit failed, please retry",
+        "Daily Check-in",
+        "How do you feel today?",
+        "Record your body and heart state for more precise suggestions",
+        "What would you like to record today?",
+        "Submit Check-in",
+        "Mood",
+        "Sleep Quality",
+        "Energy Level"
+      ]
+    ],
+    [
+      "home/home_page.dart",
+      [
+        "Hello, $_userName",
+        "No new notifications",
+        "Wellness Focus",
+        "Nourish yin, clear heat, support kidney energy",
+        "Constitution Assessment",
+        "Discover your body type for personalized wellness",
+        "Daily Check-in",
+        "Track mood, sleep, and energy patterns",
+        "Recommendations",
+        "AI Wellness Assistant",
+        "Personalized guidance for this season",
+        "View Full Seasonal Guide",
+        "Explore More",
+        "Based on your constitution"
+      ]
+    ],
+    [
+      "home/seasons_home_page.dart",
+      [
+        "Coming soon",
+        "Your body may need a slower evening today",
+        "Daily insight",
+        "Gentle suggestions",
+        "Talk to Seasons",
+        "Your AI companion for seasonal living",
+        "Explore seasonal rituals",
+        "Take three slower breaths",
+        "Make a warm drink tonight",
+        "Dim the lights 20 minutes earlier"
+      ]
+    ],
+    [
+      "home/seasons_home_v2.dart",
+      [
+        "Seasonal Wisdom",
+        "Explore Principle",
+        "Gentle Reminder",
+        "SEASONS Companion",
+        "\"$_companionTip\"",
+        "Quick Rituals",
+        "Seasonal Library",
+        "See All",
+        "Today's Rhythm",
+        "It's ${_seasonDisplayName(_season)}."
+      ]
+    ],
+    [
+      "home/wellness_dashboard_page.dart",
+      [
+        "Good Morning, SEASONS Friend",
+        "Solar Term Reminder",
+        "Spring Equinox",
+        "12 days until Qingming",
+        "Seasonal Rituals",
+        "View All",
+        "3 habits completed today",
+        "Consistency bridges intentions and health. Keep it up!",
+        "Check In",
+        "Recommended for You",
+        "Recipe",
+        "Spring Vegetable Porridge",
+        "A light, warming meal designed for gentle detox after winter.",
+        "Philosophy & Balance",
+        "Finding Balance in the New Season: Spring Equinox Living Guide",
+        "8 min read",
+        "Traditional Wellness Arts",
+        "Read More",
+        "Healing Sounds",
+        "Mountain Streams & Bamboo",
+        "\"Nourish Yang in spring and summer,\\nNourish Yin in autumn and winter.\"",
+        "Huangdi Neijing",
+        "Dietary Wisdom",
+        "Seasonal Tea",
+        "Meridian Clearing",
+        "Movement Practice"
+      ]
+    ],
+    [
+      "home/widgets/action_guide_overlay.dart",
+      [
+        "A glass of warm water — the first step to nourishing Yang",
+        "Water Reminder → Complete your first action today",
+        "Chen (7-9) Stomach is active — a light breakfast nourishes the Spleen-Stomach",
+        "View Seasonal Recipes →",
+        "Wu (11-13) Heart is active — rest for 15 min to nourish the Heart",
+        "MeditationQigong →",
+        "Shen (15-17) Bladder is active — drink more water to detoxify",
+        "Log Water Intake →",
+        "Xu (19-21) Pericardium — take a walk to relax body and mind",
+        "Take a Walk →",
+        "Hai (21-23) Triple Burner — sleep early to nourish Yin",
+        "Pre-Sleep Log →",
+        "Start Your First Action Today",
+        "Solar Term Wellness starts from morning",
+        "Afternoon Wu (11-13) — wellness continues",
+        "Time to nourish Yin, prepare for sleep",
+        "Today's Wellness in Progress",
+        "View Today's Pick \\u2192",
+        "Continue Today's Plan \\u2192"
+      ]
+    ],
+    [
+      "home/widgets/mood_section.dart",
+      [
+        "How are you feeling right now?"
+      ]
+    ],
+    [
+      "home/widgets/premium_teaser.dart",
+      [
+        "Unlock Personalized Wellness",
+        "Exclusive Body Type Plans · Long-term Tracking · AI Insights",
+        "7dayFree"
+      ]
+    ],
+    [
+      "home/widgets/today_action_card.dart",
+      [
+        "$currentTerm · $shiChen"
+      ]
+    ],
+    [
+      "ingredients/seasonal_ingredients_page.dart",
+      [
+        "Late Summer Harvest",
+        "The Seasonal Directory",
+        "Aligning your plate with the rhythms of the earth.",
+        "Search ingredients...",
+        "In Peak",
+        "Wellness Benefits",
+        "Body Type Alignment",
+        "View Rituals"
+      ]
+    ],
+    [
+      "journal/journal_reflection_page.dart",
+      [
+        "Late Summer Phase",
+        "Harvesting the Light",
+        "Take a moment to center yourself. The earth is slowing, and so may you.",
+        "Current Internal Climate",
+        "Daily Gratitude",
+        "Seasonal Reflection",
+        "Reflection saved",
+        "Save Reflection"
+      ]
+    ],
+    [
+      "journal/journal_reflection_v2.dart",
+      [
+        "Late Summer Phase",
+        "Harvesting the Light",
+        "Take a moment to center yourself. The earth is slowing, and so may you.",
+        "Current Internal Climate",
+        "Daily Gratitude",
+        "Seasonal Reflection",
+        "Prompt: What are you shedding?",
+        "Write your reflection...",
+        "Personal Intentions"
+      ]
+    ],
+    [
+      "legal/privacy_policy_page.dart",
+      [
+        "Privacy Policy"
+      ]
+    ],
+    [
+      "legal/terms_page.dart",
+      [
+        "Terms of Service"
+      ]
+    ],
+    [
+      "library/library_page.dart",
+      [
+        "Wellness Library",
+        "Your collection of calm",
+        "See All →"
+      ]
+    ],
+    [
+      "library/wellness_library_page.dart",
+      [
+        "Wellness Library",
+        "No content found for this filter"
+      ]
+    ],
+    [
+      "meditation/meditation_focus_v2.dart",
+      [
+        "Breathing into Change",
+        "10 Min · Grounding",
+        "Atmosphere Layer"
+      ]
+    ],
+    [
+      "meridian/meridian_detail_page.dart",
+      [
+        "Meridian Overview",
+        "Massage Steps",
+        "\"Where there is flow, there is no pain.\""
+      ]
+    ],
+    [
+      "movement/movement_player_page.dart",
+      [
+        "Session in Progress",
+        "Late Summer Transition",
+        "Gentle Flow Ritual",
+        "Spatial Audio Active",
+        "Save to Rituals"
+      ]
+    ],
+    [
+      "onboarding/seasons_onboarding.dart",
+      [
+        "Step ${index + 1} of ${_steps.length}",
+        "YOUR FIRST DAILY INSIGHT",
+        "There are no wrong answers.",
+        "We\\",
+        "This helps us personalise content for you.",
+        "You can always change this later."
+      ]
+    ],
+    [
+      "onboarding/wellness_onboarding_page.dart",
+      [
+        "Live in harmony with the seasons, nurture body and heart",
+        "Start",
+        "What do you care most about?",
+        "Choose one — we will customize a plan for you",
+        "Ready!",
+        "Start Experience"
+      ]
+    ],
+    [
+      "profile/about_page.dart",
+      [
+        "AboutSEASONS",
+        "SEASONS ShunShi",
+        "Live in Harmony with Time, Nourish the Heart",
+        "© 2024-2026 SEASONS ShunShi"
+      ]
+    ],
+    [
+      "profile/family_invite_page.dart",
+      [
+        "Family Management",
+        "Invite Family to Wellness Together",
+        "Share invite code so family can get personalized health suggestions:",
+        "Copy invite code to share with family",
+        "Added Family Members",
+        "No family members added yet",
+        "Share invite code to add family members",
+        "Invite code copied"
+      ]
+    ],
+    [
+      "profile/feedback_page.dart",
+      [
+        "Thank you for your feedback — we take it seriously!",
+        "Feedback",
+        "Tell us what you think",
+        "SubmitFeedback"
+      ]
+    ],
+    [
+      "profile/gdpr_page.dart",
+      [
+        "GDPR Privacy Policy",
+        "SEASONS — Live in harmony with nature",
+        "We do NOT collect:",
+        "Delete All My Data",
+        "Delete All Data?",
+        "Cancel",
+        "All data has been deleted.",
+        "Delete"
+      ]
+    ],
+    [
+      "profile/global_profile_page.dart",
+      [
+        "Digital Sanctuary",
+        "Seeker of Calm",
+        "Spring Equinox Member since 2023",
+        "Global Preferences",
+        "Sign Out of Sanctuary",
+        "Deactivate Calm Account",
+        "Hemisphere",
+        "Influences seasonal rituals and content",
+        "Measurement Units",
+        "Weight, distance, and temperature",
+        "Language & Locale",
+        "Select your primary dialect",
+        "Nourishment Logic",
+        "Personalize your recipe discovery experience"
+      ]
+    ],
+    [
+      "profile/privacy_page.dart",
+      [
+        "Data exported successfully",
+        "Export failed, please retry",
+        "Delete All Data?",
+        "This cannot be undone. All data will be permanently deleted.",
+        "Cancel",
+        "All data deleted",
+        "Deletion failed",
+        "Confirm Deletion",
+        "Clear AI Memory?",
+        "The AI will no longer remember conversations. Constitution results are kept.",
+        "AI memory cleared",
+        "Confirm Clear",
+        "Data & Privacy",
+        "Your Data",
+        "Privacy Policy",
+        "Questions about your data?",
+        "privacy@shunshi.app",
+        "Export My Data",
+        "Download all your personal data (JSON format)",
+        "Delete All Data",
+        "Permanently delete all your data (irreversible)",
+        "Clear AI Memory",
+        "Clear the AI assistant memory"
+      ]
+    ],
+    [
+      "profile/profile_setup_page.dart",
+      [
+        "Back",
+        "$_birthYear",
+        "Main health concerns (optional)",
+        "Not sure, help me take the test",
+        "Describe your physical condition (optional)",
+        "Hello, what should we call you?",
+        "We will greet you by this name",
+        "What is your gender?",
+        "Used for personalized wellness tips",
+        "Which year were you born in?",
+        "Used to recommend wellness plans suitable for your age",
+        "Discover Your Body Type",
+        "Select your TCM Body Type to get personalized wellness tips"
+      ]
+    ],
+    [
+      "records/records_page_v2.dart",
+      [
+        "WellnessRecords",
+        "Today",
+        "Sleep Stats",
+        "Avg Sleep",
+        "Quality Score",
+        "Mood Trends"
+      ]
+    ],
+    [
+      "reflection/reflection_page.dart",
+      [
+        "Skip today",
+        "Saved",
+        "Be gentle with yourself today",
+        "Grateful",
+        "Calm",
+        "Happy",
+        "Tired",
+        "Reflective"
+      ]
+    ],
+    [
+      "report/wellness_report_page.dart",
+      [
+        "Wellness Report",
+        "Personal Assessment",
+        "Your Rhythm: Balanced & Vibrant.",
+        "Late Spring Focus",
+        "Learn More",
+        "Recommended",
+        "Morning Sunlight",
+        "Explore Your Late Spring Plan",
+        "Revised May 12, 2024"
+      ]
+    ],
+    [
+      "report/wellness_report_v2.dart",
+      [
+        "Wellness Report",
+        "Spring Equinox · Week 3",
+        "Season Focus",
+        "Personalized Recommendation"
+      ]
+    ],
+    [
+      "seasons/seasons_page.dart",
+      [
+        "Nourish",
+        "Move",
+        "Other Seasons"
+      ]
+    ],
+    [
+      "settings/help_center_page.dart",
+      [
+        "Help & Support",
+        "support@seasons.app",
+        "We typically respond within 24 hours",
+        "SEASONS Safety Commitment",
+        "Email us at support@seasons.app",
+        "Restore Purchases",
+        "Got it",
+        "Response in 24h",
+        "Subscription",
+        "Getting Started",
+        "Subscription & Billing",
+        "Privacy & Data",
+        "AI Companion",
+        "Family & Accounts",
+        "Technical Issues",
+        "Email Us",
+        "Restore"
+      ]
+    ],
+    [
+      "settings/notification_settings_page.dart",
+      [
+        "NotificationsSettings",
+        "Reminder Time",
+        "Solar Term Alerts",
+        "Get notified at each solar term",
+        "Daily Check-in Reminder",
+        "Daily wellness check-in reminder",
+        "Exercise Reminder",
+        "Remind you to complete daily exercise",
+        "Sleep Reminder",
+        "Remind you to rest on time",
+        "Health Info Push",
+        "Push wellness knowledge and solar term updates"
+      ]
+    ],
+    [
+      "settings/privacy_settings_page.dart",
+      [
+        "Settings",
+        "Control what SEASONS remembers about you",
+        "You are talking to AI",
+        "Memory",
+        "Daily Reminders",
+        "Export My Data",
+        "Download all your reflections and preferences",
+        "Clear Memory",
+        "Remove all stored preferences and summaries",
+        "Delete Account",
+        "Permanently remove all your data",
+        "Crisis Support",
+        "If you are in crisis, please seek real-world support",
+        "Privacy Policy",
+        "Terms of Service",
+        "Help & Support",
+        "Export your data?",
+        "Cancel",
+        "Export",
+        "Data export ready. Sharing file...",
+        "Export failed. Please try again.",
+        "Clear all memory?",
+        "Memory cleared",
+        "Clear",
+        "Delete your account?",
+        "Delete",
+        "Account deleted. Sorry to see you go.",
+        "Failed to delete account. Please try again.",
+        "If you are in crisis",
+        "If you are in immediate danger, contact your local emergency services.",
+        "Close"
+      ]
+    ],
+    [
+      "shopping/seasonal_shopping_page.dart",
+      [
+        "Seasonal Essentials",
+        "From your kitchen",
+        "Add 6 items",
+        "Add Item",
+        "Cancel",
+        "Add"
+      ]
+    ],
+    [
+      "skills/skills_page.dart",
+      [
+        "Wellness Skills",
+        "Choose a practice",
+        "Each skill provides evidence-based, structured guidance.",
+        "Back to skills",
+        "What you could do",
+        "How to start"
+      ]
+    ],
+    [
+      "sleep/sleep_sanctuary_page.dart",
+      [
+        "Digital Sanctuary",
+        "Currently Playing",
+        "Midnight Rainfall",
+        "Bedtime Tales",
+        "Gently drift into the world of dreams.",
+        "View All",
+        "Nature's Layer"
+      ]
+    ],
+    [
+      "sleep/sleep_sanctuary_v2.dart",
+      [
+        "Sleep Sanctuary",
+        "Nightfall Stillness",
+        "30 Min · Deep Sleep",
+        "Sleep Stories"
+      ]
+    ],
+    [
+      "solar/constitution_test_page.dart",
+      [
+        "Constitution Test Result",
+        "Your Constitution Type",
+        "Share link copied",
+        "Share Result",
+        "Retake Test"
+      ]
+    ],
+    [
+      "solar/solar_term_ai_detail_page.dart",
+      [
+        "Share this SEASONS inspiration",
+        "ShunShi AI",
+        "Solar Term Essence",
+        "SEASONS Living Guide",
+        "Dietary Wisdom",
+        "Daily Rhythm",
+        "Movement Practice",
+        "Mindful Meditation"
+      ]
+    ],
+    [
+      "solar/solar_term_detail_page.dart",
+      [
+        "SEASONS AI",
+        "Share link copied",
+        "Solar Term Essence",
+        "「${info.quote}」",
+        "SEASONS Living Guide",
+        "Ask SEASONS AI about personalized $termName wellness plan",
+        "Solar term wellness goes further",
+        "Ask SEASONS AI for a personalized wellness plan for the current solar term",
+        "Share this seasonal inspiration"
+      ]
+    ],
+    [
+      "solar/widgets/current_term_card.dart",
+      [
+        "Today：${term.name}",
+        "「${term.poem}」",
+        "2026year${term.date} · ${term.seasonLabel} · ${term.durationDays}day"
+      ]
+    ],
+    [
+      "solar/widgets/solar_timeline.dart",
+      [
+        "24 Solar Terms"
+      ]
+    ],
+    [
+      "solar/widgets/solar_wellness_card.dart",
+      [
+        "Recommended",
+        "View Details"
+      ]
+    ],
+    [
+      "solar/widgets/wellness_advice.dart",
+      [
+        "Wellness Tips",
+        "View All",
+        "Diet Dos & Don\\",
+        "Acupressure",
+        "Exercisesuggestion:",
+        "EmotionsWellness"
+      ]
+    ],
+    [
+      "splash/splash_page.dart",
+      [
+        "Live in rhythm with nature"
+      ]
+    ],
+    [
+      "subscription/membership_center_page.dart",
+      [
+        "Membership",
+        "+12k",
+        "Over 12,000 members have chosen annual plans",
+        "Subscribe Now",
+        "By subscribing you agree to the Terms of Service and Privacy Policy",
+        "PREMIUM MEMBERSHIP",
+        "ShunShi AI",
+        "SVIP Benefits",
+        "Start your smart wellness journey",
+        "128 personalized health suggestions ready for you",
+        "Annual Plan",
+        "First year deal · Only ¥0.54/day",
+        "Monthly Plan",
+        "Flexible · Cancel anytime",
+        "Family Plan",
+        "3 members · Health sharing",
+        "Member Benefits"
+      ]
+    ],
+    [
+      "subscription/stripe_checkout_page.dart",
+      [
+        "Checkout",
+        "Retry",
+        "Complete Your Subscription",
+        "You will be redirected to Stripe to complete payment securely.",
+        "Secure Payment",
+        "Powered by Stripe",
+        "Opening Stripe checkout: $_checkoutUrl",
+        "Proceed to Payment"
+      ]
+    ],
+    [
+      "welcome/welcome_to_seasons_page.dart",
+      [
+        "Welcome to SEASONS.",
+        "Based on your current IP",
+        "Or select manually",
+        "Northern",
+        "Southern",
+        "Get Started",
+        "By continuing, you agree to our Seasonal Living Principles and Privacy Policy.",
+        "Let's find your rhythm."
+      ]
+    ],
+    [
+      "wellness/acupressure_page.dart",
+      [
+        "Acupressure Wellness",
+        "Select Area",
+        "All",
+        "Retry",
+        "No content yet",
+        "Massage Steps:",
+        "• $s",
+        "$label:"
+      ]
+    ],
+    [
+      "wellness/boundaries_page.dart",
+      [
+        "Product Boundaries",
+        "What SEASONS Is Not",
+        "Our product boundaries to keep you safe",
+        "If you are experiencing",
+        "SEASONS - May you live in harmony with nature",
+        "SEASONS Does Not Provide",
+        "The following are outside our scope and may pose health risks",
+        "Medical Diagnosis",
+        "Drug Recommendations",
+        "Symptom Analysis",
+        "Health Scores",
+        "Mood Scoring",
+        "What SEASONS Provides",
+        "We focus on areas that help you live better",
+        "Lifestyle Advice",
+        "Solar Term Wellness",
+        "Emotional Companionship",
+        "Sleep Improvement",
+        "Food Therapy & Teas"
+      ]
+    ],
+    [
+      "wellness/food_page.dart",
+      [
+        "Food Therapyrecommended",
+        "Select Season",
+        "Body Type",
+        "Retry",
+        "No content yet"
+      ]
+    ],
+    [
+      "wellness/mood_page.dart",
+      [
+        "Emotional Support",
+        "Chat with SEASONS",
+        "Always here to listen",
+        "Mindful Breathing Guide",
+        "Follow the rhythm, relax body and mind",
+        "How are you feeling right now?",
+        "🌬️ Mindful Breathing Guide",
+        "Close",
+        "Start Guide",
+        "Relief Methods"
+      ]
+    ],
+    [
+      "wellness/sleep_page.dart",
+      [
+        "Sleep Improvement",
+        "How was your sleep last night?",
+        "Suggested Categories",
+        "All",
+        "Retry",
+        "No content yet",
+        "Specific Steps",
+        "Got it"
+      ]
+    ],
+    [
+      "wellness/tea_page.dart",
+      [
+        "Tearecommended",
+        "Best Time to Drink",
+        "Select Season",
+        "Retry",
+        "No content yet",
+        "Ingredients: $ingredients",
+        "Brewing: $steps"
+      ]
+    ],
+    [
+      "wellness/wellness_category_page.dart",
+      [
+        "Got it"
+      ]
+    ],
+    [
+      "wellness/widgets/constitution_home_widget.dart",
+      [
+        "Discover Your Body Type",
+        "TCM Body Type identification — find the wellness path best suited for you",
+        "Start Test",
+        "9 Body Types"
+      ]
+    ],
+    [
+      "wellness/widgets/constitution_quiz_widget.dart",
+      [
+        "Question ${currentIndex + 1} / ${questions.length}",
+        "Previous"
+      ]
+    ],
+    [
+      "wellness/widgets/constitution_result_widget.dart",
+      [
+        "Your Constitution Type is",
+        "Test Date: ${DateTime.now().toString().substring(0, 16)}",
+        "Constitution Scores",
+        "Deviation",
+        "Tendency",
+        "Precautions",
+        "Unlock Full Constitution Report",
+        "Diet · Tea · Exercise · Acupoints · Seasonal Plans",
+        "Unlock Report",
+        "Retest",
+        "View Details",
+        "Share Result"
+      ]
+    ],
+    [
+      "wellness/widgets/constitution_widgets.dart",
+      [
+        "$score pts",
+        "Precautions: ${d.avoidList}"
+      ]
+    ]
+  ]
+}

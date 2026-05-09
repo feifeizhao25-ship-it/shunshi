@@ -19,16 +19,33 @@ from pathlib import Path
 from pydantic import BaseModel, Field
 from datetime import datetime
 
-from .router.config import UserTier, RoutingContext
-from .router.router import ModelRouter
 from .cache.cache import ai_cache
+from .core.settings import settings
 from .prompts.registry import prompt_registry
 from .audit.logger import audit_logger
 from .llm.siliconflow import SiliconFlowClient, ChatMessage, MessageRole, get_client
 from .database.db import init_db, close_db
-from .router import auth, chat, contents, family, notifications, solar_terms, subscription, today_plan, records, settings, skills
-from .router.recommend import router as recommend_router
+from .router import auth, chat, contents, family, notifications, solar_terms, subscription, today_plan, records, settings as settings_router_module, skills, share
 from .router import constitution, content_cms, cards, recommendations
+from .router import family as family_router
+from .safety.router import router as safety_router
+from .alerts.router import router as alert_router
+from .alerts.store import AlertStore
+from .metrics.middleware import MetricsMiddleware, get_metrics, track_llm_request
+from .middleware.api_version import APIVersionMiddleware
+from .middleware.tracing import RequestTracingMiddleware
+from .middleware.rate_limit import RateLimitMiddleware
+from .rag.router import router as rag_router
+from .rag.knowledge_base import load_knowledge_bases
+from .rag.embedder import init_embedders
+from .feature_flags.router import router as flag_router
+from .feature_flags import flag_store
+from .feature_flags.middleware import feature_flag_middleware
+from .prompts.router import router as prompt_router
+from .prompts import prompt_store
+from .router.config import UserTier, RoutingContext
+from .router.router import ModelRouter
+from .router.recommend import router as recommend_router
 from .router.speech import router as speech_router
 from .router.wisdom import router as wisdom_router
 from .router.crowd import router as crowd_router
@@ -38,7 +55,6 @@ from .router.seasons_home import router as seasons_home_router
 from .router.seasons_audio import router as seasons_audio_router
 from .router.seasons_subscription import router as seasons_subscription_router
 from .router.seasons_family import router as seasons_family_router
-from .router import family as family_router
 from .router.stripe import router as stripe_router
 from .router.lifecycle import router as lifecycle_router
 from .router.memory import router as memory_router
@@ -47,62 +63,213 @@ from .router.followup import router as followup_router
 from .router.skills import router as skills_router
 from .router.push import router as push_router
 from .router.audit import router as audit_router
-from .safety.router import router as safety_router
-from .alerts.router import router as alert_router
-from .alerts.store import AlertStore
-from .metrics.middleware import MetricsMiddleware, get_metrics, track_llm_request
-from .middleware.tracing import RequestTracingMiddleware
-from .rag.router import router as rag_router
-from .rag.knowledge_base import load_knowledge_bases
-from .rag.embedder import init_embedders
-from .feature_flags.router import router as flag_router
-from .feature_flags import flag_store
-from .feature_flags.middleware import feature_flag_middleware
-from .prompts.router import router as prompt_router
-from .prompts import prompt_store
+from .router.accessibility import router as accessibility_router
+from .router.acupoint import router as acupoint_router
+from .router.admin import router as admin_router
+from .router.admin_auth import router as admin_auth_router
+from .router.ai_companion import router as ai_companion_router
+from .router.ai_content import router as ai_content_router
+from .router.ai_dream import router as ai_dream_router
+from .router.ai_ingredient_scan import router as ai_ingredient_scan_router
+from .router.ai_wellness_plan import router as ai_wellness_plan_router
+from .router.alipay import router as alipay_router
+from .router.allergy_wellness import router as allergy_wellness_router
+from .router.audio_v2 import router as audio_v2_router
+from .router.auth import router as auth_router
+from .router.baduanjin import router as baduanjin_router
+from .router.banner import router as banner_router
+from .router.calorie_tracker import router as calorie_tracker_router
+from .router.cards import router as cards_router
+from .router.child_wellness import router as child_wellness_router
+from .router.chronic_care import router as chronic_care_router
+from .router.client_metrics import router as client_metrics_router
+from .router.community import router as community_router
+from .router.constitution import router as constitution_router
+from .router.content_cms import router as content_cms_router
+from .router.contents import router as contents_router
+from .router.core_skills import router as core_skills_router
+from .router.couple_wellness import router as couple_wellness_router
+from .router.coupon import router as coupon_router
+from .router.cultural_stories import router as cultural_stories_router
+from .router.data_analytics import router as data_analytics_router
+from .router.emotion import router as emotion_router
+from .router.exercise import router as exercise_router
+from .router.expert_qa import router as expert_qa_router
+from .router.eye_care import router as eye_care_router
+from .router.feedback import router as feedback_router
+from .router.first_insight import router as first_insight_router
+from .router.food_compatibility import router as food_compatibility_router
+from .router.food_therapy import router as food_therapy_router
+from .router.gamification import router as gamification_router
+from .router.gifting import router as gifting_router
+from .router.gratitude import router as gratitude_router
+from .router.habit_builder import router as habit_builder_router
+from .router.hair_care import router as hair_care_router
+from .router.health import router as health_router
+from .router.health_integration import router as health_integration_router
+from .router.herbal_knowledge import router as herbal_knowledge_router
+from .router.journal import router as journal_router
+from .router.kidney_care import router as kidney_care_router
+from .router.live_class import router as live_class_router
+from .router.liver_care import router as liver_care_router
+from .router.localization import router as localization_router
+from .router.lunar_calendar import router as lunar_calendar_router
+from .router.lung_care import router as lung_care_router
+from .router.maternity import router as maternity_router
+from .router.membership import router as membership_router
+from .router.menstrual import router as menstrual_router
+from .router.mental_wellness import router as mental_wellness_router
+from .router.meridian import router as meridian_router
+from .router.moxibustion import router as moxibustion_router
+from .router.multimodal_images import router as multimodal_images_router
+from .router.multimodal_speech import router as multimodal_speech_router
+from .router.multimodal_videos import router as multimodal_videos_router
+from .router.notifications import router as notifications_router
+from .router.oauth_wechat import router as oauth_wechat_router
+from .router.onboarding import router as onboarding_router
+from .router.pet_wellness import router as pet_wellness_router
+from .router.postpartum import router as postpartum_router
+from .router.push_intelligence import router as push_intelligence_router
+from .router.push_notifications import router as push_notifications_router
+from .router.recipe import router as recipe_router
+from .router.recommendations import router as recommendations_router
+from .router.records import router as records_router
+from .router.regional_wellness import router as regional_wellness_router
+from .router.senior_wellness import router as senior_wellness_router
+from .router.settings import router as settings_router
+from .router.share import router as share_router
+from .router.shichen import router as shichen_router
+from .router.skin_care import router as skin_care_router
+from .router.sleep import router as sleep_router
+from .router.smart_alarm import router as smart_alarm_router
+from .router.solar_terms import router as solar_terms_router
+from .router.solar_wellness import router as solar_wellness_router
+from .router.diary import router as diary_router
+from .router.favorites import router as favorites_router
+from .router.sports_recovery import router as sports_recovery_router
+from .router.stomach_care import router as stomach_care_router
+from .router.subscription_local import router as subscription_local_router
+from .router.tcm_culture import router as tcm_culture_router
+from .router.tcm_food_safety import router as tcm_food_safety_router
+from .router.tcm_medication import router as tcm_medication_router
+from .router.tea import router as tea_router
+from .router.theme import router as theme_router
+from .router.timezone_wellness import router as timezone_wellness_router
+from .router.today_plan import router as today_plan_router
+from .router.upload import router as upload_router
+from .router.user_data import router as user_data_router
+from .router.water_tracker import router as water_tracker_router
+from .router.wearable import router as wearable_router
+from .router.weather_wellness import router as weather_wellness_router
+from .router.wechat_social import router as wechat_social_router
+from .router.weight_manage import router as weight_manage_router
+from .router.wellness_myth import router as wellness_myth_router
+from .router.western_bridge import router as western_bridge_router
+from .router.widget import router as widget_router
+from .router.workplace_wellness import router as workplace_wellness_router
+from .router.youth_wellness import router as youth_wellness_router
+
+
+# ==================== RAG 惰性加载 ====================
+
+_rag_ready = False
+
+
+async def _lazy_load_rag():
+    """RAG 知识库惰性加载，不阻塞启动"""
+    global _rag_ready
+    try:
+        load_knowledge_bases()
+        init_embedders()
+        _rag_ready = True
+        _logger.info("[Startup] RAG 知识库后台加载完成")
+    except Exception as e:
+        _logger.error(f"[Startup] RAG 加载失败: {e}")
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """应用生命周期：启动时初始化数据库，关闭时清理"""
     # Startup
-    print("[Startup] 初始化数据库...")
+    _logger.info("[Startup] 初始化数据库...")
     init_db()
-    print("[Startup] 数据库就绪")
+    _logger.info("[Startup] 数据库就绪")
 
-    print("[Startup] 加载 RAG 知识库...")
-    load_knowledge_bases()
-    init_embedders()
-    print("[Startup] RAG 知识库就绪")
+    _logger.info("[Startup] RAG 知识库后台加载...")
+    import asyncio
+    asyncio.create_task(_lazy_load_rag())
 
-    print("[Startup] 初始化 LLM 审计日志...")
+    _logger.info("[Startup] 初始化 LLM 审计日志...")
     from .llm.audit import init_llm_audit
     init_llm_audit()
-    print("[Startup] LLM 审计日志就绪")
+    _logger.info("[Startup] LLM 审计日志就绪")
 
-    print("[Startup] 初始化 Feature Flag 系统...")
+    _logger.info("[Startup] 初始化 Feature Flag 系统...")
     flag_store.ensure_tables()
     flag_store.init_preset_flags()
-    print("[Startup] Feature Flag 系统就绪")
+    _logger.info("[Startup] Feature Flag 系统就绪")
 
-    print("[Startup] 初始化 Prompt 版本管理...")
+    _logger.info("[Startup] 初始化 Prompt 版本管理...")
     prompt_store.init_tables()
     prompt_store.init_presets()
-    print("[Startup] Prompt 版本管理就绪")
+    _logger.info("[Startup] Prompt 版本管理就绪")
 
-    print("[Startup] 初始化告警系统...")
+    _logger.info("[Startup] 初始化告警系统...")
     from .alerts.store import alert_store as _alert_store
     _alert_store.init_tables()
-    print("[Startup] 告警系统就绪")
+    _logger.info("[Startup] 告警系统就绪")
 
     yield
     # Shutdown
-    print("[Shutdown] 关闭数据库连接...")
+    _logger.info("[Shutdown] 关闭数据库连接...")
     close_db()
-    print("[Shutdown] 完成")
+    _logger.info("[Shutdown] 完成")
 
 
 app = FastAPI(title="顺时 AI Router API", version="2.0.0", lifespan=lifespan)
+
+# ==================== 全局异常处理 ====================
+
+import logging
+import traceback
+
+_logger = logging.getLogger("shunshi")
+
+from fastapi.responses import JSONResponse
+from starlette.requests import Request
+
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    """全局异常处理：捕获所有未处理异常，隐藏堆栈细节，统一返回 JSON 错误"""
+    request_id = getattr(request.state, "request_id", None) or request.headers.get("X-Request-Id", "unknown")
+    _logger.error(
+        f"[Unhandled Exception] request_id={request_id} "
+        f"method={request.method} path={request.url.path} "
+        f"error={type(exc).__name__}: {exc}\n{traceback.format_exc()}"
+    )
+    return JSONResponse(
+        status_code=500,
+        content={
+            "detail": "服务器内部错误，请稍后重试",
+            "error_code": "INTERNAL_ERROR",
+            "request_id": request_id,
+        },
+    )
+
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException):
+    """HTTP 异常统一格式化，确保所有错误返回 JSON"""
+    request_id = getattr(request.state, "request_id", None) or request.headers.get("X-Request-Id", "unknown")
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "detail": exc.detail,
+            "error_code": f"HTTP_{exc.status_code}",
+            "request_id": request_id,
+        },
+    )
 
 # 静态文件服务 (知识库图片)
 _static_dir = Path(__file__).parent.parent / "static"
@@ -111,13 +278,27 @@ if _static_dir.exists():
 
 # CORS
 from fastapi.middleware.cors import CORSMiddleware
+# CORS — 仅允许生产域名
+_CORS_ORIGINS = settings.CORS_ALLOWED_ORIGINS.split(",")
+
+# 开发模式：localhost 支持（仅当环境变量显式启用）
+if settings.CORS_ALLOW_LOCALHOST:
+    _CORS_ORIGINS.extend([
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "http://localhost:8080",
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:5173",
+        "http://127.0.0.1:8080",
+    ])
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=_CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-    expose_headers=["*"],
+    expose_headers=["X-RateLimit-Limit", "X-RateLimit-Remaining", "X-RateLimit-Reset", "Retry-After", "X-Request-Id"],
 )
 
 # ngrok 免费版跳过浏览器警告页面
@@ -138,6 +319,12 @@ app.add_middleware(RequestTracingMiddleware)
 # Prometheus Metrics 中间件
 app.add_middleware(MetricsMiddleware)
 
+# 请求限流中间件
+app.add_middleware(RateLimitMiddleware)
+
+# API 版本管理中间件
+app.add_middleware(APIVersionMiddleware)
+
 # Feature Flag 中间件
 app.add_middleware(feature_flag_middleware)
 
@@ -149,9 +336,10 @@ app.include_router(solar_terms.router)
 app.include_router(subscription.router)
 app.include_router(notifications.router)
 app.include_router(records.router)
-app.include_router(settings.router)
+app.include_router(settings_router_module.router)
 app.include_router(today_plan.router)
 app.include_router(chat.router)
+app.include_router(seasons_chat_router, prefix="/api/v1")
 # 注册新系统路由
 app.include_router(lifecycle_router)
 app.include_router(memory_router)
@@ -166,6 +354,7 @@ app.include_router(content_cms.router, prefix="/api/v1/cms", tags=["content-cms"
 # 系统提示卡 & 智能推荐路由
 app.include_router(cards.router)
 app.include_router(recommendations.router)
+app.include_router(share.router)
 
 # 国际版 Stripe 支付路由
 app.include_router(stripe_router)
@@ -190,24 +379,119 @@ app.include_router(prompt_router)
 
 # 告警管理路由
 app.include_router(alert_router)
-app.include_router(speech_router)
 app.include_router(recommend_router)
-app.include_router(wisdom_router)
-app.include_router(crowd_router)
 # SEASONS Global AI Chat
-app.include_router(seasons_chat_router)
-app.include_router(seasons_api_router)
-app.include_router(seasons_home_router)
-app.include_router(seasons_audio_router)
-app.include_router(seasons_subscription_router)
-app.include_router(seasons_family_router)
+
+# 批量注册缺失路由
+app.include_router(accessibility_router)
+app.include_router(acupoint_router)
+app.include_router(admin_router)
+app.include_router(admin_auth_router)
+app.include_router(ai_companion_router)
+app.include_router(ai_content_router)
+app.include_router(ai_dream_router)
+app.include_router(ai_ingredient_scan_router)
+app.include_router(ai_wellness_plan_router)
+app.include_router(alipay_router)
+app.include_router(allergy_wellness_router)
+app.include_router(audio_v2_router)
+app.include_router(auth_router)
+app.include_router(baduanjin_router)
+app.include_router(banner_router)
+app.include_router(calorie_tracker_router)
+app.include_router(child_wellness_router)
+app.include_router(chronic_care_router)
+app.include_router(client_metrics_router)
+app.include_router(community_router)
+app.include_router(contents_router)
+app.include_router(core_skills_router)
+app.include_router(couple_wellness_router)
+app.include_router(coupon_router)
+app.include_router(cultural_stories_router)
+app.include_router(data_analytics_router)
+app.include_router(emotion_router)
+app.include_router(exercise_router)
+app.include_router(expert_qa_router)
+app.include_router(eye_care_router)
+app.include_router(feedback_router)
+app.include_router(first_insight_router)
+app.include_router(food_compatibility_router)
+app.include_router(food_therapy_router)
+app.include_router(gamification_router)
+app.include_router(gifting_router)
+app.include_router(gratitude_router)
+app.include_router(habit_builder_router)
+app.include_router(hair_care_router)
+app.include_router(health_router)
+app.include_router(health_integration_router)
+app.include_router(herbal_knowledge_router)
+app.include_router(journal_router)
+app.include_router(kidney_care_router)
+app.include_router(live_class_router)
+app.include_router(liver_care_router)
+app.include_router(localization_router)
+app.include_router(lunar_calendar_router)
+app.include_router(lung_care_router)
+app.include_router(maternity_router)
+app.include_router(membership_router)
+app.include_router(menstrual_router)
+app.include_router(mental_wellness_router)
+app.include_router(meridian_router)
+app.include_router(moxibustion_router)
+app.include_router(multimodal_images_router)
+app.include_router(multimodal_speech_router)
+app.include_router(speech_router)
+app.include_router(multimodal_videos_router)
+app.include_router(notifications_router)
+app.include_router(oauth_wechat_router)
+app.include_router(onboarding_router)
+app.include_router(pet_wellness_router)
+app.include_router(postpartum_router)
+app.include_router(push_intelligence_router)
+app.include_router(push_notifications_router)
+app.include_router(recipe_router)
+app.include_router(records_router)
+app.include_router(regional_wellness_router)
+app.include_router(senior_wellness_router)
+app.include_router(settings_router)
+app.include_router(share_router)
+app.include_router(shichen_router)
+app.include_router(skin_care_router)
+app.include_router(sleep_router)
+app.include_router(smart_alarm_router)
+app.include_router(solar_terms_router)
+app.include_router(solar_wellness_router)
+app.include_router(diary_router)
+app.include_router(favorites_router)
+app.include_router(sports_recovery_router)
+app.include_router(stomach_care_router)
+app.include_router(subscription_local_router)
+app.include_router(tcm_culture_router)
+app.include_router(tcm_food_safety_router)
+app.include_router(tcm_medication_router)
+app.include_router(tea_router)
+app.include_router(theme_router)
+app.include_router(timezone_wellness_router)
+app.include_router(today_plan_router)
+app.include_router(upload_router)
+app.include_router(user_data_router)
+app.include_router(water_tracker_router)
+app.include_router(wearable_router)
+app.include_router(weather_wellness_router)
+app.include_router(wechat_social_router)
+app.include_router(weight_manage_router)
+app.include_router(wellness_myth_router)
+app.include_router(western_bridge_router)
+app.include_router(widget_router)
+app.include_router(workplace_wellness_router)
+app.include_router(youth_wellness_router)
 
 # 全局路由器
 model_router = ModelRouter()
 
 # LLM 客户端
 llm_client = SiliconFlowClient(
-    api_key=os.getenv("SILICONFLOW_API_KEY", "sk-zzgbgihucvfipavpgvviavuvgqfczsiqjheixrsbjpuscwvm")
+    api_key=settings.SILICONFLOW_API_KEY or os.getenv("SILICONFLOW_API_KEY", "")
 )
 
 
@@ -423,7 +707,7 @@ async def chat(request: ChatRequest):
     except Exception as e:
         # 降级处理
         logger = __import__("logging").getLogger(__name__)
-        logger.error(f"[Chat] LLM 调用失败: {e}, 尝试降级...")
+        _logger.error(f"[Chat] LLM 调用失败: {e}, 尝试降级...")
         
         audit_logger.log_fallback(
             event_id=event_id,

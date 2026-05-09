@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>成就勋章 - 瞬时康养</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&amp;family=Manrope:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-tertiary": "#ffffff",
+              "on-primary": "#ffffff",
+              "surface-tint": "#3b684a",
+              "on-primary-container": "#9ed0ab",
+              "surface-variant": "#e6e2dd",
+              "surface": "#fdf9f4",
+              "on-surface": "#1c1c19",
+              "surface-container-lowest": "#ffffff",
+              "surface-container-high": "#ebe8e3",
+              "on-error": "#ffffff",
+              "primary-container": "#2d5a3d",
+              "tertiary-fixed": "#ffdea4",
+              "tertiary": "#4c3605",
+              "on-background": "#1c1c19",
+              "surface-bright": "#fdf9f4",
+              "on-error-container": "#93000a",
+              "secondary-container": "#ffd9b4",
+              "surface-dim": "#ddd9d5",
+              "surface-container-low": "#f7f3ee",
+              "primary-fixed-dim": "#a1d2ad",
+              "on-tertiary-fixed": "#261900",
+              "inverse-surface": "#31302d",
+              "on-primary-fixed-variant": "#224f33",
+              "surface-container-highest": "#e6e2dd",
+              "inverse-primary": "#a1d2ad",
+              "primary": "#144227",
+              "inverse-on-surface": "#f4f0eb",
+              "on-secondary-container": "#795d40",
+              "outline": "#717971",
+              "on-tertiary-fixed-variant": "#5a4312",
+              "surface-container": "#f1ede8",
+              "error-container": "#ffdad6",
+              "on-secondary-fixed-variant": "#5b4227",
+              "secondary": "#74593c",
+              "on-surface-variant": "#414942",
+              "on-primary-fixed": "#00210f",
+              "error": "#ba1a1a",
+              "primary-fixed": "#bceec8",
+              "on-tertiary-container": "#e1bf82",
+              "secondary-fixed-dim": "#e4c09c",
+              "outline-variant": "#c1c9c0",
+              "tertiary-container": "#654d1b",
+              "tertiary-fixed-dim": "#e4c285",
+              "on-secondary-fixed": "#2a1702",
+              "background": "#fdf9f4",
+              "secondary-fixed": "#ffddbb",
+              "on-secondary": "#ffffff"
+            },
+            fontFamily: {
+              "notoSerif": ["Noto Serif SC", "serif"],
+              "manrope": ["Manrope", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .ink-wash-bg {
+        background: radial-gradient(circle at top right, #f7f3ee 0%, #fdf9f4 100%);
+      }
+      .badge-glow {
+        filter: drop-shadow(0 0 12px rgba(228, 194, 133, 0.2));
+      }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface font-manrope text-on-surface min-h-screen">
+<!-- Top AppBar -->
+<header class="docked full-width top-0 z-50 bg-[#fdf9f4] dark:bg-[#1c1c19] flex justify-between items-center px-6 py-4 w-full sticky">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-[#144227] dark:text-[#fdf9f4] cursor-pointer">menu</span>
+<h1 class="font-notoSerif text-xl tracking-wide font-bold text-[#144227] dark:text-[#e4c285]">瞬时康养</h1>
+</div>
+<div class="w-8 h-8 rounded-full overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Close up portrait of a calm smiling elderly man with white hair, soft lighting, minimalist background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDfUmtdve3YcWVu1SDFQLdQU96GylV-18P-tEXXnMzN4oavVfjkHmKBni_B3aCbO8eoD37Z5kNttFDbSAw2oJy_M-2aZQxhWudHAxNmxbSoM25kWMAjVoQDvllyFKJc5o-by99jh6gcxJfmMe6vabNefSLsvFoC91oes39lS7ui5wO2c-LRkWpe_eLVqlPXxQFDltmPT1633tjeItt2IS-RTEoyn3hB_gDPhzW9Fi89Ejz26JXOT-gJhcWztGlkn-TselP3IKjgkAg"/>
+</div>
+</header>
+<main class="max-w-4xl mx-auto px-6 pt-8 pb-32">
+<!-- Hero Section: Stats & Progress -->
+<section class="mb-16">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12">
+<div class="space-y-2">
+<h2 class="font-notoSerif text-4xl font-bold text-primary tracking-tight">成就勋章</h2>
+<p class="text-secondary opacity-80 tracking-wide">记录您的每一次健康修行</p>
+</div>
+<div class="flex items-baseline gap-2 bg-surface-container-low px-6 py-3 rounded-full">
+<span class="text-3xl font-bold text-tertiary">2560</span>
+<span class="text-sm font-medium text-secondary tracking-widest uppercase">积分</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-8 rounded-full shadow-[0_4px_24px_rgba(28,28,25,0.02)] relative overflow-hidden">
+<div class="relative z-10">
+<div class="flex justify-between items-center mb-4">
+<span class="text-sm font-bold text-primary tracking-widest">当前等级：入门修行者</span>
+<span class="text-sm font-medium text-secondary">下一级：中级养生者</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full transition-all duration-1000" style="width: 72%;"></div>
+</div>
+<p class="mt-4 text-xs text-secondary/60 text-right tracking-tighter">距离升级还需 440 积分</p>
+</div>
+<!-- Abstract decorative element -->
+<div class="absolute -top-12 -right-12 w-32 h-32 bg-secondary-container/20 rounded-full blur-3xl"></div>
+</div>
+</section>
+<!-- Achievements Grid -->
+<section>
+<div class="flex items-center justify-between mb-8">
+<h3 class="font-notoSerif text-2xl font-bold text-on-surface">已获荣光</h3>
+<span class="text-xs font-bold text-secondary tracking-widest border-b border-secondary/20 pb-1">3 / 8 已解锁</span>
+</div>
+<!-- Bento-style Grid for Earned Badges -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+<!-- Badge 1 -->
+<div class="group bg-surface-container-low p-8 rounded-full flex flex-col items-center text-center transition-all hover:bg-surface-container-high cursor-pointer">
+<div class="w-24 h-24 mb-6 relative">
+<div class="absolute inset-0 bg-tertiary-fixed rounded-full opacity-20 group-hover:scale-110 transition-transform duration-500"></div>
+<div class="relative flex items-center justify-center h-full">
+<span class="material-symbols-outlined text-5xl text-tertiary badge-glow" style="font-variation-settings: 'FILL' 1;">wb_sunny</span>
+</div>
+</div>
+<h4 class="font-notoSerif text-lg font-bold text-primary mb-1">早起达人</h4>
+<span class="text-xs text-secondary font-medium tracking-widest opacity-80">10天 达成</span>
+</div>
+<!-- Badge 2 -->
+<div class="group bg-surface-container-low p-8 rounded-full flex flex-col items-center text-center transition-all hover:bg-surface-container-high cursor-pointer">
+<div class="w-24 h-24 mb-6 relative">
+<div class="absolute inset-0 bg-primary-fixed rounded-full opacity-20 group-hover:scale-110 transition-transform duration-500"></div>
+<div class="relative flex items-center justify-center h-full">
+<span class="material-symbols-outlined text-5xl text-primary badge-glow" style="font-variation-settings: 'FILL' 1;">eco</span>
+</div>
+</div>
+<h4 class="font-notoSerif text-lg font-bold text-primary mb-1">节气使者</h4>
+<span class="text-xs text-secondary font-medium tracking-widest opacity-80">顺时而养</span>
+</div>
+<!-- Badge 3 -->
+<div class="group bg-surface-container-low p-8 rounded-full flex flex-col items-center text-center transition-all hover:bg-surface-container-high cursor-pointer">
+<div class="w-24 h-24 mb-6 relative">
+<div class="absolute inset-0 bg-secondary-container rounded-full opacity-40 group-hover:scale-110 transition-transform duration-500"></div>
+<div class="relative flex items-center justify-center h-full">
+<span class="material-symbols-outlined text-5xl text-secondary badge-glow" style="font-variation-settings: 'FILL' 1;">storm</span>
+</div>
+</div>
+<h4 class="font-notoSerif text-lg font-bold text-primary mb-1">养生先锋</h4>
+<span class="text-xs text-secondary font-medium tracking-widest opacity-80">初窥门径</span>
+</div>
+</div>
+<!-- Locked Badges -->
+<div class="flex items-center justify-between mb-8">
+<h3 class="font-notoSerif text-2xl font-bold text-on-surface">待登峰造极</h3>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+<!-- Locked 1 -->
+<div class="bg-surface p-6 rounded-full border-2 border-dashed border-outline-variant/30 flex flex-col items-center opacity-40 grayscale">
+<div class="w-16 h-16 mb-4 flex items-center justify-center bg-surface-container rounded-full">
+<span class="material-symbols-outlined text-3xl text-outline">history_edu</span>
+</div>
+<h4 class="font-notoSerif text-base font-bold text-on-surface mb-1">百日功成</h4>
+<span class="text-[10px] text-secondary tracking-widest">进阶解锁</span>
+</div>
+<!-- Locked 2 -->
+<div class="bg-surface p-6 rounded-full border-2 border-dashed border-outline-variant/30 flex flex-col items-center opacity-40 grayscale">
+<div class="w-16 h-16 mb-4 flex items-center justify-center bg-surface-container rounded-full">
+<span class="material-symbols-outlined text-3xl text-outline">family_restroom</span>
+</div>
+<h4 class="font-notoSerif text-base font-bold text-on-surface mb-1">全家康泰</h4>
+<span class="text-[10px] text-secondary tracking-widest">亲友共修</span>
+</div>
+<!-- Locked Placeholder -->
+<div class="bg-surface p-6 rounded-full border-2 border-dashed border-outline-variant/30 flex flex-col items-center opacity-20 grayscale">
+<div class="w-16 h-16 mb-4 flex items-center justify-center bg-surface-container rounded-full">
+<span class="material-symbols-outlined text-3xl text-outline">lock</span>
+</div>
+<h4 class="font-notoSerif text-base font-bold text-on-surface mb-1">虚位以待</h4>
+</div>
+<!-- Locked Placeholder -->
+<div class="bg-surface p-6 rounded-full border-2 border-dashed border-outline-variant/30 flex flex-col items-center opacity-20 grayscale">
+<div class="w-16 h-16 mb-4 flex items-center justify-center bg-surface-container rounded-full">
+<span class="material-symbols-outlined text-3xl text-outline">lock</span>
+</div>
+<h4 class="font-notoSerif text-base font-bold text-on-surface mb-1">虚位以待</h4>
+</div>
+</div>
+</section>
+<!-- AI Companion Module (Floating Hint) -->
+<div class="mt-20 p-8 rounded-full bg-surface-container-low/80 backdrop-blur-xl border border-outline-variant/10 flex items-center gap-6">
+<div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center animate-pulse">
+<span class="material-symbols-outlined text-white text-2xl" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+</div>
+<div class="flex-1">
+<p class="text-primary font-medium text-sm">修行小贴士</p>
+<p class="text-secondary text-sm leading-relaxed">“再坚持早起 3 天，即可获得‘晨曦悟道’隐藏勋章。”</p>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 bg-[#fdf9f4]/80 dark:bg-[#1c1c19]/80 backdrop-blur-xl shadow-[0_-4px_24px_rgba(28,28,25,0.04)] rounded-t-3xl border-t border-[#c1c9c0]/20">
+<a class="flex flex-col items-center justify-center text-[#74593c] dark:text-[#6B7B7D] opacity-70 hover:opacity-100 transition-opacity" href="#">
+<span class="material-symbols-outlined text-2xl">restaurant</span>
+<span class="font-notoSerif text-[12px] tracking-widest mt-1">食疗</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#74593c] dark:text-[#6B7B7D] opacity-70 hover:opacity-100 transition-opacity" href="#">
+<span class="material-symbols-outlined text-2xl">self_care</span>
+<span class="font-notoSerif text-[12px] tracking-widest mt-1">功法</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#74593c] dark:text-[#6B7B7D] opacity-70 hover:opacity-100 transition-opacity" href="#">
+<span class="material-symbols-outlined text-2xl">family_restroom</span>
+<span class="font-notoSerif text-[12px] tracking-widest mt-1">合家</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#144227] dark:text-[#e4c285] bg-[#f7f3ee] dark:bg-[#2d2d2a] rounded-xl px-4 py-1 transform scale-100 transition-all active:scale-90" href="#">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">military_tech</span>
+<span class="font-notoSerif text-[12px] tracking-widest mt-1">荣誉</span>
+</a>
+</nav>
+</body></html>

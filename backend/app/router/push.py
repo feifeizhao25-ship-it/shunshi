@@ -2,6 +2,7 @@
 个性化推送 API
 Mock模式 — 只返回推送内容，不实际推送
 """
+from __future__ import annotations
 import logging
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel

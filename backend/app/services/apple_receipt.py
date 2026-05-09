@@ -82,9 +82,14 @@ async def verify_apple_receipt(
             "error": "收据数据为空或格式错误",
         }
 
-    # Mock 模式
+    # Mock 模式 — 优雅降级
     if MOCK_MODE:
-        return _mock_verify(receipt_data, transaction_id)
+        logger.warning("Apple receipt verification not configured (APPLE_SHARED_SECRET missing)")
+        return {
+            "valid": False,
+            "status": -1,
+            "error": "应用内购买验证未配置",
+        }
 
     # 生产验证
     result = await _verify_with_apple(PRODUCTION_URL, receipt_data)
@@ -204,11 +209,12 @@ async def extract_subscription_info(receipt_data: str) -> dict:
         }
     """
     if MOCK_MODE:
+        logger.warning("Apple receipt not configured, cannot extract subscription info")
         return {
-            "product_id": "com.shunshi.yiyang.yearly",
-            "bundle_id": BUNDLE_ID,
+            "product_id": None,
+            "bundle_id": None,
             "transaction_id": None,
-            "quantity": 1,
+            "quantity": 0,
         }
 
     # 仅验证时才解析

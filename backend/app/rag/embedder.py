@@ -3,6 +3,7 @@ TF-IDF 向量嵌入模块
 中文用 jieba 分词，英文用 scikit-learn 默认 tokenizer
 纯本地方案，无需 API key
 """
+from __future__ import annotations
 import logging
 from typing import Optional
 

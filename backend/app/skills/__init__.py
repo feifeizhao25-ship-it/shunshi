@@ -10,6 +10,9 @@
 - ParallelSkillExecutor: 多 Skill 并行执行器
 - SkillResultMerger: 结果智能合并器
 - SkillOrchestratorEnhanced: 增强编排决策器
+- CoreSkillExecutor: 12 核心 Skills 产品化执行器
+- CoreSkillInput / CoreSkillOutput: 核心 Skill 统一输入输出
+- SkillCache: Skill 级别缓存管理器
 """
 
 from .skill_registry import SkillRegistry, SkillDefinition, skill_registry
@@ -21,6 +24,22 @@ from .parallel_executor import (
     ParallelSkillExecutor,
     SkillResultMerger,
     SkillOrchestratorEnhanced,
+)
+from .core_skills import (
+    CoreSkillExecutor,
+    CoreSkillInput,
+    CoreSkillOutput,
+    SkillCache,
+    SafetyFlag,
+    PresenceLevel,
+    LifeStage,
+    Tone,
+    Insight,
+    Action,
+    ContentCard,
+    FollowUp,
+    core_skill_executor,
+    init_core_skill_executor,
 )
 
 __all__ = [
@@ -35,4 +54,18 @@ __all__ = [
     "ParallelSkillExecutor",
     "SkillResultMerger",
     "SkillOrchestratorEnhanced",
+    "CoreSkillExecutor",
+    "CoreSkillInput",
+    "CoreSkillOutput",
+    "SkillCache",
+    "SafetyFlag",
+    "PresenceLevel",
+    "LifeStage",
+    "Tone",
+    "Insight",
+    "Action",
+    "ContentCard",
+    "FollowUp",
+    "core_skill_executor",
+    "init_core_skill_executor",
 ]

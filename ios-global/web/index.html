@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!--
+    If you are serving your web app in a path other than the root, change the
+    href value below to reflect the base path you are serving from.
+
+    The path provided below has to start and end with a slash "/" in order for
+    it to work correctly.
+
+    For more details:
+    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
+
+    This is a placeholder for base href that will be replaced by the value of
+    the `--base-href` argument provided to `flutter build`.
+  -->
+  <base href="$FLUTTER_BASE_HREF">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="SEASONS - Your AI Calm Lifestyle Companion. Find peace, reflection, and mindful living.">
+  <meta name="keywords" content="mindfulness, wellness, AI companion, calm, meditation, reflection, lifestyle">
+  <meta name="author" content="SEASONS">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="SEASONS - AI Calm Lifestyle">
+  <meta property="og:description" content="Your AI Calm Lifestyle Companion. Find peace, reflection, and mindful living.">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="en_US">
+
+  <!-- Theme Color -->
+  <meta name="theme-color" content="#1A1A2E">
+  <meta name="msapplication-navbutton-color" content="#1A1A2E">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="SEASONS">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png"/>
+
+  <title>SEASONS - AI Calm Lifestyle</title>
+  <link rel="manifest" href="manifest.json">
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #1A1A2E 0%, #16213E 50%, #0F3460 100%);
+      min-height: 100vh;
+    }
+    .loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      color: #E8D5B7;
+    }
+    .loading h1 {
+      font-size: 2.5rem;
+      font-weight: 200;
+      letter-spacing: 0.4em;
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+    }
+    .loading p {
+      font-size: 0.9rem;
+      opacity: 0.6;
+      letter-spacing: 0.15em;
+      margin-bottom: 3rem;
+    }
+    .seasons-icon {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 2rem;
+      opacity: 0.8;
+    }
+    .spinner {
+      width: 32px;
+      height: 32px;
+      border: 2px solid rgba(232, 213, 183, 0.2);
+      border-top-color: #E8D5B7;
+      border-radius: 50%;
+      animation: spin 1.2s ease-in-out infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="loading" id="loading">
+    <svg class="seasons-icon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="50" r="45" stroke="#E8D5B7" stroke-width="1.5" opacity="0.3"/>
+      <circle cx="50" cy="50" r="30" stroke="#E8D5B7" stroke-width="1.5" opacity="0.5"/>
+      <circle cx="50" cy="50" r="15" fill="#E8D5B7" opacity="0.7"/>
+      <path d="M50 5 L50 15" stroke="#E8D5B7" stroke-width="1.5" opacity="0.4"/>
+      <path d="M50 85 L50 95" stroke="#E8D5B7" stroke-width="1.5" opacity="0.4"/>
+      <path d="M5 50 L15 50" stroke="#E8D5B7" stroke-width="1.5" opacity="0.4"/>
+      <path d="M85 50 L95 50" stroke="#E8D5B7" stroke-width="1.5" opacity="0.4"/>
+    </svg>
+    <h1>Seasons</h1>
+    <p>AI Calm Lifestyle</p>
+    <div class="spinner"></div>
+  </div>
+  <script>
+    window.addEventListener('flutter-first-frame', function() {
+      var el = document.getElementById('loading');
+      if (el) el.style.display = 'none';
+    });
+  </script>
+  <script src="flutter_bootstrap.js" async></script>
+</body>
+</html>

@@ -8,6 +8,7 @@ Model Router Core Logic
 
 import logging
 from typing import Optional, List, Dict, Any
+from sqlalchemy import text
 from .config import (
     MODEL_CONFIG,
     API_MODEL_MAP,

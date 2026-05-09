@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <base href="$FLUTTER_BASE_HREF">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="顺时 ShunShi - AI 养生陪伴系统，随时随地守护您的健康">
+  <meta name="keywords" content="中医,养生,AI健康,健康陪伴,二十四节气,顺时养生">
+  <meta name="author" content="ShunShi">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="顺时 ShunShi - AI 养生陪伴">
+  <meta property="og:description" content="AI 养生陪伴系统，随时随地守护您的健康">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="zh_CN">
+
+  <!-- Theme Color -->
+  <meta name="theme-color" content="#8B5A2B">
+  <meta name="msapplication-navbutton-color" content="#8B5A2B">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="顺时养生">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png"/>
+
+  <title>顺时 ShunShi - AI 养生陪伴</title>
+  <link rel="manifest" href="manifest.json">
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #FDF5E6 0%, #FAF0E6 50%, #FFF8DC 100%);
+      min-height: 100vh;
+    }
+    .loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: #8B5A2B;
+    }
+    .loading h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      font-weight: 300;
+      letter-spacing: 0.1em;
+    }
+    .loading p {
+      font-size: 1rem;
+      opacity: 0.7;
+      margin-bottom: 2rem;
+    }
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(139, 90, 43, 0.2);
+      border-top-color: #8B5A2B;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="loading" id="loading">
+    <h1>顺 时</h1>
+    <p>AI 养生陪伴</p>
+    <div class="spinner"></div>
+  </div>
+  <script>
+    window.addEventListener('flutter-first-frame', function() {
+      var el = document.getElementById('loading');
+      if (el) el.style.display = 'none';
+    });
+  </script>
+  <script src="flutter_bootstrap.js" async></script>
+</body>
+</html>

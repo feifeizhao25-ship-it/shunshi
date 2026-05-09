@@ -9,6 +9,7 @@ from datetime import datetime
 import json
 
 from app.database.db import get_db
+from sqlalchemy import text
 
 router = APIRouter(tags=["内容管理"])
 
@@ -321,7 +322,7 @@ async def update_content(content_id: str, request: ContentUpdateRequest):
     """更新内容"""
     db = get_db()
     row = db.execute(
-        "SELECT id, type FROM cms_content WHERE id = ? AND deleted_at IS NULL",
+        text("SELECT id, type FROM cms_content WHERE id = ? AND deleted_at IS NULL"),
         (content_id,)
     ).fetchone()
 
@@ -368,7 +369,7 @@ async def update_content(content_id: str, request: ContentUpdateRequest):
 
     try:
         db.execute(
-            f"UPDATE cms_content SET {', '.join(updates)} WHERE id = ?",
+            text(f"UPDATE cms_content SET {', '.join(updates)} WHERE id = ?"),
             params
         )
         db.commit()
@@ -384,7 +385,7 @@ async def delete_content(content_id: str):
     """软删除内容"""
     db = get_db()
     row = db.execute(
-        "SELECT id FROM cms_content WHERE id = ? AND deleted_at IS NULL",
+        text("SELECT id FROM cms_content WHERE id = ? AND deleted_at IS NULL"),
         (content_id,)
     ).fetchone()
 
@@ -394,7 +395,7 @@ async def delete_content(content_id: str):
     now = datetime.now().isoformat()
     try:
         db.execute(
-            "UPDATE cms_content SET deleted_at = ?, status = 'archived' WHERE id = ?",
+            text("UPDATE cms_content SET deleted_at = ?, status = 'archived' WHERE id = ?"),
             (now, content_id)
         )
         db.commit()
@@ -412,7 +413,7 @@ async def publish_content(content_id: str):
     """上架内容（状态改为published）"""
     db = get_db()
     row = db.execute(
-        "SELECT id, status FROM cms_content WHERE id = ? AND deleted_at IS NULL",
+        text("SELECT id, status FROM cms_content WHERE id = ? AND deleted_at IS NULL"),
         (content_id,)
     ).fetchone()
 
@@ -441,7 +442,7 @@ async def archive_content(content_id: str):
     """下架内容（状态改为archived）"""
     db = get_db()
     row = db.execute(
-        "SELECT id, status FROM cms_content WHERE id = ? AND deleted_at IS NULL",
+        text("SELECT id, status FROM cms_content WHERE id = ? AND deleted_at IS NULL"),
         (content_id,)
     ).fetchone()
 
@@ -473,7 +474,7 @@ async def add_media(content_id: str, request: MediaCreateRequest):
     # 验证内容存在
     db = get_db()
     row = db.execute(
-        "SELECT id FROM cms_content WHERE id = ? AND deleted_at IS NULL",
+        text("SELECT id FROM cms_content WHERE id = ? AND deleted_at IS NULL"),
         (content_id,)
     ).fetchone()
 
@@ -520,7 +521,7 @@ async def list_media(content_id: str):
 
     # 验证内容存在
     content = db.execute(
-        "SELECT id FROM cms_content WHERE id = ? AND deleted_at IS NULL",
+        text("SELECT id FROM cms_content WHERE id = ? AND deleted_at IS NULL"),
         (content_id,)
     ).fetchone()
 
@@ -613,7 +614,7 @@ async def get_cms_stats():
     type_stats = {}
     for ct in VALID_CONTENT_TYPES:
         row = db.execute(
-            "SELECT COUNT(*) as count FROM cms_content WHERE type = ? AND deleted_at IS NULL",
+            text("SELECT COUNT(*) as count FROM cms_content WHERE type = ? AND deleted_at IS NULL"),
             (ct,)
         ).fetchone()
         type_stats[ct] = row["count"]
@@ -622,14 +623,14 @@ async def get_cms_stats():
     status_stats = {}
     for st in VALID_STATUSES:
         row = db.execute(
-            "SELECT COUNT(*) as count FROM cms_content WHERE status = ? AND deleted_at IS NULL",
+            text("SELECT COUNT(*) as count FROM cms_content WHERE status = ? AND deleted_at IS NULL"),
             (st,)
         ).fetchone()
         status_stats[st] = row["count"]
 
     # 总数
     total_row = db.execute(
-        "SELECT COUNT(*) as count FROM cms_content WHERE deleted_at IS NULL"
+        text("SELECT COUNT(*) as count FROM cms_content WHERE deleted_at IS NULL")
     ).fetchone()
 
     # 媒体总数
@@ -737,7 +738,7 @@ async def submit_for_review(
     """
     db = get_db()
     row = db.execute(
-        "SELECT id, status, author_id FROM cms_content WHERE id = ? AND deleted_at IS NULL",
+        text("SELECT id, status, author_id FROM cms_content WHERE id = ? AND deleted_at IS NULL"),
         (content_id,)
     ).fetchone()
 
@@ -758,7 +759,7 @@ async def submit_for_review(
             comment=request.comment or "",
         )
         db.execute(
-            "UPDATE cms_content SET status = ?, updated_at = datetime('now') WHERE id = ?",
+            text("UPDATE cms_content SET status = ?, updated_at = datetime('now') WHERE id = ?"),
             (new_status, content_id)
         )
         db.commit()
@@ -789,7 +790,7 @@ async def approve_content(
 
     db = get_db()
     row = db.execute(
-        "SELECT id, status FROM cms_content WHERE id = ? AND deleted_at IS NULL",
+        text("SELECT id, status FROM cms_content WHERE id = ? AND deleted_at IS NULL"),
         (content_id,)
     ).fetchone()
 
@@ -844,7 +845,7 @@ async def reject_content(
 
     db = get_db()
     row = db.execute(
-        "SELECT id, status FROM cms_content WHERE id = ? AND deleted_at IS NULL",
+        text("SELECT id, status FROM cms_content WHERE id = ? AND deleted_at IS NULL"),
         (content_id,)
     ).fetchone()
 
@@ -897,7 +898,7 @@ async def publish_approved(
 
     db = get_db()
     row = db.execute(
-        "SELECT id, status FROM cms_content WHERE id = ? AND deleted_at IS NULL",
+        text("SELECT id, status FROM cms_content WHERE id = ? AND deleted_at IS NULL"),
         (content_id,)
     ).fetchone()
 
@@ -949,7 +950,7 @@ async def list_pending_reviews(
     db = get_db()
 
     total_row = db.execute(
-        "SELECT COUNT(*) as total FROM cms_content WHERE status = 'pending_review' AND deleted_at IS NULL"
+        text("SELECT COUNT(*) as total FROM cms_content WHERE status = 'pending_review' AND deleted_at IS NULL")
     ).fetchone()
     total = total_row["total"]
 
@@ -983,7 +984,7 @@ async def get_review_history(content_id: str):
 
     # 验证内容存在
     content = db.execute(
-        "SELECT id, title, status FROM cms_content WHERE id = ? AND deleted_at IS NULL",
+        text("SELECT id, title, status FROM cms_content WHERE id = ? AND deleted_at IS NULL"),
         (content_id,)
     ).fetchone()
 
@@ -1026,7 +1027,7 @@ async def set_access_tier(
 
     db = get_db()
     row = db.execute(
-        "SELECT id FROM cms_content WHERE id = ? AND deleted_at IS NULL",
+        text("SELECT id FROM cms_content WHERE id = ? AND deleted_at IS NULL"),
         (content_id,)
     ).fetchone()
 
@@ -1035,7 +1036,7 @@ async def set_access_tier(
 
     try:
         db.execute(
-            "UPDATE cms_content SET access_tier = ?, updated_at = datetime('now') WHERE id = ?",
+            text("UPDATE cms_content SET access_tier = ?, updated_at = datetime('now') WHERE id = ?"),
             (access_tier, content_id)
         )
         db.commit()
@@ -1101,7 +1102,7 @@ async def list_content(
 
     # 总数
     count_row = db.execute(
-        f"SELECT COUNT(*) as total FROM cms_content WHERE {where_clause}",
+        text(f"SELECT COUNT(*) as total FROM cms_content WHERE {where_clause}"),
         params
     ).fetchone()
     total = count_row["total"]

@@ -13,10 +13,11 @@ POST   /api/v1/flags/evaluate     — 评估某用户某 flag（调试用）
 作者: Claw 🦅
 日期: 2026-03-18
 """
+from __future__ import annotations
 
 import os
 import logging
-from typing import Optional
+from typing import Optional, Union, List
 from dataclasses import asdict
 
 from fastapi import APIRouter, HTTPException, Header, Query
@@ -35,29 +36,38 @@ ADMIN_TOKEN = os.environ.get("ADMIN_TOKEN", "dev-admin-token")
 
 
 def _verify_admin(authorization: Optional[str] = None):
-    """校验 admin token"""
+    """校验 admin token（兼容旧环境变量和新 Admin Auth 系统）"""
     if not authorization:
         raise HTTPException(status_code=401, detail="缺少 Authorization header")
     token = authorization.replace("Bearer ", "") if authorization.startswith("Bearer ") else authorization
-    if token != ADMIN_TOKEN:
-        raise HTTPException(status_code=403, detail="无效的 admin token")
+
+    # 1. 优先检查新的 Admin Auth token
+    from app.router.admin_auth import _verify_token
+    if _verify_token(token):
+        return
+
+    # 2. 向后兼容：检查旧的 ADMIN_TOKEN 环境变量
+    if token == ADMIN_TOKEN:
+        return
+
+    raise HTTPException(status_code=403, detail="无效的 admin token")
 
 
 # ==================== Pydantic Models ====================
 
 class FlagCreateRequest(BaseModel):
     key: str = Field(..., min_length=1, max_length=128, description="Flag key (如 prompt.v2_enabled)")
-    value: bool | str | dict | list = Field(..., description="Flag 默认值")
+    value: Union[bool, str, dict, list] = Field(..., description="Flag 默认值")
     rollout_pct: float = Field(100.0, ge=0.0, le=100.0, description="灰度百分比")
-    user_whitelist: list[str] = Field(default_factory=list, description="白名单用户 ID 列表")
+    user_whitelist: List[str] = Field(default_factory=list, description="白名单用户 ID 列表")
     description: str = Field("", max_length=512, description="描述")
     category: str = Field("general", description="分类: prompt/skill/payment/content/general")
 
 
 class FlagUpdateRequest(BaseModel):
-    value: Optional[bool | str | dict | list] = None
+    value: Optional[Union[bool, str, dict, list]] = None
     rollout_pct: Optional[float] = Field(None, ge=0.0, le=100.0)
-    user_whitelist: Optional[list[str]] = None
+    user_whitelist: Optional[List[str]] = None
     description: Optional[str] = Field(None, max_length=512)
     category: Optional[str] = None
 

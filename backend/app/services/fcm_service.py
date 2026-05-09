@@ -194,15 +194,11 @@ class FCMService:
                 logger.error(f"[FCM] 发送失败: {e}")
                 return PushResult(success=False, error=str(e), mode=self.mode)
         else:
-            # Mock 模式
-            message_id = f"fcm_mock_{datetime.now().timestamp()}"
-            logger.info(
-                f"[FCM] Mock 发送: token={message.token[:20]}..., "
-                f"title={message.title}"
-            )
+            # Mock 模式 — 优雅降级：不返回假 message_id
+            logger.warning("FCM credentials not configured, push disabled")
             return PushResult(
-                success=True,
-                message_id=message_id,
+                success=False,
+                error="推送服务未配置",
                 mode="mock",
             )
 
@@ -240,11 +236,8 @@ class FCMService:
                 logger.error(f"[FCM] 主题订阅异常: {e}")
                 return False
         else:
-            logger.info(
-                f"[FCM] Mock 主题{'订阅' if subscription.subscribe else '退订'}: "
-                f"topic={subscription.topic}"
-            )
-            return True
+            logger.warning("FCM credentials not configured, topic subscription disabled")
+            return False
 
     async def send_to_topic(
         self,
@@ -273,8 +266,8 @@ class FCMService:
                 logger.error(f"[FCM] 主题发送失败: {e}")
                 return PushResult(success=False, error=str(e), mode=self.mode)
         else:
-            logger.info(f"[FCM] Mock 主题发送: topic={topic}, title={title}")
-            return PushResult(success=True, message_id=message_id, mode="mock")
+            logger.warning("FCM credentials not configured, topic push disabled")
+            return PushResult(success=False, error="推送服务未配置", mode="mock")
 
 
 # ==================== 单例 ====================

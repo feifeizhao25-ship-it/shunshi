@@ -3,6 +3,7 @@ from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel
 from typing import List, Optional
 from datetime import datetime, date
+import random
 
 from app.database.db import get_db
 
@@ -45,7 +46,7 @@ class SleepRecord(BaseModel):
 # ============ Helper Functions ============
 
 def generate_id(prefix: str) -> str:
-    return f"{prefix}_{datetime.now().strftime('%Y%m%d%H%M%S')}"
+    return f"{prefix}_{datetime.now().strftime('%Y%m%d%H%M%S')}_{random.randint(1000, 9999)}"
 
 # ============ CareStatus API ============
 
@@ -380,7 +381,8 @@ async def get_sleep_stats(
                 "period": period,
                 "average_hours": 0,
                 "average_quality": "normal",
-                "trend": "stable"
+                "trend": "stable",
+                "record_count": 0
             }
         }
     

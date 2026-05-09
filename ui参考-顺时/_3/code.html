@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+
+<html class="light" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&amp;family=Manrope:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-bright": "#fdf9f4",
+              "on-secondary": "#ffffff",
+              "secondary-fixed-dim": "#e4c09c",
+              "on-tertiary": "#ffffff",
+              "on-background": "#1c1c19",
+              "inverse-primary": "#a1d2ad",
+              "on-primary": "#ffffff",
+              "surface-container-highest": "#e6e2dd",
+              "surface-tint": "#3b684a",
+              "on-surface-variant": "#414942",
+              "primary": "#144227",
+              "on-primary-container": "#9ed0ab",
+              "tertiary-fixed": "#ffdea4",
+              "surface-container-low": "#f7f3ee",
+              "secondary-fixed": "#ffddbb",
+              "tertiary": "#4c3605",
+              "surface-dim": "#ddd9d5",
+              "secondary-container": "#ffd9b4",
+              "on-tertiary-fixed-variant": "#5a4312",
+              "surface-container-lowest": "#ffffff",
+              "tertiary-fixed-dim": "#e4c285",
+              "error-container": "#ffdad6",
+              "on-error": "#ffffff",
+              "tertiary-container": "#654d1b",
+              "on-surface": "#1c1c19",
+              "secondary": "#74593c",
+              "outline": "#717971",
+              "primary-container": "#2d5a3d",
+              "surface-container": "#f1ede8",
+              "error": "#ba1a1a",
+              "outline-variant": "#c1c9c0",
+              "primary-fixed": "#bceec8",
+              "on-error-container": "#93000a",
+              "inverse-on-surface": "#f4f0eb",
+              "on-primary-fixed": "#00210f",
+              "on-secondary-fixed-variant": "#5b4227",
+              "on-tertiary-container": "#e1bf82",
+              "on-secondary-container": "#795d40",
+              "surface-variant": "#e6e2dd",
+              "surface-container-high": "#ebe8e3",
+              "on-tertiary-fixed": "#261900",
+              "on-primary-fixed-variant": "#224f33",
+              "inverse-surface": "#31302d",
+              "on-secondary-fixed": "#2a1702",
+              "primary-fixed-dim": "#a1d2ad",
+              "surface": "#fdf9f4",
+              "background": "#fdf9f4"
+            },
+            fontFamily: {
+              "headline": ["Noto Serif SC", "serif"],
+              "body": ["Manrope", "sans-serif"],
+              "label": ["Manrope", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body { font-family: 'Manrope', sans-serif; }
+        h1, h2, h3 { font-family: 'Noto Serif SC', serif; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface min-h-screen pb-24">
+<!-- TopAppBar -->
+<header class="bg-[#fdf9f4] dark:bg-stone-950 docked full-width top-0 z-50 fixed w-full">
+<div class="flex justify-between items-center px-6 py-4 w-full max-w-screen-xl mx-auto">
+<button class="text-[#144227] dark:text-emerald-500 hover:bg-[#f7f3ee] dark:hover:bg-stone-800 transition-colors p-2 rounded-full">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-serif italic tracking-wide text-[#144227] dark:text-emerald-400 text-xl font-bold">设置</h1>
+<div class="w-10"></div> <!-- Spacer for centering -->
+</div>
+<div class="bg-[#f7f3ee] dark:bg-stone-900 h-[1px] w-full opacity-50"></div>
+</header>
+<main class="pt-24 px-6 max-w-2xl mx-auto space-y-12">
+<!-- User Identity Section (Visual Anchor) -->
+<section class="flex items-center gap-6 p-6 rounded-xl bg-surface-container-low">
+<div class="relative w-20 h-20 rounded-full overflow-hidden border-2 border-primary/10">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="Close-up portrait of a serene woman with natural lighting, soft background, minimalist aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCqCMReSsbmtzqKedrQ-aVYBr8cXrbruRUrcNEljlAG87gphmCRBgGVOUpAswbHnr21gN4qfkcSEXt7GGwf3HVEnnfvNH-2ONI-domK1J9sPKAIGf6N9amndGSD4xeg6zhf6U1q_8LBIcooVaIdwCh_yEB30gNgTXbGq0c9BSb-8foOQN1hcki22brRkxYWUOh-HTkjtMTK38H3yoX0Ayo_JAFGpT_aBi6EfVXPO-hzfw4qGMYnEqYYJuoo8hqUVif2G4UCAoQrAKo"/>
+</div>
+<div>
+<h2 class="text-2xl font-bold text-primary">云水禅心</h2>
+<p class="text-secondary text-sm">账号：shunshi_2024</p>
+</div>
+</section>
+<!-- Category: Security & Privacy -->
+<section class="space-y-4">
+<h3 class="text-lg font-bold text-secondary tracking-wider px-2">账号与安全</h3>
+<div class="space-y-2">
+<div class="flex items-center justify-between p-4 bg-surface-container-lowest rounded-xl hover:bg-surface-container-low transition-colors cursor-pointer">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary" data-icon="shield">shield</span>
+<span class="font-medium">账号安全中心</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant" data-icon="chevron_right">chevron_right</span>
+</div>
+<div class="flex items-center justify-between p-4 bg-surface-container-lowest rounded-xl hover:bg-surface-container-low transition-colors cursor-pointer">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary" data-icon="lock">lock</span>
+<span class="font-medium">隐私设置</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant" data-icon="chevron_right">chevron_right</span>
+</div>
+</div>
+</section>
+<!-- Category: Notifications (Toggle Logic) -->
+<section class="space-y-4">
+<h3 class="text-lg font-bold text-secondary tracking-wider px-2">消息推送</h3>
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden">
+<!-- Toggle Item 1 -->
+<div class="flex items-center justify-between p-5 border-b border-surface-container">
+<div class="flex flex-col">
+<span class="font-medium">节气提醒</span>
+<span class="text-xs text-secondary/70">跟随二十四节气，获取养生建议</span>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<!-- Toggle Item 2 -->
+<div class="flex items-center justify-between p-5 border-b border-surface-container">
+<div class="flex flex-col">
+<span class="font-medium">时辰提醒</span>
+<span class="text-xs text-secondary/70">按中医十二时辰定时提醒</span>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<!-- Toggle Item 3 -->
+<div class="flex items-center justify-between p-5">
+<div class="flex flex-col">
+<span class="font-medium">打卡提醒</span>
+<span class="text-xs text-secondary/70">每日养生任务完成提醒</span>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+</div>
+</section>
+<!-- Special Feature: Senior Mode -->
+<section class="space-y-4">
+<div class="bg-primary/5 p-6 rounded-2xl border border-primary/10">
+<div class="flex items-center justify-between mb-6">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="family_history">family_history</span>
+<div>
+<h3 class="text-xl font-bold text-primary">老年人模式</h3>
+<p class="text-secondary text-sm">提供更大字体与简洁界面</p>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox"/>
+<div class="w-14 h-7 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:start-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-6 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<!-- Mode Preview Card -->
+<div class="bg-surface p-4 rounded-xl border border-outline-variant/20 shadow-sm opacity-80 scale-95 origin-top">
+<p class="text-primary font-bold text-2xl mb-1">预览效果</p>
+<p class="text-on-surface text-xl">现在是 寅时 · 肺经当令</p>
+<div class="mt-4 flex gap-2">
+<div class="bg-secondary-container text-on-secondary-container px-4 py-2 rounded-lg text-lg font-bold">早起呼吸训练</div>
+</div>
+</div>
+</div>
+</section>
+<!-- System Actions -->
+<section class="space-y-2">
+<button class="w-full flex items-center justify-between p-5 bg-surface-container-lowest rounded-xl hover:bg-surface-container-low transition-colors">
+<span class="font-medium text-on-surface">清除缓存</span>
+<span class="text-secondary text-sm">124.5 MB</span>
+</button>
+<button class="w-full flex items-center justify-between p-5 bg-surface-container-lowest rounded-xl hover:bg-surface-container-low transition-colors">
+<span class="font-medium text-on-surface">关于顺时</span>
+<div class="flex items-center gap-2">
+<span class="text-secondary text-sm">版本 2.4.0</span>
+<span class="material-symbols-outlined text-outline-variant" data-icon="chevron_right">chevron_right</span>
+</div>
+</button>
+</section>
+<!-- Logout Action -->
+<section class="pt-8 pb-12">
+<button class="w-full py-4 bg-error/5 text-error font-bold rounded-xl border border-error/10 hover:bg-error/10 transition-colors">
+                退出登录
+            </button>
+<p class="text-center text-outline-variant text-xs mt-6 tracking-widest">DESIGNED BY SHUNSHI · 顺时养生</p>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 bg-[#fdf9f4]/80 dark:bg-stone-950/80 backdrop-blur-xl shadow-[0_-4px_24px_rgba(28,28,25,0.04)] border-t border-[#c1c9c0]/20">
+<a class="flex flex-col items-center justify-center text-[#74593c] dark:text-stone-400 px-4 py-1.5 hover:opacity-80 transition-opacity" href="#">
+<span class="material-symbols-outlined" data-icon="schedule">schedule</span>
+<span class="font-sans text-[11px] font-medium tracking-[0.05rem]">十二时辰</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#74593c] dark:text-stone-400 px-4 py-1.5 hover:opacity-80 transition-opacity" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-sans text-[11px] font-medium tracking-[0.05rem]">社区</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#74593c] dark:text-stone-400 px-4 py-1.5 hover:opacity-80 transition-opacity" href="#">
+<span class="material-symbols-outlined" data-icon="emoji_events">emoji_events</span>
+<span class="font-sans text-[11px] font-medium tracking-[0.05rem]">挑战</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-[#144227] text-white rounded-xl px-4 py-1.5 hover:opacity-80 transition-opacity" href="#">
+<span class="material-symbols-outlined" data-icon="settings" style="font-variation-settings: 'FILL' 1;">settings</span>
+<span class="font-sans text-[11px] font-medium tracking-[0.05rem]">设置</span>
+</a>
+</nav>
+</body></html>

@@ -11,8 +11,51 @@ import json
 import hashlib
 import threading
 import logging
+import time
 
 logger = logging.getLogger(__name__)
+
+# ============ Redis 支持 (不可用时回退到内存) ============
+try:
+    import redis as _redis
+    _REDIS_AVAILABLE = True
+except ImportError:
+    _REDIS_AVAILABLE = False
+    logger.info("[Auth] redis-py 未安装，Token 管理使用内存存储")
+
+_redis_client = None
+_redis_connected = False
+
+def _get_redis():
+    """获取 Redis 连接（懒初始化 + 连接检查）"""
+    global _redis_client, _redis_connected
+    if not _REDIS_AVAILABLE:
+        return None
+    if _redis_client and _redis_connected:
+        try:
+            _redis_client.ping()
+            return _redis_client
+        except Exception:
+            _redis_connected = False
+            _redis_client = None
+    # 尝试（重新）连接
+    redis_url = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+    try:
+        _redis_client = _redis.from_url(
+            redis_url,
+            decode_responses=True,
+            socket_connect_timeout=2,
+            socket_timeout=2,
+        )
+        _redis_client.ping()
+        _redis_connected = True
+        logger.info(f"[Auth] Redis 连接成功: {redis_url}")
+        return _redis_client
+    except Exception as e:
+        _redis_client = None
+        _redis_connected = False
+        logger.debug(f"[Auth] Redis 不可用，回退内存: {e}")
+        return None
 
 try:
     import bcrypt
@@ -29,13 +72,24 @@ except ImportError:
     logger.warning("[Auth] PyJWT 未安装，回退到随机 token")
 
 from app.database.db import get_db
+from ..core.settings import settings
 
 router = APIRouter(prefix="/api/v1/auth", tags=["认证"])
 
 # ============ 配置 ============
 
-JWT_SECRET = os.getenv("JWT_SECRET", "shunshi-dev-secret-change-in-production-2026")
-JWT_ALGORITHM = "HS256"
+JWT_SECRET = settings.JWT_SECRET or os.getenv("JWT_SECRET")
+if not JWT_SECRET:
+    import logging
+    logger = logging.getLogger(__name__)
+    logger.critical("[Security] JWT_SECRET 环境变量未设置。生产环境必须配置强随机密钥。")
+    raise RuntimeError("JWT_SECRET 环境变量必须设置。使用: openssl rand -hex 32")
+
+# JWT 密钥轮换: 支持当前+上一个密钥，用于无缝轮换
+JWT_SECRET_CURRENT = JWT_SECRET
+JWT_SECRET_PREVIOUS = os.getenv("JWT_SECRET_PREVIOUS", "")
+
+JWT_ALGORITHM = settings.JWT_ALGORITHM
 
 # Token 过期时间（生产级缩短）
 JWT_ACCESS_EXPIRE_MINUTES = 30       # Access Token 30分钟
@@ -54,16 +108,12 @@ ACCOUNT_DELETE_GRACE_DAYS = 30
 # HTTP Bearer security scheme (for Depends)
 _bearer_scheme = HTTPBearer(auto_error=False)
 
-# ============ 内存 Token 黑名单 (生产环境建议迁移到 Redis) ============
-_token_blacklock: dict = {}          # token_jti -> 过期时间戳
+# ============ 内存回退存储 (Redis 不可用时使用) ============
+_token_blacklock_mem: dict = {}          # token_jti -> 过期时间戳
 _token_blacklock_lock = threading.Lock()
-
-# ============ 内存 Token 活跃记录 (用于注销时立即失效) ============
-_active_tokens: dict = {}            # user_id -> {device_id: {jti, refresh_jti, expires_at}}
+_active_tokens_mem: dict = {}            # user_id -> {device_id: {jti, refresh_jti, expires_at}}
 _active_tokens_lock = threading.Lock()
-
-# ============ 短信验证码限流 (内存存储, 生产环境建议迁移到 Redis) ============
-_sms_rate_limit: dict = {}           # phone -> {"last_sent": timestamp, "daily_count": int, "date": "YYYY-MM-DD"}
+_sms_rate_limit_mem: dict = {}           # phone -> {"last_sent": timestamp, "daily_count": int, "date": "YYYY-MM-DD"}
 
 # ============ Models ============
 
@@ -159,7 +209,7 @@ def create_access_token(user_id: str, username: str, email: str,
         "exp": now + timedelta(minutes=JWT_ACCESS_EXPIRE_MINUTES),
         "iat": now,
     }
-    return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
+    return jwt.encode(payload, JWT_SECRET_CURRENT, algorithm=JWT_ALGORITHM)
 
 def create_refresh_token(user_id: str, device_id: str = None, jti: str = None) -> str:
     """生成 JWT refresh token (7天过期)"""
@@ -175,78 +225,143 @@ def create_refresh_token(user_id: str, device_id: str = None, jti: str = None) -
         "exp": now + timedelta(days=JWT_REFRESH_EXPIRE_DAYS),
         "iat": now,
     }
-    return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
+    return jwt.encode(payload, JWT_SECRET_CURRENT, algorithm=JWT_ALGORITHM)
 
 def decode_token(token: str) -> Optional[dict]:
-    """解码并验证 JWT token"""
+    """解码并验证 JWT token，支持密钥轮换"""
     if not _JWT_AVAILABLE:
         return None
-    try:
-        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
-        # 检查是否在黑名单中
-        jti = payload.get("jti")
-        if jti and _is_token_blacklisted(jti):
+    
+    secrets = [JWT_SECRET_CURRENT]
+    if JWT_SECRET_PREVIOUS:
+        secrets.append(JWT_SECRET_PREVIOUS)
+    
+    for secret in secrets:
+        try:
+            payload = jwt.decode(token, secret, algorithms=[JWT_ALGORITHM])
+            # 检查是否在黑名单中
+            jti = payload.get("jti")
+            if jti and _is_token_blacklisted(jti):
+                return None
+            return payload
+        except jwt.ExpiredSignatureError:
             return None
-        return payload
-    except jwt.ExpiredSignatureError:
-        return None
-    except jwt.InvalidTokenError as e:
-        import logging; logging.getLogger(__name__).warning(f"JWT decode error: {e}")
-        return None
+        except jwt.InvalidTokenError:
+            continue
+    
+    logger.warning(f"JWT decode failed: token did not match any active secret")
+    return None
 
 def _is_token_blacklisted(jti: str) -> bool:
-    """检查 token 是否在黑名单中"""
+    """检查 token 是否在黑名单中 (Redis 优先，内存回退)"""
+    r = _get_redis()
+    if r:
+        try:
+            return r.exists(f"bl:{jti}") == 1
+        except Exception as e:
+            logger.debug(f"[Auth] Redis blacklist check failed, fallback to memory: {e}")
+    # 内存回退
     with _token_blacklock_lock:
-        if jti in _token_blacklock:
-            if datetime.now(timezone.utc).timestamp() > _token_blacklock[jti]:
-                del _token_blacklock[jti]
+        if jti in _token_blacklock_mem:
+            if datetime.now(timezone.utc).timestamp() > _token_blacklock_mem[jti]:
+                del _token_blacklock_mem[jti]
                 return False
             return True
     return False
 
 def _blacklist_token(jti: str, expires_at: float):
-    """将 token 加入黑名单"""
+    """将 token 加入黑名单 (Redis 优先，内存回退)"""
+    now_ts = datetime.now(timezone.utc).timestamp()
+    ttl_seconds = max(int(expires_at - now_ts), 1)
+    r = _get_redis()
+    if r:
+        try:
+            r.setex(f"bl:{jti}", ttl_seconds, "1")
+            return
+        except Exception as e:
+            logger.debug(f"[Auth] Redis blacklist set failed, fallback to memory: {e}")
+    # 内存回退
     with _token_blacklock_lock:
-        _token_blacklock[jti] = expires_at
+        _token_blacklock_mem[jti] = expires_at
 
 def _cleanup_blacklist():
-    """清理过期黑名单条目"""
+    """清理过期黑名单条目 (仅内存需要，Redis 自动过期)"""
     now = datetime.now(timezone.utc).timestamp()
     with _token_blacklock_lock:
-        expired = [jti for jti, exp in _token_blacklock.items() if now > exp]
+        expired = [jti for jti, exp in _token_blacklock_mem.items() if now > exp]
         for jti in expired:
-            del _token_blacklock[jti]
+            del _token_blacklock_mem[jti]
 
 # ============ 活跃 Token 管理 (注销/踢出时立即失效) ============
 
 def _record_active_token(user_id: str, device_id: str, access_jti: str, refresh_jti: str):
-    """记录活跃 token"""
+    """记录活跃 token (Redis Hash 优先，内存回退)"""
+    expires_at = datetime.now(timezone.utc).timestamp() + JWT_REFRESH_EXPIRE_DAYS * 86400
+    token_info = json.dumps({"access_jti": access_jti, "refresh_jti": refresh_jti, "expires_at": expires_at})
+    
+    r = _get_redis()
+    if r:
+        try:
+            key = f"active_tokens:{user_id}"
+            r.hset(key, device_id, token_info)
+            r.expire(key, JWT_REFRESH_EXPIRE_DAYS * 86400)
+            return
+        except Exception as e:
+            logger.debug(f"[Auth] Redis active token record failed, fallback to memory: {e}")
+    # 内存回退
     with _active_tokens_lock:
-        if user_id not in _active_tokens:
-            _active_tokens[user_id] = {}
-        _active_tokens[user_id][device_id] = {
+        if user_id not in _active_tokens_mem:
+            _active_tokens_mem[user_id] = {}
+        _active_tokens_mem[user_id][device_id] = {
             "access_jti": access_jti,
             "refresh_jti": refresh_jti,
-            "expires_at": datetime.now(timezone.utc).timestamp() + JWT_REFRESH_EXPIRE_DAYS * 86400,
+            "expires_at": expires_at,
         }
+
+def _get_active_tokens(user_id: str) -> dict:
+    """获取用户所有活跃 token 记录 -> dict[device_id, token_info]"""
+    r = _get_redis()
+    if r:
+        try:
+            key = f"active_tokens:{user_id}"
+            raw = r.hgetall(key)
+            if raw:
+                return {k: json.loads(v) if isinstance(v, str) else v for k, v in raw.items()}
+        except Exception as e:
+            logger.debug(f"[Auth] Redis active tokens read failed, fallback to memory: {e}")
+    # 内存回退
+    with _active_tokens_lock:
+        return dict(_active_tokens_mem.get(user_id, {}))
 
 def _invalidate_user_tokens(user_id: str, device_id: str = None):
     """使指定用户(或设备)的所有 token 立即失效"""
-    with _active_tokens_lock:
-        if user_id not in _active_tokens:
-            return
-        devices = _active_tokens[user_id]
-        target_devices = {device_id: devices[device_id]} if device_id else devices
-        for dev_id, token_info in target_devices.items():
-            now_ts = datetime.now(timezone.utc).timestamp()
-            _blacklist_token(token_info["access_jti"], token_info["expires_at"])
-            _blacklist_token(token_info["refresh_jti"], token_info["expires_at"])
+    devices = _get_active_tokens(user_id)
+    if not devices:
+        return
+    target_devices = {device_id: devices[device_id]} if device_id and device_id in devices else devices
+    for dev_id, token_info in target_devices.items():
+        _blacklist_token(token_info["access_jti"], token_info["expires_at"])
+        _blacklist_token(token_info["refresh_jti"], token_info["expires_at"])
+    
+    r = _get_redis()
+    if r:
+        try:
+            key = f"active_tokens:{user_id}"
             if device_id:
-                del devices[dev_id]
-                if not devices:
-                    del _active_tokens[user_id]
+                r.hdel(key, device_id)
             else:
-                del _active_tokens[user_id]
+                r.delete(key)
+        except Exception as e:
+            logger.debug(f"[Auth] Redis active token cleanup failed: {e}")
+    # 内存回退
+    with _active_tokens_lock:
+        if user_id in _active_tokens_mem:
+            if device_id and device_id in _active_tokens_mem[user_id]:
+                del _active_tokens_mem[user_id][device_id]
+                if not _active_tokens_mem[user_id]:
+                    del _active_tokens_mem[user_id]
+            elif not device_id:
+                del _active_tokens_mem[user_id]
 
 # ============ 短信验证码管理 ============
 
@@ -258,23 +373,65 @@ def _generate_sms_code() -> str:
     return ''.join(random.choices('0123456789', k=6))
 
 def _can_send_sms(phone: str) -> tuple:
-    """检查是否可以发送短信 (返回 (can_send, error_message))"""
+    """检查是否可以发送短信 (返回 (can_send, error_message))，Redis 优先"""
     now = datetime.now(timezone.utc)
     today_str = now.strftime("%Y-%m-%d")
     
-    if phone in _sms_rate_limit:
-        info = _sms_rate_limit[phone]
-        
-        # 检查冷却期
+    r = _get_redis()
+    if r:
+        try:
+            # 检查冷却期
+            cooldown_key = f"sms:cooldown:{phone}"
+            ttl = r.ttl(cooldown_key)
+            if ttl and ttl > 0:
+                return False, f"请{ttl}秒后再试"
+            # 检查每日限额
+            daily_key = f"sms:daily:{phone}:{today_str}"
+            count = r.get(daily_key)
+            if count and int(count) >= SMS_DAILY_LIMIT:
+                return False, "今日验证码已达上限"
+            return True, ""
+        except Exception as e:
+            logger.debug(f"[Auth] Redis SMS rate check failed, fallback to memory: {e}")
+    
+    # 内存回退
+    if phone in _sms_rate_limit_mem:
+        info = _sms_rate_limit_mem[phone]
         if now.timestamp() - info["last_sent"] < SMS_COOLDOWN_SECONDS:
             remaining = int(SMS_COOLDOWN_SECONDS - (now.timestamp() - info["last_sent"]))
             return False, f"请{remaining}秒后再试"
-        
-        # 检查每日限额
         if info["date"] == today_str and info["daily_count"] >= SMS_DAILY_LIMIT:
             return False, "今日验证码已达上限"
-    
     return True, ""
+
+def _record_sms_sent(phone: str):
+    """记录已发送短信，更新限流 (Redis 优先)"""
+    now = datetime.now(timezone.utc)
+    today_str = now.strftime("%Y-%m-%d")
+    
+    r = _get_redis()
+    if r:
+        try:
+            # 设置冷却
+            r.setex(f"sms:cooldown:{phone}", SMS_COOLDOWN_SECONDS, "1")
+            # 递增每日计数
+            daily_key = f"sms:daily:{phone}:{today_str}"
+            r.incr(daily_key)
+            r.expire(daily_key, 86400)  # 24h TTL
+            return
+        except Exception as e:
+            logger.debug(f"[Auth] Redis SMS rate record failed, fallback to memory: {e}")
+    
+    # 内存回退
+    if phone in _sms_rate_limit_mem and _sms_rate_limit_mem[phone]["date"] == today_str:
+        _sms_rate_limit_mem[phone]["last_sent"] = now.timestamp()
+        _sms_rate_limit_mem[phone]["daily_count"] += 1
+    else:
+        _sms_rate_limit_mem[phone] = {
+            "last_sent": now.timestamp(),
+            "daily_count": 1,
+            "date": today_str,
+        }
 
 def _send_sms_code(phone: str) -> str:
     """发送短信验证码（模拟，生产环境对接短信服务商）"""
@@ -283,19 +440,10 @@ def _send_sms_code(phone: str) -> str:
         raise HTTPException(status_code=429, detail=error)
     
     now = datetime.now(timezone.utc)
-    today_str = now.strftime("%Y-%m-%d")
     code = _generate_sms_code()
     
     # 更新限流记录
-    if phone in _sms_rate_limit and _sms_rate_limit[phone]["date"] == today_str:
-        _sms_rate_limit[phone]["last_sent"] = now.timestamp()
-        _sms_rate_limit[phone]["daily_count"] += 1
-    else:
-        _sms_rate_limit[phone] = {
-            "last_sent": now.timestamp(),
-            "daily_count": 1,
-            "date": today_str,
-        }
+    _record_sms_sent(phone)
     
     # 存储验证码 (5分钟过期)
     _sms_codes[phone] = {
@@ -306,7 +454,7 @@ def _send_sms_code(phone: str) -> str:
     
     # 生产环境: 调用短信服务商 API
     # logger.info(f"[SMS] 发送验证码到 {phone}: {code}")
-    logger.info(f"[SMS] 验证码已生成: phone={phone}, code={code}")
+    logger.info(f"[SMS] 验证码已生成: phone={phone[:3]}****{phone[-4:]}, code=***")
     
     return code
 
@@ -522,7 +670,7 @@ def _get_or_create_device(db, user_id: str, device_id: str, platform: str = "unk
 
 # ============ API Endpoints (原有，保持签名不变) ============
 
-@router.post("/register", response_model=dict)
+@router.post("/register", response_model=dict, summary="用户注册", description="使用邮箱和密码注册新用户，返回JWT access_token和refresh_token")
 async def register(request: RegisterRequest):
     """用户注册"""
     db = get_db()
@@ -566,7 +714,7 @@ async def register(request: RegisterRequest):
         }
     }
 
-@router.post("/login", response_model=dict)
+@router.post("/login", response_model=dict, summary="用户登录", description="邮箱密码登录，返回JWT access_token和refresh_token")
 async def login(request: LoginRequest):
     """用户登录"""
     db = get_db()
@@ -628,7 +776,7 @@ async def login(request: LoginRequest):
 
 # ============ Token 轮换 ============
 
-@router.post("/refresh", response_model=dict)
+@router.post("/refresh", response_model=dict, summary="刷新Token", description="使用refresh_token换取新的access_token和refresh_token，旧refresh_token立即失效")
 async def refresh_token(request: RefreshRequest):
     """
     刷新 access token (Token 轮换)
@@ -693,7 +841,7 @@ async def refresh_token(request: RefreshRequest):
         }
     }
 
-@router.get("/me", response_model=dict)
+@router.get("/me", response_model=dict, summary="获取当前用户", description="根据Bearer Token返回当前登录用户的基本信息")
 async def get_me(authorization: str = Header(None)):
     """获取当前用户信息"""
     token = None
@@ -724,7 +872,7 @@ async def get_me(authorization: str = Header(None)):
         }
     }
 
-@router.post("/logout", response_model=dict)
+@router.post("/logout", response_model=dict, summary="退出登录", description="使当前Token立即失效（加入黑名单）")
 async def logout(authorization: str = Query(None)):
     """退出登录（使当前 token 立即失效）"""
     if authorization and authorization.startswith("Bearer "):
@@ -760,7 +908,7 @@ class GoogleAuthRequest(BaseModel):
     device_id: Optional[str] = None
 
 
-@router.post("/google", response_model=dict)
+@router.post("/google", response_model=dict, summary="Google登录", description="使用Google ID Token登录或注册，创建或关联用户并返回JWT")
 async def google_auth(request: GoogleAuthRequest):
     """
     Google Sign-In 登录
@@ -798,7 +946,7 @@ async def google_auth(request: GoogleAuthRequest):
     if row:
         user_id = row["id"]
         name = row["name"]
-        if not row.get("google_id"):
+        if not dict(row).get("google_id"):
             db.execute("UPDATE users SET google_id = ?, updated_at = ? WHERE id = ?",
                        (google_user_id, now, user_id))
             db.commit()
@@ -859,6 +1007,7 @@ APPLE_TEAM_ID = os.getenv("APPLE_TEAM_ID", "")
 APPLE_SERVICE_ID = os.getenv("APPLE_SERVICE_ID", "")
 APPLE_KEY_ID = os.getenv("APPLE_KEY_ID", "")
 APPLE_PRIVATE_KEY_PATH = os.getenv("APPLE_PRIVATE_KEY_PATH", "")
+# Note: Apple config keys remain os.getenv — not in settings center (Apple-specific, rarely changed)
 
 
 class AppleLoginRequest(BaseModel):
@@ -874,7 +1023,7 @@ class AppleRefreshRequest(BaseModel):
     authorization_code: str
 
 
-@router.post("/apple/login", response_model=dict)
+@router.post("/apple/login", response_model=dict, summary="Apple登录", description="使用Apple identity_token登录或注册，验证Apple公钥签名并返回JWT")
 async def apple_login(request: AppleLoginRequest):
     """
     Sign in with Apple 登录
@@ -889,7 +1038,7 @@ async def apple_login(request: AppleLoginRequest):
     )
 
     # 1. 验证 Apple identity token
-    env = os.getenv("ENV", "dev")
+    env = settings.APP_ENV if settings.APP_ENV != "development" else os.getenv("ENV", "dev")
     verify_fn = verify_apple_identity_token_dev if env == "dev" else verify_apple_identity_token
 
     try:
@@ -922,7 +1071,7 @@ async def apple_login(request: AppleLoginRequest):
         user_id = row["id"]
         name = row["name"]
         # 首次用 Apple 登录时关联已有账号
-        if not row.get("apple_id"):
+        if not dict(row).get("apple_id"):
             db.execute("UPDATE users SET apple_id = ?, updated_at = ? WHERE id = ?",
                        (apple_user_id, now, user_id))
             db.commit()
@@ -939,7 +1088,7 @@ async def apple_login(request: AppleLoginRequest):
         legacy_token = generate_token()
         db.execute("INSERT INTO auth_tokens (token, user_id) VALUES (?, ?)", (legacy_token, user_id))
         db.commit()
-        logger.info(f"[Apple] 新用户创建: {user_id}, email={apple_email}")
+        logger.info(f"[Apple] 新用户创建: {user_id}, email={apple_email[:2]}***@***")
 
     # 记录设备
     if request.device_id:
@@ -978,7 +1127,7 @@ async def apple_login(request: AppleLoginRequest):
     }
 
 
-@router.post("/apple/refresh", response_model=dict)
+@router.post("/apple/refresh", response_model=dict, summary="Apple Token刷新", description="使用Apple authorization_code换取Apple refresh_token")
 async def apple_refresh_token(request: AppleRefreshRequest):
     """
     用 Apple 的 authorization_code 刷新用户信息
@@ -1051,7 +1200,7 @@ async def apple_refresh_token(request: AppleRefreshRequest):
 
 
 # 保留旧路由兼容 (不带 /login 后缀)
-@router.post("/apple", response_model=dict)
+@router.post("/apple", response_model=dict, summary="Apple登录(兼容)", description="向后兼容的Apple登录端点，转发到/apple/login")
 async def apple_auth(request: AppleLoginRequest):
     """向后兼容: /apple -> /apple/login"""
     return await apple_login(request)
@@ -1059,7 +1208,7 @@ async def apple_auth(request: AppleLoginRequest):
 
 # ============ 短信验证码 ============
 
-@router.post("/sms/send", response_model=dict)
+@router.post("/sms/send", response_model=dict, summary="发送短信验证码", description="向手机发送6位验证码，60秒冷却，每天最多5次")
 async def send_sms_code(request: SmsSendRequest):
     """
     发送短信验证码
@@ -1072,10 +1221,10 @@ async def send_sms_code(request: SmsSendRequest):
         "success": True,
         "message": "验证码已发送",
         # 开发环境返回验证码，生产环境应移除
-        "_debug_code": code if os.getenv("ENV", "dev") != "production" else None,
+        "_debug_code": code if settings.APP_ENV != "production" else None,
     }
 
-@router.post("/sms/verify", response_model=dict)
+@router.post("/sms/verify", response_model=dict, summary="验证短信验证码", description="验证手机收到的短信验证码是否正确")
 async def verify_sms_code(request: SmsVerifyRequest):
     """
     验证短信验证码
@@ -1088,7 +1237,7 @@ async def verify_sms_code(request: SmsVerifyRequest):
 
 # ============ 游客模式 ============
 
-@router.post("/guest-login", response_model=dict)
+@router.post("/guest-login", response_model=dict, summary="游客登录", description="自动生成临时游客账号，可正常使用免费功能，后续可转为正式用户")
 async def guest_login(request: GuestLoginRequest):
     """
     游客登录 — 自动生成临时账号
@@ -1138,7 +1287,7 @@ async def guest_login(request: GuestLoginRequest):
         }
     }
 
-@router.post("/guest/convert", response_model=dict)
+@router.post("/guest/convert", response_model=dict, summary="游客转正式用户", description="将游客账号转为正式用户，绑定邮箱/手机号/密码，保留所有数据")
 async def guest_convert(
     request: GuestConvertRequest,
     user: dict = Depends(_get_current_user_from_request),
@@ -1218,7 +1367,7 @@ async def guest_convert(
 
 # ============ 多设备登录管理 ============
 
-@router.get("/devices", response_model=dict)
+@router.get("/devices", response_model=dict, summary="获取设备列表", description="返回当前用户所有已登录设备的信息")
 async def list_devices(
     user: dict = Depends(_get_current_user_from_request),
 ):
@@ -1253,7 +1402,7 @@ async def list_devices(
         }
     }
 
-@router.delete("/devices/{device_id}", response_model=dict)
+@router.delete("/devices/{device_id}", response_model=dict, summary="踢出设备", description="踢出指定设备，该设备的所有Token立即失效")
 async def kick_device(
     device_id: str,
     user: dict = Depends(_get_current_user_from_request),
@@ -1294,7 +1443,7 @@ async def kick_device(
 
 # ============ 账号安全 ============
 
-@router.delete("/account", response_model=dict)
+@router.delete("/account", response_model=dict, summary="注销账号", description="软删除账号，30天后硬删除，期间可取消注销，注销后所有Token立即失效")
 async def delete_account(
     user: dict = Depends(_get_current_user_from_request),
 ):
@@ -1348,7 +1497,7 @@ async def delete_account(
         }
     }
 
-@router.post("/account/cancel-delete", response_model=dict)
+@router.post("/account/cancel-delete", response_model=dict, summary="取消注销", description="在30天宽限期内取消账号注销，恢复正常状态")
 async def cancel_delete_account(
     request: CancelDeleteRequest,
     user: dict = Depends(_get_current_user_from_request),
@@ -1382,7 +1531,7 @@ async def cancel_delete_account(
         "message": "账号已恢复正常",
     }
 
-@router.post("/data/export", response_model=dict)
+@router.post("/data/export", response_model=dict, summary="导出用户数据", description="导出用户所有数据为JSON格式，包括基本信息、对话、记忆、设置等")
 async def export_user_data(
     user: dict = Depends(_get_current_user_from_request),
 ):
@@ -1483,7 +1632,7 @@ async def export_user_data(
         "data": export_data,
     }
 
-@router.post("/memory/reset", response_model=dict)
+@router.post("/memory/reset", response_model=dict, summary="清空AI记忆", description="清空用户的AI记忆数据，不可恢复，需传confirm=true确认")
 async def reset_ai_memory(
     request: MemoryResetRequest,
     user: dict = Depends(_get_current_user_from_request),

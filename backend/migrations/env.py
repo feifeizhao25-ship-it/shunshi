@@ -9,12 +9,12 @@
 """
 from logging.config import fileConfig
 import asyncio
-from sqlalchemy.ext.asyncio import async_engine_from_config, create_async_engine
+import os
+from sqlalchemy.ext.asyncio import create_async_engine
 from alembic import context
 
 # 导入所有模型，确保 Base.metadata 包含所有表
-from app.models import Base, __all_models__
-from app.database.db import get_database_url
+from app.models import Base
 
 config = context.config
 
@@ -26,11 +26,14 @@ target_metadata = Base.metadata
 
 
 def get_url() -> str:
-    """获取数据库 URL，优先使用命令行 -x url 参数"""
+    """获取数据库 URL，优先使用命令行 -x url 参数，其次环境变量"""
     url = context.get_x_argument(as_dictionary=True).get("url")
     if url:
         return url
-    return get_database_url()
+    return os.getenv(
+        "DATABASE_URL",
+        "postgresql+asyncpg://shunshi@localhost:5432/shunshi"
+    )
 
 
 def run_migrations_offline() -> None:

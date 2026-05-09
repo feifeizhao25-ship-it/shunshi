@@ -10,6 +10,8 @@ from typing import Optional
 from fastapi import APIRouter, Query, HTTPException
 from pydantic import BaseModel
 from .chat import router as main_chat_router
+from ..middleware.llm_quota import llm_quota
+from ..core.settings import settings
 
 router = APIRouter(prefix="/ai", tags=["ai-chat"])
 
@@ -43,7 +45,8 @@ class ChatResponse(BaseModel):
 
 # Import from main chat router's safety + intent detection
 from ..safety.guard import SafetyGuard, SafetyLevel
-from ..llm.siliconflow import get_client, ChatMessage, MessageRole
+from ..llm.deepseek import get_deepseek_client
+from ..llm.siliconflow import ChatMessage, MessageRole
 
 safety_guard = SafetyGuard()
 
@@ -87,7 +90,7 @@ NEVER say: "I'm just an AI so I can't help with that."
 Remember: You are a calm presence. Not a fixer."""
 
 
-@router.post("/chat", response_model=dict)
+@router.post("/chat", response_model=dict, summary="SEASONS聊天", description="SEASONS国际版AI聊天端点，支持南北半球季节感知和安全过滤")
 async def seasons_chat(
     body: ChatRequest = None,
     message: str = Query(None),
@@ -107,6 +110,16 @@ async def seasons_chat(
     
     if not message_text:
         raise HTTPException(status_code=400, detail="message is required")
+    
+    # LLM 配额检查
+    try:
+        from ..middleware.llm_quota import llm_quota
+        if not llm_quota.check_quota(user_id, "free"):
+            raise HTTPException(status_code=429, detail="今日AI对话次数已达上限，明天再来哦")
+    except HTTPException:
+        raise
+    except Exception:
+        pass  # 配额检查失败时放行
     
     # Create or get conversation
     if not conversation_id:
@@ -129,6 +142,15 @@ async def seasons_chat(
     }
     conversations_db[conversation_id]["messages"].append(user_message)
     
+    # --- LLM 配额检查 ---
+    # Determine tier from user_id prefix (guest_ = free, otherwise check DB later)
+    tier = "paid" if user_id and not user_id.startswith("guest_") else "free"
+    if not llm_quota.check_quota(user_id, tier):
+        raise HTTPException(
+            status_code=429,
+            detail="今日AI对话次数已达上限，明天再来哦",
+        )
+
     # Safety check
     safety_result = safety_guard.check_input(message_text, {"user_id": user_id, "lang": "en"})
     
@@ -181,7 +203,7 @@ async def seasons_chat(
     
     # Call LLM
     try:
-        client = get_client()
+        client = get_deepseek_client()
         
         # Inject context into system prompt
         from datetime import datetime as dt
@@ -200,19 +222,19 @@ async def seasons_chat(
         )
         
         all_messages = [
-            ChatMessage(role=MessageRole.SYSTEM, content=system_with_context),
-            *history_messages,
-            ChatMessage(role=MessageRole.USER, content=message_text)
+            {"role": "system", "content": system_with_context},
+            *[{"role": m.role.value if hasattr(m.role, 'value') else str(m.role), "content": m.content} for m in history_messages],
+            {"role": "user", "content": message_text}
         ]
         
-        response = await client.chat_completion(
-            model="deepseek-ai/DeepSeek-V3",
+        response = await client.chat(
             messages=all_messages,
+            model="deepseek-chat",
             temperature=0.8,
             max_tokens=300
         )
         
-        response_text = response.choices[0].message.content
+        response_text = response.content
         
     except Exception as e:
         # Fallback responses
@@ -287,7 +309,7 @@ def _daily_insight(season: str, user_id: str) -> dict:
     }
 
 
-@router.get("/daily-insight")
+@router.get("/daily-insight", summary="每日洞察(GET)", description="返回基于当前季节的每日养生洞察建议")
 async def daily_insight(
     season: str = Query("spring"),
     user_id: str = Query("seasons-user")
@@ -295,7 +317,7 @@ async def daily_insight(
     return _daily_insight(season, user_id)
 
 
-@router.post("/daily-insight")
+@router.post("/daily-insight", summary="每日洞察(POST)", description="返回基于当前季节的每日养生洞察建议")
 async def daily_insight_post(
     season: str = Query("spring"),
     user_id: str = Query("seasons-user")

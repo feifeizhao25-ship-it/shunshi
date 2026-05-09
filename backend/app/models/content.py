@@ -2,6 +2,8 @@
 顺时 ShunShi - 内容相关模型
 包含 4 张表: ContentItem, ContentMedia, ContentTag, ContentTagRelation
 """
+from __future__ import annotations
+
 import enum
 from typing import Optional
 

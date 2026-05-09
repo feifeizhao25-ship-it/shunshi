@@ -3,6 +3,7 @@ from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel
 from typing import Optional, List
 from datetime import datetime, time
+from sqlalchemy import text
 
 from app.database.db import get_db
 
@@ -36,21 +37,22 @@ class MemoryRecord(BaseModel):
 def get_default_settings(user_id: str) -> dict:
     return {
         "user_id": user_id,
-        "memory_enabled": 1,
-        "quiet_hours_enabled": 0,
+        "memory_enabled": True,
+        "quiet_hours_enabled": False,
         "quiet_hours_start": "22:00",
         "quiet_hours_end": "08:00",
-        "notifications_enabled": 1,
-        "solar_term_reminders": 1,
-        "followup_reminders": 1,
-        "marketing_notifications": 0,
+        "notifications_enabled": True,
+        "solar_term_reminders": True,
+        "followup_reminders": True,
+        "marketing_notifications": False,
         "language": "zh-CN",
         "theme": "light",
         "updated_at": datetime.now().isoformat()
     }
 
+import random
 def generate_id(prefix: str) -> str:
-    return f"{prefix}_{datetime.now().strftime('%Y%m%d%H%M%S')}"
+    return f"{prefix}_{datetime.now().strftime('%Y%m%d%H%M%S')}_{random.randint(1000,9999)}"
 
 def _settings_row_to_dict(row) -> dict:
     d = dict(row)
@@ -143,7 +145,7 @@ async def update_settings(
         params.append(user_id)
         
         db.execute(
-            f"UPDATE user_settings SET {', '.join(updates)} WHERE user_id = ?",
+            text(f"UPDATE user_settings SET {', '.join(updates)} WHERE user_id = ?"),
             params
         )
         db.commit()
@@ -207,8 +209,7 @@ async def add_memory(
     if metadata:
         try:
             meta = json.loads(metadata)
-        except:
-            pass
+        except Exception as e:            pass
     
     record_id = generate_id("mem")
     now = datetime.now().isoformat()
@@ -340,7 +341,7 @@ async def check_quiet_hours(user_id: str = Query("user-001")):
     
     row = db.execute("SELECT * FROM user_settings WHERE user_id = ?", (user_id,)).fetchone()
     
-    if not row or not row.get("quiet_hours_enabled", 0):
+    if not row or not dict(row).get("quiet_hours_enabled", 0):
         return {
             "success": True,
             "data": {"is_quiet": False, "reason": "静默时段未开启"}
@@ -348,8 +349,8 @@ async def check_quiet_hours(user_id: str = Query("user-001")):
     
     now = datetime.now()
     current_time = now.strftime("%H:%M")
-    start = row.get("quiet_hours_start", "22:00")
-    end = row.get("quiet_hours_end", "08:00")
+    start = dict(row).get("quiet_hours_start", "22:00")
+    end = dict(row).get("quiet_hours_end", "08:00")
     
     if start > end:
         is_quiet = current_time >= start or current_time <= end
@@ -375,7 +376,7 @@ async def export_settings(user_id: str = Query("user-001")):
     settings = _settings_row_to_dict(row) if row else get_default_settings(user_id)
     
     memory_rows = db.execute(
-        "SELECT * FROM user_memory WHERE user_id = ? ORDER BY created_at DESC",
+        text("SELECT * FROM user_memory WHERE user_id = ? ORDER BY created_at DESC"),
         (user_id,)
     ).fetchall()
     memory = []

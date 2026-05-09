@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+
+<html class="light" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>顺时养生仪表盘 - ShunShi Wellness Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,300;0,400;0,700;1,400&amp;family=Manrope:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-background": "#1c1c19",
+              "tertiary": "#4c3605",
+              "surface-container-low": "#f7f3ee",
+              "surface-tint": "#3b684a",
+              "on-secondary-container": "#795d40",
+              "primary": "#144227",
+              "on-primary-container": "#9ed0ab",
+              "outline-variant": "#c1c9c0",
+              "tertiary-container": "#654d1b",
+              "background": "#fdf9f4",
+              "error-container": "#ffdad6",
+              "on-secondary": "#ffffff",
+              "on-surface": "#1c1c19",
+              "on-error-container": "#93000a",
+              "on-tertiary-fixed": "#261900",
+              "secondary-fixed": "#ffddbb",
+              "on-primary-fixed": "#00210f",
+              "secondary": "#74593c",
+              "surface": "#fdf9f4",
+              "on-primary": "#ffffff",
+              "on-secondary-fixed-variant": "#5b4227",
+              "on-surface-variant": "#414942",
+              "surface-container-highest": "#e6e2dd",
+              "tertiary-fixed": "#ffdea4",
+              "inverse-primary": "#a1d2ad",
+              "outline": "#717971",
+              "secondary-container": "#ffd9b4",
+              "surface-container": "#f1ede8",
+              "inverse-surface": "#31302d",
+              "tertiary-fixed-dim": "#e4c285",
+              "on-primary-fixed-variant": "#224f33",
+              "inverse-on-surface": "#f4f0eb",
+              "surface-bright": "#fdf9f4",
+              "primary-fixed": "#bceec8",
+              "surface-container-lowest": "#ffffff",
+              "secondary-fixed-dim": "#e4c09c",
+              "on-tertiary-fixed-variant": "#5a4312",
+              "on-tertiary": "#ffffff",
+              "error": "#ba1a1a",
+              "primary-fixed-dim": "#a1d2ad",
+              "surface-variant": "#e6e2dd",
+              "on-error": "#ffffff",
+              "primary-container": "#2d5a3d",
+              "surface-container-high": "#ebe8e3",
+              "surface-dim": "#ddd9d5"
+            },
+            fontFamily: {
+              "headline": ["Noto Serif"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+      body { font-family: 'Manrope', 'Noto Sans SC', sans-serif; -webkit-font-smoothing: antialiased; }
+      h1, h2, h3, .serif { font-family: 'Noto Serif', serif; }
+      .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; }
+      .glass-card { background: rgba(247, 243, 238, 0.8); backdrop-filter: blur(20px); }
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface min-h-screen pb-32 selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- TopAppBar -->
+<header class="sticky top-0 z-50 bg-[#fdf9f4] dark:bg-stone-900">
+<div class="flex justify-between items-center w-full px-8 py-4 max-w-7xl mx-auto">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-surface-container overflow-hidden">
+<img class="w-full h-full object-cover grayscale opacity-80" data-alt="User profile portrait in soft ink-wash style photography, minimalist background, calming expression" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAhxFulHFfdS5-jByWzcuvlEdXlvLp74D1UiPyxsd2iv-attkRC3YelwXrSfHv6t1bHLSRre2AqSXrnnS2yBhT9_i0OllRiHw8xaLkKQCjU3dH5IEaI1s2OJOr79ZuztNyRRzAiwkK5pEpou1_i8Rg3WUo-AJBqWGbFlj6S_ZICS8tzq_DALzK2k2DOfb2jCXvwst5Ml_LIaaSa8p8qbN-rGMOEmVDeJW2f1k3sbO2T7MAtdIsH4y-mO2rw2oQiEG4rpzF4VM-Fpy0"/>
+</div>
+<div>
+<h1 class="font-serif text-2xl font-light tracking-tight text-[#144227] dark:text-stone-100">早安，[用户昵称]</h1>
+<p class="text-xs uppercase tracking-widest text-secondary font-medium opacity-70">酉时 · 肾经当令</p>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<button class="text-[#6B7B7D] dark:text-stone-400 hover:bg-[#f7f3ee] p-2 transition-colors rounded-full">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+</div>
+</div>
+<div class="bg-[#f7f3ee] dark:bg-stone-800 h-px w-full opacity-50"></div>
+</header>
+<main class="max-w-7xl mx-auto px-8 pt-12 space-y-16">
+<!-- Solar Term Hero Card (Asymmetric Layout) -->
+<section class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+<div class="md:col-span-7 space-y-6">
+<div class="inline-flex items-center px-4 py-1.5 rounded-full bg-primary-fixed text-on-primary-fixed-variant text-sm font-medium tracking-wide">
+                    节气提醒
+                </div>
+<h2 class="text-5xl md:text-7xl font-light tracking-tight leading-none text-primary">
+                    春分 <br/>
+<span class="italic font-serif opacity-60">Spring Equinox</span>
+</h2>
+<p class="text-xl text-secondary max-w-md font-light leading-relaxed">
+                    阴阳平衡，万物复苏。感受大地觉醒时的温润暖意。
+                </p>
+<div class="flex items-center gap-4 pt-4">
+<div class="h-px w-12 bg-outline-variant"></div>
+<span class="text-sm uppercase tracking-[0.2em] text-outline font-semibold">距离 清明 还有 12 天</span>
+</div>
+</div>
+<div class="md:col-span-5 relative group">
+<div class="aspect-[4/5] rounded-2xl overflow-hidden shadow-sm">
+<img class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-1000" data-alt="Minimalist ink-wash style illustration of delicate spring cherry blossoms against a soft warm beige paper texture background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMpYHE26nyYL9ypdQjysi4RKyu_OA29LR8XmpCiwEwg03MzwUqFge348ETQCaA5sRRQ3oysvIMsao0WA4PxDxeWiMRg4Dp6l0fBXVV-us11q4LTJjkot7FlLUHRQMDtrSHk2QQvPE76zti-9mfCRP8HIqV6Mg5vBo0CX4vfptCazEeblFAWb1ptufhWZ3mp-nmUX3nAWA0ZxowbUuOWuRs6BbiOXHXR44bOW_qLp6XHigFsWOHTOiC5Lpn_QFcQqDd_tvXhvX9d6A"/>
+</div>
+<div class="absolute -bottom-6 -left-6 glass-card p-6 rounded-xl border border-white/20 hidden md:block">
+<p class="text-xs uppercase tracking-tighter text-secondary mb-1">建议活动</p>
+<p class="font-serif text-lg text-primary italic">“晨露采撷”</p>
+</div>
+</div>
+</section>
+<!-- Horizontal Personalized Recommendations -->
+<section class="space-y-8">
+<div class="flex justify-between items-end">
+<h3 class="text-3xl font-light tracking-tight text-primary">时令仪式</h3>
+<span class="text-sm font-medium text-secondary/60 cursor-pointer hover:text-primary transition-colors">查看全部</span>
+</div>
+<div class="flex gap-6 overflow-x-auto no-scrollbar pb-4 snap-x">
+<!-- Card: Diet -->
+<div class="min-w-[280px] snap-start group">
+<div class="bg-surface-container-lowest p-8 rounded-2xl h-full flex flex-col justify-between hover:bg-surface-container transition-colors duration-500">
+<div class="space-y-4">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="restaurant">restaurant</span>
+<h4 class="font-serif text-xl font-medium">饮食之道</h4>
+<p class="text-on-surface-variant leading-relaxed">多食豆芽与韭菜，在此能量转换之际护养肝气。</p>
+</div>
+<div class="mt-8">
+<button class="text-sm font-bold uppercase tracking-widest text-primary flex items-center gap-2">
+                                食谱 <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Card: Tea -->
+<div class="min-w-[280px] snap-start group">
+<div class="bg-surface-container-lowest p-8 rounded-2xl h-full flex flex-col justify-between hover:bg-surface-container transition-colors duration-500">
+<div class="space-y-4">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="emoji_food_beverage">emoji_food_beverage</span>
+<h4 class="font-serif text-xl font-medium">时令茶饮</h4>
+<p class="text-on-surface-variant leading-relaxed">茉莉花茶可舒缓情绪，化解冬日留存的陈郁之气。</p>
+</div>
+<div class="mt-8">
+<button class="text-sm font-bold uppercase tracking-widest text-primary flex items-center gap-2">
+                                购买 <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Card: Acupoint -->
+<div class="min-w-[280px] snap-start group">
+<div class="bg-surface-container-lowest p-8 rounded-2xl h-full flex flex-col justify-between hover:bg-surface-container transition-colors duration-500">
+<div class="space-y-4">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="self_improvement">self_improvement</span>
+<h4 class="font-serif text-xl font-medium">经络通导</h4>
+<p class="text-on-surface-variant leading-relaxed">按揉太冲穴 5 分钟，帮助宣泄情绪压力。</p>
+</div>
+<div class="mt-8">
+<button class="text-sm font-bold uppercase tracking-widest text-primary flex items-center gap-2">
+                                教程 <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Card: Exercise -->
+<div class="min-w-[280px] snap-start group">
+<div class="bg-surface-container-lowest p-8 rounded-2xl h-full flex flex-col justify-between hover:bg-surface-container transition-colors duration-500">
+<div class="space-y-4">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="directions_walk">directions_walk</span>
+<h4 class="font-serif text-xl font-medium">功法运动</h4>
+<p class="text-on-surface-variant leading-relaxed">清晨漫步，顺应日光节律，吐故纳新。</p>
+</div>
+<div class="mt-8">
+<button class="text-sm font-bold uppercase tracking-widest text-primary flex items-center gap-2">
+                                记录 <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Daily Check-in Module -->
+<section class="bg-primary/5 rounded-[2rem] p-10 md:p-16 flex flex-col md:flex-row items-center justify-between gap-12 border border-primary/10">
+<div class="space-y-4 text-center md:text-left">
+<p class="text-sm uppercase tracking-[0.2em] font-bold text-primary opacity-80">今日进度</p>
+<h3 class="text-4xl md:text-5xl font-light text-primary">今日已完成 3 项习惯</h3>
+<p class="text-secondary max-w-sm">持之以恒是连接心愿与健康的桥梁。继续加油。</p>
+</div>
+<button class="px-12 py-5 bg-primary text-on-primary rounded-xl font-bold tracking-widest uppercase hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary/20">
+                打卡
+            </button>
+</section>
+<!-- Content Bento Grid -->
+<section class="grid grid-cols-1 md:grid-cols-2 gap-12">
+<!-- For You: Recipes -->
+<div class="space-y-8">
+<h3 class="text-3xl font-light tracking-tight text-primary">为您推荐</h3>
+<div class="group cursor-pointer">
+<div class="relative aspect-video rounded-2xl overflow-hidden mb-6">
+<img class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700" data-alt="Top down view of a ceramic bowl containing white vegetable porridge garnished with fresh green sprouts and oil, soft side lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDnrwjUOIn5ZfcKT-x3lF-96rqSmEcdwzz5fv4R9Qg32JN9yHHz252X_xkejvQzs6JmzgQzAW10AaSmyypDjEx81QkP_Rq2fsVkX8-282j5uiAXXTn_IXGUxr9H2Z6LODGgP0cHH5wTiXaYO6WfV2NbdFWsl_GTxMBxsJiNv3mEsMZz1GYDBZ_xT0eNPc_kAu1RW4u_eXsH55Gl9DHHn6tedT4tApSlr2k9RmnuZvfKjfGStdQnU4W2GCdv2PuX8I_TN_a7DOAcEJA"/>
+<div class="absolute top-4 left-4">
+<span class="px-3 py-1 glass-card rounded-lg text-xs font-bold uppercase tracking-wider text-primary">食谱</span>
+</div>
+</div>
+<h4 class="text-2xl font-serif mb-2">春季鲜蔬粥</h4>
+<p class="text-on-surface-variant">清淡温润的一餐，旨在为冬日后的身体进行轻盈排毒。</p>
+</div>
+</div>
+<!-- Daily Read -->
+<div class="space-y-8">
+<h3 class="text-3xl font-light tracking-tight text-primary">今日阅读</h3>
+<div class="bg-surface-container-low rounded-2xl p-8 flex flex-col justify-center min-h-full">
+<p class="text-xs font-bold uppercase tracking-widest text-secondary mb-4">哲学与平衡</p>
+<h4 class="text-3xl font-serif leading-tight mb-6">寻回新时节的平衡：春分生活指南</h4>
+<div class="flex items-center gap-4 text-sm text-on-surface-variant mb-8">
+<span>阅读需8分钟</span>
+<span class="w-1 h-1 bg-outline-variant rounded-full"></span>
+<span>传统养生艺术</span>
+</div>
+<button class="w-max px-6 py-3 border border-primary/20 rounded-lg text-primary font-bold text-sm tracking-widest uppercase hover:bg-primary hover:text-white transition-all">
+                        阅读全文
+                    </button>
+</div>
+</div>
+</section>
+<!-- Sleep Recommendation & Quote -->
+<section class="grid grid-cols-1 lg:grid-cols-3 gap-8 pb-20">
+<!-- Nature Player -->
+<div class="lg:col-span-2 glass-card p-8 rounded-2xl flex flex-col md:flex-row items-center gap-8 border border-white/50">
+<div class="w-32 h-32 rounded-xl bg-primary-container flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover opacity-60" data-alt="Abstract view of misty green forest trees with soft light rays filtering through the canopy, calming atmosphere" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCHpx3QdNp6TwlrcacxPHuTZx3gjB-oJEd8rHtlw9QETc0ldLt9jKgGmXbDDvyHnHcV-4M6FzjwUxrYW_iGgkybkQGk1dbMpL-fdpmyDWadTS9fqHGqTGMXoyJ3GmRsHNFlu08XAL-kXO4fR-HjApP0Gb4mV8KejFtDAXEdvst36LVOzvmpFim98hXCciBIPZhprrtbWsGkx1uHyh0gDr8HXw9gNFhzqlXfdTLsaSz2Ui3aRxO85IKOhz7DUWsnzaLqO6RefS32blA"/>
+</div>
+<div class="flex-1 space-y-4">
+<div>
+<p class="text-xs font-bold uppercase tracking-widest text-secondary/60">疗愈之声</p>
+<h4 class="text-2xl font-serif text-primary">山涧流泉与墨竹</h4>
+</div>
+<div class="flex items-center gap-6">
+<button class="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="play_arrow" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+<div class="flex-1 h-1 bg-outline-variant/30 rounded-full overflow-hidden">
+<div class="h-full bg-primary w-1/3"></div>
+</div>
+<span class="text-xs font-medium font-mono text-secondary">12:04 / 45:00</span>
+</div>
+</div>
+</div>
+<!-- Daily Quote -->
+<div class="bg-surface-container-highest p-8 rounded-2xl flex flex-col justify-center text-center">
+<span class="material-symbols-outlined text-primary/30 mb-6" data-icon="format_quote">format_quote</span>
+<p class="font-serif italic text-xl text-primary leading-relaxed mb-6">
+                    “春夏养阳，秋冬养阴。”
+                </p>
+<p class="text-xs font-bold uppercase tracking-[0.2em] text-secondary">
+                    《黄帝内经》
+                </p>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-6 pt-3 bg-[#fdf9f4]/80 dark:bg-stone-900/80 backdrop-blur-xl z-50 rounded-t-xl border-t border-[#c1c9c0]/20 shadow-[0_-4px_24px_rgba(28,28,25,0.04)]">
+<a class="flex flex-col items-center justify-center text-[#144227] dark:text-emerald-400 scale-110 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="home" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-serif text-[10px] uppercase tracking-[0.05rem] font-medium mt-1">首页</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#6B7B7D] dark:text-stone-500 opacity-70 hover:text-[#144227] transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="menu_book">menu_book</span>
+<span class="font-serif text-[10px] uppercase tracking-[0.05rem] font-medium mt-1">养生</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#6B7B7D] dark:text-stone-500 opacity-70 hover:text-[#144227] transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="smart_toy">smart_toy</span>
+<span class="font-serif text-[10px] uppercase tracking-[0.05rem] font-medium mt-1">AI助手</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#6B7B7D] dark:text-stone-500 opacity-70 hover:text-[#144227] transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="edit_note">edit_note</span>
+<span class="font-serif text-[10px] uppercase tracking-[0.05rem] font-medium mt-1">日记</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#6B7B7D] dark:text-stone-500 opacity-70 hover:text-[#144227] transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-serif text-[10px] uppercase tracking-[0.05rem] font-medium mt-1">我的</span>
+</a>
+</nav>
+</body></html>

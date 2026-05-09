@@ -5,12 +5,13 @@
 作者: Claw 🦅
 日期: 2026-03-18
 """
+from __future__ import annotations
 
 import json
 import hashlib
 import time
 import threading
-from typing import Any, Optional
+from typing import Dict, List, Any, Optional
 from dataclasses import dataclass, field, asdict
 from datetime import datetime
 
@@ -78,7 +79,7 @@ class FlagStore:
     """
 
     def __init__(self):
-        self._cache: dict[str, FlagValue] = {}
+        self._cache: Dict[str, FlagValue] = {}
         self._lock = threading.Lock()
 
     def _serialize_value(self, value: Any) -> tuple[str, str]:
@@ -183,7 +184,7 @@ class FlagStore:
                 return self._hash_user(key, user_id) < flag.rollout_pct
             return bool(value)
 
-    def get_variant(self, key: str, user_id: str = None, variants: list[str] = None) -> str:
+    def get_variant(self, key: str, user_id: str = None, variants: List[str] = None) -> str:
         """
         A/B 测试变体选择
         返回变体名称，如 "control", "variant_a", "variant_b"

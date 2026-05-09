@@ -40,18 +40,18 @@ pip install -r requirements.txt
 cp .env.example .env
 # 编辑 .env 填入实际值
 
-# 启动服务 (默认 SQLite)
+# 启动服务 (默认 PostgreSQL)
 uvicorn app.main:app --reload --port 4000
 
-# 或使用 MySQL (需先启动 MySQL)
-DATABASE_URL=mysql+pymysql://user:pass@localhost:3306/shunshi \
+# 或使用 Docker Compose 启动 PostgreSQL
+DATABASE_URL=postgresql+psycopg2://shunshi:password@localhost:5432/shunshi \
   uvicorn app.main:app --reload --port 4000
 ```
 
 ### Web 管理后台
 
 ```bash
-cd web-admin
+cd admin
 
 # 安装依赖
 npm ci
@@ -104,7 +104,7 @@ docker compose logs -f backend
 |------------|--------|-----------------------|
 | Nginx      | 80/443 | 主入口 (API + Web 后台)   |
 | Backend    | 4000   | FastAPI (直接访问)      |
-| MySQL      | 3306   | 数据库                  |
+| PostgreSQL  | 5432   | 数据库                  |
 | Redis      | 6379   | 缓存                   |
 | Grafana    | 3000   | 监控面板 (admin/admin)  |
 | Prometheus | 9090   | 指标采集                |
@@ -126,14 +126,14 @@ docker stats
 
 # 进入容器
 docker compose exec backend bash
-docker compose exec mysql mysql -u shunshi -p shunshi123 shunshi
+docker compose exec postgres psql -U "${DB_USER}" -d "${DB_NAME}"
 ```
 
 ### 网络
 
 Docker Compose 使用三个隔离网络：
 
-- **backend-net**: MySQL + Redis + Backend 之间的内部通信
+- **backend-net**: PostgreSQL + Redis + Backend 之间的内部通信
 - **frontend-net**: Backend + Web Admin + Nginx 之间的通信
 - **monitoring-net**: Prometheus + Grafana 之间的通信
 
@@ -161,14 +161,14 @@ kubectl apply -f k8s/configmap.yaml
 # echo -n 'your_password' | base64
 kubectl apply -f k8s/secret.yaml
 
-# 4. 部署 MySQL (StatefulSet)
-kubectl apply -f k8s/mysql-statefulset.yaml
+# 4. 部署 PostgreSQL (StatefulSet)
+kubectl apply -f k8s/postgres-statefulset.yaml
 
 # 5. 部署 Redis
 kubectl apply -f k8s/redis-deployment.yaml
 
 # 6. 等待数据库就绪
-kubectl -n shunshi rollout status statefulset/mysql --timeout=300s
+kubectl -n shunshi rollout status statefulset/postgres --timeout=300s
 kubectl -n shunshi rollout status deployment/redis --timeout=120s
 
 # 7. 部署后端
@@ -176,7 +176,7 @@ kubectl apply -f k8s/backend-deployment.yaml
 kubectl apply -f k8s/backend-service.yaml
 
 # 8. 部署 Web 管理后台
-kubectl apply -f k8s/web-admin.yaml
+kubectl apply -f k8s/admin-deployment.yaml
 
 # 9. 部署 Nginx + Ingress
 kubectl apply -f k8s/nginx-configmap.yaml
@@ -195,7 +195,7 @@ kubectl -n shunshi get all
 ```bash
 # 更新镜像版本
 kubectl -n shunshi set image deployment/backend backend=shunshi/backend:sha-xxxxx
-kubectl -n shunshi set image deployment/web-admin web-admin=shunshi/web-admin:sha-xxxxx
+kubectl -n shunshi set image deployment/admin admin=shunshi/admin:sha-xxxxx
 
 # 查看滚动更新状态
 kubectl -n shunshi rollout status deployment/backend
@@ -216,11 +216,11 @@ kubectl apply -f k8s/ --recursive
 
 | 变量                  | 说明                  | 默认值                          | 必需 |
 |---------------------|---------------------|-------------------------------|------|
-| `DATABASE_URL`      | SQLite 连接 (本地开发)   | `sqlite:///data/shunshi.db`   | 否    |
-| `MYSQL_HOST`        | MySQL 主机           | `mysql`                       | 是    |
-| `MYSQL_PORT`        | MySQL 端口           | `3306`                        | 是    |
-| `MYSQL_USER`        | MySQL 用户           | `shunshi`                     | 是    |
-| `MYSQL_PASSWORD`    | MySQL 密码           | *(需修改)*                     | 是    |
+| `DATABASE_URL`      | PostgreSQL 连接字符串   | `postgresql+psycopg2://shunshi:password@localhost:5432/shunshi`   | 否    |
+| `DB_HOST`        | 数据库主机           | `postgres`                       | 是    |
+| `DB_PORT`        | 数据库端口           | `5432`                        | 是    |
+| `DB_USER`        | 数据库用户           | `shunshi`                     | 是    |
+| `DB_PASSWORD`    | 数据库密码           | *(需修改)*                     | 是    |
 | `MYSQL_DATABASE`    | 数据库名              | `shunshi`                     | 是    |
 | `REDIS_URL`         | Redis 连接           | `redis://redis:6379/0`       | 是    |
 | `JWT_SECRET`        | JWT 签名密钥          | *(需修改)*                     | 是    |
@@ -235,36 +235,36 @@ kubectl apply -f k8s/ --recursive
 
 ### 初始化
 
-MySQL 容器首次启动时会自动执行 `backend/docker/mysql/init.sql`。
+PostgreSQL 容器首次启动时会自动执行 `backend/migrations/init.sql`。
 
 ### 手动执行迁移
 
 ```bash
 # Docker 环境
-docker compose exec mysql mysql -u root -p shunshi < backend/docker/mysql/init.sql
+docker compose exec postgres psql -U shunshi -d shunshi -f /docker-entrypoint-initdb.d/init.sql
 
 # K8s 环境
-kubectl -n shunshi exec -it mysql-0 -- mysql -u root -p shunshi < init.sql
+kubectl -n shunshi exec -it mysql-0 -- psql -U "${DB_USER}" shunshi < init.sql
 ```
 
 ### 数据备份
 
 ```bash
 # Docker
-docker compose exec mysql mysqldump -u root -p shunshi > backup_$(date +%Y%m%d).sql
+docker compose exec mysql pg_dump -u root -p shunshi > backup_$(date +%Y%m%d).sql
 
 # K8s
-kubectl -n shunshi exec mysql-0 -- mysqldump -u root -p shunshi > backup.sql
+kubectl -n shunshi exec mysql-0 -- pg_dump -u root -p shunshi > backup.sql
 ```
 
 ### 数据恢复
 
 ```bash
 # Docker
-docker compose exec -T mysql mysql -u root -p shunshi < backup.sql
+docker compose exec -T mysql psql -U "${DB_USER}" shunshi < backup.sql
 
 # K8s
-kubectl -n shunshi exec -i mysql-0 -- mysql -u root -p shunshi < backup.sql
+kubectl -n shunshi exec -i mysql-0 -- psql -U "${DB_USER}" shunshi < backup.sql
 ```
 
 ---
@@ -342,21 +342,21 @@ curl http://localhost:4000/health
 
 ```bash
 # 1. 备份数据库
-docker compose exec mysql mysqldump -u root -p shunshi > backup_mysql_$(date +%Y%m%d_%H%M%S).sql
+docker compose exec mysql pg_dump -u root -p shunshi > backup_postgres_$(date +%Y%m%d_%H%M%S).sql
 
 # 2. 备份 Redis
 docker compose exec redis redis-cli BGSAVE
 docker cp shunshi-redis:/data/dump.rdb backup_redis_$(date +%Y%m%d_%H%M%S).rdb
 
 # 3. 备份 Docker 卷
-docker run --rm -v shunshi_mysql_data:/data -v $(pwd):/backup alpine tar czf /backup/mysql_data_$(date +%Y%m%d).tar.gz /data
+docker run --rm -v shunshi_postgres_data:/data -v $(pwd):/backup alpine tar czf /backup/postgres_data_$(date +%Y%m%d).tar.gz /data
 ```
 
 ### 恢复
 
 ```bash
-# 恢复 MySQL
-docker compose exec -T mysql mysql -u root -p shunshi < backup_mysql_20260317.sql
+# 恢复 PostgreSQL
+docker compose exec -T mysql psql -U "${DB_USER}" shunshi < backup_postgres_20260317.sql
 
 # 恢复 Redis
 docker cp backup_redis.rdb shunshi-redis:/data/dump.rdb
@@ -374,7 +374,7 @@ docker compose restart redis
 docker compose logs backend --tail=100
 
 # 常见原因:
-# 1. MySQL 未就绪 -> 检查 mysql 容器状态
+# 1. PostgreSQL 未就绪 -> 检查 postgres 容器状态
 # 2. 环境变量缺失 -> 检查 .env 文件
 # 3. 端口占用 -> lsof -i :4000
 ```
@@ -382,8 +382,8 @@ docker compose logs backend --tail=100
 ### 数据库连接失败
 
 ```bash
-# 检查 MySQL 是否健康
-docker compose exec mysql mysqladmin ping -u root -p
+# 检查 PostgreSQL 是否健康
+docker compose exec mysql pg_isready -u root -p
 
 # 检查网络连通性
 docker compose exec backend python -c "
@@ -391,10 +391,10 @@ import socket
 s = socket.socket()
 s.settimeout(3)
 try:
-    s.connect(('mysql', 3306))
-    print('MySQL reachable')
+    s.connect(('postgres', 5432))
+    print("PostgreSQL reachable")
 except Exception as e:
-    print(f'Cannot reach MySQL: {e}')
+    print(f"Cannot reach PostgreSQL: {e}")
 finally:
     s.close()
 "

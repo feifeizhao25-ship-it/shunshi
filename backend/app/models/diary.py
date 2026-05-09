@@ -2,6 +2,8 @@
 顺时 ShunShi - 日记与报告相关模型
 包含 3 张表: DiaryEntry, WeeklyReport, MonthlyReport
 """
+from __future__ import annotations
+
 from datetime import date
 from typing import Optional
 
@@ -18,7 +20,7 @@ class DiaryEntry(IDMixin, Base):
     __tablename__ = "sa_diary_entries"
 
     user_id: Mapped[str] = mapped_column(
-        ForeignKey("sa_users.id", ondelete="CASCADE"),
+        ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False, index=True, comment="关联用户 ID"
     )
     entry_date: Mapped[date] = mapped_column(
@@ -61,7 +63,7 @@ class WeeklyReport(IDMixin, Base):
     __tablename__ = "sa_weekly_reports"
 
     user_id: Mapped[str] = mapped_column(
-        ForeignKey("sa_users.id", ondelete="CASCADE"),
+        ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False, index=True, comment="关联用户 ID"
     )
     week_start: Mapped[date] = mapped_column(
@@ -98,7 +100,7 @@ class MonthlyReport(IDMixin, Base):
     __tablename__ = "sa_monthly_reports"
 
     user_id: Mapped[str] = mapped_column(
-        ForeignKey("sa_users.id", ondelete="CASCADE"),
+        ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False, index=True, comment="关联用户 ID"
     )
     month: Mapped[str] = mapped_column(

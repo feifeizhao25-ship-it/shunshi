@@ -10,8 +10,13 @@ from pathlib import Path
 from typing import Optional
 
 # 数据库文件路径
-DB_DIR = Path(__file__).resolve().parent.parent.parent / "data"
-DB_PATH = DB_DIR / "shunshi.db"
+if os.environ.get("APP_ENV") == "testing":
+    # 测试环境使用独立测试数据库
+    DB_DIR = Path(__file__).resolve().parent.parent.parent / "tests"
+    DB_PATH = DB_DIR / "test_shunshi.db"
+else:
+    DB_DIR = Path(__file__).resolve().parent.parent.parent / "data"
+    DB_PATH = DB_DIR / "shunshi.db"
 
 # 线程局部存储（每个线程一个连接）
 _local = threading.local()
@@ -19,22 +24,81 @@ _local = threading.local()
 # 全局锁，用于初始化（仅启动时）
 _init_lock = threading.Lock()
 
+# 测试环境连接追踪（用于批量关闭）
+_test_connections = []
+
 
 def _get_connection() -> sqlite3.Connection:
     """获取当前线程的数据库连接"""
+    # 测试环境：每次创建新连接，避免并发锁定
+    if os.environ.get("APP_ENV") == "testing":
+        DB_DIR.mkdir(parents=True, exist_ok=True)
+        conn = sqlite3.connect(str(DB_PATH), check_same_thread=False, timeout=30.0)
+        conn.row_factory = sqlite3.Row
+        conn.execute("PRAGMA journal_mode=DELETE")
+        conn.execute("PRAGMA foreign_keys=ON")
+        conn.execute("PRAGMA busy_timeout=30000")
+        conn.execute("PRAGMA synchronous=NORMAL")
+        _test_connections.append(conn)
+        return conn
+    
     if not hasattr(_local, "connection") or _local.connection is None:
         DB_DIR.mkdir(parents=True, exist_ok=True)
-        conn = sqlite3.connect(str(DB_PATH), check_same_thread=False)
+        conn = sqlite3.connect(str(DB_PATH), check_same_thread=False, timeout=10.0)
         conn.row_factory = sqlite3.Row
         conn.execute("PRAGMA journal_mode=WAL")
         conn.execute("PRAGMA foreign_keys=ON")
+        conn.execute("PRAGMA busy_timeout=10000")
         _local.connection = conn
     return _local.connection
 
 
-def get_db() -> sqlite3.Connection:
+def close_all_test_connections():
+    """关闭所有测试环境连接"""
+    global _test_connections
+    for conn in list(_test_connections):
+        try:
+            conn.close()
+        except Exception:
+            pass
+    _test_connections.clear()
+
+
+class _TextCompatibleConnection:
+    """包装 sqlite3.Connection，兼容 SQLAlchemy text() 对象"""
+    def __init__(self, conn: sqlite3.Connection):
+        self._conn = conn
+
+    def _unwrap_sql(self, sql):
+        # 处理 SQLAlchemy text() 对象
+        if hasattr(sql, 'text'):
+            return str(sql)
+        return sql
+
+    def execute(self, sql, parameters=None):
+        sql = self._unwrap_sql(sql)
+        if parameters is not None:
+            return self._conn.execute(sql, parameters)
+        return self._conn.execute(sql)
+
+    def executescript(self, sql_script):
+        sql_script = self._unwrap_sql(sql_script)
+        return self._conn.executescript(sql_script)
+
+    def commit(self):
+        return self._conn.commit()
+
+    def fetchone(self):
+        # 不直接调用，execute 返回 cursor
+        pass
+
+    def __getattr__(self, name):
+        return getattr(self._conn, name)
+
+
+def get_db():
     """获取数据库连接（FastAPI 依赖注入用）"""
-    return _get_connection()
+    return _TextCompatibleConnection(_get_connection())
 
 
 def close_db():
@@ -61,11 +125,14 @@ CREATE TABLE IF NOT EXISTS users (
     subscription_expires_at TEXT,
     google_id TEXT UNIQUE,
     apple_id TEXT UNIQUE,
+    wechat_openid TEXT UNIQUE,
+    wechat_unionid TEXT,
     stripe_customer_id TEXT,
     memory_enabled INTEGER DEFAULT 1,
     created_at TEXT DEFAULT (datetime('now')),
     updated_at TEXT DEFAULT (datetime('now')),
-    last_active_at TEXT
+    last_active_at TEXT,
+    status TEXT DEFAULT 'active'
 );
 
 CREATE TABLE IF NOT EXISTS conversations (
@@ -264,6 +331,19 @@ CREATE TABLE IF NOT EXISTS auth_tokens (
     user_id TEXT NOT NULL,
     created_at TEXT DEFAULT (datetime('now')),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE IF NOT EXISTS user_devices (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    device_id TEXT NOT NULL,
+    platform TEXT DEFAULT 'unknown',
+    device_name TEXT,
+    last_active_at TEXT,
+    is_active INTEGER DEFAULT 1,
+    created_at TEXT,
+    updated_at TEXT
 );
 
 CREATE TABLE IF NOT EXISTS purchase_history (
@@ -1555,6 +1635,8 @@ def init_db():
             "ALTER TABLE users ADD COLUMN google_id TEXT UNIQUE",
             "ALTER TABLE users ADD COLUMN apple_id TEXT UNIQUE",
             "ALTER TABLE users ADD COLUMN apple_user_id TEXT",
+            "ALTER TABLE users ADD COLUMN wechat_openid TEXT UNIQUE",
+            "ALTER TABLE users ADD COLUMN wechat_unionid TEXT",
             "ALTER TABLE users ADD COLUMN stripe_customer_id TEXT",
         ]:
             try:
@@ -1567,6 +1649,7 @@ def init_db():
         try:
             conn.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_users_apple_id ON users(apple_id)")
             conn.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_users_apple_user_id ON users(apple_user_id)")
+            conn.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_users_wechat_openid ON users(wechat_openid)")
         except sqlite3.OperationalError:
             pass
         conn.commit()

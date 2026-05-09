@@ -74,10 +74,10 @@ class SafetyAuditLog:
         try:
             db = get_db()
             db.execute(
-                f"INSERT INTO {self.TABLE} "
+                text(f"INSERT INTO {self.TABLE} "
                 "(id, user_id, event_type, level, content_hash, "
                 "detection_rules, action_taken, model_used, latency_ms, created_at) "
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"),
                 (
                     str(uuid.uuid4()),
                     user_id,
@@ -153,14 +153,14 @@ class SafetyAuditLog:
 
             # 按级别统计
             level_stats = db.execute(
-                f"SELECT level, COUNT(*) as count FROM {self.TABLE} "
-                "GROUP BY level"
+                text(f"SELECT level, COUNT(*) as count FROM {self.TABLE} "
+                     "GROUP BY level")
             ).fetchall()
 
             # 按事件类型统计
             event_stats = db.execute(
-                f"SELECT event_type, COUNT(*) as count FROM {self.TABLE} "
-                "GROUP BY event_type"
+                text(f"SELECT event_type, COUNT(*) as count FROM {self.TABLE} "
+                     "GROUP BY event_type")
             ).fetchall()
 
             # 总数

@@ -1,0 +1,53 @@
+{
+  "breathing": [
+    "breathing_478_breathing.png",
+    "breathing_box_breathing.png",
+    "breathing_diaphragmatic.png",
+    "breathing_alternate_nostril.png",
+    "breathing_ocean_breath.png",
+    "breathing_lions_breath.png",
+    "breathing_resonance.png"
+  ],
+  "stretch": [
+    "stretch_morning_stretch.png",
+    "stretch_evening_walk.png",
+    "stretch_desk_worker.png",
+    "stretch_sun_salutation.png",
+    "stretch_bedtime_yoga.png",
+    "stretch_tai_chi.png",
+    "stretch_energy_boost.png"
+  ],
+  "tea": [
+    "tea_chamomile.png",
+    "tea_peppermint.png",
+    "tea_ginger_lemon.png",
+    "tea_matcha.png",
+    "tea_lavender_honey.png",
+    "tea_golden_milk.png",
+    "tea_jasmine.png"
+  ],
+  "sleep": [
+    "sleep_sleep_hygiene.png",
+    "sleep_progressive_mr.png",
+    "sleep_wind_down.png",
+    "sleep_body_scan.png",
+    "sleep_rain_sounds.png",
+    "sleep_counting_breath.png",
+    "sleep_gratitude_sleep.png"
+  ],
+  "reflection": [
+    "reflection_gratitude_checkin.png",
+    "reflection_mood_checkin.png",
+    "reflection_weekly_review.png",
+    "reflection_letting_go.png",
+    "reflection_intention.png",
+    "reflection_future_letter.png",
+    "reflection_mindful_moments.png"
+  ],
+  "seasonal": [
+    "seasonal_spring_renewal.png",
+    "seasonal_summer_energy.png",
+    "seasonal_autumn_letting_go.png",
+    "seasonal_winter_stillness.png"
+  ]
+}

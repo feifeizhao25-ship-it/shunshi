@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Body Type Quiz - SEASONS</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,600;1,400&amp;family=Manrope:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-primary": "#ffffff",
+              "on-primary-container": "#253000",
+              "tertiary": "#665d4e",
+              "surface-variant": "#e4e2de",
+              "on-tertiary-container": "#332b1e",
+              "inverse-surface": "#30312e",
+              "error": "#ba1a1a",
+              "outline-variant": "#c6c8b8",
+              "error-container": "#ffdad6",
+              "surface-container-highest": "#e4e2de",
+              "secondary-fixed-dim": "#ffb59b",
+              "on-tertiary-fixed": "#211b0f",
+              "on-error": "#ffffff",
+              "on-error-container": "#93000a",
+              "surface-container-high": "#eae8e4",
+              "on-secondary-fixed": "#380d00",
+              "surface-tint": "#56642b",
+              "primary-container": "#8a9a5b",
+              "primary-fixed-dim": "#bdce89",
+              "on-primary-fixed": "#161f00",
+              "surface-container-lowest": "#ffffff",
+              "inverse-primary": "#bdce89",
+              "on-secondary": "#ffffff",
+              "secondary": "#95482b",
+              "inverse-on-surface": "#f2f0ed",
+              "secondary-container": "#fc9a77",
+              "surface": "#fbf9f5",
+              "on-secondary-container": "#763015",
+              "on-surface": "#1b1c1a",
+              "secondary-fixed": "#ffdbcf",
+              "background": "#fbf9f5",
+              "on-background": "#1b1c1a",
+              "surface-dim": "#dbdad6",
+              "on-primary-fixed-variant": "#3e4c16",
+              "primary-fixed": "#d9eaa3",
+              "on-tertiary-fixed-variant": "#4e4637",
+              "tertiary-fixed-dim": "#d2c5b2",
+              "on-tertiary": "#ffffff",
+              "tertiary-container": "#9d9281",
+              "primary": "#56642b",
+              "on-surface-variant": "#46483c",
+              "surface-bright": "#fbf9f5",
+              "surface-container-low": "#f5f3ef",
+              "on-secondary-fixed-variant": "#773116",
+              "outline": "#76786b",
+              "tertiary-fixed": "#eee1cd",
+              "surface-container": "#efeeea"
+            },
+            fontFamily: {
+              "headline": ["Noto Serif"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bg-pattern {
+            background-color: #fbf9f5;
+            background-image: radial-gradient(#c6c8b8 0.5px, transparent 0.5px);
+            background-size: 24px 24px;
+            opacity: 0.4;
+        }
+        .sage-gradient {
+            background: linear-gradient(45deg, #56642b 0%, #8a9a5b 100%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body min-h-screen flex flex-col relative overflow-x-hidden">
+<div class="fixed inset-0 bg-pattern -z-10"></div>
+<header class="fixed top-0 w-full px-6 py-4 flex justify-between items-center bg-[#fbf9f5]/80 dark:bg-[#1b1c1a]/80 backdrop-blur-xl z-50">
+<div class="flex items-center gap-4">
+<button class="text-[#56642b] dark:text-[#8a9a5b] Active: scale-95 duration-200">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="text-2xl font-['Noto_Serif'] italic text-[#56642b] dark:text-[#8a9a5b]">SEASONS</h1>
+</div>
+<div class="w-10 h-10 rounded-full overflow-hidden border border-outline-variant/15">
+<img alt="User profile photo" class="w-full h-full object-cover" data-alt="close-up portrait of a serene woman with natural skin and soft lighting against a neutral cream background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD8kusNeJqqZUxaktBQK7DUB-XBxm6VO1H83bmx0eWD5wwwGMz3cWDvZwvmh3E99KW49Mtf5Ngr87gMo3g-LywMYeS-plSN-7p35WPrkALCB_3y4WAM3ZbY1pW_MLJWaad2KbCsMUrdYhqpCc8sxcjM6fXEdNUBvca9YiqIhZeGE-h-mjewmp_Kn3HrdeNBjn6Bvgu19MvZnACH2zjEOi1FQTnOx4KOaTcNvUaS6z-c5k9-aDSjrq-DQSozLSlCAxMl5yBXrta9esg"/>
+</div>
+</header>
+<main class="flex-grow pt-24 pb-32 px-6 max-w-2xl mx-auto w-full">
+<div class="mb-12">
+<div class="flex justify-between items-end mb-4">
+<span class="font-label text-[10px] uppercase tracking-[0.2em] font-bold text-primary/60">Question 5 of 12</span>
+<span class="font-headline italic text-primary">42% Complete</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full sage-gradient rounded-full" style="width: 42.5%"></div>
+</div>
+</div>
+<section class="space-y-8">
+<div class="space-y-3">
+<h2 class="font-headline text-3xl md:text-4xl text-on-surface leading-tight">
+                    How would you describe your natural energy levels throughout the day?
+                </h2>
+<p class="text-on-surface-variant font-body text-lg opacity-80 italic">
+                    Tune into your body's natural rhythm and flow.
+                </p>
+</div>
+<div class="grid grid-cols-1 gap-4">
+<button class="group flex items-center p-6 bg-surface-container-low rounded-xl text-left transition-all duration-300 hover:bg-surface-container-high focus:outline-none focus:ring-2 focus:ring-primary/20">
+<div class="w-12 h-12 flex items-center justify-center bg-white rounded-full shadow-sm mr-6 text-primary group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined" data-icon="wb_sunny">wb_sunny</span>
+</div>
+<span class="text-lg font-medium text-on-surface group-hover:translate-x-1 transition-transform">Consistently high</span>
+</button>
+<button class="group flex items-center p-6 bg-surface-container-highest/60 rounded-xl text-left border-2 border-primary/40 shadow-[0_10px_30px_rgba(86,100,43,0.08)] transition-all duration-300 focus:outline-none">
+<div class="w-12 h-12 flex items-center justify-center bg-primary text-on-primary rounded-full mr-6">
+<span class="material-symbols-outlined" data-icon="battery_horiz_075" style="font-variation-settings: 'FILL' 1;">battery_horiz_075</span>
+</div>
+<div class="flex-grow">
+<span class="text-lg font-bold text-on-surface">Prone to afternoon slumps</span>
+</div>
+<div class="text-primary">
+<span class="material-symbols-outlined" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+</button>
+<button class="group flex items-center p-6 bg-surface-container-low rounded-xl text-left transition-all duration-300 hover:bg-surface-container-high focus:outline-none focus:ring-2 focus:ring-primary/20">
+<div class="w-12 h-12 flex items-center justify-center bg-white rounded-full shadow-sm mr-6 text-primary group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined" data-icon="bedtime">bedtime</span>
+</div>
+<span class="text-lg font-medium text-on-surface group-hover:translate-x-1 transition-transform">Frequently tired</span>
+</button>
+<button class="group flex items-center p-6 bg-surface-container-low rounded-xl text-left transition-all duration-300 hover:bg-surface-container-high focus:outline-none focus:ring-2 focus:ring-primary/20">
+<div class="w-12 h-12 flex items-center justify-center bg-white rounded-full shadow-sm mr-6 text-primary group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined" data-icon="cyclone">cyclone</span>
+</div>
+<span class="text-lg font-medium text-on-surface group-hover:translate-x-1 transition-transform">Varies with the weather</span>
+</button>
+</div>
+</section>
+</main>
+<footer class="fixed bottom-0 left-0 w-full z-40 px-6 py-8 bg-gradient-to-t from-background via-background/95 to-transparent flex justify-center">
+<button class="w-full max-w-2xl h-16 sage-gradient text-on-primary font-body font-bold text-lg rounded-xl shadow-[0_20px_40px_rgba(27,28,26,0.1)] active:scale-95 transition-all duration-300 flex items-center justify-center gap-2">
+            Next Question
+            <span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</footer>
+<div class="hidden">
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-2 bg-[#fbf9f5]/80 backdrop-blur-xl rounded-t-[1.5rem] border-t border-[#c6c8b8]/15 shadow-[0_-20px_40px_rgba(27,28,26,0.05)]">
+<div class="flex flex-col items-center justify-center text-[#1b1c1a]/40 px-4 py-2">
+<span class="material-symbols-outlined" data-icon="home_max">home_max</span>
+<span class="font-['Manrope'] text-[10px] uppercase tracking-widest font-bold">Home</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#1b1c1a]/40 px-4 py-2">
+<span class="material-symbols-outlined" data-icon="auto_stories">auto_stories</span>
+<span class="font-['Manrope'] text-[10px] uppercase tracking-widest font-bold">Library</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#1b1c1a]/40 px-4 py-2">
+<span class="material-symbols-outlined" data-icon="temp_identity">perm_identity</span>
+<span class="font-['Manrope'] text-[10px] uppercase tracking-widest font-bold">AI Assistant</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#1b1c1a]/40 px-4 py-2">
+<span class="material-symbols-outlined" data-icon="person_2">person_2</span>
+<span class="font-['Manrope'] text-[10px] uppercase tracking-widest font-bold">Profile</span>
+</div>
+</nav>
+</div>
+</body></html>

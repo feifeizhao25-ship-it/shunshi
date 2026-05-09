@@ -3,6 +3,7 @@
 按 Markdown 标题层级自动分块，保留元数据
 支持主库 + 补充篇
 """
+from __future__ import annotations
 import re
 import os
 import logging

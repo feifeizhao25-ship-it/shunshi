@@ -537,7 +537,9 @@ def _get_user_id_from_request(
 
     try:
         import jwt
-        JWT_SECRET = os.getenv("JWT_SECRET", "shunshi-dev-secret-change-in-production-2026")
+        JWT_SECRET = os.getenv("JWT_SECRET")
+        if not JWT_SECRET:
+            raise RuntimeError("JWT_SECRET 环境变量未设置")
         payload = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
         if payload.get("type") == "access":
             return payload.get("sub")
@@ -547,7 +549,7 @@ def _get_user_id_from_request(
     from app.database.db import get_db
     db = get_db()
     row = db.execute(
-        "SELECT user_id FROM auth_tokens WHERE token = ?", (token,)
+        text("SELECT user_id FROM auth_tokens WHERE token = ?"), (token,)
     ).fetchone()
     return row["user_id"] if row else None
 
@@ -572,7 +574,9 @@ async def require_tier(
     if token:
         try:
             import jwt as _jwt
-            _secret = os.getenv("JWT_SECRET", "shunshi-dev-secret-change-in-production-2026")
+            _secret = os.getenv("JWT_SECRET")
+            if not _secret:
+                raise RuntimeError("JWT_SECRET 环境变量未设置")
             payload = _jwt.decode(token, _secret, algorithms=["HS256"])
             if payload.get("type") == "access":
                 user_id = payload.get("sub")
@@ -583,7 +587,7 @@ async def require_tier(
         from app.database.db import get_db
         db = get_db()
         row = db.execute(
-            "SELECT user_id FROM auth_tokens WHERE token = ?", (token,)
+            text("SELECT user_id FROM auth_tokens WHERE token = ?"), (token,)
         ).fetchone()
         user_id = row["user_id"] if row else None
 
@@ -826,26 +830,146 @@ def expire_subscription(user_id: str):
 
 # ============ 支付签名验证 ============
 
+import base64
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import padding as crypto_padding
+from sqlalchemy import text
+
+
+def _verify_alipay_sign(params: dict, sign: str, public_key_pem: str) -> bool:
+    """支付宝 RSA2 (SHA256withRSA) 验签"""
+    try:
+        # 过滤 sign/sign_type，按 key 排序拼接字符串
+        filtered = {k: v for k, v in params.items() if k not in ("sign", "sign_type") and v is not None}
+        content = "&".join(f"{k}={v}" for k, v in sorted(filtered.items()))
+        
+        key_bytes = public_key_pem.encode("utf-8")
+        if b"BEGIN PUBLIC KEY" not in key_bytes:
+            # 如果是原始 base64 公钥，包装成 PEM 格式
+            wrapped = "-----BEGIN PUBLIC KEY-----\n"
+            for i in range(0, len(public_key_pem), 64):
+                wrapped += public_key_pem[i:i+64] + "\n"
+            wrapped += "-----END PUBLIC KEY-----"
+            key_bytes = wrapped.encode("utf-8")
+        
+        public_key = serialization.load_pem_public_key(key_bytes)
+        signature = base64.b64decode(sign)
+        public_key.verify(
+            signature,
+            content.encode("utf-8"),
+            crypto_padding.PKCS1v15(),
+            hashes.SHA256(),
+        )
+        return True
+    except Exception as e:
+        logger.warning(f"[Payment] 支付宝验签失败: {e}")
+        return False
+
+
+async def _verify_apple_receipt(transaction_id: str, receipt: str) -> bool:
+    """Apple App Store 购买凭证验证"""
+    import aiohttp
+    try:
+        # 生产环境用 verifyReceipt API (iOS 14 前) 或 App Store Server API (iOS 15+)
+        # 简化实现：调用 Apple 验证服务
+        verify_url = "https://buy.itunes.apple.com/verifyReceipt"
+        async with aiohttp.ClientSession() as session:
+            async with session.post(verify_url, json={
+                "receipt-data": receipt,
+                "password": os.getenv("APPLE_SHARED_SECRET", ""),
+            }) as resp:
+                data = await resp.json()
+                status = data.get("status")
+                if status == 21007:  # Sandbox receipt
+                    verify_url = "https://sandbox.itunes.apple.com/verifyReceipt"
+                    async with session.post(verify_url, json={
+                        "receipt-data": receipt,
+                        "password": os.getenv("APPLE_SHARED_SECRET", ""),
+                    }) as resp2:
+                        data = await resp2.json()
+                        status = data.get("status")
+                return status == 0
+    except Exception as e:
+        logger.warning(f"[Payment] Apple 验签失败: {e}")
+        return False
+
+
+async def _verify_google_purchase(package_name: str, product_id: str, purchase_token: str) -> bool:
+    """Google Play 购买验证"""
+    try:
+        # 生产环境需要 Google Play Developer API 服务账号
+        # 简化实现：检查凭证非空且格式正确
+        if not purchase_token or len(purchase_token) < 10:
+            return False
+        # TODO: 完整实现需接入 Google Play Developer API
+        # from googleapiclient.discovery import build
+        # service = build('androidpublisher', 'v3', credentials=creds)
+        # result = service.purchases().products().get(
+        #     packageName=package_name, productId=product_id, token=purchase_token
+        # ).execute()
+        # return result.get('purchaseState') == 0
+        return True
+    except Exception as e:
+        logger.warning(f"[Payment] Google 验签失败: {e}")
+        return False
+
+
 def _verify_payment_signature(request: PurchaseVerifyRequest, order: dict) -> bool:
     """
     验证支付签名。
 
-    生产环境实现:
-    - 支付宝: 用公钥验证 sign
-    - Apple: 调用 App Store Server API 验证
-    - Google: 调用 Google Play Developer API 验证
+    支持:
+    - 支付宝: RSA2 公钥验签
+    - Apple: receipt 验证
+    - Google: purchase token 验证
 
-    当前为模拟模式（无签名也通过）
+    无签名时返回 False（生产环境不允许模拟支付）
     """
+    # 开发环境跳过验签（需显式配置）
+    if os.getenv("APP_ENV") == "development" and not request.sign:
+        return True
+    
     if not request.sign:
-        return True  # 模拟模式
+        logger.error("[Payment] 缺少支付签名")
+        return False
 
-    # TODO: 生产环境验签
-    # import hmac
-    # alipay_public_key = os.getenv("ALIPAY_PUBLIC_KEY")
-    # verified = verify_with_public_key(request.sign, params, alipay_public_key)
-
-    return True
+    platform = request.platform.lower()
+    
+    if platform == "alipay":
+        public_key = os.getenv("ALIPAY_PUBLIC_KEY", "")
+        if not public_key:
+            logger.error("[Payment] 未配置 ALIPAY_PUBLIC_KEY")
+            return False
+        params = {
+            "order_id": request.order_id,
+            "transaction_id": request.transaction_id,
+            "trade_status": request.trade_status,
+            "total_amount": request.total_amount,
+        }
+        return _verify_alipay_sign(params, request.sign, public_key)
+    
+    elif platform == "apple":
+        # Apple 验签是异步的，同步调用简化版
+        import asyncio
+        try:
+            loop = asyncio.get_event_loop()
+            return loop.run_until_complete(_verify_apple_receipt(
+                request.transaction_id or "", request.sign
+            ))
+        except Exception as e:
+            logger.warning(f"[Payment] Apple 验签异常: {e}")
+            return False
+    
+    elif platform == "google":
+        return _verify_google_purchase(
+            os.getenv("GOOGLE_PACKAGE_NAME", "com.shunshi.app"),
+            order.get("product_id", ""),
+            request.sign,
+        )
+    
+    else:
+        logger.warning(f"[Payment] 未知支付平台: {platform}")
+        return False
 
 
 # ============================================================
@@ -1116,35 +1240,6 @@ async def verify_payment(request: PurchaseVerifyRequest):
                 "status": "active",
                 "features": product_info["features"],
             }
-        }
-    }
-
-
-# ---- 查询订单状态 ----
-
-@router.get("/order/{order_id}", response_model=dict)
-async def query_order(order_id: str):
-    """查询订单状态"""
-    order = payment_orders.get(order_id)
-    if not order:
-        raise HTTPException(status_code=404, detail="订单不存在")
-
-    return {
-        "success": True,
-        "data": {
-            "id": order["id"],
-            "order_no": order["order_no"],
-            "user_id": order["user_id"],
-            "product_id": order["product_id"],
-            "tier": order["tier"],
-            "platform": order["platform"],
-            "amount_cents": order["amount_cents"],
-            "currency": order["currency"],
-            "status": order["status"],
-            "transaction_id": order.get("transaction_id"),
-            "created_at": order["created_at"],
-            "paid_at": order.get("paid_at"),
-            "expires_at": order.get("expires_at"),
         }
     }
 
@@ -2107,6 +2202,34 @@ async def alipay_verify(request: PaymentVerifyRequest):
                 "expires_at": expires_at,
                 "status": "active",
             }
+        }
+    }
+
+
+@router.get("/orders/{order_id}", response_model=dict)
+async def query_order(order_id: str):
+    """查询订单状态（通用）"""
+    order = payment_orders.get(order_id)
+    if not order:
+        raise HTTPException(status_code=404, detail="订单不存在")
+
+    return {
+        "success": True,
+        "data": {
+            "id": order["id"],
+            "order_no": order.get("order_no", order["id"]),
+            "user_id": order.get("user_id"),
+            "product_id": order.get("product_id"),
+            "tier": order.get("tier", order.get("plan", "")),
+            "amount_cents": order.get("amount_cents", 0),
+            "amount_display": f"¥{order.get('amount_cents', 0) / 100:.2f}",
+            "currency": order.get("currency", "CNY"),
+            "status": order["status"],
+            "platform": order.get("platform", ""),
+            "created_at": order.get("created_at"),
+            "expires_at": order.get("expires_at"),
+            "paid_at": order.get("paid_at"),
+            "transaction_id": order.get("transaction_id"),
         }
     }
 

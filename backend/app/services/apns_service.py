@@ -208,15 +208,11 @@ class APNsService:
                     mode=self.mode,
                 )
         else:
-            # Mock 模式
-            message_id = f"apns_mock_{datetime.now().timestamp()}"
-            logger.info(
-                f"[APNs] Mock 发送: token={message.token[:20]}..., "
-                f"title={message.title}"
-            )
+            # Mock 模式 — 优雅降级
+            logger.warning("APNs credentials not configured, push disabled")
             return APNSResult(
-                success=True,
-                message_id=message_id,
+                success=False,
+                error="推送服务未配置",
                 mode="mock",
             )
 
