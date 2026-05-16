@@ -86,7 +86,7 @@ class ShunShiRouter {
     AIRequest request,
   ) async {
     final response = await _dio.post(
-      '${_config.apiBaseUrl}/v1/chat/completions',
+      '${_config.apiBaseUrl}/api/v1/chat/completions',
       data: {
         'model': model.name,
         'messages': [

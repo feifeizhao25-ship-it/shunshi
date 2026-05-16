@@ -11,6 +11,7 @@ import '../../../core/theme/shunshi_spacing.dart';
 import '../../../core/theme/shunshi_text_styles.dart';
 import '../../../core/theme/shunshi_animations.dart';
 import '../../../core/theme/app_localizations.dart';
+import '../../../core/network/api_singleton.dart';
 
 /// 音频播放器 — 沉浸式设计
 ///
@@ -115,7 +116,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
 
   Future<void> _loadAudioFromId() async {
     try {
-      final response = await _dio.get('/api/v1/seasons/audio/${widget.audioId}');
+      final response = await _dio.get('/api/v1/audio/${widget.audioId}/stream');
       if (response.statusCode == 200 && mounted) {
         final data = response.data as Map<String, dynamic>;
         final audioUrl = data['audio_url'] as String?;
@@ -156,7 +157,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
   Future<void> _onCompleted() async {
     try {
       await _dio.post(
-        '/api/v1/seasons/audio/progress',
+        '/api/v1/audio/plays',
         data: {
           'audio_id': widget.audioId ?? '',
           'user_id': StorageManager.user.getUserId() ?? 'anonymous',
@@ -170,7 +171,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
   Future<void> _reportProgress() async {
     try {
       await _dio.post(
-        '/api/v1/seasons/audio/progress',
+        '/api/v1/audio/plays',
         data: {
           'audio_id': widget.audioId ?? '',
           'user_id': StorageManager.user.getUserId() ?? 'anonymous',
@@ -232,7 +233,9 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : ShunshiColors.background,
+    return Scaffold(
+
+      appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),backgroundColor: isDark ? ShunshiDarkColors.background : ShunshiColors.background,
 body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(

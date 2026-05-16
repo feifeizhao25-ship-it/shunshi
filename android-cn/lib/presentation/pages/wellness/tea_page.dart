@@ -1,5 +1,6 @@
 import '../../../core/router/safe_pop.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../data/network/api_client.dart';
 import '../../widgets/skeleton_loading.dart';
 import '../../widgets/paywall_banner.dart';
@@ -41,10 +42,16 @@ class _TeaPageState extends State<TeaPage> {
       _error = null;
     });
     try {
-      final res = await _api.get('/api/v1/contents', queryParameters: {
+      final prefs = await SharedPreferences.getInstance();
+      final constitution = prefs.getString('constitution_type');
+      final queryParams = <String, String>{
         'type': 'tea',
         'limit': '20',
-      });
+      };
+      if (constitution != null) {
+        queryParams['constitution'] = constitution;
+      }
+      final res = await _api.get('/api/v1/contents', queryParameters: queryParams);
       final data = res.data;
       final items = _parseItems(data);
       setState(() {
@@ -89,6 +96,33 @@ class _TeaPageState extends State<TeaPage> {
       ),
       body: Column(
         children: [
+          // ── Header image ──
+          Stack(
+            children: [
+              SizedBox(
+                height: 120,
+                width: double.infinity,
+                child: Image.asset(
+                  'assets/images/tea.jpg',
+                  fit: BoxFit.cover,
+                ),
+              ),
+              Positioned.fill(
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.black.withValues(alpha: 0.1),
+                        Colors.black.withValues(alpha: 0.5),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
           const PaywallBanner(message: '升级会员解锁定制节气茶饮方案', icon: Icons.local_cafe),
           Container(
             padding: const EdgeInsets.all(16),
@@ -163,7 +197,10 @@ class _TeaPageState extends State<TeaPage> {
         itemCount: filtered.length,
         itemBuilder: (context, index) {
           final tea = filtered[index];
-          return _TeaCard(tea: tea);
+          return _TeaCard(
+            tea: tea,
+            onTap: () => _showTeaDetail(tea),
+          );
         },
       ),
     );
@@ -182,12 +219,78 @@ class _TeaPageState extends State<TeaPage> {
       labelStyle: TextStyle(color: isSelected ? Colors.white : Colors.black87),
     );
   }
+
+  void _showTeaDetail(Map<String, dynamic> tea) {
+    final ingredients = tea['ingredients'] is List
+        ? (tea['ingredients'] as List).join('、')
+        : (tea['ingredients'] ?? '');
+    final steps = tea['steps'] is List
+        ? (tea['steps'] as List).join('\n')
+        : (tea['steps'] ?? '');
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.6,
+        maxChildSize: 0.85,
+        minChildSize: 0.4,
+        expand: false,
+        builder: (context, scrollController) => SingleChildScrollView(
+          controller: scrollController,
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Text(tea['emoji'] ?? '🍵', style: const TextStyle(fontSize: 32)),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(tea['title'] ?? '',
+                        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              if (tea['description'] != null)
+                Text(tea['description'], style: const TextStyle(fontSize: 15, height: 1.6)),
+              if (ingredients.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                const Text('材料', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
+                Text(ingredients, style: const TextStyle(fontSize: 14)),
+              ],
+              if (steps.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                const Text('冲泡方法', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
+                Text(steps, style: const TextStyle(fontSize: 14, height: 1.5)),
+              ],
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('知道了'),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class _TeaCard extends StatelessWidget {
   final Map<String, dynamic> tea;
+  final VoidCallback? onTap;
 
-  const _TeaCard({required this.tea});
+  const _TeaCard({required this.tea, this.onTap});
 
   Color get _teaColor {
     final tags = tea['tags'];
@@ -218,97 +321,100 @@ class _TeaCard extends StatelessWidget {
     final tags = tea['tags'] is List ? (tea['tags'] as List).join('、') : '';
     final timeLabel = _getTimeLabel(tea['best_time'] ?? 'all');
 
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: 56,
-                  height: 56,
-                  decoration: BoxDecoration(
-                    color: _teaColor.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(12),
+    return GestureDetector(
+      onTap: onTap,
+      child: Card(
+        margin: const EdgeInsets.only(bottom: 12),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 56,
+                    height: 56,
+                    decoration: BoxDecoration(
+                      color: _teaColor.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Center(
+                        child: Text(tea['emoji'] ?? '🍵',
+                            style: const TextStyle(fontSize: 28))),
                   ),
-                  child: Center(
-                      child: Text(tea['emoji'] ?? '🍵',
-                          style: const TextStyle(fontSize: 28))),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        tea['title'] ?? '',
-                        style: const TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          Icon(Icons.schedule, size: 14, color: Colors.grey[600]),
-                          const SizedBox(width: 4),
-                          Text(timeLabel,
-                              style: TextStyle(color: Colors.grey[600])),
-                          if (tags.isNotEmpty) ...[
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Text(tags,
-                                  style: TextStyle(
-                                      fontSize: 11, color: Colors.grey[600]),
-                                  overflow: TextOverflow.ellipsis),
-                            ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          tea['title'] ?? '',
+                          style: const TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            Icon(Icons.schedule, size: 14, color: Colors.grey[600]),
+                            const SizedBox(width: 4),
+                            Text(timeLabel,
+                                style: TextStyle(color: Colors.grey[600])),
+                            if (tags.isNotEmpty) ...[
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(tags,
+                                    style: TextStyle(
+                                        fontSize: 11, color: Colors.grey[600]),
+                                    overflow: TextOverflow.ellipsis),
+                              ),
+                            ],
                           ],
-                        ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(benefits,
+                  style: TextStyle(
+                      color: Colors.green[700], fontWeight: FontWeight.w500)),
+              if (ingredients.isNotEmpty) ...[
+                const SizedBox(height: 6),
+                Text('材料：$ingredients',
+                    style: TextStyle(fontSize: 13, color: Colors.grey[600])),
+              ],
+              if (steps.isNotEmpty) ...[
+                const SizedBox(height: 6),
+                Text('冲泡：$steps',
+                    style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                    maxLines: 2, overflow: TextOverflow.ellipsis),
+              ],
+              if (tea['description'] != null && tea['description'].toString().isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.amber[50],
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.info_outline, size: 16, color: Colors.amber),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(tea['description'],
+                            style: const TextStyle(fontSize: 12),
+                            maxLines: 2, overflow: TextOverflow.ellipsis),
                       ),
                     ],
                   ),
                 ),
               ],
-            ),
-            const SizedBox(height: 8),
-            Text(benefits,
-                style: TextStyle(
-                    color: Colors.green[700], fontWeight: FontWeight.w500)),
-            if (ingredients.isNotEmpty) ...[
-              const SizedBox(height: 6),
-              Text('材料：$ingredients',
-                  style: TextStyle(fontSize: 13, color: Colors.grey[600])),
             ],
-            if (steps.isNotEmpty) ...[
-              const SizedBox(height: 6),
-              Text('冲泡：$steps',
-                  style: TextStyle(fontSize: 13, color: Colors.grey[600]),
-                  maxLines: 2, overflow: TextOverflow.ellipsis),
-            ],
-            if (tea['description'] != null && tea['description'].toString().isNotEmpty) ...[
-              const SizedBox(height: 8),
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.amber[50],
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.info_outline, size: 16, color: Colors.amber),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(tea['description'],
-                          style: const TextStyle(fontSize: 12),
-                          maxLines: 2, overflow: TextOverflow.ellipsis),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ],
+          ),
         ),
       ),
     );

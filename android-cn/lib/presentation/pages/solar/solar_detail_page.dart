@@ -4,7 +4,9 @@ library;
 
 import 'package:flutter/material.dart';
 import '../../../../design_system/theme.dart';
-import 'package:dio/dio.dart';
+import '../../../core/network/api_client.dart';
+import '../../../core/cache/cache_service.dart';
+import '../../../core/loading/loading_state_manager.dart';
 
 class SolarDetailPage extends StatefulWidget {
   const SolarDetailPage({super.key});
@@ -14,32 +16,61 @@ class SolarDetailPage extends StatefulWidget {
 }
 
 class _SolarDetailPageState extends State<SolarDetailPage> {
+  final _api = ApiClient();
+  final _cache = CacheService();
+  late final LoadingDelayManager _loadingDelay;
+  bool _showLoading = false;
   Map<String, dynamic>? _data;
   bool _loading = true;
 
   @override
   void initState() {
     super.initState();
+    _loadingDelay = LoadingDelayManager(delayMs: 200, minDisplayMs: 400, onStateChanged: () { if (mounted) setState(() => _showLoading = _loadingDelay.showLoading); });
     _loadData();
   }
 
+  @override
+  void dispose() {
+    _loadingDelay.dispose();
+    super.dispose();
+  }
+
   Future<void> _loadData() async {
+    // 缓存配置: wellness staleTime=5min
+    const cacheConfig = CacheConfig(
+      staleTime: Duration(minutes: 5),
+      gcTime: Duration(hours: 24),
+      persist: true,
+    );
+    const cacheKey = 'solar_wellness_daily_advice';
+
+    // 1. Try cache
+    final cached = _cache.get<Map<String, dynamic>>(cacheKey, config: cacheConfig);
+    if (cached != null) {
+      _data = cached.data;
+      if (mounted) setState(() => _loading = false);
+      if (!cached.isStale) return;
+    } else {
+      _loadingDelay.startLoading();
+      if (mounted) setState(() => _showLoading = true);
+    }
+
+    // 2. Network
     try {
-      final dio = Dio(BaseOptions(
-        baseUrl: 'http://116.62.32.43:4000',
-        connectTimeout: const Duration(seconds: 5),
-      ));
-      final res = await dio.get('/api/v1/solar-wellness/daily-advice');
+      final res = await _api.get('/solar-wellness/daily-advice', level: SpeedLevel.s2);
       if (res.data is Map && res.data['success'] == true) {
         _data = Map<String, dynamic>.from(res.data['data']);
+        await _cache.set(cacheKey, _data!, config: cacheConfig);
       }
     } catch (_) {}
-    if (mounted) setState(() => _loading = false);
+    _loadingDelay.stopLoading();
+    if (mounted) setState(() { _loading = false; _showLoading = _loadingDelay.showLoading; });
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_loading) {
+    if (_loading && _showLoading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
     if (_data == null) {

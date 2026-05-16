@@ -82,6 +82,7 @@ class SolarTermAIDetailPage extends StatelessWidget {
     final surfaceLow = isDark ? ShunShiColors.darkSurfaceContainerLow : ShunShiColors.surfaceContainerLow;
     final d = _data;
     return Scaffold(
+  appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
       backgroundColor: isDark ? ShunShiColors.darkBackground : ShunShiColors.background,
       body: Stack(
         children: [

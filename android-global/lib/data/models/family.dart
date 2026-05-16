@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import '../../core/config/app_config.dart';
 // 家庭系统模型
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -314,7 +315,7 @@ class FamilyNotifier extends StateNotifier<FamilyState> {
     // 调用后端 API 验证并加入家庭
     try {
       final dio = Dio();
-      final res = await dio.post("http://116.62.32.43:4000/api/v1/family/join", data: {"code": code});
+      final res = await dio.post("${AppConfig.apiBaseUrl}/api/v1/family/join", data: {"code": code});
       if (res.data?["success"] == true) {
         final d = res.data["data"];
         state = state.copyWith(familyId: d["family_id"], familyName: d["family_name"]);

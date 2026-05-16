@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
+import '../../../core/config/app_config.dart';
 
 /// 跟进卡片 — 显示在首页的养生提醒
 class FollowUpCard extends StatefulWidget {
@@ -23,7 +24,7 @@ class _FollowUpCardState extends State<FollowUpCard> {
   Future<void> _loadFollowUps() async {
     try {
       final dio = Dio();
-      final res = await dio.get('http://116.62.32.43:4000/api/v1/followup/list');
+      final res = await dio.get('${AppConfig.apiBaseUrl}/api/v1/followup/list');
       if (res.data is List) {
         setState(() => _items = List<Map<String, dynamic>>.from(res.data));
       }
@@ -40,7 +41,7 @@ class _FollowUpCardState extends State<FollowUpCard> {
   Future<void> _complete(String id) async {
     try {
       final dio = Dio();
-      await dio.post('http://116.62.32.43:4000/api/v1/user/feedback', data: {
+      await dio.post('${AppConfig.apiBaseUrl}/api/v1/user/feedback', data: {
         'followup_id': id, 'action': 'completed',
       });
     } catch (_) {}

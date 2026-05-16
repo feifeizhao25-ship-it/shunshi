@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'solar_term_data.dart';
+import '../../../../core/network/api_singleton.dart';
 
 class CurrentTermCard extends StatelessWidget {
   final SolarTermInfo term;

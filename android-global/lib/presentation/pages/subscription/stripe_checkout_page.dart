@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
+import '../../../core/network/api_singleton.dart';
 
 class StripeCheckoutPage extends StatefulWidget {
   final String plan;
@@ -20,9 +21,6 @@ class _StripeCheckoutPageState extends State<StripeCheckoutPage> {
   bool _loading = true;
   String? _checkoutUrl;
   String? _error;
-
-  static const _baseUrl = 'http://116.62.32.43:4000';
-
   @override
   void initState() {
     super.initState();
@@ -31,7 +29,7 @@ class _StripeCheckoutPageState extends State<StripeCheckoutPage> {
 
   Future<void> _createCheckoutSession() async {
     try {
-      final dio = Dio(BaseOptions(baseUrl: _baseUrl));
+      final dio = apiClient.dio;
       final resp = await dio.post('/api/v1/stripe/checkout', data: {
         'plan': widget.plan,
         'user_id': 'user-001',

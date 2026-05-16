@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dio/dio.dart';
 import '../../../core/config/api_config.dart';
 import '../../../core/theme/app_localizations.dart';
+import '../../../core/network/api_singleton.dart';
 
 /// SEASONS Home — Pixel-level clone of Apple Health + Calm structure.
 ///
@@ -88,8 +89,8 @@ class _HomePageIntlState extends State<HomePageIntl> {
     }
 
     try {
-      final res = await _dio.get('/api/v1/intl/home/dashboard',
-          queryParameters: {'hemisphere': _hemisphere});
+      final res = await _dio.get('/api/v1/contents/recommend',
+          queryParameters: {'hemisphere': _hemisphere, 'locale': 'en-US'});
       final d = res.data;
       if (!mounted) return;
 
@@ -156,7 +157,7 @@ class _HomePageIntlState extends State<HomePageIntl> {
     if (_reflecting) return;
     setState(() { _selectedMood = mood; _reflecting = true; });
     try {
-      await _dio.post('/api/v1/intl/reflection', data: {'mood': mood, 'energy': 3});
+      await _dio.post('/api/v1/followup/quick/daily-checkin', data: {'mood': mood, 'energy': 3});
     } catch (_) {}
     if (mounted) setState(() { _selectedMood = ''; _reflecting = false; });
   }

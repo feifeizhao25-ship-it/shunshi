@@ -1,5 +1,7 @@
 import '../../../core/router/safe_pop.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../data/network/api_client.dart';
 import '../../../design_system/theme.dart';
 import '../../widgets/exercise_demo.dart';
@@ -41,10 +43,16 @@ class _ExercisePageState extends State<ExercisePage> {
       _error = null;
     });
     try {
-      final res = await _api.get('/api/v1/contents', queryParameters: {
+      final prefs = await SharedPreferences.getInstance();
+      final constitution = prefs.getString('constitution_type');
+      final queryParams = <String, String>{
         'type': 'exercise',
         'limit': '20',
-      });
+      };
+      if (constitution != null) {
+        queryParams['constitution'] = constitution;
+      }
+      final res = await _api.get('/api/v1/contents', queryParameters: queryParams);
       final data = res.data;
       final items = _parseItems(data);
       setState(() {
@@ -86,6 +94,33 @@ class _ExercisePageState extends State<ExercisePage> {
       ),
       body: Column(
         children: [
+          // ── Header image ──
+          Stack(
+            children: [
+              SizedBox(
+                height: 120,
+                width: double.infinity,
+                child: Image.asset(
+                  'assets/images/exercise.jpg',
+                  fit: BoxFit.cover,
+                ),
+              ),
+              Positioned.fill(
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.black.withValues(alpha: 0.1),
+                        Colors.black.withValues(alpha: 0.5),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
           const PaywallBanner(message: '升级会员解锁专属运动方案与八段锦跟练', icon: Icons.fitness_center),
           Container(
             padding: const EdgeInsets.all(16),
@@ -283,7 +318,12 @@ class _ExercisePageState extends State<ExercisePage> {
                 child: ElevatedButton.icon(
                   onPressed: () {
                     Navigator.pop(context);
-                    Navigator.pushNamed(context, '/chat');
+                    final id = exercise['id']?.toString();
+                    if (id != null && id.isNotEmpty) {
+                      GoRouter.of(context).push('/content/$id');
+                    } else {
+                      GoRouter.of(context).push('/exercise-detail');
+                    }
                   },
                   icon: const Icon(Icons.play_arrow),
                   label: const Text('开始 AI 指导练习'),

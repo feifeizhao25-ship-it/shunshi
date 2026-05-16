@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
 import '../../../data/network/api_client.dart';
 import '../../widgets/state_view.dart';
+import '../../../core/network/api_singleton.dart';
 
 class NotificationsPage extends StatefulWidget {
   const NotificationsPage({super.key});

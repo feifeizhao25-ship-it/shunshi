@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../design_system/theme.dart';
+import '../../core/config/app_config.dart';
 
 /// 底部弹出反馈卡片: "这条建议对你有帮助吗?" 👍👎
 class FeedbackSheet extends StatefulWidget {
@@ -41,7 +42,7 @@ class _FeedbackSheetState extends State<FeedbackSheet> {
       final prefs = await SharedPreferences.getInstance();
       final userId = prefs.getString('user_id') ?? 'guest';
       await Dio().post(
-        'http://116.62.32.43:4000/api/v1/feedback',
+        '${AppConfig.apiBaseUrl}/api/v1/feedback',
         data: {
           'user_id': userId,
           'type': widget.type,

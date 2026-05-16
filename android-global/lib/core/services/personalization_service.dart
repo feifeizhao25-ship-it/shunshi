@@ -1,10 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../config/app_config.dart';
 
 class PersonalizationService {
-  static const String _baseUrl = 'http://116.62.32.43:4000/api/v1/personalization';
   static final _dio = Dio(BaseOptions(
-    baseUrl: _baseUrl,
+    baseUrl: '${AppConfig.apiBaseUrl}/api/v1/personalization',
     connectTimeout: const Duration(seconds: 10),
     receiveTimeout: const Duration(seconds: 15),
   ));

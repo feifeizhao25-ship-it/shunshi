@@ -10,6 +10,7 @@ library;
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/config/app_config.dart';
 import '../../../design_system/theme.dart';
 
 class DiscoverPage extends StatefulWidget {
@@ -20,7 +21,7 @@ class DiscoverPage extends StatefulWidget {
 }
 
 class _DiscoverPageState extends State<DiscoverPage> {
-  static const _baseUrl = 'http://116.62.32.43:4000';
+  static final String _baseUrl = AppConfig.apiBaseUrl.replaceAll('/api/v1', '');
   final _dio = Dio(BaseOptions(
     baseUrl: _baseUrl,
     connectTimeout: const Duration(seconds: 8),
@@ -28,9 +29,12 @@ class _DiscoverPageState extends State<DiscoverPage> {
   ));
 
   List<Map<String, dynamic>> _articles = [];
+  List<Map<String, dynamic>> _categoryArticles = [];
   List<Map<String, dynamic>> _searchResults = [];
   bool _loading = true;
   bool _searching = false;
+  bool _loadingCategory = false;
+  String? _activeCategory;
   final _searchController = TextEditingController();
 
   static final _categories = [
@@ -62,6 +66,20 @@ class _DiscoverPageState extends State<DiscoverPage> {
     }
   }
 
+  Future<void> _fetchCategoryArticles(String category) async {
+    setState(() { _loadingCategory = true; _activeCategory = category; });
+    try {
+      final res = await _dio.get('/api/v1/contents', queryParameters: {'category': category, 'limit': 10});
+      if (!mounted) return;
+      final data = res.data;
+      if (data is Map && data['data'] is Map) {
+        final items = data['data']['items'];
+        if (items is List) _categoryArticles = items.cast<Map<String, dynamic>>();
+      }
+    } catch (_) {}
+    if (mounted) setState(() => _loadingCategory = false);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -90,6 +108,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
     final bg = isDark ? ShunShiColors.darkBackground : ShunShiColors.background;
 
     return Scaffold(
+  appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
       backgroundColor: bg,
       body: RefreshIndicator(
         color: ShunShiColors.primary,
@@ -195,6 +214,42 @@ class _DiscoverPageState extends State<DiscoverPage> {
           ),
           ], // end if (!_searching)
 
+          // ── Category Articles (when a category is selected) ──
+          if (!_searching && _activeCategory != null) ...[
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 4),
+                child: Row(children: [
+                  Text(_categories.firstWhere((c) => c.route == _activeCategory, orElse: () => _categories.first).title, style: TextStyle(
+                    fontSize: 18, fontWeight: FontWeight.w700,
+                    color: ShunShiColors.textPrimary,
+                    fontFamily: ShunShiTypography.serifFamily,
+                  )),
+                  const Spacer(),
+                  GestureDetector(
+                    onTap: () => setState(() { _activeCategory = null; _categoryArticles = []; }),
+                    child: Text('返回', style: TextStyle(fontSize: 13, color: ShunShiColors.primary)),
+                  ),
+                ]),
+              ),
+            ),
+            if (_loadingCategory)
+              const SliverToBoxAdapter(child: Padding(padding: EdgeInsets.all(40), child: Center(child: CircularProgressIndicator(color: ShunShiColors.primary))))
+            else if (_categoryArticles.isEmpty)
+              SliverToBoxAdapter(child: _buildEmptyState('该分类暂无内容', Icons.category))
+            else
+              SliverList(delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  final item = _categoryArticles[index];
+                  return Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+                    child: _apiArticleCard(item),
+                  );
+                },
+                childCount: _categoryArticles.length,
+              )),
+          ],
+
           // ── Editor's Choice Header ──
           SliverToBoxAdapter(
             child: Padding(
@@ -205,7 +260,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
                   color: ShunShiColors.textPrimary,
                   fontFamily: ShunShiTypography.serifFamily,
                 )),
-                Text("Editor's Choice", style: TextStyle(
+                Text("编辑精选", style: TextStyle(
                   fontSize: 12, color: ShunShiColors.textTertiary,
                   fontFamily: ShunShiTypography.sansFamily,
                 )),
@@ -257,15 +312,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
   Widget _categoryCard(BuildContext ctx, _Category cat) {
     return GestureDetector(
       onTap: () {
-        if (cat.route == 'constitution') {
-          ctx.push('/constitution');
-        } else if (cat.route == 'diet') {
-          ctx.push('/wellness-category/food_therapy');
-        } else if (cat.route == 'meridian') {
-          ctx.push('/wellness-category/acupressure');
-        } else {
-          ctx.push('/wellness-category/${cat.route}');
-        }
+        _fetchCategoryArticles(cat.route);
       },
       child: Container(
         decoration: BoxDecoration(
@@ -349,6 +396,32 @@ class _DiscoverPageState extends State<DiscoverPage> {
       color: ShunShiColors.primary, fontFamily: ShunShiTypography.sansFamily,
     )),
   );
+
+  Widget _buildEmptyState(String message, IconData icon) {
+    return Padding(
+      padding: const EdgeInsets.all(40),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 48, color: ShunShiColors.textTertiary),
+          const SizedBox(height: 12),
+          Text(message, style: TextStyle(fontSize: 14, color: ShunShiColors.textTertiary)),
+          const SizedBox(height: 16),
+          GestureDetector(
+            onTap: _fetchArticles,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              decoration: BoxDecoration(
+                color: ShunShiColors.primary,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text('刷新', style: TextStyle(fontSize: 14, color: Colors.white, fontWeight: FontWeight.w500)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _Category {

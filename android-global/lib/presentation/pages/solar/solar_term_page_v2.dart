@@ -4,11 +4,12 @@
 library;
 
 import 'package:dio/dio.dart';
-import '../../widgets/state_view.dart';
+import '../../../core/config/app_config.dart';import '../../widgets/state_view.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
+import '../../../data/en_content.dart';
 
 class SolarTermPageV2 extends StatefulWidget {
   final String? termName;
@@ -19,12 +20,7 @@ class SolarTermPageV2 extends StatefulWidget {
 }
 
 class _SolarTermPageV2State extends State<SolarTermPageV2> {
-  static const _baseUrl = 'http://116.62.32.43:4000';
-  final _dio = Dio(BaseOptions(
-    baseUrl: _baseUrl,
-    connectTimeout: const Duration(seconds: 8),
-    receiveTimeout: const Duration(seconds: 15),
-  ));
+  final _dio = Dio(BaseOptions(baseUrl: AppConfig.apiBaseUrl.replaceAll('/api/v1', ''), connectTimeout: const Duration(seconds: 8), receiveTimeout: const Duration(seconds: 15)));
 
   Map<String, dynamic> _term = {};
   Map<String, dynamic> _next = {};
@@ -40,8 +36,8 @@ class _SolarTermPageV2State extends State<SolarTermPageV2> {
   Future<void> _fetchData() async {
     try {
       final url = widget.termName != null
-          ? '/api/v1/solar-terms/enhanced/${Uri.encodeComponent(widget.termName!)}'
-          : '/api/v1/solar-terms/enhanced/current';
+          ? '/api/v1/solar-terms/enhanced/${Uri.encodeComponent(widget.termName!)}?locale=en-US'
+          : '/api/v1/solar-terms/enhanced/current?locale=en-US';
       final res = await _dio.get(url);
       if (!mounted) return;
       final data = res.data;
@@ -57,10 +53,84 @@ class _SolarTermPageV2State extends State<SolarTermPageV2> {
           _wellness = Map<String, dynamic>.from(d['wellness_plan']);
         }
       }
-      setState(() => _loading = false);
-    } catch (_) {
-      if (!mounted) return;
-      setState(() => _loading = false);
+    } catch (_) {}
+
+    // Fallback to local English data if API data is empty or Chinese
+    if (_term.isEmpty) {
+      _term = {
+        'name': 'Current Solar Term',
+        'name_en': 'Seasonal Transition',
+        'emoji': '🌿',
+        'date': '',
+      };
+    }
+
+    // Ensure name_en is set for Chinese name
+    if (_term.containsKey('name') && !_term.containsKey('name_en')) {
+      _term['name_en'] = ZhEnMapper.solarTerm(_term['name']?.toString());
+    }
+
+    // Replace Chinese wellness data with local English content
+    _replaceChineseWellnessData();
+
+    if (!mounted) return;
+    setState(() => _loading = false);
+  }
+
+  /// Replace any Chinese content in wellness plan with local English data
+  void _replaceChineseWellnessData() {
+    bool hasChinese = false;
+
+    void checkAndReplace(List<dynamic>? items, List<EnContent> replacements, String key) {
+      if (items == null || items.isEmpty) return;
+      for (int i = 0; i < items.length; i++) {
+        final item = items[i];
+        if (item is Map<String, dynamic>) {
+          final title = item['title']?.toString() ?? '';
+          final desc = item['description']?.toString() ?? '';
+          if (ZhEnMapper.isChinese(title) || ZhEnMapper.isChinese(desc)) {
+            hasChinese = true;
+            if (i < replacements.length) {
+              item['title'] = replacements[i].title;
+              item['description'] = replacements[i].description;
+              item['tags'] = replacements[i].tags;
+            }
+          }
+        }
+      }
+    }
+
+    // Check and replace diet
+    final diet = _wellness['diet'];
+    if (diet is List) checkAndReplace(diet.cast<Map<String, dynamic>>(), EnContentData.foods, 'diet');
+
+    // Check and replace exercise
+    final exercise = _wellness['exercise'];
+    if (exercise is List) checkAndReplace(exercise.cast<Map<String, dynamic>>(), EnContentData.exercises, 'exercise');
+
+    // Check and replace tea
+    final tea = _wellness['tea'];
+    if (tea is List) checkAndReplace(tea.cast<Map<String, dynamic>>(), EnContentData.teas, 'tea');
+
+    // If ALL wellness data was Chinese, rebuild from local
+    if (_wellness.isEmpty || hasChinese && _wellness.isEmpty) {
+      _wellness = {
+        'diet': EnContentData.foods.take(3).map((f) => <String, dynamic>{
+          'title': f.title,
+          'description': f.description,
+          'tags': f.tags,
+        }).toList(),
+        'exercise': EnContentData.exercises.take(2).map((e) => <String, dynamic>{
+          'title': e.title,
+          'description': e.description,
+          'tags': e.tags,
+        }).toList(),
+        'tea': EnContentData.teas.take(2).map((t) => <String, dynamic>{
+          'title': t.title,
+          'description': t.description,
+          'tags': t.tags,
+        }).toList(),
+      };
     }
   }
 
@@ -68,6 +138,8 @@ class _SolarTermPageV2State extends State<SolarTermPageV2> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
+
+      appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
       backgroundColor: isDark ? ShunShiColors.darkBackground : ShunShiColors.background,
       body: _loading
           ? const LoadingSkeleton()
@@ -111,11 +183,11 @@ class _SolarTermPageV2State extends State<SolarTermPageV2> {
                         Text(_term['emoji']?.toString() ?? '🌿', style: const TextStyle(fontSize: 32)),
                         const SizedBox(width: 12),
                         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                          Text(_term['name']?.toString() ?? 'Solar Term', style: TextStyle(
+                          Text(ZhEnMapper.solarTermFromApi(_term), style: TextStyle(
                             fontFamily: ShunShiTypography.serifFamily,
                             fontSize: 32, fontWeight: FontWeight.bold, color: ShunShiColors.textPrimary,
                           )),
-                          Text(_term['name_en']?.toString() ?? '', style: TextStyle(
+                          Text(ZhEnMapper.isChinese(_term['name']?.toString()) ? _term['name']?.toString() ?? '' : '', style: TextStyle(
                             fontSize: 14, color: ShunShiColors.textTertiary,
                           )),
                         ])),
@@ -145,8 +217,8 @@ class _SolarTermPageV2State extends State<SolarTermPageV2> {
                           Text(_next['emoji']?.toString() ?? '🌱', style: const TextStyle(fontSize: 24)),
                           const SizedBox(width: 12),
                           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                            Text('${AppLocalizations.of(context).t('solar_next').replaceAll('{name}', '${_next['name']}')}', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
-                            Text('${_next['name_en'] ?? ''} · ${_next['countdown_days'] != null ? '${_next['countdown_days']}d away' : _next['date'] ?? ''}',
+                            Text('${AppLocalizations.of(context).t('solar_next').replaceAll('{name}', ZhEnMapper.solarTermFromApi(_next))}', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+                            Text('${ZhEnMapper.isChinese(_next['name']?.toString()) ? _next['name'] ?? '' : ''} · ${_next['countdown_days'] != null ? '${_next['countdown_days']}d away' : _next['date'] ?? ''}',
                               style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
                           ])),
                         ]),

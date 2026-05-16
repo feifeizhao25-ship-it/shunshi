@@ -30,6 +30,12 @@ class ApiService {
     
     // Add interceptors
     _dio.interceptors.addAll([
+      InterceptorsWrapper(onRequest: (options, handler) {
+        if (!options.queryParameters.containsKey('locale')) {
+          options.queryParameters['locale'] = 'en-US';
+        }
+        handler.next(options);
+      }),
       _LoggingInterceptor(),
       _RetryInterceptor(this),
     ]);
@@ -122,7 +128,7 @@ class ApiService {
     String? notes,
   }) async {
     await _dio.post(
-      '/api/v1/seasons/reflection/submit',
+      '/api/v1/followup/quick/daily-checkin',
       data: {
         'user_id': userId,
         'mood': mood,
@@ -135,7 +141,7 @@ class ApiService {
   
   Future<List<ReflectionResponse>> getReflections(String userId) async {
     final response = await _dio.get(
-      '/api/v1/seasons/reflection/list',
+      '/api/v1/followup/list',
       queryParameters: {'user_id': userId},
     );
     return (response.data as List)
@@ -149,7 +155,7 @@ class ApiService {
     required DateTime weekEnd,
   }) async {
     final response = await _dio.post(
-      '/api/v1/seasons/reflection/weekly',
+      '/api/v1/followup/stats',
       data: {
         'user_id': userId,
         'week_start': weekStart.toIso8601String(),
@@ -170,7 +176,7 @@ class ApiService {
     int limit = 20,
   }) async {
     final response = await _dio.get(
-      '/api/v1/seasons/content/list',
+      '/api/v1/contents',
       queryParameters: {
         if (type != null) 'type': type,
         if (season != null) 'season': season,
@@ -184,7 +190,7 @@ class ApiService {
   }
   
   Future<ContentResponse> getContentDetail(String contentId) async {
-    final response = await _dio.get('/api/v1/seasons/content/$contentId');
+    final response = await _dio.get('/api/v1/contents/$contentId');
     return ContentResponse.fromJson(response.data);
   }
   
@@ -194,14 +200,14 @@ class ApiService {
   
   Future<SeasonResponse> getCurrentSeason(String userId) async {
     final response = await _dio.get(
-      '/api/v1/seasons/season/current',
+      '/api/v1/solar-terms/current',
       queryParameters: {'user_id': userId},
     );
     return SeasonResponse.fromJson(response.data);
   }
   
   Future<List<SeasonResponse>> getSeasons() async {
-    final response = await _dio.get('/api/v1/seasons/season/list');
+    final response = await _dio.get('/api/v1/solar-terms');
     return (response.data as List)
         .map((e) => SeasonResponse.fromJson(e))
         .toList();
@@ -212,7 +218,7 @@ class ApiService {
   // ===================
   
   Future<UserResponse> getUserProfile(String userId) async {
-    final response = await _dio.get('/api/v1/seasons/user/$userId');
+    final response = await _dio.get('/api/v1/auth/me');
     return UserResponse.fromJson(response.data);
   }
   
@@ -223,7 +229,7 @@ class ApiService {
     Map<String, dynamic>? preferences,
   }) async {
     await _dio.put(
-      '/api/v1/seasons/user/$userId',
+      '/api/v1/user/profile',
       data: {
         if (name != null) 'name': name,
         if (avatarUrl != null) 'avatar_url': avatarUrl,
@@ -254,10 +260,11 @@ class ApiService {
     String? mood,
   }) async {
     final response = await _dio.get(
-      '/api/v1/intl/home/dashboard',
+      '/api/v1/contents/recommend',
       queryParameters: {
         'hemisphere': hemisphere,
         if (mood != null) 'mood': mood,
+        'locale': 'en-US',
       },
     );
     return response.data as Map<String, dynamic>;
@@ -269,7 +276,7 @@ class ApiService {
     String? mood,
   }) async {
     final response = await _dio.get(
-      '/api/v1/intl/home/daily-insight',
+      '/api/v1/ai-content/daily-tip',
       queryParameters: {
         'hemisphere': hemisphere,
         if (mood != null) 'mood': mood,
@@ -284,10 +291,11 @@ class ApiService {
     String? timeOfDay,
   }) async {
     final response = await _dio.get(
-      '/api/v1/intl/home/recommendations',
+      '/api/v1/contents/recommend',
       queryParameters: {
         'hemisphere': hemisphere,
         if (timeOfDay != null) 'time_of_day': timeOfDay,
+        'locale': 'en-US',
       },
     );
     return response.data as Map<String, dynamic>;
@@ -298,15 +306,15 @@ class ApiService {
     String hemisphere = 'north',
   }) async {
     final response = await _dio.get(
-      '/api/v1/intl/seasons/current',
-      queryParameters: {'hemisphere': hemisphere},
+      '/api/v1/solar-terms/current',
+      queryParameters: {'hemisphere': hemisphere, 'locale': 'en-US'},
     );
     return response.data as Map<String, dynamic>;
   }
 
   /// Get full season content
   Future<Map<String, dynamic>> getIntlSeasonContent(String season) async {
-    final response = await _dio.get('/api/v1/intl/seasons/$season');
+    final response = await _dio.get('/api/v1/solar-wellness/current?locale=en-US');
     return response.data as Map<String, dynamic>;
   }
 
@@ -316,8 +324,8 @@ class ApiService {
     String timeOfDay = 'morning',
   }) async {
     final response = await _dio.get(
-      '/api/v1/intl/seasons/$season/ritual',
-      queryParameters: {'time_of_day': timeOfDay},
+      '/api/v1/solar-wellness/daily-advice',
+      queryParameters: {'time_of_day': timeOfDay, 'locale': 'en-US'},
     );
     return response.data as Map<String, dynamic>;
   }
@@ -332,7 +340,7 @@ class ApiService {
     List<String>? tags,
   }) async {
     final response = await _dio.post(
-      '/api/v1/intl/reflection',
+      '/api/v1/followup/quick/daily-checkin',
       data: {
         'mood': mood,
         'energy': energy,
@@ -351,7 +359,7 @@ class ApiService {
     String timeOfDay = 'evening',
   }) async {
     final response = await _dio.get(
-      '/api/v1/intl/reflection/prompt',
+      '/api/v1/ai-content/daily-tip',
       queryParameters: {
         'season': season,
         'time_of_day': timeOfDay,
@@ -362,14 +370,14 @@ class ApiService {
 
   /// Get weekly reflection summary
   Future<Map<String, dynamic>> getIntlWeeklySummary() async {
-    final response = await _dio.get('/api/v1/intl/reflection/weekly');
+    final response = await _dio.get('/api/v1/followup/stats');
     return response.data as Map<String, dynamic>;
   }
 
   /// Get mood trend
   Future<Map<String, dynamic>> getIntlMoodTrend({int days = 14}) async {
     final response = await _dio.get(
-      '/api/v1/intl/reflection/trend',
+      '/api/v1/records/emotion/trends',
       queryParameters: {'days': days},
     );
     return response.data as Map<String, dynamic>;
@@ -381,7 +389,7 @@ class ApiService {
     String? timeOfDay,
   }) async {
     final response = await _dio.get(
-      '/api/v1/intl/greeting',
+      '/api/v1/solar-wellness/current',
       queryParameters: {
         'hemisphere': hemisphere,
         if (timeOfDay != null) 'time_of_day': timeOfDay,

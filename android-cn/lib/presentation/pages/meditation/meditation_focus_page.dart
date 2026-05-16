@@ -32,7 +32,7 @@ class _MeditationFocusPageState extends State<MeditationFocusPage>
     _Atmosphere('Soft Rain', Icons.water_drop),
     _Atmosphere('Morning Forest', Icons.forest),
     _Atmosphere('Sanctuary', Icons.spa),
-    _Atmosphere('Season', Icons.wb_sunny),
+    _Atmosphere('节气', Icons.wb_sunny),
   ];
 
   @override
@@ -84,6 +84,7 @@ class _MeditationFocusPageState extends State<MeditationFocusPage>
     final surfaceLow = isDark ? ShunShiColors.darkSurfaceContainerLow : ShunShiColors.surfaceContainerLow;
 
     return Scaffold(
+  appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
       backgroundColor: bg,
       body: SafeArea(
         child: Column(

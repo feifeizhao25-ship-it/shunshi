@@ -2,6 +2,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_localizations.dart';
 import '../../../data/network/api_client.dart';
+import '../../../data/en_content.dart';
 import '../../../design_system/theme.dart';
 import '../../widgets/exercise_demo.dart';
 import '../../widgets/skeleton_loading.dart';
@@ -36,27 +37,12 @@ class _ExercisePageState extends State<ExercisePage> {
   }
 
   Future<void> _loadData() async {
+    // Use local English content first
+    final localItems = EnContentData.exercises.map((c) => EnContentData.toMap(c)).toList();
     setState(() {
-      _isLoading = true;
-      _error = null;
+      _items = localItems;
+      _isLoading = false;
     });
-    try {
-      final res = await _api.get('/api/v1/contents', queryParameters: {
-        'type': 'exercise',
-        'limit': '20',
-      });
-      final data = res.data;
-      final items = _parseItems(data);
-      setState(() {
-        _items = items;
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _error = 'Load failed';
-        _isLoading = false;
-      });
-    }
   }
 
   List<Map<String, dynamic>> _parseItems(dynamic data) {
@@ -239,7 +225,7 @@ class _ExercisePageState extends State<ExercisePage> {
                         Expanded(
                           child: Text(
                             exercise['benefits'] is List
-                                ? (exercise['benefits'] as List).join('、')
+                                ? (exercise['benefits'] as List).join(', ')
                                 : exercise['benefits'].toString(),
                             style: const TextStyle(fontWeight: FontWeight.w500),
                           ),
@@ -321,7 +307,7 @@ class _ExerciseCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final benefits = exercise['benefits'] is List
-        ? (exercise['benefits'] as List).join('、')
+        ? (exercise['benefits'] as List).join(', ')
         : (exercise['benefits'] ?? '');
     return Card(
       margin: const EdgeInsets.only(bottom: 12),

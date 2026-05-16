@@ -1,9 +1,10 @@
 // ignore_for_file: unused_field
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import '../../../core/router/safe_pop.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
+import '../../../core/router/safe_pop.dart';
+import '../../../core/network/api_client.dart';
+import '../../../core/cache/cache_service.dart';
+import '../../../core/loading/loading_state_manager.dart';
 import '../../../design_system/theme.dart';
 
 class SolarTermDetailPage extends StatefulWidget {
@@ -17,6 +18,10 @@ class SolarTermDetailPage extends StatefulWidget {
 }
 
 class _SolarTermDetailPageState extends State<SolarTermDetailPage> {
+  final _api = ApiClient();
+  final _cache = CacheService();
+  late final LoadingDelayManager _loadingDelay;
+  bool _showLoading = false;
   bool _apiError = false;
   bool _isLoading = true;
 
@@ -52,27 +57,54 @@ class _SolarTermDetailPageState extends State<SolarTermDetailPage> {
   @override
   void initState() {
     super.initState();
+    _loadingDelay = LoadingDelayManager(delayMs: 200, minDisplayMs: 400, onStateChanged: () { if (mounted) setState(() => _showLoading = _loadingDelay.showLoading); });
     _fetchTermDetail();
   }
 
+  @override
+  void dispose() {
+    _loadingDelay.dispose();
+    super.dispose();
+  }
+
   Future<void> _fetchTermDetail() async {
+    // 缓存配置: staleTime=30min, gcTime=24h
+    const cacheConfig = CacheConfig(
+      staleTime: Duration(minutes: 30),
+      gcTime: Duration(hours: 24),
+      persist: true,
+    );
+    final cacheKey = CacheKeys.solarTerm(widget.termName);
+
+    // 1. Try cache
+    final cached = _cache.get<Map<String, dynamic>>(cacheKey, config: cacheConfig);
+    if (cached != null) {
+      _termDetail = cached.data;
+      if (mounted) setState(() => _isLoading = false);
+      if (!cached.isStale) return;
+    } else {
+      _loadingDelay.startLoading();
+      if (mounted) setState(() => _showLoading = true);
+    }
+
+    // 2. Network
     try {
-      // Use the base URL from app config or default to ECS
-      // In production this should come from app_constants
-      final baseUrl = 'http://116.62.32.43:4000';
-      final url = '$baseUrl/api/v1/solar-terms/detail/${Uri.encodeComponent(widget.termName)}';
-      final resp = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 8));
-      if (resp.statusCode == 200 && mounted) {
-        final data = jsonDecode(utf8.decode(resp.bodyBytes)) as Map<String, dynamic>;
-        setState(() {
-          _termDetail = data;
-          _isLoading = false;
-        });
+      final res = await _api.get(
+        '/solar-terms/detail/${Uri.encodeComponent(widget.termName)}',
+        level: SpeedLevel.s2,
+      );
+      if (res.data is Map && mounted) {
+        _termDetail = Map<String, dynamic>.from(res.data);
+        await _cache.set(cacheKey, _termDetail, config: cacheConfig);
+        _loadingDelay.stopLoading();
+        setState(() { _isLoading = false; _showLoading = _loadingDelay.showLoading; });
       } else if (mounted) {
-        setState(() { _isLoading = false; _apiError = true; });
+        _loadingDelay.stopLoading();
+        setState(() { _isLoading = false; _apiError = true; _showLoading = _loadingDelay.showLoading; });
       }
     } catch (e) {
-      if (mounted) setState(() { _isLoading = false; _apiError = true; });
+      _loadingDelay.stopLoading();
+      if (mounted) setState(() { _isLoading = false; _apiError = true; _showLoading = _loadingDelay.showLoading; });
     }
   }
 
@@ -117,7 +149,7 @@ class _SolarTermDetailPageState extends State<SolarTermDetailPage> {
     final surface = isDark ? ShunShiColors.darkSurface : ShunShiColors.surface;
     final borderColor = isDark ? ShunShiColors.darkBorder : ShunShiColors.border;
 
-    if (_isLoading) {
+    if (_isLoading && _showLoading) {
       return Scaffold(backgroundColor: bg, body: SafeArea(child: _buildSkeleton()));
     }
 
@@ -132,6 +164,7 @@ class _SolarTermDetailPageState extends State<SolarTermDetailPage> {
     final recommendedFoods = _getList(_termDetail['recommended_foods'], ['当季蔬果', '温润食物']);
 
     return Scaffold(
+  appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
       backgroundColor: bg,
       body: SafeArea(
         child: SingleChildScrollView(

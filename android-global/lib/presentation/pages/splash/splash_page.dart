@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/theme/seasons_colors.dart';
 import '../../../core/theme/seasons_text_styles.dart';
 import '../../../core/theme/seasons_spacing.dart';
+import '../../../core/network/api_singleton.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});

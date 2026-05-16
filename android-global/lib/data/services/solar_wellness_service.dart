@@ -2,9 +2,10 @@
 library;
 
 import 'package:dio/dio.dart';
+import '../../core/config/app_config.dart';
 
 class SolarWellnessService {
-  static const _baseUrl = 'http://116.62.32.43:4000';
+  static final String _baseUrl = AppConfig.baseUrl;
   final _dio = Dio(BaseOptions(
     baseUrl: _baseUrl,
     connectTimeout: const Duration(seconds: 8),

@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
-
-// ── Subscription Tier ──────────────────────────────────
+import '../../core/config/app_config.dart';
 
 enum SubscriptionTier { free, serenity, harmony, family }
 
@@ -222,7 +221,7 @@ class SubscriptionService {
   final String _userId;
 
   SubscriptionService({
-    String baseUrl = 'http://116.62.32.43:4000',
+    String baseUrl = "http://116.62.32.43",
     required String userId,
   })  : _baseUrl = baseUrl,
         _userId = userId,

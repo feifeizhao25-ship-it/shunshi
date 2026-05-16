@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
+import '../../../core/network/api_singleton.dart';
 
 /// NotificationsSettings页
 class NotificationSettingsPage extends StatefulWidget {

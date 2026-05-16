@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/router/safe_pop.dart';
+import '../../../core/network/api_singleton.dart';
 
 class MedicalDisclaimerPage extends StatelessWidget {
   const MedicalDisclaimerPage({super.key});
@@ -20,86 +21,86 @@ class MedicalDisclaimerPage extends StatelessWidget {
           icon: const Icon(Icons.arrow_back_ios_new, size: 20),
           onPressed: () => safePop(context),
         ),
-        title: const Text('医疗免责声明',
+        title: const Text('Medical Disclaimer',
             style: TextStyle(fontFamily: ShunShiTypography.serifFamily)),
       ),
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         children: [
-          _sectionTitle('医疗免责声明'),
-          _body('最后更新日期：2025年5月', textColor),
+          _sectionTitle('Medical Disclaimer'),
+          _body('Last updated: May 2025', textColor),
           const SizedBox(height: 16),
           _warningCard(),
           const SizedBox(height: 16),
-          _sectionTitle('一、服务性质说明'),
+          _sectionTitle('1. Nature of the Service'),
           _body(
-            '1.1 顺时（ShunShi）是一款基于传统中医养生理论和人工智能技术的健康管理辅助工具。\n\n'
-            '1.2 本应用提供的所有内容，包括但不限于：\n'
-            '• 节气养生建议\n'
-            '• 体质辨识分析\n'
-            '• 饮食、运动、穴位推荐\n'
-            '• AI 对话回答\n\n'
-            '均为基于传统养生知识的信息参考，不构成医疗诊断、治疗或处方建议。',
+            '1.1 SEASONS is a health and wellness companion based on Traditional Chinese Medicine (TCM) and artificial intelligence technology.\n\n'
+            '1.2 All content provided by this app, including but not limited to:\n'
+            '• Solar term wellness suggestions\n'
+            '• Constitution (body type) analysis\n'
+            '• Diet, exercise, and acupoint recommendations\n'
+            '• AI conversation responses\n\n'
+            'is for informational reference based on traditional wellness knowledge and does not constitute medical diagnosis, treatment, or prescription advice.',
             textColor,
           ),
           const SizedBox(height: 12),
-          _sectionTitle('二、不构成医疗建议'),
+          _sectionTitle('2. Not Medical Advice'),
           _body(
-            '2.1 本应用提供的养生建议不能替代以下专业医疗服务：\n'
-            '• 医生的诊断或治疗方案\n'
-            '• 专业医疗机构的检查或检验\n'
-            '• 药物处方或用药指导\n'
-            '• 心理治疗或心理咨询\n'
-            '• 任何形式的医疗程序\n\n'
-            '2.2 AI 生成的内容可能存在不准确或不适用于您个人情况的情况。在做出任何健康相关决策前，请务必咨询合格的医疗专业人员。',
+            '2.1 The wellness suggestions provided by this app cannot replace the following professional medical services:\n'
+            '• A doctor\'s diagnosis or treatment plan\n'
+            '• Examinations or tests from professional medical institutions\n'
+            '• Drug prescriptions or medication guidance\n'
+            '• Psychotherapy or psychological counseling\n'
+            '• Any form of medical procedure\n\n'
+            '2.2 AI-generated content may be inaccurate or not applicable to your personal situation. Please consult a qualified medical professional before making any health-related decisions.',
             textColor,
           ),
           const SizedBox(height: 12),
-          _sectionTitle('三、特殊人群提示'),
+          _sectionTitle('3. Special Population Notices'),
           _body(
-            '3.1 孕妇及哺乳期女性\n'
-            '• 部分养生建议（如穴位按压、药膳食疗）可能不适用于孕期\n'
-            '• 使用本应用前请务必咨询产科医生\n'
-            '• 如出现任何不适，请立即停止使用并就医\n\n'
-            '3.2 慢性病患者\n'
-            '• 患有高血压、糖尿病、心脏病等慢性疾病的用户，应在医生指导下使用本应用\n'
-            '• 本应用的养生建议不能替代或修改医生制定的治疗方案\n'
-            '• 不要根据本应用的建议自行调整药物剂量\n\n'
-            '3.3 术后康复期\n'
-            '• 术后恢复期用户应严格遵循医嘱\n'
-            '• 运动和饮食建议需与主治医生确认后再执行\n\n'
-            '3.4 儿童\n'
-            '• 本应用不面向 14 周岁以下儿童\n'
-            '• 青少年使用应在监护人陪同和指导下进行',
+            '3.1 Pregnant and Breastfeeding Women\n'
+            '• Some wellness suggestions (such as acupoint pressure, herbal diet therapy) may not be suitable during pregnancy\n'
+            '• Please consult an obstetrician before using this app\n'
+            '• If you experience any discomfort, stop using the app immediately and seek medical attention\n\n'
+            '3.2 Chronic Disease Patients\n'
+            '• Users with chronic conditions such as hypertension, diabetes, or heart disease should use this app under medical guidance\n'
+            '• The app\'s wellness suggestions cannot replace or modify treatment plans established by your doctor\n'
+            '• Do not adjust medication dosages on your own based on the app\'s suggestions\n\n'
+            '3.3 Post-Surgery Recovery\n'
+            '• Post-surgery users should strictly follow their doctor\'s orders\n'
+            '• Exercise and diet recommendations should be confirmed with your treating physician before execution\n\n'
+            '3.4 Children\n'
+            '• This app is not intended for children under 14 years of age\n'
+            '• Adolescents should use the app under the supervision and guidance of a guardian',
             textColor,
           ),
           const SizedBox(height: 12),
-          _sectionTitle('四、紧急情况'),
+          _sectionTitle('4. Emergency Situations'),
           _body(
-            '如出现以下情况，请立即拨打 120 急救电话或前往最近的医疗机构：\n\n'
-            '• 胸痛、呼吸困难\n'
-            '• 严重出血或外伤\n'
-            '• 突发剧烈头痛、意识模糊\n'
-            '• 严重过敏反应（呼吸困难、肿胀）\n'
-            '• 高烧不退（39°C 以上）\n'
-            '• 其他任何危及生命的症状\n\n'
-            '本应用不提供紧急医疗服务，不能用于处理紧急健康状况。',
+            'If you experience any of the following, please call emergency services (911 or your local emergency number) or go to the nearest medical facility immediately:\n\n'
+            '• Chest pain, difficulty breathing\n'
+            '• Severe bleeding or trauma\n'
+            '• Sudden severe headache, confusion\n'
+            '• Severe allergic reactions (difficulty breathing, swelling)\n'
+            '• Persistent high fever (above 39°C / 102°F)\n'
+            '• Any other life-threatening symptoms\n\n'
+            'This app does not provide emergency medical services and cannot be used to handle emergency health conditions.',
             textColor,
           ),
           const SizedBox(height: 12),
-          _sectionTitle('五、责任限制'),
+          _sectionTitle('5. Limitation of Liability'),
           _body(
-            '5.1 您理解并同意，因使用本应用的内容导致的任何直接或间接损失，开发者不承担责任。\n\n'
-            '5.2 您有责任根据自身健康状况合理使用本应用，并在必要时寻求专业医疗帮助。\n\n'
-            '5.3 如您因本应用的养生建议而产生健康疑虑，请立即咨询医生。',
+            '5.1 You understand and agree that the developer is not responsible for any direct or indirect losses resulting from the use of the app\'s content.\n\n'
+            '5.2 You are responsible for using the app reasonably based on your own health condition and seeking professional medical help when necessary.\n\n'
+            '5.3 If you have health concerns arising from the app\'s wellness suggestions, please consult a doctor immediately.',
             textColor,
           ),
           const SizedBox(height: 12),
-          _sectionTitle('六、联系方式'),
+          _sectionTitle('6. Contact'),
           _body(
-            '如有关于医疗免责声明的问题：\n'
-            '• 邮箱：legal@shunshi.app\n'
-            '• 客服：support@shunshi.app',
+            'For questions about this medical disclaimer:\n'
+            '• Email: legal@shunshi.app\n'
+            '• Support: support@shunshi.app',
             textColor,
           ),
           const SizedBox(height: 40),
@@ -146,7 +147,7 @@ class MedicalDisclaimerPage extends StatelessWidget {
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              '重要提示：本应用提供的是传统养生建议，不构成医疗诊断。如有健康问题，请咨询专业医生。',
+              'Important: This app provides traditional wellness suggestions, not medical diagnoses. If you have health concerns, please consult a qualified healthcare professional.',
               style: TextStyle(
                 fontSize: 14,
                 color: ShunShiColors.warning,

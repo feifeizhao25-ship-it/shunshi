@@ -22,20 +22,20 @@ class _SeasonalShoppingPageState extends State<SeasonalShoppingPage> {
   final _newItem = TextEditingController();
 
   static final _categories = [
-    _ShoppingCategory('Produce', '4 Items', [
-      _ShoppingItem('Heirloom Carrots', 'Peak Harvest', 'Bunch of 5 with greens', true),
-      _ShoppingItem('Wild Asparagus', 'Seasonal', '1 bundle, thin stalks', false),
-      _ShoppingItem('Spring Onions', 'Fresh', 'Bunch of 6-8', true),
-      _ShoppingItem('Radishes', 'Peak Harvest', '1 bunch, red globe', false),
+    _ShoppingCategory('蔬果', '4件', [
+      _ShoppingItem('胡萝卜', '应季', '一捆，带叶', true),
+      _ShoppingItem('芦笋', '应季', '一把，细茎', false),
+      _ShoppingItem('葱', '新鲜', '6-8根一捆', true),
+      _ShoppingItem('樱桃萝卜', '应季', '一捆，红色', false),
     ]),
-    _ShoppingCategory('Herbs', '2 Items', [
-      _ShoppingItem('Fresh Mint', 'Organic', '1 small bunch', false),
-      _ShoppingItem('Basil', 'Local', 'Potted or cut', true),
+    _ShoppingCategory('香草', '2件', [
+      _ShoppingItem('薄荷', '有机', '一小把', false),
+      _ShoppingItem('罗勒', '本地', '盆栽或鲜切', true),
     ]),
-    _ShoppingCategory('Grains', '3 Items', [
-      _ShoppingItem('Arborio Rice', 'Imported', '500g bag', false),
-      _ShoppingItem('Quinoa', 'Organic', '400g', true),
-      _ShoppingItem('Barley', 'Pearled', '500g', false),
+    _ShoppingCategory('谷物', '3件', [
+      _ShoppingItem('糙米', '国产', '500g袋装', false),
+      _ShoppingItem('藜麦', '有机', '400g', true),
+      _ShoppingItem('大麦', '去壳', '500g', false),
     ]),
   ];
 

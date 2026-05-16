@@ -26,13 +26,13 @@ class AuthService {
 
       final googleUser = await googleSignIn.signIn();
       if (googleUser == null) {
-        return {'error': '用户取消了 Google 登录'};
+        return {'error': 'User cancelled Google sign-in'};
       }
 
       final googleAuth = await googleUser.authentication;
       final idToken = googleAuth.idToken;
       if (idToken == null) {
-        return {'error': 'Google 登录失败: 未获取到 ID Token'};
+        return {'error': 'Google sign-in failed: ID Token not received'};
       }
 
       // 调用后端 Google 登录接口
@@ -49,10 +49,10 @@ class AuthService {
         _isAnonymous = false;
         return {'success': true, 'user': _currentUser};
       } else {
-        return {'error': response['detail'] ?? 'Google 登录失败'};
+        return {'error': response['detail'] ?? 'Google sign-in failed'};
       }
     } catch (e) {
-      return {'error': 'Google 登录失败: ${e.toString()}'};
+      return {'error': 'Google sign-in failed: ${e.toString()}'};
     }
   }
 
@@ -67,7 +67,7 @@ class AuthService {
       );
 
       if (credential.identityToken == null) {
-        return {'error': 'Apple 登录失败: 未获取到 identity token'};
+        return {'error': 'Apple sign-in failed: identity token not received'};
       }
 
       String? displayName;
@@ -91,19 +91,19 @@ class AuthService {
         _isAnonymous = false;
         return {'success': true, 'user': _currentUser};
       } else {
-        return {'error': response['detail'] ?? 'Apple 登录失败'};
+        return {'error': response['detail'] ?? 'Apple sign-in failed'};
       }
     } on SignInWithAppleException catch (e) {
-      return {'error': 'Apple 登录失败: ${e.toString()}'};
+      return {'error': 'Apple sign-in failed: ${e.toString()}'};
     } catch (e) {
-      return {'error': 'Apple 登录失败: ${e.toString()}'};
+      return {'error': 'Apple sign-in failed: ${e.toString()}'};
     }
   }
 
-  /// 邮箱登录 (调用后端)
+  /// Email sign-in
   Future<Map<String, dynamic>> signInWithEmail(String email, String password) async {
     if (email.isEmpty || password.isEmpty) {
-      return {'error': '请输入邮箱和密码'};
+      return {'error': 'Please enter email and password'};
     }
 
     try {
@@ -116,17 +116,17 @@ class AuthService {
         _isAnonymous = false;
         return {'success': true, 'user': _currentUser};
       } else {
-        return {'error': response['detail'] ?? '登录失败'};
+        return {'error': response['detail'] ?? 'Login failed'};
       }
     } catch (e) {
-      return {'error': '登录失败: ${e.toString()}'};
+      return {'error': 'Login failed: ${e.toString()}'};
     }
   }
 
-  /// 邮箱注册 (调用后端)
+  /// Email registration
   Future<Map<String, dynamic>> registerWithEmail(String name, String email, String password) async {
     if (email.isEmpty || password.isEmpty) {
-      return {'error': '请输入邮箱和密码'};
+      return {'error': 'Please enter email and password'};
     }
 
     try {
@@ -139,10 +139,10 @@ class AuthService {
         _isAnonymous = false;
         return {'success': true, 'user': _currentUser};
       } else {
-        return {'error': response['detail'] ?? '注册失败'};
+        return {'error': response['detail'] ?? 'Registration failed'};
       }
     } catch (e) {
-      return {'error': '注册失败: ${e.toString()}'};
+      return {'error': 'Registration failed: ${e.toString()}'};
     }
   }
 
@@ -161,10 +161,10 @@ class AuthService {
         _isAnonymous = true;
         return {'success': true, 'user': _currentUser};
       } else {
-        return {'error': response['detail'] ?? '游客登录失败'};
+        return {'error': response['detail'] ?? 'Guest login failed'};
       }
     } catch (e) {
-      return {'error': '游客登录失败: ${e.toString()}'};
+      return {'error': 'Guest login failed: ${e.toString()}'};
     }
   }
 
@@ -191,7 +191,7 @@ class AuthService {
   /// 升级匿名账户 (绑定邮箱)
   Future<Map<String, dynamic>> upgradeAnonymous(String email, String password) async {
     if (_currentUser == null || !_isAnonymous) {
-      return {'error': '当前不是匿名登录'};
+      return {'error': 'Not currently signed in as guest'};
     }
 
     try {
@@ -208,10 +208,10 @@ class AuthService {
         _isAnonymous = false;
         return {'success': true, 'user': _currentUser};
       } else {
-        return {'error': response['detail'] ?? '升级失败'};
+        return {'error': response['detail'] ?? 'Upgrade failed'};
       }
     } catch (e) {
-      return {'error': '升级失败: ${e.toString()}'};
+      return {'error': 'Upgrade failed: ${e.toString()}'};
     }
   }
 

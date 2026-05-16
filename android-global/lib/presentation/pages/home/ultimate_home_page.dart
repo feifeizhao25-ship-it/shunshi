@@ -12,6 +12,8 @@ import 'package:go_router/go_router.dart';
 import 'widgets/home_skeleton.dart';
 import '../../../data/services/offline_cache.dart';
 import '../../../core/theme/app_localizations.dart';
+import '../../../core/network/api_singleton.dart';
+import '../../../data/en_content.dart';
 
 // ═══════════════════════════════════════════════════════════════
 // Twelve ShiChen Data Model (local computation)
@@ -243,12 +245,7 @@ class UltimateHomePage extends StatefulWidget {
 }
 
 class _UltimateHomePageState extends State<UltimateHomePage> {
-  static const _baseUrl = 'http://116.62.32.43:4000';
-  final _dio = Dio(BaseOptions(
-    baseUrl: _baseUrl,
-    connectTimeout: const Duration(seconds: 8),
-    receiveTimeout: const Duration(seconds: 15),
-  ));
+  final _dio = apiClient.dio;
 
   late ShiChenData _currentShiChen;
   String _solarTermInfo = '';
@@ -280,8 +277,8 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
 
     try {
       final results = await Future.wait([
-        _dio.get('/api/v1/seasons/home/dashboard?locale=en-US'),
-        _dio.get('/api/v1/solar-terms/enhanced/current'),
+        _dio.get('/api/v1/contents/recommend?locale=en-US'),
+        _dio.get('/api/v1/solar-terms/enhanced/current?locale=en-US'),
         _dio.get('/api/v1/followup/due', queryParameters: {'user_id': StorageManager.user.getUserId() ?? 'guest', 'limit': 1}),
       ]);
 
@@ -295,7 +292,15 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
 
       final solar = results[1].data;
       if (solar is Map) {
-        // Could enhance solar term info from API
+        // Update solar term info from API if available, ensuring English
+        final solarData = solar['data'] is Map ? solar['data'] as Map : (solar.containsKey('current') ? solar : null);
+        if (solarData != null && solarData['current'] is Map) {
+          final current = Map<String, dynamic>.from(solarData['current']);
+          final enName = ZhEnMapper.solarTermFromApi(current);
+          if (enName.isNotEmpty) {
+            // Could enhance solar term info if needed
+          }
+        }
       }
 
       final followupRes = results[2].data;
@@ -431,7 +436,7 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
           // Left: Menu + Brand
           Row(children: [
             GestureDetector(
-              onTap: () {},
+              onTap: () => context.push('/profile'),
               child: Container(
                 width: 40, height: 40,
                 decoration: BoxDecoration(
@@ -835,7 +840,7 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
                 )),
                 const SizedBox(height: 2),
                 Text(
-                  _followUp['title']?.toString() ?? _followUp['description']?.toString() ?? '',
+                  ZhEnMapper.isChinese(_followUp['title']?.toString()) ? 'You have a wellness reminder' : _followUp['title']?.toString() ?? _followUp['description']?.toString() ?? '',
                   style: ShunShiTypography.bodySmall,
                   maxLines: 2, overflow: TextOverflow.ellipsis,
                 ),

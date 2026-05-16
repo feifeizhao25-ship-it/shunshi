@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../design_system/theme.dart';
 import '../../../../design_system/theme_helper.dart';
+import '../../../../core/network/api_singleton.dart';
 
 class HomeBottomNav extends StatelessWidget {
   const HomeBottomNav({super.key});

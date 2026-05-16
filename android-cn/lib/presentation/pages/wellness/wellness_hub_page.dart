@@ -99,6 +99,7 @@ class _WellnessHubPageState extends State<WellnessHubPage> {
 
   Widget _buildContent() {
     return Scaffold(
+  appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
       backgroundColor: AppColors.background(context),
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),

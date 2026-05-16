@@ -4,6 +4,7 @@ import '../../../design_system/theme.dart';
 import '../../../design_system/theme_helper.dart';
 import 'chat_models.dart';
 import '../../../core/theme/app_localizations.dart';
+import '../../../core/network/api_singleton.dart';
 
 /// AI Messages气泡
 class AIBubble extends StatelessWidget {

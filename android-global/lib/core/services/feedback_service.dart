@@ -1,9 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../config/app_config.dart';
 
 class FeedbackService {
-  static const String _baseUrl = 'http://116.62.32.43:4000/api/v1';
-  static final _dio = Dio(BaseOptions(baseUrl: _baseUrl, connectTimeout: Duration(seconds: 10)));
+  static final _dio = Dio(BaseOptions(baseUrl: AppConfig.apiBaseUrl, connectTimeout: Duration(seconds: 10)))..interceptors.add(InterceptorsWrapper(onRequest: (o, h) { if (!o.queryParameters.containsKey("locale")) o.queryParameters["locale"] = "en-US"; h.next(o); }));
 
   /// Record practice completion with rating
   static Future<bool> practiceComplete({

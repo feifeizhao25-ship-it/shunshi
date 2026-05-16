@@ -3,7 +3,9 @@
 library;
 
 import 'package:dio/dio.dart';
+import '../../../core/config/app_config.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
 
 class DiaryPageV2 extends StatefulWidget {
@@ -14,7 +16,7 @@ class DiaryPageV2 extends StatefulWidget {
 }
 
 class _DiaryPageV2State extends State<DiaryPageV2> {
-  static const _baseUrl = 'http://116.62.32.43:4000';
+  static final String _baseUrl = AppConfig.apiBaseUrl.replaceAll('/api/v1', '');
   final _dio = Dio(BaseOptions(baseUrl: _baseUrl, connectTimeout: const Duration(seconds: 8)));
   final _noteController = TextEditingController();
   
@@ -106,6 +108,7 @@ class _DiaryPageV2State extends State<DiaryPageV2> {
     final termIdx = ((now.month - 1) * 2 + (now.day >= 6 ? 1 : 0)) % 24;
     
     return Scaffold(
+  appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
       backgroundColor: bg,
       body: RefreshIndicator(
         onRefresh: _fetchEntries,
@@ -300,18 +303,25 @@ class _DiaryPageV2State extends State<DiaryPageV2> {
                   final e = _recentEntries[i];
                   return Padding(
                     padding: const EdgeInsets.fromLTRB(24, 0, 24, 8),
-                    child: Container(
-                      padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(12)),
-                      child: Row(children: [
-                        Icon(_moodIcons[e['mood']] ?? Icons.sentiment_neutral, color: ShunShiColors.primary, size: 20),
-                        const SizedBox(width: 10),
-                        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                          Text(e['mood']?.toString() ?? '', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: ShunShiColors.textPrimary)),
-                          Text(e['created_at']?.toString().substring(5, 10) ?? '', style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
-                        ])),
-                        if (e['note'] != null) Icon(Icons.notes, color: ShunShiColors.textTertiary, size: 16),
-                      ]),
+                    child: GestureDetector(
+                      onTap: () {
+                        context.push('/diary-report');
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(12)),
+                        child: Row(children: [
+                          Icon(_moodIcons[e['mood']] ?? Icons.sentiment_neutral, color: ShunShiColors.primary, size: 20),
+                          const SizedBox(width: 10),
+                          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                            Text(e['mood']?.toString() ?? '', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: ShunShiColors.textPrimary)),
+                            Text(e['created_at']?.toString().substring(5, 10) ?? '', style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
+                          ])),
+                          if (e['note'] != null) Icon(Icons.notes, color: ShunShiColors.textTertiary, size: 16),
+                          const SizedBox(width: 6),
+                          Icon(Icons.chevron_right, size: 16, color: ShunShiColors.textTertiary),
+                        ]),
+                      ),
                     ),
                   );
                 }, childCount: _recentEntries.length),

@@ -51,6 +51,7 @@ class NetworkService {
     
     // Add interceptors
     dio.interceptors.addAll([
+      _LocaleInterceptor(),
       _AuthInterceptor(),
       _RetryInterceptor(),
       _OfflineInterceptor(),
@@ -103,6 +104,17 @@ class NetworkService {
 
 // ==================== Auth Interceptor ====================
 
+class _LocaleInterceptor extends Interceptor {
+  @override
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+    // Auto-append locale=en-US for Global edition
+    if (!options.queryParameters.containsKey('locale')) {
+      options.queryParameters['locale'] = 'en-US';
+    }
+    handler.next(options);
+  }
+}
+
 class _AuthInterceptor extends Interceptor {
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
@@ -122,7 +134,7 @@ class _AuthInterceptor extends Interceptor {
         // Call refresh endpoint
         final dio = Dio();
         final response = await dio.post(
-          '${AppConfig.apiBaseUrl}/auth/refresh',
+          '${AppConfig.apiBaseUrl}/api/v1/auth/refresh',
           data: {'refresh_token': refreshToken},
         );
         return response.data as Map<String, String>;

@@ -342,7 +342,7 @@ class UserService {
       });
       return res.data as Map<String, dynamic>;
     } catch (e) {
-      return {'error': 'Google 登录失败: $e'};
+      return {'error': 'Google sign-in failed: $e'};
     }
   }
 
@@ -364,7 +364,7 @@ class UserService {
       });
       return res.data as Map<String, dynamic>;
     } catch (e) {
-      return {'error': 'Apple 登录失败: $e'};
+      return {'error': 'Apple sign-in failed: $e'};
     }
   }
 
@@ -386,7 +386,7 @@ class UserService {
       }
       return res.data as Map<String, dynamic>;
     } catch (e) {
-      return {'error': '游客登录失败: $e'};
+      return {'error': 'Guest login failed: $e'};
     }
   }
 
@@ -400,7 +400,7 @@ class UserService {
       }
       return res.data as Map<String, dynamic>;
     } catch (e) {
-      return {'error': '获取用户信息失败: $e'};
+      return {'error': 'Failed to get user info: $e'};
     }
   }
 }

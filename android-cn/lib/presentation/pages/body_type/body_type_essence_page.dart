@@ -31,6 +31,7 @@ class BodyTypeEssencePage extends StatelessWidget {
     final bg = isDark ? ShunShiColors.darkBackground : ShunShiColors.background;
 
     return Scaffold(
+  appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
       backgroundColor: bg,
       body: CustomScrollView(
         slivers: [

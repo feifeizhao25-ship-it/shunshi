@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import '../../core/config/app_config.dart';
 // Follow-up 调度系统
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -224,7 +225,7 @@ class FollowUpTasksNotifier extends StateNotifier<List<FollowUpTask>> {
     // 触发推送通知
     try {
       final dio = Dio();
-      await dio.post('http://116.62.32.43:4000/api/v1/notifications/send', data: {
+      await dio.post('${AppConfig.apiBaseUrl}/api/v1/notifications/send', data: {
         'user_id': task.userId, 'title': 'Follow-up Reminder', 'body': task.title,
       });
     } catch (_) {}
@@ -348,7 +349,7 @@ class FollowUpReminderService {
     // 调用推送服务
     try {
       final dio = Dio();
-      await dio.post('http://116.62.32.43:4000/api/v1/notifications/send', data: {
+      await dio.post('${AppConfig.apiBaseUrl}/api/v1/notifications/send', data: {
         'user_id': userId, 'title': title, 'task_id': taskId,
       });
     } catch (_) {}

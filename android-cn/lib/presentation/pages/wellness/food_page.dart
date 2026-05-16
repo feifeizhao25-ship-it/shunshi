@@ -1,5 +1,7 @@
 import '../../../core/router/safe_pop.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../data/network/api_client.dart';
 import '../../widgets/food_card.dart';
 import '../../widgets/skeleton_loading.dart';
@@ -20,6 +22,7 @@ class _FoodPageState extends State<FoodPage> {
 
   String? _selectedSeason;
   String? _selectedConstitution;
+  String? _userConstitutionType;
 
   static const List<Map<String, String>> _seasonFilters = [
     {'value': 'spring', 'label': '春'},
@@ -36,6 +39,12 @@ class _FoodPageState extends State<FoodPage> {
   @override
   void initState() {
     super.initState();
+    _loadUserConstitution();
+  }
+
+  Future<void> _loadUserConstitution() async {
+    final prefs = await SharedPreferences.getInstance();
+    _userConstitutionType = prefs.getString('constitution_type');
     _loadData();
   }
 
@@ -126,6 +135,33 @@ class _FoodPageState extends State<FoodPage> {
       ),
       body: Column(
         children: [
+          // ── Header image with gradient overlay ──
+          Stack(
+            children: [
+              SizedBox(
+                height: 120,
+                width: double.infinity,
+                child: Image.asset(
+                  'assets/images/food_therapy.jpg',
+                  fit: BoxFit.cover,
+                ),
+              ),
+              Positioned.fill(
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.black.withValues(alpha: 0.1),
+                        Colors.black.withValues(alpha: 0.5),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
           Container(
             padding: const EdgeInsets.all(16),
             color: Colors.red[50],
@@ -200,6 +236,16 @@ class _FoodPageState extends State<FoodPage> {
           final food = filtered[index];
           final season = food['season_tag'] as String? ?? 'all';
           return FoodCard(
+            onTap: () {
+              final id = food['id']?.toString();
+              if (id != null && id.isNotEmpty) {
+                context.push('/content/$id');
+              } else {
+                context.push('/diet-recommend', extra: {
+                  'constitutionType': _userConstitutionType,
+                });
+              }
+            },
             food: FoodCardData(
               name: food['title'] ?? '',
               seasonTag: _seasonLabel(season),

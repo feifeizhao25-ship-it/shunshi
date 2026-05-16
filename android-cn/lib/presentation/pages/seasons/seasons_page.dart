@@ -9,7 +9,7 @@ import '../../../core/theme/seasons_colors.dart';
 import '../../../core/theme/seasons_spacing.dart';
 import '../../../core/theme/seasons_text_styles.dart';
 
-// ── 季节配色 — 更柔和的渐变 ──────────────────────────
+//
 
 Color _seasonBgStart(String season) {
   switch (season) {
@@ -60,7 +60,7 @@ String _seasonDisplayName(String season) {
   return season[0].toUpperCase() + season.substring(1);
 }
 
-// ── 当前季节辅助 ──────────────────────────────────────
+//
 
 String _getCurrentSeason() {
   final month = DateTime.now().month;
@@ -70,7 +70,7 @@ String _getCurrentSeason() {
   return 'winter';
 }
 
-// ── 主页面 ────────────────────────────────────────────
+//
 
 class SeasonsPage extends StatefulWidget {
   const SeasonsPage({super.key});
@@ -85,29 +85,30 @@ class _SeasonsPageState extends State<SeasonsPage> {
     final currentSeason = _getCurrentSeason();
     final currentInsight = null; // TODO: integrate seasons insights
     return Scaffold(
+  appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
       backgroundColor: SeasonsColors.background,
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── 顶部大视觉区域 (50%) ──
+            //
             _HeroSection(season: currentSeason),
 
-            // ── 季节感悟 ──
+            //
             if (currentInsight != null)
               _InsightSection(
                 insight: currentInsight.value,
                 season: currentSeason,
               ),
 
-            // ── 生活suggestion:  ──
+            //
             if (currentInsight != null)
               _GentleSuggestions(
                 insight: currentInsight.value,
                 season: currentSeason,
               ),
 
-            // ── Other季节快速导航 ──
+            //
             _OtherSeasons(current: currentSeason),
 
             const SizedBox(height: 48),
@@ -118,7 +119,7 @@ class _SeasonsPageState extends State<SeasonsPage> {
   }
 }
 
-// ── 顶部大视觉区域 — 50%，更柔和渐变 ──
+//
 
 class _HeroSection extends StatelessWidget {
   final String season;
@@ -201,7 +202,7 @@ class _HeroSection extends StatelessWidget {
   }
 }
 
-// ── 季节感悟 ──
+//
 
 class _InsightSection extends StatelessWidget {
   final dynamic insight;
@@ -232,7 +233,7 @@ class _InsightSection extends StatelessWidget {
   }
 }
 
-// ── 生活suggestion: （极简版，只取前3条）───────────────────────
+//
 
 class _GentleSuggestions extends StatelessWidget {
   final dynamic insight;
@@ -296,7 +297,7 @@ class _GentleSuggestions extends StatelessWidget {
   }
 }
 
-// ── 极简suggestion: 卡片 ──
+//
 
 class _GentleCard extends StatelessWidget {
   final String emoji;
@@ -334,7 +335,7 @@ class _GentleCard extends StatelessWidget {
   }
 }
 
-// ── Other季节导航 ──
+//
 
 class _OtherSeasons extends StatelessWidget {
   final String current;

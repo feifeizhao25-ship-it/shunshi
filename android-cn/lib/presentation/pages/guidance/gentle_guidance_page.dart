@@ -68,7 +68,7 @@ class GentleGuidancePage extends StatelessWidget {
               icon: Icons.restaurant_menu,
               iconColor: const Color(0xFF22C55E),
               iconBg: const Color(0xFF22C55E).withValues(alpha: 0.1),
-              title: 'Seasonal Tip',
+              title: '节气小贴士',
               time: '2h ago',
               description: 'Time for bitter greens. Dandelion and arugula will support your liver\'s natural detoxification this afternoon.',
               cta: null,

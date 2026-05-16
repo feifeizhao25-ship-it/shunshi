@@ -2,6 +2,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import '../../../data/network/api_client.dart';
+import '../../../data/en_content.dart';
 import '../../widgets/food_card.dart';
 import '../../widgets/skeleton_loading.dart';
 import '../../../core/theme/app_localizations.dart';
@@ -42,27 +43,12 @@ class _FoodPageState extends State<FoodPage> {
   }
 
   Future<void> _loadData() async {
+    // Use local English content first
+    final localItems = EnContentData.foods.map((c) => EnContentData.toMap(c)).toList();
     setState(() {
-      _isLoading = true;
-      _error = null;
+      _items = localItems;
+      _isLoading = false;
     });
-    try {
-      final res = await _api.get('/api/v1/contents', queryParameters: {
-        'type': 'recipe',
-        'limit': '20',
-      });
-      final data = res.data;
-      final items = _parseItems(data);
-      setState(() {
-        _items = items;
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _error = 'Load failed';
-        _isLoading = false;
-      });
-    }
   }
 
   List<Map<String, dynamic>> _parseItems(dynamic data) {
@@ -77,7 +63,8 @@ class _FoodPageState extends State<FoodPage> {
 
   List<Map<String, dynamic>> get _filteredFoods {
     return _items.where((food) {
-      if (_selectedSeason != null && food['season_tag'] != _selectedSeason) return false;
+      final season = food['season'] ?? food['season_tag'];
+      if (_selectedSeason != null && season != _selectedSeason && season != 'all') return false;
       if (_selectedConstitution != null) {
         final tags = food['tags'];
         if (tags == null || !(tags is List && tags.contains(_selectedConstitution))) return false;
@@ -201,20 +188,20 @@ appBar: AppBar(
         itemCount: filtered.length,
         itemBuilder: (context, index) {
           final food = filtered[index];
-          final season = food['season_tag'] as String? ?? 'all';
+          final season = food['season'] as String? ?? food['season_tag'] as String? ?? 'all';
           return FoodCard(
             food: FoodCardData(
               name: food['title'] ?? '',
               seasonTag: _seasonLabel(season),
               seasonEmoji: food['emoji'] ?? '🍲',
-              description: food['description'] ?? food['benefits']?.join('、') ?? '',
+              description: food['description'] ?? '',
               difficulty: food['difficulty'] ?? '',
               category: food['category'] ?? '',
               ingredients: food['ingredients'] is List
-                  ? (food['ingredients'] as List).join('、')
+                  ? (food['ingredients'] as List).join(', ')
                   : (food['ingredients'] ?? ''),
               effect: food['benefits'] is List
-                  ? (food['benefits'] as List).join('、')
+                  ? (food['benefits'] as List).join(', ')
                   : (food['benefits'] ?? ''),
               recipe: food['steps'] is List
                   ? (food['steps'] as List).asMap().entries.map((e) => '${e.key + 1}. ${e.value}').join('\n')

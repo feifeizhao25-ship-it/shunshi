@@ -5,9 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../design_system/theme.dart';
 import '../../widgets/membership_widgets.dart';
-
-const _baseUrl = 'http://116.62.32.43:4000';
-
+import '../../../core/network/api_singleton.dart';
 /// Chat Page — AI Wellness Assistant
 /// Stripe-inspired messaging with purple accent
 class ChatPage extends StatefulWidget {
@@ -39,15 +37,15 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
   final _scrollController = ScrollController();
   final _focusNode = FocusNode();
   final List<_ChatMessage> _messages = [];
-  final _dio = Dio(BaseOptions(baseUrl: _baseUrl));
+  final _dio = apiClient.dio;
   bool _isLoading = false;
   int _quotaRemaining = 10;
   int _quotaLimit = 10;
   bool _isVip = false;
   String _userName = '';
   String _token = '';
-  final String _currentSolarTerm = 'Qingming';
-  final String _solarTermDesc = 'Spring deepens, all things clean and bright. A time for outdoor activities and expansive moods.';
+  String _currentSolarTerm = 'Lixia';
+  final String _solarTermDesc = 'The beginning of summer. Nourish the heart, eat lightly, rest properly.';
   String? _conversationId;
 
   @override
@@ -65,7 +63,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
     });
     if (_token.isEmpty) {
       try {
-        final res = await _dio.post('/api/v1/intl/auth/guest-login', data: {
+        final res = await _dio.post('/api/v1/auth/guest-login', data: {
           'device_id': 'shunshi_${DateTime.now().millisecondsSinceEpoch}',
         });
         if (res.data != null && res.data['data']?['token'] != null) {

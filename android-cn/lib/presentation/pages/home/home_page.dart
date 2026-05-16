@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../design_system/theme.dart';
+import '../../../core/config/app_config.dart';
 import 'widgets/greeting_section.dart';
 import 'widgets/today_action_card.dart';
 import 'widgets/secondary_card.dart';
@@ -30,14 +31,14 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final _dio = Dio(BaseOptions(
-    baseUrl: 'http://116.62.32.43:4000',
+    baseUrl: AppConfig.apiBaseUrl.replaceAll('/api/v1', ''),
     connectTimeout: const Duration(seconds: 5),
     receiveTimeout: const Duration(seconds: 8),
   ));
 
   bool _isLoading = true;
   String _userName = '';
-  String _currentTerm = '清明';
+  String _currentTerm = '立夏';
   String _shiChen = '';
   String _shiChenOrgan = '';
   String _constitution = '';

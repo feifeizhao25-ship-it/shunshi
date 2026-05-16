@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../design_system/theme.dart';
 import '../../../../design_system/theme_helper.dart';
+import '../../../../core/network/api_singleton.dart';
 
 class GreetingSection extends StatelessWidget {
   final String greeting;

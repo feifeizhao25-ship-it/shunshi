@@ -13,6 +13,8 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
+import 'package:go_router/go_router.dart';
+import '../../../core/network/api_singleton.dart';
 
 class WellnessReportPage extends StatelessWidget {
   const WellnessReportPage({super.key});
@@ -27,7 +29,9 @@ class WellnessReportPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : ShunShiColors.background,
+    return Scaffold(
+
+      appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),backgroundColor: isDark ? ShunshiDarkColors.background : ShunShiColors.background,
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
@@ -44,7 +48,7 @@ class WellnessReportPage extends StatelessWidget {
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [ShunShiColors.primaryDeep ?? ShunShiColors.primary, ShunShiColors.primary],
+                    colors: [ShunShiColors.primary, ShunShiColors.primary],
                   ),
                 ),
                 child: SafeArea(
@@ -139,7 +143,7 @@ class WellnessReportPage extends StatelessWidget {
                               ),
                               const SizedBox(height: 10),
                               GestureDetector(
-                                onTap: () {},
+                                onTap: () => context.push('/wellness-category/diet'),
                                 child: Row(children: [
                                   Text(AppLocalizations.of(context).t('learn_more'), style: TextStyle(
                                     fontSize: 13, fontWeight: FontWeight.w600,

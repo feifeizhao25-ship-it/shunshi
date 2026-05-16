@@ -11,6 +11,8 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
+import 'package:go_router/go_router.dart';
+import '../../../core/network/api_singleton.dart';
 
 class SeasonalIngredientsPage extends StatefulWidget {
   const SeasonalIngredientsPage({super.key});
@@ -141,7 +143,7 @@ class _SeasonalIngredientsPageState extends State<SeasonalIngredientsPage> {
             )).toList()),
             const SizedBox(height: 10),
             GestureDetector(
-              onTap: () {},
+              onTap: () => context.push('/wellness-category/diet'),
               child: Row(children: [
                 Text(AppLocalizations.of(context).t('ingredients_view_rituals'), style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: ShunShiColors.primary, fontFamily: ShunShiTypography.sansFamily)),
                 const SizedBox(width: 4),

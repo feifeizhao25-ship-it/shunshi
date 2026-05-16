@@ -1,11 +1,12 @@
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/subscription.dart';
+import '../../core/config/app_config.dart';
 
 /// 订阅服务 - 对接后端 API
 class SubscriptionService {
   static final _dio = Dio(BaseOptions(
-    baseUrl: 'http://116.62.32.43:4000',
+    baseUrl: AppConfig.apiBaseUrl.replaceAll('/api/v1', ''),
     connectTimeout: const Duration(seconds: 8),
     receiveTimeout: const Duration(seconds: 10),
   ));

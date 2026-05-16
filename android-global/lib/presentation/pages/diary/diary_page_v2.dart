@@ -8,6 +8,7 @@ import '../../../core/theme/shunshi_colors.dart';
 import '../../../data/storage/storage_manager.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
+import '../../../core/network/api_singleton.dart';
 
 class DiaryPageV2 extends StatefulWidget {
   const DiaryPageV2({super.key});
@@ -17,9 +18,8 @@ class DiaryPageV2 extends StatefulWidget {
 }
 
 class _DiaryPageV2State extends State<DiaryPageV2> {
-  static const _baseUrl = 'http://116.62.32.43:4000';
   String? _userId;
-  final _dio = Dio(BaseOptions(baseUrl: _baseUrl, connectTimeout: const Duration(seconds: 8)));
+  final _dio = apiClient.dio;
   final _noteController = TextEditingController();
   
   String _selectedMood = 'Calm';
@@ -113,7 +113,10 @@ class _DiaryPageV2State extends State<DiaryPageV2> {
     final solarTerms = ['Minor Cold','Major Cold','Start of Spring','Rain Water','Awakening','Spring Equinox','Clear & Bright','Grain Rain','Start of Summer','Grain Buds','Grain in Ear','Summer Solstice','Minor Heat','Major Heat','Start of Autumn','End of Heat','White Dew','Autumn Equinox','Cold Dew','Frost Descent','Start of Winter','Minor Snow','Major Snow','Winter Solstice'];
     final termIdx = ((now.month - 1) * 2 + (now.day >= 6 ? 1 : 0)) % 24;
     
-    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : ShunShiColors.background,
+    return Scaffold(
+
+    
+      appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),backgroundColor: isDark ? ShunshiDarkColors.background : ShunShiColors.background,
       body: RefreshIndicator(
         onRefresh: _fetchEntries,
         color: ShunShiColors.primary,

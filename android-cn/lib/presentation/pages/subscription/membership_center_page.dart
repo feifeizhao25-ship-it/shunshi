@@ -3,10 +3,24 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
 
-class MembershipCenterPage extends StatelessWidget {
+class MembershipCenterPage extends StatefulWidget {
   const MembershipCenterPage({super.key});
+
+  @override
+  State<MembershipCenterPage> createState() => _MembershipCenterPageState();
+}
+
+class _MembershipCenterPageState extends State<MembershipCenterPage> {
+  int _selectedTier = 0; // 0=annual, 1=monthly, 2=family
+
+  static const _tiers = [
+    _Tier('年度会员', '¥199', '¥299', '首年特惠 · 每日仅需 ¥0.54', '年度'),
+    _Tier('月度卡', '¥25', null, '随用随开 · 自由续费', '月度'),
+    _Tier('家庭卡', '¥299', null, '3人共享 · 健康互联', '家庭'),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -14,6 +28,7 @@ class MembershipCenterPage extends StatelessWidget {
     final bg = isDark ? ShunShiColors.darkBackground : ShunShiColors.background;
 
     return Scaffold(
+  appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
       backgroundColor: bg,
       body: Stack(
         children: [
@@ -21,7 +36,6 @@ class MembershipCenterPage extends StatelessWidget {
             physics: const BouncingScrollPhysics(),
             child: Column(
               children: [
-                // ── TopAppBar ──
                 SafeArea(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(20, 12, 20, 8),
@@ -45,7 +59,7 @@ class MembershipCenterPage extends StatelessWidget {
                           color: ShunShiColors.primary,
                         )),
                         GestureDetector(
-                          onTap: () {},
+                          onTap: () => _showHelpSheet(context),
                           child: Container(
                             width: 40, height: 40,
                             decoration: BoxDecoration(
@@ -61,21 +75,16 @@ class MembershipCenterPage extends StatelessWidget {
                 ),
                 Container(height: 1, color: ShunShiColors.surfaceContainerLow, margin: const EdgeInsets.symmetric(horizontal: 20)),
 
-                // ── Content ──
                 Padding(
                   padding: const EdgeInsets.fromLTRB(24, 32, 24, 160),
                   child: Column(
                     children: [
-                      // Hero Card
                       _buildHeroCard(),
                       const SizedBox(height: 48),
-                      // Subscription Tiers
                       _buildTiers(),
                       const SizedBox(height: 64),
-                      // Privileges
                       _buildPrivileges(),
                       const SizedBox(height: 64),
-                      // FAQ
                       _buildFAQ(),
                       const SizedBox(height: 80),
                     ],
@@ -85,7 +94,7 @@ class MembershipCenterPage extends StatelessWidget {
             ),
           ),
 
-          // ── Floating Bottom CTA ──
+          // Floating Bottom CTA
           Positioned(
             bottom: 0, left: 0, right: 0,
             child: Container(
@@ -98,10 +107,8 @@ class MembershipCenterPage extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Social proof
                     Row(
                       children: [
-                        // Stacked avatars
                         Container(
                           width: 28, height: 28,
                           decoration: BoxDecoration(
@@ -148,12 +155,11 @@ class MembershipCenterPage extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 16),
-                    // CTA Button
                     SizedBox(
                       width: double.infinity,
                       height: 56,
                       child: ElevatedButton(
-                        onPressed: () {},
+                        onPressed: _onSubscribe,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: ShunShiColors.primary,
                           foregroundColor: Colors.white,
@@ -163,10 +169,10 @@ class MembershipCenterPage extends StatelessWidget {
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            Icon(Icons.workspace_premium, size: 22),
-                            SizedBox(width: 8),
-                            Text('立即开通', style: TextStyle(
+                          children: [
+                            const Icon(Icons.workspace_premium, size: 22),
+                            const SizedBox(width: 8),
+                            Text('立即开通 · ${_tiers[_selectedTier].label}', style: TextStyle(
                               fontSize: 18, letterSpacing: 3,
                               fontFamily: ShunShiTypography.serifFamily,
                               fontWeight: FontWeight.w500,
@@ -189,6 +195,71 @@ class MembershipCenterPage extends StatelessWidget {
     );
   }
 
+  void _onSubscribe() {
+    final tier = _tiers[_selectedTier];
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('正在发起${tier.label}订阅支付（${tier.price}）…'),
+        action: SnackBarAction(
+          label: '了解详情',
+          onPressed: () => _showPaymentStub(context, tier),
+        ),
+        duration: const Duration(seconds: 3),
+      ),
+    );
+    // TODO: integrate real payment SDK
+    _showPaymentStub(context, tier);
+  }
+
+  void _showPaymentStub(BuildContext context, _Tier tier) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: ShunShiColors.surface,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (_) => Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          Container(width: 40, height: 4, decoration: BoxDecoration(color: ShunShiColors.border, borderRadius: BorderRadius.circular(2))),
+          const SizedBox(height: 20),
+          Icon(Icons.payment, size: 48, color: ShunShiColors.primary),
+          const SizedBox(height: 16),
+          Text('${tier.label} · ${tier.price}', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+          const SizedBox(height: 8),
+          Text('支付功能即将上线，敬请期待', style: TextStyle(fontSize: 14, color: ShunShiColors.textSecondary)),
+          const SizedBox(height: 20),
+          SizedBox(width: double.infinity, child: ElevatedButton(
+            onPressed: () => Navigator.pop(context),
+            style: ElevatedButton.styleFrom(backgroundColor: ShunShiColors.primary, foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+            child: const Text('我知道了', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+          )),
+        ]),
+      ),
+    );
+  }
+
+  void _showHelpSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: ShunShiColors.surface,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (_) => Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: ShunShiColors.border, borderRadius: BorderRadius.circular(2)))),
+          const SizedBox(height: 20),
+          Text('帮助中心', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.serifFamily)),
+          const SizedBox(height: 16),
+          Text('如有任何问题，请联系：', style: TextStyle(fontSize: 14, color: ShunShiColors.textSecondary)),
+          const SizedBox(height: 8),
+          Text('support@shunshi.health', style: TextStyle(fontSize: 14, color: ShunShiColors.primary, fontWeight: FontWeight.w500)),
+          const SizedBox(height: 8),
+          Text('客服微信：ShunShi_Health', style: TextStyle(fontSize: 14, color: ShunShiColors.textSecondary)),
+          const SizedBox(height: 20),
+        ]),
+      ),
+    );
+  }
+
   Widget _buildHeroCard() {
     return Container(
       height: 220,
@@ -206,7 +277,6 @@ class MembershipCenterPage extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Top row
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -239,7 +309,6 @@ class MembershipCenterPage extends StatelessWidget {
               ),
             ],
           ),
-          // Bottom row
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -274,20 +343,19 @@ class MembershipCenterPage extends StatelessWidget {
   Widget _buildTiers() {
     return Column(
       children: [
-        // Annual plan (featured)
+        // Annual plan
         GestureDetector(
-          onTap: () {},
+          onTap: () => setState(() => _selectedTier = 0),
           child: Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
               color: ShunShiColors.surfaceContainerLowest,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: ShunShiColors.apricotLight.withValues(alpha: 0.3)),
+              border: Border.all(color: _selectedTier == 0 ? ShunShiColors.primary : ShunShiColors.apricotLight.withValues(alpha: 0.3)),
               boxShadow: ShunShiShadows.sm,
             ),
             child: Stack(
               children: [
-                // Recommended badge
                 Positioned(
                   top: 0, right: 0,
                   child: Container(
@@ -312,10 +380,13 @@ class MembershipCenterPage extends StatelessWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('年度会员', style: TextStyle(
-                          fontSize: 20, fontFamily: ShunShiTypography.serifFamily,
-                          color: ShunShiColors.primary,
-                        )),
+                        Row(children: [
+                          Radio<int>(value: 0, groupValue: _selectedTier, onChanged: (v) => setState(() => _selectedTier = v!), activeColor: ShunShiColors.primary),
+                          const Text('年度会员', style: TextStyle(
+                            fontSize: 20, fontFamily: ShunShiTypography.serifFamily,
+                            color: ShunShiColors.primary,
+                          )),
+                        ]),
                         const SizedBox(height: 4),
                         Text('首年特惠 · 每日仅需 ¥0.54', style: TextStyle(
                           fontSize: 12, color: ShunShiColors.secondary,
@@ -332,9 +403,7 @@ class MembershipCenterPage extends StatelessWidget {
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: const [
-                            Text('¥', style: TextStyle(
-                              fontSize: 13, color: ShunShiColors.primary,
-                            )),
+                            Text('¥', style: TextStyle(fontSize: 13, color: ShunShiColors.primary)),
                             Text('199', style: TextStyle(
                               fontSize: 30, fontFamily: ShunShiTypography.serifFamily,
                               fontWeight: FontWeight.w700,
@@ -351,25 +420,29 @@ class MembershipCenterPage extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 12),
-        // Monthly + Family grid
+        // Monthly + Family
         Row(
           children: [
             Expanded(
               child: GestureDetector(
-                onTap: () {},
+                onTap: () => setState(() => _selectedTier = 1),
                 child: Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     color: ShunShiColors.surfaceContainerLow,
                     borderRadius: BorderRadius.circular(16),
+                    border: _selectedTier == 1 ? Border.all(color: ShunShiColors.primary) : null,
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('月度卡', style: TextStyle(
-                        fontSize: 18, fontFamily: ShunShiTypography.serifFamily,
-                        color: ShunShiColors.primary,
-                      )),
+                      Row(children: [
+                        Radio<int>(value: 1, groupValue: _selectedTier, onChanged: (v) => setState(() => _selectedTier = v!), activeColor: ShunShiColors.primary, visualDensity: VisualDensity.compact),
+                        const Text('月度卡', style: TextStyle(
+                          fontSize: 18, fontFamily: ShunShiTypography.serifFamily,
+                          color: ShunShiColors.primary,
+                        )),
+                      ]),
                       const SizedBox(height: 8),
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.end,
@@ -383,9 +456,7 @@ class MembershipCenterPage extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 8),
-                      Text('随用随开 · 自由续费', style: TextStyle(
-                        fontSize: 9, color: ShunShiColors.secondary,
-                      )),
+                      Text('随用随开 · 自由续费', style: TextStyle(fontSize: 9, color: ShunShiColors.secondary)),
                     ],
                   ),
                 ),
@@ -394,20 +465,24 @@ class MembershipCenterPage extends StatelessWidget {
             const SizedBox(width: 12),
             Expanded(
               child: GestureDetector(
-                onTap: () {},
+                onTap: () => setState(() => _selectedTier = 2),
                 child: Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     color: ShunShiColors.surfaceContainerLow,
                     borderRadius: BorderRadius.circular(16),
+                    border: _selectedTier == 2 ? Border.all(color: ShunShiColors.primary) : null,
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('家庭卡', style: TextStyle(
-                        fontSize: 18, fontFamily: ShunShiTypography.serifFamily,
-                        color: ShunShiColors.primary,
-                      )),
+                      Row(children: [
+                        Radio<int>(value: 2, groupValue: _selectedTier, onChanged: (v) => setState(() => _selectedTier = v!), activeColor: ShunShiColors.primary, visualDensity: VisualDensity.compact),
+                        const Text('家庭卡', style: TextStyle(
+                          fontSize: 18, fontFamily: ShunShiTypography.serifFamily,
+                          color: ShunShiColors.primary,
+                        )),
+                      ]),
                       const SizedBox(height: 8),
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.end,
@@ -421,9 +496,7 @@ class MembershipCenterPage extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 8),
-                      Text('3人共享 · 健康互联', style: TextStyle(
-                        fontSize: 9, color: ShunShiColors.secondary,
-                      )),
+                      Text('3人共享 · 健康互联', style: TextStyle(fontSize: 9, color: ShunShiColors.secondary)),
                     ],
                   ),
                 ),
@@ -529,6 +602,15 @@ class MembershipCenterPage extends StatelessWidget {
       ],
     );
   }
+}
+
+class _Tier {
+  final String name;
+  final String price;
+  final String? originalPrice;
+  final String desc;
+  final String label;
+  const _Tier(this.name, this.price, this.originalPrice, this.desc, this.label);
 }
 
 class _Privilege {

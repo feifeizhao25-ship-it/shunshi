@@ -11,6 +11,7 @@ import '../../../core/theme/seasons_colors.dart';
 import '../../../core/theme/seasons_spacing.dart';
 import '../../../core/theme/seasons_text_styles.dart';
 import '../../providers/seasons_provider.dart';
+import '../../../core/network/api_singleton.dart';
 
 // ── 季节配色 — 更柔和的渐变 ──────────────────────────
 

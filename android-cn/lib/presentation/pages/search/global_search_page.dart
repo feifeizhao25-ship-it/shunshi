@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
 import '../../../data/network/api_client.dart';
 
@@ -48,14 +49,19 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
     setState(() => _loading = true);
     try {
       final resp = await ApiClient().get(
-        '/api/v1/knowledge/search',
+        '/api/v1/contents/search',
         queryParameters: {
           'q': query,
           if (_selectedType != null) 'content_type': _selectedType,
         },
       );
       final data = resp.data;
-      if (data is Map && data['results'] is List) {
+      if (data is Map && data['data'] is Map) {
+        final items = data['data']['items'];
+        if (items is List) {
+          setState(() => _results = items.cast<Map<String, dynamic>>());
+        }
+      } else if (data is Map && data['results'] is List) {
         setState(() => _results = (data['results'] as List).cast<Map<String, dynamic>>());
       } else if (data is List) {
         setState(() => _results = data.cast<Map<String, dynamic>>());
@@ -191,7 +197,7 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
     return GestureDetector(
       onTap: () {
         if (id != null) {
-          Navigator.pushNamed(context, '/content-detail', arguments: {'contentId': id});
+          context.push('/content-detail', extra: {'contentId': id});
         }
       },
       child: Container(

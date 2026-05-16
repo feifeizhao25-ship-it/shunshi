@@ -82,6 +82,21 @@ class _FavoritesPageState extends State<FavoritesPage> {
     }
   }
 
+  Future<void> _confirmRemoveFavorite(int index) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('取消收藏'),
+        content: const Text('确定要取消收藏吗？'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('取消')),
+          TextButton(onPressed: () => Navigator.pop(ctx, true), child: Text('确定', style: TextStyle(color: ShunShiColors.error))),
+        ],
+      ),
+    );
+    if (confirmed == true) _removeFavorite(index);
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -123,6 +138,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
                 onDismissed: (_) => _removeFavorite(i),
                 child: GestureDetector(
                   onTap: () => context.push('/content-detail', extra: {'contentId': item['content_id']}),
+                  onLongPress: () => _confirmRemoveFavorite(i),
                   child: Container(
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
@@ -147,7 +163,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
                           Icon(Icons.chevron_right, size: 16, color: ShunShiColors.textTertiary),
                         ]),
                         const SizedBox(height: 6),
-                        Text(item['content_id'] ?? '', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: ShunShiColors.textPrimary)),
+                        Text(item['title']?.toString() ?? item['content_id'] ?? '', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: ShunShiColors.textPrimary)),
                       ])),
                     ]),
                   ),

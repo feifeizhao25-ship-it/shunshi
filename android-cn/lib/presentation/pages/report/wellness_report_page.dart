@@ -28,6 +28,7 @@ class WellnessReportPage extends StatelessWidget {
     final bg = isDark ? ShunShiColors.darkBackground : ShunShiColors.background;
 
     return Scaffold(
+  appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
       backgroundColor: bg,
       body: CustomScrollView(
         slivers: [
@@ -188,7 +189,7 @@ class WellnessReportPage extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Recommended', style: TextStyle(
+                              Text('推荐', style: TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.w600,
                                 color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.sansFamily,
                               )),

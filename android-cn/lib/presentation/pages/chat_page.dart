@@ -8,11 +8,12 @@ import '../../../data/services/voice_service.dart';
 import '../../../design_system/theme.dart';
 import '../../../design_system/theme_helper.dart';
 import '../widgets/feedback_sheet.dart';
+import '../../../core/config/app_config.dart';
 import '../widgets/membership_widgets.dart';
 import 'chat/chat_models.dart';
 import 'chat/chat_widgets.dart';
 
-const _baseUrl = 'http://116.62.32.43:4000';
+final String _baseUrl = AppConfig.apiBaseUrl.replaceAll('/api/v1', '');
 
 class ChatPage extends StatefulWidget {
   final String? conversationId;
@@ -51,15 +52,29 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
 
   String _userName = '';
   String _token = '';
-  final String _currentSolarTerm = '清明';
-  final String _solarTermDesc = '春意渐深，万物清洁而明净。适合踏青、放风筝，心情也该舒展。';
+  String _currentSolarTerm = '立夏';
+  String _solarTermDesc = '夏之始，养心安神。清淡饮食，适当午睡，防暑防晒。';
   String? _conversationId;
 
   @override
   void initState() {
     super.initState();
     _conversationId = widget.conversationId;
+    _fetchSolarTerm();
     _initChat();
+  }
+
+  Future<void> _fetchSolarTerm() async {
+    try {
+      final res = await _dio.get('/api/v1/solar-terms/current');
+      if (res.data is Map && res.data['success'] == true) {
+        final data = res.data['data'] as Map<String, dynamic>;
+        if (mounted) setState(() {
+          _currentSolarTerm = data['name']?.toString() ?? '立夏';
+          _solarTermDesc = data['description']?.toString() ?? _solarTermDesc;
+        });
+      }
+    } catch (_) {}
   }
 
   @override
@@ -231,7 +246,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
       handleAIReply(aiText, cards: cards, sources: sources, convId: res.data?['conversation_id']);
     } catch (_) {
       try {
-        final v2Dio = Dio(BaseOptions(baseUrl: 'http://116.62.32.43:4000', connectTimeout: const Duration(seconds: 10), receiveTimeout: const Duration(seconds: 60)));
+        final v2Dio = Dio(BaseOptions(baseUrl: AppConfig.apiBaseUrl.replaceAll('/api/v1', ''), connectTimeout: const Duration(seconds: 10), receiveTimeout: const Duration(seconds: 60)));
         v2Dio.options.headers['Authorization'] = 'Bearer $_token';
         final v2Res = await v2Dio.post('/api/v1/chat?message=${Uri.encodeComponent(text)}&conversation_id=${_conversationId ?? ''}');
         final v2Data = v2Res.data;
@@ -446,23 +461,112 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
 
   Widget _buildInput() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? ShunShiColors.darkBackground : ShunShiColors.background;
-    final surface = isDark ? ShunShiColors.darkSurface : ShunShiColors.surface;
-    final border = isDark ? ShunShiColors.darkBorder : ShunShiColors.border;
-    final textTertiary = isDark ? ShunShiColors.darkTextTertiary : ShunShiColors.textTertiary;
+    final inputBg = isDark ? ShunShiColors.darkSurfaceContainerLowest : ShunShiColors.surfaceContainerLowest;
+    final borderC = isDark ? ShunShiColors.darkBorderGhost : ShunShiColors.borderGhost;
+    final hintC = isDark ? ShunShiColors.darkTextTertiary : ShunShiColors.textTertiary;
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-      decoration: BoxDecoration(color: ShunShiColors.background, border: Border(top: BorderSide(color: ShunShiColors.borderGhost, width: 0.5))),
-      child: Row(children: [
-        GestureDetector(onTap: _showQuickTopics, child: Container(width: 40, height: 40, decoration: BoxDecoration(shape: BoxShape.circle, color: surface, border: Border.all(color: border)), child: Icon(Icons.add_circle_outline, size: 20, color: textTertiary))),
-        const SizedBox(width: 8),
-        Expanded(child: Container(constraints: const BoxConstraints(maxHeight: 120), child: TextField(controller: _controller, focusNode: _focusNode, maxLines: null, textInputAction: TextInputAction.send, onSubmitted: (_) => _sendMessage(),
-          decoration: InputDecoration(hintText: '输入想和顺时聊的...', hintStyle: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 15, color: ShunShiColors.textTertiary), filled: true, fillColor: ShunShiColors.surface, contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10), border: OutlineInputBorder(borderRadius: BorderRadius.circular(24), borderSide: BorderSide.none))))),
-        const SizedBox(width: 8),
-        InkWell(onTap: _showVoiceInput, borderRadius: BorderRadius.circular(20), child: Container(width: 44, height: 44, decoration: BoxDecoration(shape: BoxShape.circle, color: _isRecording ? Colors.red : ShunShiColors.secondary), child: Icon(_isRecording ? Icons.stop : Icons.mic, color: Colors.white, size: 22))),
-        const SizedBox(width: 8),
-        GestureDetector(onTap: _sendMessage, child: Container(width: 40, height: 40, decoration: const BoxDecoration(shape: BoxShape.circle, color: ShunShiColors.primary), child: const Icon(Icons.send, color: Colors.white, size: 18))),
-      ]),
+      padding: const EdgeInsets.fromLTRB(0, 6, 0, 12),
+      decoration: BoxDecoration(
+        color: isDark ? ShunShiColors.darkBackground : ShunShiColors.background,
+        border: Border(top: BorderSide(color: borderC, width: 0.5)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // 快捷提问标签
+          QuickQuestionChips(onTap: (q) {
+            _controller.text = q;
+            _sendMessage();
+          }),
+          const SizedBox(height: 8),
+          // 输入行
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: [
+                GestureDetector(
+                    onTap: _showQuickTopics,
+                    child: Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: inputBg,
+                            border: Border.all(color: borderC)),
+                        child: Icon(Icons.add_circle_outline,
+                            size: 20, color: hintC))),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: AnimatedBuilder(
+                    animation: _focusNode,
+                    builder: (context, child) {
+                      final focused = _focusNode.hasFocus;
+                      return Container(
+                        constraints: const BoxConstraints(maxHeight: 120),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(24),
+                          border: focused
+                              ? Border.all(
+                                  color: ShunShiColors.primary
+                                      .withValues(alpha: 0.6),
+                                  width: 1.5)
+                              : Border.all(
+                                  color: Colors.transparent, width: 0),
+                        ),
+                        child: TextField(
+                          controller: _controller,
+                          focusNode: _focusNode,
+                          maxLines: null,
+                          textInputAction: TextInputAction.send,
+                          onSubmitted: (_) => _sendMessage(),
+                          decoration: InputDecoration(
+                            hintText: '输入想和顺时聊的...',
+                            hintStyle: TextStyle(
+                                fontFamily: ShunShiTypography.sansFamily,
+                                fontSize: 15,
+                                color: hintC),
+                            filled: true,
+                            fillColor: inputBg,
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 10),
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(24),
+                                borderSide: BorderSide.none),
+                            enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(24),
+                                borderSide: BorderSide.none),
+                            focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(24),
+                                borderSide: BorderSide.none),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(width: 8),
+                InkWell(
+                    onTap: _showVoiceInput,
+                    borderRadius: BorderRadius.circular(20),
+                    child: Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: _isRecording
+                                ? Colors.red
+                                : ShunShiColors.secondary),
+                        child: Icon(
+                            _isRecording ? Icons.stop : Icons.mic,
+                            color: Colors.white,
+                            size: 22))),
+                const SizedBox(width: 8),
+                GradientSendButton(onTap: _sendMessage),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

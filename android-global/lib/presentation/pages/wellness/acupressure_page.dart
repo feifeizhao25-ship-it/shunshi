@@ -2,6 +2,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import '../../../data/network/api_client.dart';
+import '../../../data/en_content.dart';
 import '../../widgets/acupoint_diagram.dart';
 import '../../widgets/skeleton_loading.dart';
 import '../../../core/theme/app_localizations.dart';
@@ -37,27 +38,12 @@ class _AcupressurePageState extends State<AcupressurePage> {
   }
 
   Future<void> _loadData() async {
+    // Use local English content first
+    final localItems = EnContentData.acupoints.map((c) => EnContentData.toMap(c)).toList();
     setState(() {
-      _isLoading = true;
-      _error = null;
+      _items = localItems;
+      _isLoading = false;
     });
-    try {
-      final res = await _api.get('/api/v1/contents', queryParameters: {
-        'type': 'acupoint',
-        'limit': '20',
-      });
-      final data = res.data;
-      final items = _parseItems(data);
-      setState(() {
-        _items = items;
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _error = 'Load failed';
-        _isLoading = false;
-      });
-    }
   }
 
   List<Map<String, dynamic>> _parseItems(dynamic data) {

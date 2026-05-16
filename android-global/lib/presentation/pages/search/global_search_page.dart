@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import '../../../core/theme/app_localizations.dart';
 import '../../../design_system/theme.dart';
 import '../../../data/network/api_client.dart';
+import '../../../core/network/api_singleton.dart';
 
 /// 全局Search页 — Search知识库内容
 class GlobalSearchPage extends StatefulWidget {
@@ -18,6 +20,8 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
   List<Map<String, dynamic>> _results = [];
   bool _loading = false;
   String? _selectedType;
+  Timer? _debounce;
+  List<String> _suggestions = [];
 
   static const _types = [
     ('All', null),
@@ -39,6 +43,7 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
   void dispose() {
     _controller.dispose();
     _focusNode.dispose();
+    _debounce?.cancel();
     super.dispose();
   }
 
@@ -74,6 +79,10 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
     return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : ShunShiColors.background,
       appBar: AppBar(
         elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new, size: 20, color: ShunShiColors.textPrimary),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
         title: _buildSearchField(),
         automaticallyImplyLeading: false,
       ),
@@ -112,7 +121,14 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
             : null,
       ),
       onSubmitted: _search,
-      onChanged: (_) => setState(() {}),
+      onChanged: (val) {
+        setState(() {});
+        // 300ms debounce — UX_API_SPEC §4.10
+        _debounce?.cancel();
+        if (val.trim().isNotEmpty) {
+          _debounce = Timer(const Duration(milliseconds: 300), () => _search(val));
+        }
+      },
     );
   }
 

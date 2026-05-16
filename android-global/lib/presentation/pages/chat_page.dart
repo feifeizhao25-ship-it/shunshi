@@ -13,9 +13,8 @@ import '../widgets/membership_widgets.dart';
 import 'chat/chat_models.dart';
 import 'chat/chat_widgets.dart';
 import '../../../core/theme/app_localizations.dart';
-
-const _baseUrl = 'http://116.62.32.43:4000';
-
+import '../../../core/network/api_singleton.dart';
+import '../../core/config/app_config.dart';
 class ChatPage extends StatefulWidget {
   final String? conversationId;
   const ChatPage({super.key, this.conversationId});
@@ -44,7 +43,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
   final _scrollController = ScrollController();
   final _focusNode = FocusNode();
   final List<ChatMessage> _messages = [];
-  final _dio = Dio(BaseOptions(baseUrl: _baseUrl));
+  final _dio = apiClient.dio;
   bool _isLoading = false;
   bool _isRecording = false;
   int _quotaRemaining = 10;
@@ -53,15 +52,29 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
 
   String _userName = '';
   String _token = '';
-  final String _currentSolarTerm = 'Qingming';
-  final String _solarTermDesc = 'Spring deepens, all things clean and bright. A time for outings and expansive moods.';
+  String _currentSolarTerm = 'Lixia';
+  String _solarTermDesc = 'The beginning of summer. Nourish the heart, eat lightly, rest properly.';
   String? _conversationId;
 
   @override
   void initState() {
     super.initState();
     _conversationId = widget.conversationId;
+    _fetchSolarTerm();
     _initChat();
+  }
+
+  Future<void> _fetchSolarTerm() async {
+    try {
+      final res = await _dio.get('/api/v1/solar-terms/current');
+      if (res.data is Map && res.data['success'] == true) {
+        final data = res.data['data'] as Map<String, dynamic>;
+        if (mounted) setState(() {
+          _currentSolarTerm = data['name']?.toString() ?? 'Lixia';
+          _solarTermDesc = data['description']?.toString() ?? _solarTermDesc;
+        });
+      }
+    } catch (_) {}
   }
 
   @override
@@ -233,7 +246,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
       handleAIReply(aiText, cards: cards, sources: sources, convId: res.data?['conversation_id']);
     } catch (_) {
       try {
-        final v2Dio = Dio(BaseOptions(baseUrl: 'http://116.62.32.43:4000', connectTimeout: const Duration(seconds: 10), receiveTimeout: const Duration(seconds: 60)));
+        final v2Dio = Dio(BaseOptions(baseUrl: AppConfig.baseUrl, connectTimeout: const Duration(seconds: 10), receiveTimeout: const Duration(seconds: 60)));
         v2Dio.options.headers['Authorization'] = 'Bearer $_token';
         final v2Res = await v2Dio.post('/api/v1/chat', data: {'message': text, 'context': {'solar_term': _currentSolarTerm}, 'conversation_id': _conversationId});  // CN uses Chinese endpoint
         final aiText = v2Res.data?['reply'] ?? 'Sorry, unable to respond right now.';

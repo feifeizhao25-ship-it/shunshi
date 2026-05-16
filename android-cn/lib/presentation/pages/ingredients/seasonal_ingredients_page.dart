@@ -130,7 +130,7 @@ class _SeasonalIngredientsPageState extends State<SeasonalIngredientsPage> {
             const SizedBox(height: 8),
             Text(ing.name, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.serifFamily)),
             const SizedBox(height: 10),
-            Text('Wellness Benefits', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: ShunShiColors.textTertiary, fontFamily: ShunShiTypography.sansFamily)),
+            Text('养生功效', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: ShunShiColors.textTertiary, fontFamily: ShunShiTypography.sansFamily)),
             const SizedBox(height: 4),
             Text(ing.benefits, style: TextStyle(fontSize: 13, color: ShunShiColors.textSecondary, height: 1.5, fontFamily: ShunShiTypography.sansFamily)),
             const SizedBox(height: 10),

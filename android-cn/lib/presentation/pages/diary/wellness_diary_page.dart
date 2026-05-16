@@ -45,6 +45,7 @@ class _WellnessDiaryPageState extends State<WellnessDiaryPage>
     final day = now.day;
 
     return Scaffold(
+  appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
       backgroundColor: bg,
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),

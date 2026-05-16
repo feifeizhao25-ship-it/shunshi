@@ -9,6 +9,7 @@ import '../../../data/storage/storage_manager.dart';
 import '../../../design_system/theme.dart';
 import '../solar/widgets/solar_wellness_card.dart';
 import '../../../core/theme/app_localizations.dart';
+import '../../../core/network/api_singleton.dart';
 
 class SeasonsHomeV2 extends StatefulWidget {
   const SeasonsHomeV2({super.key});
@@ -18,12 +19,7 @@ class SeasonsHomeV2 extends StatefulWidget {
 }
 
 class _SeasonsHomeV2State extends State<SeasonsHomeV2> {
-  static const _baseUrl = 'http://116.62.32.43:4000';
-  final _dio = Dio(BaseOptions(
-    baseUrl: _baseUrl,
-    connectTimeout: const Duration(seconds: 8),
-    receiveTimeout: const Duration(seconds: 15),
-  ));
+  final _dio = apiClient.dio;
 
   String _greeting = 'Good Morning';
   String _season = 'Spring';
@@ -45,9 +41,9 @@ class _SeasonsHomeV2State extends State<SeasonsHomeV2> {
   Future<void> _fetchData() async {
     try {
       final results = await Future.wait([
-        _dio.get('/api/v1/intl/greeting'),
-        _dio.get('/api/v1/intl/home/dashboard'),
-        _dio.get('/api/v1/intl/contents/recommend', queryParameters: {'limit': 3}),
+        _dio.get('/api/v1/solar-wellness/current', queryParameters: {'locale': 'en-US'}),
+        _dio.get('/api/v1/contents/recommend', queryParameters: {'locale': 'en-US'}),
+        _dio.get('/api/v1/contents/recommend', queryParameters: {'limit': 3, 'locale': 'en-US'}),
         _dio.get('/api/v1/followup/due', queryParameters: {'user_id': StorageManager.user.getUserId() ?? 'guest', 'limit': 1}),
       ]);
 

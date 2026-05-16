@@ -10,6 +10,7 @@ import '../../widgets/skeleton_loading.dart';
 import '../../../core/services/feedback_service.dart';
 import '../../widgets/membership_widgets.dart';
 import '../../../core/theme/app_localizations.dart';
+import '../../../core/network/api_singleton.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -73,20 +74,20 @@ class _HomePageState extends State<HomePage> {
       return;
     }
     try {
-      final dio = Dio(BaseOptions(baseUrl: 'http://116.62.32.43:4000'));
+      final dio = apiClient.dio;
       final res = await dio.get('/api/v1/solar-terms/current');
       if (res.data?['data'] != null) {
         final d = res.data['data'];
         if (mounted) {
           setState(() {
-          _currentTerm = d['name'] ?? 'Qingming';
+          _currentTerm = d['name'] ?? 'Lixia';
         });
         }
       }
     } catch (_) {
       if (mounted) {
         setState(() {
-        _currentTerm = 'Qingming';
+        _currentTerm = 'Lixia';
       });
       }
     }

@@ -3,9 +3,11 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
+import '../../../core/network/api_singleton.dart';
 
 class WellnessDashboardPage extends StatelessWidget {
   const WellnessDashboardPage({super.key});
@@ -13,7 +15,9 @@ class WellnessDashboardPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : ShunShiColors.background,
+    return Scaffold(
+
+      appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),backgroundColor: isDark ? ShunshiDarkColors.background : ShunShiColors.background,
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
@@ -52,7 +56,7 @@ class WellnessDashboardPage extends StatelessWidget {
                     ),
                     // Notification bell
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () => context.push('/notifications'),
                       child: Container(
                         width: 40, height: 40,
                         decoration: BoxDecoration(
@@ -144,7 +148,7 @@ class WellnessDashboardPage extends StatelessWidget {
                     letterSpacing: -0.5, fontFamily: ShunShiTypography.serifFamily,
                   )),
                   GestureDetector(
-                    onTap: () {},
+                    onTap: () => context.push('/wellness'),
                     child: Text(AppLocalizations.of(context).t('view_all'), style: TextStyle(
                       fontSize: 13, fontWeight: FontWeight.w500, color: ShunShiColors.secondary,
                     )),
@@ -261,7 +265,7 @@ class WellnessDashboardPage extends StatelessWidget {
                         )),
                         const SizedBox(height: 12),
                         GestureDetector(
-                          onTap: () {},
+                          onTap: () => context.push('/wellness-category/diet'),
                           child: Container(
                             decoration: BoxDecoration(
                               color: ShunShiColors.surfaceContainerLowest,

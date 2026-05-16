@@ -1,9 +1,10 @@
 import 'package:dio/dio.dart';
+import '../../core/config/app_config.dart';
 
 /// SafeMode 安全模式 - 异常情绪检测与处理（对接后端 /api/v1/mental-wellness）
 class SafeModeService {
   static final _dio = Dio(BaseOptions(
-    baseUrl: 'http://116.62.32.43:4000',
+    baseUrl: AppConfig.baseUrl,
     connectTimeout: const Duration(seconds: 8),
     receiveTimeout: const Duration(seconds: 10),
   ));
@@ -88,8 +89,8 @@ class SafeModeService {
       }
     } catch (_) {}
     return [
-      {'name': '全国24小时心理援助热线', 'phone': '400-161-9995', 'type': 'hotline'},
-      {'name': '北京心理危机研究与干预中心', 'phone': '010-82951332', 'type': 'hotline'},
+      {'name': '988 Suicide & Crisis Lifeline', 'phone': '988', 'type': 'hotline'},
+      {'name': 'Crisis Text Line', 'phone': 'Text HOME to 741741', 'type': 'hotline'},
       {'name': 'LifeLine International', 'type': 'resource'},
     ];
   }
@@ -109,6 +110,10 @@ class SafeModeService {
   // 风险信号检测
   bool _detectRiskSignals(String message) {
     final riskKeywords = [
+      'sad', 'hopeless', 'breaking down', "can't go on",
+      'so tired', 'don\'t want to live', 'meaningless',
+      'insomnia', 'anxious', 'scared',
+      // Also detect Chinese keywords since users may type in Chinese
       '难过', '绝望', '崩溃', '坚持不了',
       '好累', '不想活了', '没意思',
       '失眠', '焦虑', '害怕',
@@ -120,6 +125,9 @@ class SafeModeService {
   // 自伤/自杀倾向检测
   bool _detectSelfHarmSignals(String message) {
     final dangerKeywords = [
+      'suicide', 'kill myself', 'self-harm', 'end my life',
+      "don't want to live", 'better off dead',
+      // Also detect Chinese keywords
       '自杀', '轻生', '自残', '结束生命',
       '不想活了', '死了就好了',
     ];
@@ -147,11 +155,11 @@ class SafeModeService {
   }
 
   String _getCriticalMessage() {
-    return '我感受到你可能正在经历非常困难的时刻。你很重要，我希望你能得到帮助。';
+    return 'I sense you may be going through a very difficult time. You matter, and I want you to get the help you deserve.';
   }
 
   String _getElevatedMessage() {
-    return '我在这里陪着你。如果你愿意，可以和我聊聊你的感受。';
+    return 'I\'m here with you. If you\'d like, you can share how you\'re feeling with me.';
   }
 
   Future<void> _notifyEmergencyContacts(String userId) async {
@@ -159,7 +167,7 @@ class SafeModeService {
       await _dio.post('/api/v1/notifications/send', data: {
         'user_id': userId,
         'type': 'emergency',
-        'message': '用户触发安全模式，请关注',
+        'message': 'User triggered safe mode, please check on them',
       });
     } catch (_) {}
   }
@@ -182,9 +190,9 @@ class SafeModeResult {
 
 /// SafeMode 级别
 enum SafeModeLevel {
-  normal('normal', '正常'),
-  elevated('elevated', '关注'),
-  critical('critical', '紧急');
+  normal('normal', 'Normal'),
+  elevated('elevated', 'Elevated'),
+  critical('critical', 'Critical');
 
   final String value;
   final String description;

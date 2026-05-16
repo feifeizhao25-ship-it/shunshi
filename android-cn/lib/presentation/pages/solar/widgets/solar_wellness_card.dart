@@ -4,7 +4,8 @@ library;
 import 'package:flutter/material.dart';
 import '../../../../design_system/theme.dart';
 import 'package:go_router/go_router.dart';
-import 'package:dio/dio.dart';
+import '../../../../core/network/api_client.dart';
+import '../../../../core/cache/cache_service.dart';
 
 class SolarWellnessCard extends StatefulWidget {
   const SolarWellnessCard({super.key});
@@ -14,6 +15,8 @@ class SolarWellnessCard extends StatefulWidget {
 }
 
 class _SolarWellnessCardState extends State<SolarWellnessCard> {
+  final _api = ApiClient();
+  final _cache = CacheService();
   Map<String, dynamic>? _data;
   bool _loading = true;
 
@@ -24,15 +27,28 @@ class _SolarWellnessCardState extends State<SolarWellnessCard> {
   }
 
   Future<void> _loadData() async {
+    // 缓存配置: wellness staleTime=5min
+    const cacheConfig = CacheConfig(
+      staleTime: Duration(minutes: 5),
+      gcTime: Duration(hours: 24),
+      persist: true,
+    );
+    const cacheKey = 'solar_wellness_daily_advice';
+
+    // 1. Try cache
+    final cached = _cache.get<Map<String, dynamic>>(cacheKey, config: cacheConfig);
+    if (cached != null) {
+      _data = cached.data;
+      if (mounted) setState(() => _loading = false);
+      if (!cached.isStale) return;
+    }
+
+    // 2. Network
     try {
-      // 使用 Dio 直接请求
-      final dio = Dio(BaseOptions(
-        baseUrl: 'http://116.62.32.43:4000',
-        connectTimeout: const Duration(seconds: 5),
-      ));
-      final res = await dio.get('/api/v1/solar-wellness/daily-advice');
+      final res = await _api.get('/solar-wellness/daily-advice', level: SpeedLevel.s2);
       if (res.data is Map && res.data['success'] == true) {
         _data = Map<String, dynamic>.from(res.data['data']);
+        await _cache.set(cacheKey, _data!, config: cacheConfig);
       }
     } catch (_) {
       // 静默失败

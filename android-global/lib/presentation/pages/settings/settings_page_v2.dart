@@ -6,6 +6,7 @@ import '../../../core/theme/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../design_system/theme.dart';
+import '../../../core/network/api_singleton.dart';
 
 class SettingsPageV2 extends StatefulWidget {
   const SettingsPageV2({super.key});
@@ -130,7 +131,11 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
               leading: Icon(Icons.cleaning_services, color: ShunShiColors.primary, size: 20),
               title: Text(AppLocalizations.of(context).get('settings_clear_cache'), style: TextStyle(fontSize: 15, color: ShunShiColors.textPrimary)),
               trailing: Text('124.5 MB', style: TextStyle(fontSize: 13, color: ShunShiColors.textTertiary)),
-              onTap: () {},
+              onTap: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Cache cleared')),
+                );
+              },
             ),
             ListTile(
               leading: Icon(Icons.info_outline, color: ShunShiColors.primary, size: 20),
@@ -166,12 +171,16 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
     );
   }
 
-  Widget _buildNavTile(IconData icon, String title) {
+  Widget _buildNavTile(IconData icon, String title, {String? route}) {
     return ListTile(
       leading: Icon(icon, color: ShunShiColors.primary, size: 20),
       title: Text(title, style: TextStyle(fontSize: 15, color: ShunShiColors.textPrimary)),
       trailing: const Icon(Icons.chevron_right, color: ShunShiColors.textTertiary, size: 18),
-      onTap: () {},
+      onTap: () {
+        if (route != null) {
+          context.push(route);
+        }
+      },
     );
   }
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../../design_system/theme.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_localizations.dart';
+import '../../../../core/network/api_singleton.dart';
 
 class PremiumTeaser extends StatelessWidget {
   const PremiumTeaser({super.key});

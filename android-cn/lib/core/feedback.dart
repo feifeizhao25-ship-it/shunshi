@@ -1,10 +1,11 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'config/app_config.dart';
 
 /// 反馈服务
 
 class FeedbackService {
-  static final _dio = Dio(BaseOptions(baseUrl: 'http://116.62.32.43:4000', connectTimeout: const Duration(seconds: 8)));
+  static final _dio = Dio(BaseOptions(baseUrl: AppConfig.apiBaseUrl.replaceAll('/api/v1', ''), connectTimeout: const Duration(seconds: 8)));
 
   /// 提交反馈
   static Future<bool> submitFeedback({

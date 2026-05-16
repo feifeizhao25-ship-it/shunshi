@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import '../../../design_system/theme.dart';
 import '../../../data/content/wellness_content.dart';
+import '../../../core/network/api_singleton.dart';
 
 class _CategoryItem {
   final IconData icon;
@@ -161,7 +162,10 @@ class _LibraryPageState extends State<LibraryPage> {
       _CategoryItem(Icons.bedtime, 'Sleep Sounds', 'Nature, white noise & meditation', ShunShiColors.primaryLight, _showSleepSounds),
     ];
 
-    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : ShunShiColors.background,
+    return Scaffold(
+
+
+      appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),backgroundColor: isDark ? ShunshiDarkColors.background : ShunShiColors.background,
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [

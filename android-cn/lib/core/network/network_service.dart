@@ -122,7 +122,7 @@ class _AuthInterceptor extends Interceptor {
         // Call refresh endpoint
         final dio = Dio();
         final response = await dio.post(
-          '${AppConfig.apiBaseUrl}/auth/refresh',
+          '${AppConfig.apiBaseUrl}/api/v1/auth/refresh',
           data: {'refresh_token': refreshToken},
         );
         return response.data as Map<String, String>;

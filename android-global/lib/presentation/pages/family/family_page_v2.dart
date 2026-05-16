@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import '../../../core/theme/app_localizations.dart';
 import '../../../design_system/theme.dart';
+import '../../../core/network/api_singleton.dart';
 
 class FamilyPageV2 extends StatefulWidget {
   const FamilyPageV2({super.key});
@@ -18,8 +19,7 @@ class FamilyPageV2 extends StatefulWidget {
 }
 
 class _FamilyPageV2State extends State<FamilyPageV2> {
-  static const _baseUrl = 'http://116.62.32.43:4000';
-  final _dio = Dio(BaseOptions(baseUrl: _baseUrl, connectTimeout: const Duration(seconds: 8)));
+  final _dio = apiClient.dio;
   
   String _familyName = 'ProfileFamily';
   List<Map<String, dynamic>> _members = [];
@@ -114,7 +114,8 @@ class _FamilyPageV2State extends State<FamilyPageV2> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    if (_loading) return Scaffold(backgroundColor: ShunShiColors.background, body: const LoadingSkeleton());
+    if (_loading) return Scaffold(
+   appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),backgroundColor: ShunShiColors.background, body: const LoadingSkeleton());
 
     return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : ShunShiColors.background,
       body: RefreshIndicator(

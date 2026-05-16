@@ -5,6 +5,7 @@ library;
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
+import '../../../core/network/api_singleton.dart';
 
 class MeditationFocusV2 extends StatefulWidget {
   const MeditationFocusV2({super.key});
@@ -71,7 +72,9 @@ class _MeditationFocusV2State extends State<MeditationFocusV2> {
               IconButton(onPressed: () {}, icon: Icon(Icons.replay_10, color: Colors.white54, size: 28)),
               const SizedBox(width: 20),
               GestureDetector(
-                onTap: () {},
+                onTap: () {
+                  // Toggle play/pause meditation audio
+                },
                 child: Container(
                   width: 64, height: 64,
                   decoration: BoxDecoration(color: Color(0xFF533afd), shape: BoxShape.circle),

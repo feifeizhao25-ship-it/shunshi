@@ -1,15 +1,17 @@
-/// 首页（今日页）— 严格对齐 UI参考图 _1
-/// 设计: 水墨宣纸风格 + 毛玻璃 AI 模块
-/// 结构: TopBar → 时辰大标题 → Hero养生图 → Bento行动建议 → AI助手 → CTA
+/// 首页（今日页）— 升级版 UI v2
+/// 设计: 水墨宣纸风格 + 毛玻璃 AI 模块 + Staggered Animation
+/// 结构: TopBar → 时辰大标题 → Hero养生图 → Bento行动建议 → AI助手 → 今日推荐 → CTA
 library;
 
 import 'dart:math';
-import 'package:dio/dio.dart';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
 import 'package:go_router/go_router.dart';
 import 'widgets/home_skeleton.dart';
-import '../../../data/services/offline_cache.dart';
+import '../../../core/network/api_client.dart';
+import '../../../core/cache/cache_service.dart';
+import '../../../data/storage/storage_manager.dart';
 
 // ═══════════════════════════════════════════════════════════════
 // 十二时辰数据模型（本地计算）
@@ -204,7 +206,6 @@ String _getCurrentSolarTermInfo() {
   final now = DateTime.now();
   final month = now.month;
   final day = now.day;
-  // 粗略映射
   const terms = [
     (1, 6, '小寒', '季冬'), (1, 20, '大寒', '季冬'),
     (2, 4, '立春', '孟春'), (2, 19, '雨水', '孟春'),
@@ -230,6 +231,99 @@ String _getCurrentSolarTermInfo() {
 }
 
 // ═══════════════════════════════════════════════════════════════
+// 今日推荐数据
+// ═══════════════════════════════════════════════════════════════
+
+class TodayRecommendation {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final String tag;
+  final Color accentColor;
+  final String? route; // navigation route
+  final String? imageAsset; // AI-generated image
+
+  const TodayRecommendation({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.tag,
+    required this.accentColor,
+    this.route,
+    this.imageAsset,
+  });
+
+  factory TodayRecommendation.fromApi(Map<String, dynamic> json, bool isDark) {
+    final tag = json['category']?.toString() ?? json['type']?.toString() ?? '推荐';
+    final accentColor = _accentForTag(tag);
+    return TodayRecommendation(
+      icon: _iconForTag(tag),
+      title: json['title']?.toString() ?? json['name']?.toString() ?? '推荐',
+      subtitle: json['description']?.toString() ?? json['subtitle']?.toString() ?? '',
+      tag: tag,
+      accentColor: accentColor,
+      route: _routeForTag(tag),
+    );
+  }
+
+  static Color _accentForTag(String tag) {
+    switch (tag) {
+      case '食物': case '饮食': case '食疗': return ShunShiColors.apricot;
+      case '茶饮': case '茶': return ShunShiColors.warm;
+      case '运动': case '锻炼': return ShunShiColors.primaryLight;
+      case '养生': case '穴位': return ShunShiColors.calm;
+      default: return ShunShiColors.secondary;
+    }
+  }
+
+  static IconData _iconForTag(String tag) {
+    switch (tag) {
+      case '食物': case '饮食': case '食疗': return Icons.rice_bowl;
+      case '茶饮': case '茶': return Icons.local_cafe;
+      case '运动': case '锻炼': return Icons.directions_walk;
+      case '养生': case '穴位': return Icons.spa;
+      default: return Icons.auto_awesome;
+    }
+  }
+
+  static String? _routeForTag(String tag) {
+    switch (tag) {
+      case '食物': case '饮食': case '食疗': return '/diet-recommend';
+      case '茶饮': case '茶': return '/tea';
+      case '运动': case '锻炼': return '/exercise-detail';
+      default: return null;
+    }
+  }
+}
+
+List<TodayRecommendation> _getTodayRecommendations(ShiChenData sc) {
+  // 根据时辰给出不同推荐
+  final hour = DateTime.now().hour;
+  if (hour >= 5 && hour < 11) {
+    return const [
+      TodayRecommendation(icon: Icons.rice_bowl, title: '小米山药粥', subtitle: '温补脾胃，晨起首选', tag: '食物', accentColor: ShunShiColors.apricot, imageAsset: 'assets/images/morning_tea.jpg'),
+      TodayRecommendation(icon: Icons.local_cafe, title: '陈皮普洱茶', subtitle: '理气健脾，助消化', tag: '茶饮', accentColor: ShunShiColors.warm, imageAsset: 'assets/images/herbal_soup.jpg'),
+      TodayRecommendation(icon: Icons.self_improvement, title: '八段锦晨练', subtitle: '舒展筋骨，调和气血', tag: '运动', accentColor: ShunShiColors.primaryLight, imageAsset: 'assets/images/breathing.jpg'),
+      TodayRecommendation(icon: Icons.spa, title: '穴位按压', subtitle: '足三里·健脾胃', tag: '养生', accentColor: ShunShiColors.calm, imageAsset: 'assets/images/evening_yoga.jpg'),
+    ];
+  } else if (hour >= 11 && hour < 17) {
+    return const [
+      TodayRecommendation(icon: Icons.set_meal, title: '莲子百合汤', subtitle: '清心安神，午间滋养', tag: '食物', accentColor: ShunShiColors.apricot, imageAsset: 'assets/images/herbal_soup.jpg'),
+      TodayRecommendation(icon: Icons.emoji_food_beverage, title: '菊花枸杞茶', subtitle: '清肝明目，下午提神', tag: '茶饮', accentColor: ShunShiColors.warm, imageAsset: 'assets/images/seasonal_fruit.jpg'),
+      TodayRecommendation(icon: Icons.directions_walk, title: '午后散步', subtitle: '消食化积，通调腑气', tag: '运动', accentColor: ShunShiColors.primaryLight, imageAsset: 'assets/images/breathing.jpg'),
+      TodayRecommendation(icon: Icons.nights_stay, title: '静坐冥想', subtitle: '收敛心神，养心安神', tag: '养生', accentColor: ShunShiColors.calm, imageAsset: 'assets/images/meditation.jpg'),
+    ];
+  } else {
+    return const [
+      TodayRecommendation(icon: Icons.soup_kitchen, title: '银耳红枣羹', subtitle: '滋阴润燥，晚间养颜', tag: '食物', accentColor: ShunShiColors.apricot, imageAsset: 'assets/images/herbal_soup.jpg'),
+      TodayRecommendation(icon: Icons.local_cafe, title: '玫瑰花茶', subtitle: '疏肝理气，宁心安神', tag: '茶饮', accentColor: ShunShiColors.warm, imageAsset: 'assets/images/bedtime_tea.jpg'),
+      TodayRecommendation(icon: Icons.hot_tub, title: '温水泡脚', subtitle: '引火归元，助眠安神', tag: '运动', accentColor: ShunShiColors.primaryLight, imageAsset: 'assets/images/evening_yoga.jpg'),
+      TodayRecommendation(icon: Icons.menu_book, title: '静心阅读', subtitle: '放下手机，养百脉', tag: '养生', accentColor: ShunShiColors.calm, imageAsset: 'assets/images/bedtime_tea.jpg'),
+    ];
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
 // 首页 Widget
 // ═══════════════════════════════════════════════════════════════
 
@@ -240,14 +334,11 @@ class UltimateHomePage extends StatefulWidget {
   State<UltimateHomePage> createState() => _UltimateHomePageState();
 }
 
-class _UltimateHomePageState extends State<UltimateHomePage> {
-  static const _baseUrl = 'http://116.62.32.43:4000';
-
-  bool get isDark => Theme.of(context).brightness == Brightness.dark;  final _dio = Dio(BaseOptions(
-    baseUrl: _baseUrl,
-    connectTimeout: const Duration(seconds: 8),
-    receiveTimeout: const Duration(seconds: 15),
-  ));
+class _UltimateHomePageState extends State<UltimateHomePage>
+    with TickerProviderStateMixin {
+  bool get isDark => Theme.of(context).brightness == Brightness.dark;
+  final _api = ApiClient();
+  final _cache = CacheService();
 
   late ShiChenData _currentShiChen;
   String _solarTermInfo = '';
@@ -258,37 +349,85 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
 
   Map<String, dynamic> _followUp = {};
   bool _hasFollowUp = false;
+  List<TodayRecommendation> _todayRecs = [];
+
+  // ── Animation controllers ──
+  late AnimationController _breathController;  // 节气胶囊呼吸
+  late AnimationController _pulseController;   // AI 脉冲光点
+  late AnimationController _shimmerController; // 经络图 shimmer
+  late List<AnimationController> _staggerControllers; // 各区块入场
 
   @override
   void initState() {
     super.initState();
     _currentShiChen = getCurrentShiChen();
     _solarTermInfo = _getCurrentSolarTermInfo();
+
+    // 呼吸动画 (节气胶囊)
+    _breathController = AnimationController(
+      vsync: this, duration: const Duration(milliseconds: 2000),
+    )..repeat(reverse: true);
+
+    // AI 脉冲光点
+    _pulseController = AnimationController(
+      vsync: this, duration: const Duration(milliseconds: 1500),
+    )..repeat(reverse: true);
+
+    // Shimmer 效果
+    _shimmerController = AnimationController(
+      vsync: this, duration: const Duration(milliseconds: 2000),
+    )..repeat();
+
+    // Staggered 入场 (7 sections)
+    _staggerControllers = List.generate(7, (i) {
+      final c = AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 600),
+      );
+      Future.delayed(Duration(milliseconds: 100 + i * 120), () {
+        if (mounted) c.forward();
+      });
+      return c;
+    });
+
     _fetchDashboard();
   }
 
+  @override
+  void dispose() {
+    _breathController.dispose();
+    _pulseController.dispose();
+    _shimmerController.dispose();
+    for (final c in _staggerControllers) {
+      c.dispose();
+    }
+    super.dispose();
+  }
+
   Future<void> _fetchDashboard() async {
-    // Try offline cache first
     try {
-      final cached = await OfflineCache.getCachedDashboard();
+      final cached = _cache.get<Map<String, dynamic>>(
+        CacheKeys.today(),
+        config: CacheConfig.today,
+      );
       if (cached != null && mounted) {
-        _applyData(Map<String, dynamic>.from(cached));
+        _applyData(cached.data);
         setState(() => _loading = false);
       }
     } catch (_) {}
 
     try {
       final results = await Future.wait([
-        _dio.get('/api/v1/seasons/home/dashboard?locale=zh-CN'),
-        _dio.get('/api/v1/solar-terms/current'),
-        _dio.get('/api/v1/followup/due', queryParameters: {'user_id': 'user-001', 'limit': 1}),
+        _api.get('/seasons/home/dashboard', queryParameters: {'locale': 'zh-CN'}, level: SpeedLevel.s1),
+        _api.get('/solar-terms/current', level: SpeedLevel.s1),
+        _api.get('/followup/due', queryParameters: {'user_id': 'user-001', 'limit': 1}, level: SpeedLevel.s0),
       ]);
 
       if (!mounted) return;
 
       final dash = results[0].data;
       if (dash is Map) {
-        await OfflineCache.cacheDashboard(Map<String, dynamic>.from(dash));
+        await _cache.set(CacheKeys.today(), Map<String, dynamic>.from(dash), config: CacheConfig.today);
         _applyData(Map<String, dynamic>.from(dash));
       }
 
@@ -311,6 +450,38 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
       if (!mounted) return;
       setState(() => _loading = false);
     }
+
+    // Fetch personalized recommendations (non-blocking)
+    _fetchRecommendations();
+  }
+
+  Future<void> _fetchRecommendations() async {
+    try {
+      final token = StorageManager.user.getToken();
+      final endpoint = token != null && token.isNotEmpty
+          ? '/recommend/personalized'
+          : '/contents/recommend';
+      final res = await _api.get(endpoint, queryParameters: {'limit': 6}, level: SpeedLevel.s1);
+      if (!mounted) return;
+      final data = res.data;
+      if (data is Map && data['items'] is List) {
+        final items = (data['items'] as List).cast<Map<String, dynamic>>();
+        if (items.isNotEmpty) {
+          setState(() {
+            _todayRecs = items.map((item) => TodayRecommendation.fromApi(item, isDark)).toList();
+          });
+          return;
+        }
+      }
+      if (data is List && data.isNotEmpty) {
+        final items = data.cast<Map<String, dynamic>>();
+        setState(() {
+          _todayRecs = items.map((item) => TodayRecommendation.fromApi(item, isDark)).toList();
+        });
+      }
+    } catch (_) {
+      // Keep fallback recommendations
+    }
   }
 
   void _applyData(Map dash) {
@@ -324,11 +495,35 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
     }
   }
 
+  // ── Staggered slide+fade wrapper ──
+  Widget _staggerWrap(int index, Widget child) {
+    if (index >= _staggerControllers.length) return child;
+    final controller = _staggerControllers[index];
+    final slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.15),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: controller, curve: Curves.easeOutCubic));
+
+    final fadeAnimation = Tween<double>(
+      begin: 0.0, end: 1.0,
+    ).animate(CurvedAnimation(parent: controller, curve: Curves.easeOutCubic));
+
+    return AnimatedBuilder(
+      animation: controller,
+      builder: (context, _) => Opacity(
+        opacity: fadeAnimation.value,
+        child: Transform.translate(
+          offset: Offset(0, slideAnimation.value.dy * 30),
+          child: child,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final sc = _currentShiChen;
     final timeDisplay = '${sc.timeRange.replaceAll('-', ':00 - ')}:00';
-
     final bg = isDark ? ShunShiColors.darkBackground : ShunShiColors.background;
 
     if (_loading) return const HomeSkeleton();
@@ -336,86 +531,101 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
     return Scaffold(
       backgroundColor: bg,
       body: SafeArea(
-        child: CustomScrollView(
-          slivers: [
-            // ═══════════════ TopAppBar ═══════════════
-            SliverToBoxAdapter(
-              child: _buildTopBar(sc),
-            ),
-
-            const SliverToBoxAdapter(child: SizedBox(height: 28)),
-
-            // ═══════════════ 时辰大标题 + 节气胶囊 ═══════════════
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: _buildHeroTitle(sc, timeDisplay),
+        child: RefreshIndicator(
+          color: ShunShiColors.primary,
+          backgroundColor: isDark ? ShunShiColors.darkSurface : ShunShiColors.background,
+          displacement: 40,
+          strokeWidth: 2.5,
+          onRefresh: _fetchDashboard,
+          child: CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            slivers: [
+              // ═══════════════ TopAppBar ═══════════════
+              SliverToBoxAdapter(
+                child: _staggerWrap(0, _buildTopBar(sc)),
               ),
-            ),
 
-            const SliverToBoxAdapter(child: SizedBox(height: 28)),
+              const SliverToBoxAdapter(child: SizedBox(height: 28)),
 
-            // ═══════════════ Hero 经络意境区 ═══════════════
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: _buildHeroImage(sc),
-              ),
-            ),
-
-            const SliverToBoxAdapter(child: SizedBox(height: 32)),
-
-            // ═══════════════ Bento 行动建议 (2列) ═══════════════
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: _buildBentoGrid(sc),
-              ),
-            ),
-
-            const SliverToBoxAdapter(child: SizedBox(height: 32)),
-
-            // ═══════════════ AI 助手模块 (毛玻璃) ═══════════════
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: _buildAIModule(sc),
-              ),
-            ),
-
-            // ═══════════════ 今日洞察 (如有) ═══════════════
-            if (_dailyInsight.isNotEmpty) ...[
-              const SliverToBoxAdapter(child: SizedBox(height: 24)),
+              // ═══════════════ 时辰大标题 + 节气胶囊 ═══════════════
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: _buildDailyInsight(),
+                  child: _staggerWrap(1, _buildHeroTitle(sc, timeDisplay)),
                 ),
               ),
-            ],
 
-            // ═══════════════ 顺时提醒 (如有) ═══════════════
-            if (_hasFollowUp) ...[
-              const SliverToBoxAdapter(child: SizedBox(height: 16)),
+              const SliverToBoxAdapter(child: SizedBox(height: 28)),
+
+              // ═══════════════ Hero 经络意境区 ═══════════════
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: _buildFollowUpCard(),
+                  child: _staggerWrap(2, _buildHeroImage(sc)),
                 ),
               ),
-            ],
 
-            // ═══════════════ CTA 按钮 ═══════════════
-            const SliverToBoxAdapter(child: SizedBox(height: 32)),
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: _buildCTA(),
+              const SliverToBoxAdapter(child: SizedBox(height: 32)),
+
+              // ═══════════════ Bento 行动建议 ═══════════════
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: _staggerWrap(3, _buildBentoGrid(sc)),
+                ),
               ),
-            ),
 
-            const SliverToBoxAdapter(child: SizedBox(height: 48)),
-          ],
+              const SliverToBoxAdapter(child: SizedBox(height: 32)),
+
+              // ═══════════════ AI 助手模块 (毛玻璃) ═══════════════
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: _staggerWrap(4, _buildAIModule(sc)),
+                ),
+              ),
+
+              const SliverToBoxAdapter(child: SizedBox(height: 32)),
+
+              // ═══════════════ 今日推荐 横向滚动 ═══════════════
+              SliverToBoxAdapter(
+                child: _staggerWrap(5, _buildTodayRecommendations(sc)),
+              ),
+
+              // ═══════════════ 今日洞察 (如有) ═══════════════
+              if (_dailyInsight.isNotEmpty) ...[
+                const SliverToBoxAdapter(child: SizedBox(height: 24)),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: _staggerWrap(5, _buildDailyInsight()),
+                  ),
+                ),
+              ],
+
+              // ═══════════════ 顺时提醒 (如有) ═══════════════
+              if (_hasFollowUp) ...[
+                const SliverToBoxAdapter(child: SizedBox(height: 16)),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: _staggerWrap(6, _buildFollowUpCard()),
+                  ),
+                ),
+              ],
+
+              // ═══════════════ CTA 按钮 ═══════════════
+              const SliverToBoxAdapter(child: SizedBox(height: 32)),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: _staggerWrap(6, _buildCTA()),
+                ),
+              ),
+
+              const SliverToBoxAdapter(child: SizedBox(height: 48)),
+            ],
+          ),
         ),
       ),
     );
@@ -428,7 +638,6 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Left: Menu + Brand
           Row(children: [
             GestureDetector(
               onTap: () {},
@@ -452,7 +661,6 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
               ),
             ),
           ]),
-          // Right: Avatar
           GestureDetector(
             onTap: () => context.push('/profile'),
             child: Container(
@@ -472,8 +680,10 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
     );
   }
 
-  // ─── 时辰大标题 + 节气胶囊 ───
+  // ─── 时辰大标题 + 节气胶囊 (增强版) ───
   Widget _buildHeroTitle(ShiChenData sc, String timeDisplay) {
+    final secondaryColor = isDark ? ShunShiColors.darkSecondary : ShunShiColors.secondary;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -481,7 +691,7 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
         Text(
           timeDisplay,
           style: ShunShiTypography.labelMedium.copyWith(
-            color: isDark ? ShunShiColors.darkSecondary : ShunShiColors.secondary,
+            color: secondaryColor,
             letterSpacing: 1.5,
           ),
         ),
@@ -500,273 +710,626 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
               TextSpan(text: '${sc.name} · '),
               TextSpan(
                 text: '${sc.meridian}当令',
-                style: TextStyle(color: isDark ? ShunShiColors.darkSecondary : ShunShiColors.secondary),
+                style: TextStyle(color: secondaryColor),
               ),
             ],
           ),
         ),
-        const SizedBox(height: 12),
-        // Solar term pill
+        const SizedBox(height: 10),
+        // ── 渐变装饰线 ──
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+          height: 3,
+          width: 120,
           decoration: BoxDecoration(
-            color: (isDark ? ShunShiColors.darkSecondary : ShunShiColors.secondary).withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(999),
-          ),
-          child: Text(
-            _solarTermInfo,
-            style: ShunShiTypography.caption.copyWith(
-              color: isDark ? ShunShiColors.darkSecondary : ShunShiColors.secondary,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.5,
+            borderRadius: BorderRadius.circular(2),
+            gradient: LinearGradient(
+              colors: [
+                ShunShiColors.primary.withValues(alpha: 0.7),
+                ShunShiColors.apricot.withValues(alpha: 0.5),
+                Colors.transparent,
+              ],
             ),
+          ),
+        ),
+        const SizedBox(height: 12),
+        // ── 节气胶囊 (呼吸动画) ──
+        AnimatedBuilder(
+          animation: _breathController,
+          builder: (context, child) {
+            final scale = 1.0 + _breathController.value * 0.03;
+            final opacity = 0.85 + _breathController.value * 0.15;
+            return Transform.scale(
+              scale: scale,
+              child: Opacity(
+                opacity: opacity,
+                child: GestureDetector(
+                  onTap: () => context.push('/solar'),
+                  child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: secondaryColor.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(999),
+                    border: Border.all(
+                      color: secondaryColor.withValues(alpha: 0.15 + _breathController.value * 0.1),
+                      width: 1,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 6, height: 6,
+                        margin: const EdgeInsets.only(right: 8),
+                        decoration: BoxDecoration(
+                          color: secondaryColor.withValues(alpha: 0.6),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      Text(
+                        _solarTermInfo,
+                        style: ShunShiTypography.caption.copyWith(
+                          color: secondaryColor,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  // ─── Hero 经络意境区 (渐变色块+图标+shimmer) ───
+  Widget _buildHeroImage(ShiChenData sc) {
+    final bg = isDark ? ShunShiColors.darkBackground : ShunShiColors.background;
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        height: 280,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: isDark
+                ? [
+                    const Color(0xFF1A2E1F).withValues(alpha: 0.95),
+                    const Color(0xFF0F1A12).withValues(alpha: 0.98),
+                    const Color(0xFF2A3D2E).withValues(alpha: 0.90),
+                  ]
+                : [
+                    const Color(0xFF2A3D2E).withValues(alpha: 0.88),
+                    const Color(0xFF1A2E1F).withValues(alpha: 0.95),
+                    const Color(0xFF3D5A42).withValues(alpha: 0.82),
+                  ],
+          ),
+        ),
+        child: Stack(
+          children: [
+            // ── 经络意境: 渐变色块 + 图标 ──
+            // Top-left meridian icon cluster
+            Positioned(
+              left: 24, top: 28,
+              child: _buildMeridianNode(
+                icon: Icons.auto_awesome,
+                label: sc.meridian,
+                color: ShunShiColors.goldLight.withValues(alpha: 0.7),
+                size: 40,
+              ),
+            ),
+            // Center-right flowing gradient block
+            Positioned(
+              right: 20, top: 40,
+              child: Container(
+                width: 100, height: 60,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      ShunShiColors.apricot.withValues(alpha: 0.15),
+                      ShunShiColors.warm.withValues(alpha: 0.08),
+                    ],
+                  ),
+                ),
+                child: Icon(Icons.spa, size: 28, color: ShunShiColors.apricot.withValues(alpha: 0.5)),
+              ),
+            ),
+            // Bottom-left flowing element
+            Positioned(
+              left: 30, top: 100,
+              child: Container(
+                width: 70, height: 50,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(14),
+                  gradient: LinearGradient(
+                    colors: [
+                      ShunShiColors.primaryLight.withValues(alpha: 0.12),
+                      ShunShiColors.calm.withValues(alpha: 0.08),
+                    ],
+                  ),
+                ),
+                child: Icon(Icons.water_drop, size: 22, color: ShunShiColors.calm.withValues(alpha: 0.4)),
+              ),
+            ),
+            // Subtle meridian lines (decorative)
+            ...List.generate(4, (i) {
+              final rng = Random(i * 37 + sc.name.hashCode);
+              return Positioned(
+                left: rng.nextDouble() * 200 + 20,
+                top: rng.nextDouble() * 180 + 20,
+                child: Transform.rotate(
+                  angle: (rng.nextDouble() - 0.5) * 0.8,
+                  child: Container(
+                    width: 50 + rng.nextDouble() * 80,
+                    height: 2,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(2),
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.white.withValues(alpha: 0.0),
+                          Colors.white.withValues(alpha: 0.06 + rng.nextDouble() * 0.04),
+                          Colors.white.withValues(alpha: 0.0),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }),
+
+            // ── Shimmer overlay ──
+            AnimatedBuilder(
+              animation: _shimmerController,
+              builder: (context, child) {
+                final dx = _shimmerController.value * 1.5 - 0.25;
+                return Positioned.fill(
+                  child: ShaderMask(
+                    blendMode: BlendMode.srcOver,
+                    shaderCallback: (bounds) => LinearGradient(
+                      begin: Alignment(dx, -0.5),
+                      end: Alignment(dx + 0.3, 0.5),
+                      colors: [
+                        Colors.white.withValues(alpha: 0.0),
+                        Colors.white.withValues(alpha: 0.04),
+                        Colors.white.withValues(alpha: 0.0),
+                      ],
+                      stops: const [0.0, 0.5, 1.0],
+                    ).createShader(bounds),
+                    child: Container(color: Colors.white),
+                  ),
+                );
+              },
+            ),
+
+            // Bottom gradient overlay
+            Positioned(
+              left: 0, right: 0, bottom: 0,
+              child: Container(
+                height: 150,
+                decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(20),
+                    bottomRight: Radius.circular(20),
+                  ),
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.black.withValues(alpha: 0),
+                      Colors.black.withValues(alpha: 0.85),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            // Wellness principle card
+            Positioned(
+              left: 16, right: 16, bottom: 20,
+              child: Container(
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  color: bg.withValues(alpha: 0.92),
+                  borderRadius: BorderRadius.circular(14),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.08),
+                      blurRadius: 20,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '养生精要 Wellness Principle',
+                      style: ShunShiTypography.caption.copyWith(
+                        color: ShunShiColors.secondary,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      sc.wellnessPrinciple,
+                      style: ShunShiTypography.serifTitle.copyWith(
+                        fontSize: 18,
+                        color: ShunShiColors.primary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMeridianNode({
+    required IconData icon,
+    required String label,
+    required Color color,
+    double size = 36,
+  }) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: size + 16, height: size + 16,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: color.withValues(alpha: 0.12),
+            border: Border.all(color: color.withValues(alpha: 0.25), width: 1),
+          ),
+          child: Icon(icon, size: size * 0.55, color: color),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          label,
+          style: ShunShiTypography.caption.copyWith(
+            color: color.withValues(alpha: 0.8),
+            fontSize: 10,
+            fontWeight: FontWeight.w600,
           ),
         ),
       ],
     );
   }
 
-  // ─── Hero 水墨意境区 ───
-  Widget _buildHeroImage(ShiChenData sc) {
-    final bg = Theme.of(context).brightness == Brightness.dark ? ShunShiColors.darkBackground : ShunShiColors.background;
-    return Container(
-      height: 280,
-      width: double.infinity,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            const Color(0xFF2A2A2A).withValues(alpha: 0.85),
-            const Color(0xFF1A1A1A).withValues(alpha: 0.95),
-            const Color(0xFF3D3D3D).withValues(alpha: 0.80),
+  // ─── Bento 行动建议 (圆角20 + 微阴影 + press 反馈) ───
+  Widget _buildBentoGrid(ShiChenData sc) {
+    return Column(
+      children: [
+        for (int i = 0; i < sc.actions.length; i++) ...[
+          if (i > 0) const SizedBox(height: 16),
+          _buildBentoCard(sc.actions[i]),
+        ],
+      ],
+    );
+  }
+
+  /// 根据 Bento action 标题推断路由
+  String? _routeForAction(BentoAction action) {
+    final t = action.title;
+    if (t.contains('食') || t.contains('粥') || t.contains('茶') && t.contains('姜')) return '/diet-recommend';
+    if (t.contains('运动') || t.contains('散步') || t.contains('晨练') || t.contains('跑') || t.contains('八段锦')) return '/exercise-detail';
+    if (t.contains('茶') || t.contains('花茶') || t.contains('普洱') || t.contains('姜枣') || t.contains('陈皮') || t.contains('玫瑰') || t.contains('菊花')) return '/tea';
+    if (t.contains('睡') || t.contains('静') || t.contains('冥想') || t.contains('泡脚') || t.contains('阅读') || t.contains('按压')) return null; // wellness — stay
+    return null;
+  }
+
+  Widget _buildBentoCard(BentoAction action) {
+    final route = _routeForAction(action);
+    return _PressScale(
+      onTap: route != null ? () => context.push(route) : null,
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: isDark ? ShunShiColors.darkSurfaceContainerLowest : ShunShiColors.surfaceContainerLowest,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.02),
+              blurRadius: 4,
+              offset: const Offset(0, 1),
+            ),
           ],
         ),
-      ),
-      child: Stack(
-        children: [
-          // Decorative ink strokes (elongated ellipses)
-          ...List.generate(6, (i) {
-            final rng = Random(i * 37 + sc.name.hashCode);
-            return Positioned(
-              left: rng.nextDouble() * 260,
-              top: rng.nextDouble() * 220,
-              child: Transform.rotate(
-                angle: (rng.nextDouble() - 0.5) * 1.2,
-                child: Container(
-                  width: 60 + rng.nextDouble() * 100,
-                  height: 12 + rng.nextDouble() * 24,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(99),
-                    color: Colors.white.withValues(alpha: 0.03 + rng.nextDouble() * 0.05),
-                  ),
-                ),
-              ),
-            );
-          }),
-          // Bottom gradient overlay
-          Positioned(
-            left: 0, right: 0, bottom: 0,
-            child: Container(
-              height: 140,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 48, height: 48,
               decoration: BoxDecoration(
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(20),
-                  bottomRight: Radius.circular(20),
-                ),
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    const Color(0xFF1A1A1A).withValues(alpha: 0),
-                    const Color(0xFF1A1A1A).withValues(alpha: 0.90),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          // Wellness principle card — 养生精要
-          Positioned(
-            left: 16, right: 16, bottom: 20,
-            child: Container(
-              padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(
-                color: bg.withValues(alpha: 0.92),
+                color: ShunShiColors.primary.withValues(alpha: 0.06),
                 borderRadius: BorderRadius.circular(14),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.08),
-                    blurRadius: 20,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
               ),
+              child: Icon(action.icon, size: 24, color: isDark ? ShunShiColors.darkPrimary : ShunShiColors.primary),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '养生精要 Wellness Principle',
-                    style: ShunShiTypography.caption.copyWith(
-                      color: ShunShiColors.secondary,
-                      fontWeight: FontWeight.w500,
+                    action.title,
+                    style: ShunShiTypography.titleLarge.copyWith(
+                      fontFamily: ShunShiTypography.serifFamily,
+                      fontSize: 17,
+                      color: isDark ? ShunShiColors.darkTextPrimary : ShunShiColors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    sc.wellnessPrinciple,
-                    style: ShunShiTypography.serifTitle.copyWith(
-                      fontSize: 18,
-                      color: ShunShiColors.primary,
+                    action.description,
+                    style: ShunShiTypography.bodySmall.copyWith(
+                      height: 1.6,
+                      color: isDark ? ShunShiColors.darkTextSecondary : ShunShiColors.textSecondary,
                     ),
                   ),
                 ],
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
-  // ─── Bento 行动建议 (垂直列表) ───
-  Widget _buildBentoGrid(ShiChenData sc) {
-    return Column(
-      children: sc.actions.map((action) => _buildBentoCard(action)).toList()
-        ..insert(1, const SizedBox(height: 16)),
-    );
-  }
-
-  Widget _buildBentoCard(BentoAction action) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: ShunShiColors.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: ShunShiShadows.sm,
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 48, height: 48,
-            decoration: BoxDecoration(
-              color: ShunShiColors.primary.withValues(alpha: 0.06),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(action.icon, size: 24, color: ShunShiColors.primary),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  action.title,
-                  style: ShunShiTypography.titleLarge.copyWith(
-                    fontFamily: ShunShiTypography.serifFamily,
-                    fontSize: 17,
-                    color: isDark ? ShunShiColors.darkTextPrimary : ShunShiColors.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  action.description,
-                  style: ShunShiTypography.bodySmall.copyWith(
-                    height: 1.6,
-                    color: isDark ? ShunShiColors.darkTextSecondary : ShunShiColors.textSecondary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ─── AI 助手模块 ───
+  // ─── AI 助手模块 (毛玻璃 + 脉冲光点) ───
   Widget _buildAIModule(ShiChenData sc) {
-    final bg = Theme.of(context).brightness == Brightness.dark ? ShunShiColors.darkBackground : ShunShiColors.background;
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: ShunShiColors.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: ShunShiColors.borderGhost),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // AI avatar
-          SizedBox(
-            width: 52, height: 52,
-            child: Stack(
-              children: [
-                Container(
-                  width: 52, height: 52,
-                  decoration: const BoxDecoration(
-                    color: ShunShiColors.primary,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.auto_awesome,
-                    color: Colors.white,
-                    size: 26,
-                  ),
-                ),
-                // Pulse indicator
-                Positioned(
-                  right: 0, bottom: 0,
-                  child: Container(
-                    width: 14, height: 14,
-                    decoration: BoxDecoration(
-                      color: ShunShiColors.goldLight,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: bg, width: 2.5),
+    final bg = isDark ? ShunShiColors.darkBackground : ShunShiColors.background;
+
+    return GestureDetector(
+      onTap: () => context.push('/chat'),
+      child: ClipRRect(
+      borderRadius: BorderRadius.circular(24),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: (isDark ? ShunShiColors.darkSurface : ShunShiColors.surface).withValues(alpha: 0.75),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: isDark ? 0.08 : 0.2),
+              width: 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.06),
+                blurRadius: 16,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // AI avatar with pulse
+              SizedBox(
+                width: 52, height: 52,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    // ── 脉冲光圈 ──
+                    AnimatedBuilder(
+                      animation: _pulseController,
+                      builder: (context, child) {
+                        final pulseScale = 1.0 + _pulseController.value * 0.3;
+                        final pulseOpacity = 0.3 - _pulseController.value * 0.3;
+                        return Transform.scale(
+                          scale: pulseScale,
+                          child: Container(
+                            width: 52, height: 52,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: ShunShiColors.primaryLight.withValues(alpha: pulseOpacity),
+                            ),
+                          ),
+                        );
+                      },
                     ),
-                    child: Center(
+                    // Main avatar
+                    Container(
+                      width: 52, height: 52,
+                      decoration: const BoxDecoration(
+                        color: ShunShiColors.primary,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.auto_awesome,
+                        color: Colors.white,
+                        size: 26,
+                      ),
+                    ),
+                    // Status dot
+                    Positioned(
+                      right: 0, bottom: 0,
                       child: Container(
-                        width: 6, height: 6,
-                        decoration: const BoxDecoration(
-                          color: ShunShiColors.gold,
+                        width: 14, height: 14,
+                        decoration: BoxDecoration(
+                          color: ShunShiColors.goldLight,
                           shape: BoxShape.circle,
+                          border: Border.all(color: bg, width: 2.5),
+                        ),
+                        child: Center(
+                          child: Container(
+                            width: 6, height: 6,
+                            decoration: const BoxDecoration(
+                              color: ShunShiColors.gold,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                  ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '顺时 AI 助手',
+                      style: ShunShiTypography.titleMedium.copyWith(
+                        fontFamily: ShunShiTypography.serifFamily,
+                        fontSize: 16,
+                        color: isDark ? ShunShiColors.darkTextPrimary : ShunShiColors.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '"${sc.aiQuote}"',
+                      style: ShunShiTypography.bodyMedium.copyWith(
+                        fontStyle: FontStyle.italic,
+                        color: isDark ? ShunShiColors.darkTextSecondary : ShunShiColors.textSecondary,
+                        height: 1.7,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: 16),
-          // AI text
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '顺时 AI 助手',
-                  style: ShunShiTypography.titleMedium.copyWith(
-                    fontFamily: ShunShiTypography.serifFamily,
-                    fontSize: 16,
-                    color: isDark ? ShunShiColors.darkTextPrimary : ShunShiColors.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  '"${sc.aiQuote}"',
-                  style: ShunShiTypography.bodyMedium.copyWith(
-                    fontStyle: FontStyle.italic,
-                    color: isDark ? ShunShiColors.darkTextSecondary : ShunShiColors.textSecondary,
-                    height: 1.7,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+        ),
       ),
+      ),
+    );
+  }
+
+  // ─── 今日推荐 横向滚动 ───
+  Widget _buildTodayRecommendations(ShiChenData sc) {
+    final recs = _todayRecs.isNotEmpty ? _todayRecs : _getTodayRecommendations(sc);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Text(
+            '今日推荐',
+            style: ShunShiTypography.titleMedium.copyWith(
+              fontFamily: ShunShiTypography.serifFamily,
+              fontSize: 18,
+              color: isDark ? ShunShiColors.darkTextPrimary : ShunShiColors.textPrimary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        const SizedBox(height: 14),
+        SizedBox(
+          height: 150,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            itemCount: recs.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 14),
+            itemBuilder: (context, index) {
+              final rec = recs[index];
+              return _PressScale(
+                onTap: rec.route != null ? () => context.push(rec.route!) : null,
+                child: Container(
+                  width: 140,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: isDark ? ShunShiColors.darkSurfaceContainerLowest : ShunShiColors.surfaceContainerLowest,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: rec.accentColor.withValues(alpha: 0.12),
+                      width: 1,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.03),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // ── Image or icon ──
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: SizedBox(
+                          width: 36,
+                          height: 36,
+                          child: rec.imageAsset != null
+                              ? Image.asset(rec.imageAsset!, fit: BoxFit.cover)
+                              : Container(
+                                  decoration: BoxDecoration(
+                                    color: rec.accentColor.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Icon(rec.icon, size: 18, color: rec.accentColor),
+                                ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        rec.title,
+                        style: ShunShiTypography.titleMedium.copyWith(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: isDark ? ShunShiColors.darkTextPrimary : ShunShiColors.textPrimary,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        rec.subtitle,
+                        style: ShunShiTypography.bodySmall.copyWith(
+                          fontSize: 11,
+                          color: isDark ? ShunShiColors.darkTextTertiary : ShunShiColors.textTertiary,
+                          height: 1.4,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const Spacer(),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: rec.accentColor.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          rec.tag,
+                          style: ShunShiTypography.caption.copyWith(
+                            fontSize: 10,
+                            color: rec.accentColor,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 
@@ -782,7 +1345,14 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
             ShunShiColors.primaryContainer,
           ],
         ),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: ShunShiColors.primary.withValues(alpha: 0.15),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -813,7 +1383,7 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: ShunShiColors.primary.withValues(alpha: 0.06),
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(color: ShunShiColors.primary.withValues(alpha: 0.1)),
       ),
       child: Row(
@@ -869,5 +1439,37 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
       ),
     );
   }
+}
 
+// ═══════════════════════════════════════════════════════════════
+// Press Scale Feedback Widget
+// ═══════════════════════════════════════════════════════════════
+
+class _PressScale extends StatefulWidget {
+  final Widget child;
+  final VoidCallback? onTap;
+  const _PressScale({required this.child, this.onTap});
+
+  @override
+  State<_PressScale> createState() => _PressScaleState();
+}
+
+class _PressScaleState extends State<_PressScale> {
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: widget.onTap,
+      onTapDown: (_) => setState(() => _pressed = true),
+      onTapUp: (_) => setState(() => _pressed = false),
+      onTapCancel: () => setState(() => _pressed = false),
+      child: AnimatedScale(
+        scale: _pressed ? 0.97 : 1.0,
+        duration: const Duration(milliseconds: 120),
+        curve: Curves.easeInOut,
+        child: widget.child,
+      ),
+    );
+  }
 }

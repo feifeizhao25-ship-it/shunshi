@@ -7,6 +7,7 @@ import '../../../data/storage/storage_manager.dart';
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
+import '../../../core/network/api_singleton.dart';
 
 class ConstitutionTestV2 extends StatefulWidget {
   const ConstitutionTestV2({super.key});
@@ -16,8 +17,7 @@ class ConstitutionTestV2 extends StatefulWidget {
 }
 
 class _ConstitutionTestV2State extends State<ConstitutionTestV2> {
-  static const _baseUrl = 'http://116.62.32.43:4000';
-  final _dio = Dio(BaseOptions(baseUrl: _baseUrl, connectTimeout: const Duration(seconds: 8)));
+  final _dio = apiClient.dio;
 
   List<Map<String, dynamic>> _questions = [];
   final Map<int, int> _answers = {}; // question_id → answer_index

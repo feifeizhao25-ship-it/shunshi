@@ -17,6 +17,7 @@ import 'widgets/constitution_widgets.dart';
 import 'widgets/constitution_home_widget.dart';
 import 'widgets/constitution_quiz_widget.dart';
 import 'widgets/constitution_result_widget.dart';
+import '../../../core/network/api_singleton.dart';
 
 // Models imported from constitution_data.dart
 
@@ -230,7 +231,7 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
             characteristics: kConstitutionChars[primaryType] ?? [],
             advice: adviceList,
             scores: scoreList,
-            avoidList: (kConstitutionAvoid[primaryType] ?? []).join('、'),
+            avoidList: (kConstitutionAvoid[primaryType] ?? []).join(', '),
             isPremium: _reportUnlocked,
           );
           _view = 'result';
@@ -299,7 +300,7 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
               HealthAdvice(category: 'TeaRecommended', icon: '🍵', items: [(data['tea_advice'] as String? ?? '').split('：').last]),
               HealthAdvice(category: 'Exercise Advice', icon: '🏃', items: [(data['exercise_advice'] as String? ?? '').split('：').last]),
             ],
-            avoidList: avoid.join('、'),
+            avoidList: avoid.join(', '),
           );
           _view = 'detail';
         });
@@ -325,7 +326,7 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
           HealthAdvice(category: 'TeaRecommended', icon: '🍵', items: [adv['Tea'] ?? '']),
           HealthAdvice(category: 'Exercise Advice', icon: '🏃', items: [adv['Exercise'] ?? '']),
         ],
-        avoidList: (kConstitutionAvoid[key] ?? []).join('、'),
+        avoidList: (kConstitutionAvoid[key] ?? []).join(', '),
       );
       _view = 'detail';
     });

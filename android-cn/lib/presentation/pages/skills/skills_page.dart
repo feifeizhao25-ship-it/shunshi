@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import '../../../core/config/app_config.dart';
 
 /// Wellness Skills Page — Rule #5: All AI through structured skills.
 /// Each skill is deterministic, testable, and returns structured JSON.
@@ -12,7 +13,7 @@ class SkillsPage extends StatefulWidget {
 
 class _SkillsPageState extends State<SkillsPage> {
   final _dio = Dio(BaseOptions(
-    baseUrl: 'http://116.62.32.43:4000',
+    baseUrl: AppConfig.apiBaseUrl.replaceAll('/api/v1', ''),
     connectTimeout: const Duration(seconds: 5),
     receiveTimeout: const Duration(seconds: 8),
   ));

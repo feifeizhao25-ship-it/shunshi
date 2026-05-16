@@ -1,5 +1,7 @@
 import '../../../core/router/safe_pop.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../../data/network/api_client.dart';
 import '../../widgets/paywall_banner.dart';
 
 /// 正念呼吸引导数据
@@ -22,6 +24,27 @@ class MoodPage extends StatefulWidget {
 
 class _MoodPageState extends State<MoodPage> {
   String? _selectedMood;
+  String? _constitutionType;
+  String? _solarTerm;
+  final _api = ApiClient();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPersonalization();
+  }
+
+  Future<void> _loadPersonalization() async {
+    final prefs = await SharedPreferences.getInstance();
+    _constitutionType = prefs.getString('constitution_type');
+    try {
+      final res = await _api.get('/api/v1/solar-terms/today');
+      if (res.data is Map) {
+        _solarTerm = (res.data as Map<String, dynamic>)['name'] as String?;
+      }
+    } catch (_) {}
+    if (mounted) setState(() {});
+  }
 
   final Map<String, Map<String, dynamic>> _moodResponses = {
     'happy': {
@@ -140,7 +163,63 @@ class _MoodPageState extends State<MoodPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // ── Header image ──
+            ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: Stack(
+                children: [
+                  SizedBox(
+                    height: 120,
+                    width: double.infinity,
+                    child: Image.asset(
+                      'assets/images/meditation.jpg',
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  Positioned.fill(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.black.withValues(alpha: 0.1),
+                            Colors.black.withValues(alpha: 0.5),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
             const PaywallBanner(message: '升级会员解锁情绪追踪与AI情绪分析', icon: Icons.favorite),
+            // Personalized context banner
+            if (_constitutionType != null || _solarTerm != null)
+              Container(
+                margin: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.pink[50],
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.eco, size: 18, color: Colors.pink),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        [
+                          if (_solarTerm != null) '当前节气：$_solarTerm',
+                          if (_constitutionType != null) '你的体质：$_constitutionType',
+                        ].join(' · '),
+                        style: const TextStyle(fontSize: 13, color: Colors.pink),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             // AI 对话入口
             Card(
               color: Colors.pink[50],

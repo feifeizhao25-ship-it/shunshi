@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../data/network/api_client.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
+import '../../../core/network/api_singleton.dart';
 
 /// 家庭主页 — 隐私优先，仅显示状态级别信息
 class FamilyHomePage extends StatefulWidget {

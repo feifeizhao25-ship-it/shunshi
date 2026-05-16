@@ -2,6 +2,7 @@ import '../../../core/router/safe_pop.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
+import '../../../core/config/app_config.dart';
 
 /// 家庭成员详情页 — 仅显示状态级别信息（隐私优先）
 class FamilyMemberDetailPage extends StatefulWidget {
@@ -25,7 +26,7 @@ class _FamilyMemberDetailPageState extends State<FamilyMemberDetailPage> {
   Future<void> _loadMember() async {
     try {
       final dio = Dio();
-      final res = await dio.get('http://116.62.32.43:4000/api/v1/family/members/${widget.memberId}');
+      final res = await dio.get('${AppConfig.apiBaseUrl}/api/v1/family/members/${widget.memberId}');
       if (res.data != null) {
         setState(() {
           _member = Map<String, dynamic>.from(res.data);

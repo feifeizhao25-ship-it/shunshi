@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'dart:io';
 import '../storage/storage_manager.dart';
+import '../../core/config/app_config.dart';
 
 /// API 错误类型
 enum ApiErrorType {
@@ -28,7 +29,7 @@ class ApiClient {
   // 模拟器地址（Android emulator → host localhost）
   static const _emulatorUrl = 'http://10.0.2.2:4000';
   // 真机：优先公网直连
-  static const _realDeviceUrl = 'http://116.62.32.43:4000';
+  static final String _realDeviceUrl = AppConfig.apiBaseUrl.replaceAll('/api/v1', '');
 
   static String baseUrl = _realDeviceUrl;
   static bool _detected = true; // 默认用真机IP，不需要检测

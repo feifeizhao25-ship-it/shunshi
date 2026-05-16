@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/router/safe_pop.dart';
+import '../../../core/network/api_singleton.dart';
 
 class AboutPage extends StatelessWidget {
   const AboutPage({super.key});

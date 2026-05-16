@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import '../../../core/theme/shunshi_text_styles.dart';
 import '../../../core/theme/app_localizations.dart';
+import '../../../core/network/api_singleton.dart';
 
 /// 顺时边界公示页 — 清楚告知用户产品边界
 class BoundariesPage extends StatelessWidget {

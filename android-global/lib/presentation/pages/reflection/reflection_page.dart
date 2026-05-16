@@ -14,6 +14,7 @@ import '../../../domain/entities/reflection.dart';
 import '../../providers/reflection_provider.dart';
 import '../../widgets/components/gentle_button.dart';
 import '../../../core/theme/app_localizations.dart';
+import '../../../core/network/api_singleton.dart';
 
 // ── Emotions选项 (5个) ────────────────────────────────────
 
@@ -137,7 +138,10 @@ class _ReflectionPageState extends ConsumerState<ReflectionPage> {
       return const _SuccessView();
     }
 
-    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : ShunshiColors.background,
+    return Scaffold(
+
+
+      appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),backgroundColor: isDark ? ShunshiDarkColors.background : ShunshiColors.background,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(

@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'dart:io';
 import '../storage/storage_manager.dart';
+import '../../core/config/app_config.dart';
 
 /// API 错误类型
 enum ApiErrorType {
@@ -28,7 +29,7 @@ class ApiClient {
   // 模拟器地址（Android emulator → host localhost）
   static const _emulatorUrl = 'http://10.0.2.2:4000';
   // 真机：优先公网直连
-  static const _realDeviceUrl = 'http://116.62.32.43:4000';
+  static final String _realDeviceUrl = AppConfig.baseUrl;
 
   static String baseUrl = _realDeviceUrl;
   static bool _detected = true; // 默认用真机IP，不需要检测
@@ -60,6 +61,10 @@ class ApiClient {
     // 添加拦截器
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) {
+        // Auto-append locale=en-US for Global edition
+        if (!options.queryParameters.containsKey('locale')) {
+          options.queryParameters['locale'] = 'en-US';
+        }
         // ngrok 免费版跳过浏览器警告
         options.headers['ngrok-skip-browser-warning'] = 'true';
         // 自动添加 Token

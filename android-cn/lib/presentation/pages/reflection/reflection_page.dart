@@ -11,7 +11,7 @@ import '../../../core/theme/shunshi_spacing.dart';
 import '../../../core/theme/shunshi_text_styles.dart';
 import '../../widgets/components/gentle_button.dart';
 
-// ── 情绪定义 ──────────────────────────────────────────
+//
 
 enum _ReflectionMood {
   happy,     // 开心 😊
@@ -39,7 +39,7 @@ const _moodOptions = [
   _MoodOption(mood: _ReflectionMood.anxious, emoji: '😰', label: '焦虑'),
 ];
 
-// ── 每日反思问题池 ────────────────────────────────────
+//
 
 const _questions = [
   '今天让你感恩的是什么？',
@@ -50,7 +50,7 @@ const _questions = [
   '今天什么让你感到平静？',
 ];
 
-// ── 主页面 ────────────────────────────────────────────
+//
 
 class ReflectionPage extends StatefulWidget {
   const ReflectionPage({super.key});
@@ -124,20 +124,20 @@ class _ReflectionPageState extends State<ReflectionPage> {
           ),
           child: Column(
             children: [
-              // ── 大留白顶部 ──
+              //
               const SizedBox(height: 80),
 
-              // ── 问题居中 22sp insight样式 ──
+              //
               Text(
                 _todayQuestion,
                 style: ShunshiTextStyles.insight.copyWith(fontSize: 22),
                 textAlign: TextAlign.center,
               ),
 
-              // ── 思考空间 ──
+              //
               const SizedBox(height: 60),
 
-              // ── 情绪选择：4个大圆圈emoji（😊😌😢😰）──
+              //
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: _moodOptions.map((opt) {
@@ -174,7 +174,7 @@ class _ReflectionPageState extends State<ReflectionPage> {
                 }).toList(),
               ),
 
-              // ── 情绪标签 ──
+              //
               const SizedBox(height: 12),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -196,7 +196,7 @@ class _ReflectionPageState extends State<ReflectionPage> {
                 }).toList(),
               ),
 
-              // ── 可选文字输入框，大圆角 ──
+              //
               const SizedBox(height: 40),
               TextField(
                 controller: _notesController,
@@ -232,7 +232,7 @@ class _ReflectionPageState extends State<ReflectionPage> {
                 ),
               ),
 
-              // ── "记录下来" GentleButton ──
+              //
               const SizedBox(height: 28),
               SizedBox(
                 width: double.infinity,
@@ -244,7 +244,7 @@ class _ReflectionPageState extends State<ReflectionPage> {
                 ),
               ),
 
-              // ── "跳过今天" textSecondary色文字链接 ──
+              //
               const SizedBox(height: 20),
               GestureDetector(
                 onTap: _skip,
@@ -269,7 +269,7 @@ class _ReflectionPageState extends State<ReflectionPage> {
   }
 }
 
-// ── 提交成功视图 ──────────────────────────────────────
+//
 
 class _SuccessView extends StatelessWidget {
   const _SuccessView();
@@ -277,6 +277,7 @@ class _SuccessView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+  appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
       backgroundColor: ShunshiColors.background,
       body: Center(
         child: Column(

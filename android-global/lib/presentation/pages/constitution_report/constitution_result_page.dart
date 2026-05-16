@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
+import 'package:go_router/go_router.dart';
+import '../../../core/network/api_singleton.dart';
 
 class ConstitutionResultPage extends StatelessWidget {
   final String constitutionType;
@@ -23,7 +25,10 @@ class ConstitutionResultPage extends StatelessWidget {
     final now = DateTime.now();
     final seasonLabel = _getSeasonLabel(now.month);
 
-    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : ShunShiColors.background,
+    return Scaffold(
+
+
+      appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),backgroundColor: isDark ? ShunshiDarkColors.background : ShunShiColors.background,
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: Column(
@@ -50,7 +55,7 @@ class ConstitutionResultPage extends StatelessWidget {
                     )),
                     const Spacer(),
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () => context.push('/notifications'),
                       child: Icon(Icons.notifications_outlined, size: 22, color: ShunShiColors.primary),
                     ),
                   ],
@@ -341,7 +346,7 @@ class ConstitutionResultPage extends StatelessWidget {
                       )),
                       SizedBox(height: 12),
                       GestureDetector(
-                        onTap: () {},
+                        onTap: () => context.push('/wellness-category/diet'),
                         child: Row(
                           children: [
                             Text(AppLocalizations.of(context).t('constitutionrep_start_cooking'), style: TextStyle(

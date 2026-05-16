@@ -3,12 +3,13 @@ library;
 
 import 'dart:typed_data';
 import 'package:dio/dio.dart';
+import '../../core/config/app_config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class ShareUtil {
   static final _dio = Dio(BaseOptions(
-    baseUrl: 'http://116.62.32.43:4000',
+    baseUrl: AppConfig.apiBaseUrl.replaceAll('/api/v1', ''),
     connectTimeout: const Duration(seconds: 15),
     responseType: ResponseType.bytes,
   ));

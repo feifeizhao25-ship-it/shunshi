@@ -34,7 +34,7 @@ class _LibraryPageState extends State<LibraryPage> {
   }
 
   void _showRecipes() {
-    _showCategorySheet('Seasonal Recipes', Icons.restaurant_menu, ShunShiColors.secondary,
+    _showCategorySheet('节气食谱', Icons.restaurant_menu, ShunShiColors.secondary,
       WellnessContent.recipes.map((r) => _ContentItem(
         emoji: r.emoji,
         title: r.name,
@@ -155,8 +155,8 @@ class _LibraryPageState extends State<LibraryPage> {
     final bg = isDark ? ShunShiColors.darkBackground : ShunShiColors.background;
 
     final categories = [
-      _CategoryItem(Icons.accessibility_new, 'Body Types', 'Discover your wellness profile', ShunShiColors.primary, _showBodyTypes),
-      _CategoryItem(Icons.restaurant_menu, 'Seasonal Recipes', 'Fresh ingredients by season', ShunShiColors.secondary, _showRecipes),
+      _CategoryItem(Icons.accessibility_new, '体质辨识', '了解你的养生体质', ShunShiColors.primary, _showBodyTypes),
+      _CategoryItem(Icons.restaurant_menu, '节气食谱', '应季食材推荐', ShunShiColors.secondary, _showRecipes),
       _CategoryItem(Icons.local_cafe, 'Herbal Teas', 'Chamomile, Peppermint, Ginger', ShunShiColors.blue, _showHerbalTeas),
       _CategoryItem(Icons.touch_app, 'Pressure Points', 'Reflexology & acupressure', ShunShiColors.apricot, _showPressurePoints),
       _CategoryItem(Icons.fitness_center, 'Movement', 'Yoga, Tai Chi & Stretching', ShunShiColors.goldLight, _showMovement),
@@ -164,6 +164,7 @@ class _LibraryPageState extends State<LibraryPage> {
     ];
 
     return Scaffold(
+  appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
       backgroundColor: bg,
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
@@ -177,7 +178,7 @@ class _LibraryPageState extends State<LibraryPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'Wellness Library',
+                      '养生库',
                       style: TextStyle(
                         fontFamily: ShunShiTypography.serifFamily,
                         fontSize: 30,

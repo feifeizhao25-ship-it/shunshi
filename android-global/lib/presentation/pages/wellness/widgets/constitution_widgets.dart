@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/shunshi_colors.dart';
 import '../../../../core/theme/shunshi_text_styles.dart';
 import 'constitution_data.dart';
+import '../../../../core/network/api_singleton.dart';
 
 /// 答 questions选项卡片
 class QuizOptionCard extends StatelessWidget {

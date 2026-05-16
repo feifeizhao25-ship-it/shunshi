@@ -7,11 +7,12 @@
 /// 3. EditFeatured文章列表
 library;
 
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
+import '../../../data/en_content.dart';
+import '../../../core/network/api_singleton.dart';
 
 class DiscoverPage extends StatefulWidget {
   const DiscoverPage({super.key});
@@ -21,12 +22,7 @@ class DiscoverPage extends StatefulWidget {
 }
 
 class _DiscoverPageState extends State<DiscoverPage> {
-  static const _baseUrl = 'http://116.62.32.43:4000';
-  final _dio = Dio(BaseOptions(
-    baseUrl: _baseUrl,
-    connectTimeout: const Duration(seconds: 8),
-    receiveTimeout: const Duration(seconds: 15),
-  ));
+  final _dio = apiClient.dio;
 
   List<Map<String, dynamic>> _articles = [];
   List<Map<String, dynamic>> _searchResults = [];
@@ -70,25 +66,21 @@ class _DiscoverPageState extends State<DiscoverPage> {
   }
 
   Future<void> _fetchArticles() async {
-    try {
-      final res = await _dio.get('/api/v1/contents/recommend', queryParameters: {'limit': 6});
-      if (!mounted) return;
-      final data = res.data;
-      if (data is Map && data['data'] is Map) {
-        final items = data['data']['items'];
-        if (items is List) _articles = items.cast<Map<String, dynamic>>();
-      }
-      setState(() => _loading = false);
-    } catch (_) {
-      if (!mounted) return;
-      setState(() => _loading = false);
-    }
+    // Use local English content
+    final localArticles = EnContentData.articles.map((c) => EnContentData.toMap(c)).toList();
+    if (!mounted) return;
+    setState(() {
+      _articles = localArticles;
+      _loading = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
+
+      appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
       backgroundColor: isDark ? ShunShiColors.darkBackground : ShunShiColors.background,
       body: RefreshIndicator(
         color: ShunShiColors.primary,
@@ -129,7 +121,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
                   controller: _searchController,
                   onChanged: (v) => _search(v),
                   decoration: InputDecoration(
-                    hintText: 'SearchRecipes、Tea、Qigong...',
+                    hintText: 'Search recipes, tea, qigong...',
                     hintStyle: TextStyle(fontSize: 14, color: ShunShiColors.textTertiary),
                     border: InputBorder.none,
                     icon: Icon(Icons.search, size: 20, color: ShunShiColors.textTertiary),

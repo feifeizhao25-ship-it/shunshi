@@ -12,6 +12,52 @@ class AppLocalizations {
       _AppLocalizationsDelegate();
 
   static const Map<String, Map<String, String>> _localizedValues = {
+    'zh': {
+      'app_title': '顺时',
+      'loading': '加载中...',
+      'error': '出了点问题',
+      'retry': '重试',
+      'cancel': '取消',
+      'confirm': '确认',
+      'save': '保存',
+      'delete': '删除',
+      'edit': '编辑',
+      'next': '下一步',
+      'skip': '跳过',
+      'get_started': '开始使用',
+      'nav_home': '首页',
+      'nav_seasons': '节气',
+      'nav_library': '养生库',
+      'nav_profile': '我的',
+      'home_greeting_morning': '早上好',
+      'home_greeting_afternoon': '下午好',
+      'home_greeting_evening': '晚上好',
+      'home_daily_insight': '今日洞察',
+      'home_suggestions': '养生建议',
+      'home_chat_entry': '与AI助手聊天',
+      'home_quick_questions': '快速提问',
+      'chat_placeholder': '分享你的想法...',
+      'chat_companion': 'AI助手',
+      'seasons_title': '节气',
+      'seasons_subtitle': '顺应自然节奏生活',
+      'seasons_spring': '春',
+      'seasons_summer': '夏',
+      'seasons_autumn': '秋',
+      'seasons_winter': '冬',
+      'library_title': '养生库',
+      'library_subtitle': '精选养生内容',
+      'reflection_title': '今日反思',
+      'reflection_how_feeling': '今天感觉如何？',
+      'reflection_save': '保存反思',
+      'profile_title': '我的',
+      'subscribe_title': '选择你的方案',
+      'onboarding_welcome': '欢迎来到顺时',
+      'onboarding_subtitle': '你的节气养生伴侣',
+      'body_type_title': '体质',
+      'wellness_title': '养生',
+      'settings_title': '设置',
+      'subscription_title': '订阅',
+    },
     'en': {
       'app_title': 'SEASONS',
       'loading': 'Loading...',
@@ -126,7 +172,7 @@ class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> 
 
   @override
   bool isSupported(Locale locale) {
-    return ['en', 'ja'].contains(locale.languageCode);
+    return ['zh', 'en', 'ja'].contains(locale.languageCode);
   }
 
   @override

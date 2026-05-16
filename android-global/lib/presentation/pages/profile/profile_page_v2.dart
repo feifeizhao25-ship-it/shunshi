@@ -1,5 +1,5 @@
-/// 个人中心页 — 参考UI _8
-/// 积分/优惠券/收藏 + 功能入口 + 底部Slogan
+/// Profile Page — Global Edition
+/// Points / Coupons / Favorites + Menu Entries + Slogan
 library;
 
 import 'package:flutter/material.dart';
@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../design_system/theme.dart';
 import '../../../data/network/api_client.dart';
+import '../../../core/network/api_singleton.dart';
 
 class ProfilePageV2 extends StatefulWidget {
   const ProfilePageV2({super.key});
@@ -17,9 +18,9 @@ class ProfilePageV2 extends StatefulWidget {
 
 class _ProfilePageV2State extends State<ProfilePageV2> {
   int _favoriteCount = 0;
-  String _userName = '\u987a\u65f6\u5c0f\u53cb';
+  String _userName = 'SEASONS';
 
-  final String _subscriptionTier = '\u514d\u8d39\u7528\u6237';
+  String _subscriptionTier = 'Free Plan';
 
   @override
   void initState() {
@@ -45,9 +46,9 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
   Future<String> _getConstitution() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      return prefs.getString('constitution_type') ?? '平和质';
+      return prefs.getString('constitution_type') ?? 'Balanced';
     } catch (_) {
-      return '平和质';
+      return 'Balanced';
     }
   }
 
@@ -68,7 +69,7 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
                 padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
                 child: Row(
                   children: [
-                    Text('ShunShi AI', style: TextStyle(
+                    Text('SEASONS AI', style: TextStyle(
                       fontFamily: ShunShiTypography.serifFamily,
                       fontSize: 18, fontWeight: FontWeight.w600,
                       color: ShunShiColors.primary,
@@ -97,7 +98,6 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
               padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
               child: Column(
                 children: [
-                  // Avatar
                   Container(
                     width: 72, height: 72,
                     decoration: BoxDecoration(
@@ -113,7 +113,6 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
                     child: const Icon(Icons.person, size: 36, color: Colors.white),
                   ),
                   const SizedBox(height: 12),
-                  // Name + Verified
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -127,7 +126,7 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
                     ],
                   ),
                   const SizedBox(height: 6),
-                  // 体质标签
+                  // Body type tag
                   FutureBuilder<String>(
                     future: _getConstitution(),
                     builder: (context, snap) => snap.hasData && snap.data!.isNotEmpty
@@ -148,7 +147,7 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
                           )
                         : const SizedBox.shrink(),
                   ),
-                  // SVIP Badge
+                  // Plan Badge
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
                     decoration: BoxDecoration(
@@ -164,7 +163,7 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
             ),
           ),
 
-          // Stats Row (积分/优惠券/收藏)
+          // Stats Row
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
@@ -179,18 +178,18 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
                 ),
                 child: Row(
                   children: [
-                    _buildStat('积分', '2560'),
+                    _buildStat('Points', '2560'),
                     Container(width: 1, height: 32, color: ShunShiColors.borderGhost),
-                    _buildStat('优惠券', '3 张'),
+                    _buildStat('Coupons', '3'),
                     Container(width: 1, height: 32, color: ShunShiColors.borderGhost),
-                    _buildStat('收藏', '$_favoriteCount'),
+                    _buildStat('Favorites', '$_favoriteCount'),
                   ],
                 ),
               ),
             ),
           ),
 
-          // 功能入口
+          // Menu Entries
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
@@ -203,19 +202,19 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
                   ],
                 ),
                 child: Column(children: [
-                  _buildMenuTile(Icons.family_restroom, '家庭养生管理', () => context.push('/family')),
+                  _buildMenuTile(Icons.family_restroom, 'Family Wellness', () => context.push('/family')),
                   _buildDivider(),
-                  _buildMenuTile(Icons.military_tech, '我的成就勋章', () => context.push('/achievement')),
+                  _buildMenuTile(Icons.military_tech, 'My Achievements', () => context.push('/achievement')),
                   _buildDivider(),
-                  _buildMenuTile(Icons.health_and_safety, '体质报告', () => context.push('/constitution-report')),
+                  _buildMenuTile(Icons.health_and_safety, 'Body Type Report', () => context.push('/constitution-report')),
                   _buildDivider(),
-                  _buildMenuTile(Icons.auto_awesome, '养生日记', () => context.push('/diary')),
+                  _buildMenuTile(Icons.auto_awesome, 'Wellness Diary', () => context.push('/diary')),
                 ]),
               ),
             ),
           ),
 
-          // 邀请好友卡片
+          // Invite Card
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
@@ -231,12 +230,12 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('邀请好友领会员', style: TextStyle(
+                    Text('Invite Friends, Get Premium', style: TextStyle(
                       fontSize: 17, fontWeight: FontWeight.w600,
                       color: ShunShiColors.surface,
                     )),
                     const SizedBox(height: 4),
-                    Text('与友偕行，共享颐养时光', style: TextStyle(
+                    Text('Share the gift of seasonal wellness', style: TextStyle(
                       fontSize: 13, color: Colors.white70,
                     )),
                     const SizedBox(height: 14),
@@ -246,7 +245,7 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
                         color: Colors.white.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: Text('立即邀请', style: TextStyle(
+                      child: Text('Invite Now', style: TextStyle(
                         fontSize: 13, color: ShunShiColors.surface, fontWeight: FontWeight.w500,
                       )),
                     ),
@@ -256,7 +255,7 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
             ),
           ),
 
-          // 设置/客服
+          // Settings & Support
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
@@ -269,17 +268,17 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
                   ],
                 ),
                 child: Column(children: [
-                  _buildMenuTile(Icons.park, '订阅管理', () => context.push('/subscription')),
+                  _buildMenuTile(Icons.park, 'Subscription', () => context.push('/subscription')),
                   _buildDivider(),
-                  _buildMenuTile(Icons.favorite_border, '我的收藏', () => context.push('/favorites')),
+                  _buildMenuTile(Icons.favorite_border, 'My Favorites', () => context.push('/favorites')),
                   _buildDivider(),
-                  _buildMenuTile(Icons.emoji_events_outlined, '养生成就', () => context.push('/achievement')),
+                  _buildMenuTile(Icons.emoji_events_outlined, 'Wellness Achievements', () => context.push('/achievement')),
                   _buildDivider(),
-                  _buildMenuTile(Icons.settings, '设置', () => context.push('/settings')),
+                  _buildMenuTile(Icons.settings, 'Settings', () => context.push('/settings')),
                   _buildDivider(),
-                  _buildMenuTile(Icons.info_outline, '关于顺时', () => context.push('/about')),
+                  _buildMenuTile(Icons.info_outline, 'About SEASONS', () => context.push('/about')),
                   _buildDivider(),
-                  _buildMenuTile(Icons.headset_mic, '意见反馈', () => context.push('/feedback')),
+                  _buildMenuTile(Icons.headset_mic, 'Feedback', () => context.push('/feedback')),
                 ]),
               ),
             ),
@@ -290,7 +289,7 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
             child: Padding(
               padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
               child: Center(
-                child: Text('顺应天时，颐养身心', style: TextStyle(
+                child: Text('Live with the rhythm of nature', style: TextStyle(
                   fontFamily: ShunShiTypography.serifFamily,
                   fontSize: 14, color: ShunShiColors.textTertiary,
                   fontStyle: FontStyle.italic,

@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../data/services/subscription_service.dart';
+import '../../core/config/app_config.dart';
 
 class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
   final Dio _dio;
@@ -9,7 +10,7 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
 
   SubscriptionNotifier()
       : _dio = Dio(BaseOptions(
-          baseUrl: 'http://116.62.32.43:4000',
+          baseUrl: AppConfig.baseUrl,
           connectTimeout: const Duration(seconds: 10),
         )),
         super(SubscriptionState(
@@ -48,7 +49,7 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
   Future<SubscriptionState> _fetchFromSeasonsApi() async {
     try {
       final response = await _dio.get(
-        '/api/v1/seasons/subscription/status',
+        '/api/v1/subscription/status',
         queryParameters: {'user_id': _userId},
       );
       final data = response.data as Map<String, dynamic>;
@@ -97,7 +98,7 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
     try {
       final productId = _tierToId(tier);
       await _dio.post(
-        '/api/v1/seasons/subscription/checkout',
+        '/api/v1/stripe/checkout',
         data: {'product_id': productId, 'billing': 'monthly'},
         queryParameters: {'user_id': _userId},
       );
@@ -117,7 +118,7 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
     state = state.copyWith(isRestoring: true);
     try {
       await _dio.post(
-        '/api/v1/seasons/subscription/restore',
+        '/api/v1/orders/restore',
         queryParameters: {'user_id': _userId},
       );
       await refresh();
@@ -135,7 +136,7 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
     state = state.copyWith(isRestoring: true);
     try {
       final response = await _dio.post(
-        '/api/v1/seasons/subscription/restore',
+        '/api/v1/orders/restore',
         data: {
           'user_id': _userId,
           'receipt_data': platform == 'ios' ? receiptData : null,
@@ -185,7 +186,7 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
     }
     try {
       await _dio.post(
-        '/api/v1/seasons/subscription/trial',
+        '/api/v1/subscription/status',
         data: {'product_id': productId},
         queryParameters: {'user_id': _userId},
       );

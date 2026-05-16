@@ -12,8 +12,11 @@ class AppConfig {
   /// 后端 API 基础地址（含 /api/v1）
   static const String apiBaseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'http://116.62.32.43:4000/api/v1',
+    defaultValue: 'http://116.62.32.43:4000',
   );
+
+  /// 后端基础地址（不含 /api/v1），用于 Dio baseUrl 等
+  static const String baseUrl = 'http://116.62.32.43:4000';
 
   // ─── 应用变体 ──────────────────────────────────────────────────────────────
   /// 平台变体标识（ios-cn / android-cn / ios-global / android-global）

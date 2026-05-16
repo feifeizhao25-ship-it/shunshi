@@ -3,6 +3,7 @@ library;
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import '../../../core/config/app_config.dart';
 import '../../../design_system/theme.dart';
 
 class _TypeFilter {
@@ -19,7 +20,7 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
   final _controller = TextEditingController();
-  final _dio = Dio(BaseOptions(baseUrl: 'http://116.62.32.43:4000', connectTimeout: const Duration(seconds: 8)));
+  final _dio = Dio(BaseOptions(baseUrl: AppConfig.apiBaseUrl.replaceAll('/api/v1', ''), connectTimeout: const Duration(seconds: 8)));
   List<Map<String, dynamic>> _results = [];
   bool _loading = false;
   String _query = '';
@@ -79,6 +80,7 @@ class _SearchPageState extends State<SearchPage> {
     final bg = isDark ? ShunShiColors.darkBackground : ShunShiColors.background;
 
     return Scaffold(
+  appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
       backgroundColor: bg,
       body: SafeArea(
         child: Column(

@@ -4,9 +4,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
-
-const _baseUrl = 'http://116.62.32.43:4000';
-
+import '../../../core/network/api_singleton.dart';
 class DailyCheckinPage extends StatefulWidget {
   const DailyCheckinPage({super.key});
   @override
@@ -32,7 +30,7 @@ class _DailyCheckinPageState extends State<DailyCheckinPage> {
   Future<void> _submit() async {
     setState(() => _isSubmitting = true);
     try {
-      final dio = Dio(BaseOptions(baseUrl: _baseUrl));
+      final dio = apiClient.dio;
       await dio.post('/api/v1/user/daily-checkin', data: {
         'mood': _mood.round(),
         'sleep_quality': _sleep.round(),

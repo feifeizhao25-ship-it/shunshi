@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 import '../storage/storage_manager.dart';
+import '../../core/config/app_config.dart';
 
 /// 图片上传状态
 enum ImageUploadState {
@@ -155,10 +156,7 @@ class ImageUploadService {
   // 获取 API Base URL
   static String _getBaseUrl() {
     // 从环境或默认配置获取
-    return const String.fromEnvironment(
-      'API_BASE_URL',
-      defaultValue: 'http://116.62.32.43:4000',
-    );
+    return AppConfig.baseUrl;
   }
   
   // 获取存储的 Token
@@ -305,13 +303,13 @@ class ImageUploadButton extends ConsumerWidget {
         IconButton(
           icon: const Icon(Icons.photo_library),
           onPressed: () => notifier.pickImages(maxImages: maxImages),
-          tooltip: '从相册选择',
+          tooltip: 'Choose from Gallery',
         ),
         // 拍照按钮
         IconButton(
           icon: const Icon(Icons.camera_alt),
           onPressed: () => notifier.takePhoto(),
-          tooltip: '拍照',
+          tooltip: 'Take Photo',
         ),
         // 上传按钮
         if (selectedImages.isNotEmpty)
@@ -334,7 +332,7 @@ class ImageUploadButton extends ConsumerWidget {
                       onImagesUploaded!(urls);
                     }
                   },
-            tooltip: '上传',
+            tooltip: 'Upload',
           ),
       ],
     );

@@ -1,4 +1,6 @@
 // App Constants
+import '../config/app_config.dart';
+
 class AppConstants {
   AppConstants._();
   
@@ -6,14 +8,8 @@ class AppConstants {
   static const String appName = 'SEASONS';
   static const String appVersion = '1.0.0';
   
-  // API - Auto-detect environment
-  // Set SEASONS_API_URL env var or modify below for your deployment
-  // Emulator uses 10.0.2.2 to reach host localhost
-  // For real device, set SEASONS_API_URL or change below
-  static const String baseUrl = String.fromEnvironment(
-    'SEASONS_API_URL',
-    defaultValue: 'http://116.62.32.43:4000',
-  );
+  // API - derived from AppConfig (strip /api/v1 suffix)
+  static const String baseUrl = AppConfig.baseUrl;
   static const String apiVersion = 'v1';
   
   // Subscription Tiers

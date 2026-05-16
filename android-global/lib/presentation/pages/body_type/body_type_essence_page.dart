@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
+import '../../../core/network/api_singleton.dart';
 
 class BodyTypeEssencePage extends StatelessWidget {
   final String? bodyType;
@@ -30,7 +31,9 @@ class BodyTypeEssencePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : ShunShiColors.background,
+    return Scaffold(
+
+      appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),backgroundColor: isDark ? ShunshiDarkColors.background : ShunShiColors.background,
       body: CustomScrollView(
         slivers: [
           // ── Header ──
@@ -55,7 +58,7 @@ class BodyTypeEssencePage extends StatelessWidget {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      ShunShiColors.primaryDeep ?? ShunShiColors.primary,
+                      ShunShiColors.primary,
                       ShunShiColors.primary,
                     ],
                   ),

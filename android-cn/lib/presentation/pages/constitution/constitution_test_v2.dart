@@ -3,6 +3,7 @@
 library;
 
 import 'package:dio/dio.dart';
+import '../../../core/config/app_config.dart';
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
 
@@ -14,7 +15,7 @@ class ConstitutionTestV2 extends StatefulWidget {
 }
 
 class _ConstitutionTestV2State extends State<ConstitutionTestV2> {
-  static const _baseUrl = 'http://116.62.32.43:4000';
+  static final String _baseUrl = AppConfig.apiBaseUrl.replaceAll('/api/v1', '');
   final _dio = Dio(BaseOptions(baseUrl: _baseUrl, connectTimeout: const Duration(seconds: 8)));
 
   List<Map<String, dynamic>> _questions = [];

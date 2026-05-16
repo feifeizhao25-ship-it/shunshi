@@ -38,6 +38,7 @@ class _SleepSanctuaryPageState extends State<SleepSanctuaryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+  appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
       backgroundColor: const Color(0xFF0F172A),
       body: SafeArea(
         child: Column(
@@ -50,7 +51,7 @@ class _SleepSanctuaryPageState extends State<SleepSanctuaryPage> {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.menu, color: Colors.white70),
-                    onPressed: () {},
+                    onPressed: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('设置功能开发中'), duration: Duration(seconds: 1))),
                   ),
                   Text('数字净心', style: TextStyle(
                     fontSize: 16, fontWeight: FontWeight.w600,
@@ -204,7 +205,7 @@ class _SleepSanctuaryPageState extends State<SleepSanctuaryPage> {
                   )),
                   const SizedBox(height: 4),
                   GestureDetector(
-                    onTap: () {},
+                    onTap: () => Navigator.of(context).pushNamed('/sleep-stories'),
                     child: Text('查看全部', style: TextStyle(
                       fontSize: 13, color: const Color(0xFF8B5CF6), fontFamily: ShunShiTypography.sansFamily,
                     )),

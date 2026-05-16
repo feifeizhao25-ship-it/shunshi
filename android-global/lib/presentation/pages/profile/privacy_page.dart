@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
+import '../../../core/network/api_singleton.dart';
+import '../../../core/config/app_config.dart';
 
 /// 隐私数据页 — 导出/删除/清空
 class PrivacyPage extends StatefulWidget {
@@ -52,7 +54,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
             Navigator.pop(ctx);
             try {
               final dio = Dio();
-              await dio.delete('http://116.62.32.43:4000/api/v1/user/data');
+              await dio.delete('${AppConfig.apiBaseUrl}/api/v1/user/data');
               if (mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text(AppLocalizations.of(context).t('profile_all_data_deleted')), duration: Duration(seconds: 2)));

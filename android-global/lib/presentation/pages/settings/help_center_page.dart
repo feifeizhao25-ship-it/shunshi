@@ -5,6 +5,7 @@ import '../../../core/theme/seasons_spacing.dart';
 import '../../../core/theme/seasons_text_styles.dart';
 import '../../widgets/components/soft_card.dart';
 import '../../../core/theme/app_localizations.dart';
+import '../../../core/network/api_singleton.dart';
 
 /// Help Center & Trust FAQ — SEASONS Global
 /// In-app support page for international users

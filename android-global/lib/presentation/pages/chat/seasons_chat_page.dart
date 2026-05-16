@@ -1,12 +1,16 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/services/ai_safety.dart';
+import '../../../core/services/sse_chat_service.dart';
 import '../../widgets/feedback_sheet.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
+import '../../../core/network/api_singleton.dart';
+import '../../../core/config/app_config.dart';
 
 const String _systemPrompt =
     'You are SEASONS, a calm and thoughtful AI companion focused on seasonal '
@@ -28,6 +32,11 @@ class _SeasonsChatPageState extends State<SeasonsChatPage>
   final List<_ChatMessage> _messages = [];
   bool _isLoading = false;
   late AnimationController _dotController;
+  late AnimationController _cursorController;
+  String _streamingText = ''; // Current SSE streaming text
+  bool _isStreaming = false;
+  Object? _sseSubscription;
+  String? _conversationId;
 
   static const int _maxInputLength = 500;
   static const int _maxHistory = 50;
@@ -39,6 +48,10 @@ class _SeasonsChatPageState extends State<SeasonsChatPage>
       vsync: this,
       duration: const Duration(milliseconds: 1200),
     )..repeat();
+    _cursorController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 530),
+    )..repeat(reverse: true);
     _initChat();
   }
 
@@ -48,6 +61,8 @@ class _SeasonsChatPageState extends State<SeasonsChatPage>
     _scrollController.dispose();
     _focusNode.dispose();
     _dotController.dispose();
+    _cursorController.dispose();
+    _sseSubscription = null;
     super.dispose();
   }
 
@@ -123,10 +138,11 @@ class _SeasonsChatPageState extends State<SeasonsChatPage>
 
   Future<void> _sendMessage() async {
     final text = _controller.text.trim();
-    if (text.isEmpty || _isLoading) return;
+    if (text.isEmpty || _isLoading || _isStreaming) return;
     if (text.length > _maxInputLength) return;
     _controller.clear();
 
+    // Safety checks (unchanged)
     if (AISafetyService.isPromptInjection(text)) {
       setState(() {
         _messages.add(_ChatMessage(role: 'user', text: text));
@@ -159,57 +175,89 @@ class _SeasonsChatPageState extends State<SeasonsChatPage>
 
     setState(() {
       _messages.add(_ChatMessage(role: 'user', text: text));
-      _isLoading = true;
+      _isLoading = true; // Shows 3-dot thinking indicator
     });
     _scrollToBottom();
 
+    // ── SSE Streaming ──────────────────────────────────
+    final sseService = SSEChatService(baseUrl: AppConfig.apiBaseUrl);
+    _streamingText = '';
+
     try {
-      final dio = Dio(BaseOptions(
-        baseUrl: 'http://116.62.32.43:4000',
-        connectTimeout: const Duration(seconds: 10),
-        receiveTimeout: const Duration(seconds: 30),
-      ));
-      final response = await dio.post('/ai/chat', data: {'message': text});
+      final eventStream = sseService.sendMessage(
+        message: text,
+        userId: 'seasons-user',
+        conversationId: _conversationId,
+      );
 
-      final structured =
-          response.data?['structured_output'] as Map<String, dynamic>?;
-      final reply = response.data?['reply'] ?? '';
-      var aiText = structured?['insight'] ?? reply;
-      if (aiText.isEmpty) aiText = "I'm here. Take your time.";
-
-      final disclaimer = structured?['disclaimer'] ?? '';
-      if (disclaimer.isNotEmpty) {
-        aiText = '$aiText\n\n$disclaimer';
+      await for (final event in eventStream) {
+        switch (event.type) {
+          case 'start':
+            setState(() {
+              _isLoading = false;
+              _isStreaming = true;
+              _streamingText = '';
+            });
+            _scrollToBottom();
+          case 'token':
+            final delta = event.data['delta'] as String? ?? '';
+            setState(() {
+              _streamingText += delta;
+            });
+            _scrollToBottom();
+          case 'card':
+            // Card events — append to last message metadata
+            break;
+          case 'done':
+            setState(() {
+              _isStreaming = false;
+              _messages.add(_ChatMessage(
+                role: 'assistant',
+                text: _streamingText,
+              ));
+              _streamingText = '';
+            });
+            _saveHistory();
+            _scrollToBottom();
+          case 'error':
+            setState(() {
+              _isLoading = false;
+              _isStreaming = false;
+              _streamingText = '';
+              _messages.add(_ChatMessage(
+                role: 'assistant',
+                text: "I'm having trouble connecting. Please try again.",
+              ));
+            });
+            _saveHistory();
+            _scrollToBottom();
+        }
       }
-
-      final parsed = _tryParseStructured(aiText);
-      final mergedStructured = structured ?? parsed;
-
-      setState(() {
-        _messages.add(_ChatMessage(
-          role: 'assistant',
-          text: aiText,
-          structured: mergedStructured,
-        ));
-        _isLoading = false;
-      });
     } catch (e) {
       setState(() {
-        _messages.add(_ChatMessage(
-          role: 'assistant',
-          text: "I'm having trouble connecting right now. Please try again in a moment.",
-        ));
         _isLoading = false;
+        _isStreaming = false;
+        if (_streamingText.isNotEmpty) {
+          _messages.add(_ChatMessage(role: 'assistant', text: _streamingText));
+          _streamingText = '';
+        } else {
+          _messages.add(_ChatMessage(
+            role: 'assistant',
+            text: "I'm having trouble connecting right now. Please try again in a moment.",
+          ));
+        }
       });
+      _saveHistory();
+      _scrollToBottom();
     }
-    _saveHistory();
-    _scrollToBottom();
   }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
+
+      appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
       backgroundColor:
           isDark ? const Color(0xFF0F0F1A) : const Color(0xFFFDF9F4),
       body: SafeArea(
@@ -270,13 +318,16 @@ class _SeasonsChatPageState extends State<SeasonsChatPage>
   }
 
   Widget _buildMessageList() {
+    // 1 = thinking indicator OR streaming bubble
+    final extra = (_isLoading || _isStreaming) ? 1 : 0;
     return ListView.builder(
       controller: _scrollController,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-      itemCount: _messages.length + (_isLoading ? 1 : 0),
+      itemCount: _messages.length + extra,
       itemBuilder: (context, index) {
-        if (index == _messages.length && _isLoading) {
-          return _buildTypingIndicator();
+        if (index == _messages.length) {
+          if (_isLoading) return _buildTypingIndicator();
+          if (_isStreaming) return _buildStreamingBubble();
         }
         if (index >= _messages.length) return const SizedBox.shrink();
         final msg = _messages[index];
@@ -754,8 +805,7 @@ class _SeasonsChatPageState extends State<SeasonsChatPage>
                   builder: (context, child) {
                     final progress =
                         (_dotController.value * 3 - i).clamp(0.0, 1.0);
-                    final scale =
-                        0.5 + 0.5 * (1 - (2 * progress - 1).abs());
+                    final scale = 0.5 + 0.5 * (1 - (2 * progress - 1).abs());
                     return Padding(
                       padding: EdgeInsets.only(left: i > 0 ? 4 : 0),
                       child: Transform.scale(
@@ -775,6 +825,75 @@ class _SeasonsChatPageState extends State<SeasonsChatPage>
                   },
                 );
               }),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Streaming bubble — shows text as it arrives + blinking cursor
+  Widget _buildStreamingBubble() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16, top: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: isDark ? const Color(0xFF1E1E2E) : const Color(0xFFF5EBE0),
+            ),
+            child: const Center(
+              child: Text('🌿', style: TextStyle(fontSize: 16)),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Flexible(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF1A1A2E) : const Color(0xFFF5EBE0),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Flexible(
+                    child: Text(
+                      _streamingText,
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: isDark ? Colors.white : ShunShiColors.textPrimary,
+                        height: 1.5,
+                      ),
+                    ),
+                  ),
+                  // Blinking cursor
+                  AnimatedBuilder(
+                    animation: _cursorController,
+                    builder: (context, _) {
+                      return Opacity(
+                        opacity: _cursorController.value,
+                        child: Container(
+                          width: 2,
+                          height: 16,
+                          margin: const EdgeInsets.only(left: 1),
+                          decoration: BoxDecoration(
+                            color: isDark
+                                ? const Color(0xFF533AFD)
+                                : const Color(0xFF533AFD),
+                            borderRadius: BorderRadius.circular(1),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         ],

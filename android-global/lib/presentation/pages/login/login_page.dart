@@ -13,6 +13,7 @@ import '../../../data/storage/storage_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dio/dio.dart';
 import '../../../core/theme/app_localizations.dart';
+import '../../../core/network/api_singleton.dart';
 
 /// Login mode
 enum _LoginMode { password, register }

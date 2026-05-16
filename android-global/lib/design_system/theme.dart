@@ -333,7 +333,7 @@ class ShunShiSpacing {
   static const double xl = 24;
   static const double xxl = 32;
   static const double xxxl = 48;
-  static const double breath = 64; // "呼吸"间距 — 大量留白
+  static const double breath = 64; // Breathing spacing — generous whitespace
   
   static const double screenPadding = 20;
   static const double cardPadding = 16;
@@ -426,7 +426,7 @@ class ShunShiTheme {
         backgroundColor: ShunShiColors.background,
         foregroundColor: ShunShiColors.textPrimary,
         elevation: 0,
-        centerTitle: false,  // 左对齐，杂志风
+        centerTitle: false,  // Left-aligned, magazine style
         titleTextStyle: ShunShiTypography.headlineSmall.copyWith(
           fontFamily: ShunShiTypography.serifFamily,
         ),

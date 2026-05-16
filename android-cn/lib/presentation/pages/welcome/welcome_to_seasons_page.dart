@@ -49,7 +49,7 @@ class _WelcomeToSeasonsPageState extends State<WelcomeToSeasonsPage> {
               ),
               const SizedBox(height: 28),
               Text(
-                'Welcome to SEASONS.',
+                '欢迎来到顺时。',
                 style: TextStyle(
                   fontSize: 28, fontWeight: FontWeight.w700,
                   color: ShunShiColors.textPrimary,

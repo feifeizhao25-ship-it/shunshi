@@ -1,15 +1,15 @@
+import 'app_config.dart';
+
 /// Centralized API configuration for SEASONS.
 /// Tries multiple endpoints with fallback.
 class ApiConfig {
   ApiConfig._();
 
   /// Base URLs in priority order.
-  /// 1. Mac LAN (when testing on device via same WiFi)
-  /// 2. ECS public (when deployed)
-  /// 3. Android emulator localhost
-  static const List<String> baseUrls = [
-    'http://116.62.32.43:4000',  // Mac LAN (SSH tunnel)
-    'http://116.62.32.43:4000',   // ECS public
+  /// 1. Primary (from AppConfig)
+  /// 2. Android emulator localhost
+  static final List<String> baseUrls = [
+    AppConfig.baseUrl,  // Primary (from AppConfig)
     'http://10.0.2.2:4010',       // Android emulator
   ];
 

@@ -2,6 +2,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import '../../../../design_system/theme.dart';
 import '../../../data/network/api_client.dart';
+import '../../../data/en_content.dart';
 import '../../widgets/skeleton_loading.dart';
 import '../../../core/theme/app_localizations.dart';
 
@@ -37,27 +38,12 @@ class _TeaPageState extends State<TeaPage> {
   }
 
   Future<void> _loadData() async {
+    // Use local English content first
+    final localItems = EnContentData.teas.map((c) => EnContentData.toMap(c)).toList();
     setState(() {
-      _isLoading = true;
-      _error = null;
+      _items = localItems;
+      _isLoading = false;
     });
-    try {
-      final res = await _api.get('/api/v1/contents', queryParameters: {
-        'type': 'tea',
-        'limit': '20',
-      });
-      final data = res.data;
-      final items = _parseItems(data);
-      setState(() {
-        _items = items;
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _error = 'Load failed';
-        _isLoading = false;
-      });
-    }
   }
 
   List<Map<String, dynamic>> _parseItems(dynamic data) {
@@ -73,7 +59,7 @@ class _TeaPageState extends State<TeaPage> {
   List<Map<String, dynamic>> get _filteredTeas {
     return _items.where((tea) {
       if (_selectedTimeOfDay != 'all' && tea['best_time'] != _selectedTimeOfDay) return false;
-      if (_selectedSeason != null && tea['season_tag'] != _selectedSeason) return false;
+      if (_selectedSeason != null && tea['season'] != _selectedSeason && tea['season'] != 'all') return false;
       return true;
     }).toList();
   }
@@ -208,15 +194,15 @@ class _TeaCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ingredients = tea['ingredients'] is List
-        ? (tea['ingredients'] as List).join('、')
+        ? (tea['ingredients'] as List).join(', ')
         : (tea['ingredients'] ?? '');
     final benefits = tea['benefits'] is List
-        ? (tea['benefits'] as List).join('、')
+        ? (tea['benefits'] as List).join(', ')
         : (tea['benefits'] ?? '');
     final steps = tea['steps'] is List
         ? (tea['steps'] as List).join('\n')
         : (tea['steps'] ?? '');
-    final tags = tea['tags'] is List ? (tea['tags'] as List).join('、') : '';
+    final tags = tea['tags'] is List ? (tea['tags'] as List).join(', ') : '';
     final timeLabel = _getTimeLabel(tea['best_time'] ?? 'all');
 
     return Card(

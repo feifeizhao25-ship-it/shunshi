@@ -58,6 +58,7 @@ class _MovementPlayerPageState extends State<MovementPlayerPage> {
     final bg = isDark ? ShunShiColors.darkBackground : ShunShiColors.background;
 
     return Scaffold(
+  appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
       backgroundColor: bg,
       body: SafeArea(
         child: Column(
@@ -179,7 +180,7 @@ class _MovementPlayerPageState extends State<MovementPlayerPage> {
                 child: OutlinedButton.icon(
                   onPressed: () {},
                   icon: const Icon(Icons.favorite_outline, size: 18),
-                  label: Text('Save to Rituals', style: TextStyle(
+                  label: Text('收藏', style: TextStyle(
                     fontSize: 15, fontWeight: FontWeight.w600, fontFamily: ShunShiTypography.sansFamily,
                   )),
                   style: OutlinedButton.styleFrom(

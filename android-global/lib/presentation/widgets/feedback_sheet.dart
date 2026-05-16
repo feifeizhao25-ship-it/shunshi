@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../design_system/theme.dart';
+import '../../core/config/app_config.dart';
 
 /// Bottom sheet for content feedback: 👍👎 + optional text comment.
 class FeedbackSheet extends StatefulWidget {
@@ -44,7 +45,7 @@ class _FeedbackSheetState extends State<FeedbackSheet> {
       final userId = prefs.getString('user_id') ?? 'guest';
 
       await Dio().post(
-        'http://116.62.32.43:4000/api/v1/feedback',
+        '${AppConfig.apiBaseUrl}/api/v1/feedback',
         data: {
           'user_id': userId,
           'type': widget.type,

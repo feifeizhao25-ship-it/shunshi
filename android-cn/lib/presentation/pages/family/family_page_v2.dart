@@ -3,6 +3,7 @@
 library;
 
 import 'package:dio/dio.dart';
+import '../../../core/config/app_config.dart';
 import '../../widgets/state_view.dart';
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
@@ -15,7 +16,7 @@ class FamilyPageV2 extends StatefulWidget {
 }
 
 class _FamilyPageV2State extends State<FamilyPageV2> {
-  static const _baseUrl = 'http://116.62.32.43:4000';
+  static final String _baseUrl = AppConfig.apiBaseUrl.replaceAll('/api/v1', '');
   final _dio = Dio(BaseOptions(baseUrl: _baseUrl, connectTimeout: const Duration(seconds: 8)));
   
   String _familyName = '我的家庭';
@@ -113,6 +114,7 @@ class _FamilyPageV2State extends State<FamilyPageV2> {
     if (_loading) return Scaffold(backgroundColor: bg, body: const LoadingSkeleton());
 
     return Scaffold(
+  appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
       backgroundColor: bg,
       body: RefreshIndicator(
         color: ShunShiColors.primary,

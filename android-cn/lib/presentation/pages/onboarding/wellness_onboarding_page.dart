@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -17,7 +18,10 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
   String? _selectedConcern;
   late AnimationController _pageAnim;
   late AnimationController _scaleAnim;
+  late AnimationController _breathAnim;
+  late AnimationController _confettiAnim;
   late Animation<double> _scale;
+  late Animation<double> _breath;
   late Animation<Offset> _slideAnim;
 
   static const _concerns = [
@@ -45,12 +49,30 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
       begin: const Offset(0.15, 0),
       end: Offset.zero,
     ).animate(CurvedAnimation(parent: _pageAnim, curve: Curves.easeOutCubic));
+
+    // Logo breathing animation
+    _breathAnim = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2000),
+    );
+    _breath = Tween<double>(begin: 1.0, end: 1.06).animate(
+      CurvedAnimation(parent: _breathAnim, curve: Curves.easeInOutSine),
+    );
+    _breathAnim.repeat(reverse: true);
+
+    // Confetti controller
+    _confettiAnim = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2500),
+    );
   }
 
   @override
   void dispose() {
     _pageAnim.dispose();
     _scaleAnim.dispose();
+    _breathAnim.dispose();
+    _confettiAnim.dispose();
     super.dispose();
   }
 
@@ -66,19 +88,22 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
 
   void _selectConcern(String concern) {
     setState(() => _selectedConcern = concern);
-    // 自动跳转下一页
     Future.delayed(const Duration(milliseconds: 300), () {
       if (mounted) _nextPage();
     });
   }
 
   Future<void> _finish() async {
+    _confettiAnim.forward();
     final prefs = await SharedPreferences.getInstance();
     if (_selectedConcern != null) {
       await prefs.setStringList('user_concerns', [_selectedConcern!]);
     }
     await prefs.setBool('onboarding_completed', true);
-    if (mounted) context.go('/today');
+    // Let confetti play briefly before navigating
+    Future.delayed(const Duration(milliseconds: 800), () {
+      if (mounted) context.go('/today');
+    });
   }
 
   @override
@@ -86,31 +111,52 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bg = isDark ? ShunShiColors.darkBackground : ShunShiColors.background;
 
-    return Scaffold(
-      backgroundColor: bg,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            children: [
-              Expanded(
-                child: FadeTransition(
-                  opacity: _pageAnim,
-                  child: SlideTransition(
-                    position: _slideAnim,
-                    child: ScaleTransition(
-                      scale: _scale,
-                      child: _buildPage(),
+    return Stack(
+      children: [
+        Scaffold(
+          appBar: AppBar(
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back_ios_new),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            elevation: 0,
+          ),
+          backgroundColor: bg,
+          body: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: FadeTransition(
+                      opacity: _pageAnim,
+                      child: SlideTransition(
+                        position: _slideAnim,
+                        child: ScaleTransition(
+                          scale: _scale,
+                          child: _buildPage(),
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                  const SizedBox(height: 16),
+                  _buildProgressBar(),
+                ],
               ),
-              const SizedBox(height: 16),
-              _buildDots(),
-            ],
+            ),
           ),
         ),
-      ),
+
+        // Confetti overlay on page 3
+        if (_page == 2 && _confettiAnim.isAnimating)
+          Positioned.fill(
+            child: IgnorePointer(
+              child: CustomPaint(
+                painter: _ConfettiPainter(_confettiAnim.value),
+              ),
+            ),
+          ),
+      ],
     );
   }
 
@@ -128,16 +174,28 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        // Logo
-        Container(
-          width: 88, height: 88,
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [ShunShiColors.primary, ShunShiColors.primaryLight],
+        // Logo with breathing animation
+        ScaleTransition(
+          scale: _breath,
+          child: Container(
+            width: 88, height: 88,
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [ShunShiColors.primary, ShunShiColors.primaryLight],
+              ),
+              borderRadius: BorderRadius.circular(22),
+              boxShadow: [
+                BoxShadow(
+                  color: ShunShiColors.primary.withValues(alpha: 0.3),
+                  blurRadius: 20,
+                  spreadRadius: 4,
+                ),
+              ],
             ),
-            borderRadius: BorderRadius.circular(22),
+            child: const Icon(Icons.eco, size: 44, color: Colors.white),
           ),
-          child: const Icon(Icons.eco, size: 44, color: Colors.white),
         ),
         const SizedBox(height: 32),
         const Text(
@@ -157,18 +215,35 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
           ),
         ),
         const SizedBox(height: 56),
+        // "开始使用" button with gradient + shadow
         SizedBox(
           width: double.infinity,
           height: 54,
-          child: ElevatedButton(
-            onPressed: _nextPage,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: ShunShiColors.primary,
-              foregroundColor: Colors.white,
-              elevation: 0,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [ShunShiColors.primary, ShunShiColors.primaryLight],
+              ),
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: ShunShiColors.primary.withValues(alpha: 0.35),
+                  blurRadius: 16,
+                  offset: const Offset(0, 6),
+                ),
+              ],
             ),
-            child: const Text('开始使用', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
+            child: ElevatedButton(
+              onPressed: _nextPage,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                foregroundColor: Colors.white,
+                elevation: 0,
+                shadowColor: Colors.transparent,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              ),
+              child: const Text('开始使用', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
+            ),
           ),
         ),
       ],
@@ -199,49 +274,34 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
         const SizedBox(height: 36),
         ..._concerns.map((c) => Padding(
           padding: const EdgeInsets.only(bottom: 14),
-          child: GestureDetector(
+          child: _BounceSelectionCard(
+            isSelected: _selectedConcern == c.label,
             onTap: () => _selectConcern(c.label),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-              decoration: BoxDecoration(
-                color: _selectedConcern == c.label
-                    ? ShunShiColors.primary.withValues(alpha: 0.08)
-                    : ShunShiColors.surfaceContainerLowest,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: _selectedConcern == c.label
-                      ? ShunShiColors.primary
-                      : ShunShiColors.border,
-                  width: _selectedConcern == c.label ? 2 : 1,
-                ),
-              ),
-              child: Row(
-                children: [
-                  Text(c.emoji, style: const TextStyle(fontSize: 28)),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(c.label, style: TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.w600,
-                          fontFamily: ShunShiTypography.serifFamily,
-                          color: _selectedConcern == c.label
-                              ? ShunShiColors.primary
-                              : ShunShiColors.textPrimary,
-                        )),
-                        const SizedBox(height: 2),
-                        Text(c.desc, style: const TextStyle(
-                          fontSize: 13, color: ShunShiColors.textTertiary,
-                        )),
-                      ],
-                    ),
+            child: Row(
+              children: [
+                Text(c.emoji, style: const TextStyle(fontSize: 28)),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(c.label, style: TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.w600,
+                        fontFamily: ShunShiTypography.serifFamily,
+                        color: _selectedConcern == c.label
+                            ? ShunShiColors.primary
+                            : ShunShiColors.textPrimary,
+                      )),
+                      const SizedBox(height: 2),
+                      Text(c.desc, style: const TextStyle(
+                        fontSize: 13, color: ShunShiColors.textTertiary,
+                      )),
+                    ],
                   ),
-                  if (_selectedConcern == c.label)
-                    const Icon(Icons.check_circle, color: ShunShiColors.primary, size: 24),
-                ],
-              ),
+                ),
+                if (_selectedConcern == c.label)
+                  const Icon(Icons.check_circle, color: ShunShiColors.primary, size: 24),
+              ],
             ),
           ),
         )),
@@ -285,37 +345,216 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
         SizedBox(
           width: double.infinity,
           height: 54,
-          child: ElevatedButton(
-            onPressed: _finish,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: ShunShiColors.primary,
-              foregroundColor: Colors.white,
-              elevation: 0,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [ShunShiColors.primary, ShunShiColors.primaryLight],
+              ),
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: ShunShiColors.primary.withValues(alpha: 0.35),
+                  blurRadius: 16,
+                  offset: const Offset(0, 6),
+                ),
+              ],
             ),
-            child: const Text('开始体验', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
+            child: ElevatedButton(
+              onPressed: _finish,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                foregroundColor: Colors.white,
+                elevation: 0,
+                shadowColor: Colors.transparent,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              ),
+              child: const Text('开始体验', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
+            ),
           ),
         ),
       ],
     );
   }
 
-  // ── 进度指示器 (3个点) ──
-  Widget _buildDots() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(3, (i) => AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        margin: const EdgeInsets.symmetric(horizontal: 5),
-        width: i == _page ? 28 : 8,
-        height: 8,
-        decoration: BoxDecoration(
-          color: i == _page ? ShunShiColors.primary : ShunShiColors.border,
-          borderRadius: BorderRadius.circular(4),
+  // ── Progress bar (replaces dots) ──
+  Widget _buildProgressBar() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(
+          children: List.generate(3, (i) {
+            final isActive = i <= _page;
+            final isCurrent = i == _page;
+            return Expanded(
+              child: Padding(
+                padding: EdgeInsets.only(left: i > 0 ? 6 : 0),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 400),
+                  height: isCurrent ? 4 : 3,
+                  decoration: BoxDecoration(
+                    color: isActive
+                        ? ShunShiColors.primary
+                        : ShunShiColors.primary.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+            );
+          }),
         ),
-      )),
+      ],
     );
   }
+}
+
+/// Bounce selection card — scales up slightly on selection
+class _BounceSelectionCard extends StatefulWidget {
+  final bool isSelected;
+  final VoidCallback onTap;
+  final Widget child;
+
+  const _BounceSelectionCard({
+    required this.isSelected,
+    required this.onTap,
+    required this.child,
+  });
+
+  @override
+  State<_BounceSelectionCard> createState() => _BounceSelectionCardState();
+}
+
+class _BounceSelectionCardState extends State<_BounceSelectionCard>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _bounceController;
+  late Animation<double> _bounceAnim;
+
+  @override
+  void initState() {
+    super.initState();
+    _bounceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _bounceAnim = TweenSequence<double>([
+      TweenSequenceItem(
+        tween: Tween(begin: 1.0, end: 1.04)
+            .chain(CurveTween(curve: Curves.easeOutCubic)),
+        weight: 50,
+      ),
+      TweenSequenceItem(
+        tween: Tween(begin: 1.04, end: 1.0)
+            .chain(CurveTween(curve: Curves.easeInOut)),
+        weight: 50,
+      ),
+    ]).animate(_bounceController);
+  }
+
+  @override
+  void didUpdateWidget(covariant _BounceSelectionCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isSelected && !oldWidget.isSelected) {
+      _bounceController.forward(from: 0.0);
+    }
+  }
+
+  @override
+  void dispose() {
+    _bounceController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ScaleTransition(
+      scale: _bounceAnim,
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+          decoration: BoxDecoration(
+            color: widget.isSelected
+                ? ShunShiColors.primary.withValues(alpha: 0.08)
+                : ShunShiColors.surfaceContainerLowest,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: widget.isSelected
+                  ? ShunShiColors.primary
+                  : ShunShiColors.border,
+              width: widget.isSelected ? 2 : 1,
+            ),
+          ),
+          child: widget.child,
+        ),
+      ),
+    );
+  }
+}
+
+/// Simple confetti painter — particle animation
+class _ConfettiPainter extends CustomPainter {
+  final double progress;
+  static final _rng = Random(42);
+  static final _particles = List.generate(40, (i) => _Particle(_rng));
+
+  _ConfettiPainter(this.progress);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    for (final p in _particles) {
+      final t = progress;
+      final x = p.startX * size.width + p.vx * t * size.width;
+      final y = p.startY * size.height * 0.3 + p.vy * t * size.height * 1.2;
+      final opacity = (1.0 - t * 0.8).clamp(0.0, 1.0);
+      final scale = (p.size * (1.0 - t * 0.3)).clamp(2.0, 8.0);
+
+      if (y > size.height || opacity <= 0) continue;
+
+      final paint = Paint()
+        ..color = p.color.withValues(alpha: opacity)
+        ..style = PaintingStyle.fill;
+
+      canvas.save();
+      canvas.translate(x, y);
+      canvas.rotate(p.rotation * t * 6.28);
+      canvas.drawRect(
+        Rect.fromCenter(center: Offset.zero, width: scale, height: scale * 0.6),
+        paint,
+      );
+      canvas.restore();
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _ConfettiPainter oldDelegate) =>
+      oldDelegate.progress != progress;
+}
+
+class _Particle {
+  final double startX;
+  final double startY;
+  final double vx;
+  final double vy;
+  final double size;
+  final double rotation;
+  final Color color;
+
+  static const _colors = [
+    ShunShiColors.primary,
+    ShunShiColors.goldLight,
+    ShunShiColors.apricot,
+    ShunShiColors.calm,
+    ShunShiColors.warm,
+  ];
+
+  _Particle(Random rng)
+      : startX = rng.nextDouble(),
+        startY = rng.nextDouble(),
+        vx = (rng.nextDouble() - 0.5) * 0.3,
+        vy = rng.nextDouble() * 0.5 + 0.3,
+        size = rng.nextDouble() * 5 + 3,
+        rotation = rng.nextDouble(),
+        color = _colors[rng.nextInt(_colors.length)];
 }
 
 class _Concern {

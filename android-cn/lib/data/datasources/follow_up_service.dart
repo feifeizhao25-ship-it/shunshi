@@ -1,11 +1,12 @@
 // lib/data/datasources/follow_up_service.dart
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../core/config/app_config.dart';
 
 /// Follow-up 跟进服务 - AI 主动关怀系统
 class FollowUpService {
   static final _dio = Dio(BaseOptions(
-    baseUrl: 'http://116.62.32.43:4000',
+    baseUrl: AppConfig.apiBaseUrl.replaceAll('/api/v1', ''),
     connectTimeout: const Duration(seconds: 8),
   ));
 

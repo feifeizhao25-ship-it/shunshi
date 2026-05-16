@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/theme/seasons_colors.dart';
 import '../../../core/theme/app_localizations.dart';
+import '../../../core/network/api_singleton.dart';
 
 /// SEASONS International Onboarding — Calm × AI Companion × Seasonal Living
 /// 5-step, ~90s, zero TCM terminology.

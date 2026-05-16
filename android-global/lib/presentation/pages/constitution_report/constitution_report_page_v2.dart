@@ -6,6 +6,7 @@ import '../../../core/theme/shunshi_colors.dart';
 import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
+import '../../../core/network/api_singleton.dart';
 
 class ConstitutionReportPageV2 extends StatelessWidget {
   const ConstitutionReportPageV2({super.key});

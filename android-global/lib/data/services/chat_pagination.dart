@@ -253,13 +253,13 @@ class MessageDateDivider extends StatelessWidget {
     
     String text;
     if (messageDate == today) {
-      text = '今天';
+      text = 'Today';
     } else if (messageDate == today.subtract(const Duration(days: 1))) {
-      text = '昨天';
+      text = 'Yesterday';
     } else if (messageDate == today.subtract(const Duration(days: 2))) {
-      text = '前天';
+      text = '2 days ago';
     } else {
-      text = '${date.month}月${date.day}日';
+      text = '${date.month}/${date.day}';
     }
     
     return Container(

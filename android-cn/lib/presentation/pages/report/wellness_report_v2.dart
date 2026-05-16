@@ -35,7 +35,7 @@ class WellnessReportV2 extends StatelessWidget {
           SliverToBoxAlternate(child: Padding(
             padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('Wellness Report', style: TextStyle(
+              Text('养生报告', style: TextStyle(
                 fontFamily: ShunShiTypography.serifFamily,
                 fontSize: 28, fontWeight: FontWeight.bold, color: ShunShiColors.textPrimary,
               )),
@@ -72,7 +72,7 @@ class WellnessReportV2 extends StatelessWidget {
                 Row(children: [
                   Icon(Icons.eco, color: Colors.white, size: 20),
                   const SizedBox(width: 8),
-                  Text('Season Focus', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white)),
+                  Text('节气重点', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white)),
                 ]),
                 const SizedBox(height: 8),
                 Text('Spring is asking you to lighten. Your report shows strong mental clarity paired with room to expand physical movement. Consider adding 10 minutes of morning stretching.',

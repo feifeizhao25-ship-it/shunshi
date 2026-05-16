@@ -1,12 +1,12 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'config/app_config.dart';
 
-/// 反馈服务
-
+/// Feedback Service
 class FeedbackService {
-  static final _dio = Dio(BaseOptions(baseUrl: 'http://116.62.32.43:4000', connectTimeout: const Duration(seconds: 8)));
+  static final _dio = Dio(BaseOptions(baseUrl: AppConfig.baseUrl, connectTimeout: const Duration(seconds: 8)));
 
-  /// 提交反馈
+  /// Submit feedback
   static Future<bool> submitFeedback({
     required String content,
     String? contact,
@@ -26,12 +26,12 @@ class FeedbackService {
     }
   }
 
-  /// 评价 App
+  /// Rate the App
   static Future<bool> rateApp({required int rating, String? comment}) async {
     try {
       await _dio.post('/api/v1/feedback', data: {
         'user_id': 'guest',
-        'content': '评分: $rating/5 ${comment ?? ""}',
+        'content': 'Rating: $rating/5 ${comment ?? ""}',
         'type': 'rating',
       });
     } catch (_) {}
@@ -39,10 +39,10 @@ class FeedbackService {
   }
 }
 
-/// 反馈弹窗组件
+/// Feedback Dialog
 class FeedbackDialog extends StatefulWidget {
   const FeedbackDialog({super.key});
-  
+
   @override
   State<FeedbackDialog> createState() => _FeedbackDialogState();
 }
@@ -51,18 +51,18 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
   final _controller = TextEditingController();
   final _contactController = TextEditingController();
   bool _isSubmitting = false;
-  
+
   @override
   void dispose() {
     _controller.dispose();
     _contactController.dispose();
     super.dispose();
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('反馈建议'),
+      title: const Text('Feedback & Suggestions'),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -71,7 +71,7 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
               controller: _controller,
               maxLines: 4,
               decoration: const InputDecoration(
-                hintText: '请描述您遇到的问题或建议...',
+                hintText: 'Describe your issue or suggestion...',
                 border: OutlineInputBorder(),
               ),
             ),
@@ -79,7 +79,7 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
             TextField(
               controller: _contactController,
               decoration: const InputDecoration(
-                hintText: '联系方式 (可选)',
+                hintText: 'Contact info (optional)',
                 border: OutlineInputBorder(),
               ),
             ),
@@ -89,7 +89,7 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('取消'),
+          child: const Text('Cancel'),
         ),
         ElevatedButton(
           onPressed: _isSubmitting ? null : _submit,
@@ -99,44 +99,44 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
                   height: 20,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
-              : const Text('提交'),
+              : const Text('Submit'),
         ),
       ],
     );
   }
-  
+
   Future<void> _submit() async {
     if (_controller.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('请输入反馈内容')),
+        const SnackBar(content: Text('Please enter your feedback')),
       );
       return;
     }
-    
+
     setState(() => _isSubmitting = true);
-    
+
     final success = await FeedbackService.submitFeedback(
       content: _controller.text,
       contact: _contactController.text.isEmpty ? null : _contactController.text,
     );
-    
+
     setState(() => _isSubmitting = false);
-    
+
     if (mounted) {
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(success ? '感谢您的反馈!' : '提交失败，请重试'),
+          content: Text(success ? 'Thank you for your feedback!' : 'Submission failed, please try again'),
         ),
       );
     }
   }
 }
 
-/// 评价弹窗
+/// Rate App Dialog
 class RateAppDialog extends StatefulWidget {
   const RateAppDialog({super.key});
-  
+
   @override
   State<RateAppDialog> createState() => _RateAppDialogState();
 }
@@ -145,17 +145,17 @@ class _RateAppDialogState extends State<RateAppDialog> {
   int _rating = 0;
   final _commentController = TextEditingController();
   bool _isSubmitting = false;
-  
+
   @override
   void dispose() {
     _commentController.dispose();
     super.dispose();
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('评价顺时'),
+      title: const Text('Rate SEASONS'),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -175,7 +175,7 @@ class _RateAppDialogState extends State<RateAppDialog> {
             controller: _commentController,
             maxLines: 3,
             decoration: const InputDecoration(
-              hintText: '评价内容 (可选)',
+              hintText: 'Your comment (optional)',
               border: OutlineInputBorder(),
             ),
           ),
@@ -184,7 +184,7 @@ class _RateAppDialogState extends State<RateAppDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('取消'),
+          child: const Text('Cancel'),
         ),
         ElevatedButton(
           onPressed: _rating == 0 || _isSubmitting ? null : _submit,
@@ -194,26 +194,26 @@ class _RateAppDialogState extends State<RateAppDialog> {
                   height: 20,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
-              : const Text('提交'),
+              : const Text('Submit'),
         ),
       ],
     );
   }
-  
+
   Future<void> _submit() async {
     setState(() => _isSubmitting = true);
-    
+
     await FeedbackService.rateApp(
       rating: _rating,
       comment: _commentController.text.isEmpty ? null : _commentController.text,
     );
-    
+
     setState(() => _isSubmitting = false);
-    
+
     if (mounted) {
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('感谢您的评价!')),
+        const SnackBar(content: Text('Thank you for your rating!')),
       );
     }
   }

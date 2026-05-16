@@ -54,10 +54,11 @@ class SeasonsNotifier extends StateNotifier<SeasonsState> {
       
       try {
         final seasonResp = await _dio.get(
-          '/api/v1/seasons/season/current',
+          '/api/v1/solar-terms/current',
           queryParameters: {
             'user_id': 'seasons-user',
             'hemisphere': hemisphere,
+            'locale': 'en-US',
           },
         );
         final data = seasonResp.data is Map

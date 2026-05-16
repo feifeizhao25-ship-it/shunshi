@@ -3,6 +3,7 @@ library;
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import '../../../core/config/app_config.dart';
 import '../../../design_system/theme.dart';
 
 class WellnessLibraryPage extends StatefulWidget {
@@ -13,7 +14,7 @@ class WellnessLibraryPage extends StatefulWidget {
 }
 
 class _WellnessLibraryPageState extends State<WellnessLibraryPage> {
-  static const _baseUrl = 'http://116.62.32.43:4000';
+  static final String _baseUrl = AppConfig.apiBaseUrl.replaceAll('/api/v1', '');
   final _dio = Dio(BaseOptions(
     baseUrl: _baseUrl,
     connectTimeout: const Duration(seconds: 8),
@@ -27,7 +28,7 @@ class _WellnessLibraryPageState extends State<WellnessLibraryPage> {
   bool _searching = false;
   final _searchController = TextEditingController();
 
-  static const _filters = ['All', 'Sleep', 'Nutrition', 'Movement', 'Mindfulness', 'Seasonal'];
+  static const _filters = ['全部', '睡眠', '饮食', '运动', '冥想', '节气养生'];
 
   Future<void> _search(String query) async {
     if (query.trim().isEmpty) {
@@ -110,6 +111,7 @@ class _WellnessLibraryPageState extends State<WellnessLibraryPage> {
     final bg = isDark ? ShunShiColors.darkBackground : ShunShiColors.background;
 
     return Scaffold(
+  appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
       backgroundColor: bg,
       body: _loading
           ? const Center(child: CircularProgressIndicator(color: Color(0xFF533afd)))

@@ -1,11 +1,12 @@
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/subscription.dart';
+import '../../core/config/app_config.dart';
 
 /// 订阅服务 - 对接后端 API
 class SubscriptionService {
   static final _dio = Dio(BaseOptions(
-    baseUrl: 'http://116.62.32.43:4000',
+    baseUrl: AppConfig.baseUrl,
     connectTimeout: const Duration(seconds: 8),
     receiveTimeout: const Duration(seconds: 10),
   ));
@@ -63,7 +64,7 @@ class SubscriptionService {
       }
     } catch (e) {
       // fallback: 模拟下单（用于开发/测试）
-      throw Exception('支付功能即将上线，敬请期待');
+      throw Exception('Payment coming soon, stay tuned');
     }
     return null;
   }

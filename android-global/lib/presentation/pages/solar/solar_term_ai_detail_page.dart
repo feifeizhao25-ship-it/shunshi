@@ -5,6 +5,8 @@ library;
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
+import 'package:go_router/go_router.dart';
+import '../../../core/network/api_singleton.dart';
 
 class SolarTermAIDetailPage extends StatelessWidget {
   final String termName;
@@ -81,6 +83,8 @@ class SolarTermAIDetailPage extends StatelessWidget {
     final d = _data;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
+
+      appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
       backgroundColor: isDark ? ShunShiColors.darkBackground : ShunShiColors.background,
       body: Stack(
         children: [
@@ -111,7 +115,7 @@ class SolarTermAIDetailPage extends StatelessWidget {
             left: 0, right: 0,
             child: Center(
               child: GestureDetector(
-                onTap: () {},
+                onTap: () => context.push('/chat'),
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
                   decoration: BoxDecoration(
@@ -173,7 +177,7 @@ class SolarTermAIDetailPage extends StatelessWidget {
                   color: ShunShiColors.primary,
                 )),
                 GestureDetector(
-                  onTap: () {},
+                  onTap: () => context.push('/chat'),
                   child: Container(
                     width: 40, height: 40,
                     decoration: BoxDecoration(
@@ -518,7 +522,9 @@ class SolarTermAIDetailPage extends StatelessWidget {
               children: [
                 // Play button
                 GestureDetector(
-                  onTap: () {},
+                  onTap: () {
+                    // Play/pause audio narration
+                  },
                   child: Container(
                     width: 52, height: 52,
                     decoration: BoxDecoration(

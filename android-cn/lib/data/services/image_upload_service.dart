@@ -1,6 +1,7 @@
 // 图片上传服务
 import 'dart:io';
 import 'package:dio/dio.dart';
+import '../../core/config/app_config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -155,9 +156,9 @@ class ImageUploadService {
   // 获取 API Base URL
   static String _getBaseUrl() {
     // 从环境或默认配置获取
-    return const String.fromEnvironment(
+    return String.fromEnvironment(
       'API_BASE_URL',
-      defaultValue: 'http://116.62.32.43:4000',
+      defaultValue: AppConfig.apiBaseUrl.replaceAll('/api/v1', ''),
     );
   }
   

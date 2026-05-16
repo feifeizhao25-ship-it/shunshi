@@ -8,15 +8,15 @@ import 'package:flutter/material.dart';
 import 'package:record/record.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:dio/dio.dart';
+import '../../core/config/app_config.dart';
 
-/// 语音输入服务
 class VoiceService {
   static final VoiceService _instance = VoiceService._();
   factory VoiceService() => _instance;
   VoiceService._();
 
   final _recorder = AudioRecorder();
-  static const String _baseUrl = 'http://116.62.32.43:4000';
+  static final String _baseUrl = AppConfig.baseUrl;
   final _dio = Dio(BaseOptions(
     baseUrl: _baseUrl,
     connectTimeout: const Duration(seconds: 10),

@@ -157,7 +157,7 @@ class _JournalReflectionPageState extends State<JournalReflectionPage> {
                   elevation: 0,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
-                child: Text('Save Reflection', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFamily: ShunShiTypography.sansFamily)),
+                child: Text('保存反思', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFamily: ShunShiTypography.sansFamily)),
               ),
             ),
             const SizedBox(height: 40),

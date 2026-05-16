@@ -10,6 +10,7 @@ import '../../../core/theme/shunshi_colors.dart';
 import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
+import '../../../core/network/api_singleton.dart';
 
 class RecordsPageV2 extends StatefulWidget {
   const RecordsPageV2({super.key});
@@ -18,8 +19,7 @@ class RecordsPageV2 extends StatefulWidget {
 }
 
 class _RecordsPageV2State extends State<RecordsPageV2> {
-  static const _baseUrl = 'http://116.62.32.43:4000';
-  final _dio = Dio(BaseOptions(baseUrl: _baseUrl, connectTimeout: const Duration(seconds: 8)));
+  final _dio = apiClient.dio;
   
   int _weekStreak = 0;
   int _totalPoints = 0;

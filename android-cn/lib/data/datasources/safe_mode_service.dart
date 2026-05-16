@@ -1,11 +1,12 @@
 // lib/data/datasources/safe_mode_service.dart
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../core/config/app_config.dart';
 
 /// SafeMode 安全模式 - 异常情绪检测与处理
 class SafeModeService {
   static final _dio = Dio(BaseOptions(
-    baseUrl: 'http://116.62.32.43:4000',
+    baseUrl: AppConfig.apiBaseUrl.replaceAll('/api/v1', ''),
     connectTimeout: const Duration(seconds: 8),
   ));
 

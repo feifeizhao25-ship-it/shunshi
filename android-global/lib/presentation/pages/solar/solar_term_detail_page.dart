@@ -7,6 +7,9 @@ import '../../../core/theme/shunshi_colors.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
+import '../../../core/network/api_singleton.dart';
+import '../../../core/config/app_config.dart';
+import '../../../data/en_content.dart';
 
 class SolarTermDetailPage extends StatefulWidget {
   final String termName;
@@ -61,8 +64,8 @@ class _SolarTermDetailPageState extends State<SolarTermDetailPage> {
     try {
       // Use the base URL from app config or default to ECS
       // In production this should come from app_constants
-      final baseUrl = 'http://116.62.32.43:4000';
-      final url = '$baseUrl/api/v1/solar-terms/detail/${Uri.encodeComponent(widget.termName)}';
+      final baseUrl = AppConfig.baseUrl;
+      final url = '$baseUrl/api/v1/solar-terms/detail/${Uri.encodeComponent(widget.termName)}?locale=en-US';
       final resp = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 8));
       if (resp.statusCode == 200 && mounted) {
         final data = jsonDecode(utf8.decode(resp.bodyBytes)) as Map<String, dynamic>;
@@ -81,6 +84,12 @@ class _SolarTermDetailPageState extends State<SolarTermDetailPage> {
   List<String> _getList(dynamic field, List<String> fallback) {
     if (field is List) return field.cast<String>();
     return fallback;
+  }
+
+  /// Filter out Chinese strings, replace with fallback if all are Chinese
+  List<String> _filterChinese(List<String> items) {
+    final nonChinese = items.where((s) => !ZhEnMapper.isChinese(s)).toList();
+    return nonChinese.isNotEmpty ? nonChinese : items;
   }
 
   Widget _buildSkeleton() {
@@ -123,13 +132,16 @@ class _SolarTermDetailPageState extends State<SolarTermDetailPage> {
     final info = _termData[termName] ?? _TermInfo(en: termName, quote: '', season: widget.season ?? '');
 
     // 从API读取真实数据
-    final exercises = _getList(_termDetail['exercises'], ['Outing', 'Tai Chi', 'Baduanjin', 'Walking']);
-    final healthTips = _getList(_termDetail['health_tips'], ['Follow the season', 'Adjust diet', 'Moderate exercise', 'Regulate emotions']);
-    final acupoints = _getList(_termDetail['acupoints'], ['Taichong (LR3)', 'Zusanli (ST36)', 'Hegu (LI4)']);
-    final emotionalCare = _getList(_termDetail['emotional_care'], ['Regulate emotions', 'Stay calm', 'Get more sunlight']);
-    final recommendedFoods = _getList(_termDetail['recommended_foods'], ['Seasonal produce', 'Warming foods']);
+    final exercises = _filterChinese(_getList(_termDetail['exercises'], ['Outing', 'Tai Chi', 'Baduanjin', 'Walking']));
+    final healthTips = _filterChinese(_getList(_termDetail['health_tips'], ['Follow the season', 'Adjust diet', 'Moderate exercise', 'Regulate emotions']));
+    final acupoints = _filterChinese(_getList(_termDetail['acupoints'], ['Taichong (LR3)', 'Zusanli (ST36)', 'Hegu (LI4)']));
+    final emotionalCare = _filterChinese(_getList(_termDetail['emotional_care'], ['Regulate emotions', 'Stay calm', 'Get more sunlight']));
+    final recommendedFoods = _filterChinese(_getList(_termDetail['recommended_foods'], ['Seasonal produce', 'Warming foods']));
 
     return Scaffold(
+
+
+      appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
       backgroundColor: isDark ? ShunShiColors.darkBackground : ShunShiColors.background,
       body: SafeArea(
         child: SingleChildScrollView(
@@ -196,11 +208,11 @@ class _SolarTermDetailPageState extends State<SolarTermDetailPage> {
             const SizedBox(height: 14),
 
             // 饮食（推荐食物）
-            _sectionCard('Diet', recommendedFoods.join('、'), Icons.restaurant_rounded),
+            _sectionCard('Diet', recommendedFoods.join(', '), Icons.restaurant_rounded),
             const SizedBox(height: 10),
 
             // 运动（真实数据）
-            _sectionCard('Exercise', exercises.join('、'), Icons.self_improvement_rounded),
+            _sectionCard('Exercise', exercises.join(', '), Icons.self_improvement_rounded),
             const SizedBox(height: 10),
 
             // 穴位调理（真实数据，点击展开穴位列表）
@@ -208,11 +220,11 @@ class _SolarTermDetailPageState extends State<SolarTermDetailPage> {
             const SizedBox(height: 10),
 
             // 情志调养（真实数据）
-            _sectionCard('Emotional Care', emotionalCare.join('、'), Icons.spa_rounded),
+            _sectionCard('Emotional Care', emotionalCare.join(', '), Icons.spa_rounded),
             const SizedBox(height: 10),
 
             // 养生提示
-            _sectionCard('Wellness Tips', healthTips.join('、'), Icons.favorite_rounded),
+            _sectionCard('Wellness Tips', healthTips.join(', '), Icons.favorite_rounded),
             const SizedBox(height: 20),
 
             // AI推荐卡片

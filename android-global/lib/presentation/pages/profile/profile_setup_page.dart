@@ -10,6 +10,7 @@ import '../../../core/theme/shunshi_spacing.dart';
 import '../../../core/theme/shunshi_text_styles.dart';
 import '../../../data/network/api_client.dart';
 import '../../../core/theme/app_localizations.dart';
+import '../../../core/network/api_singleton.dart';
 
 /// TCM九种Body Type
 const _constitutionTypes = [
@@ -159,7 +160,9 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : ShunshiColors.background,
+    return Scaffold(
+
+      appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),backgroundColor: isDark ? ShunshiDarkColors.background : ShunshiColors.background,
       body: SafeArea(
         child: Column(
           children: [

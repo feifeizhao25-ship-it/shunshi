@@ -5,6 +5,8 @@ library;
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
+import 'package:go_router/go_router.dart';
+import '../../../core/network/api_singleton.dart';
 
 class WellnessDiaryPage extends StatefulWidget {
   const WellnessDiaryPage({super.key});
@@ -44,6 +46,9 @@ class _WellnessDiaryPageState extends State<WellnessDiaryPage>
     final day = now.day;
 
     return Scaffold(
+
+
+      appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
       backgroundColor: isDark ? ShunShiColors.darkBackground : ShunShiColors.background,
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
@@ -72,7 +77,7 @@ class _WellnessDiaryPageState extends State<WellnessDiaryPage>
                       )),
                     ),
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () => context.push('/notifications'),
                       child: const Icon(Icons.notifications_outlined, size: 22, color: ShunShiColors.primary),
                     ),
                   ],

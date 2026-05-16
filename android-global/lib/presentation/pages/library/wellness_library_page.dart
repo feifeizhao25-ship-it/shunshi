@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
+import '../../../core/network/api_singleton.dart';
 
 class WellnessLibraryPage extends StatefulWidget {
   const WellnessLibraryPage({super.key});
@@ -15,12 +16,7 @@ class WellnessLibraryPage extends StatefulWidget {
 }
 
 class _WellnessLibraryPageState extends State<WellnessLibraryPage> {
-  static const _baseUrl = 'http://116.62.32.43:4000';
-  final _dio = Dio(BaseOptions(
-    baseUrl: _baseUrl,
-    connectTimeout: const Duration(seconds: 8),
-    receiveTimeout: const Duration(seconds: 15),
-  ));
+  final _dio = apiClient.dio;
 
   List<Map<String, dynamic>> _contents = [];
   List<Map<String, dynamic>> _filtered = [];
@@ -57,7 +53,7 @@ class _WellnessLibraryPageState extends State<WellnessLibraryPage> {
 
   Future<void> _fetchContents() async {
     try {
-      final res = await _dio.get('/api/v1/intl/contents/recommend', queryParameters: {'limit': 20});
+      final res = await _dio.get('/api/v1/contents/recommend', queryParameters: {'limit': 20, 'locale': 'en-US'});
       if (!mounted) return;
       final data = res.data;
       if (data is Map && data['data'] is List) {
@@ -109,7 +105,9 @@ class _WellnessLibraryPageState extends State<WellnessLibraryPage> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : ShunShiColors.background,
+    return Scaffold(
+
+      appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),backgroundColor: isDark ? ShunshiDarkColors.background : ShunShiColors.background,
       body: _loading
           ? const Center(child: CircularProgressIndicator(color: Color(0xFF533afd)))
           : RefreshIndicator(

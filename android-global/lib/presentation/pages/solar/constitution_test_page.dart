@@ -4,6 +4,7 @@ import '../../../core/theme/shunshi_colors.dart';
 import '../../../design_system/theme.dart';
 import '../../widgets/paywall_banner.dart';
 import '../../../core/theme/app_localizations.dart';
+import '../../../core/network/api_singleton.dart';
 
 /// Body Type Quiz结果页
 class ConstitutionTestPage extends StatelessWidget {

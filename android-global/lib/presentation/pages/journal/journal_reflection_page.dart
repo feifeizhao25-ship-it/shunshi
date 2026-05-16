@@ -12,6 +12,7 @@ library;
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
+import '../../../core/network/api_singleton.dart';
 
 class JournalReflectionPage extends StatefulWidget {
   const JournalReflectionPage({super.key});

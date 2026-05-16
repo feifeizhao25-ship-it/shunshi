@@ -1,5 +1,7 @@
 import '../../../core/router/safe_pop.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../data/network/api_client.dart';
 import '../../widgets/acupoint_diagram.dart';
 import '../../widgets/skeleton_loading.dart';
@@ -40,10 +42,16 @@ class _AcupressurePageState extends State<AcupressurePage> {
       _error = null;
     });
     try {
-      final res = await _api.get('/api/v1/contents', queryParameters: {
+      final prefs = await SharedPreferences.getInstance();
+      final constitution = prefs.getString('constitution_type');
+      final queryParams = <String, String>{
         'type': 'acupoint',
         'limit': '20',
-      });
+      };
+      if (constitution != null) {
+        queryParams['constitution'] = constitution;
+      }
+      final res = await _api.get('/api/v1/contents', queryParameters: queryParams);
       final data = res.data;
       final items = _parseItems(data);
       setState(() {
@@ -85,6 +93,33 @@ class _AcupressurePageState extends State<AcupressurePage> {
       ),
       body: Column(
         children: [
+          // ── Header image ──
+          Stack(
+            children: [
+              SizedBox(
+                height: 120,
+                width: double.infinity,
+                child: Image.asset(
+                  'assets/images/acupressure.jpg',
+                  fit: BoxFit.cover,
+                ),
+              ),
+              Positioned.fill(
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.black.withValues(alpha: 0.1),
+                        Colors.black.withValues(alpha: 0.5),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
           Container(
             padding: const EdgeInsets.all(16),
             color: Colors.purple[50],
@@ -160,6 +195,9 @@ class _AcupressurePageState extends State<AcupressurePage> {
           ...filtered.map((point) => Card(
                 margin: const EdgeInsets.only(bottom: 12),
                 child: ExpansionTile(
+                  onExpansionChanged: (expanded) {
+                    // Navigate on first tap collapse (single tap)
+                  },
                   leading: CircleAvatar(
                     backgroundColor: Colors.purple[100],
                     child: Text(point['emoji'] ?? '📍',
@@ -170,6 +208,19 @@ class _AcupressurePageState extends State<AcupressurePage> {
                   subtitle: Text(
                       '${point['category'] ?? ''} · ${point['description'] ?? ''}',
                       maxLines: 1, overflow: TextOverflow.ellipsis),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.open_in_new, size: 18),
+                        onPressed: () {
+                          final id = point['id']?.toString() ?? '';
+                          context.push('/meridian-detail', extra: {'meridianId': id});
+                        },
+                        tooltip: '查看经络详情',
+                      ),
+                    ],
+                  ),
                   children: [
                     Padding(
                       padding: const EdgeInsets.all(16),

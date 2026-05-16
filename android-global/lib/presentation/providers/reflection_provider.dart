@@ -57,7 +57,7 @@ class ReflectionNotifier extends StateNotifier<ReflectionState> {
 
     try {
       final response = await _dio.get(
-        '/api/v1/seasons/reflection/list',
+        '/api/v1/followup/list',
         queryParameters: {'user_id': 'seasons-user'},
       );
 
@@ -92,7 +92,7 @@ class ReflectionNotifier extends StateNotifier<ReflectionState> {
       final sleepStr = _sleepToString(sleep);
 
       await _dio.post(
-        '/api/v1/seasons/reflection/submit',
+        '/api/v1/followup/quick/daily-checkin',
         data: {
           'user_id': 'seasons-user',
           'mood': moodStr,

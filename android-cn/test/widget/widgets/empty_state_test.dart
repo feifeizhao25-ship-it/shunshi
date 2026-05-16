@@ -1,41 +1,88 @@
 // test/widget/widgets/empty_state_test.dart
+// 空状态组件测试 — 扩充版
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shunshi/presentation/widgets/empty_state.dart';
+import 'package:shunshi/presentation/widgets/components/empty_state.dart';
+import '../../helpers/pump_app.dart';
 
 void main() {
   group('EmptyState widget', () {
-    testWidgets('renders title text', (tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: EmptyState(icon: Icons.inbox, title: '暂无内容'),
-          ),
-        ),
+    testWidgets('显示消息文本', (tester) async {
+      await pumpApp(
+        tester,
+        child: const EmptyState(message: '暂无内容'),
       );
 
       expect(find.text('暂无内容'), findsOneWidget);
     });
 
-    testWidgets('shows action button when provided', (tester) async {
-      bool pressed = false;
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: EmptyState(
-              icon: Icons.inbox,
-              title: '暂无数据',
-              actionLabel: '刷新',
-              onAction: () => pressed = true,
-            ),
-          ),
+    testWidgets('显示图标', (tester) async {
+      await pumpApp(
+        tester,
+        child: const EmptyState(
+          message: '暂无内容',
+          icon: Icons.inbox_outlined,
         ),
       );
 
-      expect(find.text('刷新'), findsOneWidget);
-      await tester.tap(find.text('刷新'));
-      await tester.pump();
-      expect(pressed, isTrue);
+      expect(find.byIcon(Icons.inbox_outlined), findsOneWidget);
+    });
+
+    testWidgets('无图标时不显示图标', (tester) async {
+      await pumpApp(
+        tester,
+        child: const EmptyState(message: '暂无内容'),
+      );
+
+      expect(find.byType(Icon), findsNothing);
+    });
+
+    testWidgets('显示副标题', (tester) async {
+      await pumpApp(
+        tester,
+        child: const EmptyState(
+          message: '暂无内容',
+          subtitle: '下拉刷新试试',
+        ),
+      );
+
+      expect(find.text('下拉刷新试试'), findsOneWidget);
+    });
+
+    testWidgets('无副标题时不显示', (tester) async {
+      await pumpApp(
+        tester,
+        child: const EmptyState(message: '暂无内容'),
+      );
+
+      // 只有一个 Text widget（message）
+      expect(find.byType(Text), findsOneWidget);
+    });
+
+    testWidgets('带操作按钮时显示', (tester) async {
+      var tapped = false;
+      await pumpApp(
+        tester,
+        child: EmptyState(
+          message: '暂无内容',
+          actionText: '重试',
+          onAction: () => tapped = true,
+        ),
+      );
+
+      expect(find.text('重试'), findsOneWidget);
+      await tester.tap(find.text('重试'));
+      expect(tapped, isTrue);
+    });
+
+    testWidgets('无操作按钮时不显示', (tester) async {
+      await pumpApp(
+        tester,
+        child: const EmptyState(message: '暂无内容'),
+      );
+
+      expect(find.text('重试'), findsNothing);
     });
   });
 }

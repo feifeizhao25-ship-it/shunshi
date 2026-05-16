@@ -16,7 +16,7 @@ class GrowthMilestonesPage extends StatelessWidget {
 
   static const _milestones = [
     _Milestone('🌅', 'Early Riser', 'Wake before 6 AM for 7 days', true, 120, Color(0xFFF59E0B)),
-    _Milestone('🌿', 'Seasonal Seeker', 'Complete your first seasonal ritual', true, 200, Color(0xFF22C55E)),
+    _Milestone('🌿', '节气探索者', '完成你的第一个节气仪式', true, 200, Color(0xFF22C55E)),
     _Milestone('🧘', 'Still Mind', 'Meditate for 30 consecutive days', true, 350, Color(0xFF8B5CF6)),
     _Milestone('🍵', 'Tea Ceremony', 'Brew 10 different seasonal teas', true, 180, Color(0xFF06B6D4)),
     _Milestone('📖', '100 Day Journey', 'Practice wellness for 100 days', false, 500, null),
@@ -108,7 +108,7 @@ class GrowthMilestonesPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Next: Inner Sage — 570 XP remaining',
+                    '下一: 内在智者 — 还差 570 XP',
                     style: TextStyle(
                       fontSize: 12, color: ShunShiColors.textTertiary,
                       fontFamily: ShunShiTypography.sansFamily,

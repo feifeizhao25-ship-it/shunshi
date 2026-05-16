@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import '../../core/config/app_config.dart';
 
 // ── Subscription Tier ──────────────────────────────────
 
@@ -222,7 +223,7 @@ class SubscriptionService {
   final String _userId;
 
   SubscriptionService({
-    String baseUrl = 'http://116.62.32.43:4000',
+    String baseUrl = AppConfig.baseUrl,
     required String userId,
   })  : _baseUrl = baseUrl,
         _userId = userId,
@@ -236,7 +237,7 @@ class SubscriptionService {
   Future<SubscriptionState> fetchState() async {
     try {
       final response = await _dio.get(
-        '/api/v1/seasons/subscription/status',
+        '/api/v1/subscription/status',
         queryParameters: {'user_id': _userId},
       );
       final data = response.data as Map<String, dynamic>;
@@ -280,7 +281,7 @@ class SubscriptionService {
     if (productId == null) return false;
     try {
       await _dio.post(
-        '/api/v1/seasons/subscription/trial',
+        '/api/v1/subscription/status',
         data: {'product_id': productId},
         queryParameters: {'user_id': _userId},
       );
@@ -297,7 +298,7 @@ class SubscriptionService {
     if (productId == null) return false;
     try {
       await _dio.post(
-        '/api/v1/seasons/subscription/checkout',
+        '/api/v1/stripe/checkout',
         data: {'product_id': productId, 'billing': 'monthly'},
         queryParameters: {'user_id': _userId},
       );
@@ -312,7 +313,7 @@ class SubscriptionService {
   Future<bool> restore() async {
     try {
       await _dio.post(
-        '/api/v1/seasons/subscription/restore',
+        '/api/v1/orders/restore',
         queryParameters: {'user_id': _userId},
       );
       return true;

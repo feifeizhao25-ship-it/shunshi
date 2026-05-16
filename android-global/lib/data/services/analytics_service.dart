@@ -284,7 +284,7 @@ class AnalyticsService {
   Future<void> _sendAsync(Map<String, dynamic> payload) async {
     try {
       await _dio.post(
-        '/api/v1/seasons/analytics/track',
+        '/api/v1/metrics/batch',
         data: payload,
       );
     } catch (e) {

@@ -3,6 +3,7 @@
 library;
 
 import 'package:dio/dio.dart';
+import '../../../core/config/app_config.dart';
 import '../../widgets/state_view.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -15,7 +16,7 @@ class RecordsPageV2 extends StatefulWidget {
 }
 
 class _RecordsPageV2State extends State<RecordsPageV2> {
-  static const _baseUrl = 'http://116.62.32.43:4000';
+  static final String _baseUrl = AppConfig.apiBaseUrl.replaceAll('/api/v1', '');
   final _dio = Dio(BaseOptions(baseUrl: _baseUrl, connectTimeout: const Duration(seconds: 8)));
   
   int _weekStreak = 0;
@@ -172,16 +173,21 @@ class _RecordsPageV2State extends State<RecordsPageV2> {
               const SizedBox(height: 12),
               ..._emotionTrends.take(5).map((e) => Padding(
                 padding: const EdgeInsets.only(bottom: 8),
-                child: Container(
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(12)),
-                  child: Row(children: [
-                    Icon(_emotionIcon(e['avg_mood'] as int? ?? 3), color: ShunShiColors.primary, size: 18),
-                    const SizedBox(width: 10),
-                    Text(e['date']?.toString().substring(5, 10) ?? '', style: TextStyle(fontSize: 13, color: ShunShiColors.textSecondary)),
-                    const Spacer(),
-                    Text(_emotionLabel(e['avg_mood'] as int? ?? 3), style: TextStyle(fontSize: 13, color: ShunShiColors.textPrimary)),
-                  ]),
+                child: GestureDetector(
+                  onTap: () => context.push('/wellness-diary'),
+                  child: Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(12)),
+                    child: Row(children: [
+                      Icon(_emotionIcon(e['avg_mood'] as int? ?? 3), color: ShunShiColors.primary, size: 18),
+                      const SizedBox(width: 10),
+                      Text(e['date']?.toString().substring(5, 10) ?? '', style: TextStyle(fontSize: 13, color: ShunShiColors.textSecondary)),
+                      const Spacer(),
+                      Text(_emotionLabel(e['avg_mood'] as int? ?? 3), style: TextStyle(fontSize: 13, color: ShunShiColors.textPrimary)),
+                      const SizedBox(width: 6),
+                      Icon(Icons.chevron_right, size: 16, color: ShunShiColors.textTertiary),
+                    ]),
+                  ),
                 ),
               )),
             ],

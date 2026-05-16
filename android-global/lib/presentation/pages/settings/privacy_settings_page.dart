@@ -5,11 +5,13 @@ import 'package:go_router/go_router.dart';
 import 'package:dio/dio.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../core/config/app_config.dart';
 import '../../../core/theme/seasons_colors.dart';
 import '../../../core/theme/seasons_spacing.dart';
 import '../../../core/theme/seasons_text_styles.dart';
 import '../../widgets/components/soft_card.dart';
 import '../../../core/theme/app_localizations.dart';
+import '../../../core/network/api_singleton.dart';
 
 /// Settings / Privacy Page — SEASONS Global
 /// Includes: memory control, data export, delete account, AI disclosure
@@ -33,7 +35,7 @@ class _SettingsPageState extends State<SettingsPage> {
   void initState() {
     super.initState();
     _dio = Dio(BaseOptions(
-      baseUrl: 'http://116.62.32.43:4000',
+      baseUrl: AppConfig.baseUrl,
       connectTimeout: const Duration(seconds: 15),
     ));
     _loadUserId();
@@ -529,7 +531,7 @@ class _SettingsPageState extends State<SettingsPage> {
             horizontal: SeasonsSpacing.lg,
             vertical: SeasonsSpacing.md,
           ),
-          onTap: () {},
+          onTap: () => context.push('/legal/medical-disclaimer'),
           child: Row(
             children: [
               const Icon(Icons.description_outlined,
@@ -555,7 +557,7 @@ class _SettingsPageState extends State<SettingsPage> {
             horizontal: SeasonsSpacing.lg,
             vertical: SeasonsSpacing.md,
           ),
-          onTap: () {},
+          onTap: () => context.push('/legal/terms'),
           child: Row(
             children: [
               const Icon(Icons.article_outlined,
@@ -581,7 +583,7 @@ class _SettingsPageState extends State<SettingsPage> {
             horizontal: SeasonsSpacing.lg,
             vertical: SeasonsSpacing.md,
           ),
-          onTap: () {},
+          onTap: () => context.push('/help'),
           child: Row(
             children: [
               const Icon(Icons.help_outline,

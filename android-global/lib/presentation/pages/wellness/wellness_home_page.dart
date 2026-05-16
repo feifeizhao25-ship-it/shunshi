@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
+import '../../../core/network/api_singleton.dart';
 
 class WellnessHomePage extends StatelessWidget {
   const WellnessHomePage({super.key});
@@ -14,6 +15,8 @@ class WellnessHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
+
+      appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
       backgroundColor: isDark ? ShunShiColors.darkBackground : ShunShiColors.background,
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
@@ -42,7 +45,7 @@ class WellnessHomePage extends StatelessWidget {
                     )),
                     const Spacer(),
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () => context.push('/notifications'),
                       child: const Icon(Icons.notifications_outlined, size: 22, color: ShunShiColors.primary),
                     ),
                   ],
@@ -83,12 +86,12 @@ class WellnessHomePage extends StatelessWidget {
                     crossAxisSpacing: 16,
                     childAspectRatio: 0.75,
                     children: [
-                      _gridIcon(Icons.health_and_safety, 'Constitution', () => context.push('/wellness/constitution')),
-                      _gridIcon(Icons.restaurant_menu, 'Seasonal Recipes', () => context.push('/wellness/food_therapy')),
-                      _gridIcon(Icons.emoji_food_beverage, 'Wellness Teas', () => context.push('/wellness/tea')),
-                      _gridIcon(Icons.architecture, 'Acupoints', () => context.push('/wellness/acupressure')),
-                      _gridIcon(Icons.self_improvement, 'Traditional Qigong', () => context.push('/wellness/exercise')),
-                      _gridIcon(Icons.graphic_eq, 'Sleep Audio', () => context.push('/wellness/sleep')),
+                      _gridIcon(Icons.health_and_safety, 'Constitution', () => context.push('/constitution')),
+                      _gridIcon(Icons.restaurant_menu, 'Seasonal Recipes', () => context.push('/wellness-category/diet')),
+                      _gridIcon(Icons.emoji_food_beverage, 'Wellness Teas', () => context.push('/wellness-category/tea')),
+                      _gridIcon(Icons.architecture, 'Acupoints', () => context.push('/wellness-category/acupoint')),
+                      _gridIcon(Icons.self_improvement, 'Traditional Qigong', () => context.push('/wellness-category/exercise')),
+                      _gridIcon(Icons.graphic_eq, 'Sleep Audio', () => context.push('/sleep-sanctuary')),
                     ],
                   ),
                   const SizedBox(height: 48),
@@ -122,7 +125,7 @@ class WellnessHomePage extends StatelessWidget {
                             ],
                           ),
                           GestureDetector(
-                            onTap: () {},
+                            onTap: () => context.push('/discover'),
                             child: Row(
                               children: [
                                 Text(AppLocalizations.of(context).get('view_all'), style: TextStyle(
@@ -207,9 +210,10 @@ class WellnessHomePage extends StatelessWidget {
     required String desc,
     required String likes,
     required List<Color> gradient,
+    VoidCallback? onTap,
   }) {
     return GestureDetector(
-      onTap: () {},
+      onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
           color: ShunShiColors.surfaceContainerLowest,

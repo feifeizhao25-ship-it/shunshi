@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import '../../core/config/app_config.dart';
 // Image service (Global - shared logic)
 import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
@@ -85,7 +86,7 @@ class ImageService {
       final formData = FormData.fromMap({
         'file': await MultipartFile.fromFile(localPath),
       });
-      final res = await dio.post('http://116.62.32.43:4000/api/v1/upload/image', data: formData);
+      final res = await dio.post('${AppConfig.apiBaseUrl}/api/v1/upload/image', data: formData);
       return res.data?['data']?['url'];
     } catch (e) {
       debugPrint('[ImageService] Upload failed: $e');

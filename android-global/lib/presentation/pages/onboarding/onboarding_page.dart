@@ -14,6 +14,7 @@ import '../../../core/theme/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../design_system/theme.dart';
+import '../../../core/network/api_singleton.dart';
 
 class OnboardingPage extends StatefulWidget {
   const OnboardingPage({super.key});
@@ -113,8 +114,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
 
     // Post to backend
     try {
-      final dio = Dio(BaseOptions(baseUrl: 'http://116.62.32.43:4000'));
-      await dio.post('/api/v1/seasons/onboarding/complete', data: {
+      final dio = apiClient.dio;
+      await dio.post('/api/v1/auth/me', data: {
         'feeling': _feeling?.toLowerCase(),
         'help_goal': _helpWith.toList(),
         'life_stage': _lifeStage?.toLowerCase(),

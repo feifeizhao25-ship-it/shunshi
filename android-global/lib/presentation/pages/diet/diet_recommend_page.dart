@@ -8,6 +8,7 @@ import '../../../design_system/theme.dart';
 import '../../../data/network/api_client.dart';
 import '../../widgets/state_view.dart';
 import '../../../core/theme/app_localizations.dart';
+import '../../../core/network/api_singleton.dart';
 
 class DietRecommendPage extends StatefulWidget {
   final String? constitutionType;

@@ -4,6 +4,7 @@
 library;
 
 import 'package:dio/dio.dart';
+import '../../../core/config/app_config.dart';
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
 
@@ -15,7 +16,7 @@ class CommunityPageV2 extends StatefulWidget {
 }
 
 class _CommunityPageV2State extends State<CommunityPageV2> with SingleTickerProviderStateMixin {
-  final _dio = Dio(BaseOptions(baseUrl: 'http://116.62.32.43:4000', connectTimeout: const Duration(seconds: 8)));
+  final _dio = Dio(BaseOptions(baseUrl: AppConfig.apiBaseUrl.replaceAll('/api/v1', ''), connectTimeout: const Duration(seconds: 8)));
   List<Map<String, dynamic>> _posts = [];
   bool _loading = true;
   String? _error;
@@ -69,6 +70,7 @@ class _CommunityPageV2State extends State<CommunityPageV2> with SingleTickerProv
     final posts = _filteredPosts;
 
     return Scaffold(
+  appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
       backgroundColor: bg,
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
@@ -198,17 +200,83 @@ class _CommunityPageV2State extends State<CommunityPageV2> with SingleTickerProv
           Row(children: [Icon(Icons.emoji_events, color: Color(0xFFFFD700), size: 16), const SizedBox(width: 6), Text(badge.toString(), style: TextStyle(fontSize: 12, color: ShunShiColors.textSecondary, fontWeight: FontWeight.w500))]),
         ],
         const SizedBox(height: 10),
-        Text(content, style: TextStyle(fontSize: 14, color: ShunShiColors.textSecondary, height: 1.6)),
+        GestureDetector(
+          onTap: () => _showPostDetail(context, post),
+          child: Text(content, style: TextStyle(fontSize: 14, color: ShunShiColors.textSecondary, height: 1.6)),
+        ),
         const SizedBox(height: 12),
         Row(children: [
-          Icon(Icons.favorite_border, size: 18, color: ShunShiColors.textTertiary), const SizedBox(width: 4),
+          GestureDetector(
+            onTap: () => _showPostDetail(context, post),
+            child: Icon(Icons.favorite_border, size: 18, color: ShunShiColors.textTertiary),
+          ), const SizedBox(width: 4),
           Text('$likes', style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)), const SizedBox(width: 20),
-          Icon(Icons.chat_bubble_outline, size: 18, color: ShunShiColors.textTertiary), const SizedBox(width: 4),
+          GestureDetector(
+            onTap: () => _showPostDetail(context, post),
+            child: Icon(Icons.chat_bubble_outline, size: 18, color: ShunShiColors.textTertiary),
+          ), const SizedBox(width: 4),
           Text('$comments', style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)), const Spacer(),
-          Icon(Icons.share, size: 18, color: ShunShiColors.textTertiary), const SizedBox(width: 4),
-          const Text('分享', style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
+          GestureDetector(
+            onTap: () => _sharePost(post),
+            child: Row(children: [Icon(Icons.share, size: 18, color: ShunShiColors.textTertiary), const SizedBox(width: 4), const Text('分享', style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary))]),
+          ),
         ]),
       ]),
+    );
+  }
+
+  void _showPostDetail(BuildContext context, Map<String, dynamic> post) {
+    final name = post['user_name'] ?? post['author'] ?? '匿名用户';
+    final type = post['user_type'] ?? post['tag'] ?? '';
+    final content = post['content'] ?? post['body'] ?? '';
+    final likes = (post['like_count'] ?? post['likes'] ?? 0) is int ? post['like_count'] ?? post['likes'] ?? 0 : 0;
+    final comments = (post['comment_count'] ?? post['comments'] ?? 0) is int ? post['comment_count'] ?? post['comments'] ?? 0 : 0;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: ShunShiColors.surface,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (_) => DraggableScrollableSheet(
+        initialChildSize: 0.7,
+        minChildSize: 0.5,
+        maxChildSize: 0.9,
+        expand: false,
+        builder: (_, controller) => SingleChildScrollView(
+          controller: controller,
+          padding: const EdgeInsets.all(24),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Center(child: Container(width: 36, height: 4, decoration: BoxDecoration(color: ShunShiColors.border, borderRadius: BorderRadius.circular(2)))),
+            const SizedBox(height: 20),
+            Row(children: [
+              Container(width: 40, height: 40, decoration: BoxDecoration(shape: BoxShape.circle, color: ShunShiColors.primaryContainer), child: Icon(Icons.person, color: ShunShiColors.primary, size: 20)),
+              const SizedBox(width: 12),
+              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(name, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+                if (type.isNotEmpty) Text(type, style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
+              ])),
+            ]),
+            const SizedBox(height: 16),
+            Text(content, style: TextStyle(fontSize: 16, color: ShunShiColors.textSecondary, height: 1.8)),
+            const SizedBox(height: 20),
+            Divider(color: ShunShiColors.borderGhost),
+            const SizedBox(height: 12),
+            Row(children: [
+              Icon(Icons.favorite_border, size: 20, color: ShunShiColors.primary), const SizedBox(width: 6), Text('$likes 赞', style: TextStyle(fontSize: 14, color: ShunShiColors.textSecondary)),
+              const SizedBox(width: 24),
+              Icon(Icons.chat_bubble_outline, size: 20, color: ShunShiColors.primary), const SizedBox(width: 6), Text('$comments 评论', style: TextStyle(fontSize: 14, color: ShunShiColors.textSecondary)),
+            ]),
+          ]),
+        ),
+      ),
+    );
+  }
+
+  void _sharePost(Map<String, dynamic> post) {
+    final content = post['content'] ?? '';
+    final name = post['user_name'] ?? '匿名';
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('分享 $name 的动态：${content.length > 20 ? content.substring(0, 20) + '…' : content}')),
     );
   }
 

@@ -104,7 +104,7 @@ class Content {
   factory Content.fromJson(Map<String, dynamic> json) => Content(
     id: json['id'] as String,
     type: ContentType.values.firstWhere(
-      (e) => e.name == (json['type'] as String?)?.replaceAll('_', '').toLowerCase(),
+      (e) => e.name.replaceAll('_', '').toLowerCase() == (json['type'] as String?)?.replaceAll('_', '').toLowerCase(),
       orElse: () => ContentType.unknown,
     ),
     title: json['title'] as String,

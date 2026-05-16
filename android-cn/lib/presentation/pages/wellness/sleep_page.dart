@@ -1,5 +1,7 @@
 import '../../../core/router/safe_pop.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../data/network/api_client.dart';
 import '../../widgets/skeleton_loading.dart';
 
@@ -39,10 +41,16 @@ class _SleepPageState extends State<SleepPage> {
       _error = null;
     });
     try {
-      final res = await _api.get('/api/v1/contents', queryParameters: {
+      final prefs = await SharedPreferences.getInstance();
+      final constitution = prefs.getString('constitution_type');
+      final queryParams = <String, String>{
         'type': 'sleep',
         'limit': '20',
-      });
+      };
+      if (constitution != null) {
+        queryParams['constitution'] = constitution;
+      }
+      final res = await _api.get('/api/v1/contents', queryParameters: queryParams);
       final data = res.data;
       final items = _parseItems(data);
       setState(() {
@@ -84,6 +92,33 @@ class _SleepPageState extends State<SleepPage> {
       ),
       body: Column(
         children: [
+          // ── Header image ──
+          Stack(
+            children: [
+              SizedBox(
+                height: 120,
+                width: double.infinity,
+                child: Image.asset(
+                  'assets/images/sleep.jpg',
+                  fit: BoxFit.cover,
+                ),
+              ),
+              Positioned.fill(
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.black.withValues(alpha: 0.1),
+                        Colors.black.withValues(alpha: 0.5),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
           Container(
             padding: const EdgeInsets.all(16),
             color: Colors.indigo[50],
@@ -300,8 +335,11 @@ class _SleepPageState extends State<SleepPage> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('知道了'),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    context.push('/sleep-report');
+                  },
+                  child: const Text('查看睡眠报告'),
                 ),
               ),
             ],

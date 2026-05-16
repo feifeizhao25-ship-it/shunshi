@@ -1,8 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
+import '../../../core/config/app_config.dart';
 
-const _baseUrl = 'http://116.62.32.43:4000';
+final String _baseUrl = AppConfig.apiBaseUrl.replaceAll('/api/v1', '');
 
 /// Show practice completion dialog with rating
 Future<void> showPracticeFeedback(BuildContext context, {

@@ -5,6 +5,8 @@ library;
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
+import 'package:go_router/go_router.dart';
+import '../../../core/network/api_singleton.dart';
 
 class MembershipCenterPage extends StatelessWidget {
   const MembershipCenterPage({super.key});
@@ -13,6 +15,8 @@ class MembershipCenterPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
+
+      appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
       backgroundColor: isDark ? ShunShiColors.darkBackground : ShunShiColors.background,
       body: Stack(
         children: [
@@ -44,7 +48,7 @@ class MembershipCenterPage extends StatelessWidget {
                           color: ShunShiColors.primary,
                         )),
                         GestureDetector(
-                          onTap: () {},
+                          onTap: () => context.push('/help'),
                           child: Container(
                             width: 40, height: 40,
                             decoration: BoxDecoration(
@@ -275,7 +279,9 @@ class MembershipCenterPage extends StatelessWidget {
       children: [
         // Annual plan (featured)
         GestureDetector(
-          onTap: () {},
+          onTap: () {
+            // Select annual plan — payment flow
+          },
           child: Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
@@ -355,7 +361,9 @@ class MembershipCenterPage extends StatelessWidget {
           children: [
             Expanded(
               child: GestureDetector(
-                onTap: () {},
+                onTap: () {
+                  // Select monthly plan
+                },
                 child: Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
@@ -393,7 +401,9 @@ class MembershipCenterPage extends StatelessWidget {
             SizedBox(width: 12),
             Expanded(
               child: GestureDetector(
-                onTap: () {},
+                onTap: () {
+                  // Select family plan
+                },
                 child: Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
