@@ -118,7 +118,7 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
     state = state.copyWith(isRestoring: true);
     try {
       await _dio.post(
-        '/api/v1/orders/restore',
+        '/api/v1/subscription/restore',
         queryParameters: {'user_id': _userId},
       );
       await refresh();
@@ -136,7 +136,7 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
     state = state.copyWith(isRestoring: true);
     try {
       final response = await _dio.post(
-        '/api/v1/orders/restore',
+        '/api/v1/subscription/restore',
         data: {
           'user_id': _userId,
           'receipt_data': platform == 'ios' ? receiptData : null,

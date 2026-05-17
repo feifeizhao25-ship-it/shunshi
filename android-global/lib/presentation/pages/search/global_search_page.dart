@@ -55,7 +55,7 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
     setState(() => _loading = true);
     try {
       final resp = await ApiClient().get(
-        '/api/v1/knowledge/search',
+        '/api/v1/contents/search',
         queryParameters: {
           'q': query,
           if (_selectedType != null) 'content_type': _selectedType,

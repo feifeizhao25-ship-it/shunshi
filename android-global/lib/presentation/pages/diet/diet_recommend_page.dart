@@ -47,7 +47,7 @@ class _DietRecommendPageState extends State<DietRecommendPage> {
       final params = <String, dynamic>{'q': query, 'top_k': 20};
       if (_activeFilter != 'all') params['content_type'] = _activeFilter;
       final resp = await ApiClient().get(
-        '/api/v1/knowledge/search',
+        '/api/v1/contents/search',
         queryParameters: params,
       );
       final data = resp.data;

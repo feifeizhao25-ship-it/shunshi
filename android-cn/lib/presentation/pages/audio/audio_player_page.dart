@@ -114,7 +114,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
 
   Future<void> _loadAudioFromId() async {
     try {
-      final response = await _dio.get('/api/v1/seasons/audio/${widget.audioId}');
+      final response = await _dio.get('/api/v1/audio/${widget.audioId}');
       if (response.statusCode == 200 && mounted) {
         final data = response.data as Map<String, dynamic>;
         final audioUrl = data['audio_url'] as String?;
@@ -154,7 +154,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
   Future<void> _onCompleted() async {
     try {
       await _dio.post(
-        '/api/v1/seasons/audio/progress',
+        '/api/v1/audio/progress',
         data: {
           'audio_id': widget.audioId ?? '',
           'user_id': StorageManager.user.getUserId() ?? 'anonymous',
@@ -168,7 +168,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
   Future<void> _reportProgress() async {
     try {
       await _dio.post(
-        '/api/v1/seasons/audio/progress',
+        '/api/v1/audio/progress',
         data: {
           'audio_id': widget.audioId ?? '',
           'user_id': StorageManager.user.getUserId() ?? 'anonymous',
