@@ -55,7 +55,7 @@ class _WellnessLibraryPageState extends State<WellnessLibraryPage> {
 
   Future<void> _fetchContents() async {
     try {
-      final res = await _dio.get('/api/v1/intl/contents/recommend', queryParameters: {'limit': 20});
+      final res = await _dio.get('/api/v1/contents/recommend', queryParameters: {'limit': 20});
       if (!mounted) return;
       final data = res.data;
       if (data is Map && data['data'] is List) {

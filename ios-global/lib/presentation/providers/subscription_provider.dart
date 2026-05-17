@@ -44,11 +44,11 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
   }
 
   /// Fetch subscription status from SEASONS backend
-  /// GET /api/v1/seasons/subscription/status?user_id=X
+  /// GET /api/v1/subscription/status?user_id=X
   Future<SubscriptionState> _fetchFromSeasonsApi() async {
     try {
       final response = await _dio.get(
-        '/api/v1/seasons/subscription/status',
+        '/api/v1/subscription/status',
         queryParameters: {'user_id': _userId},
       );
       final data = response.data as Map<String, dynamic>;
@@ -91,13 +91,13 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
   }
 
   /// Purchase via SEASONS checkout
-  /// POST /api/v1/seasons/subscription/checkout
+  /// POST /api/v1/subscription/create-order
   Future<void> purchase(SubscriptionTier tier) async {
     state = state.copyWith(isPurchasing: true);
     try {
       final productId = _tierToId(tier);
       await _dio.post(
-        '/api/v1/seasons/subscription/checkout',
+        '/api/v1/subscription/create-order',
         data: {'product_id': productId, 'billing': 'monthly'},
         queryParameters: {'user_id': _userId},
       );
@@ -112,12 +112,12 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
   }
 
   /// Restore purchases from App Store / Play Store
-  /// POST /api/v1/seasons/subscription/restore
+  /// POST /api/v1/subscription/restore
   Future<void> restore() async {
     state = state.copyWith(isRestoring: true);
     try {
       await _dio.post(
-        '/api/v1/seasons/subscription/restore',
+        '/api/v1/subscription/restore',
         queryParameters: {'user_id': _userId},
       );
       await refresh();
@@ -135,7 +135,7 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
     state = state.copyWith(isRestoring: true);
     try {
       final response = await _dio.post(
-        '/api/v1/seasons/subscription/restore',
+        '/api/v1/subscription/restore',
         data: {
           'user_id': _userId,
           'receipt_data': platform == 'ios' ? receiptData : null,
@@ -185,7 +185,7 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
     }
     try {
       await _dio.post(
-        '/api/v1/seasons/subscription/trial',
+        '/api/v1/subscription/status',
         data: {'product_id': productId},
         queryParameters: {'user_id': _userId},
       );

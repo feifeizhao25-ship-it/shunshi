@@ -126,7 +126,7 @@ class AudioNotifier extends StateNotifier<AudioState> {
   Future<List<AudioItem>> _loadCategory(String type) async {
     try {
       final response = await _dio.get(
-        '/api/v1/seasons/audio/list',
+        '/api/v1/audio/list',
         queryParameters: {'type': type, 'limit': 10},
       );
       return (response.data as List)
@@ -140,7 +140,7 @@ class AudioNotifier extends StateNotifier<AudioState> {
   Future<List<AudioItem>> _loadRecommended() async {
     try {
       final response = await _dio.get(
-        '/api/v1/seasons/audio/recommended',
+        '/api/v1/audio/recommended',
         queryParameters: {'time_of_day': 'evening', 'season': 'spring', 'limit': 3},
       );
       return (response.data as List)

@@ -42,8 +42,8 @@ class _SleepReportPageState extends State<SleepReportPage> {
 
     try {
       final [insightRes, entriesRes] = await Future.wait([
-        dio.get('/api/v1/sleep/insight', queryParameters: {'user_id': userId}),
-        dio.get('/api/v1/journal/list', queryParameters: {
+        dio.get('/api/v1/records/sleep/stats', queryParameters: {'user_id': userId}),
+        dio.get('/api/v1/journal/entries/$userId', queryParameters: {
           'user_id': userId,
           'limit': 7,
         }),

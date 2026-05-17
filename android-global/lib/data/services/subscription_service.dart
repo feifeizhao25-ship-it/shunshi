@@ -313,7 +313,7 @@ class SubscriptionService {
   Future<bool> restore() async {
     try {
       await _dio.post(
-        '/api/v1/orders/restore',
+        '/api/v1/subscription/restore',
         queryParameters: {'user_id': _userId},
       );
       return true;

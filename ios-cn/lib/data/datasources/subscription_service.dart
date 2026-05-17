@@ -13,7 +13,7 @@ class SubscriptionService {
   /// 获取订阅计划列表
   static Future<List<SubscriptionPlan>> getPlans() async {
     try {
-      final res = await _dio.get('/api/v1/orders/products');
+      final res = await _dio.get('/api/v1/subscription/status');
       if (res.data?['success'] == true) {
         final List data = res.data['data'];
         // 标记 recommended plan（yiyang 颐养版）
@@ -31,7 +31,7 @@ class SubscriptionService {
   static Future<UserSubscriptionStatus> getCurrentStatus() async {
     final userId = await _getUserId();
     try {
-      final res = await _dio.get('/api/v1/orders/user/$userId');
+      final res = await _dio.get('/api/v1/subscription/status$userId');
       if (res.data?['success'] == true) {
         return UserSubscriptionStatus.fromJson(res.data['data']);
       }
@@ -51,7 +51,7 @@ class SubscriptionService {
     final userId = await _getUserId();
     try {
       final res = await _dio.post(
-        '/api/v1/orders/create',
+        '/api/v1/subscription/create-order',
         data: {
           'user_id': userId,
           'plan_id': planId,
@@ -88,7 +88,7 @@ class SubscriptionService {
   static Future<bool> restorePurchases() async {
     final userId = await _getUserId();
     try {
-      final res = await _dio.post('/api/v1/orders/restore', data: {'user_id': userId});
+      final res = await _dio.post('/api/v1/subscription/restore', data: {'user_id': userId});
       return res.data?['success'] == true;
     } catch (e) {
       return false;

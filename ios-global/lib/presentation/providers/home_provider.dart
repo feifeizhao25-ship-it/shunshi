@@ -113,7 +113,7 @@ class HomeNotifier extends StateNotifier<HomeState> {
 
     try {
       final response = await _dio.get(
-        '/api/v1/seasons/home/dashboard',
+        '/api/v1/contents/recommend',
         queryParameters: {
           'user_id': userId,
           'hemisphere': hemisphere,

@@ -122,7 +122,7 @@ class ApiService {
     String? notes,
   }) async {
     await _dio.post(
-      '/api/v1/seasons/reflection/submit',
+      '/api/v1/user/daily-checkin',
       data: {
         'user_id': userId,
         'mood': mood,
@@ -135,7 +135,7 @@ class ApiService {
   
   Future<List<ReflectionResponse>> getReflections(String userId) async {
     final response = await _dio.get(
-      '/api/v1/seasons/reflection/list',
+      '/api/v1/journal/entries/user-001',
       queryParameters: {'user_id': userId},
     );
     return (response.data as List)
@@ -149,7 +149,7 @@ class ApiService {
     required DateTime weekEnd,
   }) async {
     final response = await _dio.post(
-      '/api/v1/seasons/reflection/weekly',
+      '/api/v1/journal/insights/user-001',
       data: {
         'user_id': userId,
         'week_start': weekStart.toIso8601String(),
@@ -170,7 +170,7 @@ class ApiService {
     int limit = 20,
   }) async {
     final response = await _dio.get(
-      '/api/v1/seasons/content/list',
+      '/api/v1/contents',
       queryParameters: {
         if (type != null) 'type': type,
         if (season != null) 'season': season,
@@ -184,7 +184,7 @@ class ApiService {
   }
   
   Future<ContentResponse> getContentDetail(String contentId) async {
-    final response = await _dio.get('/api/v1/seasons/content/$contentId');
+    final response = await _dio.get('/api/v1/contents');
     return ContentResponse.fromJson(response.data);
   }
   
@@ -194,14 +194,14 @@ class ApiService {
   
   Future<SeasonResponse> getCurrentSeason(String userId) async {
     final response = await _dio.get(
-      '/api/v1/seasons/season/current',
+      '/api/v1/solar-terms/current',
       queryParameters: {'user_id': userId},
     );
     return SeasonResponse.fromJson(response.data);
   }
   
   Future<List<SeasonResponse>> getSeasons() async {
-    final response = await _dio.get('/api/v1/seasons/season/list');
+    final response = await _dio.get('/api/v1/solar-terms');
     return (response.data as List)
         .map((e) => SeasonResponse.fromJson(e))
         .toList();
@@ -212,7 +212,7 @@ class ApiService {
   // ===================
   
   Future<UserResponse> getUserProfile(String userId) async {
-    final response = await _dio.get('/api/v1/seasons/user/$userId');
+    final response = await _dio.get('/api/v1/user/profile$userId');
     return UserResponse.fromJson(response.data);
   }
   
@@ -223,7 +223,7 @@ class ApiService {
     Map<String, dynamic>? preferences,
   }) async {
     await _dio.put(
-      '/api/v1/seasons/user/$userId',
+      '/api/v1/user/profile$userId',
       data: {
         if (name != null) 'name': name,
         if (avatarUrl != null) 'avatar_url': avatarUrl,

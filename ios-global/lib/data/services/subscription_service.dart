@@ -232,11 +232,11 @@ class SubscriptionService {
         ));
 
   /// Fetch subscription state from SEASONS API
-  /// GET /api/v1/seasons/subscription/status?user_id=X
+  /// GET /api/v1/subscription/status?user_id=X
   Future<SubscriptionState> fetchState() async {
     try {
       final response = await _dio.get(
-        '/api/v1/seasons/subscription/status',
+        '/api/v1/subscription/status',
         queryParameters: {'user_id': _userId},
       );
       final data = response.data as Map<String, dynamic>;
@@ -274,13 +274,13 @@ class SubscriptionService {
   }
 
   /// Start a free trial
-  /// POST /api/v1/seasons/subscription/trial
+  /// POST /api/v1/subscription/status
   Future<bool> startTrial(SubscriptionTier tier) async {
     final productId = _tierToId(tier);
     if (productId == null) return false;
     try {
       await _dio.post(
-        '/api/v1/seasons/subscription/trial',
+        '/api/v1/subscription/status',
         data: {'product_id': productId},
         queryParameters: {'user_id': _userId},
       );
@@ -291,13 +291,13 @@ class SubscriptionService {
   }
 
   /// Create checkout session
-  /// POST /api/v1/seasons/subscription/checkout
+  /// POST /api/v1/subscription/create-order
   Future<bool> purchase(SubscriptionTier tier) async {
     final productId = _tierToId(tier);
     if (productId == null) return false;
     try {
       await _dio.post(
-        '/api/v1/seasons/subscription/checkout',
+        '/api/v1/subscription/create-order',
         data: {'product_id': productId, 'billing': 'monthly'},
         queryParameters: {'user_id': _userId},
       );
@@ -308,11 +308,11 @@ class SubscriptionService {
   }
 
   /// Restore purchases from app store
-  /// POST /api/v1/seasons/subscription/restore
+  /// POST /api/v1/subscription/restore
   Future<bool> restore() async {
     try {
       await _dio.post(
-        '/api/v1/seasons/subscription/restore',
+        '/api/v1/subscription/restore',
         queryParameters: {'user_id': _userId},
       );
       return true;

@@ -279,7 +279,7 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
 
     try {
       final results = await Future.wait([
-        _dio.get('/api/v1/seasons/home/dashboard?locale=en-US'),
+        _dio.get('/api/v1/contents/recommend?locale=en-US'),
         _dio.get('/api/v1/solar-terms/enhanced/current'),
         _dio.get('/api/v1/followup/due', queryParameters: {'user_id': StorageManager.user.getUserId() ?? 'guest', 'limit': 1}),
       ]);

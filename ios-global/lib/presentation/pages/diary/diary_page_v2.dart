@@ -56,7 +56,7 @@ class _DiaryPageV2State extends State<DiaryPageV2> {
 
   Future<void> _fetchEntries() async {
     try {
-      final res = await _dio.get('/api/v1/journal/list', queryParameters: {'user_id': _userId ?? 'guest', 'limit': 7});
+      final res = await _dio.get('/api/v1/journal/entries/$userId', queryParameters: {'user_id': _userId ?? 'guest', 'limit': 7});
       if (res.data is Map && res.data['entries'] is List) {
         _recentEntries = (res.data['entries'] as List).cast<Map<String, dynamic>>();
       }
