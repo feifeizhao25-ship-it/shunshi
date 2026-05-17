@@ -29,7 +29,7 @@ class _MeditationFocusPageState extends State<MeditationFocusPage>
   int _selectedAtmosphere = 0;
 
   static const _atmospheres = [
-    _Atmosphere('Soft Rain', Icons.water_drop),
+    _Atmosphere('细雨', Icons.water_drop),
     _Atmosphere('Morning Forest', Icons.forest),
     _Atmosphere('Sanctuary', Icons.spa),
     _Atmosphere('节气', Icons.wb_sunny),

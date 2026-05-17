@@ -101,14 +101,14 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
               color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.serifFamily,
             )),
             const SizedBox(height: 4),
-            Text('Take a quiet moment to listen to your internal landscape.', style: TextStyle(
+            Text('静心片刻，倾听内在的声音。', style: TextStyle(
               fontSize: 13, color: ShunShiColors.textSecondary,
               fontFamily: ShunShiTypography.sansFamily,
             )),
             const SizedBox(height: 20),
 
             // ── Energy Level ──
-            Text('Energy Level', style: TextStyle(
+            Text('精力水平', style: TextStyle(
               fontSize: 14, fontWeight: FontWeight.w600,
               color: ShunShiColors.textSecondary, fontFamily: ShunShiTypography.sansFamily,
             )),
@@ -117,7 +117,7 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
             const SizedBox(height: 24),
 
             // ── Current Mood ──
-            Text('Current Mood', style: TextStyle(
+            Text('当前心情', style: TextStyle(
               fontSize: 14, fontWeight: FontWeight.w600,
               color: ShunShiColors.textSecondary, fontFamily: ShunShiTypography.sansFamily,
             )),
@@ -135,7 +135,7 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
               child: ElevatedButton(
                 onPressed: _energyIndex >= 0 && _moodIndex >= 0 ? () {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Check-in saved'), duration: Duration(seconds: 2)),
+                    const SnackBar(content: Text('打卡已保存'), duration: Duration(seconds: 2)),
                   );
                   Navigator.pop(context);
                 } : null,
@@ -146,7 +146,7 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
                   elevation: 0,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
-                child: Text('Complete Check-in', style: TextStyle(
+                child: Text('完成打卡', style: TextStyle(
                   fontSize: 16, fontWeight: FontWeight.w600, fontFamily: ShunShiTypography.sansFamily,
                 )),
               ),

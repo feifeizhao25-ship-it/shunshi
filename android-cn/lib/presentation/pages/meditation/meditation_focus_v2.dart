@@ -21,7 +21,7 @@ class _MeditationFocusV2State extends State<MeditationFocusV2>
   int _elapsedSeconds = 0;
   int _totalSeconds = 600; // 10 min default
   bool _isPlaying = false;
-  String _atmosphere = 'Soft Rain';
+  String _atmosphere = '细雨';
   int _selectedScene = 0;
 
   static const _scenes = [
@@ -31,7 +31,7 @@ class _MeditationFocusV2State extends State<MeditationFocusV2>
   ];
 
   static const _atmospheres = [
-    ('Soft Rain', Icons.water_drop),
+    ('细雨', Icons.water_drop),
     ('Morning Forest', Icons.forest),
     ('Sanctuary', Icons.spa),
     ('节气', Icons.wb_sunny),

@@ -106,7 +106,7 @@ class _GrowthMilestonesV2State extends State<GrowthMilestonesV2> {
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('Current Season', style: TextStyle(fontSize: 12, color: Colors.white54, fontWeight: FontWeight.w500)),
+                Text('当前季节', style: TextStyle(fontSize: 12, color: Colors.white54, fontWeight: FontWeight.w500)),
                 const SizedBox(height: 4),
                 Text('春分调养', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
                 const SizedBox(height: 8),

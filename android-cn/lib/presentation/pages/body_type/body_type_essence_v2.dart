@@ -39,7 +39,7 @@ class BodyTypeEssenceV2 extends StatelessWidget {
                 fontSize: 24, fontWeight: FontWeight.bold, color: ShunShiColors.textPrimary,
               )),
               const SizedBox(height: 8),
-              Text('Your constitution mirrors the transition between Spring and Autumn. You possess a resilient core with a fluid adaptability to external shifts.',
+              Text('您的体质如同春秋之交，内核坚韧，同时具备灵活适应外部变化的能力。',
                 style: TextStyle(fontSize: 13, color: ShunShiColors.textTertiary, height: 1.5)),
             ]),
           )),

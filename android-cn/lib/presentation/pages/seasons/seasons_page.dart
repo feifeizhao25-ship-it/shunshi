@@ -357,7 +357,7 @@ class _OtherSeasons extends StatelessWidget {
         children: [
           const SizedBox(height: 40),
           Text(
-            'Other Seasons',
+            '其他节气',
             style: SeasonsTextStyles.heading.copyWith(
               color: SeasonsColors.textSecondary,
             ),

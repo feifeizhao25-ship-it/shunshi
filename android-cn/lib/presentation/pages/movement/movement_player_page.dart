@@ -92,7 +92,7 @@ class _MovementPlayerPageState extends State<MovementPlayerPage> {
               fontSize: 14, color: ShunShiColors.primary,
               fontFamily: ShunShiTypography.sansFamily, fontWeight: FontWeight.w500,
             )),
-            Text('Gentle Flow Ritual', style: TextStyle(
+            Text('柔缓养生功', style: TextStyle(
               fontSize: 24, fontWeight: FontWeight.w700,
               color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.serifFamily,
             )),
@@ -112,7 +112,7 @@ class _MovementPlayerPageState extends State<MovementPlayerPage> {
                 children: [
                   Icon(Icons.spatial_audio_off, size: 16, color: ShunShiColors.primary),
                   const SizedBox(width: 4),
-                  Text('Spatial Audio Active', style: TextStyle(
+                  Text('空间音频已开启', style: TextStyle(
                     fontSize: 12, color: ShunShiColors.primary,
                     fontFamily: ShunShiTypography.sansFamily,
                   )),

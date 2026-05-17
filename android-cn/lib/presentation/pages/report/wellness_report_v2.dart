@@ -75,7 +75,7 @@ class WellnessReportV2 extends StatelessWidget {
                   Text('节气重点', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white)),
                 ]),
                 const SizedBox(height: 8),
-                Text('Spring is asking you to lighten. Your report shows strong mental clarity paired with room to expand physical movement. Consider adding 10 minutes of morning stretching.',
+                Text('春季宜轻身。您的报告显示心智清晰，建议增加10分钟晨间拉伸，提升身体活力。',
                   style: TextStyle(fontSize: 13, color: Colors.white70, height: 1.5)),
               ]),
             ),

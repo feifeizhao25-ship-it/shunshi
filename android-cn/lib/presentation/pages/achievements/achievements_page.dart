@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/config/app_config.dart';
 
-/// Achievements页
+/// 成就页
 ///
 /// 参考: _6/code.html — Achievements + 进度统计 + 徽章收集
 class AchievementsPage extends StatefulWidget {
@@ -54,12 +54,12 @@ class _AchievementsPageState extends State<AchievementsPage> {
 
   // Fallback badges
   static const _fallbackBadges = [
-    {'icon': '🌅', 'name': 'Early Riser', 'unlocked': true},
-    {'icon': '🧘', 'name': 'Practice Starter', 'unlocked': true},
-    {'icon': '🍵', 'name': 'Food Therapy Expert', 'unlocked': true},
-    {'icon': '🏔️', 'name': '100-Day Commitment', 'unlocked': false},
-    {'icon': '🌿', 'name': 'Solar Term Master', 'unlocked': false},
-    {'icon': '⭐', 'name': 'Community Star', 'unlocked': false},
+    {'icon': '🌅', 'name': '早起达人', 'unlocked': true},
+    {'icon': '🧘', 'name': '修炼入门', 'unlocked': true},
+    {'icon': '🍵', 'name': '食疗专家', 'unlocked': true},
+    {'icon': '🏔️', 'name': '百日坚持', 'unlocked': false},
+    {'icon': '🌿', 'name': '节气大师', 'unlocked': false},
+    {'icon': '⭐', 'name': '社区之星', 'unlocked': false},
   ];
 
   List<Map<String, dynamic>> get _displayBadges => _badges.isNotEmpty ? _badges : _fallbackBadges;
@@ -89,7 +89,7 @@ class _AchievementsPageState extends State<AchievementsPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'ACHIEVEMENTS',
+                              '成就',
                               style: TextStyle(
                                 fontFamily: ShunShiTypography.sansFamily,
                                 fontSize: 13,
@@ -99,7 +99,7 @@ class _AchievementsPageState extends State<AchievementsPage> {
                             ),
                             const SizedBox(height: 4),
                             const Text(
-                              'Achievements',
+                              '养生成就',
                               style: TextStyle(
                                 fontFamily: ShunShiTypography.serifFamily,
                                 fontSize: 36,
@@ -124,7 +124,7 @@ class _AchievementsPageState extends State<AchievementsPage> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Track every step of your wellness journey',
+                      '记录您养生旅程的每一步',
                       style: TextStyle(
                         fontFamily: ShunShiTypography.sansFamily,
                         fontSize: 14,
@@ -143,11 +143,11 @@ class _AchievementsPageState extends State<AchievementsPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Row(
                   children: [
-                    _StatCard('Streak', '$_streak', ' days', Icons.local_fire_department),
+                    _StatCard('连续打卡', '$_streak', ' 天', Icons.local_fire_department),
                     const SizedBox(width: 12),
-                    _StatCard('Level', '$_level', '', Icons.military_tech),
+                    _StatCard('等级', '$_level', '', Icons.military_tech),
                     const SizedBox(width: 12),
-                    _StatCard('Points', '$_points', '', Icons.stars),
+                    _StatCard('积分', '$_points', '', Icons.stars),
                   ],
                 ),
               ),
@@ -161,7 +161,7 @@ class _AchievementsPageState extends State<AchievementsPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'Current Progress',
+                      '当前进度',
                       style: TextStyle(
                         fontFamily: ShunShiTypography.serifFamily,
                         fontSize: 20,
@@ -171,21 +171,21 @@ class _AchievementsPageState extends State<AchievementsPage> {
                     ),
                     const SizedBox(height: 16),
                     _ProgressCard(
-                      title: '100-Day Wellness Challenge',
+                      title: '百日养生挑战',
                       current: 42,
                       total: 100,
                       icon: Icons.emoji_events,
                     ),
                     const SizedBox(height: 12),
                     _ProgressCard(
-                      title: 'Complete Movement Set',
+                      title: '功法全集',
                       current: 3,
                       total: 8,
                       icon: Icons.self_improvement,
                     ),
                     const SizedBox(height: 12),
                     _ProgressCard(
-                      title: '24 Solar Terms Wellness',
+                      title: '二十四节气养生',
                       current: 6,
                       total: 24,
                       icon: Icons.filter_vintage,
@@ -203,7 +203,7 @@ class _AchievementsPageState extends State<AchievementsPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'Badges Earned',
+                      '已获徽章',
                       style: TextStyle(
                         fontFamily: ShunShiTypography.serifFamily,
                         fontSize: 20,

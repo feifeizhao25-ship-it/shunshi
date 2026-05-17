@@ -15,12 +15,12 @@ class GrowthMilestonesPage extends StatelessWidget {
   const GrowthMilestonesPage({super.key});
 
   static const _milestones = [
-    _Milestone('🌅', 'Early Riser', 'Wake before 6 AM for 7 days', true, 120, Color(0xFFF59E0B)),
+    _Milestone('🌅', '早起达人', '连续7天6点前起床', true, 120, Color(0xFFF59E0B)),
     _Milestone('🌿', '节气探索者', '完成你的第一个节气仪式', true, 200, Color(0xFF22C55E)),
     _Milestone('🧘', 'Still Mind', 'Meditate for 30 consecutive days', true, 350, Color(0xFF8B5CF6)),
     _Milestone('🍵', 'Tea Ceremony', 'Brew 10 different seasonal teas', true, 180, Color(0xFF06B6D4)),
-    _Milestone('📖', '100 Day Journey', 'Practice wellness for 100 days', false, 500, null),
-    _Milestone('🌍', 'Earth Guardian', 'Complete all seasonal challenges', false, 800, null),
+    _Milestone('📖', '百日养生', '坚持养生练习100天', false, 500, null),
+    _Milestone('🌍', '节气守护', '完成所有节气挑战', false, 800, null),
     _Milestone('🔥', 'Inner Fire', 'Master all 8 movements of Ba Duan Jin', false, 600, null),
     _Milestone('✨', 'Sovereign', 'Unlock all other milestones', false, 1000, null),
   ];
@@ -41,7 +41,7 @@ class GrowthMilestonesPage extends StatelessWidget {
           icon: const Icon(Icons.arrow_back_ios_new, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text('Growth Milestones', style: TextStyle(
+        title: Text('成长里程碑', style: TextStyle(
           fontSize: 20, fontWeight: FontWeight.w700,
           fontFamily: ShunShiTypography.serifFamily,
           color: ShunShiColors.textPrimary,
@@ -99,7 +99,7 @@ class GrowthMilestonesPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    'Level: Mindful Seeker',
+                    '等级: 养生探索者',
                     style: TextStyle(
                       fontSize: 14, fontWeight: FontWeight.w600,
                       color: ShunShiColors.textPrimary,
@@ -140,7 +140,7 @@ class GrowthMilestonesPage extends StatelessWidget {
             const SizedBox(height: 28),
 
             // ── Unlocked ──
-            Text('Unlocked', style: TextStyle(
+            Text('已解锁', style: TextStyle(
               fontSize: 16, fontWeight: FontWeight.w700,
               color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.serifFamily,
             )),
@@ -157,7 +157,7 @@ class GrowthMilestonesPage extends StatelessWidget {
             const SizedBox(height: 24),
 
             // ── Locked ──
-            Text('Journey Ahead', style: TextStyle(
+            Text('前路漫漫', style: TextStyle(
               fontSize: 16, fontWeight: FontWeight.w700,
               color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.serifFamily,
             )),

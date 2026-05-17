@@ -48,7 +48,7 @@ class GentleGuidanceV2 extends StatelessWidget {
             child: _buildGuidanceCard(
               icon: Icons.light_mode,
               iconColor: Color(0xFFFF9800),
-              title: 'Morning Ritual',
+              title: '晨间仪式',
               time: 'Just now',
               content: 'A 5-minute sun-gazing practice to align your circadian rhythm with the early spring light.',
               action: 'Begin Practice',
@@ -102,7 +102,7 @@ class GentleGuidanceV2 extends StatelessWidget {
             child: _buildGuidanceCard(
               icon: Icons.self_improvement,
               iconColor: Color(0xFF533afd),
-              title: 'Flow State',
+              title: '心流状态',
               time: 'Morning',
               content: 'A gentle hip-opening sequence is recommended to release the stagnant energy of the week.',
               action: 'Cultivating Stillness',

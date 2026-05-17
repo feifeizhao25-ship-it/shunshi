@@ -73,7 +73,7 @@ class _SkillsPageState extends State<SkillsPage> {
       appBar: AppBar(
         backgroundColor: bg,
         elevation: 0,
-        title: Text('Wellness Skills', style: TextStyle(color: text, fontWeight: FontWeight.w600)),
+        title: Text('养生技能', style: TextStyle(color: text, fontWeight: FontWeight.w600)),
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: sub),
           onPressed: () => Navigator.pop(context),
@@ -109,12 +109,12 @@ class _SkillsPageState extends State<SkillsPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Choose a practice',
+            '选择一项练习',
             style: TextStyle(fontSize: 16, color: sub, fontWeight: FontWeight.w500),
           ),
           const SizedBox(height: 4),
           Text(
-            'Each skill provides evidence-based, structured guidance.',
+            '每项技能提供基于循证的结构化指导。',
             style: TextStyle(fontSize: 13, color: sub.withOpacity(0.7)),
           ),
           const SizedBox(height: 24),
@@ -200,7 +200,7 @@ class _SkillsPageState extends State<SkillsPage> {
           TextButton.icon(
             onPressed: () => setState(() => _activeResult = null),
             icon: const Icon(Icons.arrow_back, size: 18),
-            label: const Text('Back to skills'),
+            label: const Text('返回技能列表'),
             style: TextButton.styleFrom(foregroundColor: const Color(0xFF533AFD)),
           ),
           const SizedBox(height: 16),
@@ -221,7 +221,7 @@ class _SkillsPageState extends State<SkillsPage> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  confidence.toUpperCase(),
+                  confidence == 'high' ? '高' : confidence == 'low' ? '低' : '中',
                   style: TextStyle(color: confColor, fontSize: 10, fontWeight: FontWeight.w700),
                 ),
               ),
@@ -238,7 +238,7 @@ class _SkillsPageState extends State<SkillsPage> {
 
           // Actions
           if (actions.isNotEmpty) ...[
-            Text('What you could do', style: TextStyle(
+            Text('建议行动', style: TextStyle(
               fontSize: 14, fontWeight: FontWeight.w600, color: sub)),
             const SizedBox(height: 10),
             ...actions.map((a) => Container(
@@ -297,7 +297,7 @@ class _SkillsPageState extends State<SkillsPage> {
           // Steps
           if (steps.isNotEmpty) ...[
             const SizedBox(height: 20),
-            Text('How to start', style: TextStyle(
+            Text('操作步骤', style: TextStyle(
               fontSize: 14, fontWeight: FontWeight.w600, color: sub)),
             const SizedBox(height: 10),
             ...steps.asMap().entries.map((e) => Padding(
