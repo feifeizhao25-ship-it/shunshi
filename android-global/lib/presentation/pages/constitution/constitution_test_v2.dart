@@ -1,5 +1,5 @@
 /// 体质辨识测试页 V3 — 接 API
-/// GET /questions → 25题, POST /submit → 体质结果, GET /types → 9种体质详情
+/// GET /questions → 25题, POST /submit → Your Body Type, GET /types → 9种体质详情
 library;
 
 import 'package:dio/dio.dart';

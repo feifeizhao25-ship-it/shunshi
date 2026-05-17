@@ -134,7 +134,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
     } catch (_) {}
   }
 
-  // ── 对话持久化 ──
+  // ── Conversation持久化 ──
 
   Future<void> _saveConversation() async {
     final prefs = await SharedPreferences.getInstance();
@@ -170,7 +170,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
     });
   }
 
-  // ── 发送消息 ──
+  // ── SendMessages ──
 
   Future<void> _sendMessage() async {
     final text = _controller.text.trim();

@@ -84,7 +84,7 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
   }
 
   Future<void> _simulatePaymentSuccess(SubscriptionPlan plan) async {
-    // 开发模式：直接将本地订阅状态设为已购买
+    // 开发模式：直接将本地Subscription状态设为已购买
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('subscription_plan', plan.id);
     await prefs.setBool('is_subscribed', true);

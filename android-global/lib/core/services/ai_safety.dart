@@ -159,16 +159,16 @@ class AISafetyService {
   static String _getCrisisResponseCn(RiskLevel level) {
     switch (level) {
       case RiskLevel.crisis:
-        return '⚠️ 您提到的内容让我们非常担心您的安全。请您Now联系专业帮助：\n\n'
-            '• 24hour心理援助热线：400-161-9995\n'
-            '• 北京心理危机研究与干预中心：010-82951332\n'
-            '• 急救电话：120\n\n'
-            '您的生命安全和身心健康是最重要的。SEASONSAI不能替代Professional Care诊断，请务必寻求专业人士的帮助。';
+        return '⚠️ We are very concerned about what you mentioned. Please reach out for help now：\n\n'
+            '• 24hr Crisis Hotline: 988 (Suicide & Crisis Lifeline)\n'
+            '• Crisis Text Line: Text HOME to 741741\n'
+            '• Emergency: 911\n\n'
+            'Your safety and well-being matter most. SEASONS AI is not a substitute for professional care. Please seek help.';
       case RiskLevel.high:
-        return '⚠️ 您提到的健康问题需要Professional Care关注。建议您尽快咨询专业医师，进行详细检查。\n\n'
-            'SEASONSAI提供的Wellness Tips仅供参考，不能替代医生诊断。如有不适，请及时就医。';
+        return '⚠️ The health concern you mentioned requires professional care. Please consult a doctor for a thorough examination.\n\n'
+            'SEASONS AI Wellness Tips are for reference only and cannot replace medical diagnosis. If you feel unwell, please see a doctor.';
       case RiskLevel.medium:
-        return '📌 温馨提示：以下建议基于中医Wellness理论，仅供参考。如有持续不适，请咨询专业医师。';
+        return '📌 温馨提示：The following suggestions are based on traditional wellness theory and are for reference only. If symptoms persist, consult a doctor.';
       case RiskLevel.low:
         return '';
     }

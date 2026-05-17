@@ -1,5 +1,5 @@
 /// 节气AI详情页 — 对齐UI参考 _10
-/// 固定顶栏(返回+ShunShi AI+分享) → Hero水墨画 → 节气内涵卡片 → Bento Grid(饮食/起居/功法) → 冥想音频卡 → 浮动分享
+/// 固定顶栏(返回+ShunShi AI+分享) → Hero水墨画 → Solar Term Essence卡片 → Bento Grid(饮食/起居/功法) → Meditation Audio卡 → 浮动分享
 library;
 
 import 'package:flutter/material.dart';
@@ -95,11 +95,11 @@ class SolarTermAIDetailPage extends StatelessWidget {
               children: [
                 // ── Hero Section ──
                 _buildHeroSection(context, d),
-                // ── 节气内涵 ──
+                // ── Solar Term Essence ──
                 _buildInsightSection(context, d),
                 // ── 顺时生活方案 Bento Grid ──
                 _buildBentoSection(context, d),
-                // ── 冥想音频卡 ──
+                // ── Meditation Audio卡 ──
                 _buildMeditationCard(context, d),
                 SizedBox(height: 120),
               ],

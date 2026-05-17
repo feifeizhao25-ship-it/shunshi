@@ -190,7 +190,7 @@ class _SolarTermDetailPageState extends State<SolarTermDetailPage> {
             ),
             const SizedBox(height: 24),
 
-            // 节气内涵
+            // Solar Term Essence
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(20),

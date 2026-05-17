@@ -1,5 +1,5 @@
-/// 会员订阅中心 — 对齐UI参考 _11
-/// TopBar(返回+会员中心+帮助) → Hero会员卡 → 订阅方案(年度/月度/家庭) → 会员权益(5项) → FAQ → 浮动底部CTA
+/// 会员Subscription中心 — 对齐UI参考 _11
+/// TopBar(返回+Membership+帮助) → Hero会员卡 → Subscription方案(年度/月度/家庭) → 会员权益(5项) → FAQ → 浮动底部CTA
 library;
 
 import 'package:flutter/material.dart';

@@ -11,7 +11,7 @@ import '../../../core/theme/app_localizations.dart';
 import '../../../core/network/api_singleton.dart';
 import '../../../core/config/app_config.dart';
 
-/// 睡眠报告页 — 7天柱状图 + AI趋势分析 + 建议
+/// Sleep Report页 — 7天柱状图 + AI趋势分析 + 建议
 class SleepReportPage extends StatefulWidget {
   const SleepReportPage({super.key});
 

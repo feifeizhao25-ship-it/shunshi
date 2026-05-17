@@ -1,6 +1,6 @@
-/// 节气详情页 — API 驱动
+/// Solar Term Details页 — API 驱动
 /// 数据: /api/v1/solar-terms/enhanced/current + /enhanced/{name}
-/// 展示节气内涵、饮食/起居/功法/冥想建议
+/// 展示Solar Term Essence、饮食/起居/功法/冥想建议
 library;
 
 import 'package:dio/dio.dart';

@@ -64,7 +64,7 @@ String _seasonDisplayName(String season) {
   return season[0].toUpperCase() + season.substring(1);
 }
 
-// ── 当前季节辅助 ──────────────────────────────────────
+// ── Current Season辅助 ──────────────────────────────────────
 
 String _getCurrentSeason() {
   final month = DateTime.now().month;

@@ -1,4 +1,4 @@
-/// 体质测试结果页 — 对齐UI参考 _9
+/// Body Type Quiz结果页 — 对齐UI参考 _9
 /// TopBar(头像+ShunShi AI+通知) → 标题+标签 → Constitution Strength(进度条) → AI调养总评(毛玻璃) → Personalized Care Plan → 底部CTA
 library;
 
