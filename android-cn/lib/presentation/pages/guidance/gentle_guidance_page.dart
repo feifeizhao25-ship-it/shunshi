@@ -162,7 +162,7 @@ class GentleGuidancePage extends StatelessWidget {
           if (cta != null) ...[
             const SizedBox(height: 12),
             GestureDetector(
-              onTap: () {},
+              onTap: () { Navigator.of(context).pop(); },
               child: Text(cta, style: TextStyle(
                 fontSize: 14, fontWeight: FontWeight.w600,
                 color: ShunShiColors.primary, fontFamily: ShunShiTypography.sansFamily,

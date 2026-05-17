@@ -3,6 +3,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
 
 class ConstitutionResultPage extends StatelessWidget {
@@ -51,7 +52,7 @@ class ConstitutionResultPage extends StatelessWidget {
                     )),
                     const Spacer(),
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () => context.push('/notifications'),
                       child: const Icon(Icons.notifications_outlined, size: 22, color: ShunShiColors.primary),
                     ),
                   ],
@@ -103,7 +104,7 @@ class ConstitutionResultPage extends StatelessWidget {
                   const SizedBox(height: 48),
 
                   // ── 专属调养方案 ──
-                  _buildSolutions(),
+                  _buildSolutions(context),
                   const SizedBox(height: 40),
 
                   // ── 底部 CTA ──
@@ -277,7 +278,7 @@ class ConstitutionResultPage extends StatelessWidget {
     );
   }
 
-  Widget _buildSolutions() {
+  Widget _buildSolutions(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -342,7 +343,7 @@ class ConstitutionResultPage extends StatelessWidget {
                       )),
                       const SizedBox(height: 12),
                       GestureDetector(
-                        onTap: () {},
+                        onTap: () => context.push('/food/cooking'),
                         child: Row(
                           children: const [
                             Text('开始烹饪', style: TextStyle(

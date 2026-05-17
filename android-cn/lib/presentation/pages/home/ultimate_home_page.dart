@@ -640,7 +640,7 @@ class _UltimateHomePageState extends State<UltimateHomePage>
         children: [
           Row(children: [
             GestureDetector(
-              onTap: () {},
+              onTap: () { ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('菜单功能开发中'), duration: Duration(seconds: 1))); },
               child: Container(
                 width: 40, height: 40,
                 decoration: BoxDecoration(

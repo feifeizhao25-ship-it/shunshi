@@ -63,11 +63,11 @@ class AboutPage extends StatelessWidget {
           // Links
           Container(decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(16)),
             child: Column(children: [
-              _linkTile('用户协议', Icons.description_outlined),
+              _linkTile(context, '用户协议', Icons.description_outlined),
               const Divider(height: 1, indent: 16, endIndent: 16),
-              _linkTile('隐私政策', Icons.privacy_tip_outlined),
+              _linkTile(context, '隐私政策', Icons.privacy_tip_outlined),
               const Divider(height: 1, indent: 16, endIndent: 16),
-              _linkTile('开源许可', Icons.code),
+              _linkTile(context, '开源许可', Icons.code),
             ]),
           ),
           const SizedBox(height: 24),
@@ -92,12 +92,16 @@ class AboutPage extends StatelessWidget {
     ]);
   }
 
-  Widget _linkTile(String title, IconData icon) {
+  Widget _linkTile(BuildContext context, String title, IconData icon) {
     return ListTile(
       leading: Icon(icon, color: ShunShiColors.textSecondary, size: 20),
       title: Text(title, style: TextStyle(fontSize: 14, color: ShunShiColors.textPrimary)),
       trailing: const Icon(Icons.chevron_right, color: ShunShiColors.textTertiary, size: 18),
-      onTap: () {},
+      onTap: () {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('$title · 功能开发中'), duration: const Duration(seconds: 1)),
+        );
+      },
     );
   }
 }

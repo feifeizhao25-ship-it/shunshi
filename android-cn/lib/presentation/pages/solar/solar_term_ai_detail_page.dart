@@ -98,7 +98,7 @@ class SolarTermAIDetailPage extends StatelessWidget {
                 // ── 顺时生活方案 Bento Grid ──
                 _buildBentoSection(d),
                 // ── 冥想音频卡 ──
-                _buildMeditationCard(d),
+                _buildMeditationCard(context, d),
                 const SizedBox(height: 120),
               ],
             ),
@@ -113,7 +113,7 @@ class SolarTermAIDetailPage extends StatelessWidget {
             left: 0, right: 0,
             child: Center(
               child: GestureDetector(
-                onTap: () {},
+                onTap: () { ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('分享功能开发中'), duration: Duration(seconds: 1))); },
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
                   decoration: BoxDecoration(
@@ -176,7 +176,7 @@ class SolarTermAIDetailPage extends StatelessWidget {
                   color: ShunShiColors.primary,
                 )),
                 GestureDetector(
-                  onTap: () {},
+                  onTap: () { ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('分享功能开发中'), duration: Duration(seconds: 1))); },
                   child: Container(
                     width: 40, height: 40,
                     decoration: BoxDecoration(
@@ -475,7 +475,7 @@ class SolarTermAIDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildMeditationCard(_TermData d) {
+  Widget _buildMeditationCard(BuildContext context, _TermData d) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 36, 24, 0),
       child: Container(
@@ -522,7 +522,7 @@ class SolarTermAIDetailPage extends StatelessWidget {
               children: [
                 // Play button
                 GestureDetector(
-                  onTap: () {},
+                  onTap: () { ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('音频播放功能开发中'), duration: Duration(seconds: 1))); },
                   child: Container(
                     width: 52, height: 52,
                     decoration: BoxDecoration(

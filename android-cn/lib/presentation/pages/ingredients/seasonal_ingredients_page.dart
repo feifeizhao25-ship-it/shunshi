@@ -143,7 +143,7 @@ class _SeasonalIngredientsPageState extends State<SeasonalIngredientsPage> {
             )).toList()),
             const SizedBox(height: 10),
             GestureDetector(
-              onTap: () {},
+              onTap: () { ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('食材详情开发中'), duration: Duration(seconds: 1))); },
               child: Row(children: [
                 Text('View Rituals', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: ShunShiColors.primary, fontFamily: ShunShiTypography.sansFamily)),
                 const SizedBox(width: 4),

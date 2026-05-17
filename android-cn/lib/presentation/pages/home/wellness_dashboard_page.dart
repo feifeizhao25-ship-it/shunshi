@@ -2,6 +2,7 @@
 /// TopBar(昵称+时辰+通知) → 节气Hero → 时令仪式横滑 → 今日进度 → 为您推荐 + 今日阅读 → 疗愈之声 + 每日名言
 library;
 
+import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
 
@@ -54,7 +55,7 @@ class WellnessDashboardPage extends StatelessWidget {
                     ),
                     // Notification bell
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () { context.go('/notifications'); },
                       child: Container(
                         width: 40, height: 40,
                         decoration: BoxDecoration(
@@ -146,7 +147,7 @@ class WellnessDashboardPage extends StatelessWidget {
                     letterSpacing: -0.5, fontFamily: ShunShiTypography.serifFamily,
                   )),
                   GestureDetector(
-                    onTap: () {},
+                    onTap: () { ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('详情页开发中'), duration: Duration(seconds: 1))); },
                     child: const Text('查看全部', style: TextStyle(
                       fontSize: 13, fontWeight: FontWeight.w500, color: ShunShiColors.secondary,
                     )),
@@ -263,7 +264,7 @@ class WellnessDashboardPage extends StatelessWidget {
                         )),
                         const SizedBox(height: 12),
                         GestureDetector(
-                          onTap: () {},
+                          onTap: () { ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('详情页开发中'), duration: Duration(seconds: 1))); },
                           child: Container(
                             decoration: BoxDecoration(
                               color: ShunShiColors.surfaceContainerLowest,

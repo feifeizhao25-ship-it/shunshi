@@ -3,6 +3,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
 
 class WellnessDiaryPage extends StatefulWidget {
@@ -74,7 +75,7 @@ class _WellnessDiaryPageState extends State<WellnessDiaryPage>
                       )),
                     ),
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () { context.go('/notifications'); },
                       child: const Icon(Icons.notifications_outlined, size: 22, color: ShunShiColors.primary),
                     ),
                   ],

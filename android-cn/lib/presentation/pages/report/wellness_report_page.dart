@@ -147,7 +147,7 @@ class WellnessReportPage extends StatelessWidget {
                               ),
                               const SizedBox(height: 10),
                               GestureDetector(
-                                onTap: () {},
+                                onTap: () { ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('报告详情开发中'), duration: Duration(seconds: 1))); },
                                 child: Row(children: [
                                   Text('了解更多', style: TextStyle(
                                     fontSize: 13, fontWeight: FontWeight.w600,

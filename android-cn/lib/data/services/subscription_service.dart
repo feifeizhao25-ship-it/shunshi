@@ -221,7 +221,7 @@ class SubscriptionService {
   final String _userId;
 
   SubscriptionService({
-    String baseUrl = "http://116.62.32.43",
+    String baseUrl = AppConfig.apiBaseUrl,
     required String userId,
   })  : _baseUrl = baseUrl,
         _userId = userId,
