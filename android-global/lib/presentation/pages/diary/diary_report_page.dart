@@ -27,7 +27,7 @@ class _DiaryReportPageState extends State<DiaryReportPage> {
   Future<void> _loadTrends() async {
     try {
       final dio = Dio();
-      final res = await dio.get('/api/v1/journal/trends');
+      final res = await dio.get('/api/v1/journal/insights/guest');
       if (res.data is List) {
         setState(() {
           _trends = List<Map<String, dynamic>>.from(res.data);

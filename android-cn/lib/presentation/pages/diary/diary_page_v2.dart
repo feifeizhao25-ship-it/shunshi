@@ -50,13 +50,13 @@ class _DiaryPageV2State extends State<DiaryPageV2> {
 
   Future<void> _fetchEntries() async {
     try {
-      final res = await _dio.get('/api/v1/journal/list', queryParameters: {'user_id': 'user-001', 'limit': 7});
+      final res = await _dio.get('/api/v1/journal/entries/user-001', queryParameters: {'limit': 7});
       if (res.data is Map && res.data['entries'] is List) {
         _recentEntries = (res.data['entries'] as List).cast<Map<String, dynamic>>();
       }
       // Try trends for AI insight
       try {
-        final trends = await _dio.get('/api/v1/journal/trends', queryParameters: {'user_id': 'user-001'});
+        final trends = await _dio.get('/api/v1/journal/insights/user-001');
         if (trends.data is Map && trends.data['insight'] != null) {
           _aiInsight = trends.data['insight'].toString();
         }
