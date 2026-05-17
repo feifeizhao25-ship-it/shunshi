@@ -13,7 +13,7 @@ class FeedbackService {
     List<String>? screenshots,
   }) async {
     try {
-      final res = await _dio.post('/api/v1/feedback', data: {
+      final res = await _dio.post('/api/v1/feedback/submit', data: {
         'user_id': 'guest',
         'content': content,
         'contact': contact,
@@ -29,7 +29,7 @@ class FeedbackService {
   /// Rate the App
   static Future<bool> rateApp({required int rating, String? comment}) async {
     try {
-      await _dio.post('/api/v1/feedback', data: {
+      await _dio.post('/api/v1/feedback/submit', data: {
         'user_id': 'guest',
         'content': 'Rating: $rating/5 ${comment ?? ""}',
         'type': 'rating',

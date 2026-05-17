@@ -32,7 +32,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
     if (_msgCtrl.text.trim().isEmpty) return;
     setState(() => _submitting = true);
     try {
-      await ApiClient().post('/api/v1/feedback', data: {
+      await ApiClient().post('/api/v1/feedback/submit', data: {
         'user_id': 'guest',
         'category': _category,
         'message': _msgCtrl.text.trim(),
