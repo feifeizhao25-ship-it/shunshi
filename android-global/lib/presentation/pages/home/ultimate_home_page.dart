@@ -669,7 +669,7 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  action.title,
+                  AppLocalizations.of(context).get(action.title),
                   style: ShunShiTypography.titleLarge.copyWith(
                     fontFamily: ShunShiTypography.serifFamily,
                     fontSize: 17,
