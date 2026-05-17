@@ -42,7 +42,7 @@ class _FeedbackSheetState extends State<FeedbackSheet> {
       final prefs = await SharedPreferences.getInstance();
       final userId = prefs.getString('user_id') ?? 'guest';
       await Dio().post(
-        '${AppConfig.apiBaseUrl}/api/v1/feedback',
+        '${AppConfig.apiBaseUrl}/api/v1/feedback/submit',
         data: {
           'user_id': userId,
           'type': widget.type,

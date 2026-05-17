@@ -183,7 +183,7 @@ class _HomePageState extends State<HomePage> {
     if (_reflecting) return;
     setState(() { _selectedMood = mood; _reflecting = true; });
     try {
-      await _dio.post('/api/v1/intl/reflection', data: {'mood': mood, 'energy': 3});
+      await _dio.post('/api/v1/user/daily-checkin', data: {'mood': mood, 'energy': 3});
     } catch (_) {}
     if (mounted) setState(() { _selectedMood = ''; _reflecting = false; });
   }
