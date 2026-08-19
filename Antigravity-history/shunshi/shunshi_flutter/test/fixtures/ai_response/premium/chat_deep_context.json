@@ -1,0 +1,41 @@
+{
+    "text": "从你最近的状态来看，睡眠质量有所改善，但情绪方面仍需要关注。作为气郁质的你，在春分时节特别适合通过疏肝理气来调整。\n\n我注意到你上周提到工作压力大——这时候合欢花茶、玫瑰花茶都是不错的选择，既能疏肝解郁，又温和不刺激。",
+    "tone": "gentle",
+    "care_status": "needs_attention",
+    "follow_up": {
+        "in_days": 3,
+        "intent": "mood_check",
+        "topic": "跟进情绪调理进展"
+    },
+    "offline_encouraged": false,
+    "presence_level": "normal",
+    "safety_flag": "green",
+    "content_cards": [
+        {
+            "id": "recipe_001",
+            "type": "recipe",
+            "title": "合欢花茶",
+            "description": "疏肝解郁、安神助眠"
+        }
+    ],
+    "follow_up_questions": [
+        "最近睡眠怎么样？",
+        "工作压力有缓解吗？"
+    ],
+    "metadata": {
+        "model": "qwen2.5-72b-instruct",
+        "prompt_version": {
+            "core": "core_v1.2",
+            "policy": "policy_v1.0",
+            "task": "chat_v2.1"
+        },
+        "tokens": {
+            "prompt": 1200,
+            "completion": 350,
+            "total": 1550
+        },
+        "latency_ms": 2340,
+        "safety_flag": "green",
+        "user_tier": "premium"
+    }
+}

@@ -1,0 +1,49 @@
+# ── 环境变量：只允许 .env.example 入库 ──
+.env
+.env.*
+!.env.example
+!.env.sample
+!.env.template
+
+# ── 第三方服务凭证 ──
+google-services.json
+GoogleService-Info.plist
+firebase-adminsdk*.json
+*.jks
+*.keystore
+*.p8
+*.p12
+*.mobileprovision
+
+# ── Python ──
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# ── Node / 构建产物 ──
+node_modules/
+dist/
+build/
+.next/
+out/
+
+# ── Flutter ──
+.dart_tool/
+.flutter-plugins-dependencies
+
+# ── 数据库 ──
+*.db
+*.sqlite
+*.sqlite3
+
+# ── 测试产物 ──
+test_results_*.json
+
+# ── 其他 ──
+.DS_Store
+*.log
+
+# ── 2026-08-19 ──
+.fuse_hidden*

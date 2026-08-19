@@ -1,0 +1,7 @@
+# 手机端-Flutter 早就是一个独立仓库（有自己的 remote 与提交历史）。
+# 此前它以 gitlink 形式被父仓库暂存，但没有 .gitmodules —— 那样的指针
+# 无法被 `git clone --recursive` 解析，克隆下来只会得到一个空目录。
+[submodule "手机端-Flutter"]
+	path = 手机端-Flutter
+	url = https://github.com/feifeizhao25-ship-it/shunshi-app.git
+	branch = main

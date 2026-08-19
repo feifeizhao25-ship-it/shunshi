@@ -1,0 +1,28 @@
+default_platform(:ios)
+
+platform :ios do
+  desc "Push a new beta build to TestFlight"
+  lane :beta do
+    # match(type: "appstore")
+    build_app(
+      workspace: "ios/Runner.xcworkspace",
+      scheme: "Runner"
+    )
+    upload_to_testflight(
+      skip_waiting_for_build_processing: true
+    )
+  end
+end
+
+platform :android do
+  desc "Submit a new Beta Build to Crashlytics/Play Store"
+  lane :beta do
+    gradle(task: "bundle", build_type: "Release")
+    upload_to_play_store(
+      track: 'internal',
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+  end
+end

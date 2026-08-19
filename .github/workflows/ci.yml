@@ -1,0 +1,103 @@
+name: CI
+
+# 说明：本项目原有一份写得相当完整的 Flutter CI，但它位于
+#   手机端-Flutter/.github/workflows/ci.yml
+# GitHub Actions 只识别**仓库根目录**下的 .github/workflows/，
+# 因此那份配置从未被触发过——analyze、test、release 构建一次都没跑。
+#
+# 这里在根目录重建同等内容，并指定 working-directory 到 Flutter 子目录。
+# 建议后续删除子目录里那一份，避免两处漂移。
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: shunshi-cn-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  flutter:
+    name: Flutter (analyze / test / release build)
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    defaults:
+      run:
+        working-directory: 手机端-Flutter
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.38.5
+          channel: stable
+          cache: true
+
+      - run: flutter pub get
+
+      - name: Reject analyzer errors
+        run: flutter analyze --no-fatal-infos --no-fatal-warnings
+
+      - name: Verify production release contracts
+        run: python3 scripts/verify_production_release.py
+
+      - run: flutter test --no-pub
+
+      # release 构建必须注入 SHUNSHI_API_BASE_URL：
+      # AppConfig 在 kReleaseMode 下缺此值会直接抛错，这正是期望行为。
+      - name: Build web release
+        run: >-
+          flutter build web --release
+          --dart-define=SHUNSHI_API_BASE_URL=https://ci.invalid
+
+      - name: Build Android release smoke artifact
+        env:
+          ALLOW_DEBUG_RELEASE_SIGNING: "true"
+        run: >-
+          flutter build apk --release
+          --dart-define=SHUNSHI_API_BASE_URL=https://ci.invalid
+
+  release-build-guard:
+    name: Release build must fail without API base URL
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: 手机端-Flutter
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.38.5
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      # 回归保护：曾经 network_service.dart 硬编码 http://localhost:4000，
+      # 绕过了 AppConfig 的 release 校验，导致上架包连不上后端。
+      # 这里确认「不给 dart-define 时 release 构建必须失败」。
+      - name: Expect failure when SHUNSHI_API_BASE_URL is absent
+        run: |
+          if flutter build web --release; then
+            echo "::error::Release build succeeded without SHUNSHI_API_BASE_URL — AppConfig guard is being bypassed somewhere."
+            exit 1
+          fi
+          echo "OK: release build correctly rejected missing SHUNSHI_API_BASE_URL"
+
+  secret-scan:
+    name: Secret Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      # 本项目曾在 Antigravity-history 的 Swift 源码中硬编码
+      # SiliconFlow / OpenRouter / Fal 密钥，加一道扫描防止复发。
+      - name: gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

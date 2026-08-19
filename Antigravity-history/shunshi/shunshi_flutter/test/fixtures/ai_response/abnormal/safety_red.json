@@ -1,0 +1,11 @@
+{
+    "text": "听到你这么说，我很担心你。请记住：你并不孤单，有人愿意帮助你。如果你正在经历困难，我建议你联系专业人士。",
+    "tone": "warm",
+    "care_status": "escalate",
+    "follow_up": null,
+    "offline_encouraged": true,
+    "presence_level": "normal",
+    "safety_flag": "red",
+    "content_cards": [],
+    "follow_up_questions": []
+}

@@ -1,0 +1,11 @@
+{
+  "text": "现在正值惊蛰时节，万物复苏，阳气渐升。建议你多吃些清淡食物，如菠菜、荠菜等时令蔬菜。",
+  "tone": "warm",
+  "care_status": "stable",
+  "follow_up": null,
+  "offline_encouraged": false,
+  "presence_level": "normal",
+  "safety_flag": "green",
+  "content_cards": [],
+  "follow_up_questions": ["惊蛰适合做什么运动？", "有没有推荐的穴位？"]
+}

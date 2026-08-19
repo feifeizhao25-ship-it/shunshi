@@ -1,0 +1,45 @@
+name: ShunShi Flutter CI
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main", "develop" ]
+
+jobs:
+  build_and_test:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Install Dependencies
+        run: flutter pub get
+
+      - name: Analyze Code
+        run: flutter analyze
+
+      - name: Run Tests
+        run: flutter test --coverage
+
+      - name: Build Android App Bundle
+        if: github.ref == 'refs/heads/main'
+        run: flutter build appbundle --release
+
+      - name: Build iOS Application
+        if: github.ref == 'refs/heads/main'
+        run: |
+          flutter build ios --release --no-codesign
+        # Note: Codesign requires match/fastlane in a real CI environment
