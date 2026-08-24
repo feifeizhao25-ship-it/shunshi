@@ -9,6 +9,21 @@ import pytest
 from datetime import datetime, timedelta
 
 
+@pytest.fixture(autouse=True)
+def seed_followup_users():
+    from app.database.db import get_db
+
+    db = get_db()
+    for user_id in ("test-user-001", "complete-test-user", "cancel-test-user"):
+        db.execute(
+            """INSERT OR IGNORE INTO users
+               (id, name, password_hash, created_at, updated_at)
+               VALUES (?, '测试用户', '', datetime('now'), datetime('now'))""",
+            (user_id,),
+        )
+    db.commit()
+
+
 # ==================== 生成跟进 ====================
 
 class TestGenerateFollowUp:
@@ -224,66 +239,58 @@ class TestFollowUpCancel:
 class TestFollowUpQuietHours:
     """静默时段不发送"""
 
-    def test_quiet_hours_default(self, client):
+    def test_quiet_hours_default(self, client, auth_headers):
         """默认静默时段设置"""
-        response = client.get("/api/v1/settings/quiet-hours?user_id=test-user-001")
+        response = client.get("/api/v1/settings/quiet-hours", headers=auth_headers)
         assert response.status_code == 200
         data = response.json()
-        assert data.get("success") is True
-        quiet = data.get("data", {})
-        assert "start" in quiet, "静默时段应有 start"
-        assert "end" in quiet, "静默时段应有 end"
-        # 默认 22:00-08:00
-        assert quiet.get("start") == "22:00", (
-            f"默认静默开始时间应为 22:00，实际: {quiet.get('start')}"
-        )
-        assert quiet.get("end") == "08:00", (
-            f"默认静默结束时间应为 08:00，实际: {quiet.get('end')}"
-        )
+        assert data == {"enabled": False, "start_time": None, "end_time": None}
 
-    def test_quiet_hours_check(self, client):
+    def test_quiet_hours_check(self, client, auth_headers):
         """检查当前是否在静默时段"""
         response = client.get(
-            "/api/v1/settings/quiet-hours/check?user_id=test-user-001"
+            "/api/v1/settings/quiet-hours/check", headers=auth_headers
         )
         assert response.status_code == 200
         data = response.json()
-        assert "is_quiet" in data.get("data", {}), "应返回是否在静默时段"
+        assert "is_quiet" in data, "应返回是否在静默时段"
 
-    def test_set_quiet_hours(self, client):
+    def test_set_quiet_hours(self, client, auth_headers):
         """设置自定义静默时段"""
         response = client.post(
             "/api/v1/settings/quiet-hours",
-            params={
-                "user_id": "test-user-001",
-                "enabled": "true",
-                "start": "23:00",
-                "end": "07:00",
-            }
+            json={
+                "enabled": True,
+                "start_time": "23:00",
+                "end_time": "07:00",
+            },
+            headers=auth_headers,
         )
         assert response.status_code == 200
         data = response.json()
-        assert data.get("success") is True
+        assert data["enabled"] is True
 
         # 验证设置已生效
         get_resp = client.get(
-            "/api/v1/settings/quiet-hours?user_id=test-user-001"
+            "/api/v1/settings/quiet-hours", headers=auth_headers
         )
-        quiet = get_resp.json().get("data", {})
-        assert quiet.get("start") == "23:00", "静默开始时间应已更新"
-        assert quiet.get("end") == "07:00", "静默结束时间应已更新"
+        quiet = get_resp.json()
+        assert quiet.get("start_time") == "23:00", "静默开始时间应已更新"
+        assert quiet.get("end_time") == "07:00", "静默结束时间应已更新"
 
-    def test_disable_quiet_hours(self, client):
+    def test_disable_quiet_hours(self, client, auth_headers):
         """应能关闭静默时段"""
         response = client.post(
             "/api/v1/settings/quiet-hours",
-            params={
-                "user_id": "test-user-001",
-                "enabled": "false",
-            }
+            json={
+                "enabled": False,
+                "start_time": None,
+                "end_time": None,
+            },
+            headers=auth_headers,
         )
         assert response.status_code == 200
-        data = response.json().get("data", {})
+        data = response.json()
         assert data.get("enabled") is False, "静默时段应已关闭"
 
     def test_followup_types_include_all(self, client):

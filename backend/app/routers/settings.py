@@ -9,6 +9,7 @@
 """
 
 import json
+from datetime import datetime
 
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
@@ -86,3 +87,17 @@ def set_quiet_hours(
     session: Session = Depends(get_session),
 ):
     return _write(session, user_id, QUIET_HOURS_KEY, body.model_dump())
+
+
+@router.get("/settings/quiet-hours/check")
+def check_quiet_hours(
+    user_id: str = Depends(current_user), session: Session = Depends(get_session)
+):
+    settings = _read(session, user_id, QUIET_HOURS_KEY, DEFAULT_QUIET_HOURS)
+    start = settings.get("start_time")
+    end = settings.get("end_time")
+    is_quiet = False
+    if settings.get("enabled") and start and end:
+        current = datetime.now().strftime("%H:%M")
+        is_quiet = start <= current < end if start < end else current >= start or current < end
+    return {**settings, "is_quiet": is_quiet}
