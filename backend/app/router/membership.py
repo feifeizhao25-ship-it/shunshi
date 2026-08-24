@@ -60,9 +60,9 @@ MEMBERSHIP_TIERS = {
         "name": "高级会员",
         "price_monthly": 38,
         "features": {
-            "ai_questions_per_day": float('inf'),
+            "ai_questions_per_day": "unlimited",
             "content_access": "全部内容（包括专属课程）",
-            "audio_per_day": float('inf'),
+            "audio_per_day": "unlimited",
             "companion": True,
             "family_members": 2,
         },
@@ -72,9 +72,9 @@ MEMBERSHIP_TIERS = {
         "name": "家庭会员",
         "price_monthly": 58,
         "features": {
-            "ai_questions_per_day": float('inf'),
+            "ai_questions_per_day": "unlimited",
             "content_access": "全部内容（包括专属课程）",
-            "audio_per_day": float('inf'),
+            "audio_per_day": "unlimited",
             "companion": True,
             "family_members": 5,
         },
@@ -258,14 +258,14 @@ async def get_tier_benefits(tier: str):
     benefits = []
     features = tier_data["features"]
 
-    if features["ai_questions_per_day"] == float('inf'):
+    if features["ai_questions_per_day"] == "unlimited":
         benefits.append("无限次数AI问答（每天）")
     else:
         benefits.append(f"每日{features['ai_questions_per_day']}次AI问答")
 
     benefits.append(f"权益范围：{features['content_access']}")
 
-    if features["audio_per_day"] == float('inf'):
+    if features["audio_per_day"] == "unlimited":
         benefits.append("无限音频内容")
     else:
         benefits.append(f"每日{features['audio_per_day']}个音频")
@@ -309,17 +309,17 @@ async def compare_tiers():
             "tier": tier_key,
             "name": tier_data["name"],
             "ai_questions": (
-                "无限" if features["ai_questions_per_day"] == float('inf')
+                "无限" if features["ai_questions_per_day"] == "unlimited"
                 else f"每日{features['ai_questions_per_day']}次"
             ),
             "content": features["content_access"],
             "audio": (
-                "无限" if features["audio_per_day"] == float('inf')
+                "无限" if features["audio_per_day"] == "unlimited"
                 else f"每日{features['audio_per_day']}个"
             ),
             "companion": "✓ 有" if features["companion"] else "✗ 无",
             "family_members": f"{features['family_members']}人",
-            "price": f"¥{features['ai_questions_per_day']} 元/月" if tier_data["price_monthly"] > 0 else "免费",
+            "price": f"¥{tier_data['price_monthly']} 元/月" if tier_data["price_monthly"] > 0 else "免费",
         })
 
     return {

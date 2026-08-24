@@ -29,9 +29,10 @@ class UserMembership(Base):
     __tablename__ = "sa_user_memberships"
     id = Column(GUID(), primary_key=True, default=uuid.uuid4)
     user_id = Column(String(64), nullable=False, index=True)
-    plan_id = Column(GUID(), nullable=False)
-    started_at = Column(TIMESTAMP, nullable=False)
-    expires_at = Column(TIMESTAMP, nullable=False)
+    # Product tiers use stable string codes (free/basic/premium/family), not UUIDs.
+    plan_id = Column(String(50), nullable=False, default="free")
+    started_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
+    expires_at = Column(TIMESTAMP, nullable=True)
     auto_renew = Column(Boolean, default=False)
     payment_method = Column(String(50))  # alipay / wechat / stripe / apple / google
     transaction_id = Column(String(200))
