@@ -4,6 +4,7 @@ test_content_cms.py
 """
 
 import pytest
+import uuid
 from fastapi.testclient import TestClient
 from app.main import app
 
@@ -189,12 +190,14 @@ class TestContentTags:
 
     def test_create_tag(self):
         """POST /api/v1/cms/tags 创建标签"""
+        suffix = uuid.uuid4().hex[:10]
         payload = {
-            "name": "养生",
-            "slug": "wellness"
+            "name": f"养生-{suffix}",
+            "slug": f"wellness-{suffix}",
         }
         response = client.post("/api/v1/cms/tags", json=payload)
-        assert response.status_code in [200, 201, 404]
+        assert response.status_code == 200, response.text
+        assert response.json()["slug"] == payload["slug"]
 
     def test_get_tag_detail(self):
         """GET /api/v1/cms/tags/{tag_id} 获取标签详情"""

@@ -76,8 +76,11 @@ SEASONAL_COUPLE_PLANS = {
 
 class CouplePlanRequest(BaseModel):
     couple_id: str = Field(..., description="夫妻ID（唯一标识）")
-    person_a_constitution: str = Field(..., description="一方体质")
-    person_b_constitution: str = Field(..., description="另一方体质")
+    person_a_constitution: str = Field(default="balanced", description="一方体质")
+    person_b_constitution: str = Field(default="balanced", description="另一方体质")
+    # 兼容早期移动端字段；新客户端使用 person_a/person_b 命名。
+    user1_constitution: Optional[str] = None
+    user2_constitution: Optional[str] = None
     season: str = Field(default="spring", description="当前季节")
     goals: Optional[List[str]] = Field(None, description="共同健康目标")
 
@@ -99,17 +102,19 @@ async def get_seasonal_plan(season: str):
 @router.post("/plan", summary="生成双人养生计划")
 async def create_couple_plan(request: CouplePlanRequest):
     seasonal = SEASONAL_COUPLE_PLANS.get(request.season, SEASONAL_COUPLE_PLANS["spring"])
+    person_a = request.user1_constitution or request.person_a_constitution
+    person_b = request.user2_constitution or request.person_b_constitution
     plan = {
         "couple_id": request.couple_id,
         "season": request.season,
-        "person_a_constitution": request.person_a_constitution,
-        "person_b_constitution": request.person_b_constitution,
+        "person_a_constitution": person_a,
+        "person_b_constitution": person_b,
         "shared_activities": seasonal["activities"],
         "shared_diet": seasonal["diet"],
         "romance_tip": seasonal["romance_tip"],
         "individual_notes": {
-            "person_a": f"体质{request.person_a_constitution}者注意个性化调理",
-            "person_b": f"体质{request.person_b_constitution}者注意个性化调理"
+            "person_a": f"体质{person_a}者注意个性化调理",
+            "person_b": f"体质{person_b}者注意个性化调理"
         }
     }
     _couple_plans[request.couple_id] = plan

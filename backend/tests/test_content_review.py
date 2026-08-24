@@ -267,12 +267,12 @@ class TestRouteRegistration:
         """验证审核路由已注册"""
         route_paths = [r.path for r in router.routes]
         expected_paths = [
-            "/review/submit/{content_id}",
-            "/review/approve/{content_id}",
-            "/review/reject/{content_id}",
-            "/review/publish/{content_id}",
-            "/review/pending",
-            "/review/history/{content_id}",
+            "/api/v1/cms/review/submit/{content_id}",
+            "/api/v1/cms/review/approve/{content_id}",
+            "/api/v1/cms/review/reject/{content_id}",
+            "/api/v1/cms/review/publish/{content_id}",
+            "/api/v1/cms/review/pending",
+            "/api/v1/cms/review/history/{content_id}",
         ]
         for path in expected_paths:
             assert path in route_paths, f"路由 {path} 未注册"
@@ -280,12 +280,12 @@ class TestRouteRegistration:
     def test_access_tier_route_registered(self):
         """验证会员分级路由已注册"""
         route_paths = [r.path for r in router.routes]
-        assert "/content/{content_id}/access-tier" in route_paths
+        assert "/api/v1/cms/content/{content_id}/access-tier" in route_paths
 
     def test_list_content_has_access_tier_param(self):
         """验证列表接口支持 access_tier 参数"""
         route_paths = [r.path for r in router.routes]
-        assert "/content" in route_paths
+        assert "/api/v1/cms/content" in route_paths
 
 
 # ==================== 审核表结构测试 ====================
