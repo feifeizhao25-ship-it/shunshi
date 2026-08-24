@@ -280,6 +280,20 @@ TCM_TERMS = {
         "cultural_context": "The most common pattern in emotionally suppressed modern populations; central to understanding psychosomatic disease.",
         "common_misconception_en": "Liver depression is a functional stagnation pattern, not psychiatric depression, though they can coexist.",
     },
+    "five_phases": {
+        "term_id": "five_phases",
+        "chinese": "五行",
+        "pinyin": "wǔ xíng",
+        "english": "Five Phases (Wu Xing)",
+        "japanese": "五行",
+        "korean": "오행",
+        "spanish": "Cinco Fases (Wu Xing)",
+        "french": "Cinq Phases (Wu Xing)",
+        "german": "Fünf Wandlungsphasen (Wu Xing)",
+        "definition_en": "A traditional Chinese classification framework using Wood, Fire, Earth, Metal, and Water to describe relationships and cycles.",
+        "cultural_context": "The framework appears across classical Chinese philosophy, calendars, music, and traditional medicine.",
+        "common_misconception_en": "The phases are historical conceptual categories, not chemical elements or independently verified anatomical mechanisms.",
+    },
 }
 
 # Supported languages
