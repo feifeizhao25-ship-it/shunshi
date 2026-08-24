@@ -3,8 +3,9 @@ enum SubscriptionTier {
   serenity,
   harmony,
   family,
-  // Legacy aliases for backward compatibility
-  premium, // maps to serenity
+  // Legacy wire value kept for backward compatibility. Normalize it to
+  // serenity at API boundaries when entitlement behavior is evaluated.
+  premium,
 }
 
 class User {

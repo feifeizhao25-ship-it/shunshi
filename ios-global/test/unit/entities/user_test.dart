@@ -92,9 +92,9 @@ void main() {
       expect(SubscriptionTier.values, contains(SubscriptionTier.family));
     });
 
-    test('premium is an alias for serenity', () {
-      // premium is kept for backward compatibility
-      expect(SubscriptionTier.premium, SubscriptionTier.serenity);
+    test('premium remains available for legacy payloads', () {
+      expect(SubscriptionTier.values, contains(SubscriptionTier.premium));
+      expect(SubscriptionTier.premium.name, 'premium');
     });
 
     test('default subscription is free', () {
