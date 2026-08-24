@@ -6,7 +6,7 @@
 from fastapi import APIRouter, HTTPException, Query, Path, Depends
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict
-from datetime import datetime, date
+from datetime import date as Date, datetime
 from sqlalchemy.orm import Session
 from app.db.database import get_db
 from app.models.wearable import WearableSync
@@ -38,7 +38,7 @@ TCM_SLEEP_ANALYSIS = {
 class WearableDataSync(BaseModel):
     user_id: str = Field(..., description="用户ID")
     device_id: str = Field(..., description="设备ID")
-    date: str = Field(..., description="数据日期 YYYY-MM-DD")
+    date: Date = Field(..., description="数据日期 YYYY-MM-DD")
     heart_rate_avg: Optional[float] = Field(None, description="平均心率(bpm)")
     heart_rate_resting: Optional[float] = Field(None, description="静息心率(bpm)")
     steps: Optional[int] = Field(None, description="步数")
@@ -136,9 +136,9 @@ async def sync_data(request: WearableDataSync, db: Session = Depends(get_db)):
     db.commit()
 
     entry = {
-        "date": request.date,
+        "date": request.date.isoformat(),
         "device_id": request.device_id,
-        "raw_data": request.dict(exclude={"user_id", "device_id", "date"}),
+        "raw_data": request.model_dump(exclude={"user_id", "device_id", "date"}),
         "tcm_insights": tcm_insights,
         "synced_at": datetime.now().isoformat()
     }
@@ -172,7 +172,7 @@ async def get_history(user_id: str, days: int = Query(7, ge=1, le=90), db: Sessi
 
 @router.get("/today-summary/{user_id}", summary="今日健康摘要")
 async def get_today_summary(user_id: str, db: Session = Depends(get_db)):
-    today = date.today().isoformat()
+    today = Date.today()
     row = (db.query(WearableSync)
            .filter(WearableSync.user_id == user_id, WearableSync.sync_date == today)
            .order_by(WearableSync.created_at.desc()).first())

@@ -6,7 +6,7 @@
 from fastapi import APIRouter, HTTPException, Path, Query
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import math
 
 router = APIRouter(prefix="/api/v1/timezone", tags=["timezone_circadian"])
@@ -243,12 +243,32 @@ def _parse_time(time_str: str) -> tuple:
 def _calculate_tz_offset_hours(tz_str: str) -> int:
     """解析时区字符串，返回小时偏移"""
     try:
+        tz_str = tz_str.strip()
         if tz_str.startswith("+"):
             return int(tz_str[1:])
         else:
             return int(tz_str)
     except ValueError:
         raise HTTPException(status_code=422, detail="时区格式错误，如 +8, -5")
+
+
+def _parse_utc_offset(value: str, field_name: str) -> int:
+    """Parse UTC offsets, including '+' decoded as a query-string space."""
+    raw = value.strip()
+    if not raw.upper().startswith("UTC"):
+        raise HTTPException(status_code=422, detail=f"{field_name} 格式错误")
+    offset = raw[3:]
+    if not offset:
+        return 0
+    if offset.startswith(" "):
+        offset = f"+{offset.strip()}"
+    try:
+        parsed = int(offset)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=f"{field_name} 格式错误") from exc
+    if not -12 <= parsed <= 14:
+        raise HTTPException(status_code=422, detail=f"{field_name} 超出有效范围")
+    return parsed
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -266,7 +286,7 @@ async def get_current_shichen(timezone_offset: str = Query("+8", description="�
     except HTTPException as e:
         raise e
 
-    now_utc = datetime.utcnow()
+    now_utc = datetime.now(timezone.utc)
     now_local = now_utc + timedelta(hours=offset_hours)
     hour = now_local.hour
 
@@ -276,7 +296,7 @@ async def get_current_shichen(timezone_offset: str = Query("+8", description="�
         "success": True,
         "data": {
             "current_time": now_local.strftime("%H:%M"),
-            "timezone_offset": timezone_offset,
+            "timezone_offset": f"{offset_hours:+d}",
             "shichen": shichen_info["shichen"],
             "shichen_name": shichen_info["name"],
             "hour": hour,
@@ -349,16 +369,8 @@ async def get_jet_lag_recovery(
     """
     根据两个时区计算时差，返回详细的调节方案和中医调理建议。
     """
-    try:
-        from_offset = int(from_tz.replace("UTC", "").replace("+", ""))
-    except ValueError:
-        raise HTTPException(status_code=422, detail="from_tz 格式错误")
-
-    try:
-        to_offset_str = to_tz.replace("UTC", "")
-        to_offset = int(to_offset_str) if to_offset_str.startswith("+") else int(to_offset_str)
-    except ValueError:
-        raise HTTPException(status_code=422, detail="to_tz 格式错误")
+    from_offset = _parse_utc_offset(from_tz, "from_tz")
+    to_offset = _parse_utc_offset(to_tz, "to_tz")
 
     time_diff = abs(to_offset - from_offset)
     direction = "向东" if to_offset > from_offset else "向西"
@@ -499,7 +511,8 @@ async def get_personalized_schedule(request: PersonalizedScheduleRequest):
     lunch_shichen = _get_shichen_info(12)
     schedule.append({
         "time": "12:00",
-        "activity": "午餐 + 午休",
+        "activity": "午餐",
+        "note": "餐后建议午休 20 分钟",
         "shichen": lunch_shichen["shichen"],
         "recommendation": f"午时进食，并午休 20 分钟，{lunch_shichen['tcm_principle']}",
     })
