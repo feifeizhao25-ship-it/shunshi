@@ -350,8 +350,8 @@ class PromptStore:
         """获取灰度版本内容（非活跃的最新版本）"""
         conn = get_db()
         row = conn.execute(
-            text("SELECT content FROM prompt_versions WHERE prompt_key = ? AND is_active = 0 "
-            "ORDER BY version DESC LIMIT 1"),
+            "SELECT content FROM prompt_versions WHERE prompt_key = ? AND is_active = 0 "
+            "ORDER BY version DESC LIMIT 1",
             (key,),
         ).fetchone()
         return row["content"] if row else None
@@ -391,21 +391,20 @@ class PromptStore:
         if not target:
             raise ValueError(f"Prompt '{key}' v{target_version} 不存在")
 
-        now = datetime.now(timezone.utc).isoformat()
-
-        # 取消所有版本的 active
-        conn.execute(
-            "UPDATE prompt_versions SET is_active = 0 WHERE prompt_key = ?",
-            (key,),
-        )
-
-        # 激活目标版本
-        conn.execute(
-            text("UPDATE prompt_versions SET is_active = 1, created_at = ? "
-                 "WHERE prompt_key = ? AND version = ?"),
-            (now, key, target_version),
-        )
-        conn.commit()
+        try:
+            # 同一事务内切换活跃版本；版本创建时间保持不可变。
+            conn.execute(
+                "UPDATE prompt_versions SET is_active = 0 WHERE prompt_key = ?",
+                (key,),
+            )
+            conn.execute(
+                "UPDATE prompt_versions SET is_active = 1 WHERE prompt_key = ? AND version = ?",
+                (key, target_version),
+            )
+            conn.commit()
+        except Exception:
+            conn.rollback()
+            raise
 
         pv = PromptVersion(
             id=target["id"], prompt_key=target["prompt_key"],
@@ -413,7 +412,7 @@ class PromptStore:
             changelog=target["changelog"] + f" | 回滚到 v{target_version}",
             category=target["category"], is_active=True,
             created_by=target["created_by"] or "system",
-            created_at=now,
+            created_at=target["created_at"],
         )
         with self._lock:
             self._active_cache[key] = pv
