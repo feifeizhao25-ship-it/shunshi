@@ -92,6 +92,13 @@ FONT_OPTIONS = [
     {"id": "classic", "name": "经典宋体", "preview": "顺时養生"},
 ]
 
+THEME_ALIASES = {
+    "spring": "spring_blossom",
+    "summer": "summer_lotus",
+    "autumn": "autumn_maple",
+    "winter": "winter_snow",
+}
+
 
 class ThemeSettingsRequest(BaseModel):
     user_id: str = Field(..., description="用户ID")
@@ -116,6 +123,7 @@ async def list_themes(
 
 @router.get("/{theme_id}", summary="主题详情")
 async def get_theme(theme_id: str):
+    theme_id = THEME_ALIASES.get(theme_id, theme_id)
     if theme_id not in BUILT_IN_THEMES:
         raise HTTPException(status_code=404, detail="主题不存在")
     return {"success": True, "data": BUILT_IN_THEMES[theme_id]}
@@ -123,10 +131,11 @@ async def get_theme(theme_id: str):
 
 @router.post("/settings", summary="设置用户主题")
 async def set_theme(request: ThemeSettingsRequest):
-    if request.theme_id not in BUILT_IN_THEMES:
+    theme_id = THEME_ALIASES.get(request.theme_id, request.theme_id)
+    if theme_id not in BUILT_IN_THEMES:
         raise HTTPException(status_code=404, detail="主题不存在")
     _user_themes[request.user_id] = {
-        "theme_id": request.theme_id,
+        "theme_id": theme_id,
         "font_id": request.font_id or "default",
         "dark_mode": request.dark_mode or False,
         "auto_season": request.auto_season if request.auto_season is not None else True
