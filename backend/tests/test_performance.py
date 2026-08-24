@@ -229,6 +229,11 @@ def _create_test_app(db_conn):
         yield
 
     test_app = FastAPI(title="Perf Test App", version="test", lifespan=_empty_lifespan)
+    from app.config import Settings
+    test_app.state.settings = Settings(
+        env="test",
+        jwt_secret=os.getenv("JWT_SECRET", "test-jwt-secret-for-performance-only"),
+    )
 
     # 注册所有路由 (与 main.py 一致)
     test_app.include_router(auth.router)
