@@ -1,115 +1,80 @@
-"""
-顺时 - 订阅系统测试
-test_subscription.py
-"""
+"""订阅模块：回调 fail-closed；验签通过才入账；禁止假开通会员。"""
 
-import pytest
-from unittest.mock import patch, MagicMock
+import hashlib
+import hmac
+import json
+import time
 
+from fastapi.testclient import TestClient
 
-class TestSubscriptionPlans:
-    """订阅计划列表测试"""
+from app.main import create_app
 
-    def test_get_plans(self, client):
-        response = client.get("/api/v1/subscription/plans?user_id=test-user-001")
-        assert response.status_code == 200
-        data = response.json()
-        # 返回计划列表
-        assert "plans" in data or "data" in data
-
-
-class TestSubscriptionGet:
-    """获取订阅状态测试"""
-
-    def test_get_user_subscription(self, client):
-        response = client.get("/api/v1/subscription?user_id=test-user-001")
-        assert response.status_code == 200
-        data = response.json()
-        assert "data" in data or "plan" in data or "status" in data
+CALLBACK_BODY = {
+    "user_id": "user-1",
+    "product_id": "shunshi_yangxin_monthly",
+    "store": "app_store",
+    "expires_at": int(time.time()) + 30 * 86400,
+    "original_transaction_id": "txn-1",
+}
 
 
-class TestSubscriptionCreate:
-    """创建订阅测试"""
+def _signed(secret: str, body: dict) -> tuple[bytes, str]:
+    raw = json.dumps(body).encode()
+    return raw, hmac.new(secret.encode(), raw, hashlib.sha256).hexdigest()
 
-    def test_subscribe_monthly(self, client):
-        # 实际 API 不支持 "monthly" plan，只有 free/yangxin/yiyang/family
-        # 使用实际存在的 plan
+
+def test_callback_fail_closed_when_secret_unconfigured(client):
+    response = client.post("/api/v1/billing/callback", json=CALLBACK_BODY)
+    assert response.status_code == 503
+    detail = response.json()["detail"]
+    assert detail["configured"] is False
+
+
+def test_subscription_status_defaults_to_free(client, auth_headers):
+    response = client.get("/api/v1/subscription/status", headers=auth_headers)
+    assert response.status_code == 200
+    assert response.json() == {"active": False, "plan": "free", "tier": "free"}
+
+
+def test_callback_rejects_bad_signature(settings):
+    settings.payment_callback_secret = "callback-secret"
+    with TestClient(create_app(settings)) as client:
         response = client.post(
-            "/api/v1/subscription/subscribe?user_id=test-user-001",
-            json={"plan": "yangxin", "platform": "ios"},
+            "/api/v1/billing/callback",
+            json=CALLBACK_BODY,
+            headers={"X-Payment-Signature": "0" * 64},
         )
-        assert response.status_code == 200
+    assert response.status_code == 401
 
-    def test_subscribe_free(self, client):
-        response = client.post(
-            "/api/v1/subscription/subscribe?user_id=test-user-001",
-            json={"plan": "free", "platform": "ios"},
+
+def test_callback_activates_entitlement_with_valid_signature(settings):
+    settings.payment_callback_secret = "callback-secret"
+    with TestClient(create_app(settings)) as client:
+        login = client.post("/api/v1/auth/guest-login")
+        headers = {"Authorization": f"Bearer {login.json()['access_token']}"}
+        # 回调 body 的 user_id 必须与登录用户一致才能查到权益；先拿到真实 user_id
+        # guest token 的 sub 即用户 id，这里直接用回调返回 + status 查询闭环验证
+        raw, signature = _signed("callback-secret", CALLBACK_BODY)
+        callback = client.post(
+            "/api/v1/billing/callback",
+            content=raw,
+            headers={"X-Payment-Signature": signature, "Content-Type": "application/json"},
         )
-        assert response.status_code == 200
+        assert callback.status_code == 200
+        assert callback.json()["active"] is True
 
+        # 给当前登录用户补一条有效回调，验证 status 查询
+        import jwt as pyjwt
 
-class TestSubscriptionAlipay:
-    """支付宝支付测试"""
-
-    def test_create_alipay_order(self, client):
-        # 实际 API 路径是 /alipay/create-order
-        response = client.post("/api/v1/subscription/alipay/create-order", json={
-            "user_id": "test-user-001",
-            "plan": "yangxin",
-        })
-        assert response.status_code == 200
-
-    def test_verify_alipay_order(self, client):
-        """支付宝回调验证"""
-        # 先创建一个订单
-        create_resp = client.post("/api/v1/subscription/alipay/create-order", json={
-            "user_id": "test-user-001",
-            "plan": "yangxin",
-        })
-        order_id = create_resp.json()["data"]["order_id"]
-        
-        # 验证订单（实际 API 需要 PaymentVerifyRequest: order_id + trade_no）
-        response = client.post("/api/v1/subscription/alipay/verify", json={
-            "order_id": order_id,
-            "trade_no": "TEST_TRADE_001",
-        })
-        assert response.status_code == 200
-
-
-class TestSubscriptionStripe:
-    """Stripe 支付测试"""
-
-    def test_create_stripe_checkout(self, client):
-        """测试 Stripe checkout session 创建"""
-        # 实际 API 路径是 /stripe/create-checkout
-        response = client.post("/api/v1/subscription/stripe/create-checkout", json={
-            "user_id": "test-user-001",
-            "plan": "yangxin",
-            "success_url": "https://app.shunshi.com/payment/success",
-            "cancel_url": "https://app.shunshi.com/payment/cancel",
-        })
-        assert response.status_code == 200
-
-    def test_stripe_webhook(self, client):
-        """Stripe webhook 端点"""
-        response = client.post(
-            "/api/v1/subscription/stripe/webhook",
-            json={
-                "type": "checkout.session.completed",
-                "data": {
-                    "id": "cs_test_mock",
-                    "object": {"metadata": {"user_id": "test-user-001", "plan": "yangxin"}}
-                },
-            },
-            headers={"Stripe-Signature": "mock_signature"},
-        )
-        assert response.status_code == 200
-
-
-class TestSubscriptionExpiry:
-    """订阅到期检查测试"""
-
-    def test_check_expiry(self, client):
-        # 实际 API 使用 GET 方法
-        response = client.get("/api/v1/subscription/check-expiry")
-        assert response.status_code == 200
+        user_id = pyjwt.decode(
+            headers["Authorization"][7:], settings.jwt_secret, algorithms=["HS256"]
+        )["sub"]
+        raw, signature = _signed("callback-secret", {**CALLBACK_BODY, "user_id": user_id, "original_transaction_id": "txn-2"})
+        assert client.post(
+            "/api/v1/billing/callback",
+            content=raw,
+            headers={"X-Payment-Signature": signature, "Content-Type": "application/json"},
+        ).status_code == 200
+        status = client.get("/api/v1/subscription/status", headers=headers)
+        assert status.json()["active"] is True
+        assert status.json()["product_id"] == "shunshi_yangxin_monthly"
