@@ -47,7 +47,19 @@ BADGES = {
     "exercise_first": {"id": "exercise_first", "name": "运动开启者", "description": "完成第一个运动", "category": "exercise", "icon_hint": "🏃", "points": 30, "rarity": "common"},
     "meditation_first": {"id": "meditation_first", "name": "冥想初心者", "description": "第一次冥想", "category": "meditation", "icon_hint": "🧘‍♀️", "points": 25, "rarity": "common"},
     "meditation_sage": {"id": "meditation_sage", "name": "冥想大师", "description": "完成100次冥想", "category": "meditation", "icon_hint": "🌟", "points": 400, "rarity": "legendary"},
+    "checkin_14": {"id": "checkin_14", "name": "两周相伴", "description": "连续打卡14天", "category": "checkin", "icon_hint": "🌿", "points": 90, "rarity": "common"},
+    "checkin_60": {"id": "checkin_60", "name": "习惯守护者", "description": "连续打卡60天", "category": "checkin", "icon_hint": "🪴", "points": 320, "rarity": "rare"},
+    "solar_term_6": {"id": "solar_term_6", "name": "一季观察者", "description": "完成6个节气主题浏览", "category": "solar_term", "icon_hint": "🌤️", "points": 90, "rarity": "common"},
+    "solar_term_12": {"id": "solar_term_12", "name": "半岁旅人", "description": "完成12个节气主题浏览", "category": "solar_term", "icon_hint": "🌓", "points": 180, "rarity": "rare"},
+    "constitution_review": {"id": "constitution_review", "name": "自我复核", "description": "查看并确认一次体质问卷结果及其限制说明", "category": "constitution", "icon_hint": "📝", "points": 35, "rarity": "common"},
+    "food_therapy_3": {"id": "food_therapy_3", "name": "食谱收藏家", "description": "收藏3个传统食谱参考", "category": "food_therapy", "icon_hint": "🥣", "points": 60, "rarity": "common"},
+    "exercise_7": {"id": "exercise_7", "name": "活动一周", "description": "记录7次自主活动", "category": "exercise", "icon_hint": "👟", "points": 80, "rarity": "common"},
+    "exercise_30": {"id": "exercise_30", "name": "活动里程碑", "description": "记录30次自主活动", "category": "exercise", "icon_hint": "🏅", "points": 220, "rarity": "rare"},
+    "meditation_7": {"id": "meditation_7", "name": "七次静心", "description": "完成7次冥想记录", "category": "meditation", "icon_hint": "🕯️", "points": 70, "rarity": "common"},
 }
+
+for _badge in BADGES.values():
+    _badge.setdefault("unlock_condition", _badge["description"])
 
 LEVEL_SYSTEM = {
     "levels": [
@@ -57,6 +69,15 @@ LEVEL_SYSTEM = {
         {"level": 4, "name": "健康达人", "min_points": 601, "max_points": 1000},
         {"level": 5, "name": "养生大师", "min_points": 1001, "max_points": 999999},
     ]
+}
+
+# 等级权益只描述产品内功能，不承诺健康效果，也不把基本健康内容设为付费门槛。
+LEVEL_BENEFITS = {
+    "1": ["基础打卡与个人成就记录"],
+    "2": ["解锁更多个性化内容排序选项"],
+    "3": ["解锁月度成长回顾"],
+    "4": ["解锁年度成长回顾"],
+    "5": ["解锁完整历史成就档案"],
 }
 
 
@@ -200,15 +221,29 @@ async def daily_checkin(request: CheckInRequest, db: Session = Depends(get_db)):
 async def get_leaderboard(limit: int = Query(10, ge=1, le=100), db: Session = Depends(get_db)):
     rows = db.query(UserPoints).order_by(UserPoints.total_points.desc()).limit(limit).all()
     total_users = db.query(UserPoints).count()
+    badge_counts = dict(
+        db.query(UserBadge.user_id, func.count(UserBadge.id))
+        .filter(UserBadge.user_id.in_([row.user_id for row in rows]))
+        .group_by(UserBadge.user_id)
+        .all()
+    ) if rows else {}
     leaderboard = [{
         "rank": idx + 1,
         "user_id": r.user_id[:4] + "**" if len(r.user_id) > 4 else "**",
         "points": r.total_points,
         "level": r.level,
+        "badges_count": badge_counts.get(r.user_id, 0),
     } for idx, r in enumerate(rows)]
     return {"success": True, "data": {"leaderboard": leaderboard, "total_users": total_users, "limit": limit}}
 
 
 @router.get("/levels", summary="积分等级系统说明")
 async def get_levels():
-    return {"success": True, "data": {"levels": LEVEL_SYSTEM["levels"], "description": "通过完成任务、打卡、解锁徽章获得积分，积分达到一定阈值可升级。"}}
+    return {
+        "success": True,
+        "data": {
+            "levels": LEVEL_SYSTEM["levels"],
+            "description": "通过完成任务、打卡、解锁徽章获得积分，积分达到一定阈值可升级。",
+            "level_benefits": LEVEL_BENEFITS,
+        },
+    }
