@@ -21,7 +21,7 @@ from pydantic import BaseModel, Field, field_validator
 from ..skills.skill_registry import skill_registry
 from ..skills.orchestrator import SkillOrchestrator, SkillExecutionResult
 
-router = APIRouter()
+router = APIRouter(prefix="/api/v1/skills")
 
 
 # ==================== 请求/响应模型 ====================

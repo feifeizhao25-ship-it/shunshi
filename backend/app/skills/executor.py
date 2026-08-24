@@ -407,9 +407,7 @@ class SkillExecutor:
         )
 
     async def _call_llm(self, model: str, prompt: str) -> str:
-        """调用 LLM 获取 Skill 执行结果（Deepseek 直连）"""
-        from app.llm.deepseek import get_deepseek_client
-        
+        """调用注入的 LLM 客户端，未注入时才使用默认 DeepSeek。"""
         system_prompt = (
             "你是顺时，一个温暖贴心的 AI 养生健康陪伴助手。\n"
             "请根据用户的需求，提供专业、实用、温暖的养生建议。\n"
@@ -420,7 +418,22 @@ class SkillExecutor:
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": prompt},
         ]
-        
+
+        if self.llm_client is not None:
+            response = await self.llm_client.chat_completion(
+                messages=messages,
+                model=model,
+                temperature=0.7,
+                max_tokens=4096,
+            )
+            choice = response.choices[0]
+            if isinstance(choice, dict):
+                return choice["message"]["content"]
+            message = choice.message
+            return message["content"] if isinstance(message, dict) else message.content
+
+        from app.llm.deepseek import get_deepseek_client
+
         client = get_deepseek_client()
         response = await client.chat(
             messages=messages,

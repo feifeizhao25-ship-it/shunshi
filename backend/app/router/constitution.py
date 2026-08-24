@@ -10,7 +10,7 @@ from datetime import datetime
 from app.database.db import get_db
 from sqlalchemy import text
 
-router = APIRouter(tags=["体质辨识"])  # prefix 在 main.py 中统一注册
+router = APIRouter(prefix="/api/v1/constitution", tags=["体质辨识"])
 
 
 # ==================== 九种体质定义 ====================

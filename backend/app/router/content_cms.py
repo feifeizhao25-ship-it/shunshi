@@ -11,7 +11,7 @@ import json
 from app.database.db import get_db
 from sqlalchemy import text
 
-router = APIRouter(tags=["内容管理"])
+router = APIRouter(prefix="/api/v1/cms", tags=["内容管理"])
 
 
 # ==================== 常量定义 ====================
