@@ -400,9 +400,7 @@ class TestPostWorkout:
             "duration_minutes": 60,
             "intensity": "invalid_intensity"
         })
-        assert response.status_code == 200
-        data = response.json()
-        assert data["success"] is False
+        assert response.status_code == 422
 
     def test_post_workout_zero_duration(self):
         """测试零运动时长"""

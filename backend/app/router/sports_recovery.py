@@ -425,6 +425,12 @@ def _generate_post_workout_advice(sport_type: str, duration_minutes: int, intens
 
     multiplier = intensity_multiplier.get(intensity, 1.5)
     energy_cost = duration_minutes * multiplier
+    intensity_label = {
+        "low": "低强度",
+        "medium": "中等强度",
+        "high": "高强度",
+        "extreme": "极限强度",
+    }[intensity]
 
     advice = {
         "sport_type": sport_type,
@@ -436,16 +442,16 @@ def _generate_post_workout_advice(sport_type: str, duration_minutes: int, intens
 
     # 根据能量消耗程度生成建议
     if energy_cost < 50:
-        advice["recovery_emphasis"] = "轻度运动，恢复需求低"
+        advice["recovery_emphasis"] = f"{intensity_label}运动，累计负荷较低，恢复需求低"
         advice["recovery_priority"] = ["补水", "轻度拉伸", "清淡食物"]
     elif energy_cost < 100:
-        advice["recovery_emphasis"] = "中度运动，需要标准恢复"
+        advice["recovery_emphasis"] = f"{intensity_label}运动，累计负荷中等，需要标准恢复"
         advice["recovery_priority"] = ["充足补水", "营养补充", "充足睡眠"]
     elif energy_cost < 150:
-        advice["recovery_emphasis"] = "高强度运动，需要深度恢复"
+        advice["recovery_emphasis"] = f"{intensity_label}运动，累计负荷较高，需要深度恢复"
         advice["recovery_priority"] = ["活血化瘀食疗", "穴位按摩", "8小时睡眠"]
     else:
-        advice["recovery_emphasis"] = "极限强度运动，需要全面恢复"
+        advice["recovery_emphasis"] = f"{intensity_label}运动，累计负荷极高，需要全面恢复"
         advice["recovery_priority"] = ["立即补充电解质", "高蛋白食疗", "24小时内穴位深度按摩", "9小时以上睡眠"]
 
     # 运动类型特异性建议
