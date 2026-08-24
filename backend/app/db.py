@@ -4,7 +4,7 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session, sessionmaker
 
-from .models import Base
+from .simple_models import Base
 
 
 def make_engine(database_url: str) -> Engine:

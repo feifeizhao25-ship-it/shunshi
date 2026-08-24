@@ -11,7 +11,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from ..deps import current_user, get_session
-from ..models import Feedback
+from ..simple_models import Feedback
 
 router = APIRouter(prefix="/api/v1/feedback", tags=["feedback"])
 

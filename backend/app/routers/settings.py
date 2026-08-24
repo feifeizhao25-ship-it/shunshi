@@ -15,7 +15,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from ..deps import current_user, get_session
-from ..models import UserSetting
+from ..simple_models import UserSetting
 
 router = APIRouter(prefix="/api/v1", tags=["settings"])
 

@@ -20,14 +20,14 @@ jobs:
       - name: Install deps
         run: pip install -r requirements.txt
       - name: Compile check
-        run: python -m py_compile app/main.py
+        run: python -m compileall -q app
       - name: Lint (ruff)
         run: pip install ruff && ruff check app/ --select=E9,F63,F7,F82
       - name: Test
         env:
           DATABASE_URL: sqlite:///test.db
           REDIS_URL: redis://localhost
-        run: python -m pytest tests/ -x --tb=short 2>/dev/null || echo "Tests need DB connection"
+        run: python -m pytest tests/ -x --tb=short
 
   flutter-cn:
     runs-on: ubuntu-latest
@@ -42,7 +42,9 @@ jobs:
       - name: Get deps
         run: flutter pub get
       - name: Analyze
-        run: flutter analyze lib/ 2>&1 | grep "error" || true
+        run: flutter analyze --no-fatal-warnings --no-fatal-infos
+      - name: Test
+        run: flutter test
       - name: Build APK (debug)
         run: flutter build apk --debug --dart-define=API_BASE_URL=http://localhost/api/v1 --dart-define=APP_VARIANT=android-cn
 
@@ -59,6 +61,8 @@ jobs:
       - name: Get deps
         run: flutter pub get
       - name: Analyze
-        run: flutter analyze lib/ 2>&1 | grep "error" || true
+        run: flutter analyze --no-fatal-warnings --no-fatal-infos
+      - name: Test
+        run: flutter test
       - name: Build APK (debug)
         run: flutter build apk --debug --dart-define=API_BASE_URL=http://localhost/api/v1 --dart-define=APP_VARIANT=android-global

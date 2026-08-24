@@ -12,7 +12,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from ..deps import current_user, get_session
-from ..models import Reflection, new_id
+from ..simple_models import Reflection, new_id
 
 router = APIRouter(prefix="/api/v1/reflections", tags=["reflections"])
 

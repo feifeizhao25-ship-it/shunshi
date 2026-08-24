@@ -15,7 +15,7 @@ from sqlalchemy.orm import Session
 from ..config import Settings
 from ..deps import current_user, get_session, get_settings
 from ..entitlements import get_registry, tier_for_product
-from ..models import Entitlement
+from ..simple_models import Entitlement
 
 router = APIRouter(prefix="/api/v1", tags=["subscription"])
 

@@ -15,7 +15,7 @@ from sqlalchemy.orm import Session
 
 from ..config import Settings
 from ..deps import current_user, get_session, get_settings
-from ..models import (
+from ..simple_models import (
     AudioProgress,
     Entitlement,
     Feedback,
