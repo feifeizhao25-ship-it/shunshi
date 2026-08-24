@@ -139,7 +139,15 @@ async def list_famous_doctors():
 
 @router.get("/famous-doctors/{doctor_id}", summary="名医详情")
 async def get_famous_doctor(doctor_id: str):
-    doctor = next((d for d in FAMOUS_DOCTORS if d["id"] == doctor_id), None)
+    aliases = {
+        "bianque": "bian_que",
+        "huatuo": "hua_tuo",
+        "zhangzhongjing": "zhang_zhongjing",
+        "sunsimiao": "sun_simiao",
+        "lishizhen": "li_shizhen",
+    }
+    canonical_id = aliases.get(doctor_id, doctor_id)
+    doctor = next((d for d in FAMOUS_DOCTORS if d["id"] == canonical_id), None)
     if not doctor:
         raise HTTPException(status_code=404, detail="名医不存在")
     return {"success": True, "data": doctor}
@@ -157,9 +165,19 @@ async def list_stories():
 
 @router.get("/daily-wisdom", summary="每日中医智慧")
 async def get_daily_wisdom():
-    import random
+    from datetime import date
+    import hashlib
+
     all_quotes = []
     for classic in TCM_CLASSICS:
         all_quotes.extend(classic.get("famous_quotes", []))
-    quote = random.choice(all_quotes) if all_quotes else "医者仁术"
-    return {"success": True, "data": {"quote": quote, "date": __import__("datetime").date.today().isoformat()}}
+    today = date.today().isoformat()
+    if all_quotes:
+        index = int(hashlib.sha256(today.encode("utf-8")).hexdigest(), 16) % len(all_quotes)
+        quote = all_quotes[index]
+    else:
+        quote = "医者仁术"
+    return {
+        "success": True,
+        "data": {"quote": quote, "wisdom": quote, "date": today},
+    }
