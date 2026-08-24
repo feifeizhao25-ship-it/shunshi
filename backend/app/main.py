@@ -12,7 +12,7 @@ from .db import init_db, make_engine, make_session_factory
 from .db.database import engine as product_engine, init_db as init_product_db
 from .database.db import close_all_test_connections, init_db as init_record_store
 from .models.base import Base as product_model_base
-from .routers import chat, feedback, health, memory, reflections, seasons, settings as settings_router, subscription, user
+from .routers import chat, content, feedback, health, memory, reflections, seasons, settings as settings_router, subscription, user
 
 
 def _include_product_routers(app: FastAPI) -> None:
@@ -110,6 +110,20 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(feedback.router)
     app.include_router(settings_router.router)
     app.include_router(seasons.router)
+    # Only mount the authenticated proxy endpoints from the skeleton content
+    # module. Its /contents routes are placeholders and must not shadow the
+    # seeded, production catalogue discovered below.
+    content_proxy = APIRouter()
+    content_proxy_paths = {
+        "/api/v1/cms/content/{content_id}",
+        "/api/v1/seasons/audio/{audio_id}",
+    }
+    content_proxy.routes.extend(
+        route
+        for route in content.router.routes
+        if getattr(route, "path", None) in content_proxy_paths
+    )
+    app.include_router(content_proxy)
     _include_product_routers(app)
     return app
 

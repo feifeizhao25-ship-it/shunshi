@@ -56,12 +56,18 @@ def test_audio_progress_saved(client, auth_headers):
     ]
 
 
-def test_content_endpoints_fail_closed(client, auth_headers):
-    """无内容源配置：contents/cms/audio 详情一律 503 configured:false，不编造内容。"""
+def test_public_content_catalogue_uses_seeded_source(client):
+    """公开养生目录来自已落库内容，而不是骨架占位或模型临时编造。"""
+    response = client.get("/api/v1/contents")
+    assert response.status_code == 200
+    data = response.json()["data"]
+    assert data["total"] > 0
+    assert data["items"]
+
+
+def test_unconfigured_content_proxies_fail_closed(client, auth_headers):
+    """尚未接入的 CMS/音频代理一律 503 configured:false，不编造详情。"""
     for method, path in (
-        ("GET", "/api/v1/contents"),
-        ("GET", "/api/v1/contents/c1"),
-        ("POST", "/api/v1/contents/c1/like"),
         ("GET", "/api/v1/cms/content/c1"),
         ("GET", "/api/v1/seasons/audio/a1"),
     ):
@@ -71,5 +77,5 @@ def test_content_endpoints_fail_closed(client, auth_headers):
 
 
 def test_content_endpoints_require_auth(client):
-    assert client.get("/api/v1/contents").status_code == 401
+    assert client.get("/api/v1/cms/content/c1").status_code == 401
     assert client.get("/api/v1/seasons/audio/a1").status_code == 401
