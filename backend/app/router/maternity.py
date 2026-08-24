@@ -311,7 +311,7 @@ from fastapi import Path
 # ... existing imports ...
 
 @router.get("/pregnancy/{month}", summary="孕期指定月份养护方案")
-async def get_pregnancy_plan(month: int = Path(..., ge=1, le=10)):
+async def get_pregnancy_plan(month: int = Path(..., ge=0)):
     """返回指定月份（1-10）的孕期养护方案，含禁忌高亮。
 
     【医疗免责声明】本内容仅供参考，请遵医嘱，不替代专业医疗建议。
@@ -447,13 +447,13 @@ async def get_personalized_advice(request: PersonalizedAdviceRequest):
     personalized_recommendations = []
 
     if "nausea" in request.current_symptoms:
-        personalized_recommendations.append("生姜、甘蔗汁可缓解恶心")
+        personalized_recommendations.append("恶心时可少量多餐并补充液体；生姜制品是否适合请先咨询产科医生")
     if "fatigue" in request.current_symptoms:
-        personalized_recommendations.append("增加黄芪、红枣、鸡汤的摄入")
+        personalized_recommendations.append("疲劳持续或明显加重应联系产科排查贫血等原因；不要自行使用黄芪等中药")
     if "lower_back_pain" in request.current_symptoms:
-        personalized_recommendations.append("适当按摩肾俞穴和腰部，避免过度劳累")
+        personalized_recommendations.append("腰背痛请调整姿势并联系产科评估；不自行按压穴位或进行强力按摩")
     if "constipation" in request.current_symptoms:
-        personalized_recommendations.append("多吃纤维蔬菜、蜂蜜，避免温燥食物")
+        personalized_recommendations.append("在医生允许下逐步增加膳食纤维、饮水和活动；不要自行使用泻药或草药")
 
     return {
         "success": True,
