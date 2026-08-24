@@ -18,10 +18,10 @@ EYE_EXERCISES = [
             {"step": 4, "name": "按太阳穴", "duration": "1分钟", "method": "两拇指按太阳穴，食指刮上下眼皮"},
             {"step": 5, "name": "远眺放松", "duration": "1分钟", "method": "注视远处绿色植物，让眼部肌肉放松"},
         ],
-        "benefit": "缓解眼部疲劳，改善视力，预防近视"
+        "benefit": "可帮助安排短暂休息和放松感；没有替代验光或近视防控的作用"
     },
     {
-        "id": "ex_002", "name": "眼球运动操", "duration_minutes": 3,
+        "id": "ex_002", "aliases": ["eye_roll"], "name": "眼球运动操", "duration_minutes": 3,
         "steps": [
             {"step": 1, "name": "上下运动", "duration": "30秒", "method": "眼球缓慢上下移动10次"},
             {"step": 2, "name": "左右运动", "duration": "30秒", "method": "眼球缓慢左右移动10次"},
@@ -29,7 +29,7 @@ EYE_EXERCISES = [
             {"step": 4, "name": "逆时针转动", "duration": "30秒", "method": "眼球逆时针缓慢转动5圈"},
             {"step": 5, "name": "远近交替", "duration": "1分钟", "method": "看近处（10cm）然后看远处（6m），交替10次"},
         ],
-        "benefit": "锻炼眼部肌肉，改善眼部血液循环"
+        "benefit": "可作为短暂的用眼休息活动；不能替代视力检查或近视防控"
     }
 ]
 
@@ -111,16 +111,25 @@ TCM_EYE_DIET = {
 
 @router.get("/exercises", summary="眼部保健操列表")
 async def list_eye_exercises():
-    return {"success": True, "data": {"exercises": EYE_EXERCISES}}
+    return {"success": True, "data": {
+        "exercises": EYE_EXERCISES,
+        "disclaimer": "仅供一般性用眼休息参考；眼痛、视力突然变化、闪光或飞蚊骤增时应及时就医。",
+    }}
 
 
 @router.get("/exercises/{exercise_id}", summary="眼部保健操详情")
 async def get_eye_exercise(exercise_id: str):
-    exercise = next((e for e in EYE_EXERCISES if e["id"] == exercise_id), None)
+    exercise = next(
+        (e for e in EYE_EXERCISES if e["id"] == exercise_id or exercise_id in e.get("aliases", [])),
+        None,
+    )
     if not exercise:
         from fastapi import HTTPException
         raise HTTPException(status_code=404, detail="保健操不存在")
-    return {"success": True, "data": exercise}
+    return {"success": True, "data": {
+        **exercise,
+        "disclaimer": "动作应轻柔且不得按压眼球；不适时立即停止并咨询眼科专业人员。",
+    }}
 
 
 @router.get("/acupoints", summary="护眼穴位列表")
@@ -151,7 +160,7 @@ async def get_daily_eye_care(
         "exercise": "每周进行三次以上有氧运动，促进眼部血液循环"
     }
     if intensity == "high":
-        plan["extra"] = "用眼超过8小时，建议增加眼部热敷次数，使用人工泪液"
+        plan["extra"] = "用眼超过8小时，建议增加规律休息；人工泪液的选择和使用请咨询药师或眼科专业人员"
     return {
         "success": True,
         "data": {

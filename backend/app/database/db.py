@@ -38,7 +38,10 @@ def _get_connection() -> sqlite3.Connection:
         DB_DIR.mkdir(parents=True, exist_ok=True)
         conn = sqlite3.connect(str(DB_PATH), check_same_thread=False, timeout=30.0)
         conn.row_factory = sqlite3.Row
-        conn.execute("PRAGMA journal_mode=DELETE")
+        # TestClient serves requests from worker threads. WAL allows readers
+        # and writers to coexist and avoids false `database is locked` failures
+        # caused by the legacy rollback journal across those connections.
+        conn.execute("PRAGMA journal_mode=WAL")
         conn.execute("PRAGMA foreign_keys=ON")
         conn.execute("PRAGMA busy_timeout=30000")
         conn.execute("PRAGMA synchronous=NORMAL")

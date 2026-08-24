@@ -10,7 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from .config import Settings
 from .db import init_db, make_engine, make_session_factory
 from .db.database import engine as product_engine, init_db as init_product_db
-from .database.db import init_db as init_record_store
+from .database.db import close_all_test_connections, init_db as init_record_store
 from .models.base import Base as product_model_base
 from .routers import chat, feedback, health, memory, reflections, seasons, settings as settings_router, subscription, user
 
@@ -54,8 +54,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         init_product_db()
         product_model_base.metadata.create_all(product_engine)
         init_record_store()
-        yield
-        engine.dispose()
+        try:
+            yield
+        finally:
+            close_all_test_connections()
+            engine.dispose()
 
     app = FastAPI(
         title="顺时 API",
