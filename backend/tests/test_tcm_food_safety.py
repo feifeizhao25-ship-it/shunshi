@@ -196,27 +196,27 @@ class TestIncompatiblePairs:
 class TestCheckCompatibility:
     """POST /api/v1/food-safety/check - 食材相克检查"""
 
-    def test_check_spinach_tofu_incompatible(self, client):
-        """测试：菠菜和豆腐检查为不兼容"""
+    def test_check_spinach_tofu_debunks_pairing_myth(self, client):
+        """菠菜和豆腐不存在普遍成立的食物相克。"""
         response = client.post("/api/v1/food-safety/check", json={
             "food1": "菠菜",
             "food2": "豆腐",
         })
         assert response.status_code == 200
         data = response.json()["data"]
-        assert data["compatible"] is False
-        assert "reason" in data
-        assert "severity" in data
+        assert data["compatible"] is True
+        assert data["evidence"]["sources"]
 
-    def test_check_crab_persimmon_incompatible(self, client):
-        """测试：螃蟹和柿子检查为不兼容"""
+    def test_check_crab_persimmon_debunks_pairing_myth(self, client):
+        """螃蟹和柿子可以同食，并返回权威辟谣来源。"""
         response = client.post("/api/v1/food-safety/check", json={
             "food1": "螃蟹",
             "food2": "柿子",
         })
         assert response.status_code == 200
         data = response.json()["data"]
-        assert data["compatible"] is False
+        assert data["compatible"] is True
+        assert data["evidence"]["reviewed_at"] == "2026-08-24"
 
     def test_check_by_food_id(self, client):
         """测试：使用食材ID检查相克"""
@@ -225,7 +225,7 @@ class TestCheckCompatibility:
             "food2": "tofu",
         })
         assert response.status_code == 200
-        assert response.json()["data"]["compatible"] is False
+        assert response.json()["data"]["compatible"] is True
 
     def test_check_safe_combination_ginger_honey(self, client):
         """测试：生姜和蜂蜜安全组合（无记录）"""
@@ -253,21 +253,21 @@ class TestCheckCompatibility:
             "food2": "菠菜",
         })
         assert response.status_code == 200
-        assert response.json()["data"]["compatible"] is False
+        assert response.json()["data"]["compatible"] is True
 
     def test_check_missing_food1(self, client):
         """测试：缺少food1参数"""
         response = client.post("/api/v1/food-safety/check", json={
             "food2": "豆腐",
         })
-        assert response.status_code == 400
+        assert response.status_code == 422
 
     def test_check_missing_food2(self, client):
         """测试：缺少food2参数"""
         response = client.post("/api/v1/food-safety/check", json={
             "food1": "菠菜",
         })
-        assert response.status_code == 400
+        assert response.status_code == 422
 
     def test_check_invalid_food(self, client):
         """测试：无效食材返回404"""

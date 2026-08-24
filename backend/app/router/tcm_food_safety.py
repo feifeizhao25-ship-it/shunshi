@@ -10,6 +10,15 @@ from datetime import datetime
 
 router = APIRouter(prefix="/api/v1/food-safety", tags=["tcm_food_safety"])
 
+FOOD_PAIRING_EVIDENCE = {
+    "reviewed_at": "2026-08-24",
+    "conclusion": "营养学中没有普遍成立的‘食物相克’；应关注过敏、变质、食用量和个人疾病限制。",
+    "sources": [
+        {"title": "关于螃蟹的流言 几分真假？", "publisher": "陕西省卫生健康委员会", "url": "https://sxwjw.shaanxi.gov.cn/ywgz/gbbj/202012/t20201214_2145555.html"},
+        {"title": "柿子不能和鱼、虾、蟹、牛奶等同食？", "publisher": "广州市健康科普信息平台（来源：中国疾控中心）", "url": "https://kepu.wjw.gz.gov.cn/zs/content/post_4812.html"},
+    ],
+}
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Pydantic 请求模型
@@ -398,13 +407,6 @@ SEASON_FOODS = {
     "冬": ["white_radish", "sweet_potato", "lamb"],
 }
 
-TCM_PROPERTY_FOODS = {
-    "凉": ["spinach", "tofu", "white_radish", "bitter_melon", "lotus_root", "crab"],
-    "温": ["sweet_potato", "ginger", "garlic", "shrimp", "lamb"],
-    "平": ["honey", "milk", "egg", "pork", "chinese_yam", "black_fungus", "white_fungus", "black_tea"],
-}
-
-
 def _get_food_by_id(food_id: str):
     """根据ID获取食材，不存在则返回None"""
     return next((f for f in FOODS if f["id"] == food_id), None)
@@ -422,7 +424,7 @@ def _get_food_by_name(food_name: str):
 @router.get("/foods", summary="食材列表")
 async def list_foods(
     season: Optional[str] = Query(None, description="采购季节: 春/夏/秋/冬"),
-    tcm_property: Optional[str] = Query(None, description="中医性质: 凉/温/平"),
+    tcm_property: Optional[str] = Query(None, pattern=r"^(凉|温|平)$", description="中医性质: 凉/温/平"),
     limit: int = Query(20, ge=1, le=50),
 ):
     """返回食材列表，支持按季节和中医性质筛选。"""
@@ -432,9 +434,8 @@ async def list_foods(
         ids = SEASON_FOODS[season]
         results = [f for f in results if f["id"] in ids]
 
-    if tcm_property and tcm_property in TCM_PROPERTY_FOODS:
-        ids = TCM_PROPERTY_FOODS[tcm_property]
-        results = [f for f in results if f["id"] in ids]
+    if tcm_property:
+        results = [f for f in results if f["tcm_property"] == tcm_property]
 
     return {
         "success": True,
@@ -456,81 +457,46 @@ async def get_food_detail(food_id: str):
 
 @router.get("/incompatible-pairs", summary="食物相克组合列表")
 async def list_incompatible_pairs(limit: int = Query(10, ge=1, le=20)):
-    """返回所有经典食物相克组合。"""
+    """兼容旧路径，返回已辟谣的民间搭配说法及权威依据。"""
+    myths = [
+        {**pair, "is_myth": True, "compatible": True, "correction": FOOD_PAIRING_EVIDENCE["conclusion"]}
+        for pair in INCOMPATIBLE_PAIRS[:limit]
+    ]
     return {
         "success": True,
         "data": {
-            "pairs": INCOMPATIBLE_PAIRS[:limit],
+            "pairs": myths,
             "total": len(INCOMPATIBLE_PAIRS),
+            "evidence": FOOD_PAIRING_EVIDENCE,
         },
     }
 
 
 @router.post("/check", summary="食材相克检查")
 async def check_compatibility(body: FoodCompatCheckRequest):
-    """检查两种食材是否相克。"""
+    """检查食材搭配，并纠正没有科学依据的普遍‘相克’说法。"""
     food1 = body.food1
     food2 = body.food2
 
     f1 = _get_food_by_name(food1) or _get_food_by_id(food1)
     f2 = _get_food_by_name(food2) or _get_food_by_id(food2)
+    known_names = {
+        name
+        for pair in INCOMPATIBLE_PAIRS
+        for name in pair["combination"].split(" + ")
+    } | {"冰糖", "番茄", "西红柿"}
 
-    if not f1 or not f2:
+    if (not f1 and food1 not in known_names) or (not f2 and food2 not in known_names):
         raise HTTPException(status_code=404, detail="One or both foods not found")
-
-    # 检查相克
-    for pair in INCOMPATIBLE_PAIRS:
-        pair_foods = pair["combination"].split(" + ")
-        if (food1 in pair_foods and food2 in pair_foods) or \
-           (f1["name"] in pair_foods and f2["name"] in pair_foods):
-            return {
-                "success": True,
-                "data": {
-                    "food1": food1,
-                    "food2": food2,
-                    "compatible": False,
-                    "reason": pair["reason"],
-                    "tcm_view": pair["tcm_view"],
-                    "severity": pair["severity"],
-                    "interval_hours": pair["recommended_interval_hours"],
-                },
-            }
-
-    # 检查禁忌列表
-    for forbidden in f1.get("forbidden_combinations", []):
-        if forbidden["food"] == food2 or forbidden["food"] == f2["name"]:
-            return {
-                "success": True,
-                "data": {
-                    "food1": food1,
-                    "food2": food2,
-                    "compatible": False,
-                    "reason": forbidden["reason"],
-                    "severity": forbidden["severity"],
-                },
-            }
-
-    for forbidden in f2.get("forbidden_combinations", []):
-        if forbidden["food"] == food1 or forbidden["food"] == f1["name"]:
-            return {
-                "success": True,
-                "data": {
-                    "food1": food1,
-                    "food2": food2,
-                    "compatible": False,
-                    "reason": forbidden["reason"],
-                    "severity": forbidden["severity"],
-                },
-            }
-
-    # 安全组合
     return {
         "success": True,
         "data": {
             "food1": food1,
             "food2": food2,
             "compatible": True,
-            "message": "两种食材可安全搭配食用",
+            "message": FOOD_PAIRING_EVIDENCE["conclusion"],
+            "cautions": ["确认食材新鲜并充分烹调", "有食物过敏或基础疾病时遵医嘱", "任何食物均应适量"],
+            "evidence": FOOD_PAIRING_EVIDENCE,
         },
     }
 
