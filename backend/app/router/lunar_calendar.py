@@ -4,10 +4,17 @@
 """
 
 from fastapi import APIRouter, HTTPException, Query
+from pydantic import BaseModel, Field
 from typing import Optional, List
 from datetime import datetime
 
 router = APIRouter(prefix="/api/v1/lunar", tags=["lunar_calendar"])
+
+
+class BirthdayWellnessRequest(BaseModel):
+    lunar_month: int = Field(..., ge=1, le=12)
+    lunar_day: int = Field(..., ge=1, le=30)
+    constitution_type: Optional[str] = Field(None, max_length=50)
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 传统节日数据库（12 个节日）
@@ -427,35 +434,17 @@ async def monthly_wellness(month: int):
 
 @router.post("/birthday", summary="农历生日养生建议")
 async def birthday_wellness(
-    lunar_month: int,
-    lunar_day: int,
-    constitution_type: Optional[str] = None,
+    request: BirthdayWellnessRequest,
 ):
-    """根据农历生日（月日）和体质类型提供养生建议。"""
-    if lunar_month < 1 or lunar_month > 12:
-        raise HTTPException(status_code=422, detail="Lunar month must be between 1 and 12")
-    if lunar_day < 1 or lunar_day > 30:
-        raise HTTPException(status_code=422, detail="Lunar day must be between 1 and 30")
+    """返回生日月份对应的文化季节内容，不依据生日诊断体质。"""
+    lunar_month = request.lunar_month
+    lunar_day = request.lunar_day
+    constitution_type = request.constitution_type
 
     monthly_info = LUNAR_MONTHLY_WELLNESS.get(lunar_month, {})
 
-    # 根据出生月份推断体质倾向
-    constitution_mapping = {
-        1: "qi_deficiency",
-        2: "liver_qi_stagnation",
-        3: "spleen_weakness",
-        4: "spleen_weakness",
-        5: "damp_heat",
-        6: "damp_heat",
-        7: "heart_weakness",
-        8: "yin_deficiency",
-        9: "yin_deficiency",
-        10: "qi_deficiency",
-        11: "yang_deficiency",
-        12: "yang_deficiency",
-    }
-
-    inferred_constitution = constitution_mapping.get(lunar_month, "balanced")
+    # 保留旧字段名以兼容客户端；值只接受用户自述，生日不能推断体质。
+    inferred_constitution = constitution_type or "not_assessed"
 
     return {
         "success": True,
@@ -463,7 +452,9 @@ async def birthday_wellness(
             "lunar_birthday": f"{lunar_month}-{lunar_day}",
             "birth_month_name": monthly_info.get("month_name", ""),
             "inferred_constitution": constitution_type or inferred_constitution,
-            "constitution_description": f"出生于农历{monthly_info.get('month_name', '')}，体质倾向为：{constitution_type or inferred_constitution}",
+            "constitution_description": "体质不能依据出生日期推断；如需记录，仅展示用户自述结果。",
+            "constitution_source": "self_reported" if constitution_type else "not_assessed",
+            "content_scope": "传统历法文化与一般生活方式参考，不构成医学诊断或个体化治疗建议。",
             "monthly_focus": monthly_info.get("focus", ""),
             "recommended_foods": monthly_info.get("recommended_foods", []),
             "avoided_foods": monthly_info.get("avoided_foods", []),
