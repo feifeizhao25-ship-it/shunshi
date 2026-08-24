@@ -198,6 +198,8 @@ def app(db, monkeypatch):
 
     # 创建测试专用 app (只包含 auth 路由, 不触发 lifespan)
     test_app = FastAPI(title="Test Auth API")
+    from app.config import Settings
+    test_app.state.settings = Settings(env="test", jwt_secret=JWT_SECRET)
     test_app.include_router(auth_mod.router)
 
     return test_app
@@ -481,13 +483,7 @@ class TestTokenManagement:
 
         resp = await client.get("/api/v1/auth/me",
                                 headers={"Authorization": f"Bearer {expired_token}"})
-        # 无效 token 会 fallback 到演示用户（这是当前行为的一个特点）
-        # 端点不严格返回 401，而是返回演示用户
-        assert resp.status_code == 200
-        # 但不应返回我们创建的用户数据
-        assert resp.json()["data"]["email"] != "expired@test.com"
-        # BUG 记录: /me 端点在 token 无效时 fallback 到演示用户而非返回 401
-        # 这与 _get_current_user_from_request (严格模式) 行为不一致
+        assert resp.status_code == 401
 
     @pytest.mark.asyncio
     async def test_refresh_token_refreshes_access(self, client, db):
@@ -910,13 +906,11 @@ class TestSMSCodeFlow:
 class TestEdgeCases:
 
     @pytest.mark.asyncio
-    async def test_login_nonexistent_user_demo_mode(self, client, db):
-        """登录不存在的用户 — 当前行为是返回演示用户"""
+    async def test_login_nonexistent_user_rejected(self, client, db):
+        """不存在的账号不得获得任何用户令牌。"""
         resp = await client.post("/api/v1/auth/login",
                                  json=_login_payload("nonexist@test.com", "any"))
-        # BUG 记录: 不存在的用户不应返回 200，应返回 401
-        # 当前实现会自动创建/返回演示用户
-        assert resp.status_code == 200
+        assert resp.status_code == 401
 
     @pytest.mark.asyncio
     async def test_logout_without_token(self, client, db):

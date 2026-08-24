@@ -125,6 +125,7 @@ CREATE TABLE IF NOT EXISTS users (
     id TEXT PRIMARY KEY,
     name TEXT DEFAULT '用户',
     email TEXT UNIQUE,
+    phone TEXT UNIQUE,
     password_hash TEXT NOT NULL DEFAULT '',
     avatar_url TEXT,
     life_stage TEXT DEFAULT 'exploration',
@@ -1643,6 +1644,7 @@ def init_db():
         
         # 确保新增列存在（国际版 OAuth + Stripe 支持）
         for col_sql in [
+            "ALTER TABLE users ADD COLUMN phone TEXT",
             "ALTER TABLE users ADD COLUMN google_id TEXT UNIQUE",
             "ALTER TABLE users ADD COLUMN apple_id TEXT UNIQUE",
             "ALTER TABLE users ADD COLUMN apple_user_id TEXT",
@@ -1659,6 +1661,7 @@ def init_db():
         # 确保索引存在
         try:
             conn.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_users_apple_id ON users(apple_id)")
+            conn.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_users_phone ON users(phone)")
             conn.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_users_apple_user_id ON users(apple_user_id)")
             conn.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_users_wechat_openid ON users(wechat_openid)")
         except sqlite3.OperationalError:

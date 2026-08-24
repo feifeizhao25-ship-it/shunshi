@@ -150,14 +150,13 @@ class TestLoginEndpoint:
         assert response.status_code == 401
         assert "密码错误" in response.json().get("detail", response.json().get("error", ""))
 
-    def test_login_nonexistent_user_fallback(self, client):
-        """不存在的用户会回退到演示用户"""
+    def test_login_nonexistent_user_rejected(self, client):
+        """不存在的用户不得获取演示账号令牌。"""
         response = client.post("/api/v1/auth/login", json={
             "email": "nonexistent@test.com",
             "password": "anything",
         })
-        # 演示模式：不存在的用户也会返回 token
-        assert response.status_code == 200
+        assert response.status_code == 401
 
     def test_login_missing_fields(self, client):
         response = client.post("/api/v1/auth/login", json={
@@ -206,9 +205,7 @@ class TestMeEndpoint:
 
     def test_me_without_token(self, client):
         response = client.get("/api/v1/auth/me")
-        assert response.status_code == 200
-        data = response.json()
-        assert data["success"] is True
+        assert response.status_code == 401
 
     def test_me_with_token(self, client, test_user_token):
         response = client.get(

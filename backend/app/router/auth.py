@@ -2,7 +2,7 @@
 # 生产级升级: Token轮换 · 多设备管理 · 游客模式 · 账号安全 · 密码预留
 from fastapi import APIRouter, HTTPException, Query, Depends, Header
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 from typing import Optional, List
 from datetime import datetime, timedelta, timezone
 import os
@@ -12,6 +12,14 @@ import hashlib
 import threading
 import logging
 import time
+
+from app.config import Settings
+from app.deps import get_settings
+from app.security import (
+    issue_token as issue_core_token,
+    revoke_token as revoke_core_token,
+    verify_token as verify_core_token,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -118,13 +126,27 @@ _sms_rate_limit: dict = {}           # phone -> {"last_sent": timestamp, "daily_
 # ============ Models ============
 
 class RegisterRequest(BaseModel):
-    email: str
+    email: Optional[str] = None
+    phone: Optional[str] = Field(None, pattern=r"^1\d{10}$")
     password: str
     name: Optional[str] = None
 
+    @model_validator(mode="after")
+    def require_one_identifier(self):
+        if bool(self.email) == bool(self.phone):
+            raise ValueError("邮箱和手机号必须且只能填写一个")
+        return self
+
 class LoginRequest(BaseModel):
-    email: str
+    email: Optional[str] = None
+    phone: Optional[str] = Field(None, pattern=r"^1\d{10}$")
     password: str
+
+    @model_validator(mode="after")
+    def require_one_identifier(self):
+        if bool(self.email) == bool(self.phone):
+            raise ValueError("邮箱和手机号必须且只能填写一个")
+        return self
 
 class RefreshRequest(BaseModel):
     refresh_token: str
@@ -570,7 +592,8 @@ def get_user_from_token(token: str) -> Optional[dict]:
     return None
 
 def _get_current_user_from_request(
-    credentials: Optional[HTTPAuthorizationCredentials] = Depends(_bearer_scheme)
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(_bearer_scheme),
+    settings: Settings = Depends(get_settings),
 ) -> dict:
     """
     FastAPI 依赖注入（严格模式）: 必须提供有效 token，否则返回401
@@ -581,7 +604,19 @@ def _get_current_user_from_request(
     
     token = credentials.credentials
     payload = None
-    
+
+    try:
+        user_id = verify_core_token(settings, token)
+        row = get_db().execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone()
+        if row:
+            user = dict(row)
+            if user.get("status") == "deleted":
+                raise HTTPException(status_code=403, detail="账号已注销")
+            return user
+    except HTTPException as exc:
+        if exc.status_code == 403:
+            raise
+
     if _JWT_AVAILABLE:
         payload = decode_token(token)
     
@@ -671,26 +706,31 @@ def _get_or_create_device(db, user_id: str, device_id: str, platform: str = "unk
 # ============ API Endpoints (原有，保持签名不变) ============
 
 @router.post("/register", response_model=dict, summary="用户注册", description="使用邮箱和密码注册新用户，返回JWT access_token和refresh_token")
-async def register(request: RegisterRequest):
+async def register(request: RegisterRequest, settings: Settings = Depends(get_settings)):
     """用户注册"""
     db = get_db()
     
-    # 检查邮箱是否已存在
-    existing = db.execute("SELECT id FROM users WHERE email = ?", (request.email,)).fetchone()
+    identifier_column = "email" if request.email else "phone"
+    identifier = request.email or request.phone
+    existing = db.execute(
+        f"SELECT id FROM users WHERE {identifier_column} = ?", (identifier,)
+    ).fetchone()
     if existing:
-        raise HTTPException(status_code=400, detail="邮箱已被注册")
+        status_code = 400 if request.email else 409
+        label = "邮箱" if request.email else "手机号"
+        raise HTTPException(status_code=status_code, detail=f"{label}已被注册")
     
     # 创建用户
     user_id = f"user_{uuid.uuid4().hex[:12]}"
     now = datetime.now(timezone.utc).isoformat()
     
     db.execute("""
-        INSERT INTO users (id, email, name, password_hash, life_stage, created_at, updated_at)
-        VALUES (?, ?, ?, ?, 'exploration', ?, ?)
-    """, (user_id, request.email, request.name or "用户", hash_password(request.password), now, now))
+        INSERT INTO users (id, email, phone, name, password_hash, life_stage, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, 'exploration', ?, ?)
+    """, (user_id, request.email, request.phone, request.name or "用户", hash_password(request.password), now, now))
     
     # 生成 JWT token
-    access_token = create_access_token(user_id, request.name or "用户", request.email)
+    access_token = issue_core_token(settings, user_id)["access_token"]
     refresh_token = create_refresh_token(user_id)
     
     # 保存 legacy token 向后兼容
@@ -698,12 +738,13 @@ async def register(request: RegisterRequest):
     db.execute("INSERT INTO auth_tokens (token, user_id) VALUES (?, ?)", (legacy_token, user_id))
     db.commit()
     
-    return {
+    response = {
         "success": True,
         "data": {
             "user": {
                 "id": user_id,
                 "email": request.email,
+                "phone": request.phone,
                 "name": request.name or "用户",
                 "life_stage": "exploration"
             },
@@ -713,37 +754,35 @@ async def register(request: RegisterRequest):
             "expires_in": JWT_ACCESS_EXPIRE_MINUTES * 60,
         }
     }
+    response["access_token"] = access_token
+    return response
 
 @router.post("/login", response_model=dict, summary="用户登录", description="邮箱密码登录，返回JWT access_token和refresh_token")
-async def login(request: LoginRequest):
+async def login(request: LoginRequest, settings: Settings = Depends(get_settings)):
     """用户登录"""
     db = get_db()
     
-    # 查找用户
-    row = db.execute("SELECT * FROM users WHERE email = ?", (request.email,)).fetchone()
+    identifier_column = "email" if request.email else "phone"
+    identifier = request.email or request.phone
+    row = db.execute(
+        f"SELECT * FROM users WHERE {identifier_column} = ?", (identifier,)
+    ).fetchone()
     
     if not row:
-        # 创建演示用户（保留原始行为）
-        user_id = "user-001"
-        name = "演示用户"
-        life_stage = "exploration"
-        is_premium = 0
-        subscription_plan = "free"
-        pw_hash = ""
-    else:
-        user_id = row["id"]
-        name = row["name"]
-        life_stage = row["life_stage"]
-        is_premium = row["is_premium"]
-        subscription_plan = row["subscription_plan"]
-        pw_hash = row["password_hash"]
+        raise HTTPException(status_code=401, detail="账号或密码错误")
+    user_id = row["id"]
+    name = row["name"]
+    life_stage = row["life_stage"]
+    is_premium = row["is_premium"]
+    subscription_plan = row["subscription_plan"]
+    pw_hash = row["password_hash"]
     
     # 验证密码（如果有的话）
     if pw_hash and not verify_password(request.password, pw_hash):
         raise HTTPException(status_code=401, detail="密码错误")
     
     # 生成 JWT token
-    access_token = create_access_token(user_id, name, request.email)
+    access_token = issue_core_token(settings, user_id)["access_token"]
     refresh_token = create_refresh_token(user_id)
     
     # 保存 legacy token 向后兼容
@@ -756,12 +795,13 @@ async def login(request: LoginRequest):
                (now, now, user_id))
     db.commit()
     
-    return {
+    response = {
         "success": True,
         "data": {
             "user": {
                 "id": user_id,
                 "email": request.email,
+                "phone": request.phone,
                 "name": name,
                 "life_stage": life_stage,
                 "is_premium": bool(is_premium),
@@ -773,11 +813,13 @@ async def login(request: LoginRequest):
             "expires_in": JWT_ACCESS_EXPIRE_MINUTES * 60,
         }
     }
+    response["access_token"] = access_token
+    return response
 
 # ============ Token 轮换 ============
 
 @router.post("/refresh", response_model=dict, summary="刷新Token", description="使用refresh_token换取新的access_token和refresh_token，旧refresh_token立即失效")
-async def refresh_token(request: RefreshRequest):
+async def refresh_token(request: RefreshRequest, settings: Settings = Depends(get_settings)):
     """
     刷新 access token (Token 轮换)
     - 验证 refresh_token
@@ -813,10 +855,7 @@ async def refresh_token(request: RefreshRequest):
     # 生成新的 access token 和 refresh token (轮换)
     new_access_jti = str(uuid.uuid4())
     new_refresh_jti = str(uuid.uuid4())
-    new_access_token = create_access_token(
-        user_id, user["name"], user["email"],
-        device_id=device_id, jti=new_access_jti
-    )
+    new_access_token = issue_core_token(settings, user_id)["access_token"]
     new_refresh_token = create_refresh_token(
         user_id, device_id=device_id, jti=new_refresh_jti
     )
@@ -842,29 +881,33 @@ async def refresh_token(request: RefreshRequest):
     }
 
 @router.get("/me", response_model=dict, summary="获取当前用户", description="根据Bearer Token返回当前登录用户的基本信息")
-async def get_me(authorization: str = Header(None)):
+async def get_me(
+    authorization: str = Header(None),
+    settings: Settings = Depends(get_settings),
+):
     """获取当前用户信息"""
     token = None
     if authorization and authorization.startswith("Bearer "):
         token = authorization.replace("Bearer ", "")
     
-    user = get_user_from_token(token) if token else None
+    user = None
+    if token:
+        try:
+            user_id = verify_core_token(settings, token)
+            row = get_db().execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone()
+            user = dict(row) if row else None
+        except HTTPException:
+            user = None
     
     if not user:
-        # 返回演示用户
-        db = get_db()
-        row = db.execute("SELECT * FROM users WHERE id = 'user-001'").fetchone()
-        if row:
-            user = dict(row)
-        else:
-            user = {"id": "user-001", "email": "demo@shunshi.com", "name": "演示用户",
-                    "life_stage": "exploration", "is_premium": 0, "subscription_plan": "free"}
+        raise HTTPException(status_code=401, detail="未登录或令牌无效")
     
     return {
         "success": True,
         "data": {
             "id": user["id"],
-            "email": user["email"],
+            "email": user.get("email"),
+            "phone": user.get("phone"),
             "name": user["name"],
             "life_stage": user["life_stage"],
             "is_premium": bool(user.get("is_premium", 0)),
@@ -873,10 +916,14 @@ async def get_me(authorization: str = Header(None)):
     }
 
 @router.post("/logout", response_model=dict, summary="退出登录", description="使当前Token立即失效（加入黑名单）")
-async def logout(authorization: str = Query(None)):
+async def logout(
+    authorization: str = Query(None),
+    settings: Settings = Depends(get_settings),
+):
     """退出登录（使当前 token 立即失效）"""
     if authorization and authorization.startswith("Bearer "):
         token = authorization.replace("Bearer ", "")
+        revoke_core_token(settings, token)
         
         # JWT: 加入黑名单
         if _JWT_AVAILABLE:
