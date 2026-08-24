@@ -12,7 +12,7 @@ from .db import init_db, make_engine, make_session_factory
 from .db.database import engine as product_engine, init_db as init_product_db
 from .database.db import init_db as init_record_store
 from .models.base import Base as product_model_base
-from .routers import chat, content, feedback, health, memory, reflections, seasons, settings as settings_router, subscription, user
+from .routers import chat, feedback, health, memory, reflections, seasons, settings as settings_router, subscription, user
 
 
 def _include_product_routers(app: FastAPI) -> None:
@@ -75,6 +75,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
 
     app.include_router(health.router)
+    # These authenticated core routes remain authoritative. The legacy content
+    # proxy is intentionally excluded because the production content router
+    # below owns the public catalogue and search contract.
     app.include_router(user.router)
     app.include_router(memory.router)
     app.include_router(chat.router)
@@ -83,7 +86,6 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(feedback.router)
     app.include_router(settings_router.router)
     app.include_router(seasons.router)
-    app.include_router(content.router)
     _include_product_routers(app)
     return app
 
