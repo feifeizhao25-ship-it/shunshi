@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 # ==================== 配置 ====================
 
-DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "sk-be3af715e1a24dd9be2145a39e0869ec")
+DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "")
 DEEPSEEK_BASE_URL = os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
 
 # 模型映射

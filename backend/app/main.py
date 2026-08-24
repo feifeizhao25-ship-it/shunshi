@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 import importlib
 import pkgutil
 
-from fastapi import FastAPI
+from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .config import Settings
@@ -75,6 +75,27 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
 
     app.include_router(health.router)
+    # The production auth contract accepts the email/password payload used by
+    # the shipped clients. Mount only those overlapping account primitives
+    # before the legacy skeleton user router. Other legacy account endpoints
+    # (data export/deletion and guest auth) remain authoritative; mounting the
+    # whole production router here would silently replace their response
+    # contracts because Starlette resolves duplicate paths by registration
+    # order.
+    from .router import auth as product_auth_router
+    auth_compat = APIRouter()
+    preferred_auth_paths = {
+        "/api/v1/auth/register",
+        "/api/v1/auth/login",
+        "/api/v1/auth/refresh",
+        "/api/v1/auth/me",
+    }
+    auth_compat.routes.extend(
+        route
+        for route in product_auth_router.router.routes
+        if getattr(route, "path", None) in preferred_auth_paths
+    )
+    app.include_router(auth_compat)
     # These authenticated core routes remain authoritative. The legacy content
     # proxy is intentionally excluded because the production content router
     # below owns the public catalogue and search contract.
