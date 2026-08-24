@@ -206,6 +206,7 @@ async def get_current_shichen():
         "success": True,
         "data": {
             **data,
+            "shichen_name": data["name_cn"],
             "current_time": datetime.now().strftime("%H:%M"),
             "message": f"现在是{data['name_cn']}，{data['wellness']['principle']}"
         }
