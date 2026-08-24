@@ -357,9 +357,16 @@ async def search_by_symptom(symptom: str = Query(..., description="西方症状�
     }
 
 
-@router.get("/constitution/{western_description}", summary="体质查询")
-async def find_constitution_by_western(q: str = Query(..., description="西方体质或症状描述")):
+@router.get("/constitution", summary="体质查询")
+@router.get("/constitution/{western_description}", summary="体质查询（旧路径兼容）")
+async def find_constitution_by_western(
+    western_description: Optional[str] = None,
+    q: Optional[str] = Query(None, description="西方体质或症状描述"),
+):
     """用西方描述查找对应的 TCM 体质概念。"""
+    q = (q or western_description or "").strip()
+    if not q:
+        raise HTTPException(status_code=422, detail="请提供查询描述")
     q_lower = q.lower()
     results = []
 
