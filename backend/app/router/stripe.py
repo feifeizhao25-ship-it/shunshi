@@ -271,7 +271,7 @@ async def create_checkout_session(request: CreateCheckoutRequest):
 
 
 @router.post("/create-portal-session", response_model=dict)
-async def create_portal_session(user_id: str = Query("user-001")):
+async def create_portal_session(user_id: str = Query(..., min_length=1)):
     """
     创建 Stripe Customer Portal Session
     用户可在此管理订阅: 升级、降级、取消

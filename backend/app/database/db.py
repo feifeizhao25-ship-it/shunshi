@@ -25,6 +25,7 @@ _local = threading.local()
 
 # 全局锁，用于初始化（仅启动时）
 _init_lock = threading.Lock()
+_initialized = False
 
 # 测试环境连接追踪（用于批量关闭）
 _test_connections = []
@@ -100,6 +101,10 @@ class _TextCompatibleConnection:
 
 def get_db():
     """获取数据库连接（FastAPI 依赖注入用）"""
+    # Some ASGI test clients and embedded consumers do not enter app lifespan.
+    # Keep request handling safe without relying on import-time side effects.
+    if not _initialized:
+        init_db()
     return _TextCompatibleConnection(_get_connection())
 
 
@@ -1614,6 +1619,7 @@ VALUES ('user-001', '演示用户', 'demo@shunshi.com', '', 'exploration');
 
 def init_db():
     """初始化数据库：建表 + 种子数据"""
+    global _initialized
     with _init_lock:
         conn = _get_connection()
         
@@ -1697,6 +1703,7 @@ def init_db():
             print(f"[DB] 语言分布: {locale_counts}")
         else:
             print(f"[DB] 数据库已就绪，现有 {count} 条内容记录")
+        _initialized = True
 
 
 # ==================== 辅助函数 ====================
