@@ -47,13 +47,16 @@ _banners: Dict[str, dict] = {
 class BannerCreateRequest(BaseModel):
     title: str = Field(..., max_length=50)
     subtitle: Optional[str] = Field(None, max_length=100)
-    image_url: str
-    link_url: str
+    type: Optional[str] = None
+    content: Optional[str] = None
+    image_url: str = ""
+    link_url: str = ""
     link_type: str = Field(default="internal", description="internal/external")
     position: str = Field(default="home_top")
-    platforms: List[str] = Field(default=["ios_cn", "android_cn"])
-    start_date: str
-    end_date: str
+    platforms: List[str] = Field(default_factory=lambda: ["ios_cn", "android_cn"])
+    platform: Optional[List[str]] = None
+    start_date: str = Field(default_factory=lambda: date.today().isoformat())
+    end_date: str = "2099-12-31"
     priority: int = Field(default=5, ge=1, le=10)
     solar_term: Optional[str] = None
 
@@ -98,12 +101,13 @@ async def create_banner(request: BannerCreateRequest):
     banner = {
         "id": banner_id,
         "title": request.title,
-        "subtitle": request.subtitle,
+        "subtitle": request.subtitle or request.content,
+        "type": request.type,
         "image_url": request.image_url,
         "link_url": request.link_url,
         "link_type": request.link_type,
         "position": request.position,
-        "platforms": request.platforms,
+        "platforms": request.platform or request.platforms,
         "start_date": request.start_date,
         "end_date": request.end_date,
         "is_active": True,
@@ -112,7 +116,7 @@ async def create_banner(request: BannerCreateRequest):
         "created_at": datetime.now().isoformat()
     }
     _banners[banner_id] = banner
-    return {"success": True, "data": {"banner": banner, "message": "横幅创建成功"}}
+    return {"success": True, "data": {"banner_id": banner_id, "banner": banner, "message": "横幅创建成功"}}
 
 
 @router.delete("/{banner_id}", summary="停用横幅")
