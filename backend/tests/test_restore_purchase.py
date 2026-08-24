@@ -417,11 +417,24 @@ class TestRestoreMockMode:
         """Mock 模式收据 hash 一致性"""
         from app.services.apple_receipt import verify_apple_receipt
 
-        receipt = "CONSISTENT_RECEIPT_DATA"
+        receipt = "MOCK_CONSISTENT_RECEIPT_DATA"
         expected_hash = hashlib.sha256(receipt.encode()).hexdigest()[:16]
 
         result = asyncio.run(verify_apple_receipt(receipt_data=receipt))
         assert expected_hash in result.get("transaction_id", "")
+
+    def test_mock_receipts_rejected_outside_testing(self, monkeypatch):
+        """生产环境即使使用 MOCK_ 前缀也不能激活购买。"""
+        from app.services.apple_receipt import verify_apple_receipt
+        from app.services.google_purchase import verify_google_purchase
+
+        monkeypatch.setenv("APP_ENV", "production")
+        ios = asyncio.run(verify_apple_receipt("MOCK_RECEIPT_PRODUCTION_BLOCK"))
+        android = asyncio.run(verify_google_purchase(
+            "com.shunshi.app", "com.shunshi.yiyang.yearly", "MOCK_ANDROID_PRODUCTION_BLOCK"
+        ))
+        assert ios["valid"] is False
+        assert android["valid"] is False
 
     def test_android_empty_token_rejected(self):
         """空 token 应被拒绝"""

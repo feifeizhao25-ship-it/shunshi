@@ -70,8 +70,10 @@ async def verify_google_purchase(
             "error": "购买令牌为空或格式错误",
         }
 
-    # Mock 模式 — 优雅降级
+    # 仅显式测试环境、且带测试前缀的令牌可以走 mock；生产缺配置必须失败关闭。
     if MOCK_MODE:
+        if os.getenv("APP_ENV") == "testing" and purchase_token.startswith("MOCK_"):
+            return _mock_verify(product_id, purchase_token, is_subscription)
         logger.warning("Google Play purchase verification not configured (GOOGLE_SERVICE_ACCOUNT_JSON missing)")
         return {
             "valid": False,

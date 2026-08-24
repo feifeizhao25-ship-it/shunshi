@@ -82,8 +82,10 @@ async def verify_apple_receipt(
             "error": "收据数据为空或格式错误",
         }
 
-    # Mock 模式 — 优雅降级
+    # 仅显式测试环境、且带测试前缀的凭证可以走 mock；生产缺配置必须失败关闭。
     if MOCK_MODE:
+        if os.getenv("APP_ENV") == "testing" and receipt_data.startswith("MOCK_"):
+            return _mock_verify(receipt_data, transaction_id)
         logger.warning("Apple receipt verification not configured (APPLE_SHARED_SECRET missing)")
         return {
             "valid": False,
