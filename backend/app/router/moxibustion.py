@@ -5,7 +5,7 @@
 
 from fastapi import APIRouter, Query, HTTPException
 from typing import Optional, List
-from datetime import datetime
+from datetime import date, datetime
 
 router = APIRouter(prefix="/api/v1/moxibustion", tags=["moxibustion"])
 
@@ -273,9 +273,9 @@ SANFU_THERAPY_DATA = {
         "final_fu": {"start_date": "2025-08-13", "end_date": "2025-08-22", "name": "末伏"},
     },
     2026: {
-        "initial_fu": {"start_date": "2026-07-16", "end_date": "2026-07-25", "name": "初伏"},
-        "middle_fu": {"start_date": "2026-07-26", "end_date": "2026-08-14", "name": "中伏"},
-        "final_fu": {"start_date": "2026-08-15", "end_date": "2026-08-24", "name": "末伏"},
+        "initial_fu": {"start_date": "2026-07-15", "end_date": "2026-07-24", "name": "初伏"},
+        "middle_fu": {"start_date": "2026-07-25", "end_date": "2026-08-13", "name": "中伏"},
+        "final_fu": {"start_date": "2026-08-14", "end_date": "2026-08-23", "name": "末伏"},
     },
     2027: {
         "initial_fu": {"start_date": "2027-07-15", "end_date": "2027-07-24", "name": "初伏"},
@@ -314,6 +314,23 @@ SANJIU_THERAPY_DATA = {
 def _get_point_by_id(point_id: str):
     """根据ID获取穴位"""
     return next((p for p in MOXIBUSTION_POINTS if p["id"] == point_id), None)
+
+
+def _therapy_period_active(periods: dict, today: date) -> bool:
+    return any(
+        date.fromisoformat(period["start_date"]) <= today <= date.fromisoformat(period["end_date"])
+        for period in periods.values()
+    )
+
+
+def _next_therapy_period(schedule: dict, today: date):
+    candidates = []
+    for year, periods in schedule.items():
+        start = min(date.fromisoformat(period["start_date"]) for period in periods.values())
+        end = max(date.fromisoformat(period["end_date"]) for period in periods.values())
+        if end >= today:
+            candidates.append((start, year, periods))
+    return min(candidates, default=None, key=lambda item: item[0])
 
 
 def _current_season():
@@ -410,13 +427,11 @@ async def get_constitution_plan(constitution_type: str):
 
 @router.get("/seasonal-therapy", summary="三伏灸/三九灸信息")
 async def seasonal_therapy():
-    """根据当前月份返回三伏灸或三九灸信息。"""
+    """返回传统三伏、三九日期资料；不据此宣称疗效。"""
     now = datetime.now()
+    today = now.date()
     current_month = now.month
     current_year = now.year
-
-    is_sanfu_season = current_month in (7, 8)
-    is_sanjiu_season = current_month in (12, 1)
 
     result = {
         "current_month": current_month,
@@ -425,46 +440,27 @@ async def seasonal_therapy():
         "sanjiu_therapy": None,
     }
 
-    if is_sanfu_season:
-        therapy_data = SANFU_THERAPY_DATA.get(current_year)
-        if therapy_data:
-            result["sanfu_therapy"] = {
-                "active": True,
-                "periods": therapy_data,
-                "main_points": ["zusanli", "guanyuan", "mingmen"],
-                "description": "三伏灸为冬病夏治之法，在三伏天艾灸穴位，可温阳扶正，预防冬季疾病",
-            }
-    else:
-        # 查找下一个三伏灸时期
-        next_year = current_year if current_month < 7 else current_year + 1
-        therapy_data = SANFU_THERAPY_DATA.get(next_year)
-        if therapy_data:
-            result["sanfu_therapy"] = {
-                "active": False,
-                "next_period": f"{next_year}年7月-8月",
-                "periods": therapy_data,
-            }
+    sanfu = _next_therapy_period(SANFU_THERAPY_DATA, today)
+    if sanfu:
+        _, year, periods = sanfu
+        active = _therapy_period_active(periods, today)
+        result["sanfu_therapy"] = {
+            "active": active,
+            "next_period": None if active else f"{year}年7月-8月",
+            "periods": periods,
+            "description": "三伏灸属于传统文化与中医实践资料，不能替代疾病预防或治疗；如考虑艾灸，请先由合格专业人员评估。",
+        }
 
-    if is_sanjiu_season:
-        year_key = current_year if current_month == 12 else current_year - 1
-        therapy_data = SANJIU_THERAPY_DATA.get(year_key)
-        if therapy_data:
-            result["sanjiu_therapy"] = {
-                "active": True,
-                "periods": therapy_data,
-                "main_points": ["mingmen", "shenshu", "guanyuan"],
-                "description": "三九灸为冬季扶阳之法，在三九天艾灸穴位，可大补阳气，增强体质",
-            }
-    else:
-        # 查找下一个三九灸时期
-        next_year = current_year if current_month <= 11 else current_year + 1
-        therapy_data = SANJIU_THERAPY_DATA.get(next_year)
-        if therapy_data:
-            result["sanjiu_therapy"] = {
-                "active": False,
-                "next_period": f"{next_year}年12月-{next_year + 1}年1月",
-                "periods": therapy_data,
-            }
+    sanjiu = _next_therapy_period(SANJIU_THERAPY_DATA, today)
+    if sanjiu:
+        _, year, periods = sanjiu
+        active = _therapy_period_active(periods, today)
+        result["sanjiu_therapy"] = {
+            "active": active,
+            "next_period": None if active else f"{year}年12月-{year + 1}年1月",
+            "periods": periods,
+            "description": "三九灸属于传统文化与中医实践资料，不能替代疾病预防或治疗；自行施灸存在烫伤和延误就医风险。",
+        }
 
     return {
         "success": True,
