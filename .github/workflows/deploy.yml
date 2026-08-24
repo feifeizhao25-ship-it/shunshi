@@ -33,6 +33,10 @@ jobs:
 
       - name: Run backend tests
         working-directory: backend
+        env:
+          DATABASE_URL: sqlite:///test.db
+          REDIS_URL: redis://localhost
+          JWT_SECRET: ci-only-secret-with-at-least-32-characters
         run: |
           python -m compileall -q app
           python -m pytest tests/ -v --tb=short

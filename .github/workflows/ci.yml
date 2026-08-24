@@ -27,6 +27,7 @@ jobs:
         env:
           DATABASE_URL: sqlite:///test.db
           REDIS_URL: redis://localhost
+          JWT_SECRET: ci-only-secret-with-at-least-32-characters
         run: python -m pytest tests/ -x --tb=short
 
   flutter-cn:
