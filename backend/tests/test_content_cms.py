@@ -73,14 +73,14 @@ class TestContentDetail:
     """内容详情端点测试"""
 
     def test_get_content_detail_returns_200(self):
-        """GET /api/v1/cms/content/{content_id} 返回 200"""
+        """未登录读取 CMS 内容详情必须被拒绝。"""
         response = client.get("/api/v1/cms/content/test-content-001")
-        assert response.status_code in [200, 404]
+        assert response.status_code == 401
 
     def test_unknown_content_404(self):
-        """获取不存在的内容返回 404"""
+        """鉴权先于资源存在性检查，避免泄露内容 ID。"""
         response = client.get("/api/v1/cms/content/nonexistent-content-xyz")
-        assert response.status_code in [404, 200]
+        assert response.status_code == 401
 
 
 class TestContentUpdate:
@@ -241,19 +241,19 @@ class TestContentSearch:
     """内容搜索端点测试"""
 
     def test_search_content(self):
-        """GET /api/v1/cms/content/search?q=food 搜索内容"""
+        """CMS 搜索路径同样不能绕过详情鉴权。"""
         response = client.get("/api/v1/cms/content/search?q=food")
-        assert response.status_code in [200, 404]
+        assert response.status_code == 401
 
     def test_search_requires_query(self):
-        """缺少查询参数应返回错误"""
+        """未登录时先返回鉴权错误。"""
         response = client.get("/api/v1/cms/content/search")
-        assert response.status_code in [422, 404]
+        assert response.status_code == 401
 
     def test_search_with_filters(self):
-        """搜索支持筛选"""
+        """筛选参数不能绕过 CMS 鉴权。"""
         response = client.get("/api/v1/cms/content/search?q=test&type=food&status=published")
-        assert response.status_code in [200, 404]
+        assert response.status_code == 401
 
 
 class TestContentBatch:
