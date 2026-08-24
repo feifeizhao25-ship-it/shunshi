@@ -429,19 +429,6 @@ async def get_stories(
     }
 
 
-@router.get("/{story_id}", summary="完整故事")
-async def get_story_detail(story_id: str):
-    """返回某个故事的完整内容。"""
-    if story_id not in CULTURAL_STORIES:
-        raise HTTPException(status_code=404, detail="故事不存在")
-
-    story = CULTURAL_STORIES[story_id]
-    return {
-        "success": True,
-        "data": story,
-    }
-
-
 @router.get("/daily", summary="今日精选故事")
 async def get_daily_story():
     """返回基于今日日期的精选故事。每天相同。"""
@@ -521,4 +508,19 @@ async def get_related_stories(tcm_element: str):
             "total_related": len(results),
             "stories": results,
         },
+    }
+
+
+# Keep the catch-all detail route after every named sub-route. FastAPI matches
+# in registration order; placing it earlier makes /daily, /category/* and
+# /related/* unreachable because their first path segment is treated as an ID.
+@router.get("/{story_id}", summary="完整故事")
+async def get_story_detail(story_id: str):
+    """返回某个故事的完整内容。"""
+    if story_id not in CULTURAL_STORIES:
+        raise HTTPException(status_code=404, detail="故事不存在")
+
+    return {
+        "success": True,
+        "data": CULTURAL_STORIES[story_id],
     }
