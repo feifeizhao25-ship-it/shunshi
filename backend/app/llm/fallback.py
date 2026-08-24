@@ -258,8 +258,9 @@ class ModelFallbackChain:
                 except asyncio.TimeoutError:
                     last_error = Exception(f"timeout: {provider_name}/{model_name}")
                     tried_providers.append(f"{provider_name}:{model_name}")
-                    fallback_reason = FallbackReason.TIMEOUT
-                    fallback_from = f"{provider_name}:{model_name}"
+                    if fallback_reason is None:
+                        fallback_reason = FallbackReason.TIMEOUT
+                        fallback_from = f"{provider_name}:{model_name}"
                     logger.warning(
                         f"[FallbackChain] {provider_name}/{model_name} 超时，尝试下一个..."
                     )
@@ -285,8 +286,9 @@ class ModelFallbackChain:
                 except _EmptyResponseError:
                     last_error = Exception(f"empty_response: {provider_name}/{model_name}")
                     tried_providers.append(f"{provider_name}:{model_name}")
-                    fallback_reason = FallbackReason.EMPTY_RESPONSE
-                    fallback_from = f"{provider_name}:{model_name}"
+                    if fallback_reason is None:
+                        fallback_reason = FallbackReason.EMPTY_RESPONSE
+                        fallback_from = f"{provider_name}:{model_name}"
                     logger.warning(
                         f"[FallbackChain] {provider_name}/{model_name} 返回空，尝试下一个..."
                     )
@@ -296,12 +298,12 @@ class ModelFallbackChain:
                     last_error = e
                     tried_providers.append(f"{provider_name}:{model_name}")
 
-                    if "429" in error_str:
-                        fallback_reason = FallbackReason.RATE_LIMIT
-                    else:
-                        fallback_reason = FallbackReason.SERVER_ERROR
-
-                    fallback_from = f"{provider_name}:{model_name}"
+                    if fallback_reason is None:
+                        if "429" in error_str:
+                            fallback_reason = FallbackReason.RATE_LIMIT
+                        else:
+                            fallback_reason = FallbackReason.SERVER_ERROR
+                        fallback_from = f"{provider_name}:{model_name}"
                     logger.warning(
                         f"[FallbackChain] {provider_name}/{model_name} 失败: {e}，尝试下一个..."
                     )

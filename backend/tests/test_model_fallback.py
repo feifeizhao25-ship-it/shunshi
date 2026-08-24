@@ -351,10 +351,11 @@ def test_template_selection_by_skill(chain):
 
 def test_fallback_chain_config(chain):
     """验证 fallback chain 配置正确"""
-    assert chain.fallback_chain == {
-        "siliconflow": ["openrouter"],
-        "openrouter": ["siliconflow"],
-    }
+    expected_providers = {"deepseek", "siliconflow", "openrouter"}
+    assert set(chain.fallback_chain) == expected_providers
+    for primary, fallbacks in chain.fallback_chain.items():
+        assert primary not in fallbacks
+        assert set(fallbacks) == expected_providers - {primary}
     assert chain.timeout_seconds == 30
     assert chain.max_retries == 2
 
