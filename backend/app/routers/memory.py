@@ -61,6 +61,9 @@ def set_memory(
 def delete_memory(user_id: str = Depends(current_user), session: Session = Depends(get_session)):
     session.execute(delete(UserSetting).where(UserSetting.user_id == user_id))
     session.execute(delete(Message).where(Message.user_id == user_id))
+    # 迁移期间旧版个性化记忆仍在独立记录库中；用户的一键清除必须覆盖它。
+    from ..services.memory_system import memory_system
+    memory_system.delete_all_memories(user_id)
     return {"deleted": True}
 
 

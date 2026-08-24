@@ -225,9 +225,9 @@ class TestDataExport:
         assert "memory" in exported, "导出数据应包含 memory"
         assert "exported_at" in exported, "导出数据应包含时间戳"
 
-    def test_export_memory(self, client):
+    def test_export_memory(self, client, auth_headers):
         """用户可导出记忆数据"""
-        response = client.get("/api/v1/memory/list?user_id=test-user-001")
+        response = client.get("/api/v1/memory/list", headers=auth_headers)
         assert response.status_code == 200
 
 
@@ -338,25 +338,23 @@ class TestMemoryReset:
         )
         assert response.status_code == 200
 
-    def test_memory_api_delete_all(self, client):
+    def test_memory_api_delete_all(self, client, auth_headers):
         """Memory API 的 delete all 端点"""
         # 先创建记忆
         create_resp = client.post(
             "/api/v1/memory/create",
             json={
-                "user_id": "delete-test-user",
                 "type": "preference",
                 "content": "待删除记忆",
                 "confidence": 1.0,
-            }
+            },
+            headers=auth_headers,
         )
         if create_resp.status_code == 200:
             del_resp = client.delete(
                 "/api/v1/memory/all",
-                params={"user_id": "delete-test-user"}
+                headers=auth_headers,
             )
             assert del_resp.status_code == 200, "Memory API 清除应成功"
             data = del_resp.json()
-            assert data.get("success") is True or "deleted_count" in data, (
-                "应返回删除结果"
-            )
+            assert data.get("deleted") is True, "应返回删除结果"

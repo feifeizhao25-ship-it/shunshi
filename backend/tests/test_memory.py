@@ -32,4 +32,37 @@ def test_delete_conversations_contract(client, auth_headers):
 
 def test_memory_requires_auth(client):
     assert client.post("/api/v1/settings/memory", json={"enabled": True}).status_code == 401
+    assert client.post(
+        "/api/v1/memory/create",
+        json={"type": "preference", "content": "不应写入"},
+    ).status_code == 401
+    assert client.get("/api/v1/memory/list").status_code == 401
     assert client.delete("/api/v1/memory/all").status_code == 401
+
+
+def test_legacy_memory_is_user_scoped_and_deleted(client, auth_headers):
+    forbidden = client.post(
+        "/api/v1/memory/create",
+        headers=auth_headers,
+        json={"user_id": "another-user", "type": "preference", "content": "越权写入"},
+    )
+    assert forbidden.status_code == 403
+
+    created = client.post(
+        "/api/v1/memory/create",
+        headers=auth_headers,
+        json={"type": "preference", "content": "喜欢简洁说明", "confidence": 0.9},
+    )
+    assert created.status_code == 200
+
+    before = client.get("/api/v1/memory/list", headers=auth_headers)
+    assert before.status_code == 200
+    assert any(item["content"] == "喜欢简洁说明" for item in before.json()["memories"])
+
+    deleted = client.delete("/api/v1/memory/all", headers=auth_headers)
+    assert deleted.status_code == 200
+    assert deleted.json() == {"deleted": True}
+
+    after = client.get("/api/v1/memory/list", headers=auth_headers)
+    assert after.status_code == 200
+    assert after.json()["count"] == 0

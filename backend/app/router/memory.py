@@ -3,12 +3,12 @@
 """
 
 from datetime import datetime, timezone
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Depends
 from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
 
 from app.services.memory_system import memory_system, MemoryType
-from sqlalchemy import text
+from app.deps import current_user
 
 router = APIRouter(prefix="/api/v1/memory", tags=["记忆系统"])
 
@@ -17,7 +17,7 @@ router = APIRouter(prefix="/api/v1/memory", tags=["记忆系统"])
 
 class CreateMemoryRequest(BaseModel):
     """创建记忆请求"""
-    user_id: str
+    user_id: Optional[str] = None
     type: str  # preference / habit / emotional_trend / reflection_theme
     content: str
     confidence: float = 1.0
@@ -43,7 +43,7 @@ class ClearMemoryRequest(BaseModel):
 # ============ API 端点 ============
 
 @router.get("/context")
-async def get_user_context(user_id: str = Query(..., description="用户ID")):
+async def get_user_context(user_id: str = Depends(current_user)):
     """
     获取用户上下文
 
@@ -56,7 +56,7 @@ async def get_user_context(user_id: str = Query(..., description="用户ID")):
 
 @router.get("/list")
 async def list_memories(
-    user_id: str = Query(..., description="用户ID"),
+    user_id: str = Depends(current_user),
     type: Optional[str] = Query(None, description="记忆类型过滤"),
     limit: int = Query(50, description="返回数量限制", le=100),
 ):
@@ -78,14 +78,14 @@ async def list_memories(
 
 
 @router.get("/stats")
-async def get_memory_stats(user_id: str = Query(..., description="用户ID")):
+async def get_memory_stats(user_id: str = Depends(current_user)):
     """获取用户记忆统计"""
     stats = memory_system.get_memory_stats(user_id)
     return stats
 
 
 @router.post("/create")
-async def create_memory(request: CreateMemoryRequest):
+async def create_memory(request: CreateMemoryRequest, user_id: str = Depends(current_user)):
     """
     手动创建一条记忆
 
@@ -99,8 +99,11 @@ async def create_memory(request: CreateMemoryRequest):
             detail=f"无效的记忆类型: {request.type}，有效值: {valid_types}",
         )
 
+    if request.user_id and request.user_id != user_id:
+        raise HTTPException(status_code=403, detail="不能为其他用户创建记忆")
+
     item = memory_system.update_user_memory(
-        user_id=request.user_id,
+        user_id=user_id,
         memory_type=request.type,
         content=request.content,
         confidence=request.confidence,
@@ -122,7 +125,7 @@ async def extract_memories(request: ExtractMemoryRequest):
 
 
 @router.post("/clear")
-async def clear_all_memories(request: ClearMemoryRequest):
+async def clear_all_memories(request: ClearMemoryRequest, user_id: str = Depends(current_user)):
     """
     清除用户所有记忆
 
@@ -130,7 +133,9 @@ async def clear_all_memories(request: ClearMemoryRequest):
     请求: { user_id: str }
     响应: { success: true, cleared_count: N }
     """
-    count = memory_system.delete_all_memories(request.user_id)
+    if request.user_id != user_id:
+        raise HTTPException(status_code=403, detail="不能清除其他用户的记忆")
+    count = memory_system.delete_all_memories(user_id)
     return {
         "success": True,
         "cleared_count": count,
@@ -140,7 +145,7 @@ async def clear_all_memories(request: ClearMemoryRequest):
 
 @router.get("/export")
 async def export_memories(
-    user_id: str = Query(..., description="用户ID"),
+    user_id: str = Depends(current_user),
     limit: int = Query(200, description="最大导出数量", le=500),
 ):
     """
@@ -163,7 +168,7 @@ async def export_memories(
 
 
 @router.delete("/all")
-async def delete_all_memories(user_id: str = Query(..., description="用户ID")):
+async def delete_all_memories(user_id: str = Depends(current_user)):
     """
     清除用户所有记忆（GDPR合规）
 
@@ -180,7 +185,7 @@ async def delete_all_memories(user_id: str = Query(..., description="用户ID"))
 @router.delete("/{memory_id}")
 async def delete_memory(
     memory_id: str,
-    user_id: str = Query(..., description="用户ID（权限校验）"),
+    user_id: str = Depends(current_user),
 ):
     """
     删除单条记忆（GDPR合规）

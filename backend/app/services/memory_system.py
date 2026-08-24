@@ -181,6 +181,12 @@ class MemorySystem:
         self._ensure_table()
         conn = get_db()
 
+        # 认证用户来自主产品库；为旧记忆表维护最小外键镜像，不复制邮箱等身份资料。
+        conn.execute(
+            "INSERT OR IGNORE INTO users (id, name, password_hash) VALUES (?, ?, ?)",
+            (user_id, "用户", ""),
+        )
+
         # 检查是否已存在相似记忆
         existing = conn.execute(
             "SELECT id, confidence FROM user_memory WHERE user_id = ? AND type = ? AND content = ?",
