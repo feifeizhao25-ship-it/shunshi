@@ -74,10 +74,10 @@ class SafetyAuditLog:
         try:
             db = get_db()
             db.execute(
-                text(f"INSERT INTO {self.TABLE} "
+                f"INSERT INTO {self.TABLE} "
                 "(id, user_id, event_type, level, content_hash, "
                 "detection_rules, action_taken, model_used, latency_ms, created_at) "
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"),
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 (
                     str(uuid.uuid4()),
                     user_id,
@@ -88,12 +88,14 @@ class SafetyAuditLog:
                     action_taken,
                     model_used,
                     latency_ms,
-                    datetime.now().isoformat(),
+                    datetime.now(timezone.utc).isoformat(),
                 ),
             )
             db.commit()
+            return True
         except Exception as e:
             logger.error("[SafetyAuditLog] 写入日志失败: %s", e)
+            return False
 
     def get_logs(
         self,
@@ -153,14 +155,12 @@ class SafetyAuditLog:
 
             # 按级别统计
             level_stats = db.execute(
-                text(f"SELECT level, COUNT(*) as count FROM {self.TABLE} "
-                     "GROUP BY level")
+                f"SELECT level, COUNT(*) as count FROM {self.TABLE} GROUP BY level"
             ).fetchall()
 
             # 按事件类型统计
             event_stats = db.execute(
-                text(f"SELECT event_type, COUNT(*) as count FROM {self.TABLE} "
-                     "GROUP BY event_type")
+                f"SELECT event_type, COUNT(*) as count FROM {self.TABLE} GROUP BY event_type"
             ).fetchall()
 
             # 总数
