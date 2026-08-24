@@ -6,6 +6,27 @@ test_followup.py
 import pytest
 
 
+@pytest.fixture(autouse=True)
+def seed_followup_users():
+    """Follow-up rows must reference real users; seed explicit test owners."""
+    from app.database.db import get_db
+
+    db = get_db()
+    for user_id in (
+        "test-user-001",
+        "due-test-user",
+        "complete-test-user",
+        "cancel-test-user",
+    ):
+        db.execute(
+            """INSERT OR IGNORE INTO users
+               (id, name, password_hash, created_at, updated_at)
+               VALUES (?, '测试用户', '', datetime('now'), datetime('now'))""",
+            (user_id,),
+        )
+    db.commit()
+
+
 class TestFollowUpCreate:
     """Follow-up 创建测试"""
 
@@ -153,12 +174,5 @@ class TestFollowUpStats:
     """统计测试"""
 
     def test_get_stats(self, client):
-        # /api/v1/followup/stats 可能与 /stats 路由冲突（/{followup_id}）
-        # 实际 API 中 stats 在 /stats 路径，但 GET /{followup_id} 也会匹配
-        # 检查实际路由：stats 是 GET /stats，{followup_id} 是 GET /{followup_id}
-        # FastAPI 按注册顺序匹配，stats 在 {followup_id} 之后注册所以 404
-        # 实际应使用正确路径测试
         response = client.get("/api/v1/followup/stats?user_id=test-user-001")
-        # 如果 stats 被 {followup_id} 捕获则返回 404，这是 API 路由顺序问题
-        # 接受 200 或 404
-        assert response.status_code in (200, 404)
+        assert response.status_code == 200

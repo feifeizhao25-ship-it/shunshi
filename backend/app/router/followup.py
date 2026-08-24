@@ -58,6 +58,10 @@ async def schedule_followup(request: ScheduleFollowUpRequest):
 
     支持多种类型：签到提醒、情绪跟进、睡眠跟进、关怀提醒、订阅到期提醒
     """
+    db = get_db()
+    if not db.execute("SELECT id FROM users WHERE id = ?", (request.user_id,)).fetchone():
+        raise HTTPException(status_code=404, detail="用户不存在")
+
     try:
         followup = followup_scheduler.schedule_followup(
             user_id=request.user_id,
