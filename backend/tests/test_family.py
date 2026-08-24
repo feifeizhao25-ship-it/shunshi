@@ -9,6 +9,7 @@
 """
 
 import pytest
+import uuid
 from datetime import datetime, timedelta
 
 
@@ -350,8 +351,9 @@ class TestFamilyCareReminder:
     def test_send_care_reminder(self, client):
         """应能发送关怀提醒"""
         # 先注册用户到 users 表，满足 notifications 外键约束
+        email = f"care-test-{uuid.uuid4().hex}@example.com"
         reg = client.post("/api/v1/auth/register", json={
-            "email": "care-test@example.com",
+            "email": email,
             "password": "TestPass123!",
             "name": "关怀测试用户",
         })
@@ -360,10 +362,15 @@ class TestFamilyCareReminder:
         else:
             # 已注册则登录获取 user_id
             login = client.post("/api/v1/auth/login", json={
-                "email": "care-test@example.com",
+                "email": email,
                 "password": "TestPass123!",
             })
-            user_id = login.json().get("user_id", "care-test-user")
+            login_payload = login.json()
+            user_id = (
+                login_payload.get("user_id")
+                or login_payload.get("data", {}).get("user", {}).get("id")
+            )
+            assert user_id, login.text
         
         add_resp = client.post("/api/v1/family/members", json={
             "name": "关怀对象",

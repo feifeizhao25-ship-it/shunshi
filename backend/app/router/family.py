@@ -1,10 +1,11 @@
 # 家庭系统 API 路由
 from fastapi import APIRouter, HTTPException, Depends, Query
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List, Literal, Optional
 from datetime import datetime, timedelta
 import random
 import string
+import json
 from sqlalchemy import text
 
 from app.database.db import get_db
@@ -315,7 +316,7 @@ async def get_family_status(user_id: str = "user-001"):
 
 class ReminderRequest(BaseModel):
     target_member_id: str
-    type: str = "health_reminder"  # health_reminder / care / medication
+    type: Literal["health_reminder", "care", "medication"] = "health_reminder"
     message: Optional[str] = None
 
 @router.post("/reminder")
@@ -331,6 +332,9 @@ async def send_care_reminder(request: ReminderRequest, user_id: str = "user-001"
     
     if not target:
         raise HTTPException(status_code=404, detail="成员不存在")
+
+    if not db.execute("SELECT id FROM users WHERE id = ?", (user_id,)).fetchone():
+        raise HTTPException(status_code=404, detail="用户不存在")
     
     now = datetime.now().isoformat()
     
@@ -348,9 +352,15 @@ async def send_care_reminder(request: ReminderRequest, user_id: str = "user-001"
     db.execute("""
         INSERT INTO notifications (id, user_id, type, title, body, data, sent_at)
         VALUES (?, ?, ?, ?, ?, ?, ?)
-    """, (notif_id, user_id, request.type, "家庭关怀", body,
-          '{"source": "family", "target_member": "' + target['member_name'] + '"}',
-          now))
+    """, (
+        notif_id,
+        user_id,
+        request.type,
+        "家庭关怀",
+        body,
+        json.dumps({"source": "family", "target_member": target["member_name"]}, ensure_ascii=False),
+        now,
+    ))
     db.commit()
     
     return {
