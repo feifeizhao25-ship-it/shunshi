@@ -120,6 +120,24 @@ class FoodTherapyQueryRequest(BaseModel):
     season: Optional[str] = Field(None, description="季节")
 
 
+RECIPE_ALIASES = {"yam_millet_porridge": "yam_congee"}
+
+
+def _public_recipe(recipe: dict) -> dict:
+    """Expose cooking guidance without presenting traditional claims as treatment."""
+    return {
+        **recipe,
+        "ingredients": [
+            {**item, "function": "普通食材；不作疾病治疗或疗效声明"}
+            for item in recipe["ingredients"]
+        ],
+        "function": "传统饮食文化中的常见搭配，仅作为一般食谱参考",
+        "contraindication": "如有食物过敏、慢性病、孕期或正在用药，请先咨询医生或注册营养师。",
+        "dosage": "按普通膳食适量食用，不替代诊断、处方或治疗。",
+        "evidence_status": "traditional-reference-not-clinical-treatment",
+    }
+
+
 @router.get("/list", summary="食疗方案列表")
 async def list_food_therapy(
     category: Optional[str] = Query(None, description="功效分类"),
@@ -133,14 +151,19 @@ async def list_food_therapy(
         items = [r for r in items if constitution in r["constitution"]]
     if season:
         items = [r for r in items if "all" in r["season"] or season in r["season"]]
-    return {"success": True, "data": {"recipes": items, "total": len(items)}}
+    return {"success": True, "data": {
+        "recipes": [_public_recipe(item) for item in items],
+        "total": len(items),
+        "disclaimer": "体质和功效标签属于传统文化分类，不代表临床诊断或已证实疗效。",
+    }}
 
 
 @router.get("/{recipe_id}", summary="食疗方案详情")
 async def get_food_therapy(recipe_id: str):
+    recipe_id = RECIPE_ALIASES.get(recipe_id, recipe_id)
     if recipe_id not in FOOD_THERAPY_RECIPES:
         raise HTTPException(status_code=404, detail="食疗方案不存在")
-    return {"success": True, "data": FOOD_THERAPY_RECIPES[recipe_id]}
+    return {"success": True, "data": _public_recipe(FOOD_THERAPY_RECIPES[recipe_id])}
 
 
 @router.post("/recommend", summary="个性化食疗推荐")
@@ -153,8 +176,9 @@ async def recommend_food_therapy(request: FoodTherapyQueryRequest):
     return {
         "success": True,
         "data": {
-            "recommendations": items[:3],
-            "tips": "食疗需根据个人体质调整，建议咨询专业中医师。"
+            "recommendations": [_public_recipe(item) for item in items[:3]],
+            "recipes": [_public_recipe(item) for item in items[:3]],
+            "tips": "该结果是规则筛选的食谱参考，不是个体化医疗或营养处方。"
         }
     }
 
