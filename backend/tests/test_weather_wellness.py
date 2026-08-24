@@ -8,11 +8,10 @@ class TestWeatherAdvice:
         response = client.post("/api/v1/weather-wellness/advice", json=payload)
         assert response.status_code == 200
 
-    def test_advice_has_tcm_tips(self, client):
+    def test_advice_requires_observed_temperature_and_humidity(self, client):
         payload = {"weather_type": "rainy"}
-        data = client.post("/api/v1/weather-wellness/advice", json=payload).json()
-        assert data["success"] is True
-        assert "data" in data
+        response = client.post("/api/v1/weather-wellness/advice", json=payload)
+        assert response.status_code == 422
 
     def test_advice_requires_weather_type(self, client):
         response = client.post("/api/v1/weather-wellness/advice", json={})
