@@ -111,7 +111,13 @@ async def get_constitution_care(constitution: Optional[str] = Query(None)):
             from fastapi import HTTPException
             raise HTTPException(status_code=404, detail="体质类型不存在")
         return {"success": True, "data": {"constitution": constitution, "care": care}}
-    return {"success": True, "data": {"constitutions": CONSTITUTION_SKIN_CARE}}
+    return {
+        "success": True,
+        "data": {
+            "constitutions": CONSTITUTION_SKIN_CARE,
+            "skin_types": CONSTITUTION_SKIN_CARE,
+        },
+    }
 
 
 @router.get("/seasonal-care", summary="四季护肤方案")
