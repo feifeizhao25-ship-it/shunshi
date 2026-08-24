@@ -2,12 +2,18 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:dio/dio.dart';
 
 void main() {
+  const runLiveApiTests = bool.fromEnvironment('RUN_LIVE_API_TESTS');
+  const apiBaseUrl = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: 'http://localhost:4000',
+  );
+
   group('ShunShi API Integration Tests', () {
     late Dio dio;
 
     setUp(() {
       dio = Dio(BaseOptions(
-        baseUrl: 'http://116.62.32.43:4000',
+        baseUrl: apiBaseUrl,
         connectTimeout: const Duration(seconds: 10),
         receiveTimeout: const Duration(seconds: 30),
       ));
@@ -61,5 +67,5 @@ void main() {
       expect(res.statusCode, 200);
       expect(res.data, contains('python_gc_objects_collected_total'));
     });
-  });
+  }, skip: runLiveApiTests ? false : 'Set RUN_LIVE_API_TESTS=true to test a deployed API');
 }

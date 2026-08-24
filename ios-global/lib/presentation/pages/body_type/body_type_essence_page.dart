@@ -53,7 +53,7 @@ class BodyTypeEssencePage extends StatelessWidget {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      ShunShiColors.primaryDeep ?? ShunShiColors.primary,
+                      ShunShiColors.primaryDark,
                       ShunShiColors.primary,
                     ],
                   ),

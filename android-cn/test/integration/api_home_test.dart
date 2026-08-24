@@ -6,8 +6,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:dio/dio.dart';
 
 void main() {
+  const runLiveApiTests = bool.fromEnvironment('RUN_LIVE_API_TESTS');
+  const apiBaseUrl = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: 'http://localhost:4010',
+  );
   final dio = Dio(BaseOptions(
-    baseUrl: 'http://localhost:4010',
+    baseUrl: apiBaseUrl,
     connectTimeout: const Duration(seconds: 10),
     receiveTimeout: const Duration(seconds: 10),
   ));
@@ -88,5 +93,5 @@ void main() {
         expect(total, greaterThan(0), reason: 'No items for type: $type');
       }
     });
-  });
+  }, skip: runLiveApiTests ? false : 'Set RUN_LIVE_API_TESTS=true after starting the API');
 }

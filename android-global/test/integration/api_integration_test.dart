@@ -5,14 +5,19 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:dio/dio.dart';
 
-const API_BASE = 'http://116.62.32.43:4000/api/v1';
+const runLiveApiTests = bool.fromEnvironment('RUN_LIVE_API_TESTS');
+const apiBaseUrl = String.fromEnvironment(
+  'API_BASE_URL',
+  defaultValue: 'http://localhost:4000/api/v1',
+);
+const liveApiSkipReason = 'Set RUN_LIVE_API_TESTS=true to test a deployed API';
 
 void main() {
   late Dio dio;
 
   setUp(() {
     dio = Dio(BaseOptions(
-      baseUrl: API_BASE,
+      baseUrl: apiBaseUrl,
       connectTimeout: const Duration(seconds: 10),
       receiveTimeout: const Duration(seconds: 15),
       queryParameters: {'locale': 'en-US'},
@@ -25,7 +30,7 @@ void main() {
       expect(resp.statusCode, 200);
       expect(resp.data['status'], 'healthy');
     });
-  });
+  }, skip: runLiveApiTests ? false : liveApiSkipReason);
 
   group('TC-API-CONTENTS: Content endpoints', () {
     test('TC-CONT-001: EN contents total >= 300', () async {
@@ -62,7 +67,7 @@ void main() {
       final resp = await dio.get('/contents/search', queryParameters: {'q': 'sleep', 'locale': 'en-US'});
       expect(resp.statusCode, 200);
     });
-  });
+  }, skip: runLiveApiTests ? false : liveApiSkipReason);
 
   group('TC-API-QUIZ: Constitution', () {
     test('TC-QUIZ-001: EN questions >= 25', () async {
@@ -94,7 +99,7 @@ void main() {
         expect(e.response?.statusCode, 404);
       }
     });
-  });
+  }, skip: runLiveApiTests ? false : liveApiSkipReason);
 
   group('TC-API-SOLAR: Solar terms', () {
     test('TC-SOLAR-001: EN solar terms >= 24', () async {
@@ -108,7 +113,7 @@ void main() {
       expect(resp.statusCode, 200);
       expect(resp.data['data'].length, greaterThanOrEqualTo(24));
     });
-  });
+  }, skip: runLiveApiTests ? false : liveApiSkipReason);
 
   group('TC-API-AUTH: Authentication', () {
     test('TC-AUTH-001: Guest login', () async {
@@ -120,5 +125,5 @@ void main() {
         expect(e.response?.statusCode, anyOf(429, 200));
       }
     });
-  });
+  }, skip: runLiveApiTests ? false : liveApiSkipReason);
 }

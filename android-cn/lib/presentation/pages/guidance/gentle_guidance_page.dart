@@ -53,6 +53,7 @@ class GentleGuidancePage extends StatelessWidget {
 
             // ── Morning Ritual ──
             _guidanceCard(
+              context: context,
               icon: Icons.light_mode,
               iconColor: const Color(0xFFF59E0B),
               iconBg: const Color(0xFFF59E0B).withValues(alpha: 0.1),
@@ -65,6 +66,7 @@ class GentleGuidancePage extends StatelessWidget {
 
             // ── Seasonal Tip ──
             _guidanceCard(
+              context: context,
               icon: Icons.restaurant_menu,
               iconColor: const Color(0xFF22C55E),
               iconBg: const Color(0xFF22C55E).withValues(alpha: 0.1),
@@ -77,6 +79,7 @@ class GentleGuidancePage extends StatelessWidget {
 
             // ── Body Type Insight ──
             _guidanceCard(
+              context: context,
               icon: Icons.monitor_heart_outlined,
               iconColor: ShunShiColors.primary,
               iconBg: ShunShiColors.primary.withValues(alpha: 0.1),
@@ -115,6 +118,7 @@ class GentleGuidancePage extends StatelessWidget {
   }
 
   Widget _guidanceCard({
+    required BuildContext context,
     required IconData icon,
     required Color iconColor,
     required Color iconBg,

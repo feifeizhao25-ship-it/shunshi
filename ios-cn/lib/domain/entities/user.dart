@@ -160,6 +160,8 @@ class User {
     lastActiveAt: json['last_active_at'] != null
         ? DateTime.tryParse(json['last_active_at'] as String)
         : null,
-    preferences: json['preferences'] as Map<String, dynamic>? ?? {},
+    preferences: json['preferences'] is Map
+        ? Map<String, dynamic>.from(json['preferences'] as Map)
+        : const {},
   );
 }

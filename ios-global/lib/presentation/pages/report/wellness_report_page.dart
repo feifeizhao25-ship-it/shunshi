@@ -42,7 +42,7 @@ class WellnessReportPage extends StatelessWidget {
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [ShunShiColors.primaryDeep ?? ShunShiColors.primary, ShunShiColors.primary],
+                    colors: [ShunShiColors.primaryDark, ShunShiColors.primary],
                   ),
                 ),
                 child: SafeArea(

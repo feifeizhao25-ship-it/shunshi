@@ -12,7 +12,7 @@ void main() async {
 
   AppErrorHandler.init();
 
-  Future.wait([
+  await Future.wait([
     StorageManager.init(),
     NotificationService().init(),
   ]).catchError((Object e) {
