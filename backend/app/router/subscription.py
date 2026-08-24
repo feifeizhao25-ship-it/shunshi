@@ -2119,6 +2119,7 @@ async def alipay_create_order(request: AlipayOrderRequest):
             "order_id": order_id,
             "order_no": order_no,
             "plan": request.plan,
+            "amount": payment_orders[order_id]["amount_cents"] / 100,
             "amount_cents": payment_orders[order_id]["amount_cents"],
             "amount_display": f"¥{payment_orders[order_id]['amount_cents'] / 100:.2f}",
             "currency": "CNY",

@@ -238,11 +238,11 @@ class TestRestorePurchase:
         # 恢复购买
         restore_resp = client.post(
             "/api/v1/subscription/restore",
-            params={
-                "user_id": "complete-test-user",
+            params={"user_id": "complete-test-user"},
+            json={
                 "receipt": "MOCK_IOS_RECEIPT_DATA_1234567890",
                 "platform": "ios",
-            }
+            },
         )
         assert restore_resp.status_code == 200
         data = restore_resp.json()
@@ -252,11 +252,11 @@ class TestRestorePurchase:
         """无购买历史时恢复应失败"""
         restore_resp = client.post(
             "/api/v1/subscription/restore",
-            params={
-                "user_id": "delete-test-user",
-                "receipt": "NONEXISTENT_RECEIPT",
+            params={"user_id": "delete-test-user"},
+            json={
+                "purchase_token": "NONEXISTENT_RECEIPT",
                 "platform": "android",
-            }
+            },
         )
         assert restore_resp.status_code == 200
         data = restore_resp.json()
