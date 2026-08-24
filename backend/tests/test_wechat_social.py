@@ -325,7 +325,7 @@ class TestGenerateMonthlyReport:
             "top_wellness_action": "秋季调理",
         })
         data = response.json()["data"]
-        assert "emoji" in data["share_emoji"]
+        assert data["share_emoji"] == "🌿 💪 ✨"
 
 
 class TestListTemplates:

@@ -38,6 +38,14 @@ SOLAR_TERM_POSTERS = {
         "golden_sentence": "一声春雷唤醒了大地，也唤醒了我们体内的阳气。让我们与春天一起复苏。",
         "emoji_combo": "⛈️ 🌱 🍃 💪 🌲",
     },
+    "chunfen": {
+        "name": "春分",
+        "date": "3月20-22日",
+        "title": "昼夜均分，规律作息正当时",
+        "content": "春分前后昼夜接近等长，可借季节变化重新建立规律睡眠、均衡饮食和适量运动习惯。天气仍有波动，按实际气温增减衣物。",
+        "golden_sentence": "春分昼夜均，生活也宜有张有弛。",
+        "emoji_combo": "🌗 🌱 🌤️ 🚶 🍵",
+    },
     "qingming": {
         "name": "清明",
         "date": "4月4-6日",
@@ -70,13 +78,13 @@ SOLAR_TERM_POSTERS = {
         "golden_sentence": "小满时节，人体湿热如麦子未熟。及时清热，才能顺利度过夏季。",
         "emoji_combo": "🌾 🥒 💚 💦 🏃",
     },
-    "duanwu": {
-        "name": "端午",
+    "mangzhong": {
+        "name": "芒种",
         "date": "6月5-7日",
-        "title": "端午时节话养生，艾草驱邪最相宜",
-        "content": "端午是中医药浴和艾灸的绝佳时机。此时应清热祛湿，避免长期吹空调。可用艾草泡脚驱寒，配合清热茶饮。食用粽子要适量，搭配消食茶。注重居住通风，避免湿气困脾。",
-        "golden_sentence": "端午时节，艾草飘香。古人的智慧告诉我们，最好的养生，就在身边。",
-        "emoji_combo": "🪴 🚣 💚 🌿 🫖",
+        "title": "芒种忙而有序，炎热时节注意补水",
+        "content": "芒种后气温和湿度常升高，户外劳作或运动应避开高温时段、及时补水并保证睡眠。饮食保持清淡多样，出现中暑症状应立即降温并及时就医。",
+        "golden_sentence": "芒种虽忙，也要给身体留出休息和补水的时间。",
+        "emoji_combo": "🌾 💧 ☀️ 🥗 😴",
     },
     "xiazhi": {
         "name": "夏至",
@@ -126,7 +134,7 @@ SOLAR_TERM_POSTERS = {
         "golden_sentence": "白露降，秋意深。这个季节的干燥，最容易伤害肺和皮肤。及时滋阴，才是上策。",
         "emoji_combo": "💧 🫖 🍵 🧴 😷",
     },
-    "autumnequinox": {
+    "qiufen": {
         "name": "秋分",
         "date": "9月22-24日",
         "title": "秋分阴阳均，调理脾胃最关键",
@@ -134,7 +142,7 @@ SOLAR_TERM_POSTERS = {
         "golden_sentence": "秋分一刻值千金，阴阳平衡的时刻，最适合调理脾胃。为冬季储备能量，就从秋分开始。",
         "emoji_combo": "⚖️ 🥘 💪 🍵 🌰",
     },
-    "hengshan": {
+    "hanlu": {
         "name": "寒露",
         "date": "10月8-9日",
         "title": "寒露已深，进补前的最后调理",
@@ -158,7 +166,7 @@ SOLAR_TERM_POSTERS = {
         "golden_sentence": "立冬一日，贺冬百倍。冬季的进补，决定了整个冬天的健康。抓住立冬，别浪费这个机会。",
         "emoji_combo": "❄️ 🥘 🔥 🩹 💪",
     },
-    "xiaoXue": {
+    "xiaoxue": {
         "name": "小雪",
         "date": "11月22-23日",
         "title": "小雪时节，三九灸即将开始",
@@ -198,6 +206,13 @@ SOLAR_TERM_POSTERS = {
         "golden_sentence": "大寒过后，春在咫尺。冬季的所有坚持，都在为春天的生机做准备。",
         "emoji_combo": "❄️ ☀️ 🌱 🫖 💪",
     },
+}
+
+SOLAR_TERM_ALIASES = {
+    "duanwu": "mangzhong",
+    "autumnequinox": "qiufen",
+    "hengshan": "hanlu",
+    "xiaoXue": "xiaoxue",
 }
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -356,6 +371,7 @@ def _get_current_season():
 @router.get("/poster/{solar_term_code}", summary="节气朋友圈海报文案")
 async def get_solar_term_poster(solar_term_code: str):
     """获取指定节气的朋友圈海报文案。"""
+    solar_term_code = SOLAR_TERM_ALIASES.get(solar_term_code, solar_term_code)
     if solar_term_code not in SOLAR_TERM_POSTERS:
         raise HTTPException(status_code=404, detail=f"Solar term '{solar_term_code}' not found")
 
@@ -480,6 +496,7 @@ async def list_templates():
 @router.get("/solar-term-wishes/{solar_term_code}", summary="节气祝福语")
 async def get_solar_term_wishes(solar_term_code: str):
     """获取节气祝福语（发给亲友）。"""
+    solar_term_code = SOLAR_TERM_ALIASES.get(solar_term_code, solar_term_code)
     if solar_term_code not in SOLAR_TERM_POSTERS:
         raise HTTPException(status_code=404, detail=f"Solar term '{solar_term_code}' not found")
 
