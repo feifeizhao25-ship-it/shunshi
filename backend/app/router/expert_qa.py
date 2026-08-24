@@ -17,40 +17,43 @@ router = APIRouter(prefix="/api/v1/expert-qa", tags=["expert-qa"])
 _EXPERTS = {
     "expert_001": {
         "expert_id": "expert_001",
-        "name": "李明华",
-        "title": "主任中医师",
+        "name": "示例专家 A",
+        "title": "演示资料（非真实医生）",
         "specialties": ["体质调理", "脾胃疾病", "亚健康调理"],
-        "hospital": "北京中医药大学附属医院",
-        "experience_years": 25,
-        "rating": 4.9,
-        "bio": "从事中医临床25年，擅长体质辨识与调理，发表学术论文50余篇。",
+        "hospital": None,
+        "experience_years": None,
+        "rating": None,
+        "is_demo": True,
+        "bio": "产品流程演示资料，不代表真实医生、医疗机构或执业资质。",
     },
     "expert_002": {
         "expert_id": "expert_002",
-        "name": "王秀芳",
-        "title": "副主任中医师",
+        "name": "示例专家 B",
+        "title": "演示资料（非真实医生）",
         "specialties": ["妇科调理", "产后恢复", "月经不调"],
-        "hospital": "上海中医药大学附属医院",
-        "experience_years": 18,
-        "rating": 4.8,
-        "bio": "专注中医妇科18年，擅长女性体质调理与妇科疾病的中医治疗。",
+        "hospital": None,
+        "experience_years": None,
+        "rating": None,
+        "is_demo": True,
+        "bio": "产品流程演示资料，不代表真实医生、医疗机构或执业资质。",
     },
     "expert_003": {
         "expert_id": "expert_003",
-        "name": "张建国",
-        "title": "中医主治医师",
+        "name": "示例专家 C",
+        "title": "演示资料（非真实医生）",
         "specialties": ["针灸推拿", "颈肩腰背痛", "亚健康"],
-        "hospital": "广州中医药大学第一附属医院",
-        "experience_years": 12,
-        "rating": 4.7,
-        "bio": "针灸推拿专家，擅长运动损伤与慢性疼痛的中医综合治疗。",
+        "hospital": None,
+        "experience_years": None,
+        "rating": None,
+        "is_demo": True,
+        "bio": "产品流程演示资料，不代表真实医生、医疗机构或执业资质。",
     },
 }
 
 _FAQ = [
     {"q": "什么是气虚体质？", "a": "气虚体质表现为经常感到疲倦、声音低弱、容易出汗等，需要通过饮食和运动调补元气。"},
     {"q": "如何判断自己的体质？", "a": "可通过舌象、脉象、症状综合判断，或完成我们的体质测评问卷获得初步判断。"},
-    {"q": "中医养生需要坚持多久才见效？", "a": "一般轻微偏颇体质调理3个月可见效，慢性问题需要6-12个月的持续调理。"},
+    {"q": "中医养生需要坚持多久才见效？", "a": "个体情况和证据基础差异很大，不能承诺固定见效时间；如有持续症状，应咨询具备资质的医疗专业人员。"},
     {"q": "食疗能代替药物吗？", "a": "食疗适用于日常保健和轻度偏颇调理，严重疾病需在医生指导下用药，食疗作为辅助手段。"},
 ]
 
@@ -74,6 +77,7 @@ def list_experts():
         "data": {
             "experts": list(_EXPERTS.values()),
             "total": len(_EXPERTS),
+            "disclaimer": "当前条目仅用于界面演示，不代表平台已有签约医生或医疗服务资质。",
         }
     }
 
@@ -104,7 +108,7 @@ def submit_question(body: QuestionIn, db: Session = Depends(get_db)):
         "data": {
             "question_id": str(q.id),
             "status": "pending",
-            "message": "问题已提交，专家将在48小时内回复。",
+            "message": "问题已记录。当前专家资料为流程演示，不能承诺真人回复或医疗服务。",
             "expert_id": body.expert_id,
         }
     }
@@ -158,6 +162,8 @@ def answer_question(question_id: str, body: AnswerIn, db: Session = Depends(get_
             "question_id": question_id,
             "status": "answered",
             "expert": _EXPERTS[body.expert_id]["name"],
+            "is_demo": _EXPERTS[body.expert_id].get("is_demo", False),
+            "disclaimer": "演示回答不构成诊断、处方或真人医生意见。",
             "answered_at": q.answered_at.isoformat(),
         }
     }

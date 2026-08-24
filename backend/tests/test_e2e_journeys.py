@@ -88,6 +88,7 @@ def db():
             name TEXT,
             email TEXT,
             phone TEXT,
+            password_hash TEXT NOT NULL DEFAULT '',
             life_stage TEXT DEFAULT 'exploration',
             auth_provider TEXT DEFAULT 'guest',
             status TEXT DEFAULT 'active',
@@ -332,9 +333,11 @@ def _create_test_app(db_conn):
     test_app.include_router(lifecycle_router)
     test_app.include_router(memory_router)
     test_app.include_router(followup_router)
-    test_app.include_router(skills.router, prefix="/api/v1/skills")
-    test_app.include_router(constitution.router, prefix="/api/v1/constitution")
-    test_app.include_router(content_cms.router, prefix="/api/v1/cms")
+    # These production routers own their canonical API prefixes. Supplying a
+    # second prefix here would mount unreachable /api/v1/*/api/v1/* routes.
+    test_app.include_router(skills.router)
+    test_app.include_router(constitution.router)
+    test_app.include_router(content_cms.router)
     test_app.include_router(cards.router)
     test_app.include_router(recommendations.router)
     test_app.include_router(stripe_router)
@@ -605,8 +608,12 @@ class TestSubscriptionJourney:
         TestSubscriptionJourney._order_id = data["order_id"]
 
     @pytest.mark.asyncio
-    async def test_verify_payment(self, client: AsyncClient):
+    async def test_verify_payment(self, client: AsyncClient, monkeypatch):
         """验证支付（模拟）"""
+        # Simulation is allowed only under the endpoint's explicit development
+        # switch. Production and default test environments must keep rejecting
+        # unsigned payment callbacks.
+        monkeypatch.setenv("APP_ENV", "development")
         order_id = getattr(TestSubscriptionJourney, "_order_id", None)
         assert order_id is not None, "缺少 order_id, 请先运行 test_create_order"
 
@@ -760,7 +767,9 @@ class TestConstitutionJourney:
         """获取体质问卷"""
         resp = await client.get("/api/v1/constitution/questions")
         assert resp.status_code == 200, f"获取问卷失败: {resp.text}"
-        questions = resp.json()
+        payload = resp.json()
+        assert payload["success"] is True
+        questions = payload["data"]["questions"]
         assert isinstance(questions, list), "问卷应为列表"
         assert len(questions) == 25, f"应有25道题目, 实际: {len(questions)}"
 

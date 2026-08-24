@@ -752,6 +752,7 @@ async def get_questions(
     for q in QUESTIONS:
         result.append({
             "id": q["id"],
+            "question": q["question"],
             "text": q["question"],
             "content": q["question"],
             "options": [{"text": opt["text"], "value": opt.get("value", opt["text"])} for opt in q["options"]],

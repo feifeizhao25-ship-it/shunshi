@@ -57,7 +57,7 @@ class TestExpertAnswer:
         payload = {"user_id": "test_user", "question": "Answer test?", "category": "general"}
         create_data = client.post("/api/v1/expert-qa/questions", json=payload).json()
         q_id = create_data["data"]["question_id"]
-        answer_payload = {"expert_id": "expert_001", "answer": "这是专业回答。"}
+        answer_payload = {"expert_id": "expert_001", "answer": "这是用于接口验证的完整示例回答。"}
         response = client.post(f"/api/v1/expert-qa/questions/{q_id}/answer", json=answer_payload)
         assert response.status_code == 200
 
