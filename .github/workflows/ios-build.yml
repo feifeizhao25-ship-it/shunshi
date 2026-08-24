@@ -6,7 +6,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-ios:
+  verify-ios:
+    if: github.event_name == 'push'
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
@@ -25,7 +26,45 @@ jobs:
         working-directory: ios-cn/ios
         run: pod install --repo-update
 
-      - name: Build iOS Archive
+      - name: Verify unsigned release build
+        working-directory: ios-cn
+        run: flutter build ios --release --no-codesign
+
+  build-signed-ios:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.38.5'
+          channel: 'stable'
+
+      - name: Install dependencies
+        working-directory: ios-cn
+        run: flutter pub get
+
+      - name: Setup CocoaPods
+        working-directory: ios-cn/ios
+        run: pod install --repo-update
+
+      - name: Validate signing credentials
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_PROVISIONING_PROFILE: ${{ secrets.APPLE_PROVISIONING_PROFILE }}
+        run: |
+          for name in APPLE_TEAM_ID APPLE_CERTIFICATE APPLE_CERTIFICATE_PASSWORD APPLE_PROVISIONING_PROFILE; do
+            if [ -z "${!name}" ]; then
+              echo "::error::$name is required for a signed App Store archive"
+              exit 1
+            fi
+          done
+
+      - name: Build signed iOS Archive
         working-directory: ios-cn
         env:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
