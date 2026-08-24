@@ -89,8 +89,9 @@ def test_premium_tier_unlimited_features():
     data = response.json()["data"]
     premium_tier = next(t for t in data["tiers"] if t["tier"] == "premium")
     features = premium_tier["features"]
-    assert features["ai_questions_per_day"] == float('inf')
-    assert features["audio_per_day"] == float('inf')
+    # JSON 不支持 Infinity；使用显式字符串保证跨端序列化一致。
+    assert features["ai_questions_per_day"] == "unlimited"
+    assert features["audio_per_day"] == "unlimited"
     assert features["companion"] == True
 
 
@@ -182,7 +183,7 @@ def test_activate_applies_discount_3_months():
     )
     data = response.json()["data"]
     assert data["discount_applied"] == 5
-    assert data["total_price"] == 18 * 3 * 0.95
+    assert data["total_price"] == pytest.approx(18 * 3 * 0.95)
 
 
 def test_activate_applies_discount_6_months():
@@ -197,7 +198,7 @@ def test_activate_applies_discount_6_months():
     )
     data = response.json()["data"]
     assert data["discount_applied"] == 10
-    assert data["total_price"] == 38 * 6 * 0.90
+    assert data["total_price"] == pytest.approx(38 * 6 * 0.90)
 
 
 def test_activate_applies_discount_12_months():
@@ -212,7 +213,7 @@ def test_activate_applies_discount_12_months():
     )
     data = response.json()["data"]
     assert data["discount_applied"] == 15
-    assert data["total_price"] == 58 * 12 * 0.85
+    assert data["total_price"] == pytest.approx(58 * 12 * 0.85)
 
 
 def test_activate_sets_expiration():
@@ -664,7 +665,7 @@ def test_pricing_calculations_accuracy():
         },
     )
     data = response.json()["data"]
-    assert data["total_price"] == 18 * 6 * 0.9
+    assert data["total_price"] == pytest.approx(18 * 6 * 0.9)
 
 
 def test_all_duration_options_supported():

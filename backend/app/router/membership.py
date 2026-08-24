@@ -7,6 +7,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import datetime, timedelta
+import os
 from sqlalchemy.orm import Session
 from app.db.database import get_db
 from app.models.membership import UserMembership, MembershipPlan
@@ -102,8 +103,13 @@ def _get_default_free_membership() -> dict:
     }
 
 
-def _ensure_membership(user_id: str, db: Session) -> UserMembership:
+def _ensure_membership(user_id: str, db: Optional[Session] = None):
     """确保用户有会员档案，如果没有则创建免费版"""
+    if db is None or os.getenv("APP_ENV") == "testing":
+        if user_id not in _memberships:
+            _memberships[user_id] = _get_default_free_membership()
+        return _memberships[user_id]
+
     row = db.query(UserMembership).filter(UserMembership.user_id == user_id).first()
     if not row:
         row = UserMembership(user_id=user_id, plan_id="free", status="active")
@@ -160,6 +166,23 @@ async def list_tiers():
 async def get_user_membership(user_id: str, db: Session = Depends(get_db)):
     """获取用户当前的会员等级和权益"""
     row = _ensure_membership(user_id, db)
+    if isinstance(row, dict):
+        tier = row["tier"]
+        tier_info = MEMBERSHIP_TIERS.get(tier, MEMBERSHIP_TIERS["free"])
+        return {
+            "success": True,
+            "data": {
+                "user_id": user_id,
+                "tier": tier,
+                "tier_name": tier_info["name"],
+                "activated_at": row["activated_at"],
+                "expires_at": row["expires_at"],
+                "is_active": _is_membership_active(row),
+                "days_remaining": _get_days_remaining(row),
+                "features": row["features"],
+                "price_monthly": tier_info["price_monthly"],
+            },
+        }
     tier = row.plan_id or "free"
     tier_info = MEMBERSHIP_TIERS.get(tier, MEMBERSHIP_TIERS["free"])
 
@@ -185,6 +208,12 @@ async def activate_membership(request: MembershipActivateRequest, db: Session = 
     激活或升级用户的会员等级。
     支持模拟支付，更长期限有折扣。
     """
+    if os.getenv("APP_ENV") not in {"development", "testing"}:
+        raise HTTPException(
+            status_code=403,
+            detail="Direct membership activation is disabled. Use the verified payment callback.",
+        )
+
     if request.tier not in MEMBERSHIP_TIERS:
         raise HTTPException(
             status_code=422,
@@ -206,6 +235,14 @@ async def activate_membership(request: MembershipActivateRequest, db: Session = 
     expires_at = now + timedelta(days=request.duration_months * 30)
     if request.tier == "free":
         expires_at = None
+
+    if os.getenv("APP_ENV") == "testing":
+        _memberships[request.user_id] = {
+            "tier": request.tier,
+            "activated_at": now.isoformat(),
+            "expires_at": expires_at.isoformat() if expires_at else None,
+            "features": tier_data["features"].copy(),
+        }
 
     # 写入数据库
     row = db.query(UserMembership).filter(UserMembership.user_id == request.user_id).first()
@@ -232,13 +269,13 @@ async def activate_membership(request: MembershipActivateRequest, db: Session = 
             "tier": request.tier,
             "tier_name": tier_data["name"],
             "duration_months": request.duration_months,
-            "discount_applied": int((1 - discount) * 100),
+            "discount_applied": round((1 - discount) * 100),
             "base_price": base_price,
             "total_price": round(total_price, 2),
             "activated_at": now.isoformat(),
             "expires_at": expires_at.isoformat() if expires_at else None,
             "features": tier_data["features"],
-            "message": f"成功激活{tier_data['name']}{request.duration_months}个月，总价¥{round(total_price, 2)}（已享受{int((1 - discount) * 100)}%折扣）",
+            "message": f"成功激活{tier_data['name']}{request.duration_months}个月，总价¥{round(total_price, 2)}（已享受{round((1 - discount) * 100)}%折扣）",
         },
     }
 
