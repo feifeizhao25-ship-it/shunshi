@@ -5,7 +5,7 @@
 
 from fastapi import APIRouter, HTTPException, Query, Depends
 from pydantic import BaseModel, Field
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Union
 from datetime import datetime
 from sqlalchemy.orm import Session
 from app.db.database import get_db
@@ -109,7 +109,19 @@ class OnboardingProgressRequest(BaseModel):
 
 class ConstitutionQuizAnswerRequest(BaseModel):
     user_id: str = Field(..., description="用户ID")
-    answers: Dict[str, int] = Field(..., description="问题ID到选项索引(0-3)的映射")
+    answers: Dict[str, Union[int, str]] = Field(..., description="问题ID到选项索引(0-3)或旧版选项字母(a-d)的映射")
+
+
+def _normalize_quiz_answer(value: Union[int, str]) -> int:
+    if isinstance(value, int) and not isinstance(value, bool) and 0 <= value <= 3:
+        return value
+    if isinstance(value, str):
+        normalized = value.strip().lower()
+        if normalized in {"a", "b", "c", "d"}:
+            return ord(normalized) - ord("a")
+        if normalized in {"0", "1", "2", "3"}:
+            return int(normalized)
+    raise HTTPException(status_code=422, detail="Quiz answers must be 0-3 or a-d")
 
 
 @router.get("/steps", summary="引导步骤列表")
@@ -216,7 +228,7 @@ async def get_constitution_quiz():
 async def submit_constitution_quiz(request: ConstitutionQuizAnswerRequest):
     scores: Dict[str, int] = {}
     for q in CONSTITUTION_QUIZ:
-        answer = request.answers.get(q["id"], 0)
+        answer = _normalize_quiz_answer(request.answers.get(q["id"], 0))
         constitution = q["related_constitution"]
         scores[constitution] = scores.get(constitution, 0) + answer
 
@@ -226,7 +238,10 @@ async def submit_constitution_quiz(request: ConstitutionQuizAnswerRequest):
         "data": {
             "dominant_constitution": dominant,
             "scores": scores,
-            "message": f"您的主要体质倾向为：{dominant}，顺时将为您定制专属养生方案",
+            "message": f"这份简短问卷当前显示的内容偏好标签为：{dominant}。结果可随时修改，不用于医学诊断。",
+            "assessment_scope": "仅用于内容排序的初步偏好信号，不是完整体质评估或疾病诊断。",
+            "confidence": "low",
+            "editable": True,
             "next_step": "health_goals"
         }
     }
