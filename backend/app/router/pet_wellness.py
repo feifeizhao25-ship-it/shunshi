@@ -5,41 +5,44 @@
 
 from fastapi import APIRouter, Query
 from typing import Optional
+from datetime import datetime
 
 router = APIRouter(prefix="/api/v1/pet-wellness", tags=["pet-wellness"])
+
+VETERINARY_NOTICE = "内容仅作日常护理参考，不替代执业兽医诊断；饮食、补充剂、疫苗和驱虫方案应按物种、年龄与病史咨询兽医。"
 
 PET_SEASONAL_CARE = {
     "spring": {
         "season": "春季", "focus": "换毛期护理、过敏预防",
         "dogs": {
             "tips": ["春季换毛期每天梳毛", "注意花粉过敏症状", "增加户外活动时间", "防跳蚤虱子"],
-            "diet": ["均衡营养", "增加Omega-3补充"],
+            "diet": ["维持适合犬只生命阶段的完整均衡主粮；补充剂先咨询兽医"],
             "exercise": ["增加户外时间", "社交化训练"]
         },
         "cats": {
             "tips": ["加强梳毛防止毛球", "防春季发情骚动", "注意花粉过敏"],
-            "diet": ["高蛋白食物", "适当添加猫草"],
+            "diet": ["维持适合猫生命阶段的完整均衡主粮；不随意添加人用食物或补充剂"],
             "exercise": ["室内互动玩具"]
         }
     },
     "summer": {
         "season": "夏季", "focus": "防暑降温、防蚊虫",
         "dogs": {
-            "tips": ["避免正午外出", "提供充足清水", "不留在密闭车内", "定期剪毛"],
-            "diet": ["清凉食物", "多补水"],
+            "tips": ["避免高温时段外出", "持续提供清洁饮水", "绝不留在停放车辆内", "不要为降温随意剃除双层被毛"],
+            "diet": ["维持完整均衡主粮并确保饮水；食欲下降或疑似中暑立即就医"],
             "exercise": ["早晨或傍晚运动", "游泳（适合犬类）"]
         },
         "cats": {
             "tips": ["确保室内通风", "提供阴凉区域", "多放水碗"],
-            "diet": ["清淡易消化食物", "湿粮补水"],
+            "diet": ["维持完整均衡饮食；更换湿粮或饮食前逐步过渡并咨询兽医"],
             "exercise": ["减少激烈运动"]
         }
     },
     "autumn": {
         "season": "秋季", "focus": "增强免疫、驱虫护理",
         "dogs": {
-            "tips": ["进行年度驱虫", "注射疫苗", "开始增加运动强度"],
-            "diet": ["适当增加热量", "维生素E"],
+            "tips": ["按兽医制定的地区风险方案驱虫和接种疫苗", "依据体况逐步调整运动"],
+            "diet": ["依据体况评分调整热量，不自行补充维生素E"],
             "exercise": ["增加户外活动"]
         },
         "cats": {
@@ -52,12 +55,12 @@ PET_SEASONAL_CARE = {
         "season": "冬季", "focus": "保暖防寒、关节护理",
         "dogs": {
             "tips": ["穿宠物保暖衣（短毛犬）", "避免在冰雪上长时间行走", "关注老年犬关节"],
-            "diet": ["适当增加热量", "关节保健品"],
+            "diet": ["依据体况而非季节自动增加热量；关节补充剂先咨询兽医"],
             "exercise": ["室内游戏", "短时间户外"]
         },
         "cats": {
             "tips": ["提供温暖睡床", "增加互动防无聊"],
-            "diet": ["高能量食物"],
+            "diet": ["室内猫通常无需因冬季改用高能量食物，按体况维持完整均衡饮食"],
             "exercise": ["室内玩具游戏"]
         }
     }
@@ -65,13 +68,13 @@ PET_SEASONAL_CARE = {
 
 PET_HEALTH_SIGNS = {
     "healthy_signs": {
-        "dogs": ["精神活泼", "食欲正常", "毛发光亮", "鼻头湿润凉爽（清醒时）", "大便成形"],
+        "dogs": ["精神和活动符合平常状态", "食欲饮水稳定", "呼吸平稳", "排便排尿规律"],
         "cats": ["皮毛光洁", "眼睛明亮", "活动正常", "食欲稳定", "规律如厕"]
     },
     "warning_signs": {
-        "dogs": ["精神萎靡", "食欲减退", "呕吐腹泻", "异常嗜睡", "鼻干热"],
+        "dogs": ["精神或行为突然改变", "食欲饮水明显改变", "反复呕吐腹泻", "呼吸困难", "排尿异常"],
         "cats": ["隐藏躲避", "食欲骤减", "呕吐频繁", "排尿异常", "眼睛分泌物增多"],
-        "when_to_vet": "出现任何持续超过24小时的警示症状，应立即就诊"
+        "when_to_vet": "呼吸困难、抽搐、昏倒、疑似中毒、无法排尿、严重出血或中暑应立即急诊；其他异常请尽快联系兽医，不要固定等待24小时。"
     }
 }
 
@@ -93,20 +96,25 @@ COMMON_PET_HEALTH_FOODS = [
 
 @router.get("/seasonal-care", summary="宠物季节养护")
 async def get_seasonal_care(
-    season: str = Query(..., description="季节: spring/summer/autumn/winter"),
+    season: Optional[str] = Query(None, description="季节: spring/summer/autumn/winter"),
     pet_type: str = Query("dogs", description="宠物类型: dogs/cats")
 ):
+    if season is None:
+        month = datetime.now().month
+        season = "spring" if month in (3, 4, 5) else "summer" if month in (6, 7, 8) else "autumn" if month in (9, 10, 11) else "winter"
+    pet_type = {"dog": "dogs", "cat": "cats"}.get(pet_type, pet_type)
     care = PET_SEASONAL_CARE.get(season)
     if not care:
         from fastapi import HTTPException
         raise HTTPException(status_code=404, detail="季节参数无效")
     pet_care = care.get(pet_type, {})
-    return {"success": True, "data": {"season": care["season"], "focus": care["focus"], "care": pet_care}}
+    seasonal_care = {"season": care["season"], "focus": care["focus"], "care": pet_care}
+    return {"success": True, "data": {**seasonal_care, "seasonal_care": seasonal_care, "veterinary_notice": VETERINARY_NOTICE}}
 
 
 @router.get("/health-signs", summary="宠物健康信号")
 async def get_health_signs(pet_type: Optional[str] = Query(None)):
-    return {"success": True, "data": PET_HEALTH_SIGNS}
+    return {"success": True, "data": {**PET_HEALTH_SIGNS, "veterinary_notice": VETERINARY_NOTICE}}
 
 
 @router.get("/tcm-wisdom", summary="宠物养生智慧")
@@ -119,7 +127,7 @@ async def get_healthy_foods(pet_type: Optional[str] = Query(None)):
     foods = COMMON_PET_HEALTH_FOODS
     if pet_type:
         foods = [f for f in foods if pet_type in f["for"]]
-    return {"success": True, "data": {"foods": foods}}
+    return {"success": True, "data": {"foods": foods, "veterinary_notice": VETERINARY_NOTICE, "serving_note": "这些只能作为经兽医确认后的少量辅食，不能替代完整均衡主粮。"}}
 
 
 @router.get("/overview", summary="宠物养生概览")
