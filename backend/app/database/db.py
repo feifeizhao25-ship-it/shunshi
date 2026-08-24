@@ -13,10 +13,12 @@ from typing import Optional
 if os.environ.get("APP_ENV") == "testing":
     # 测试环境使用独立测试数据库
     DB_DIR = Path(__file__).resolve().parent.parent.parent / "tests"
-    DB_PATH = DB_DIR / "test_shunshi.db"
+    # Keep the legacy record-store schema isolated from the SQLAlchemy product DB.
+    # Both schemas define `users` with incompatible columns.
+    DB_PATH = DB_DIR / "test_shunshi_records.db"
 else:
     DB_DIR = Path(__file__).resolve().parent.parent.parent / "data"
-    DB_PATH = DB_DIR / "shunshi.db"
+    DB_PATH = DB_DIR / "shunshi_records.db"
 
 # 线程局部存储（每个线程一个连接）
 _local = threading.local()
