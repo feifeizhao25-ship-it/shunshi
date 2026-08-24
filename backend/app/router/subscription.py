@@ -914,7 +914,7 @@ async def _verify_google_purchase(package_name: str, product_id: str, purchase_t
         return False
 
 
-def _verify_payment_signature(request: PurchaseVerifyRequest, order: dict) -> bool:
+async def _verify_payment_signature(request: PurchaseVerifyRequest, order: dict) -> bool:
     """
     验证支付签名。
 
@@ -949,19 +949,10 @@ def _verify_payment_signature(request: PurchaseVerifyRequest, order: dict) -> bo
         return _verify_alipay_sign(params, request.sign, public_key)
     
     elif platform == "apple":
-        # Apple 验签是异步的，同步调用简化版
-        import asyncio
-        try:
-            loop = asyncio.get_event_loop()
-            return loop.run_until_complete(_verify_apple_receipt(
-                request.transaction_id or "", request.sign
-            ))
-        except Exception as e:
-            logger.warning(f"[Payment] Apple 验签异常: {e}")
-            return False
+        return await _verify_apple_receipt(request.transaction_id or "", request.sign)
     
     elif platform == "google":
-        return _verify_google_purchase(
+        return await _verify_google_purchase(
             os.getenv("GOOGLE_PACKAGE_NAME", "com.shunshi.app"),
             order.get("product_id", ""),
             request.sign,
@@ -1142,7 +1133,7 @@ async def verify_payment(request: PurchaseVerifyRequest):
         raise HTTPException(status_code=400, detail=f"订单状态不正确: {order['status']}，当前状态不允许支付")
 
     # === 签名验证（支付回调必须验签） ===
-    verified = _verify_payment_signature(request, order)
+    verified = await _verify_payment_signature(request, order)
     if not verified:
         # 状态转换: pending → failed
         if transition_order(order["status"], OrderStatus.FAILED.value):
@@ -2014,7 +2005,7 @@ async def verify_purchase(request: PurchaseVerifyRequest):
     now = datetime.now(timezone.utc)
     now_iso = now.isoformat()
 
-    verified = _verify_payment_signature(request, order)
+    verified = await _verify_payment_signature(request, order)
 
     if not verified:
         order["status"] = "failed"

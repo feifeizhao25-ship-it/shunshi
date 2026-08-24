@@ -21,10 +21,13 @@ import sys
 import re
 import json
 import sqlite3
+import base64
 import pytest
 import pytest_asyncio
 from unittest.mock import patch, MagicMock, AsyncMock
 from datetime import datetime, timedelta, timezone
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import padding, rsa
 
 # 确保项目根目录在 path 中
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
@@ -115,6 +118,7 @@ def app(db, monkeypatch):
     monkeypatch.setattr(sub_mod, "family_seats", {})
     monkeypatch.setattr(sub_mod, "audit_log", [])
     monkeypatch.setattr(sub_mod, "usage_stats", {})
+    monkeypatch.setenv("ALIPAY_PUBLIC_KEY", _TEST_PAYMENT_PUBLIC_KEY)
 
     # 替换 get_db → 内存 DB (用于通知)
     monkeypatch.setattr(db_mod, "get_db", lambda: db)
@@ -158,6 +162,40 @@ SUB_MOD = "app.router.subscription"
 
 API_BASE = "/api/v1/subscription"
 
+_TEST_PAYMENT_PRIVATE_KEY = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+_TEST_PAYMENT_PUBLIC_KEY = _TEST_PAYMENT_PRIVATE_KEY.public_key().public_bytes(
+    encoding=serialization.Encoding.PEM,
+    format=serialization.PublicFormat.SubjectPublicKeyInfo,
+).decode("utf-8")
+
+
+def _sign_test_alipay_callback(payload):
+    content = "&".join(
+        f"{key}={value}"
+        for key, value in sorted(payload.items())
+        if key not in ("sign", "sign_type") and value is not None
+    )
+    signature = _TEST_PAYMENT_PRIVATE_KEY.sign(
+        content.encode("utf-8"), padding.PKCS1v15(), hashes.SHA256()
+    )
+    return base64.b64encode(signature).decode("ascii")
+
+
+def _test_alipay_callback(order_id, transaction_id):
+    callback = {
+        "order_id": order_id,
+        "platform": "alipay",
+        "transaction_id": transaction_id,
+    }
+    callback["sign"] = _sign_test_alipay_callback({
+        "order_id": order_id,
+        "transaction_id": transaction_id,
+        "trade_status": None,
+        "total_amount": None,
+    })
+    callback["sign_type"] = "RSA2"
+    return callback
+
 
 async def _create_and_pay_order(client, user_id, product_id, platform="alipay"):
     """创建订单 → 模拟支付 → 验证支付。返回 (order_id, resp_json)"""
@@ -171,13 +209,13 @@ async def _create_and_pay_order(client, user_id, product_id, platform="alipay"):
     order_id = resp.json()["data"]["order_id"]
 
     # 2. 模拟支付回调
+    transaction_id = f"TXN_TEST_{order_id[:8]}"
+    callback = {"order_id": order_id, "platform": platform, "transaction_id": transaction_id}
+    if platform == "alipay":
+        callback = _test_alipay_callback(order_id, transaction_id)
     resp = await client.post(
         f"{API_BASE}/verify-payment",
-        json={
-            "order_id": order_id,
-            "platform": platform,
-            "transaction_id": f"TXN_TEST_{order_id[:8]}",
-        },
+        json=callback,
     )
     return order_id, resp.json()
 
@@ -340,6 +378,35 @@ class TestPaymentVerification:
         # 通过 API 查询状态确认
         resp_status = await client.get(f"{API_BASE}/status", params={"user_id": user_id})
         assert resp_status.json()["data"]["plan"] == "jiahe"
+
+    @pytest.mark.asyncio
+    async def test_verify_payment_rejects_missing_signature(self, client):
+        create = await client.post(
+            f"{API_BASE}/create-order",
+            json={"product_id": "yangxin_monthly", "platform": "alipay"},
+            params={"user_id": "user-missing-signature"},
+        )
+        order_id = create.json()["data"]["order_id"]
+        response = await client.post(
+            f"{API_BASE}/verify-payment",
+            json={"order_id": order_id, "platform": "alipay", "transaction_id": "TXN_UNSIGNED"},
+        )
+        assert response.status_code == 400
+        assert "签名验证失败" in response.json()["detail"]
+
+    @pytest.mark.asyncio
+    async def test_verify_payment_rejects_tampered_transaction(self, client):
+        create = await client.post(
+            f"{API_BASE}/create-order",
+            json={"product_id": "yangxin_monthly", "platform": "alipay"},
+            params={"user_id": "user-tampered-signature"},
+        )
+        order_id = create.json()["data"]["order_id"]
+        callback = _test_alipay_callback(order_id, "TXN_ORIGINAL")
+        callback["transaction_id"] = "TXN_TAMPERED"
+        response = await client.post(f"{API_BASE}/verify-payment", json=callback)
+        assert response.status_code == 400
+        assert "签名验证失败" in response.json()["detail"]
 
     @pytest.mark.asyncio
     async def test_verify_invalid_payment(self, client):
@@ -819,13 +886,13 @@ class TestEndToEndFlow:
         order_id = resp_order.json()["data"]["order_id"]
 
         # 3. 查询订单 (应为 pending)
-        resp_query = await client.get(f"{API_BASE}/order/{order_id}")
+        resp_query = await client.get(f"{API_BASE}/orders/{order_id}")
         assert resp_query.json()["data"]["status"] == "pending"
 
         # 4. 支付
         resp_pay = await client.post(
             f"{API_BASE}/verify-payment",
-            json={"order_id": order_id, "platform": "alipay", "transaction_id": "TXN_E2E_001"},
+            json=_test_alipay_callback(order_id, "TXN_E2E_001"),
         )
         assert resp_pay.json()["data"]["status"] == "paid"
 
@@ -882,7 +949,7 @@ class TestEndToEndFlow:
         order_id = resp_order.json()["data"]["order_id"]
         resp_pay = await client.post(
             f"{API_BASE}/verify-payment",
-            json={"order_id": order_id, "platform": "alipay"},
+            json=_test_alipay_callback(order_id, f"TXN_UPGRADE_{order_id[:8]}"),
         )
         assert resp_pay.json()["data"]["plan"] == "yiyang"
 
@@ -911,7 +978,7 @@ class TestEndToEndFlow:
         assert resp_cancel.json()["data"]["status"] == "cancelled"
 
         # 3. 确认订单状态
-        resp_query = await client.get(f"{API_BASE}/order/{order_id}")
+        resp_query = await client.get(f"{API_BASE}/orders/{order_id}")
         assert resp_query.json()["data"]["status"] == "cancelled"
 
     @pytest.mark.asyncio
@@ -936,7 +1003,7 @@ class TestEndToEndFlow:
         oid2 = resp2.json()["data"]["order_id"]
         resp2p = await client.post(
             f"{API_BASE}/verify-payment",
-            json={"order_id": oid2, "platform": "alipay"},
+            json=_test_alipay_callback(oid2, f"TXN_TRANS_{oid2[:8]}"),
         )
         assert resp2p.json()["data"]["status"] == "paid"
 
