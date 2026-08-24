@@ -155,7 +155,7 @@ class SubscriptionOrder(IDMixin, Base):
 
     # ---- 关系 ----
     product: Mapped[Optional["SubscriptionProduct"]] = relationship(
-        "SubscriptionProduct", back_populates="product"
+        "SubscriptionProduct", back_populates="orders"
     )
 
     def __repr__(self) -> str:

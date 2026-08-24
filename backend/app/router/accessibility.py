@@ -31,6 +31,7 @@ FONT_SIZE_SCALE = {
 
 COLOR_BLIND_PALETTES = {
     "none": {"primary": "#1B7F79", "accent": "#E91E8C", "warning": "#FF9800", "error": "#F44336"},
+    "normal": {"primary": "#1B7F79", "accent": "#E91E8C", "warning": "#FF9800", "error": "#F44336"},
     "deuteranopia": {"primary": "#0066CC", "accent": "#FF6600", "warning": "#FFCC00", "error": "#CC0000"},
     "protanopia": {"primary": "#0066CC", "accent": "#FF6600", "warning": "#FFCC00", "error": "#CC0000"},
     "tritanopia": {"primary": "#009999", "accent": "#FF6699", "warning": "#FF9933", "error": "#FF3300"},

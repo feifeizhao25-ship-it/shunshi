@@ -37,6 +37,9 @@ jobs:
           DATABASE_URL: sqlite:///test.db
           REDIS_URL: redis://localhost
           JWT_SECRET: ci-only-secret-with-at-least-32-characters
+          ADMIN_JWT_SECRET: ci-admin-secret-with-at-least-32-characters
+          ADMIN_PASSWORD_HASH: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+          APP_ENV: testing
         run: |
           python -m compileall -q app
           python -m pytest tests/ -v --tb=short

@@ -109,11 +109,11 @@ ACCOUNT_DELETE_GRACE_DAYS = 30
 _bearer_scheme = HTTPBearer(auto_error=False)
 
 # ============ 内存回退存储 (Redis 不可用时使用) ============
-_token_blacklock_mem: dict = {}          # token_jti -> 过期时间戳
+_token_blacklock: dict = {}          # token_jti -> 过期时间戳
 _token_blacklock_lock = threading.Lock()
-_active_tokens_mem: dict = {}            # user_id -> {device_id: {jti, refresh_jti, expires_at}}
+_active_tokens: dict = {}            # user_id -> {device_id: {jti, refresh_jti, expires_at}}
 _active_tokens_lock = threading.Lock()
-_sms_rate_limit_mem: dict = {}           # phone -> {"last_sent": timestamp, "daily_count": int, "date": "YYYY-MM-DD"}
+_sms_rate_limit: dict = {}           # phone -> {"last_sent": timestamp, "daily_count": int, "date": "YYYY-MM-DD"}
 
 # ============ Models ============
 
@@ -262,9 +262,9 @@ def _is_token_blacklisted(jti: str) -> bool:
             logger.debug(f"[Auth] Redis blacklist check failed, fallback to memory: {e}")
     # 内存回退
     with _token_blacklock_lock:
-        if jti in _token_blacklock_mem:
-            if datetime.now(timezone.utc).timestamp() > _token_blacklock_mem[jti]:
-                del _token_blacklock_mem[jti]
+        if jti in _token_blacklock:
+            if datetime.now(timezone.utc).timestamp() > _token_blacklock[jti]:
+                del _token_blacklock[jti]
                 return False
             return True
     return False
@@ -282,15 +282,15 @@ def _blacklist_token(jti: str, expires_at: float):
             logger.debug(f"[Auth] Redis blacklist set failed, fallback to memory: {e}")
     # 内存回退
     with _token_blacklock_lock:
-        _token_blacklock_mem[jti] = expires_at
+        _token_blacklock[jti] = expires_at
 
 def _cleanup_blacklist():
     """清理过期黑名单条目 (仅内存需要，Redis 自动过期)"""
     now = datetime.now(timezone.utc).timestamp()
     with _token_blacklock_lock:
-        expired = [jti for jti, exp in _token_blacklock_mem.items() if now > exp]
+        expired = [jti for jti, exp in _token_blacklock.items() if now > exp]
         for jti in expired:
-            del _token_blacklock_mem[jti]
+            del _token_blacklock[jti]
 
 # ============ 活跃 Token 管理 (注销/踢出时立即失效) ============
 
@@ -310,9 +310,9 @@ def _record_active_token(user_id: str, device_id: str, access_jti: str, refresh_
             logger.debug(f"[Auth] Redis active token record failed, fallback to memory: {e}")
     # 内存回退
     with _active_tokens_lock:
-        if user_id not in _active_tokens_mem:
-            _active_tokens_mem[user_id] = {}
-        _active_tokens_mem[user_id][device_id] = {
+        if user_id not in _active_tokens:
+            _active_tokens[user_id] = {}
+        _active_tokens[user_id][device_id] = {
             "access_jti": access_jti,
             "refresh_jti": refresh_jti,
             "expires_at": expires_at,
@@ -331,7 +331,7 @@ def _get_active_tokens(user_id: str) -> dict:
             logger.debug(f"[Auth] Redis active tokens read failed, fallback to memory: {e}")
     # 内存回退
     with _active_tokens_lock:
-        return dict(_active_tokens_mem.get(user_id, {}))
+        return dict(_active_tokens.get(user_id, {}))
 
 def _invalidate_user_tokens(user_id: str, device_id: str = None):
     """使指定用户(或设备)的所有 token 立即失效"""
@@ -355,13 +355,13 @@ def _invalidate_user_tokens(user_id: str, device_id: str = None):
             logger.debug(f"[Auth] Redis active token cleanup failed: {e}")
     # 内存回退
     with _active_tokens_lock:
-        if user_id in _active_tokens_mem:
-            if device_id and device_id in _active_tokens_mem[user_id]:
-                del _active_tokens_mem[user_id][device_id]
-                if not _active_tokens_mem[user_id]:
-                    del _active_tokens_mem[user_id]
+        if user_id in _active_tokens:
+            if device_id and device_id in _active_tokens[user_id]:
+                del _active_tokens[user_id][device_id]
+                if not _active_tokens[user_id]:
+                    del _active_tokens[user_id]
             elif not device_id:
-                del _active_tokens_mem[user_id]
+                del _active_tokens[user_id]
 
 # ============ 短信验证码管理 ============
 
@@ -395,8 +395,8 @@ def _can_send_sms(phone: str) -> tuple:
             logger.debug(f"[Auth] Redis SMS rate check failed, fallback to memory: {e}")
     
     # 内存回退
-    if phone in _sms_rate_limit_mem:
-        info = _sms_rate_limit_mem[phone]
+    if phone in _sms_rate_limit:
+        info = _sms_rate_limit[phone]
         if now.timestamp() - info["last_sent"] < SMS_COOLDOWN_SECONDS:
             remaining = int(SMS_COOLDOWN_SECONDS - (now.timestamp() - info["last_sent"]))
             return False, f"请{remaining}秒后再试"
@@ -423,11 +423,11 @@ def _record_sms_sent(phone: str):
             logger.debug(f"[Auth] Redis SMS rate record failed, fallback to memory: {e}")
     
     # 内存回退
-    if phone in _sms_rate_limit_mem and _sms_rate_limit_mem[phone]["date"] == today_str:
-        _sms_rate_limit_mem[phone]["last_sent"] = now.timestamp()
-        _sms_rate_limit_mem[phone]["daily_count"] += 1
+    if phone in _sms_rate_limit and _sms_rate_limit[phone]["date"] == today_str:
+        _sms_rate_limit[phone]["last_sent"] = now.timestamp()
+        _sms_rate_limit[phone]["daily_count"] += 1
     else:
-        _sms_rate_limit_mem[phone] = {
+        _sms_rate_limit[phone] = {
             "last_sent": now.timestamp(),
             "daily_count": 1,
             "date": today_str,

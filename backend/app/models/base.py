@@ -9,12 +9,9 @@ from datetime import datetime, timezone
 from typing import Optional
 
 from sqlalchemy import DateTime, Boolean, func
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column
 
-
-class Base(DeclarativeBase):
-    """所有模型的声明式基类"""
-    pass
+from app.db.database import Base
 
 
 class TimestampMixin:

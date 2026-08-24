@@ -1,13 +1,40 @@
 """顺时后端骨架入口：单 FastAPI 应用，按模块分 router。"""
 
 from contextlib import asynccontextmanager
+import importlib
+import pkgutil
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .config import Settings
 from .db import init_db, make_engine, make_session_factory
+from .db.database import engine as product_engine, init_db as init_product_db
+from .models.base import Base as product_model_base
 from .routers import chat, content, feedback, health, memory, reflections, seasons, settings as settings_router, subscription, user
+
+
+def _include_product_routers(app: FastAPI) -> None:
+    """Mount every production router under ``app.router``.
+
+    Keeping this discovery fail-closed ensures a missing runtime dependency or
+    broken router prevents release instead of silently shipping a partial API.
+    """
+    from . import router as product_router_package
+
+    mounted = {id(route) for route in app.router.routes}
+    for module_info in pkgutil.iter_modules(product_router_package.__path__):
+        if module_info.name.startswith("_"):
+            continue
+        module = importlib.import_module(f"{product_router_package.__name__}.{module_info.name}")
+        candidate = getattr(module, "router", None)
+        if candidate is not None and id(candidate) not in mounted:
+            needs_prefix = not candidate.prefix and any(
+                getattr(route, "path", None) == "" for route in candidate.routes
+            )
+            prefix = f"/api/v1/{module_info.name.replace('_', '-')}" if needs_prefix else ""
+            app.include_router(candidate, prefix=prefix)
+            mounted.add(id(candidate))
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -23,6 +50,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @asynccontextmanager
     async def lifespan(app: FastAPI):
         init_db(engine)  # 启动建表，对齐见己 init_db 惯例
+        init_product_db()
+        product_model_base.metadata.create_all(product_engine)
         yield
         engine.dispose()
 
@@ -53,6 +82,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(settings_router.router)
     app.include_router(seasons.router)
     app.include_router(content.router)
+    _include_product_routers(app)
     return app
 
 

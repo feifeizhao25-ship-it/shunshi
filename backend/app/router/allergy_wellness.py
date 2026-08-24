@@ -267,8 +267,9 @@ async def get_allergy_calendar():
     calendar_list = []
     for month in range(1, 13):
         calendar_list.append({
-            "month": month,
             **ALLERGY_CALENDAR[month],
+            "month": month,
+            "month_name": ALLERGY_CALENDAR[month]["month"],
         })
 
     return {
