@@ -71,7 +71,7 @@ class _HomePageState extends State<HomePage> {
       return;
     }
     try {
-      final dio = Dio(BaseOptions(baseUrl: 'http://116.62.32.43:4000'));
+      final dio = Dio(BaseOptions(baseUrl: 'https://api.seasonsapp.com'));
       final res = await dio.get('/api/v1/solar-terms/current');
       if (res.data?['data'] != null) {
         final d = res.data['data'];

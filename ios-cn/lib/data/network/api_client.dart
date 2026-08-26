@@ -28,7 +28,7 @@ class ApiClient {
   // 模拟器地址（Android emulator → host localhost）
   static const _emulatorUrl = 'http://10.0.2.2:4000';
   // 真机：优先公网直连
-  static const _realDeviceUrl = 'http://116.62.32.43:4000';
+  static const _realDeviceUrl = 'https://api.shunshi.app';
 
   static String baseUrl = _realDeviceUrl;
   static bool _detected = true; // 默认用真机IP，不需要检测

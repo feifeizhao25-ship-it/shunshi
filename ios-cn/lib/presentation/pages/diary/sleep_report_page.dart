@@ -30,7 +30,7 @@ class _SleepReportPageState extends State<SleepReportPage> {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('access_token') ?? '';
     return Dio(BaseOptions(
-      baseUrl: 'http://116.62.32.43:4000',
+      baseUrl: 'https://api.shunshi.app',
       headers: token.isNotEmpty ? {'Authorization': 'Bearer $token'} : {},
     ));
   }

@@ -12,7 +12,7 @@ class AppConfig {
   /// 后端 API 基础地址（含 /api/v1）
   static const String apiBaseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'http://116.62.32.43:4000/api/v1',
+    defaultValue: 'https://api.shunshi.app/api/v1',
   );
 
   // ─── 应用变体 ──────────────────────────────────────────────────────────────

@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../design_system/theme.dart';
 import '../../../design_system/theme_helper.dart';
 
-const _baseUrl = 'http://116.62.32.43:4000';
+const _baseUrl = 'https://api.shunshi.app';
 
 class SubscriptionPage extends StatefulWidget {
   const SubscriptionPage({super.key});
@@ -535,4 +535,3 @@ const _privacyPolicyText = '''
 八、联系我们
 如对隐私政策有疑问，请通过应用内客服联系我们。
 ''';
-

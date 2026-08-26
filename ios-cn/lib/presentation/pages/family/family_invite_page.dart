@@ -26,7 +26,7 @@ class _FamilyInvitePageState extends State<FamilyInvitePage> {
   Future<void> _generateCode() async {
     try {
       final dio = Dio();
-      final res = await dio.post('http://116.62.32.43:4000/api/v1/family/invite');
+      final res = await dio.post('https://api.shunshi.app/api/v1/family/invite');
       if (res.data?['code'] != null) {
         setState(() {
           _code = res.data['code'];
@@ -48,7 +48,7 @@ class _FamilyInvitePageState extends State<FamilyInvitePage> {
     // Try backend first, fallback to demo
     try {
       final dio = Dio();
-      final res = await dio.get('http://116.62.32.43:4000/api/v1/family/members');
+      final res = await dio.get('https://api.shunshi.app/api/v1/family/members');
       if (res.data?['members'] != null) {
         final members = (res.data['members'] as List)
             .map((m) => Map<String, String>.from(m as Map))

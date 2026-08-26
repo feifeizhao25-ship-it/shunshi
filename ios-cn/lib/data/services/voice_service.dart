@@ -16,7 +16,7 @@ class VoiceService {
   VoiceService._();
 
   final _recorder = AudioRecorder();
-  static const String _baseUrl = 'http://116.62.32.43:4000';
+  static const String _baseUrl = 'https://api.shunshi.app';
   final _dio = Dio(BaseOptions(
     baseUrl: _baseUrl,
     connectTimeout: const Duration(seconds: 10),

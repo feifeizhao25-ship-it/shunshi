@@ -15,7 +15,7 @@ class FamilyPageV2 extends StatefulWidget {
 }
 
 class _FamilyPageV2State extends State<FamilyPageV2> {
-  static const _baseUrl = 'http://116.62.32.43:4000';
+  static const _baseUrl = 'https://api.shunshi.app';
   final _dio = Dio(BaseOptions(baseUrl: _baseUrl, connectTimeout: const Duration(seconds: 8)));
   
   String _familyName = '我的家庭';

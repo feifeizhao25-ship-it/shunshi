@@ -25,7 +25,7 @@ class _FamilyMemberDetailPageState extends State<FamilyMemberDetailPage> {
   Future<void> _loadMember() async {
     try {
       final dio = Dio();
-      final res = await dio.get('http://116.62.32.43:4000/api/v1/family/members/${widget.memberId}');
+      final res = await dio.get('https://api.shunshi.app/api/v1/family/members/${widget.memberId}');
       if (res.data != null) {
         setState(() {
           _member = Map<String, dynamic>.from(res.data);

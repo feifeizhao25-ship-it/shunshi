@@ -19,7 +19,7 @@ class _StripeCheckoutPageState extends State<StripeCheckoutPage> {
   String? _checkoutUrl;
   String? _error;
 
-  static const _baseUrl = 'http://116.62.32.43:4000';
+  static const _baseUrl = 'https://api.seasonsapp.com';
 
   @override
   void initState() {

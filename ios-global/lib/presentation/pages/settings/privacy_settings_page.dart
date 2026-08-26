@@ -32,7 +32,7 @@ class _SettingsPageState extends State<SettingsPage> {
   void initState() {
     super.initState();
     _dio = Dio(BaseOptions(
-      baseUrl: 'http://116.62.32.43:4000',
+      baseUrl: 'https://api.seasonsapp.com',
       connectTimeout: const Duration(seconds: 15),
     ));
     _loadUserId();

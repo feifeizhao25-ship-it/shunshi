@@ -8,8 +8,8 @@ class ApiConfig {
   /// 2. ECS public (when deployed)
   /// 3. Android emulator localhost
   static const List<String> baseUrls = [
-    'http://116.62.32.43:4000',  // Mac LAN (SSH tunnel)
-    'http://116.62.32.43:4000',   // ECS public
+    'https://api.seasonsapp.com',  // Mac LAN (SSH tunnel)
+    'https://api.seasonsapp.com',   // ECS public
     'http://10.0.2.2:4010',       // Android emulator
   ];
 

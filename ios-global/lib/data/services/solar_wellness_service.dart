@@ -4,7 +4,7 @@ library;
 import 'package:dio/dio.dart';
 
 class SolarWellnessService {
-  static const _baseUrl = 'http://116.62.32.43:4000';
+  static const _baseUrl = 'https://api.seasonsapp.com';
   final _dio = Dio(BaseOptions(
     baseUrl: _baseUrl,
     connectTimeout: const Duration(seconds: 8),

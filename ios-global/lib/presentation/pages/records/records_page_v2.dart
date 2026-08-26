@@ -16,7 +16,7 @@ class RecordsPageV2 extends StatefulWidget {
 }
 
 class _RecordsPageV2State extends State<RecordsPageV2> {
-  static const _baseUrl = 'http://116.62.32.43:4000';
+  static const _baseUrl = 'https://api.seasonsapp.com';
   final _dio = Dio(BaseOptions(baseUrl: _baseUrl, connectTimeout: const Duration(seconds: 8)));
   
   int _weekStreak = 0;

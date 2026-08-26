@@ -44,7 +44,7 @@ class _FeedbackSheetState extends State<FeedbackSheet> {
       final userId = prefs.getString('user_id') ?? 'guest';
 
       await Dio().post(
-        'http://116.62.32.43:4000/api/v1/feedback',
+        'https://api.seasonsapp.com/api/v1/feedback',
         data: {
           'user_id': userId,
           'type': widget.type,

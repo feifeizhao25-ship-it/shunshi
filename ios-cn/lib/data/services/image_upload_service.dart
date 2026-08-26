@@ -157,7 +157,7 @@ class ImageUploadService {
     // 从环境或默认配置获取
     return const String.fromEnvironment(
       'API_BASE_URL',
-      defaultValue: 'http://116.62.32.43:4000',
+      defaultValue: 'https://api.shunshi.app',
     );
   }
   

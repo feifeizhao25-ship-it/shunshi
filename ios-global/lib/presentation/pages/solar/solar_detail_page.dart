@@ -26,7 +26,7 @@ class _SolarDetailPageState extends State<SolarDetailPage> {
   Future<void> _loadData() async {
     try {
       final dio = Dio(BaseOptions(
-        baseUrl: 'http://116.62.32.43:4000',
+        baseUrl: 'https://api.seasonsapp.com',
         connectTimeout: const Duration(seconds: 5),
       ));
       final res = await dio.get('/api/v1/solar-wellness/daily-advice');

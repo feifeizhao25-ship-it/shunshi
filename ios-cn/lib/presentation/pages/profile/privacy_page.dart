@@ -50,7 +50,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
             Navigator.pop(ctx);
             try {
               final dio = Dio();
-              await dio.delete('http://116.62.32.43:4000/api/v1/user/data');
+              await dio.delete('https://api.shunshi.app/api/v1/user/data');
               if (mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('所有数据已删除'), duration: Duration(seconds: 2)));

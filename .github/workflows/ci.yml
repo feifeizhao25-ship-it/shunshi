@@ -7,6 +7,16 @@ on:
     branches: [main]
 
 jobs:
+  mobile-network-security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Reject clear-text public mobile API endpoints
+        run: python scripts/verify_mobile_network_security.py
+
   backend:
     runs-on: ubuntu-latest
     defaults:
@@ -34,6 +44,7 @@ jobs:
         run: python -m pytest tests/ -x --tb=short
 
   flutter-cn:
+    needs: mobile-network-security
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -53,6 +64,7 @@ jobs:
         run: flutter build apk --debug --dart-define=API_BASE_URL=http://localhost/api/v1 --dart-define=APP_VARIANT=android-cn
 
   flutter-global:
+    needs: mobile-network-security
     runs-on: ubuntu-latest
     defaults:
       run:

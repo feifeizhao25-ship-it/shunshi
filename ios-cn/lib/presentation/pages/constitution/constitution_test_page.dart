@@ -69,7 +69,7 @@ class _ConstitutionTestFlowPageState extends State<ConstitutionTestFlowPage> {
     try {
       final prefs = await SharedPreferences.getInstance();
       final userId = prefs.getString('user_id') ?? '';
-      final dio = Dio(BaseOptions(baseUrl: 'http://116.62.32.43:4000'));
+      final dio = Dio(BaseOptions(baseUrl: 'https://api.shunshi.app'));
       await dio.post('/api/v1/constitution/submit', data: {
         'user_id': userId,
         'primary_type': primary,

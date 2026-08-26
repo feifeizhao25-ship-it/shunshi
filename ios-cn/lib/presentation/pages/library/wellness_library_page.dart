@@ -13,7 +13,7 @@ class WellnessLibraryPage extends StatefulWidget {
 }
 
 class _WellnessLibraryPageState extends State<WellnessLibraryPage> {
-  static const _baseUrl = 'http://116.62.32.43:4000';
+  static const _baseUrl = 'https://api.shunshi.app';
   final _dio = Dio(BaseOptions(
     baseUrl: _baseUrl,
     connectTimeout: const Duration(seconds: 8),

@@ -110,7 +110,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
 
     // Post to backend
     try {
-      final dio = Dio(BaseOptions(baseUrl: 'http://116.62.32.43:4000'));
+      final dio = Dio(BaseOptions(baseUrl: 'https://api.seasonsapp.com'));
       await dio.post('/api/v1/user/profile', data: {
         'feeling': _feeling?.toLowerCase(),
         'help_goal': _helpWith.toList(),

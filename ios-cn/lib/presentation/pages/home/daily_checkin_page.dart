@@ -3,7 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
 
-const _baseUrl = 'http://116.62.32.43:4000';
+const _baseUrl = 'https://api.shunshi.app';
 
 class DailyCheckinPage extends StatefulWidget {
   const DailyCheckinPage({super.key});

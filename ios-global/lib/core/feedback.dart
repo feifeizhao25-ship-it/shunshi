@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 /// 反馈服务
 
 class FeedbackService {
-  static final _dio = Dio(BaseOptions(baseUrl: 'http://116.62.32.43:4000', connectTimeout: const Duration(seconds: 8)));
+  static final _dio = Dio(BaseOptions(baseUrl: 'https://api.seasonsapp.com', connectTimeout: const Duration(seconds: 8)));
 
   /// 提交反馈
   static Future<bool> submitFeedback({

@@ -14,7 +14,7 @@ class DiaryPageV2 extends StatefulWidget {
 }
 
 class _DiaryPageV2State extends State<DiaryPageV2> {
-  static const _baseUrl = 'http://116.62.32.43:4000';
+  static const _baseUrl = 'https://api.shunshi.app';
   final _dio = Dio(BaseOptions(baseUrl: _baseUrl, connectTimeout: const Duration(seconds: 8)));
   final _noteController = TextEditingController();
   

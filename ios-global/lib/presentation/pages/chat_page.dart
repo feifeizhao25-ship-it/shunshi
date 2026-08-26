@@ -12,7 +12,7 @@ import '../widgets/membership_widgets.dart';
 import 'chat/chat_models.dart';
 import 'chat/chat_widgets.dart';
 
-const _baseUrl = 'http://116.62.32.43:4000';
+const _baseUrl = 'https://api.seasonsapp.com';
 
 class ChatPage extends StatefulWidget {
   final String? conversationId;
@@ -231,7 +231,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
       handleAIReply(aiText, cards: cards, sources: sources, convId: res.data?['conversation_id']);
     } catch (_) {
       try {
-        final v2Dio = Dio(BaseOptions(baseUrl: 'http://116.62.32.43:4000', connectTimeout: const Duration(seconds: 10), receiveTimeout: const Duration(seconds: 60)));
+        final v2Dio = Dio(BaseOptions(baseUrl: 'https://api.seasonsapp.com', connectTimeout: const Duration(seconds: 10), receiveTimeout: const Duration(seconds: 60)));
         v2Dio.options.headers['Authorization'] = 'Bearer $_token';
         final v2Res = await v2Dio.post('/api/v1/chat', data: {'message': text, 'context': {'solar_term': _currentSolarTerm}, 'conversation_id': _conversationId});  // CN uses Chinese endpoint
         final aiText = v2Res.data?['reply'] ?? '抱歉，暂时无法回应。';

@@ -12,7 +12,7 @@ class AppConstants {
   // For real device, set SEASONS_API_URL or change below
   static const String baseUrl = String.fromEnvironment(
     'SEASONS_API_URL',
-    defaultValue: 'http://116.62.32.43:4000',
+    defaultValue: 'https://api.seasonsapp.com',
   );
   static const String apiVersion = 'v1';
   

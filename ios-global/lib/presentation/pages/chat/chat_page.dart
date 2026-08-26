@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../design_system/theme.dart';
 import '../../widgets/membership_widgets.dart';
 
-const _baseUrl = 'http://116.62.32.43:4000';
+const _baseUrl = 'https://api.seasonsapp.com';
 
 /// Chat Page — AI Wellness Assistant
 /// Stripe-inspired messaging with purple accent

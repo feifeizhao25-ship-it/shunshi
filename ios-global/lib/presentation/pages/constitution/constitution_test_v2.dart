@@ -15,7 +15,7 @@ class ConstitutionTestV2 extends StatefulWidget {
 }
 
 class _ConstitutionTestV2State extends State<ConstitutionTestV2> {
-  static const _baseUrl = 'http://116.62.32.43:4000';
+  static const _baseUrl = 'https://api.seasonsapp.com';
   final _dio = Dio(BaseOptions(baseUrl: _baseUrl, connectTimeout: const Duration(seconds: 8)));
 
   List<Map<String, dynamic>> _questions = [];
