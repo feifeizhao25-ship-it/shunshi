@@ -15,7 +15,9 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ARG NEXT_PUBLIC_API_URL=http://localhost:4000
 ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
-RUN npm run build
+# Next.js does not require a public directory, but the runtime stage copies it
+# when present. Keep the container contract valid for projects with no assets.
+RUN mkdir -p public && npm run build
 
 # Production
 FROM base AS runner
