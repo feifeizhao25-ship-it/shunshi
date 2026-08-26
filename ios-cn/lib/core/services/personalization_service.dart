@@ -7,6 +7,7 @@ class PersonalizationService {
     baseUrl: _baseUrl,
     connectTimeout: const Duration(seconds: 10),
     receiveTimeout: const Duration(seconds: 15),
+    headers: const {'Accept-Language': 'zh-CN'},
   ));
 
   static Future<String> _getToken() async {
@@ -21,8 +22,7 @@ class PersonalizationService {
       final res = await _dio.get('/dashboard',
         options: Options(headers: {'Authorization': 'Bearer $token'}));
       return res.data as Map<String, dynamic>;
-    } catch (e) {
-      print('[Personalization] Dashboard error: $e');
+    } catch (_) {
       return null;
     }
   }
@@ -61,8 +61,7 @@ class PersonalizationService {
         },
         options: Options(headers: {'Authorization': 'Bearer $token'}));
       return res.data as Map<String, dynamic>;
-    } catch (e) {
-      print('[Personalization] Action complete error: $e');
+    } catch (_) {
       return null;
     }
   }
