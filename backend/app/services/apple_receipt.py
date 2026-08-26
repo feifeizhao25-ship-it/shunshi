@@ -94,17 +94,21 @@ async def verify_apple_receipt(
         }
 
     # 生产验证
-    result = await _verify_with_apple(PRODUCTION_URL, receipt_data)
+    result = await _verify_with_apple(PRODUCTION_URL, receipt_data, transaction_id)
 
     # Sandbox 回退
     if result.get("status") == AppleReceiptStatus.SANDBOX_RECEIPT:
         logger.info("[AppleReceipt] 收据来自 sandbox，切换到 sandbox URL")
-        result = await _verify_with_apple(SANDBOX_URL, receipt_data)
+        result = await _verify_with_apple(SANDBOX_URL, receipt_data, transaction_id)
 
     return result
 
 
-async def _verify_with_apple(url: str, receipt_data: str) -> dict:
+async def _verify_with_apple(
+    url: str,
+    receipt_data: str,
+    transaction_id: Optional[str] = None,
+) -> dict:
     """向 Apple 服务器发送验证请求"""
     payload = {
         "receipt-data": receipt_data,

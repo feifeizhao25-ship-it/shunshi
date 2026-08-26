@@ -119,7 +119,7 @@ def get_async_session_local():
 
 def get_db() -> Session:
     """FastAPI 依赖: 获取同步数据库会话"""
-    db = SessionLocal()
+    db = get_session_local()()
     try:
         yield db
     finally:
@@ -128,7 +128,7 @@ def get_db() -> Session:
 
 async def get_async_db() -> AsyncSession:
     """FastAPI 依赖: 获取异步数据库会话"""
-    async with AsyncSessionLocal() as session:
+    async with get_async_session_local()() as session:
         try:
             yield session
         finally:
