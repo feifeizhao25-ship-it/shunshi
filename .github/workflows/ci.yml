@@ -76,6 +76,20 @@ jobs:
           flutter-version: '3.38.5'
       - name: Get deps
         run: flutter pub get
+      - name: Verify global build uses upstream repositories and declared assets exist
+        run: |
+          if grep -R "maven.aliyun.com" android --include='*.gradle' --include='*.gradle.kts'; then
+            echo "Global build must not depend on CN-only Maven mirrors" >&2
+            exit 1
+          fi
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          declared = re.findall(r'^\s+-\s+(assets/\S+)\s*$', Path('pubspec.yaml').read_text(), re.M)
+          missing = [p for p in declared if not Path(p).exists()]
+          if missing:
+              raise SystemExit('Missing Flutter asset directories: ' + ', '.join(missing))
+          PY
       - name: Analyze
         run: flutter analyze --no-fatal-warnings --no-fatal-infos
       - name: Test

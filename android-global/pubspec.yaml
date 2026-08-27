@@ -101,9 +101,6 @@ flutter:
 
   assets:
     - assets/images/
-    - assets/icons/
-    - assets/animations/
-    - assets/audio/
 
   fonts:
     - family: NotoSerifSC
