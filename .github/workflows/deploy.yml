@@ -151,9 +151,44 @@ jobs:
 
       - name: Configure kubeconfig
         run: |
+          test -n "${{ secrets.KUBE_CONFIG }}" || { echo "::error::KUBE_CONFIG 未配置"; exit 1; }
           mkdir -p $HOME/.kube
           echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
           chmod 600 $HOME/.kube/config
+
+      - name: Create production secrets
+        env:
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          SHUNSHI_DATABASE_URL: ${{ secrets.SHUNSHI_DATABASE_URL }}
+          SHUNSHI_JWT_SECRET: ${{ secrets.SHUNSHI_JWT_SECRET }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          ADMIN_JWT_SECRET: ${{ secrets.ADMIN_JWT_SECRET }}
+          ADMIN_PASSWORD_HASH: ${{ secrets.ADMIN_PASSWORD_HASH }}
+          SILICONFLOW_API_KEY: ${{ secrets.SILICONFLOW_API_KEY }}
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
+          ALIPAY_APP_ID: ${{ secrets.ALIPAY_APP_ID }}
+          ALIPAY_PRIVATE_KEY: ${{ secrets.ALIPAY_PRIVATE_KEY }}
+          WECHAT_APP_SECRET: ${{ secrets.WECHAT_APP_SECRET }}
+        run: |
+          for required in DB_PASSWORD SHUNSHI_DATABASE_URL SHUNSHI_JWT_SECRET JWT_SECRET ADMIN_JWT_SECRET ADMIN_PASSWORD_HASH SILICONFLOW_API_KEY; do
+            test -n "${!required}" || { echo "::error::GitHub Secret $required 未配置"; exit 1; }
+          done
+          kubectl create namespace shunshi --dry-run=client -o yaml | kubectl apply -f -
+          kubectl -n shunshi create secret generic shunshi-secret \
+            --from-literal=DB_PASSWORD="$DB_PASSWORD" \
+            --from-literal=SHUNSHI_DATABASE_URL="$SHUNSHI_DATABASE_URL" \
+            --from-literal=SHUNSHI_JWT_SECRET="$SHUNSHI_JWT_SECRET" \
+            --from-literal=JWT_SECRET="$JWT_SECRET" \
+            --from-literal=ADMIN_JWT_SECRET="$ADMIN_JWT_SECRET" \
+            --from-literal=ADMIN_PASSWORD_HASH="$ADMIN_PASSWORD_HASH" \
+            --from-literal=SILICONFLOW_API_KEY="$SILICONFLOW_API_KEY" \
+            --from-literal=STRIPE_SECRET_KEY="$STRIPE_SECRET_KEY" \
+            --from-literal=STRIPE_WEBHOOK_SECRET="$STRIPE_WEBHOOK_SECRET" \
+            --from-literal=ALIPAY_APP_ID="$ALIPAY_APP_ID" \
+            --from-literal=ALIPAY_PRIVATE_KEY="$ALIPAY_PRIVATE_KEY" \
+            --from-literal=WECHAT_APP_SECRET="$WECHAT_APP_SECRET" \
+            --dry-run=client -o yaml | kubectl apply -f -
 
       - name: Update image tags in K8s manifests
         run: |
@@ -167,7 +202,6 @@ jobs:
         run: |
           kubectl apply -f k8s/namespace.yaml
           kubectl apply -f k8s/configmap.yaml
-          kubectl apply -f k8s/secret.yaml
           kubectl apply -f k8s/postgres-statefulset.yaml
           kubectl apply -f k8s/redis-deployment.yaml
           kubectl apply -f k8s/redis-service.yaml

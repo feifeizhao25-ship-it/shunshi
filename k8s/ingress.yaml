@@ -5,18 +5,17 @@ metadata:
   namespace: shunshi
   annotations:
     # Let's Encrypt 自动证书 (使用 cert-manager)
-    # cert-manager.io/cluster-issuer: letsencrypt-prod
-    # nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
 spec:
-  # TLS 配置 (启用 cert-manager 后取消注释)
-  # tls:
-  #   - hosts:
-  #       - shunshi.com
-  #       - api.shunshi.com
-  #     secretName: shunshi-tls
+  tls:
+    - hosts:
+        - shunshi.app
+        - api.shunshi.app
+      secretName: shunshi-tls
   ingressClassName: nginx
   rules:
-    - host: shunshi.com
+    - host: shunshi.app
       http:
         paths:
           - path: /api
@@ -40,7 +39,7 @@ spec:
                 name: admin
                 port:
                   number: 80
-    - host: api.shunshi.com
+    - host: api.shunshi.app
       http:
         paths:
           - path: /

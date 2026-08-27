@@ -4,10 +4,16 @@ metadata:
   name: shunshi-config
   namespace: shunshi
 data:
+  APP_ENV: "production"
+  DEBUG: "false"
   DB_HOST: "postgres"
   DB_PORT: "5432"
   DB_NAME: "shunshi"
   DB_USER: "shunshi"
   REDIS_URL: "redis://redis:6379/0"
+  SHUNSHI_ENV: "production"
+  SHUNSHI_REDIS_URL: "redis://redis:6379/0"
+  SHUNSHI_CORS_ORIGINS: "https://shunshi.app,https://www.shunshi.app"
+  CORS_ALLOWED_ORIGINS: "https://shunshi.app,https://www.shunshi.app"
   LOG_LEVEL: "INFO"
-  FLUTTER_APP_URL: "http://localhost:3007"
+  FLUTTER_APP_URL: "https://shunshi.app"

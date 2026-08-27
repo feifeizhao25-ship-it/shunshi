@@ -32,9 +32,6 @@ spec:
                 name: shunshi-config
             - secretRef:
                 name: shunshi-secret
-          env:
-            - name: DATABASE_URL
-              value: "postgresql+psycopg2://$(DB_USER):$(DB_PASSWORD)@postgres:5432/$(DB_NAME)"
           resources:
             requests:
               memory: "256Mi"
