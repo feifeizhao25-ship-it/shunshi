@@ -152,9 +152,9 @@ jobs:
       - name: Configure kubeconfig
         run: |
           test -n "${{ secrets.KUBE_CONFIG }}" || { echo "::error::KUBE_CONFIG 未配置"; exit 1; }
-          mkdir -p $HOME/.kube
-          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
-          chmod 600 $HOME/.kube/config
+          mkdir -p "$HOME/.kube"
+          printf '%s' "${{ secrets.KUBE_CONFIG }}" | base64 -d > "$HOME/.kube/config"
+          chmod 600 "$HOME/.kube/config"
 
       - name: Create production secrets
         env:
@@ -194,9 +194,13 @@ jobs:
         run: |
           SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
           cd k8s
-          sed -i.bak "s|shunshi/backend:latest|${{ env.IMAGE_PREFIX }}/backend:sha-${SHORT_SHA}|g" backend-deployment.yaml
-          sed -i.bak "s|shunshi/admin:latest|${{ env.IMAGE_PREFIX }}/admin:sha-${SHORT_SHA}|g" admin-deployment.yaml
-          rm -f *.bak
+          # docker/metadata-action is configured with prefix=, so the
+          # immutable image tag is the bare seven-character SHA (not sha-<SHA>).
+          sed -i.bak "s|shunshi/backend:latest|${{ env.IMAGE_PREFIX }}/backend:${SHORT_SHA}|g" backend-deployment.yaml
+          sed -i.bak "s|shunshi/admin:latest|${{ env.IMAGE_PREFIX }}/admin:${SHORT_SHA}|g" admin-deployment.yaml
+          rm -f -- ./*.bak
+          grep -F "image: ${{ env.IMAGE_PREFIX }}/backend:${SHORT_SHA}" backend-deployment.yaml
+          grep -F "image: ${{ env.IMAGE_PREFIX }}/admin:${SHORT_SHA}" admin-deployment.yaml
 
       - name: Apply Kubernetes manifests
         run: |
