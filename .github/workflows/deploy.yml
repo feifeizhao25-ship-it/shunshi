@@ -52,6 +52,17 @@ jobs:
       - name: Install admin dependencies
         run: cd admin && npm ci && npm run build
 
+      - name: Validate domestic Web build contract
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          config = Path('android-cn/lib/core/config/app_config.dart').read_text()
+          assert "defaultValue: 'https://api.shunshi.app'" in config
+          assert '不含 /api/v1' in config
+          manifest = Path('android-cn/web/manifest.json').read_text()
+          assert '顺时' in manifest and 'A new Flutter project' not in manifest
+          PY
+
   # ==================== 构建并推送后端镜像 ====================
   build-backend:
     name: Build & Push Backend
@@ -134,11 +145,48 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+  # ==================== 构建并推送国内用户 Web/PWA 镜像 ====================
+  build-web-cn:
+    name: Build & Push CN Web
+    runs-on: ubuntu-latest
+    needs: test
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE_PREFIX }}/web-cn
+          tags: |
+            type=sha,prefix=
+            type=ref,event=branch
+            type=raw,value=latest,enable={{is_default_branch}}
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: ./android-cn
+          file: ./android-cn/Dockerfile.web
+          push: true
+          build-args: API_BASE_URL=https://api.shunshi.app
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,scope=web-cn
+          cache-to: type=gha,mode=max,scope=web-cn
+
   # ==================== 部署到生产环境 ====================
   deploy:
     name: Deploy to Production
     runs-on: ubuntu-latest
-    needs: [build-backend, build-web]
+    needs: [build-backend, build-web, build-web-cn]
     environment: production
     # A push publishes tested immutable images; touching production requires
     # an explicit operator action after external cluster/secrets are ready.
@@ -200,9 +248,11 @@ jobs:
           # immutable image tag is the bare seven-character SHA (not sha-<SHA>).
           sed -i.bak "s|shunshi/backend:latest|${{ env.IMAGE_PREFIX }}/backend:${SHORT_SHA}|g" backend-deployment.yaml
           sed -i.bak "s|shunshi/admin:latest|${{ env.IMAGE_PREFIX }}/admin:${SHORT_SHA}|g" admin-deployment.yaml
+          sed -i.bak "s|shunshi/web-cn:latest|${{ env.IMAGE_PREFIX }}/web-cn:${SHORT_SHA}|g" web-cn-deployment.yaml
           rm -f -- ./*.bak
           grep -F "image: ${{ env.IMAGE_PREFIX }}/backend:${SHORT_SHA}" backend-deployment.yaml
           grep -F "image: ${{ env.IMAGE_PREFIX }}/admin:${SHORT_SHA}" admin-deployment.yaml
+          grep -F "image: ${{ env.IMAGE_PREFIX }}/web-cn:${SHORT_SHA}" web-cn-deployment.yaml
 
       - name: Apply Kubernetes manifests
         run: |
@@ -214,6 +264,7 @@ jobs:
           kubectl apply -f k8s/backend-deployment.yaml
           kubectl apply -f k8s/backend-service.yaml
           kubectl apply -f k8s/admin-deployment.yaml
+          kubectl apply -f k8s/web-cn-deployment.yaml
           kubectl apply -f k8s/nginx-configmap.yaml
           kubectl apply -f k8s/nginx-deployment.yaml
           kubectl apply -f k8s/ingress.yaml
@@ -223,6 +274,7 @@ jobs:
         run: |
           kubectl -n shunshi rollout status deployment/backend --timeout=300s
           kubectl -n shunshi rollout status deployment/admin --timeout=120s
+          kubectl -n shunshi rollout status deployment/web-cn --timeout=180s
           kubectl -n shunshi rollout status statefulset/postgres --timeout=180s
 
       - name: Verify deployment

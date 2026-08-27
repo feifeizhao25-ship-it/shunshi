@@ -38,7 +38,7 @@ export default function LoginPage() {
       } else {
         setError(res?.message || '登录失败');
       }
-    } catch (err) {
+    } catch {
       setError('网络错误，请稍后重试');
     } finally {
       setLoading(false);

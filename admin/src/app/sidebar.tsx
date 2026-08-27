@@ -64,7 +64,7 @@ export default function Sidebar({ active }: { active?: string }) {
           退出登录
         </button>
         <div className="text-xs text-gray-400 text-center">
-          Backend: {process.env.NEXT_PUBLIC_API_URL || 'localhost:8000'}
+          API：{process.env.NEXT_PUBLIC_API_URL || '同源安全代理'}
         </div>
       </div>
     </aside>

@@ -2,14 +2,14 @@
 /// 通过 --dart-define 在构建时注入，开发环境回退至本地地址。
 ///
 /// 用法示例:
-///   flutter run --dart-define=API_BASE_URL=https://api.shunshi.cn/api/v1
-///   flutter build android --dart-define=API_BASE_URL=https://api.shunshi.cn/api/v1 \
+///   flutter run --dart-define=API_BASE_URL=https://api.shunshi.app
+///   flutter build android --dart-define=API_BASE_URL=https://api.shunshi.app \
 ///                          --dart-define=APP_VARIANT=android-cn
 class AppConfig {
   AppConfig._();
 
   //
-  /// 后端 API 基础地址（含 /api/v1）
+  /// 后端服务源地址（不含 /api/v1）。各功能按后端契约追加版本路径。
   static const String apiBaseUrl = String.fromEnvironment(
     'API_BASE_URL',
     defaultValue: 'https://api.shunshi.app',
@@ -32,5 +32,5 @@ class AppConfig {
   //
   static const Duration connectTimeout = Duration(seconds: 10);
   static const Duration receiveTimeout = Duration(seconds: 30);
-  static const Duration sendTimeout    = Duration(seconds: 30);
+  static const Duration sendTimeout = Duration(seconds: 30);
 }

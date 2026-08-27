@@ -1,12 +1,12 @@
 {
-    "name": "shunshi",
-    "short_name": "shunshi",
+    "name": "顺时｜节气养生与个性化健康助手",
+    "short_name": "顺时",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
-    "orientation": "portrait-primary",
+    "background_color": "#F6F2E8",
+    "theme_color": "#315B4A",
+    "description": "面向国内用户的节气养生、体质管理与个性化健康生活助手。",
+    "orientation": "any",
     "prefer_related_applications": false,
     "icons": [
         {

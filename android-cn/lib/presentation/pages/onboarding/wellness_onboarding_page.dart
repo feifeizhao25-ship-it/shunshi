@@ -123,25 +123,30 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
           ),
           backgroundColor: bg,
           body: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                children: [
-                  Expanded(
-                    child: FadeTransition(
-                      opacity: _pageAnim,
-                      child: SlideTransition(
-                        position: _slideAnim,
-                        child: ScaleTransition(
-                          scale: _scale,
-                          child: _buildPage(),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 680),
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: FadeTransition(
+                          opacity: _pageAnim,
+                          child: SlideTransition(
+                            position: _slideAnim,
+                            child: ScaleTransition(
+                              scale: _scale,
+                              child: _buildPage(),
+                            ),
+                          ),
                         ),
                       ),
-                    ),
+                      const SizedBox(height: 16),
+                      _buildProgressBar(),
+                    ],
                   ),
-                  const SizedBox(height: 16),
-                  _buildProgressBar(),
-                ],
+                ),
               ),
             ),
           ),
@@ -162,10 +167,14 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
 
   Widget _buildPage() {
     switch (_page) {
-      case 0: return _page1();
-      case 1: return _page2();
-      case 2: return _page3();
-      default: return _page1();
+      case 0:
+        return _page1();
+      case 1:
+        return _page2();
+      case 2:
+        return _page3();
+      default:
+        return _page1();
     }
   }
 
@@ -178,7 +187,8 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
         ScaleTransition(
           scale: _breath,
           child: Container(
-            width: 88, height: 88,
+            width: 88,
+            height: 88,
             decoration: BoxDecoration(
               gradient: const LinearGradient(
                 begin: Alignment.topLeft,
@@ -202,7 +212,8 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
           '顺时',
           style: TextStyle(
             fontFamily: ShunShiTypography.serifFamily,
-            fontSize: 36, fontWeight: FontWeight.w700,
+            fontSize: 36,
+            fontWeight: FontWeight.w700,
             color: ShunShiColors.textPrimary,
           ),
         ),
@@ -211,7 +222,8 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
           '顺应天时，养身心',
           style: TextStyle(
             fontFamily: ShunShiTypography.sansFamily,
-            fontSize: 18, color: ShunShiColors.textSecondary,
+            fontSize: 18,
+            color: ShunShiColors.textSecondary,
           ),
         ),
         const SizedBox(height: 56),
@@ -240,9 +252,14 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
                 foregroundColor: Colors.white,
                 elevation: 0,
                 shadowColor: Colors.transparent,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
               ),
-              child: const Text('开始使用', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
+              child: const Text(
+                '开始使用',
+                style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+              ),
             ),
           ),
         ),
@@ -259,7 +276,8 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
           '你最关注什么？',
           style: TextStyle(
             fontFamily: ShunShiTypography.serifFamily,
-            fontSize: 26, fontWeight: FontWeight.w700,
+            fontSize: 26,
+            fontWeight: FontWeight.w700,
             color: ShunShiColors.textPrimary,
           ),
         ),
@@ -268,43 +286,58 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
           '选择一项，我们为你定制方案',
           style: TextStyle(
             fontFamily: ShunShiTypography.sansFamily,
-            fontSize: 14, color: ShunShiColors.textTertiary,
+            fontSize: 14,
+            color: ShunShiColors.textTertiary,
           ),
         ),
         const SizedBox(height: 36),
-        ..._concerns.map((c) => Padding(
-          padding: const EdgeInsets.only(bottom: 14),
-          child: _BounceSelectionCard(
-            isSelected: _selectedConcern == c.label,
-            onTap: () => _selectConcern(c.label),
-            child: Row(
-              children: [
-                Text(c.emoji, style: const TextStyle(fontSize: 28)),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(c.label, style: TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.w600,
-                        fontFamily: ShunShiTypography.serifFamily,
-                        color: _selectedConcern == c.label
-                            ? ShunShiColors.primary
-                            : ShunShiColors.textPrimary,
-                      )),
-                      const SizedBox(height: 2),
-                      Text(c.desc, style: const TextStyle(
-                        fontSize: 13, color: ShunShiColors.textTertiary,
-                      )),
-                    ],
+        ..._concerns.map(
+          (c) => Padding(
+            padding: const EdgeInsets.only(bottom: 14),
+            child: _BounceSelectionCard(
+              isSelected: _selectedConcern == c.label,
+              onTap: () => _selectConcern(c.label),
+              child: Row(
+                children: [
+                  Text(c.emoji, style: const TextStyle(fontSize: 28)),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          c.label,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            fontFamily: ShunShiTypography.serifFamily,
+                            color: _selectedConcern == c.label
+                                ? ShunShiColors.primary
+                                : ShunShiColors.textPrimary,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          c.desc,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: ShunShiColors.textTertiary,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                if (_selectedConcern == c.label)
-                  const Icon(Icons.check_circle, color: ShunShiColors.primary, size: 24),
-              ],
+                  if (_selectedConcern == c.label)
+                    const Icon(
+                      Icons.check_circle,
+                      color: ShunShiColors.primary,
+                      size: 24,
+                    ),
+                ],
+              ),
             ),
           ),
-        )),
+        ),
       ],
     );
   }
@@ -316,19 +349,25 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Container(
-          width: 80, height: 80,
+          width: 80,
+          height: 80,
           decoration: BoxDecoration(
             color: ShunShiColors.primary.withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
-          child: const Icon(Icons.check_rounded, size: 44, color: ShunShiColors.primary),
+          child: const Icon(
+            Icons.check_rounded,
+            size: 44,
+            color: ShunShiColors.primary,
+          ),
         ),
         const SizedBox(height: 28),
         const Text(
           '准备就绪！',
           style: TextStyle(
             fontFamily: ShunShiTypography.serifFamily,
-            fontSize: 30, fontWeight: FontWeight.w700,
+            fontSize: 30,
+            fontWeight: FontWeight.w700,
             color: ShunShiColors.textPrimary,
           ),
         ),
@@ -338,7 +377,9 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
           textAlign: TextAlign.center,
           style: const TextStyle(
             fontFamily: ShunShiTypography.sansFamily,
-            fontSize: 16, color: ShunShiColors.textSecondary, height: 1.6,
+            fontSize: 16,
+            color: ShunShiColors.textSecondary,
+            height: 1.6,
           ),
         ),
         const SizedBox(height: 44),
@@ -366,9 +407,14 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
                 foregroundColor: Colors.white,
                 elevation: 0,
                 shadowColor: Colors.transparent,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
               ),
-              child: const Text('开始体验', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
+              child: const Text(
+                '开始体验',
+                style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+              ),
             ),
           ),
         ),
@@ -437,13 +483,17 @@ class _BounceSelectionCardState extends State<_BounceSelectionCard>
     );
     _bounceAnim = TweenSequence<double>([
       TweenSequenceItem(
-        tween: Tween(begin: 1.0, end: 1.04)
-            .chain(CurveTween(curve: Curves.easeOutCubic)),
+        tween: Tween(
+          begin: 1.0,
+          end: 1.04,
+        ).chain(CurveTween(curve: Curves.easeOutCubic)),
         weight: 50,
       ),
       TweenSequenceItem(
-        tween: Tween(begin: 1.04, end: 1.0)
-            .chain(CurveTween(curve: Curves.easeInOut)),
+        tween: Tween(
+          begin: 1.04,
+          end: 1.0,
+        ).chain(CurveTween(curve: Curves.easeInOut)),
         weight: 50,
       ),
     ]).animate(_bounceController);
@@ -548,13 +598,13 @@ class _Particle {
   ];
 
   _Particle(Random rng)
-      : startX = rng.nextDouble(),
-        startY = rng.nextDouble(),
-        vx = (rng.nextDouble() - 0.5) * 0.3,
-        vy = rng.nextDouble() * 0.5 + 0.3,
-        size = rng.nextDouble() * 5 + 3,
-        rotation = rng.nextDouble(),
-        color = _colors[rng.nextInt(_colors.length)];
+    : startX = rng.nextDouble(),
+      startY = rng.nextDouble(),
+      vx = (rng.nextDouble() - 0.5) * 0.3,
+      vy = rng.nextDouble() * 0.5 + 0.3,
+      size = rng.nextDouble() * 5 + 3,
+      rotation = rng.nextDouble(),
+      color = _colors[rng.nextInt(_colors.length)];
 }
 
 class _Concern {

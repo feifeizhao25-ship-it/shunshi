@@ -10,8 +10,9 @@ metadata:
 spec:
   tls:
     - hosts:
-        - shunshi.app
-        - api.shunshi.app
+      - shunshi.app
+      - api.shunshi.app
+      - admin.shunshi.app
       secretName: shunshi-tls
   ingressClassName: nginx
   rules:
@@ -27,6 +28,23 @@ spec:
                   number: 4000
           - path: /health
             pathType: Exact
+            backend:
+              service:
+                name: backend
+                port:
+                  number: 4000
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web-cn
+                port:
+                  number: 80
+    - host: admin.shunshi.app
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
             backend:
               service:
                 name: backend

@@ -1,4 +1,7 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+// Production uses the same-origin /api proxy. A browser cannot resolve the
+// internal Docker/Kubernetes service name, so never bake `backend:4000` into
+// client-side JavaScript.
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || '';
 
 export interface ApiResponse<T = any> {
   success?: boolean;
