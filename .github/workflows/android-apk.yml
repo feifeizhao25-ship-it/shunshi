@@ -33,6 +33,13 @@ jobs:
           cd android-cn
           flutter pub get
 
+      - name: Verify canonical Android repositories
+        run: |
+          if grep -R "maven.aliyun.com" android-cn/android --include='*.gradle' --include='*.gradle.kts'; then
+            echo "Domestic Android build must use canonical Google/Maven Central repositories" >&2
+            exit 1
+          fi
+
       - name: Build debug APK
         run: |
           cd android-cn
