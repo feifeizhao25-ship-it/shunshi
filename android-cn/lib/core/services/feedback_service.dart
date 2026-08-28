@@ -3,8 +3,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../config/app_config.dart';
 
 class FeedbackService {
-  static const String _baseUrl = AppConfig.apiBaseUrl;
-  static final _dio = Dio(BaseOptions(baseUrl: _baseUrl, connectTimeout: Duration(seconds: 10)));
+  static const String _baseUrl = '${AppConfig.apiBaseUrl}/api/v1';
+  static final _dio = Dio(
+    BaseOptions(baseUrl: _baseUrl, connectTimeout: Duration(seconds: 10)),
+  );
 
   /// Record practice completion with rating
   static Future<bool> practiceComplete({
@@ -14,12 +16,15 @@ class FeedbackService {
   }) async {
     try {
       final userId = await _getUserId();
-      final resp = await _dio.post('/feedback/practice-complete', data: {
-        'user_id': userId,
-        'content_id': contentId,
-        'rating': rating,
-        'note': note,
-      });
+      final resp = await _dio.post(
+        '/feedback/practice-complete',
+        data: {
+          'user_id': userId,
+          'content_id': contentId,
+          'rating': rating,
+          'note': note,
+        },
+      );
       return resp.statusCode == 200;
     } catch (_) {
       return false;
@@ -35,13 +40,16 @@ class FeedbackService {
   }) async {
     try {
       final userId = await _getUserId();
-      final resp = await _dio.post('/feedback/checkin', data: {
-        'user_id': userId,
-        'mood': mood,
-        'sleep_quality': sleepQuality,
-        'energy': energy,
-        'notes': notes,
-      });
+      final resp = await _dio.post(
+        '/feedback/checkin',
+        data: {
+          'user_id': userId,
+          'mood': mood,
+          'sleep_quality': sleepQuality,
+          'energy': energy,
+          'notes': notes,
+        },
+      );
       return resp.statusCode == 200;
     } catch (_) {
       return false;
@@ -77,7 +85,10 @@ class FeedbackService {
       final resp = await _dio.get('/subscription/status/$userId');
       return resp.data;
     } catch (_) {
-      return {'tier': 'free', 'limits': {'daily_messages': 10, 'model': 'glm-4-flash'}};
+      return {
+        'tier': 'free',
+        'limits': {'daily_messages': 10, 'model': 'glm-4-flash'},
+      };
     }
   }
 

@@ -2,17 +2,17 @@
 /// 通过 --dart-define 在构建时注入，开发环境回退至本地地址。
 ///
 /// 用法示例:
-///   flutter run --dart-define=API_BASE_URL=https://api.seasonsapp.com/api/v1
-///   flutter build android --dart-define=API_BASE_URL=https://api.seasonsapp.com/api/v1 \
-///                          --dart-define=APP_VARIANT=android-global
+///   flutter run --dart-define=API_BASE_URL=https://api.seasonsapp.com
+///   flutter build ios --dart-define=API_BASE_URL=https://api.seasonsapp.com \
+///                      --dart-define=APP_VARIANT=ios-global
 class AppConfig {
   AppConfig._();
 
   // ─── API ──────────────────────────────────────────────────────────────────
-  /// 后端 API 基础地址（含 /api/v1）
+  /// 后端服务源地址（不含 /api/v1）
   static const String apiBaseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'https://api.seasonsapp.com/api/v1',
+    defaultValue: 'https://api.seasonsapp.com',
   );
 
   // ─── 应用变体 ──────────────────────────────────────────────────────────────
@@ -32,5 +32,5 @@ class AppConfig {
   // ─── 超时 ──────────────────────────────────────────────────────────────────
   static const Duration connectTimeout = Duration(seconds: 10);
   static const Duration receiveTimeout = Duration(seconds: 30);
-  static const Duration sendTimeout    = Duration(seconds: 30);
+  static const Duration sendTimeout = Duration(seconds: 30);
 }

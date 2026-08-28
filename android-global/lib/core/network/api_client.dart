@@ -45,26 +45,36 @@ class ApiClient {
   }
 
   // ── Request Interceptor ──────────────────────────────────
-  void _onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
-    // 1. Auto-append locale=en-US for Global edition
+  void _onRequest(
+    RequestOptions options,
+    RequestInterceptorHandler handler,
+  ) async {
+    // 1. Normalize the version prefix while API_BASE_URL remains an origin.
+    if (options.path != '/api/v1' && !options.path.startsWith('/api/v1/')) {
+      options.path =
+          '/api/v1${options.path.startsWith('/') ? options.path : '/${options.path}'}';
+    }
+
+    // 2. Auto-append locale=en-US for Global edition
     if (!options.queryParameters.containsKey('locale')) {
       options.queryParameters['locale'] = 'en-US';
     }
 
-    // 2. Auto-attach auth token
+    // 3. Auto-attach auth token
     final token = await tokenStorage.getAccessToken();
     if (token != null && !options.headers.containsKey('Authorization')) {
       options.headers['Authorization'] = 'Bearer $token';
     }
 
-    // 3. Set timeout by level (via extra['level'])
+    // 4. Set timeout by level (via extra['level'])
     final level = options.extra['level'] as ApiLevel? ?? ApiLevel.s1;
     final timeout = _timeoutForLevel(level);
     options.connectTimeout = timeout;
     options.receiveTimeout = timeout;
 
-    // 4. Request dedup — skip if identical request was sent < 1s ago
-    final dedupKey = '${options.method}:${options.path}:${options.queryParameters}';
+    // 5. Request dedup — skip if identical request was sent < 1s ago
+    final dedupKey =
+        '${options.method}:${options.path}:${options.queryParameters}';
     final now = DateTime.now();
     final lastSent = _recentRequests[dedupKey];
     if (lastSent != null && now.difference(lastSent).inMilliseconds < 1000) {
@@ -76,7 +86,7 @@ class ApiClient {
     // Cleanup old dedup entries (> 5s)
     _recentRequests.removeWhere((_, t) => now.difference(t).inSeconds > 5);
 
-    // 5. Add idempotency key for write operations
+    // 6. Add idempotency key for write operations
     if (['POST', 'PUT', 'DELETE'].contains(options.method.toUpperCase())) {
       options.headers['Idempotency-Key'] =
           '${DateTime.now().millisecondsSinceEpoch}-${options.uri}';
@@ -125,7 +135,9 @@ class ApiClient {
     final status = error.response?.statusCode ?? 0;
     if (status >= 500 && status < 600 && opts.extra['_retried5xx'] != true) {
       opts.extra['_retried5xx'] = true;
-      await Future.delayed(Duration(milliseconds: 1000 + (DateTime.now().millisecond % 1000)));
+      await Future.delayed(
+        Duration(milliseconds: 1000 + (DateTime.now().millisecond % 1000)),
+      );
       try {
         final response = await _dio.fetch(opts);
         handler.resolve(response);
@@ -237,7 +249,12 @@ class ApiClient {
   }) {
     final opts = options ?? Options();
     opts.extra = {...?opts.extra, 'level': level};
-    return _dio.post<T>(path, data: data, queryParameters: queryParameters, options: opts);
+    return _dio.post<T>(
+      path,
+      data: data,
+      queryParameters: queryParameters,
+      options: opts,
+    );
   }
 
   Future<Response<T>> put<T>(
@@ -249,7 +266,12 @@ class ApiClient {
   }) {
     final opts = options ?? Options();
     opts.extra = {...?opts.extra, 'level': level};
-    return _dio.put<T>(path, data: data, queryParameters: queryParameters, options: opts);
+    return _dio.put<T>(
+      path,
+      data: data,
+      queryParameters: queryParameters,
+      options: opts,
+    );
   }
 
   Future<Response<T>> delete<T>(
@@ -261,7 +283,12 @@ class ApiClient {
   }) {
     final opts = options ?? Options();
     opts.extra = {...?opts.extra, 'level': level};
-    return _dio.delete<T>(path, data: data, queryParameters: queryParameters, options: opts);
+    return _dio.delete<T>(
+      path,
+      data: data,
+      queryParameters: queryParameters,
+      options: opts,
+    );
   }
 
   /// Streaming for AI responses (SSE)

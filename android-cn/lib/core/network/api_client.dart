@@ -45,12 +45,17 @@ class _RequestDeduplicator {
   final Map<String, Completer<Response>> _pending = {};
 
   String _key(String method, String path, Map<String, dynamic>? params) {
-    final paramStr = params?.entries.map((e) => '${e.key}=${e.value}').join('&') ?? '';
+    final paramStr =
+        params?.entries.map((e) => '${e.key}=${e.value}').join('&') ?? '';
     return '$method:$path:$paramStr';
   }
 
   /// 如果有相同的进行中请求，返回其 future；否则返回 null
-  Future<Response>? getExisting(String method, String path, Map<String, dynamic>? params) {
+  Future<Response>? getExisting(
+    String method,
+    String path,
+    Map<String, dynamic>? params,
+  ) {
     final key = _key(method, path, params);
     final pending = _pending[key];
     if (pending != null && !pending.isCompleted) {
@@ -60,7 +65,11 @@ class _RequestDeduplicator {
   }
 
   /// 注册一个进行中的请求
-  Completer<Response> register(String method, String path, Map<String, dynamic>? params) {
+  Completer<Response> register(
+    String method,
+    String path,
+    Map<String, dynamic>? params,
+  ) {
     final key = _key(method, path, params);
     final completer = Completer<Response>();
     _pending[key] = completer;
@@ -88,31 +97,38 @@ class ApiClient {
   static const _maxRetryTimeout = 1; // 超时最多重试 1 次
 
   ApiClient({String? baseUrl}) {
-    _dio = Dio(BaseOptions(
-      baseUrl: baseUrl ?? AppConfig.apiBaseUrl,
-      connectTimeout: AppConfig.connectTimeout,
-      receiveTimeout: AppConfig.receiveTimeout,
-      sendTimeout: AppConfig.sendTimeout,
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-    ));
+    _dio = Dio(
+      BaseOptions(
+        baseUrl: baseUrl ?? AppConfig.apiBaseUrl,
+        connectTimeout: AppConfig.connectTimeout,
+        receiveTimeout: AppConfig.receiveTimeout,
+        sendTimeout: AppConfig.sendTimeout,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      ),
+    );
 
     _setupInterceptors();
   }
 
   void _setupInterceptors() {
-    _dio.interceptors.add(InterceptorsWrapper(
-      onRequest: _onRequest,
-      onResponse: _onResponse,
-      onError: _onError,
-    ));
+    _dio.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: _onRequest,
+        onResponse: _onResponse,
+        onError: _onError,
+      ),
+    );
   }
 
   // ==================== Request Interceptor ====================
 
-  void _onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
+  void _onRequest(
+    RequestOptions options,
+    RequestInterceptorHandler handler,
+  ) async {
     // 1. 自动加 token
     final token = await tokenStorage.getAccessToken();
     if (token != null) {
@@ -156,18 +172,22 @@ class ApiClient {
 
     if (kDebugMode) {
       final warn = duration > p95 ? ' ⚠️ SLOW' : '';
-      print('← ${response.statusCode} ${response.requestOptions.path} ${duration}ms [$level]$warn');
+      print(
+        '← ${response.statusCode} ${response.requestOptions.path} ${duration}ms [$level]$warn',
+      );
     }
 
     // 性能埋点钩子 — 外部可订阅
-    _performanceCallback?.call(PerformanceEvent(
-      endpoint: response.requestOptions.path,
-      method: response.requestOptions.method,
-      statusCode: response.statusCode ?? 0,
-      durationMs: duration,
-      level: level,
-      cacheHit: false,
-    ));
+    _performanceCallback?.call(
+      PerformanceEvent(
+        endpoint: response.requestOptions.path,
+        method: response.requestOptions.method,
+        statusCode: response.statusCode ?? 0,
+        durationMs: duration,
+        level: level,
+        cacheHit: false,
+      ),
+    );
 
     handler.next(response);
   }
@@ -209,7 +229,11 @@ class ApiClient {
         handler.resolve(response);
         return;
       } catch (e) {
-        handler.next(e is DioException ? e : DioException(requestOptions: options, error: e));
+        handler.next(
+          e is DioException
+              ? e
+              : DioException(requestOptions: options, error: e),
+        );
         return;
       }
     }
@@ -222,7 +246,11 @@ class ApiClient {
         handler.resolve(response);
         return;
       } catch (e) {
-        handler.next(e is DioException ? e : DioException(requestOptions: options, error: e));
+        handler.next(
+          e is DioException
+              ? e
+              : DioException(requestOptions: options, error: e),
+        );
         return;
       }
     }
@@ -240,7 +268,9 @@ class ApiClient {
     }
 
     if (kDebugMode) {
-      print('✗ ${options.method} ${options.path} ${error.message} (retry=$retryCount)');
+      print(
+        '✗ ${options.method} ${options.path} ${error.message} (retry=$retryCount)',
+      );
     }
 
     handler.next(error);
@@ -269,18 +299,22 @@ class ApiClient {
       }
 
       // 用独立的 Dio 实例发 refresh，避免拦截器循环
-      final dio = Dio(BaseOptions(
-        baseUrl: _dio.options.baseUrl,
-        connectTimeout: const Duration(seconds: 3),
-      ));
-      final response = await dio.post('/auth/refresh', data: {
-        'refresh_token': refreshToken,
-      });
+      final dio = Dio(
+        BaseOptions(
+          baseUrl: _dio.options.baseUrl,
+          connectTimeout: const Duration(seconds: 3),
+        ),
+      );
+      final response = await dio.post(
+        '/auth/refresh',
+        data: {'refresh_token': refreshToken},
+      );
 
       final data = response.data;
       if (data is Map && data['access_token'] != null) {
         final newAccessToken = data['access_token'] as String;
-        final newRefreshToken = data['refresh_token'] as String? ?? refreshToken;
+        final newRefreshToken =
+            data['refresh_token'] as String? ?? refreshToken;
 
         await tokenStorage.saveTokens(
           accessToken: newAccessToken,
@@ -306,6 +340,14 @@ class ApiClient {
 
   // ==================== Public API ====================
 
+  /// Accept both legacy `/api/v1/...` paths and concise `/...` paths while
+  /// keeping API_BASE_URL an origin. This prevents missing or duplicated
+  /// version prefixes across mobile and Web release builds.
+  String _versionedPath(String path) {
+    if (path == '/api/v1' || path.startsWith('/api/v1/')) return path;
+    return '/api/v1${path.startsWith('/') ? path : '/$path'}';
+  }
+
   /// GET 请求（带请求去重）
   Future<Response<T>> get<T>(
     String path, {
@@ -325,7 +367,11 @@ class ApiClient {
       opts.extra ??= {};
       opts.extra!['speedLevel'] = level;
 
-      final response = await _dio.get<T>(path, queryParameters: queryParameters, options: opts);
+      final response = await _dio.get<T>(
+        _versionedPath(path),
+        queryParameters: queryParameters,
+        options: opts,
+      );
       completer.complete(response);
       _deduplicator.complete('GET', path, queryParameters);
       return response;
@@ -346,7 +392,12 @@ class ApiClient {
     final opts = options ?? Options();
     opts.extra ??= {};
     opts.extra!['speedLevel'] = level;
-    return _dio.post<T>(path, data: data, queryParameters: queryParameters, options: opts);
+    return _dio.post<T>(
+      _versionedPath(path),
+      data: data,
+      queryParameters: queryParameters,
+      options: opts,
+    );
   }
 
   /// PUT 请求
@@ -360,7 +411,12 @@ class ApiClient {
     final opts = options ?? Options();
     opts.extra ??= {};
     opts.extra!['speedLevel'] = level;
-    return _dio.put<T>(path, data: data, queryParameters: queryParameters, options: opts);
+    return _dio.put<T>(
+      _versionedPath(path),
+      data: data,
+      queryParameters: queryParameters,
+      options: opts,
+    );
   }
 
   /// DELETE 请求
@@ -374,7 +430,12 @@ class ApiClient {
     final opts = options ?? Options();
     opts.extra ??= {};
     opts.extra!['speedLevel'] = level;
-    return _dio.delete<T>(path, data: data, queryParameters: queryParameters, options: opts);
+    return _dio.delete<T>(
+      _versionedPath(path),
+      data: data,
+      queryParameters: queryParameters,
+      options: opts,
+    );
   }
 
   /// SSE 流式请求 (UX_API_SPEC §7)
@@ -387,13 +448,10 @@ class ApiClient {
     final opts = Options(
       responseType: ResponseType.stream,
       extra: {'speedLevel': SpeedLevel.s3},
-      headers: {
-        'Accept': 'text/event-stream',
-        'Cache-Control': 'no-cache',
-      },
+      headers: {'Accept': 'text/event-stream', 'Cache-Control': 'no-cache'},
     );
     final response = await _dio.post<ResponseBody>(
-      path,
+      _versionedPath(path),
       data: data,
       queryParameters: queryParameters,
       options: opts,
@@ -486,5 +544,6 @@ class PerformanceEvent {
   });
 
   @override
-  String toString() => '$method $endpoint → $statusCode ${durationMs}ms [$level] cache=$cacheHit';
+  String toString() =>
+      '$method $endpoint → $statusCode ${durationMs}ms [$level] cache=$cacheHit';
 }

@@ -7,8 +7,9 @@ on:
 
 env:
   FLUTTER_VERSION: "3.38.5"
-  CN_API_BASE_URL: "https://api.shunshi.app/api/v1"
-  GLOBAL_API_BASE_URL: "https://api.seasonsapp.com/api/v1"
+  # Origins only. Client features append the versioned /api/v1 contract.
+  CN_API_BASE_URL: "https://api.shunshi.app"
+  GLOBAL_API_BASE_URL: "https://api.seasonsapp.com"
 
 jobs:
   # ==================== Android 国内版 ====================
@@ -40,13 +41,13 @@ jobs:
       - name: Build APK (release)
         run: |
           flutter build apk --release \
-            --dart-define=API_BASE_URL=${CN_API_BASE_URL} \
+            --dart-define=API_BASE_URL="$CN_API_BASE_URL" \
             --dart-define=APP_VARIANT=android-cn
 
       - name: Build AAB (Play Store)
         run: |
           flutter build appbundle --release \
-            --dart-define=API_BASE_URL=${CN_API_BASE_URL} \
+            --dart-define=API_BASE_URL="$CN_API_BASE_URL" \
             --dart-define=APP_VARIANT=android-cn
 
       - name: Upload APK artifact
@@ -92,13 +93,13 @@ jobs:
       - name: Build APK (release)
         run: |
           flutter build apk --release \
-            --dart-define=API_BASE_URL=${GLOBAL_API_BASE_URL} \
+            --dart-define=API_BASE_URL="$GLOBAL_API_BASE_URL" \
             --dart-define=APP_VARIANT=android-global
 
       - name: Build AAB (Play Store)
         run: |
           flutter build appbundle --release \
-            --dart-define=API_BASE_URL=${GLOBAL_API_BASE_URL} \
+            --dart-define=API_BASE_URL="$GLOBAL_API_BASE_URL" \
             --dart-define=APP_VARIANT=android-global
 
       - name: Upload APK artifact
@@ -138,7 +139,7 @@ jobs:
       - name: Build iOS (no codesign)
         run: |
           flutter build ios --release --no-codesign \
-            --dart-define=API_BASE_URL=${CN_API_BASE_URL} \
+            --dart-define=API_BASE_URL="$CN_API_BASE_URL" \
             --dart-define=APP_VARIANT=ios-cn
 
       - name: Archive .app for artifact
@@ -178,7 +179,7 @@ jobs:
       - name: Build iOS (no codesign)
         run: |
           flutter build ios --release --no-codesign \
-            --dart-define=API_BASE_URL=${GLOBAL_API_BASE_URL} \
+            --dart-define=API_BASE_URL="$GLOBAL_API_BASE_URL" \
             --dart-define=APP_VARIANT=ios-global
 
       - name: Archive .app for artifact
