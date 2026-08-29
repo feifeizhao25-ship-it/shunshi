@@ -28,10 +28,12 @@ export default function DashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
 
   useEffect(() => {
     async function loadData() {
       setLoading(true);
+      setLoadError(false);
       try {
         const [statsRes, alertsRes] = await Promise.all([
           fetchAPI('/api/v1/admin/dashboard'),
@@ -40,7 +42,7 @@ export default function DashboardPage() {
         if (statsRes?.data) setStats(statsRes.data as DashboardStats);
         if (alertsRes?.data) setAlerts(alertsRes.data as Alert[]);
       } catch {
-        // Use fallback mock data
+        setLoadError(true);
       }
       setLoading(false);
     }
@@ -87,9 +89,14 @@ export default function DashboardPage() {
             正在连接后端 API...
           </div>
         )}
+        {loadError && (
+          <div className="mb-4 px-4 py-3 bg-red-50 text-red-700 text-sm rounded-lg" role="alert">
+            运营数据读取失败，当前未展示推测值或示例数据。请检查后端服务后重试。
+          </div>
+        )}
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
           {statCards.map((stat) => (
             <div key={stat.label} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-md transition-shadow">
               <div className="flex items-center gap-3 mb-3">
@@ -124,13 +131,13 @@ export default function DashboardPage() {
             </div>
           ) : (
             <div className="px-6 py-8 text-center text-gray-400 text-sm">
-              {loading ? '加载中...' : '暂无活跃告警'}
+              {loading ? '加载中...' : loadError ? '告警数据暂时无法读取' : '暂无活跃告警'}
             </div>
           )}
         </div>
 
         {/* Quick Actions */}
-        <div className="mt-8 grid grid-cols-4 gap-4">
+        <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
           {[
             { label: '用户管理', href: '/users', desc: '查看和管理用户', icon: '👥' },
             { label: '内容审核', href: '/content', desc: '审核和管理内容', icon: '📝' },
