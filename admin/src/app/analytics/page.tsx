@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Sidebar from '../sidebar';
 import { fetchAPI } from '../../lib/api';
 
@@ -32,9 +32,7 @@ export default function AnalyticsPage() {
     arpu: 0,
   });
 
-  useEffect(() => { loadAnalytics(); }, [period]);
-
-  async function loadAnalytics() {
+  const loadAnalytics = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetchAPI<{ data: any }>(`/api/v1/data-analytics/overview?period=${period}`);
@@ -53,7 +51,12 @@ export default function AnalyticsPage() {
       }
     } catch { /* empty */ }
     setLoading(false);
-  }
+  }, [period]);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => void loadAnalytics(), 0);
+    return () => window.clearTimeout(timer);
+  }, [loadAnalytics]);
 
   const periods = [
     { value: '24h', label: '24小时' },

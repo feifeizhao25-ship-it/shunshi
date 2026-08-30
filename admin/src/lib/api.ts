@@ -14,14 +14,15 @@ export interface ApiResponse<T = any> {
 
 /**
  * 获取存储的 Admin Token
- * 优先从 localStorage 读取，回退到环境变量（兼容旧版本）
+ * 仅从登录后写入的浏览器存储读取。NEXT_PUBLIC_* 会进入公开前端包，
+ * 绝不能用于承载管理员令牌。
  */
 function getAdminToken(): string {
   if (typeof window !== 'undefined') {
     const stored = localStorage.getItem('admin_token');
     if (stored) return stored;
   }
-  return process.env.NEXT_PUBLIC_ADMIN_TOKEN || '';
+  return '';
 }
 
 /**
@@ -68,7 +69,7 @@ export async function fetchAPI<T = any>(path: string, options?: RequestInit): Pr
       // Token 过期，清除并提示
       clearAdminToken();
       if (typeof window !== 'undefined') {
-        window.location.href = '/login';
+        window.dispatchEvent(new Event('admin-auth-changed'));
       }
       return { data: [], error: 'Unauthorized' } as any;
     }

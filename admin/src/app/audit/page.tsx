@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Sidebar from '../sidebar';
 import { fetchAPI } from '../../lib/api';
 
@@ -20,16 +20,19 @@ export default function AuditPage() {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
 
-  useEffect(() => { loadLogs(); }, [page]);
-
-  async function loadLogs() {
+  const loadLogs = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetchAPI<{ data: AuditLog[] }>(`/api/v1/audit?page=${page}&page_size=50`);
       if (res?.data) setLogs(Array.isArray(res.data) ? res.data : []);
     } catch { /* empty */ }
     setLoading(false);
-  }
+  }, [page]);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => void loadLogs(), 0);
+    return () => window.clearTimeout(timer);
+  }, [loadLogs]);
 
   const actionColors: Record<string, string> = {
     create: 'bg-green-100 text-green-700',

@@ -11,7 +11,11 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
   const loggedIn = useSyncExternalStore(
     (onChange) => {
       window.addEventListener('storage', onChange);
-      return () => window.removeEventListener('storage', onChange);
+      window.addEventListener('admin-auth-changed', onChange);
+      return () => {
+        window.removeEventListener('storage', onChange);
+        window.removeEventListener('admin-auth-changed', onChange);
+      };
     },
     isLoggedIn,
     () => false,

@@ -6,8 +6,9 @@ Adds 'from sqlalchemy.sql import text' import where needed.
 """
 import re
 import os
+from pathlib import Path
 
-BASE_DIR = "/Users/feifei00/Documents/Shunshi/backend/app"
+BASE_DIR = Path(__file__).resolve().parent / "app"
 SQL_KEYWORDS = "(SELECT|INSERT|UPDATE|DELETE|CREATE|ALTER|DROP)"
 
 modified_files = set()

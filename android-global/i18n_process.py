@@ -3,7 +3,7 @@
 import re, os, json
 from pathlib import Path
 
-BASE = Path("/Users/feifei00/Documents/Shunshi/android-global")
+BASE = Path(__file__).resolve().parent
 PAGES = BASE / "lib/presentation/pages"
 LOC_FILE = BASE / "lib/core/theme/app_localizations.dart"
 

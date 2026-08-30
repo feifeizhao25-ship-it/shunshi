@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Sidebar from '../sidebar';
 import { fetchAPI } from '@/lib/api';
 
@@ -32,11 +32,7 @@ export default function LLMAuditPage() {
   const [loading, setLoading] = useState(true);
   const [selectedCall, setSelectedCall] = useState<LLMAuditRecord | null>(null);
 
-  useEffect(() => {
-    loadData();
-  }, [activeTab]);
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     setLoading(true);
     try {
       if (activeTab === 'recent') {
@@ -55,7 +51,12 @@ export default function LLMAuditPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [activeTab]);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => void loadData(), 0);
+    return () => window.clearTimeout(timer);
+  }, [loadData]);
 
   const formatDate = (dateStr: string) => {
     if (!dateStr) return '-';

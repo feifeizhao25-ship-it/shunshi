@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Sidebar from '../sidebar';
 import { fetchAPI, deleteAPI, postAPI } from '../../lib/api';
 
@@ -26,11 +26,7 @@ export default function UsersPage() {
   const [filterTier, setFilterTier] = useState('all');
   const pageSize = 20;
 
-  useEffect(() => {
-    loadUsers();
-  }, [page, filterTier]);
-
-  async function loadUsers() {
+  const loadUsers = useCallback(async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams({
@@ -49,7 +45,12 @@ export default function UsersPage() {
       // Fallback empty
     }
     setLoading(false);
-  }
+  }, [filterTier, page, search]);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => void loadUsers(), 0);
+    return () => window.clearTimeout(timer);
+  }, [loadUsers]);
 
   async function handleToggleActive(userId: string, currentActive: boolean) {
     if (!confirm(currentActive ? '确定禁用该用户？' : '确定启用该用户？')) return;

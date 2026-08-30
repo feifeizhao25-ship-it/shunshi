@@ -7,6 +7,24 @@ on:
     branches: [main]
 
 jobs:
+  admin:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: admin
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: admin/package-lock.json
+      - run: npm ci
+      - run: npm audit --omit=dev --audit-level=high
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+
   mobile-network-security:
     runs-on: ubuntu-latest
     steps:
@@ -18,6 +36,8 @@ jobs:
         run: python scripts/verify_mobile_network_security.py
       - name: Verify mobile API origin/version contract
         run: python scripts/verify_mobile_api_contract.py
+      - name: Verify repository and CI integrity
+        run: python scripts/verify_repository_integrity.py
 
   backend:
     runs-on: ubuntu-latest

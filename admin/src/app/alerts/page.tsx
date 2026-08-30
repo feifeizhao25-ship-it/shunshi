@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Sidebar from '../sidebar';
 import { fetchAPI, postAPI } from '../../lib/api';
 
@@ -22,9 +22,7 @@ export default function AlertsPage() {
   const [filterLevel, setFilterLevel] = useState('all');
   const [filterResolved, setFilterResolved] = useState('unresolved');
 
-  useEffect(() => { loadAlerts(); }, [filterLevel, filterResolved]);
-
-  async function loadAlerts() {
+  const loadAlerts = useCallback(async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams({ limit: '100' });
@@ -34,7 +32,12 @@ export default function AlertsPage() {
       if (res?.data) setAlerts(Array.isArray(res.data) ? res.data : []);
     } catch { /* empty */ }
     setLoading(false);
-  }
+  }, [filterLevel, filterResolved]);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => void loadAlerts(), 0);
+    return () => window.clearTimeout(timer);
+  }, [loadAlerts]);
 
   async function handleResolve(id: string) {
     try {

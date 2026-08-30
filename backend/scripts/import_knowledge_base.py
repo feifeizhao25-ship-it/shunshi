@@ -8,8 +8,9 @@ import sqlite3
 import os
 import json
 from datetime import datetime
+from pathlib import Path
 
-BASE = '/Users/feifei00/Documents/Shunshi'
+BASE = Path(__file__).resolve().parents[2] / '参考文档，知识库'
 DB_PATH = os.path.join(os.path.dirname(__file__), '..', 'data', 'shunshi.db')
 
 def get_db():
@@ -426,7 +427,7 @@ def import_wisdom_quotes(content):
 
 def main():
     # 1. 主知识库
-    main_path = os.path.join(BASE, '顺时知识库_中文版.md')
+    main_path = BASE / '顺时知识库_中文版.md'
     with open(main_path, 'r', encoding='utf-8') as f:
         main_content = f.read()
     
@@ -444,7 +445,7 @@ def main():
     print(f"  各章节内容: +{c3}")
     
     # 2. 补充篇
-    supp_path = os.path.join(BASE, '顺时知识库_补充篇_中文版.md')
+    supp_path = BASE / '顺时知识库_补充篇_中文版.md'
     with open(supp_path, 'r', encoding='utf-8') as f:
         supp_content = f.read()
     

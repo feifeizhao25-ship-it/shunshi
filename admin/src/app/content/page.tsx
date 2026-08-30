@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Sidebar from '../sidebar';
 import { fetchAPI, postAPI, putAPI, deleteAPI } from '@/lib/api';
 
@@ -60,9 +60,7 @@ export default function ContentPage() {
     title: '', content_type: 'article', category: '', body: '', tags: [] as string[],
   });
 
-  useEffect(() => { loadData(); }, [filterType, filterStatus]);
-
-  async function loadData() {
+  const loadData = useCallback(async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams({ page: '1', page_size: '50' });
@@ -82,7 +80,12 @@ export default function ContentPage() {
       console.error('Failed to load content:', err);
     }
     setLoading(false);
-  }
+  }, [filterType, filterStatus]);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => void loadData(), 0);
+    return () => window.clearTimeout(timer);
+  }, [loadData]);
 
   async function handleCreate() {
     try {
