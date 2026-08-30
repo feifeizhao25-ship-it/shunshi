@@ -24,6 +24,19 @@ for knowledge_file in ("顺时知识库_中文版.md", "顺时知识库_补充�
     if not (ROOT / "参考文档，知识库" / knowledge_file).is_file():
         errors.append(f"参考文档，知识库/{knowledge_file}: required RAG source is missing")
 
+rag_loader = (ROOT / "backend/app/rag/knowledge_base.py").read_text(encoding="utf-8")
+for required in ("参考文档，知识库", "source_manifest.json", "verified_cn.md"):
+    if required not in rag_loader:
+        errors.append(f"backend/app/rag/knowledge_base.py: runtime RAG source missing {required!r}")
+rag_evidence = (ROOT / "backend/app/rag/evidence.py").read_text(encoding="utf-8")
+for required in ("verified_official", "valid_until", "date.today()"):
+    if required not in rag_evidence:
+        errors.append(f"backend/app/rag/evidence.py: verified RAG gate missing {required!r}")
+for relative in ("backend/app/router/chat.py", "backend/app/routers/chat.py"):
+    chat_source = (ROOT / relative).read_text(encoding="utf-8")
+    if "verified_cn_context" not in chat_source:
+        errors.append(f"{relative}: verified RAG context is not connected")
+
 admin_manifest = json.loads((ROOT / "admin/package.json").read_text(encoding="utf-8"))
 if not admin_manifest.get("scripts", {}).get("test"):
     errors.append("admin/package.json: fail-closed test command is required")
@@ -74,6 +87,17 @@ for relative in (
     source = (ROOT / relative).read_text(encoding="utf-8")
     if "data['access_token']" not in source:
         errors.append(f"{relative}: login must persist the backend access_token")
+
+for relative in (
+    "android-cn/lib/presentation/pages/chat_page.dart",
+    "ios-cn/lib/presentation/pages/chat_page.dart",
+):
+    source = (ROOT / relative).read_text(encoding="utf-8")
+    for forbidden in ("宜食银耳、百合润燥之物", "《黄帝内经·素问》", "《本草纲目》"):
+        if forbidden in source:
+            errors.append(f"{relative}: offline mode fabricates health evidence {forbidden!r}")
+    if "离线状态不生成健康建议" not in source:
+        errors.append(f"{relative}: offline health response must fail closed")
 
 entries = subprocess.run(
     ["git", "ls-files", "-s", "-z"], cwd=ROOT, check=True, capture_output=True, text=True

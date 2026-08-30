@@ -457,19 +457,21 @@ async def chat(
     selected_model = route_result.selected_model
 
     # ============ Step 5.5: RAG Knowledge Enhancement ============
+    rag_sources = []
+    rag_source_details = []
     try:
-        from app.main import _rag_ready
-        if not _rag_ready:
-            logger.info("[Chat] RAG 未就绪，跳过知识注入")
-        else:
-            from app.rag.retriever import retrieve as rag_retrieve
-            relevant_chunks = rag_retrieve(message, lang='cn', top_k=3)
-            if relevant_chunks:
-                knowledge_context = "\n\n".join([c['content'][:500] for c in relevant_chunks])
-                system_prompt += f"\n\n--- 参考知识（来自顺时知识库，请结合这些信息回答） ---\n{knowledge_context}"
-                logger.info(f"[Chat] RAG 注入 {len(relevant_chunks)} 个知识 chunks")
+        from app.rag.evidence import verified_cn_context
+
+        knowledge_context, rag_sources, rag_source_details = verified_cn_context(message)
+        if knowledge_context:
+            system_prompt += (
+                "\n\n--- 已核验官方参考知识 ---\n"
+                "只能按原文范围回答，不得扩展为诊断、处方或疗效承诺。\n"
+                f"{knowledge_context}"
+            )
+            logger.info("[Chat] RAG 注入 %s 个已核验 chunks", len(rag_sources))
     except Exception as rag_err:
-        logger.warning(f"[Chat] RAG 检索失败，跳过知识注入: {rag_err}")
+        logger.error("[Chat] RAG 检索失败，未注入知识: %s", rag_err)
 
     # ============ Step 6: Call LLM (with Fallback Chain) ============
     ai_response = None
@@ -573,6 +575,8 @@ async def chat(
         "data": {
             "message_id": ai_message_id,
             "conversation_id": conversation_id,
+            "sources": rag_sources,
+            "source_details": rag_source_details,
             **ai_response
         }
     }

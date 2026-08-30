@@ -7,17 +7,31 @@ from __future__ import annotations
 import re
 import os
 import logging
+import json
+from pathlib import Path
 from typing import Optional
 from dataclasses import dataclass, field
 
 logger = logging.getLogger(__name__)
 
-# 默认知识库路径
-_DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "data")
-_CN_PATH = os.path.join(_DATA_DIR, "knowledge_base_cn.md")
-_GL_PATH = os.path.join(_DATA_DIR, "knowledge_base_gl.md")
-_CN_SUPP_PATH = os.path.join(_DATA_DIR, "knowledge_base_cn_supplement.md")
-_GL_SUPP_PATH = os.path.join(_DATA_DIR, "knowledge_base_gl_supplement.md")
+# 运行时直接读取仓库内受版本控制的权威文稿目录。
+_ROOT = Path(__file__).resolve().parents[3]
+_DATA_DIR = _ROOT / "参考文档，知识库"
+_CN_PATH = _DATA_DIR / "顺时知识库_中文版.md"
+_GL_PATH = _DATA_DIR / "SEASONS_Knowledge_Base_English.md"
+_CN_SUPP_PATH = _DATA_DIR / "顺时知识库_补充篇_中文版.md"
+_GL_SUPP_PATH = _DATA_DIR / "SEASONS_Knowledge_Base_Supplement_English.md"
+_CN_VERIFIED_PATH = Path(__file__).with_name("verified_cn.md")
+_SOURCE_MANIFEST_PATH = Path(__file__).with_name("source_manifest.json")
+
+
+def _source_metadata(path: str | Path) -> dict:
+    manifest = json.loads(_SOURCE_MANIFEST_PATH.read_text(encoding="utf-8"))
+    filename = Path(path).name
+    entry = manifest.get("documents", {}).get(filename)
+    if not entry:
+        raise RuntimeError(f"RAG 来源清单缺少文档: {filename}")
+    return {"source_file": filename, **entry}
 
 # 中文知识库标题 → 分类/季节/节气的映射
 _CN_SEASON_MAP = {
@@ -363,13 +377,15 @@ class KnowledgeBase:
             path = _CN_PATH if self.lang == "cn" else _GL_PATH
 
         if not os.path.exists(path):
-            logger.warning(f"[KB] 知识库文件不存在: {path}")
-            return
+            raise FileNotFoundError(f"知识库文件不存在: {path}")
 
         with open(path, "r", encoding="utf-8") as f:
             text = f.read()
 
         new_chunks = _parse_markdown_into_chunks(text, self.lang, source="main")
+        source_metadata = _source_metadata(path)
+        for chunk in new_chunks:
+            chunk.metadata.update(source_metadata)
         self.chunks.extend(new_chunks)
         self.loaded = True
         logger.info(f"[KB] {self.lang} 主知识库加载完成: {len(new_chunks)} chunks")
@@ -380,13 +396,15 @@ class KnowledgeBase:
             path = _CN_SUPP_PATH if self.lang == "cn" else _GL_SUPP_PATH
 
         if not os.path.exists(path):
-            logger.warning(f"[KB] 补充篇不存在: {path}")
-            return
+            raise FileNotFoundError(f"补充篇不存在: {path}")
 
         with open(path, "r", encoding="utf-8") as f:
             text = f.read()
 
         new_chunks = _parse_markdown_into_chunks(text, self.lang, source="supplement")
+        source_metadata = _source_metadata(path)
+        for chunk in new_chunks:
+            chunk.metadata.update(source_metadata)
         self.chunks.extend(new_chunks)
         logger.info(f"[KB] {self.lang} 补充篇加载完成: {len(new_chunks)} chunks, 总计: {len(self.chunks)}")
 
@@ -442,11 +460,27 @@ cn_kb = KnowledgeBase("cn")
 gl_kb = KnowledgeBase("gl")
 
 
-def load_knowledge_bases():
+def load_knowledge_bases(force: bool = False):
     """启动时加载所有知识库（主库 + 补充篇）"""
+    if (
+        not force
+        and cn_kb.loaded
+        and gl_kb.loaded
+        and cn_kb.chunks
+        and gl_kb.chunks
+    ):
+        return
     logger.info("[KB] 开始加载知识库...")
+    cn_kb.chunks.clear()
+    gl_kb.chunks.clear()
+    cn_kb.loaded = False
+    gl_kb.loaded = False
     cn_kb.load()
     cn_kb.load_supplement()
+    cn_kb.load(_CN_VERIFIED_PATH)
     gl_kb.load()
     gl_kb.load_supplement()
+    from .embedder import init_embedders
+
+    init_embedders()
     logger.info(f"[KB] 加载完成: CN={len(cn_kb.chunks)} chunks, GL={len(gl_kb.chunks)} chunks")

@@ -82,8 +82,45 @@ def test_ai_chat_contract_via_shunshi_router(gateway_client):
     assert captured["tier"] == "premium"
 
 
+def test_chat_injects_only_verified_current_rag_and_returns_sources(gateway_client):
+    client, headers, captured = gateway_client
+    response = client.post(
+        "/api/v1/chat/send",
+        headers=headers,
+        json={"message": "怎样做到食物多样、少盐少油的平衡膳食？"},
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["sources"]
+    assert all("官方资料已核验" in source for source in body["sources"])
+    assert all(
+        detail["evidence_status"] == "verified_official"
+        for detail in body["source_details"]
+    )
+    system_messages = [
+        item["content"]
+        for item in captured["payload"]["messages"]
+        if item["role"] == "system"
+    ]
+    assert any("已核验且未过期的官方参考资料" in item for item in system_messages)
+    assert not any("legacy_unverified" in item for item in system_messages)
+
+
 def test_chat_requires_auth(client):
     assert client.post("/api/v1/chat/send", json={"message": "hi"}).status_code == 401
+
+
+def test_crisis_input_never_reaches_model_gateway(gateway_client):
+    client, headers, captured = gateway_client
+    captured.clear()
+    response = client.post(
+        "/api/v1/chat/send",
+        headers=headers,
+        json={"message": "我想自杀，不想活了"},
+    )
+    assert response.status_code == 200
+    assert response.json()["safety_flag"] == "crisis"
+    assert "payload" not in captured
 
 
 # ── request_gateway 的错误映射与真实解包 ──────────────────────────────

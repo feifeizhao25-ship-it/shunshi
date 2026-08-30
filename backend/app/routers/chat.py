@@ -114,11 +114,43 @@ async def chat(
             detail={"detail": "模型网关未配置（缺少 SHUNSHI_MODEL_ROUTER_URL）", "configured": False},
         )
     message = body.text()
+    from ..safety.guard import SafetyLevel, safety_guard
+
+    safety_result = safety_guard.check_input(message, {"user_id": user_id, "lang": "cn"})
+    if safety_result.level == SafetyLevel.CRISIS or safety_result.should_block:
+        safe_answer = safety_result.override_response or safety_guard.build_crisis_response(
+            safety_result, lang="cn"
+        )
+        session.add(Message(user_id=user_id, role="user", content=message))
+        session.add(Message(user_id=user_id, role="assistant", content=safe_answer))
+        return {
+            "content": safe_answer,
+            "message": safe_answer,
+            "text": safe_answer,
+            "tone": "empathetic" if safety_result.level == SafetyLevel.CRISIS else "gentle",
+            "care_status": "crisis" if safety_result.level == SafetyLevel.CRISIS else "stable",
+            "safety_flag": safety_result.flag or safety_result.level.value,
+            "sources": [],
+            "source_details": [],
+        }
     messages = [{"role": "system", "content": SYSTEM_PROMPT}]
     # /api/v1/ai/chat（ShunShiRouter）会把组装好的完整 prompt 一并传来，
     # 此时以客户端 prompt 为准，不再叠加骨架 system prompt，避免双份系统提示。
     if body.prompt:
         messages = [{"role": "system", "content": body.prompt}]
+    from ..rag.evidence import verified_cn_context
+
+    rag_context, rag_sources, rag_source_details = verified_cn_context(message)
+    if rag_context:
+        messages.append(
+            {
+                "role": "system",
+                "content": (
+                    "以下是已核验且未过期的官方参考资料。只能按资料范围回答，"
+                    "不得扩展为诊断、处方或疗效承诺：\n" + rag_context
+                ),
+            }
+        )
     messages.append({"role": "user", "content": message})
     answer = await request_gateway(
         settings.model_router_url,
@@ -130,6 +162,12 @@ async def chat(
         },
         tier=body.model_tier or "free",
     )
+    output_safety = safety_guard.check_output(
+        answer,
+        {"user_id": user_id, "model": body.model_tier or "free"},
+    )
+    if output_safety.prefix:
+        answer = answer + output_safety.prefix
     session.add(Message(user_id=user_id, role="user", content=message))
     session.add(Message(user_id=user_id, role="assistant", content=answer))
     return {
@@ -138,5 +176,7 @@ async def chat(
         "text": answer,
         "tone": "gentle",
         "care_status": "stable",
-        "safety_flag": "none",
+        "safety_flag": output_safety.flag or "none",
+        "sources": rag_sources,
+        "source_details": rag_source_details,
     }

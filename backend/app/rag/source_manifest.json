@@ -1,0 +1,69 @@
+{
+  "schema_version": "1.0",
+  "reviewed_at": "2026-08-30",
+  "documents": {
+    "verified_cn.md": {
+      "locale": "zh-CN",
+      "region": "CN",
+      "evidence_status": "verified_official",
+      "high_risk_allowed": false,
+      "reviewed_at": "2026-08-30",
+      "valid_until": "2027-02-28"
+    },
+    "顺时知识库_中文版.md": {
+      "locale": "zh-CN",
+      "region": "CN",
+      "evidence_status": "legacy_unverified",
+      "high_risk_allowed": false,
+      "reviewed_at": "2026-08-30",
+      "valid_until": "2026-11-30"
+    },
+    "顺时知识库_补充篇_中文版.md": {
+      "locale": "zh-CN",
+      "region": "CN",
+      "evidence_status": "legacy_unverified",
+      "high_risk_allowed": false,
+      "reviewed_at": "2026-08-30",
+      "valid_until": "2026-11-30"
+    },
+    "SEASONS_Knowledge_Base_English.md": {
+      "locale": "en",
+      "region": "GLOBAL",
+      "evidence_status": "legacy_unverified",
+      "high_risk_allowed": false,
+      "reviewed_at": "2026-08-30",
+      "valid_until": "2026-11-30"
+    },
+    "SEASONS_Knowledge_Base_Supplement_English.md": {
+      "locale": "en",
+      "region": "GLOBAL",
+      "evidence_status": "legacy_unverified",
+      "high_risk_allowed": false,
+      "reviewed_at": "2026-08-30",
+      "valid_until": "2026-11-30"
+    }
+  },
+  "authoritative_references": [
+    {
+      "title": "中国居民膳食指南（2022）核心推荐",
+      "publisher": "中国疾病预防控制中心（省级卫健委转载）",
+      "url": "https://wjw.fj.gov.cn/ztzl/jkjy/jkzgxd/202206/t20220615_5930367.htm",
+      "published_at": "2022-06-15",
+      "reviewed_at": "2026-08-30"
+    },
+    {
+      "title": "儿童青少年肥胖食养指南（2024年版）问答",
+      "publisher": "国家卫生健康委员会",
+      "url": "https://www.nhc.gov.cn/sps/c100088/202402/9ba512ba8e314a47a181db11d2fa188d/files/1743476134816_82016.pdf",
+      "published_at": "2024-02-08",
+      "reviewed_at": "2026-08-30"
+    },
+    {
+      "title": "减油、增豆、加奶核心信息",
+      "publisher": "国家卫生健康委员会",
+      "url": "https://www.nhc.gov.cn/sps/c100087/202404/90c64c79708740a1bca0ee31e524caf7.shtml",
+      "published_at": "2024-04-29",
+      "reviewed_at": "2026-08-30"
+    }
+  ]
+}
