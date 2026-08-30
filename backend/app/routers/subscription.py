@@ -44,14 +44,64 @@ def subscription_status(
     row = session.get(Entitlement, user_id)
     if row and row.expires_at > time.time():
         # tier 由注册表 product_tier_map 同源推导，未登记商品不拔高权益
+        tier = tier_for_product(row.product_id)
+        plan = _domestic_plan(row.product_id)
+        payload = {
+            "plan": plan,
+            "plan_name": _DOMESTIC_PLAN_NAMES[plan],
+            "status": "active",
+            "is_active": True,
+            "expires_at": row.expires_at,
+            "features": _DOMESTIC_FEATURES[plan],
+        }
         return {
             "active": True,
             "product_id": row.product_id,
             "store": row.store,
             "expires_at": row.expires_at,
-            "tier": tier_for_product(row.product_id),
+            "tier": tier,
+            "success": True,
+            "data": payload,
         }
-    return {"active": False, "plan": "free", "tier": "free"}
+    return {
+        "active": False,
+        "plan": "free",
+        "tier": "free",
+        "success": True,
+        "data": {
+            "plan": "free",
+            "plan_name": _DOMESTIC_PLAN_NAMES["free"],
+            "status": "active",
+            "is_active": True,
+            "expires_at": None,
+            "features": _DOMESTIC_FEATURES["free"],
+        },
+    }
+
+
+_DOMESTIC_PLAN_NAMES = {
+    "free": "免费版",
+    "yangxin": "养心版",
+    "yiyang": "颐养版",
+    "jiahe": "家和版",
+}
+_DOMESTIC_FEATURES = {
+    "free": {"basic_chat": True, "solar_terms": True},
+    "yangxin": {"basic_chat": True, "solar_terms": True, "unlimited_chat": True, "today_plan": True},
+    "yiyang": {"basic_chat": True, "solar_terms": True, "unlimited_chat": True, "today_plan": True, "deep_suggestions": True, "weekly_summary": True},
+    "jiahe": {"basic_chat": True, "solar_terms": True, "unlimited_chat": True, "today_plan": True, "deep_suggestions": True, "weekly_summary": True, "family": True},
+}
+
+
+def _domestic_plan(product_id: str) -> str:
+    normalized = product_id.lower()
+    if "jiahe" in normalized or "family" in normalized:
+        return "jiahe"
+    if "yiyang" in normalized:
+        return "yiyang"
+    if "yangxin" in normalized or "healing" in normalized:
+        return "yangxin"
+    return "free"
 
 
 @router.post("/billing/callback")

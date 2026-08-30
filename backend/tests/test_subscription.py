@@ -33,7 +33,12 @@ def test_callback_fail_closed_when_secret_unconfigured(client):
 def test_subscription_status_defaults_to_free(client, auth_headers):
     response = client.get("/api/v1/subscription/status", headers=auth_headers)
     assert response.status_code == 200
-    assert response.json() == {"active": False, "plan": "free", "tier": "free"}
+    body = response.json()
+    assert body["active"] is False
+    assert body["plan"] == "free"
+    assert body["tier"] == "free"
+    assert body["success"] is True
+    assert body["data"]["plan"] == "free"
 
 
 def test_callback_rejects_bad_signature(settings):

@@ -1,6 +1,6 @@
 # 订阅系统 API 路由
 # 生产级升级: SKU管理 · 支付状态机 · 权益中间件 · 过期回退 · 家庭席位
-from fastapi import APIRouter, HTTPException, Query, Depends
+from fastapi import APIRouter, HTTPException, Query, Depends, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict
@@ -12,6 +12,8 @@ import logging
 import os
 import secrets
 
+from app.security import verify_token
+
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/v1/subscription", tags=["订阅"])
@@ -19,6 +21,22 @@ router = APIRouter(prefix="/api/v1/subscription", tags=["订阅"])
 # ============ Bearer Scheme ============
 
 _bearer_scheme = HTTPBearer(auto_error=False)
+
+
+def _payment_user(
+    request: Request,
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(_bearer_scheme),
+    user_id: Optional[str] = Query(None),
+) -> str:
+    """Bind purchases to the authenticated account in production."""
+    if credentials is not None:
+        settings = getattr(request.app.state, "settings", None)
+        if settings is None:
+            raise HTTPException(status_code=503, detail="认证配置不可用")
+        return verify_token(settings, credentials.credentials)
+    if os.getenv("APP_ENV") == "testing":
+        return user_id or "user-001"
+    raise HTTPException(status_code=401, detail="请先登录后购买")
 
 
 # ============ 订单状态机 ============
@@ -716,6 +734,68 @@ def get_user_subscription(user_id: str) -> SubscriptionStatus:
     )
 
 
+def _persist_payment_order(order: dict) -> None:
+    from app.database.db import get_db
+
+    db = get_db()
+    _ensure_payment_orders_table(db)
+    db.execute(
+        """INSERT OR REPLACE INTO payment_orders
+           (id, order_no, user_id, product_id, tier, platform, amount_cents,
+            currency, status, created_at, expires_at, transaction_id,
+            payment_method, paid_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+        (
+            order["id"], order["order_no"], order["user_id"],
+            order["product_id"], order["tier"], order["platform"],
+            order["amount_cents"], order["currency"], order["status"],
+            order["created_at"], order["expires_at"],
+            order.get("transaction_id"), order.get("payment_method"),
+            order.get("paid_at"),
+        ),
+    )
+    db.commit()
+
+
+def _get_payment_order(order_id: str) -> Optional[dict]:
+    order = payment_orders.get(order_id)
+    if order:
+        return order
+    from app.database.db import get_db
+
+    db = get_db()
+    _ensure_payment_orders_table(db)
+    row = db.execute(
+        "SELECT * FROM payment_orders WHERE id = ?", (order_id,)
+    ).fetchone()
+    if not row:
+        return None
+    restored = dict(row)
+    payment_orders[order_id] = restored
+    return restored
+
+
+def _ensure_payment_orders_table(db) -> None:
+    db.execute(
+        """CREATE TABLE IF NOT EXISTS payment_orders (
+            id TEXT PRIMARY KEY,
+            order_no TEXT NOT NULL UNIQUE,
+            user_id TEXT NOT NULL,
+            product_id TEXT NOT NULL,
+            tier TEXT NOT NULL,
+            platform TEXT NOT NULL,
+            amount_cents INTEGER NOT NULL,
+            currency TEXT NOT NULL DEFAULT 'CNY',
+            status TEXT NOT NULL DEFAULT 'pending',
+            created_at TEXT NOT NULL,
+            expires_at TEXT NOT NULL,
+            transaction_id TEXT,
+            payment_method TEXT,
+            paid_at TEXT
+        )"""
+    )
+
+
 def check_subscription_valid(user_id: str) -> dict:
     """检查订阅是否有效（中间件可调用）"""
     sub = get_user_subscription(user_id)
@@ -1019,7 +1099,10 @@ async def get_products(
 # ---- 创建订单 ----
 
 @router.post("/create-order", response_model=dict)
-async def create_order(request: CreateOrderRequest, user_id: str = Query("user-001")):
+async def create_order(
+    request: CreateOrderRequest,
+    user_id: str = Depends(_payment_user),
+):
     """
     创建订单。
     1. 查找产品 SKU
@@ -1090,6 +1173,7 @@ async def create_order(request: CreateOrderRequest, user_id: str = Query("user-0
         "payment_method": None,
         "paid_at": None,
     }
+    _persist_payment_order(payment_orders[order_id])
 
     _write_audit_log("order_created", user_id, {
         "order_id": order_id,
@@ -1135,7 +1219,7 @@ async def verify_payment(request: PurchaseVerifyRequest):
     4. 激活订阅
     5. 写审计日志
     """
-    order = payment_orders.get(request.order_id)
+    order = _get_payment_order(request.order_id)
 
     if not order:
         raise HTTPException(status_code=404, detail="订单不存在")
@@ -1187,6 +1271,7 @@ async def verify_payment(request: PurchaseVerifyRequest):
     order["status"] = OrderStatus.PAID.value
     order["paid_at"] = now_iso
     order["transaction_id"] = request.transaction_id or f"TXN_{uuid.uuid4().hex[:16]}"
+    _persist_payment_order(order)
 
     # === 激活订阅 ===
     tier = order["tier"]
@@ -2071,10 +2156,15 @@ async def alipay_verify(request: PaymentVerifyRequest):
 
 
 @router.get("/orders/{order_id}", response_model=dict)
-async def query_order(order_id: str):
+async def query_order(
+    order_id: str,
+    user_id: str = Depends(_payment_user),
+):
     """查询订单状态（通用）"""
-    order = payment_orders.get(order_id)
+    order = _get_payment_order(order_id)
     if not order:
+        raise HTTPException(status_code=404, detail="订单不存在")
+    if os.getenv("APP_ENV") != "testing" and order.get("user_id") != user_id:
         raise HTTPException(status_code=404, detail="订单不存在")
 
     return {
@@ -2099,10 +2189,15 @@ async def query_order(order_id: str):
 
 
 @router.get("/alipay/order/{order_id}", response_model=dict)
-async def alipay_query_order(order_id: str):
+async def alipay_query_order(
+    order_id: str,
+    user_id: str = Depends(_payment_user),
+):
     """查询支付宝订单状态（向后兼容）"""
-    order = payment_orders.get(order_id)
+    order = _get_payment_order(order_id)
     if not order:
+        raise HTTPException(status_code=404, detail="订单不存在")
+    if os.getenv("APP_ENV") != "testing" and order.get("user_id") != user_id:
         raise HTTPException(status_code=404, detail="订单不存在")
 
     return {

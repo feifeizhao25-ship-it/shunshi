@@ -102,10 +102,10 @@ class _LoginPageState extends State<LoginPage> {
       final client = ApiClient();
       // 先尝试手机号登录 API
       try {
-        final response = await client.post('/api/v1/auth/phone-login', data: {
-          'phone': phone,
-          'code': code,
-        });
+        final response = await client.post(
+          '/api/v1/auth/phone-login',
+          data: {'phone': phone, 'code': code},
+        );
         final data = response.data as Map<String, dynamic>;
         _handleLoginSuccess(data, phone: phone);
         return;
@@ -116,7 +116,10 @@ class _LoginPageState extends State<LoginPage> {
       // Fallback: guest-login + 绑定手机号
       final response = await client.post(
         '/api/v1/auth/guest-login',
-        data: {'device_id': 'phone_${phone}_${DateTime.now().millisecondsSinceEpoch}'},
+        data: {
+          'device_id':
+              'phone_${phone}_${DateTime.now().millisecondsSinceEpoch}',
+        },
       );
       final data = response.data as Map<String, dynamic>;
       _handleLoginSuccess(data, phone: phone);
@@ -142,10 +145,10 @@ class _LoginPageState extends State<LoginPage> {
 
     try {
       final client = ApiClient();
-      final response = await client.post('/api/v1/auth/login', data: {
-        'phone': phone,
-        'password': password,
-      });
+      final response = await client.post(
+        '/api/v1/auth/login',
+        data: {'phone': phone, 'password': password},
+      );
       final data = response.data as Map<String, dynamic>;
       _handleLoginSuccess(data);
     } catch (_) {
@@ -201,18 +204,22 @@ class _LoginPageState extends State<LoginPage> {
       String? displayName;
       if (credential.givenName != null || credential.familyName != null) {
         displayName =
-            '${credential.givenName ?? ''} ${credential.familyName ?? ''}'.trim();
+            '${credential.givenName ?? ''} ${credential.familyName ?? ''}'
+                .trim();
       }
 
       // 发送到后端验证
       final client = ApiClient();
-      final response = await client.post('/api/v1/auth/apple/login', data: {
-        'identity_token': credential.identityToken,
-        'authorization_code': credential.authorizationCode,
-        'name': displayName,
-        'email': credential.email,
-        'platform': 'ios',
-      });
+      final response = await client.post(
+        '/api/v1/auth/apple/login',
+        data: {
+          'identity_token': credential.identityToken,
+          'authorization_code': credential.authorizationCode,
+          'name': displayName,
+          'email': credential.email,
+          'platform': 'ios',
+        },
+      );
 
       final data = response.data as Map<String, dynamic>;
       _handleLoginSuccess(data);
@@ -235,14 +242,18 @@ class _LoginPageState extends State<LoginPage> {
     // TODO: 接入微信SDK
     setState(() => _isLoading = false);
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('微信登录即将开放')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('微信登录即将开放')));
     }
   }
 
   void _handleLoginSuccess(Map<String, dynamic> data, {String? phone}) async {
-    final token = data['token'] as String? ?? data['data']?['token'] as String?;
+    final token =
+        data['access_token'] as String? ??
+        data['token'] as String? ??
+        data['data']?['access_token'] as String? ??
+        data['data']?['token'] as String?;
     if (token != null) {
       await StorageManager.user.saveToken(token);
     }
@@ -260,6 +271,7 @@ class _LoginPageState extends State<LoginPage> {
     // 检查是否需要填写 profile
     final prefs = await SharedPreferences.getInstance();
     final profileDone = prefs.getBool('profile_completed') ?? false;
+    if (!mounted) return;
     if (profileDone) {
       context.go('/home');
     } else {
@@ -273,7 +285,9 @@ class _LoginPageState extends State<LoginPage> {
       backgroundColor: const Color(0xFFF8F6F1), // 强制亮色背景
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: ShunshiSpacing.pagePadding),
+          padding: const EdgeInsets.symmetric(
+            horizontal: ShunshiSpacing.pagePadding,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -297,10 +311,7 @@ class _LoginPageState extends State<LoginPage> {
                     const SizedBox(height: 16),
                     Text('顺时', style: ShunshiTextStyles.greeting),
                     const SizedBox(height: 4),
-                    Text(
-                      '顺应时节，养生有道',
-                      style: ShunshiTextStyles.bodySecondary,
-                    ),
+                    Text('顺应时节，养生有道', style: ShunshiTextStyles.bodySecondary),
                   ],
                 ),
               ),
@@ -314,7 +325,9 @@ class _LoginPageState extends State<LoginPage> {
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
                     color: ShunshiColors.error.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(ShunshiSpacing.radiusMedium),
+                    borderRadius: BorderRadius.circular(
+                      ShunshiSpacing.radiusMedium,
+                    ),
                   ),
                   child: Text(
                     _errorMessage!,
@@ -413,9 +426,13 @@ class _LoginPageState extends State<LoginPage> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: ShunshiColors.primary,
                     foregroundColor: Colors.white,
-                    disabledBackgroundColor: ShunshiColors.primary.withValues(alpha: 0.5),
+                    disabledBackgroundColor: ShunshiColors.primary.withValues(
+                      alpha: 0.5,
+                    ),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(ShunshiSpacing.radiusMedium),
+                      borderRadius: BorderRadius.circular(
+                        ShunshiSpacing.radiusMedium,
+                      ),
                     ),
                     elevation: 0,
                   ),
@@ -439,9 +456,9 @@ class _LoginPageState extends State<LoginPage> {
                 child: TextButton(
                   onPressed: () {
                     // 跳转注册（暂复用登录页）
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('注册页面即将开放')),
-                    );
+                    ScaffoldMessenger.of(
+                      context,
+                    ).showSnackBar(const SnackBar(content: Text('注册页面即将开放')));
                   },
                   child: Text(
                     '还没有账号？立即注册',
@@ -532,7 +549,9 @@ class _LoginPageState extends State<LoginPage> {
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF3A3A37) : ShunshiColors.surfaceDim,
         borderRadius: BorderRadius.circular(ShunshiSpacing.radiusMedium),
-        border: Border.all(color: isDark ? const Color(0xFF5A5A55) : ShunshiColors.borderLight),
+        border: Border.all(
+          color: isDark ? const Color(0xFF5A5A55) : ShunshiColors.borderLight,
+        ),
       ),
       child: TextField(
         controller: controller,
@@ -547,7 +566,11 @@ class _LoginPageState extends State<LoginPage> {
           hintStyle: ShunshiTextStyles.caption.copyWith(
             color: isDark ? const Color(0xFF9C9C96) : ShunshiColors.textHint,
           ),
-          prefixIcon: Icon(prefix, color: isDark ? const Color(0xFF9C9C96) : ShunshiColors.textHint, size: 20),
+          prefixIcon: Icon(
+            prefix,
+            color: isDark ? const Color(0xFF9C9C96) : ShunshiColors.textHint,
+            size: 20,
+          ),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(horizontal: 16),
         ),
@@ -595,11 +618,7 @@ class _LoginPageState extends State<LoginPage> {
               color: Colors.black.withValues(alpha: 0.85),
               shape: BoxShape.circle,
             ),
-            child: const Icon(
-              Icons.apple,
-              color: Colors.white,
-              size: 28,
-            ),
+            child: const Icon(Icons.apple, color: Colors.white, size: 28),
           ),
           const SizedBox(height: 8),
           Text('Apple', style: ShunshiTextStyles.caption),

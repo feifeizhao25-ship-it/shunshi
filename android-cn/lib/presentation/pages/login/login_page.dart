@@ -50,7 +50,10 @@ class _LoginPageState extends State<LoginPage>
       duration: const Duration(milliseconds: 2200),
     );
     _logoBreath = Tween<double>(begin: 1.0, end: 1.05).animate(
-      CurvedAnimation(parent: _logoBreathController, curve: Curves.easeInOutSine),
+      CurvedAnimation(
+        parent: _logoBreathController,
+        curve: Curves.easeInOutSine,
+      ),
     );
     _logoBreathController.repeat(reverse: true);
   }
@@ -126,10 +129,10 @@ class _LoginPageState extends State<LoginPage>
     try {
       final client = ApiClient();
       try {
-        final response = await client.post('/api/v1/auth/phone-login', data: {
-          'phone': phone,
-          'code': code,
-        });
+        final response = await client.post(
+          '/api/v1/auth/phone-login',
+          data: {'phone': phone, 'code': code},
+        );
         final data = response.data as Map<String, dynamic>;
         _handleLoginSuccess(data, phone: phone);
         return;
@@ -137,7 +140,10 @@ class _LoginPageState extends State<LoginPage>
 
       final response = await client.post(
         '/api/v1/auth/guest-login',
-        data: {'device_id': 'phone_${phone}_${DateTime.now().millisecondsSinceEpoch}'},
+        data: {
+          'device_id':
+              'phone_${phone}_${DateTime.now().millisecondsSinceEpoch}',
+        },
       );
       final data = response.data as Map<String, dynamic>;
       _handleLoginSuccess(data, phone: phone);
@@ -161,14 +167,23 @@ class _LoginPageState extends State<LoginPage>
       setState(() => _errorMessage = '请输入密码');
       return;
     }
-    setState(() { _isLoading = true; _errorMessage = null; });
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
     try {
       final client = ApiClient();
-      final response = await client.post('/api/v1/auth/login', data: {'email': email, 'password': password});
+      final response = await client.post(
+        '/api/v1/auth/login',
+        data: {'email': email, 'password': password},
+      );
       final data = response.data as Map<String, dynamic>;
       _handleLoginSuccess(data);
     } catch (_) {
-      setState(() { _errorMessage = '邮箱或密码错误'; _isLoading = false; });
+      setState(() {
+        _errorMessage = '邮箱或密码错误';
+        _isLoading = false;
+      });
     }
   }
 
@@ -215,17 +230,21 @@ class _LoginPageState extends State<LoginPage>
       String? displayName;
       if (credential.givenName != null || credential.familyName != null) {
         displayName =
-            '${credential.givenName ?? ''} ${credential.familyName ?? ''}'.trim();
+            '${credential.givenName ?? ''} ${credential.familyName ?? ''}'
+                .trim();
       }
 
       final client = ApiClient();
-      final response = await client.post('/api/v1/auth/apple/login', data: {
-        'identity_token': credential.identityToken,
-        'authorization_code': credential.authorizationCode,
-        'name': displayName,
-        'email': credential.email,
-        'platform': 'ios',
-      });
+      final response = await client.post(
+        '/api/v1/auth/apple/login',
+        data: {
+          'identity_token': credential.identityToken,
+          'authorization_code': credential.authorizationCode,
+          'name': displayName,
+          'email': credential.email,
+          'platform': 'ios',
+        },
+      );
 
       final data = response.data as Map<String, dynamic>;
       _handleLoginSuccess(data);
@@ -248,14 +267,18 @@ class _LoginPageState extends State<LoginPage>
     // TODO: 接入微信SDK
     setState(() => _isLoading = false);
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('微信登录即将开放')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('微信登录即将开放')));
     }
   }
 
   void _handleLoginSuccess(Map<String, dynamic> data, {String? phone}) async {
-    final token = data['token'] as String? ?? data['data']?['token'] as String?;
+    final token =
+        data['access_token'] as String? ??
+        data['token'] as String? ??
+        data['data']?['access_token'] as String? ??
+        data['data']?['token'] as String?;
     if (token != null) {
       await StorageManager.user.saveToken(token);
     }
@@ -270,6 +293,7 @@ class _LoginPageState extends State<LoginPage>
     if (!mounted) return;
     final prefs = await SharedPreferences.getInstance();
     final profileDone = prefs.getBool('profile_completed') ?? false;
+    if (!mounted) return;
     if (profileDone) {
       context.go('/home');
     } else {
@@ -287,7 +311,9 @@ class _LoginPageState extends State<LoginPage>
       backgroundColor: bgColor,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: ShunshiSpacing.pagePadding),
+          padding: const EdgeInsets.symmetric(
+            horizontal: ShunshiSpacing.pagePadding,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -336,10 +362,7 @@ class _LoginPageState extends State<LoginPage>
                         ),
                       ),
                       const SizedBox(height: 4),
-                      Text(
-                        '顺应时节，养生有道',
-                        style: ShunshiTextStyles.bodySecondary,
-                      ),
+                      Text('顺应时节，养生有道', style: ShunshiTextStyles.bodySecondary),
                     ],
                   ),
                 ),
@@ -525,9 +548,9 @@ class _LoginPageState extends State<LoginPage>
               Center(
                 child: TextButton(
                   onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('注册页面即将开放')),
-                    );
+                    ScaffoldMessenger.of(
+                      context,
+                    ).showSnackBar(const SnackBar(content: Text('注册页面即将开放')));
                   },
                   child: Text(
                     '还没有账号？立即注册',
@@ -550,7 +573,10 @@ class _LoginPageState extends State<LoginPage>
   Widget _buildTab(String label, _LoginMode mode) {
     final isActive = _mode == mode;
     return GestureDetector(
-      onTap: () => setState(() { _mode = mode; _errorMessage = null; }),
+      onTap: () => setState(() {
+        _mode = mode;
+        _errorMessage = null;
+      }),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -604,7 +630,9 @@ class _LoginPageState extends State<LoginPage>
             border: Border.all(
               color: hasFocus
                   ? ShunshiColors.primary.withValues(alpha: 0.6)
-                  : (isDark ? const Color(0xFF3A3A36) : ShunshiColors.borderLight),
+                  : (isDark
+                        ? const Color(0xFF3A3A36)
+                        : ShunshiColors.borderLight),
               width: hasFocus ? 1.5 : 1,
             ),
           ),
@@ -620,7 +648,9 @@ class _LoginPageState extends State<LoginPage>
             decoration: InputDecoration(
               hintText: hint,
               hintStyle: ShunshiTextStyles.caption.copyWith(
-                color: isDark ? const Color(0xFF6E6E68) : ShunshiColors.textHint,
+                color: isDark
+                    ? const Color(0xFF6E6E68)
+                    : ShunshiColors.textHint,
               ),
               prefixIcon: Padding(
                 padding: const EdgeInsets.only(left: 16, right: 10),
@@ -628,13 +658,18 @@ class _LoginPageState extends State<LoginPage>
                   prefixIcon,
                   color: hasFocus
                       ? ShunshiColors.primary
-                      : (isDark ? const Color(0xFF6E6E68) : ShunshiColors.textHint),
+                      : (isDark
+                            ? const Color(0xFF6E6E68)
+                            : ShunshiColors.textHint),
                   size: 20,
                 ),
               ),
               prefixIconConstraints: const BoxConstraints(minWidth: 46),
               border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 16,
+              ),
             ),
           ),
         );
@@ -687,11 +722,15 @@ class _GradientButtonState extends State<_GradientButton>
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTapDown: widget.onPressed != null ? (_) => _pressController.forward() : null,
-      onTapUp: widget.onPressed != null ? (_) {
-        _pressController.reverse();
-        widget.onPressed?.call();
-      } : null,
+      onTapDown: widget.onPressed != null
+          ? (_) => _pressController.forward()
+          : null,
+      onTapUp: widget.onPressed != null
+          ? (_) {
+              _pressController.reverse();
+              widget.onPressed?.call();
+            }
+          : null,
       onTapCancel: () => _pressController.reverse(),
       child: ScaleTransition(
         scale: _scaleAnim,
@@ -723,7 +762,9 @@ class _GradientButtonState extends State<_GradientButton>
                   )
                 : Text(
                     widget.label,
-                    style: ShunshiTextStyles.button.copyWith(color: Colors.white),
+                    style: ShunshiTextStyles.button.copyWith(
+                      color: Colors.white,
+                    ),
                   ),
           ),
         ),
@@ -758,10 +799,7 @@ class _SocialCircleButton extends StatelessWidget {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: color.withValues(alpha: 0.1),
-              border: Border.all(
-                color: color.withValues(alpha: 0.2),
-                width: 1,
-              ),
+              border: Border.all(color: color.withValues(alpha: 0.2), width: 1),
             ),
             child: Icon(icon, color: color, size: 24),
           ),
@@ -807,10 +845,7 @@ class _DashedBorderPainter extends CustomPainter {
       double distance = 0;
       while (distance < metric.length) {
         final end = (distance + dashWidth).clamp(0.0, metric.length);
-        canvas.drawPath(
-          metric.extractPath(distance, end),
-          paint,
-        );
+        canvas.drawPath(metric.extractPath(distance, end), paint);
         distance += dashWidth + dashGap;
       }
     }

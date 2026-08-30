@@ -218,6 +218,23 @@ CREATE TABLE IF NOT EXISTS subscriptions (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS payment_orders (
+    id TEXT PRIMARY KEY,
+    order_no TEXT NOT NULL UNIQUE,
+    user_id TEXT NOT NULL,
+    product_id TEXT NOT NULL,
+    tier TEXT NOT NULL,
+    platform TEXT NOT NULL,
+    amount_cents INTEGER NOT NULL,
+    currency TEXT NOT NULL DEFAULT 'CNY',
+    status TEXT NOT NULL DEFAULT 'pending',
+    created_at TEXT NOT NULL,
+    expires_at TEXT NOT NULL,
+    transaction_id TEXT,
+    payment_method TEXT,
+    paid_at TEXT
+);
+
 CREATE TABLE IF NOT EXISTS family_relations (
     id TEXT PRIMARY KEY,
     user_id TEXT NOT NULL,

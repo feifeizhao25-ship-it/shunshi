@@ -58,6 +58,23 @@ for relative in (
         if required not in source:
             errors.append(f"{relative}: real payment confirmation flow is missing {required!r}")
 
+for relative in (
+    "android-cn/lib/data/datasources/subscription_service.dart",
+    "ios-cn/lib/data/datasources/subscription_service.dart",
+):
+    source = (ROOT / relative).read_text(encoding="utf-8")
+    for required in ("Authorization", "Bearer $token", "StorageManager.user.getToken"):
+        if required not in source:
+            errors.append(f"{relative}: authenticated subscription flow is missing {required!r}")
+
+for relative in (
+    "android-cn/lib/presentation/pages/login/login_page.dart",
+    "ios-cn/lib/presentation/pages/login/login_page.dart",
+):
+    source = (ROOT / relative).read_text(encoding="utf-8")
+    if "data['access_token']" not in source:
+        errors.append(f"{relative}: login must persist the backend access_token")
+
 entries = subprocess.run(
     ["git", "ls-files", "-s", "-z"], cwd=ROOT, check=True, capture_output=True, text=True
 ).stdout.split("\0")

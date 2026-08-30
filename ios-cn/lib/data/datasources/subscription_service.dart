@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/subscription.dart';
 import '../../core/config/app_config.dart';
+import '../storage/storage_manager.dart';
 
 /// 订阅服务 - 对接后端 API
 class SubscriptionService {
@@ -36,11 +37,10 @@ class SubscriptionService {
 
   /// 获取用户当前订阅状态
   static Future<UserSubscriptionStatus> getCurrentStatus() async {
-    final userId = await _getUserId();
     try {
       final res = await _dio.get(
         '/api/v1/subscription/status',
-        queryParameters: {'user_id': userId},
+        options: Options(headers: _authHeaders()),
       );
       if (res.data?['success'] == true) {
         return UserSubscriptionStatus.fromJson(res.data['data']);
@@ -61,12 +61,11 @@ class SubscriptionService {
     String planId, {
     int period = 1,
   }) async {
-    final userId = await _getUserId();
     try {
       final res = await _dio.post(
         '/api/v1/subscription/create-order',
         data: {'product_id': planId, 'platform': 'alipay'},
-        queryParameters: {'user_id': userId},
+        options: Options(headers: _authHeaders()),
       );
       if (res.data?['success'] == true) {
         return SubscriptionOrder.fromJson(res.data['data']);
@@ -77,6 +76,13 @@ class SubscriptionService {
     return null;
   }
 
+  static Map<String, String> _authHeaders() {
+    final token = StorageManager.user.getToken();
+    return token == null || token.isEmpty
+        ? const {}
+        : {'Authorization': 'Bearer $token'};
+  }
+
   /// 轮询订单状态（扫码支付场景）
   static Future<String?> pollOrderStatus(
     String orderId, {
@@ -84,7 +90,10 @@ class SubscriptionService {
   }) async {
     for (int i = 0; i < maxAttempts; i++) {
       try {
-        final res = await _dio.get('/api/v1/subscription/orders/$orderId');
+        final res = await _dio.get(
+          '/api/v1/subscription/orders/$orderId',
+          options: Options(headers: _authHeaders()),
+        );
         if (res.data?['success'] == true) {
           final status = res.data['data']['status'];
           if (status == 'paid') return 'paid';

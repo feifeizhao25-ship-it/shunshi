@@ -125,7 +125,17 @@
   },
   "product_tier_map": {
     "shunshi_yangxin_monthly": "pro",
+    "shunshi_yangxin_yearly": "pro",
     "shunshi_healing_monthly": "pro",
-    "shunshi_family_monthly": "family"
+    "shunshi_yiyang_monthly": "pro",
+    "shunshi_yiyang_yearly": "pro",
+    "shunshi_family_monthly": "family",
+    "shunshi_family_yearly": "family",
+    "yangxin_monthly": "pro",
+    "yangxin_yearly": "pro",
+    "yiyang_monthly": "pro",
+    "yiyang_yearly": "pro",
+    "family_monthly": "family",
+    "family_yearly": "family"
   }
 }
