@@ -36,6 +36,28 @@ for forbidden in ("--passWithNoTests", "continue-on-error: true", "|| true"):
     if forbidden in ci_source:
         errors.append(f".github/workflows/ci.yml: forbidden false-green option {forbidden}")
 
+payment_sources = {
+    "backend/app/router/subscription.py": ("mock=1", "MOCK_QR_CODE", "MOCK_TRADE"),
+    "backend/app/services/alipay_service.py": ('ALIPAY_MODE", "mock', "跳过回调验签"),
+    "android-cn/lib/presentation/pages/subscription/subscription_page_v2.dart": ("_simulatePaymentSuccess", "setBool('is_subscribed', true)"),
+    "ios-cn/lib/data/datasources/subscription_service.dart": ("_mockOrder",),
+    "ios-cn/lib/presentation/pages/subscription/subscription_page_v2.dart": ("setBool('is_subscribed', true)",),
+}
+for relative, forbidden_values in payment_sources.items():
+    source = (ROOT / relative).read_text(encoding="utf-8")
+    for forbidden in forbidden_values:
+        if forbidden in source:
+            errors.append(f"{relative}: forbidden synthetic payment behavior {forbidden!r}")
+
+for relative in (
+    "android-cn/lib/presentation/pages/subscription/subscription_page_v2.dart",
+    "ios-cn/lib/presentation/pages/subscription/subscription_page_v2.dart",
+):
+    source = (ROOT / relative).read_text(encoding="utf-8")
+    for required in ("paymentUrl", "launchUrl", "pollOrderStatus", "status == 'paid'"):
+        if required not in source:
+            errors.append(f"{relative}: real payment confirmation flow is missing {required!r}")
+
 entries = subprocess.run(
     ["git", "ls-files", "-s", "-z"], cwd=ROOT, check=True, capture_output=True, text=True
 ).stdout.split("\0")

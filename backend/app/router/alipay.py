@@ -4,6 +4,7 @@
 """
 import logging
 from typing import Optional
+from decimal import Decimal, InvalidOperation
 
 from fastapi import APIRouter, HTTPException, Request, Query
 from pydantic import BaseModel
@@ -66,6 +67,8 @@ async def create_order(request: CreateAlipayOrderRequest):
         return {"success": True, "data": result.model_dump()}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
 
 
 @router.get("/query-order")
@@ -109,6 +112,8 @@ async def alipay_notify(request: Request):
 
     trade_status = notify_data.trade_status
     out_trade_no = notify_data.out_trade_no
+    if not out_trade_no or not notify_data.trade_no:
+        raise HTTPException(status_code=400, detail="支付宝交易标识缺失")
 
     logger.info(
         f"[Alipay] 回调: order={out_trade_no}, "
@@ -118,8 +123,8 @@ async def alipay_notify(request: Request):
     if trade_status == "TRADE_SUCCESS":
         # 支付成功 - 激活订阅
         db = get_db()
-        now = datetime.now().isoformat()
-        expires_at = (datetime.now() + timedelta(days=30)).isoformat()
+        now_dt = datetime.now()
+        now = now_dt.isoformat()
 
         # 解析 passback_params 获取 user_id 和 sku
         passback = {}
@@ -132,14 +137,33 @@ async def alipay_notify(request: Request):
         sku = passback.get("sku", "yangxin_monthly")
 
         from app.services.alipay_service import ALIPAY_PRODUCTS
-        product = ALIPAY_PRODUCTS.get(sku, {})
+        product = ALIPAY_PRODUCTS.get(sku)
+        if not user_id or not product:
+            logger.error("[Alipay] 回调缺少有效 user_id/sku")
+            raise HTTPException(status_code=400, detail="订单归属信息无效")
+        try:
+            paid_amount = Decimal(notify_data.total_amount)
+        except InvalidOperation as exc:
+            raise HTTPException(status_code=400, detail="支付金额格式无效") from exc
+        if paid_amount != product["price"]:
+            logger.error("[Alipay] 回调金额不匹配: order=%s", out_trade_no)
+            raise HTTPException(status_code=400, detail="支付金额不匹配")
+
+        subscription_id = f"sub_alipay_{out_trade_no}"
+        existing = db.execute(
+            "SELECT id FROM subscriptions WHERE id = ?", (subscription_id,)
+        ).fetchone()
+        if existing:
+            return {"success": True}
+
+        expires_at = (now_dt + timedelta(days=product["duration_days"])).isoformat()
 
         # 更新用户订阅
         db.execute(
             """INSERT OR REPLACE INTO subscriptions
                (id, user_id, plan, status, started_at, expires_at, auto_renew, platform, subscribed_at)
-               VALUES (?, ?, ?, 'active', ?, ?, 1, 'alipay', ?)""",
-            (f"sub_alipay_{out_trade_no}", user_id, product.get("tier", sku),
+               VALUES (?, ?, ?, 'active', ?, ?, 0, 'alipay', ?)""",
+            (subscription_id, user_id, product["tier"],
              now, expires_at, now),
         )
         db.commit()

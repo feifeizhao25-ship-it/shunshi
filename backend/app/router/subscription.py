@@ -1027,14 +1027,37 @@ async def create_order(request: CreateOrderRequest, user_id: str = Query("user-0
     3. 创建 pending 订单
     4. 返回支付参数
     """
-    product = None
-    for p in SUBSCRIPTION_PRODUCTS:
-        if p["product_id"] == request.product_id:
-            product = p
-            break
-
-    if not product:
+    matching_products = [
+        product
+        for product in SUBSCRIPTION_PRODUCTS
+        if product["product_id"] == request.product_id
+    ]
+    if not matching_products:
         raise HTTPException(status_code=400, detail=f"产品不存在: {request.product_id}")
+
+    product = next(
+        (
+            candidate
+            for candidate in matching_products
+            if candidate["platform"] == request.platform
+        ),
+        None,
+    )
+    if product is None:
+        raise HTTPException(status_code=400, detail="商品与支付平台不匹配")
+
+    alipay_result = None
+    if request.platform == "alipay":
+        from app.services.alipay_service import alipay_service
+        sku = {"jiahe_monthly": "family_monthly", "jiahe_yearly": "family_yearly"}.get(
+            product["product_id"], product["product_id"]
+        )
+        try:
+            alipay_result = alipay_service.create_order(product_sku=sku, user_id=user_id)
+        except RuntimeError as exc:
+            raise HTTPException(status_code=503, detail=str(exc)) from exc
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
 
     # 检查是否已是同等级（同平台不允许重复购买）
     current_sub = get_user_subscription(user_id)
@@ -1045,7 +1068,7 @@ async def create_order(request: CreateOrderRequest, user_id: str = Query("user-0
 
     now = datetime.now(timezone.utc)
     now_iso = now.isoformat()
-    order_no = generate_order_no()
+    order_no = alipay_result.order_no if alipay_result else generate_order_no()
     order_id = str(uuid.uuid4())
 
     # 订单过期时间（30分钟）
@@ -1090,8 +1113,7 @@ async def create_order(request: CreateOrderRequest, user_id: str = Query("user-0
     }
 
     if request.platform == "alipay":
-        pay_params["pay_url"] = f"https://openapi.alipay.com/gateway.do?mock=1&orderId={order_no}"
-        pay_params["qr_code"] = f"MOCK_QR_CODE_{order_no}"
+        pay_params["pay_url"] = alipay_result.pay_url
     elif request.platform == "apple":
         pay_params["product_id"] = product["product_id"]
 
@@ -1918,65 +1940,10 @@ def _mock_verify_receipt(platform: str, receipt_data: str, product_id: str = Non
 
 @router.post("/purchase", response_model=dict)
 async def create_purchase(request: PurchaseRequest, user_id: str = Query("user-001")):
-    """发起支付（向后兼容）"""
-    product = None
-    for p in SUBSCRIPTION_PRODUCTS:
-        if p["product_id"] == request.product_id:
-            product = p
-            break
-
-    if not product:
-        raise HTTPException(status_code=400, detail="产品不存在")
-
-    current_sub = get_user_subscription(user_id)
-    new_tier = product["tier"]
-
-    if TIER_ORDER.get(new_tier, 0) <= TIER_ORDER.get(current_sub.plan, 0):
-        if current_sub.plan == new_tier and current_sub.status == "active":
-            raise HTTPException(status_code=400, detail="当前已是该等级会员")
-
-    now = datetime.now(timezone.utc).isoformat()
-    order_id = f"ORD_{now.replace('-', '').replace(':', '').replace('.', '')[:14]}_{uuid.uuid4().hex[:6]}"
-
-    payment_orders[order_id] = {
-        "id": order_id,
-        "order_no": order_id,
-        "user_id": user_id,
-        "product_id": product["product_id"],
-        "tier": product["tier"],
-        "amount_cents": product["price_cents"],
-        "currency": product["currency"],
-        "platform": request.platform,
-        "status": "pending",
-        "created_at": now,
-        "expires_at": (datetime.now(timezone.utc) + timedelta(minutes=30)).isoformat(),
-    }
-
-    _write_audit_log("order_created", user_id, {
-        "order_id": order_id,
-        "product_id": product["product_id"],
-        "amount_cents": product["price_cents"],
-        "platform": request.platform,
-    })
-
-    pay_params = {
-        "order_id": order_id,
-        "amount_cents": product["price_cents"],
-        "amount_display": f"¥{product['price_cents'] / 100:.2f}",
-        "currency": product["currency"],
-        "expires_in": 1800,
-    }
-
-    if request.platform == "alipay":
-        pay_params["pay_url"] = f"https://openapi.alipay.com/gateway.do?mock=1&orderId={order_id}"
-        pay_params["qr_code"] = f"MOCK_QR_CODE_{order_id}"
-    elif request.platform == "apple":
-        pay_params["product_id"] = product["product_id"]
-
-    return {
-        "success": True,
-        "data": pay_params,
-    }
+    """旧路径复用正式创建订单逻辑，不维护第二套支付实现。"""
+    return await create_order(
+        CreateOrderRequest(product_id=request.product_id, platform=request.platform), user_id
+    )
 
 
 # ---- 旧版验签（兼容） ----
@@ -2078,7 +2045,7 @@ async def verify_purchase(request: PurchaseVerifyRequest):
     }
 
 
-# ============ 支付宝模拟支付接口 ============
+# ============ 支付宝兼容接口 ============
 
 @router.post("/alipay/create-order", response_model=dict)
 async def alipay_create_order(request: AlipayOrderRequest):
@@ -2086,116 +2053,21 @@ async def alipay_create_order(request: AlipayOrderRequest):
     if request.plan not in SUBSCRIPTION_PLANS:
         raise HTTPException(status_code=400, detail="订阅计划不存在")
 
-    plan = SUBSCRIPTION_PLANS[request.plan]
-
-    order_no = generate_order_no()
-    order_id = str(uuid.uuid4())
-
-    payment_orders[order_id] = {
-        "id": order_id,
-        "order_no": order_no,
-        "user_id": request.user_id,
-        "plan": request.plan,
-        "tier": request.plan,
-        "product_id": f"{request.plan}_yearly",
-        "amount_cents": plan.get("price_yearly_cents", plan.get("price_cents", 0)),
-        "currency": "CNY",
-        "status": "pending",
-        "platform": "alipay",
-        "created_at": datetime.now(timezone.utc).isoformat(),
-        "expires_at": (datetime.now(timezone.utc) + timedelta(minutes=30)).isoformat(),
-    }
-
-    _write_audit_log("alipay_order_created", request.user_id, {
-        "order_id": order_id,
-        "order_no": order_no,
-        "plan": request.plan,
-        "amount_cents": payment_orders[order_id]["amount_cents"],
-    })
-
-    return {
-        "success": True,
-        "data": {
-            "order_id": order_id,
-            "order_no": order_no,
-            "plan": request.plan,
-            "amount": payment_orders[order_id]["amount_cents"] / 100,
-            "amount_cents": payment_orders[order_id]["amount_cents"],
-            "amount_display": f"¥{payment_orders[order_id]['amount_cents'] / 100:.2f}",
-            "currency": "CNY",
-            "status": "pending",
-            "pay_url": f"https://openapi.alipay.com/gateway.do?mock=1&orderId={order_no}",
-            "qr_code": f"MOCK_QR_CODE_{order_no}",
-            "expires_in": 1800,
-        }
-    }
+    if request.plan == "free":
+        raise HTTPException(status_code=400, detail="免费方案无需创建支付订单")
+    return await create_order(
+        CreateOrderRequest(product_id=f"{request.plan}_yearly", platform="alipay"),
+        request.user_id,
+    )
 
 
 @router.post("/alipay/verify", response_model=dict)
 async def alipay_verify(request: PaymentVerifyRequest):
-    """验证支付宝支付结果（向后兼容）"""
-    order = payment_orders.get(request.order_id)
-
-    if not order:
-        raise HTTPException(status_code=404, detail="订单不存在")
-
-    if order["status"] == "paid":
-        return {
-            "success": True,
-            "data": {"order_id": request.order_id, "status": "already_paid"}
-        }
-
-    order["status"] = "paid"
-    now = datetime.now(timezone.utc)
-    order["paid_at"] = now.isoformat()
-    order["transaction_id"] = request.trade_no or f"MOCK_TRADE_{uuid.uuid4().hex[:12]}"
-
-    plan = SUBSCRIPTION_PLANS[order["plan"]]
-    expires_at = (now + timedelta(days=365)).isoformat()
-
-    subscriptions[order["user_id"]] = {
-        "plan": order["plan"],
-        "status": "active",
-        "expires_at": expires_at,
-        "auto_renew": True,
-        "platform": "alipay",
-        "order_id": order["id"],
-        "activated_at": now.isoformat(),
-    }
-
-    if order["user_id"] not in purchase_history:
-        purchase_history[order["user_id"]] = []
-    purchase_history[order["user_id"]].append({
-        "plan": order["plan"],
-        "price_cents": order.get("amount_cents", 0),
-        "platform": "alipay",
-        "order_id": order["id"],
-        "order_no": order.get("order_no", ""),
-        "trade_no": order["transaction_id"],
-        "subscribed_at": now.isoformat()
-    })
-
-    _write_audit_log("alipay_payment_verified", order["user_id"], {
-        "order_id": request.order_id,
-        "trade_no": order["transaction_id"],
-        "plan": order["plan"],
-    })
-
-    return {
-        "success": True,
-        "data": {
-            "order_id": order["id"],
-            "order_no": order.get("order_no", ""),
-            "trade_no": order["transaction_id"],
-            "plan": order["plan"],
-            "status": "paid",
-            "subscription": {
-                "plan": order["plan"],
-                "expires_at": expires_at,
-                "status": "active",
-            }
-        }
-    }
+    """客户端不得自报支付成功；支付宝只通过正式异步通知验签入账。"""
+    raise HTTPException(
+        status_code=410,
+        detail="该接口已停用，请使用 /api/v1/payments/alipay/notify",
+    )
 
 
 @router.get("/orders/{order_id}", response_model=dict)

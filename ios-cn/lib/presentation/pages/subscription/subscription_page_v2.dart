@@ -3,10 +3,52 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../design_system/theme.dart';
+import '../../../data/datasources/subscription_service.dart';
 
-class SubscriptionPageV2 extends StatelessWidget {
+class SubscriptionPageV2 extends StatefulWidget {
   const SubscriptionPageV2({super.key});
+
+  @override
+  State<SubscriptionPageV2> createState() => _SubscriptionPageV2State();
+}
+
+class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
+  bool _purchasing = false;
+
+  Future<void> _purchaseAnnual() async {
+    setState(() => _purchasing = true);
+    try {
+      final order = await SubscriptionService.createOrder('yiyang_yearly');
+      final paymentUrl = order?.paymentUrl;
+      if (order == null || paymentUrl == null || paymentUrl.isEmpty) {
+        throw Exception('支付渠道未返回有效链接');
+      }
+      final launched = await launchUrl(
+        Uri.parse(paymentUrl),
+        mode: LaunchMode.externalApplication,
+      );
+      if (!launched) throw Exception('无法打开支付宝');
+      final status = await SubscriptionService.pollOrderStatus(order.orderId);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            status == 'paid' ? '支付已确认，会员权益已生效' : '尚未收到支付确认，可稍后刷新会员状态',
+          ),
+        ),
+      );
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('购买失败：$error')));
+      }
+    } finally {
+      if (mounted) setState(() => _purchasing = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,9 +56,21 @@ class SubscriptionPageV2 extends StatelessWidget {
       backgroundColor: ShunShiColors.background,
       appBar: AppBar(
         backgroundColor: ShunShiColors.background,
-        leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
-        title: Text('会员中心', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18, fontWeight: FontWeight.w600)),
-        actions: [IconButton(icon: const Icon(Icons.help_outline), onPressed: () {})],
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.pop(),
+        ),
+        title: Text(
+          '会员中心',
+          style: TextStyle(
+            fontFamily: ShunShiTypography.serifFamily,
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        actions: [
+          IconButton(icon: const Icon(Icons.help_outline), onPressed: () {}),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
@@ -28,17 +82,34 @@ class SubscriptionPageV2 extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(colors: [Color(0xFF144227), Color(0xFF2D7A4A)], begin: Alignment.topLeft, end: Alignment.bottomRight),
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF144227), Color(0xFF2D7A4A)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('SVIP 尊享', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: ShunShiColors.surface)),
+                  Text(
+                    'SVIP 尊享',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: ShunShiColors.surface,
+                    ),
+                  ),
                   const SizedBox(height: 4),
-                  Text('开启您的智能养生之旅', style: TextStyle(fontSize: 14, color: Colors.white70)),
+                  Text(
+                    '开启您的智能养生之旅',
+                    style: TextStyle(fontSize: 14, color: Colors.white70),
+                  ),
                   const SizedBox(height: 12),
-                  Text('已为您定制 128 条健康建议', style: TextStyle(fontSize: 12, color: Color(0xFFE4C285))),
+                  Text(
+                    '权益以订单确认页和当前已上线功能为准',
+                    style: TextStyle(fontSize: 12, color: Color(0xFFE4C285)),
+                  ),
                 ],
               ),
             ),
@@ -52,30 +123,69 @@ class SubscriptionPageV2 extends StatelessWidget {
                   color: ShunShiColors.surface,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(color: ShunShiColors.primary, width: 2),
-                  boxShadow: [BoxShadow(color: ShunShiColors.primary.withOpacity(0.1), blurRadius: 12, offset: const Offset(0, 4))],
+                  boxShadow: [
+                    BoxShadow(
+                      color: ShunShiColors.primary.withValues(alpha: 0.1),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                        decoration: BoxDecoration(color: ShunShiColors.primary, borderRadius: BorderRadius.circular(6)),
-                        child: Text('RECOMMENDED', style: TextStyle(fontSize: 10, color: Colors.white, fontWeight: FontWeight.bold)),
-                      ),
-                    ]),
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 3,
+                          ),
+                          decoration: BoxDecoration(
+                            color: ShunShiColors.primary,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            'RECOMMENDED',
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                     const SizedBox(height: 12),
-                    Text('年度会员', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
-                    Text('首年特惠 · 每日仅需 ¥0.54', style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
-                    const SizedBox(height: 8),
-                    Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                      Text('¥199', style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: ShunShiColors.primary)),
-                      const SizedBox(width: 8),
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 6),
-                        child: Text('¥299', style: TextStyle(fontSize: 14, color: ShunShiColors.textTertiary, decoration: TextDecoration.lineThrough)),
+                    Text(
+                      '年度会员',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: ShunShiColors.textPrimary,
                       ),
-                    ]),
+                    ),
+                    Text(
+                      '颐养版年付 · 每日约 ¥1.09',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: ShunShiColors.textTertiary,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          '¥399/年',
+                          style: TextStyle(
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
+                            color: ShunShiColors.primary,
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
@@ -83,34 +193,91 @@ class SubscriptionPageV2 extends StatelessWidget {
             const SizedBox(height: 12),
 
             // 月度卡 + 家庭卡
-            Row(children: [
-              Expanded(child: _buildPlanCard('月度卡', '¥25', '随用随开 · 自由续费', false)),
-              const SizedBox(width: 12),
-              Expanded(child: _buildPlanCard('家庭卡', '¥299', '3人共享 · 健康互联', false)),
-            ]),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildPlanCard('颐养月付', '¥59', '按月购买 · 支付前确认', false),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildPlanCard('家和年付', '¥699', '最多4个家庭席位', false),
+                ),
+              ],
+            ),
             const SizedBox(height: 24),
 
             // 会员权益
-            Text('会员尊享权益', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+            Text(
+              '会员尊享权益',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: ShunShiColors.textPrimary,
+              ),
+            ),
             const SizedBox(height: 12),
-            _buildBenefit(Icons.auto_awesome, 'AI私人订制方案', '基于二十四节气与体质实时调整的个性化调理建议。'),
-            _buildBenefit(Icons.restaurant_menu, '全站食谱解锁', '5000+ 药膳食谱，包含详细营养成分与时令搭配。'),
-            _buildBenefit(Icons.headphones, '高保真音频随心听', '沉浸式冥想导引、中医名家访谈，高品质声学体验。'),
-            _buildBenefit(Icons.family_restroom, '家庭成员健康互联', '一人订阅，全家守护。实时关注家人的健康动态。'),
-            _buildBenefit(Icons.military_tech, '专属会员勋章', '独有的身份标识，记录您的养生打卡每一刻荣誉。'),
+            _buildBenefit(
+              Icons.auto_awesome,
+              'AI私人订制方案',
+              '基于二十四节气与体质实时调整的个性化调理建议。',
+            ),
+            _buildBenefit(
+              Icons.restaurant_menu,
+              '完整内容库',
+              '解锁当前已上架并持续更新的食养、作息与节气内容。',
+            ),
+            _buildBenefit(Icons.headphones, '会员音频', '按实际上架范围收听冥想导引与养生音频。'),
+            _buildBenefit(
+              Icons.family_restroom,
+              '家庭成员关怀',
+              '家和版最多提供4个家庭席位，并由成员自行控制共享范围。',
+            ),
+            _buildBenefit(
+              Icons.insights,
+              '长期趋势与周度报告',
+              '在数据充足时生成趋势视图和周度深度报告，并明确数据范围。',
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '当前支付宝年付为单次购买，不自动续费；支付前会再次展示金额与订单信息。',
+              style: TextStyle(
+                fontSize: 12,
+                color: ShunShiColors.textTertiary,
+                height: 1.5,
+              ),
+            ),
             const SizedBox(height: 20),
 
             // FAQ
             Container(
               padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(color: ShunShiColors.surfaceContainerLow, borderRadius: BorderRadius.circular(12)),
-              child: Row(children: [
-                Icon(Icons.help_outline, color: ShunShiColors.textTertiary, size: 18),
-                const SizedBox(width: 8),
-                Text('如何取消自动续费？', style: TextStyle(fontSize: 14, color: ShunShiColors.textSecondary)),
-                const Spacer(),
-                Icon(Icons.chevron_right, color: ShunShiColors.textTertiary, size: 18),
-              ]),
+              decoration: BoxDecoration(
+                color: ShunShiColors.surfaceContainerLow,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.help_outline,
+                    color: ShunShiColors.textTertiary,
+                    size: 18,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    '如何取消自动续费？',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: ShunShiColors.textSecondary,
+                    ),
+                  ),
+                  const Spacer(),
+                  Icon(
+                    Icons.chevron_right,
+                    color: ShunShiColors.textTertiary,
+                    size: 18,
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 40),
           ],
@@ -120,14 +287,24 @@ class SubscriptionPageV2 extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
           child: SizedBox(
-            width: double.infinity, height: 52,
+            width: double.infinity,
+            height: 52,
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: _purchasing ? null : _purchaseAnnual,
               style: ElevatedButton.styleFrom(
                 backgroundColor: ShunShiColors.primary,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
               ),
-              child: Text('立即开通', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white)),
+              child: Text(
+                _purchasing ? '等待支付确认…' : '立即开通',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
             ),
           ),
         ),
@@ -135,20 +312,47 @@ class SubscriptionPageV2 extends StatelessWidget {
     );
   }
 
-  Widget _buildPlanCard(String title, String price, String subtitle, bool isSelected) {
+  Widget _buildPlanCard(
+    String title,
+    String price,
+    String subtitle,
+    bool isSelected,
+  ) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: ShunShiColors.surface,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: isSelected ? ShunShiColors.primary : ShunShiColors.borderGhost),
+        border: Border.all(
+          color: isSelected ? ShunShiColors.primary : ShunShiColors.borderGhost,
+        ),
       ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(title, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
-        const SizedBox(height: 6),
-        Text(price, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: ShunShiColors.primary)),
-        Text(subtitle, style: TextStyle(fontSize: 11, color: ShunShiColors.textTertiary)),
-      ]),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: ShunShiColors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            price,
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: ShunShiColors.primary,
+            ),
+          ),
+          Text(
+            subtitle,
+            style: TextStyle(fontSize: 11, color: ShunShiColors.textTertiary),
+          ),
+        ],
+      ),
     );
   }
 
@@ -157,20 +361,49 @@ class SubscriptionPageV2 extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Container(
         padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(12)),
-        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Container(
-            width: 36, height: 36,
-            decoration: BoxDecoration(color: ShunShiColors.primary.withOpacity(0.08), borderRadius: BorderRadius.circular(10)),
-            child: Icon(icon, color: ShunShiColors.primary, size: 18),
-          ),
-          const SizedBox(width: 12),
-          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
-            const SizedBox(height: 2),
-            Text(desc, style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary, height: 1.5)),
-          ])),
-        ]),
+        decoration: BoxDecoration(
+          color: ShunShiColors.surface,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: ShunShiColors.primary.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon, color: ShunShiColors.primary, size: 18),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: ShunShiColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    desc,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: ShunShiColors.textTertiary,
+                      height: 1.5,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

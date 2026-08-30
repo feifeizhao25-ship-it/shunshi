@@ -1,7 +1,7 @@
 """
 顺时 ShunShi - 支付宝支付服务 (CN版)
 支持: 创建订单 / 查询 / 退款 / 回调验证
-Mock 模式: ALIPAY_MODE=mock 时返回模拟数据
+生产代码不提供模拟支付；未配置商户凭据时明确失败。
 
 产品 ID 矩阵:
   养心月付 / 养心年付 / 益阳月付 / 益阳年付 / 佳和月付 / 佳和年付
@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 # ==================== 配置 ====================
 
-ALIPAY_MODE = os.getenv("ALIPAY_MODE", "mock")  # mock / sandbox / production
+ALIPAY_MODE = os.getenv("ALIPAY_MODE", "production")  # sandbox / production
 
 ALIPAY_APP_ID = os.getenv("ALIPAY_APP_ID", "")
 ALIPAY_PRIVATE_KEY = os.getenv("ALIPAY_PRIVATE_KEY", "")
@@ -36,7 +36,6 @@ ALIPAY_RETURN_URL = os.getenv("ALIPAY_RETURN_URL", "https://app.shunshi.cn/payme
 ALIPAY_GATEWAY = {
     "production": "https://openapi.alipay.com/gateway.do",
     "sandbox": "https://openapi-sandbox.dl.alipaydev.com/gateway.do",
-    "mock": "https://openapi.alipay.com/gateway.do",
 }
 
 # ==================== 产品定义 ====================
@@ -153,13 +152,11 @@ class AlipayService:
         if self._client:
             return self._client
 
-        if self.mode == "mock":
-            return None
+        if self.mode not in {"sandbox", "production"}:
+            raise RuntimeError("ALIPAY_MODE 必须是 sandbox 或 production")
 
         if not ALIPAY_APP_ID or not ALIPAY_PRIVATE_KEY:
-            logger.warning("[Alipay] 缺少 APP_ID 或 PRIVATE_KEY，降级到 mock 模式")
-            self.mode = "mock"
-            return None
+            raise RuntimeError("支付宝商户配置不完整")
 
         try:
             from alipay import AliPay
@@ -174,9 +171,7 @@ class AlipayService:
             logger.info(f"[Alipay] SDK 初始化完成 (mode={self.mode})")
             return self._client
         except ImportError:
-            logger.warning("[Alipay] python-alipay-sdk 未安装，运行 mock 模式")
-            self.mode = "mock"
-            return None
+            raise RuntimeError("支付宝 SDK 未安装")
 
     def create_order(
         self,
@@ -203,7 +198,7 @@ class AlipayService:
 
         client = self._get_client()
 
-        if client and self.mode != "mock":
+        if client:
             # 真实支付宝调用
             pay_url = client.api_alipay_trade_page_pay(
                 out_trade_no=order_no,
@@ -214,10 +209,6 @@ class AlipayService:
                 passback_params=f"user_id={user_id}&sku={product_sku}",
             )
             logger.info(f"[Alipay] 创建订单: {order_no}, sku={product_sku}")
-        else:
-            # Mock 模式 — 优雅降级
-            logger.warning("Alipay APP_ID/PRIVATE_KEY not configured, payment disabled")
-            raise RuntimeError("支付服务未配置，请联系管理员")
 
         return AlipayOrderResult(
             order_no=order_no,
@@ -231,7 +222,7 @@ class AlipayService:
         """查询订单状态"""
         client = self._get_client()
 
-        if client and self.mode != "mock":
+        if client:
             result = client.api_alipay_trade_query(out_trade_no=order_no)
             return AlipayQueryResult(
                 order_no=result.get("out_trade_no", order_no),
@@ -240,10 +231,6 @@ class AlipayService:
                 total_amount=result.get("total_amount", "0.00"),
                 buyer_id=result.get("buyer_id", ""),
             )
-        else:
-            # Mock 模式 — 优雅降级
-            logger.warning("Alipay not configured, query disabled")
-            raise RuntimeError("支付服务未配置，请联系管理员")
 
     def refund(
         self,
@@ -255,7 +242,7 @@ class AlipayService:
         client = self._get_client()
         refund_no = f"RF{datetime.now().strftime('%Y%m%d%H%M%S')}{uuid.uuid4().hex[:8]}"
 
-        if client and self.mode != "mock":
+        if client:
             result = client.api_alipay_trade_refund(
                 out_trade_no=order_no,
                 refund_amount=refund_amount,
@@ -268,23 +255,18 @@ class AlipayService:
                 refund_amount=refund_amount,
                 refund_status="SUCCESS" if result.get("code") == "10000" else "FAILED",
             )
-        else:
-            logger.warning("Alipay not configured, refund disabled")
-            raise RuntimeError("支付服务未配置，请联系管理员")
 
     def verify_notify(self, params: dict) -> AlipayNotifyData:
         """验证支付宝回调签名并解析数据"""
         client = self._get_client()
 
-        if client and self.mode != "mock":
+        if client:
             signature = params.pop("sign", None)
             sign_type = params.pop("sign_type", None)
             # python-alipay-sdk 验签
             is_valid = client.verify(params, signature)
             if not is_valid:
                 raise ValueError("支付宝回调签名验证失败")
-        else:
-            logger.info("[Alipay] Mock 模式 - 跳过回调验签")
 
         return AlipayNotifyData(
             out_trade_no=params.get("out_trade_no", ""),

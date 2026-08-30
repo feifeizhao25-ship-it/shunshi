@@ -4,6 +4,27 @@ from fastapi.testclient import TestClient
 
 from app.config import Settings
 from app.main import create_app
+from app.services.alipay_service import ALIPAY_PRODUCTS, AlipayOrderResult
+
+
+@pytest.fixture(autouse=True)
+def stub_external_alipay_order_creation(monkeypatch):
+    """Keep tests deterministic without weakening production payment checks."""
+
+    def _create_order(product_sku: str, user_id: str, return_url=None):
+        product = ALIPAY_PRODUCTS[product_sku]
+        return AlipayOrderResult(
+            order_no=f"APTEST{uuid.uuid4().hex[:16]}",
+            pay_url=f"https://openapi.alipay.test/pay/{uuid.uuid4().hex}",
+            total_amount=str(product["price"]),
+            product_id=product["product_id"],
+            mode="sandbox",
+        )
+
+    monkeypatch.setattr(
+        "app.services.alipay_service.alipay_service.create_order",
+        _create_order,
+    )
 
 
 @pytest.fixture()

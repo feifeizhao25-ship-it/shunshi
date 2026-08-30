@@ -317,7 +317,7 @@ class TestOrderCreation:
     async def test_create_order_generates_order_id(self, client):
         resp = await client.post(
             f"{API_BASE}/create-order",
-            json={"product_id": "yiyang_yearly", "platform": "apple"},
+            json={"product_id": "yiyang_apple_yearly", "platform": "apple"},
             params={"user_id": "user-order-id-001"},
         )
         data = resp.json()["data"]
@@ -1070,8 +1070,8 @@ class TestBackwardCompatAPI:
         assert data["status"] == "active"
 
     @pytest.mark.asyncio
-    async def test_alipay_create_and_verify(self, client):
-        """支付宝旧版流程: 创建订单 → 验证"""
+    async def test_alipay_legacy_verify_is_retired(self, client):
+        """旧客户端不能绕过支付宝服务端通知确认付款。"""
         resp = await client.post(
             f"{API_BASE}/alipay/create-order",
             json={"plan": "yangxin", "user_id": "user-alipay-compat"},
@@ -1083,8 +1083,11 @@ class TestBackwardCompatAPI:
             f"{API_BASE}/alipay/verify",
             json={"order_id": order_id},
         )
-        assert resp_verify.status_code == 200
-        assert resp_verify.json()["data"]["status"] == "paid"
+        assert resp_verify.status_code == 410
+
+        order = await client.get(f"{API_BASE}/orders/{order_id}")
+        assert order.status_code == 200
+        assert order.json()["data"]["status"] == "pending"
 
     @pytest.mark.asyncio
     async def test_stripe_webhook(self, client):
@@ -1207,10 +1210,15 @@ class TestEdgeCases:
     @pytest.mark.asyncio
     async def test_create_order_with_all_platforms(self, client):
         """所有平台都能创建订单"""
-        for product_id in ["yangxin_apple_monthly", "yiyang_monthly", "jiahe_yearly"]:
+        products = [
+            ("yangxin_apple_monthly", "apple"),
+            ("yiyang_monthly", "alipay"),
+            ("jiahe_yearly", "alipay"),
+        ]
+        for product_id, platform in products:
             resp = await client.post(
                 f"{API_BASE}/create-order",
-                json={"product_id": product_id, "platform": "alipay"},
+                json={"product_id": product_id, "platform": platform},
             )
             assert resp.status_code == 200, f"Failed for {product_id}: {resp.text}"
             assert resp.json()["data"]["status"] == "pending"

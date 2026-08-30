@@ -75,18 +75,16 @@ class TestCreateOrder:
         assert order_data.get("status") == "pending", (
             f"新建订单状态应为 pending，实际: {order_data.get('status')}"
         )
-        assert order_data.get("plan") == "yangxin", "订单计划应为 yangxin"
-        assert order_data.get("amount") > 0, "付费订单金额应大于 0"
+        assert order_data.get("amount_cents") == 19900
+        assert order_data.get("pay_url", "").startswith("https://")
 
     def test_create_free_plan_order(self, client):
-        """免费计划不应有订单金额"""
+        """免费计划无需创建支付订单。"""
         response = client.post("/api/v1/subscription/alipay/create-order", json={
             "user_id": "test-user-001",
             "plan": "free",
         })
-        # free 计划金额为 0
-        data = response.json().get("data", {})
-        assert data.get("amount") == 0, "免费计划金额应为 0"
+        assert response.status_code == 400
 
     def test_create_stripe_checkout(self, client):
         """创建 Stripe checkout"""
@@ -106,10 +104,10 @@ class TestCreateOrder:
 # ==================== 支付验签 ====================
 
 class TestVerifyPayment:
-    """验签后订单变 paid"""
+    """客户端自报支付结果必须被拒绝。"""
 
     def test_verify_alipay_order(self, client):
-        """验签后订单状态变为 paid"""
+        """旧接口不能凭 order_id/trade_no 激活会员。"""
         # 先创建订单
         create_resp = client.post("/api/v1/subscription/alipay/create-order", json={
             "user_id": "test-user-001",
@@ -122,16 +120,11 @@ class TestVerifyPayment:
             "order_id": order_id,
             "trade_no": "TEST_TRADE_VERIFY_001",
         })
-        assert verify_resp.status_code == 200
-        data = verify_resp.json()
-        assert data.get("success") is True
-        order_data = data.get("data", {})
-        assert order_data.get("status") == "paid", (
-            f"验签后订单状态应为 paid，实际: {order_data.get('status')}"
-        )
+        assert verify_resp.status_code == 410
+        assert "/api/v1/payments/alipay/notify" in verify_resp.json()["detail"]
 
     def test_verify_already_paid_order(self, client):
-        """已支付订单重复验签应返回 already_paid"""
+        """重复调用旧接口也不能改变支付状态。"""
         # 创建并支付
         create_resp = client.post("/api/v1/subscription/alipay/create-order", json={
             "user_id": "test-user-001",
@@ -149,11 +142,10 @@ class TestVerifyPayment:
             "order_id": order_id,
             "trade_no": "TEST_TRADE_DUP_002",
         })
-        assert dup_resp.status_code == 200
-        data = dup_resp.json().get("data", {})
-        assert data.get("status") == "already_paid", (
-            "重复验签应返回 already_paid"
-        )
+        assert dup_resp.status_code == 410
+
+        query_resp = client.get(f"/api/v1/subscription/alipay/order/{order_id}")
+        assert query_resp.json()["data"]["status"] == "pending"
 
     def test_query_order_status(self, client):
         """可查询订单状态"""
@@ -175,7 +167,7 @@ class TestSubscriptionActivation:
     """支付后订阅激活"""
 
     def test_subscription_activated_after_payment(self, client):
-        """支付宝验签后订阅应激活"""
+        """未经支付宝服务端验签的请求不得激活订阅。"""
         # 创建并支付
         create_resp = client.post("/api/v1/subscription/alipay/create-order", json={
             "user_id": "due-test-user",
@@ -192,9 +184,8 @@ class TestSubscriptionActivation:
         sub_resp = client.get("/api/v1/subscription?user_id=due-test-user")
         assert sub_resp.status_code == 200
         sub_data = sub_resp.json().get("data", {})
-        assert sub_data.get("status") == "active", "支付后订阅应处于 active 状态"
-        assert sub_data.get("plan") == "yiyang", "订阅计划应为 yiyang"
-        assert sub_data.get("expires_at") is not None, "应有到期时间"
+        assert sub_data.get("plan") == "free"
+        assert sub_data.get("expires_at") is None
 
     def test_stripe_webhook_activates_subscription(self, client):
         """Stripe webhook 应激活订阅"""
@@ -384,10 +375,11 @@ class TestConcurrentPurchase:
             "trade_no": "TEST_CONCURRENT_001",
         })
 
-        # 验证订阅状态为 active
+        # 客户端自报支付后，订阅仍不能被激活
         sub_resp = client.get("/api/v1/subscription?user_id=context-test-user")
         sub_data = sub_resp.json().get("data", {})
-        assert sub_data.get("status") == "active"
+        assert sub_data.get("plan") == "free"
+        assert sub_data.get("expires_at") is None
 
     def test_invalid_plan_rejected(self, client):
         """无效计划应被拒绝"""

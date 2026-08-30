@@ -1,21 +1,28 @@
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/subscription.dart';
+import '../../core/config/app_config.dart';
 
 /// 订阅服务 - 对接后端 API
 class SubscriptionService {
-  static final _dio = Dio(BaseOptions(
-    baseUrl: 'https://api.shunshi.app',
-    connectTimeout: const Duration(seconds: 8),
-    receiveTimeout: const Duration(seconds: 10),
-  ));
+  static final _dio = Dio(
+    BaseOptions(
+      baseUrl: AppConfig.apiBaseUrl.replaceAll('/api/v1', ''),
+      connectTimeout: const Duration(seconds: 8),
+      receiveTimeout: const Duration(seconds: 10),
+    ),
+  );
 
   /// 获取订阅计划列表
   static Future<List<SubscriptionPlan>> getPlans() async {
     try {
-      final res = await _dio.get('/api/v1/subscription/status');
+      final userId = await _getUserId();
+      final res = await _dio.get(
+        '/api/v1/subscription/products',
+        queryParameters: {'platform': 'alipay', 'user_id': userId},
+      );
       if (res.data?['success'] == true) {
-        final List data = res.data['data'];
+        final List data = res.data['data']['products'];
         // 标记 recommended plan（yiyang 颐养版）
         return data.map((p) {
           return SubscriptionPlan.fromJson(p, recommended: p['id'] == 'yiyang');
@@ -31,7 +38,10 @@ class SubscriptionService {
   static Future<UserSubscriptionStatus> getCurrentStatus() async {
     final userId = await _getUserId();
     try {
-      final res = await _dio.get('/api/v1/subscription/status$userId');
+      final res = await _dio.get(
+        '/api/v1/subscription/status',
+        queryParameters: {'user_id': userId},
+      );
       if (res.data?['success'] == true) {
         return UserSubscriptionStatus.fromJson(res.data['data']);
       }
@@ -47,32 +57,34 @@ class SubscriptionService {
   }
 
   /// 创建订单（获取支付链接）
-  static Future<SubscriptionOrder?> createOrder(String planId, {int period = 1}) async {
+  static Future<SubscriptionOrder?> createOrder(
+    String planId, {
+    int period = 1,
+  }) async {
     final userId = await _getUserId();
     try {
       final res = await _dio.post(
         '/api/v1/subscription/create-order',
-        data: {
-          'user_id': userId,
-          'plan_id': planId,
-          'period_count': period,
-        },
+        data: {'product_id': planId, 'platform': 'alipay'},
+        queryParameters: {'user_id': userId},
       );
       if (res.data?['success'] == true) {
         return SubscriptionOrder.fromJson(res.data['data']);
       }
     } catch (e) {
-      // fallback: 模拟下单（用于开发/测试）
-      throw Exception('支付功能即将上线，敬请期待');
+      throw Exception('支付服务暂不可用，请稍后重试');
     }
     return null;
   }
 
   /// 轮询订单状态（扫码支付场景）
-  static Future<String?> pollOrderStatus(String orderId, {int maxAttempts = 30}) async {
+  static Future<String?> pollOrderStatus(
+    String orderId, {
+    int maxAttempts = 30,
+  }) async {
     for (int i = 0; i < maxAttempts; i++) {
       try {
-        final res = await _dio.get('/api/v1/orders/$orderId');
+        final res = await _dio.get('/api/v1/subscription/orders/$orderId');
         if (res.data?['success'] == true) {
           final status = res.data['data']['status'];
           if (status == 'paid') return 'paid';
@@ -88,7 +100,10 @@ class SubscriptionService {
   static Future<bool> restorePurchases() async {
     final userId = await _getUserId();
     try {
-      final res = await _dio.post('/api/v1/subscription/restore', data: {'user_id': userId});
+      final res = await _dio.post(
+        '/api/v1/subscription/restore',
+        data: {'user_id': userId},
+      );
       return res.data?['success'] == true;
     } catch (e) {
       return false;
@@ -106,18 +121,6 @@ class SubscriptionService {
     return uid;
   }
 
-  /// 开发模式模拟订单
-  static SubscriptionOrder _mockOrder(String planId) {
-    final plan = _fallbackPlans.firstWhere((p) => p.id == planId, orElse: () => _fallbackPlans.first);
-    return SubscriptionOrder(
-      orderId: 'mock_${DateTime.now().millisecondsSinceEpoch}',
-      planId: planId,
-      amountCents: plan.priceCents,
-      status: 'pending',
-      createdAt: DateTime.now(),
-    );
-  }
-
   /// 后端不可用时的硬编码 plan fallback
   static final List<SubscriptionPlan> _fallbackPlans = [
     SubscriptionPlan(
@@ -125,7 +128,11 @@ class SubscriptionService {
       name: '免费版',
       priceCents: 0,
       description: '基础功能，满足日常养生需求',
-      features: {'basic_chat': true, 'solar_terms': true, 'unlimited_chat': false},
+      features: {
+        'basic_chat': true,
+        'solar_terms': true,
+        'unlimited_chat': false,
+      },
       isCurrent: true,
     ),
     SubscriptionPlan(
@@ -136,7 +143,12 @@ class SubscriptionService {
       period: 'month',
       periodName: '月',
       description: '无限聊天+今日计划，适合养生爱好者',
-      features: {'basic_chat': true, 'solar_terms': true, 'unlimited_chat': true, 'today_plan': true},
+      features: {
+        'basic_chat': true,
+        'solar_terms': true,
+        'unlimited_chat': true,
+        'today_plan': true,
+      },
     ),
     SubscriptionPlan(
       id: 'yiyang',
@@ -147,7 +159,14 @@ class SubscriptionService {
       periodName: '月',
       description: '深度建议+周总结，适合养生达人',
       isRecommended: true,
-      features: {'basic_chat': true, 'solar_terms': true, 'unlimited_chat': true, 'today_plan': true, 'deep_suggestions': true, 'weekly_summary': true},
+      features: {
+        'basic_chat': true,
+        'solar_terms': true,
+        'unlimited_chat': true,
+        'today_plan': true,
+        'deep_suggestions': true,
+        'weekly_summary': true,
+      },
     ),
     SubscriptionPlan(
       id: 'jiahe',
@@ -158,7 +177,15 @@ class SubscriptionService {
       periodName: '月',
       description: '家庭共享（4席位），适合全家使用',
       familySeats: 4,
-      features: {'basic_chat': true, 'solar_terms': true, 'unlimited_chat': true, 'today_plan': true, 'deep_suggestions': true, 'weekly_summary': true, 'family': true},
+      features: {
+        'basic_chat': true,
+        'solar_terms': true,
+        'unlimited_chat': true,
+        'today_plan': true,
+        'deep_suggestions': true,
+        'weekly_summary': true,
+        'family': true,
+      },
     ),
   ];
 }

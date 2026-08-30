@@ -93,7 +93,7 @@ class SubscriptionPlan {
       3: {'basic_chat': true, 'unlimited_chat': true, 'today_plan': true, 'deep_suggestions': true, 'family': true},
     };
     return SubscriptionPlan(
-      id: json['id'] ?? 'free',
+      id: json['id'] ?? json['product_id'] ?? 'free',
       name: json['name'] ?? '',
       priceCents: priceCents,
       priceYearlyCents: json['price_yearly_cents'],
@@ -101,7 +101,7 @@ class SubscriptionPlan {
       periodName: json['period_name'] ?? (level == 1 ? '月' : '年'),
       description: json['description'] ?? descMap[level] ?? '',
       features: Map<String, bool>.from(json['features'] ?? featMap[level] ?? {}),
-      isCurrent: json['is_current'] ?? false,
+      isCurrent: json['is_current'] ?? json['is_current_tier'] ?? false,
       familySeats: level == 3 ? 4 : 0,
       isRecommended: recommended || level == 2,
     );
@@ -140,7 +140,7 @@ class SubscriptionOrder {
       expiresAt: json['expires_at'] != null
           ? DateTime.parse(json['expires_at'])
           : null,
-      paymentUrl: json['payment_url'],
+      paymentUrl: json['pay_url'] ?? json['payment_url'],
     );
   }
 }
@@ -165,7 +165,7 @@ class UserSubscriptionStatus {
 
   factory UserSubscriptionStatus.fromJson(Map<String, dynamic> json) {
     return UserSubscriptionStatus(
-      planId: json['plan_id'] ?? 'free',
+      planId: json['plan_id'] ?? json['plan'] ?? 'free',
       planName: json['plan_name'] ?? '免费版',
       isActive: json['is_active'] ?? false,
       expiresAt: json['expires_at'] != null

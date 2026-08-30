@@ -73,7 +73,10 @@ class SubscriptionPlan {
     return '¥${(priceYearlyCents! / 100).toStringAsFixed(0)}';
   }
 
-  factory SubscriptionPlan.fromJson(Map<String, dynamic> json, {bool recommended = false}) {
+  factory SubscriptionPlan.fromJson(
+    Map<String, dynamic> json, {
+    bool recommended = false,
+  }) {
     // Support both price (yuan) and price_cents (fen)
     int priceCents;
     if (json.containsKey('price_cents')) {
@@ -85,23 +88,41 @@ class SubscriptionPlan {
     }
     // Map level to description and features
     final level = json['level'] as int? ?? 0;
-    final descMap = {0: '基础功能', 1: '月度会员，畅享全部功能', 2: '年度会员，超值优惠', 3: '家庭共享，最多4人使用'};
+    final descMap = {
+      0: '基础功能',
+      1: '月度会员，畅享全部功能',
+      2: '年度会员，超值优惠',
+      3: '家庭共享，最多4人使用',
+    };
     final featMap = {
       0: {'basic_chat': true},
       1: {'basic_chat': true, 'unlimited_chat': true, 'today_plan': true},
-      2: {'basic_chat': true, 'unlimited_chat': true, 'today_plan': true, 'deep_suggestions': true},
-      3: {'basic_chat': true, 'unlimited_chat': true, 'today_plan': true, 'deep_suggestions': true, 'family': true},
+      2: {
+        'basic_chat': true,
+        'unlimited_chat': true,
+        'today_plan': true,
+        'deep_suggestions': true,
+      },
+      3: {
+        'basic_chat': true,
+        'unlimited_chat': true,
+        'today_plan': true,
+        'deep_suggestions': true,
+        'family': true,
+      },
     };
     return SubscriptionPlan(
-      id: json['id'] ?? 'free',
+      id: json['id'] ?? json['product_id'] ?? 'free',
       name: json['name'] ?? '',
       priceCents: priceCents,
       priceYearlyCents: json['price_yearly_cents'],
       period: json['period'] ?? (level == 1 ? 'month' : 'year'),
       periodName: json['period_name'] ?? (level == 1 ? '月' : '年'),
       description: json['description'] ?? descMap[level] ?? '',
-      features: Map<String, bool>.from(json['features'] ?? featMap[level] ?? {}),
-      isCurrent: json['is_current'] ?? false,
+      features: Map<String, bool>.from(
+        json['features'] ?? featMap[level] ?? {},
+      ),
+      isCurrent: json['is_current'] ?? json['is_current_tier'] ?? false,
       familySeats: level == 3 ? 4 : 0,
       isRecommended: recommended || level == 2,
     );
@@ -140,7 +161,7 @@ class SubscriptionOrder {
       expiresAt: json['expires_at'] != null
           ? DateTime.parse(json['expires_at'])
           : null,
-      paymentUrl: json['payment_url'],
+      paymentUrl: json['pay_url'] ?? json['payment_url'],
     );
   }
 }
@@ -165,7 +186,7 @@ class UserSubscriptionStatus {
 
   factory UserSubscriptionStatus.fromJson(Map<String, dynamic> json) {
     return UserSubscriptionStatus(
-      planId: json['plan_id'] ?? 'free',
+      planId: json['plan_id'] ?? json['plan'] ?? 'free',
       planName: json['plan_name'] ?? '免费版',
       isActive: json['is_active'] ?? false,
       expiresAt: json['expires_at'] != null

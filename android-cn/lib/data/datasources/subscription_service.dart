@@ -14,15 +14,19 @@ class SubscriptionService {
   /// 获取订阅计划列表
   static Future<List<SubscriptionPlan>> getPlans() async {
     try {
-      final res = await _dio.get('/api/v1/subscription/status');
+      final userId = await _getUserId();
+      final res = await _dio.get(
+        '/api/v1/subscription/products',
+        queryParameters: {'platform': 'alipay', 'user_id': userId},
+      );
       if (res.data?['success'] == true) {
-        final List data = res.data['data'];
+        final List data = res.data['data']['products'];
         // 标记 recommended plan（yiyang 颐养版）
         return data.map((p) {
           return SubscriptionPlan.fromJson(p, recommended: p['id'] == 'yiyang');
         }).toList();
       }
-    } catch (e) {
+    } catch (_) {
       // fallback to hardcoded plans
     }
     return _fallbackPlans;
@@ -32,11 +36,14 @@ class SubscriptionService {
   static Future<UserSubscriptionStatus> getCurrentStatus() async {
     final userId = await _getUserId();
     try {
-      final res = await _dio.get('/api/v1/subscription/status$userId');
+      final res = await _dio.get(
+        '/api/v1/subscription/status',
+        queryParameters: {'user_id': userId},
+      );
       if (res.data?['success'] == true) {
         return UserSubscriptionStatus.fromJson(res.data['data']);
       }
-    } catch (e) {
+    } catch (_) {
       // fallback
     }
     return UserSubscriptionStatus(
@@ -54,17 +61,16 @@ class SubscriptionService {
       final res = await _dio.post(
         '/api/v1/subscription/create-order',
         data: {
-          'user_id': userId,
-          'plan_id': planId,
-          'period_count': period,
+          'product_id': planId,
+          'platform': 'alipay',
         },
+        queryParameters: {'user_id': userId},
       );
       if (res.data?['success'] == true) {
         return SubscriptionOrder.fromJson(res.data['data']);
       }
-    } catch (e) {
-      // 支付功能即将上线，暂不可用
-      print('[Subscription] 支付服务暂不可用: $e');
+    } catch (_) {
+      // 调用方展示统一错误，不在生产日志输出可能包含网络细节的异常。
     }
     return null;
   }
@@ -73,7 +79,7 @@ class SubscriptionService {
   static Future<String?> pollOrderStatus(String orderId, {int maxAttempts = 30}) async {
     for (int i = 0; i < maxAttempts; i++) {
       try {
-        final res = await _dio.get('/api/v1/orders/$orderId');
+        final res = await _dio.get('/api/v1/subscription/orders/$orderId');
         if (res.data?['success'] == true) {
           final status = res.data['data']['status'];
           if (status == 'paid') return 'paid';

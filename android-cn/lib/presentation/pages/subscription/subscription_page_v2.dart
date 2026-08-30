@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../design_system/theme.dart';
 import '../../../data/datasources/subscription_service.dart';
 import '../../../data/models/subscription.dart';
@@ -70,25 +70,32 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
           _purchasingPlanId = null;
           _orderMessage = '订单已创建：¥${(order.amountCents / 100).toStringAsFixed(0)}\n请完成支付后刷新页面';
         });
-        // 模拟支付成功（开发模式）
-        await _simulatePaymentSuccess(plan);
+        final paymentUrl = order.paymentUrl;
+        if (paymentUrl == null || paymentUrl.isEmpty) {
+          _showToast('支付渠道未返回有效链接，请稍后重试');
+          return;
+        }
+        final launched = await launchUrl(
+          Uri.parse(paymentUrl),
+          mode: LaunchMode.externalApplication,
+        );
+        if (!launched) {
+          _showToast('无法打开支付宝，请检查是否已安装');
+          return;
+        }
+        final status = await SubscriptionService.pollOrderStatus(order.orderId);
+        if (status == 'paid' && mounted) {
+          await _loadData();
+          _showToast('支付已确认，会员权益已生效');
+        } else if (mounted) {
+          _showToast('尚未收到支付确认，可稍后在会员中心刷新');
+        }
       }
     } catch (e) {
       if (mounted) {
         setState(() => _purchasingPlanId = null);
         _showToast('购买失败：${e.toString()}');
       }
-    }
-  }
-
-  Future<void> _simulatePaymentSuccess(SubscriptionPlan plan) async {
-    // 开发模式：直接将本地订阅状态设为已购买
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('subscription_plan', plan.id);
-    await prefs.setBool('is_subscribed', true);
-    if (mounted) {
-      await _loadData();
-      _showToast('购买成功！欢迎加入${plan.name}');
     }
   }
 
@@ -165,9 +172,9 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
                       Container(
                         padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
-                          color: ShunShiColors.primary.withOpacity(0.08),
+                          color: ShunShiColors.primary.withValues(alpha: 0.08),
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: ShunShiColors.primary.withOpacity(0.3)),
+                          border: Border.all(color: ShunShiColors.primary.withValues(alpha: 0.3)),
                         ),
                         child: Row(children: [
                           Icon(Icons.info_outline, color: ShunShiColors.primary, size: 18),
@@ -219,7 +226,7 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
+                color: Colors.white.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Text(
@@ -292,7 +299,7 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
               color: ShunShiColors.surface,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: ShunShiColors.primary, width: 2),
-              boxShadow: [BoxShadow(color: ShunShiColors.primary.withOpacity(0.1), blurRadius: 12, offset: const Offset(0, 4))],
+              boxShadow: [BoxShadow(color: ShunShiColors.primary.withValues(alpha: 0.1), blurRadius: 12, offset: const Offset(0, 4))],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -306,13 +313,19 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
                   const SizedBox(width: 8),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(color: const Color(0xFFE4C285).withOpacity(0.2), borderRadius: BorderRadius.circular(6)),
+                    decoration: BoxDecoration(color: const Color(0xFFE4C285).withValues(alpha: 0.2), borderRadius: BorderRadius.circular(6)),
                     child: Text('年度特惠', style: TextStyle(fontSize: 10, color: ShunShiColors.primary, fontWeight: FontWeight.w600)),
                   ),
                 ]),
                 const SizedBox(height: 12),
                 Text(recommended.name, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
-                Text('${recommended.periodName ?? ""} · 每日仅需 ¥${(recommended.priceYearlyCents ?? 0) ~/ 36500}', style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
+                Text(
+                  '${recommended.periodName ?? ""} · 每日约 ¥${((recommended.priceYearlyCents ?? 0) / 36500).toStringAsFixed(2)}',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: ShunShiColors.textTertiary,
+                  ),
+                ),
                 const SizedBox(height: 8),
                 Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
                   Text('¥${(recommended.priceYearlyCents ?? 0) ~/ 100}', style: TextStyle(fontSize: 34, fontWeight: FontWeight.bold, color: ShunShiColors.primary)),
@@ -375,7 +388,7 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
     if (isCurrent) {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        decoration: BoxDecoration(color: ShunShiColors.textTertiary.withOpacity(0.15), borderRadius: BorderRadius.circular(8)),
+        decoration: BoxDecoration(color: ShunShiColors.textTertiary.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(8)),
         child: Text('当前', style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
       );
     }
@@ -397,10 +410,12 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
       Text('会员尊享权益', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
       const SizedBox(height: 12),
       _buildBenefit(Icons.auto_awesome, 'AI私人订制方案', '基于二十四节气与体质实时调整的个性化调理建议。'),
-      _buildBenefit(Icons.restaurant_menu, '全站食谱解锁', '5000+ 药膳食谱，包含详细营养成分与时令搭配。'),
-      _buildBenefit(Icons.headphones, '高保真音频随心听', '沉浸式冥想导引、中医名家访谈，高品质声学体验。'),
-      _buildBenefit(Icons.family_restroom, '家庭成员健康互联', '一人订阅，全家守护。实时关注家人的健康动态。'),
-      _buildBenefit(Icons.military_tech, '专属会员勋章', '独有的身份标识，记录您的养生打卡每一刻荣誉。'),
+      _buildBenefit(Icons.restaurant_menu, '完整内容库', '解锁当前已上架并持续更新的食养、作息与节气内容。'),
+      _buildBenefit(Icons.headphones, '会员音频', '按实际上架范围收听冥想导引与养生音频。'),
+      _buildBenefit(Icons.family_restroom, '家庭成员关怀', '家和版最多提供4个家庭席位，并由成员自行控制共享范围。'),
+      _buildBenefit(Icons.insights, '长期趋势与周度报告', '在数据充足时生成趋势视图和周度深度报告，并明确数据范围。'),
+      const SizedBox(height: 8),
+      Text('当前支付宝方案为单次购买，不自动续费；支付前会再次展示金额与订单信息。', style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary, height: 1.5)),
     ]);
   }
 
@@ -413,7 +428,7 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Container(
             width: 36, height: 36,
-            decoration: BoxDecoration(color: ShunShiColors.primary.withOpacity(0.08), borderRadius: BorderRadius.circular(10)),
+            decoration: BoxDecoration(color: ShunShiColors.primary.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(10)),
             child: Icon(icon, color: ShunShiColors.primary, size: 18),
           ),
           const SizedBox(width: 12),
