@@ -7,8 +7,9 @@ Safety Audit Log — 每次安全事件记录到数据库
 """
 
 import json
-import uuid
 import logging
+import os
+import uuid
 from datetime import datetime, timezone
 from typing import Optional, List, Dict, Any
 
@@ -22,13 +23,29 @@ class SafetyAuditLog:
 
     TABLE = "safety_audit_logs"
 
+    @staticmethod
+    def _close_test_connection(db) -> None:
+        if db is None or os.environ.get("APP_ENV") != "testing":
+            return
+        from app.database.db import close_test_connection
+
+        close_test_connection(db)
+
+    @staticmethod
+    def _prepare_test_connection(db) -> None:
+        """测试审计写入不应因其他用例持锁而阻塞业务断言。"""
+        if os.environ.get("APP_ENV") == "testing":
+            db.execute("PRAGMA busy_timeout=250")
+
     def __init__(self):
         self._ensure_table()
 
     def _ensure_table(self):
         """确保审计日志表存在"""
+        db = None
         try:
             db = get_db()
+            self._prepare_test_connection(db)
             db.execute(f"""
                 CREATE TABLE IF NOT EXISTS {self.TABLE} (
                     id TEXT PRIMARY KEY,
@@ -58,6 +75,8 @@ class SafetyAuditLog:
             db.commit()
         except Exception as e:
             logger.error("[SafetyAuditLog] 建表失败: %s", e)
+        finally:
+            self._close_test_connection(db)
 
     def log(
         self,
@@ -71,8 +90,10 @@ class SafetyAuditLog:
         latency_ms: float = None,
     ):
         """记录一条安全审计日志"""
+        db = None
         try:
             db = get_db()
+            self._prepare_test_connection(db)
             db.execute(
                 f"INSERT INTO {self.TABLE} "
                 "(id, user_id, event_type, level, content_hash, "
@@ -96,6 +117,8 @@ class SafetyAuditLog:
         except Exception as e:
             logger.error("[SafetyAuditLog] 写入日志失败: %s", e)
             return False
+        finally:
+            self._close_test_connection(db)
 
     def get_logs(
         self,
@@ -106,8 +129,10 @@ class SafetyAuditLog:
         offset: int = 0,
     ) -> List[Dict[str, Any]]:
         """查询审计日志"""
+        db = None
         try:
             db = get_db()
+            self._prepare_test_connection(db)
             conditions = []
             params = []
 
@@ -146,11 +171,15 @@ class SafetyAuditLog:
         except Exception as e:
             logger.error("[SafetyAuditLog] 查询日志失败: %s", e)
             return []
+        finally:
+            self._close_test_connection(db)
 
     def get_stats(self, days: int = 7) -> Dict[str, Any]:
         """获取安全统计信息"""
+        db = None
         try:
             db = get_db()
+            self._prepare_test_connection(db)
             since = datetime.now().isoformat()[:10]  # 简化：按天统计
 
             # 按级别统计
@@ -188,3 +217,5 @@ class SafetyAuditLog:
                 "by_level": {},
                 "by_event_type": {},
             }
+        finally:
+            self._close_test_connection(db)

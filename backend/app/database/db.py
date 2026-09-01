@@ -25,7 +25,9 @@ _local = threading.local()
 
 # 全局锁，用于初始化（仅启动时）
 _init_lock = threading.Lock()
+_test_journal_lock = threading.Lock()
 _initialized = False
+_test_wal_initialized = False
 
 # 测试环境连接追踪（用于批量关闭）
 _test_connections = []
@@ -35,15 +37,20 @@ def _get_connection() -> sqlite3.Connection:
     """获取当前线程的数据库连接"""
     # 测试环境：每次创建新连接，避免并发锁定
     if os.environ.get("APP_ENV") == "testing":
+        global _test_wal_initialized
         DB_DIR.mkdir(parents=True, exist_ok=True)
         conn = sqlite3.connect(str(DB_PATH), check_same_thread=False, timeout=30.0)
         conn.row_factory = sqlite3.Row
         # TestClient serves requests from worker threads. WAL allows readers
         # and writers to coexist and avoids false `database is locked` failures
         # caused by the legacy rollback journal across those connections.
-        conn.execute("PRAGMA journal_mode=WAL")
-        conn.execute("PRAGMA foreign_keys=ON")
         conn.execute("PRAGMA busy_timeout=30000")
+        # journal_mode 是数据库级设置，每条连接重复设置会获取独占锁。
+        with _test_journal_lock:
+            if not _test_wal_initialized:
+                conn.execute("PRAGMA journal_mode=WAL")
+                _test_wal_initialized = True
+        conn.execute("PRAGMA foreign_keys=ON")
         conn.execute("PRAGMA synchronous=NORMAL")
         _test_connections.append(conn)
         return conn
@@ -68,6 +75,16 @@ def close_all_test_connections():
         except Exception:
             pass
     _test_connections.clear()
+
+
+def close_test_connection(db) -> None:
+    """只关闭由本模块创建的单个测试连接。"""
+    if db is None or os.environ.get("APP_ENV") != "testing":
+        return
+    raw_connection = getattr(db, "_conn", db)
+    if raw_connection in _test_connections:
+        db.close()
+        _test_connections.remove(raw_connection)
 
 
 class _TextCompatibleConnection:

@@ -656,9 +656,12 @@ def _get_user_subscription_lazy(user_id: str) -> dict:
 
 def _notify_subscription_expired(user_id: str, old_plan: str):
     """通知用户订阅已过期（写入通知表）"""
+    db = None
     try:
         from app.database.db import get_db
         db = get_db()
+        if os.environ.get("APP_ENV") == "testing":
+            db.execute("PRAGMA busy_timeout=250")
         now = datetime.now(timezone.utc).isoformat()
 
         try:
@@ -694,6 +697,10 @@ def _notify_subscription_expired(user_id: str, old_plan: str):
         db.commit()
     except Exception as e:
         logger.warning(f"[Subscription] 通知失败: {e}")
+    finally:
+        from app.database.db import close_test_connection
+
+        close_test_connection(db)
 
 
 # ============ Helper Functions ============

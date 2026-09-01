@@ -123,48 +123,59 @@ def _get_plan_or_404(plan_id: str) -> dict:
     return plan
 
 
+def _execute_and_commit(sql: str, parameters: tuple) -> None:
+    """执行 Stripe 状态写入并确保失败事务不留锁。"""
+    db = get_db()
+    from app.database.db import close_test_connection
+    try:
+        db.execute(sql, parameters)
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
+    finally:
+        close_test_connection(db)
+
+
 def _activate_subscription(user_id: str, plan_id: str, stripe_customer_id: Optional[str] = None,
                            stripe_subscription_id: Optional[str] = None) -> dict:
     """在数据库中激活用户订阅"""
     db = get_db()
-    now = datetime.now().isoformat()
-    expires_at = (datetime.now() + timedelta(days=30)).isoformat()  # 一个月
-
-    # 更新 users 表的订阅状态
-    db.execute("""
-        UPDATE users SET
-            subscription_plan = ?,
-            is_premium = 1,
-            subscription_expires_at = ?,
-            updated_at = ?
-        WHERE id = ?
-    """, (plan_id, expires_at, now, user_id))
-
-    # 写入 subscriptions 表
-    sub_id = f"sub_{datetime.now().strftime('%Y%m%d%H%M%S')}_{user_id}"
-    db.execute("""
-        INSERT OR REPLACE INTO subscriptions (id, user_id, plan, status, started_at, expires_at, auto_renew, platform, subscribed_at)
-        VALUES (?, ?, ?, 'active', ?, ?, 1, 'stripe', ?)
-    """, (sub_id, user_id, plan_id, now, expires_at, now))
-
-    # 写入购买历史
-    plan = SUBSCRIPTION_PLANS_EN.get(plan_id, SUBSCRIPTION_PLANS_EN["serenity"])
-    db.execute("""
-        INSERT INTO purchase_history (id, user_id, plan, price, platform, receipt, subscribed_at)
-        VALUES (?, ?, ?, ?, 'stripe', ?, ?)
-    """, (f"ph_{sub_id}", user_id, plan_id, int(plan["price"] * 100), stripe_subscription_id or "", now))
-
-    db.commit()
-    logger.info(f"[Stripe] 订阅激活: user={user_id}, plan={plan_id}, expires={expires_at}")
-
-    return {
-        "user_id": user_id,
-        "plan": plan_id,
-        "status": "active",
-        "expires_at": expires_at,
-        "stripe_customer_id": stripe_customer_id,
-        "stripe_subscription_id": stripe_subscription_id,
-    }
+    from app.database.db import close_test_connection
+    try:
+        now = datetime.now().isoformat()
+        expires_at = (datetime.now() + timedelta(days=30)).isoformat()
+        db.execute("""
+            UPDATE users SET subscription_plan = ?, is_premium = 1,
+                subscription_expires_at = ?, updated_at = ? WHERE id = ?
+        """, (plan_id, expires_at, now, user_id))
+        sub_id = f"sub_{datetime.now().strftime('%Y%m%d%H%M%S')}_{user_id}"
+        db.execute("""
+            INSERT OR REPLACE INTO subscriptions
+            (id, user_id, plan, status, started_at, expires_at, auto_renew, platform, subscribed_at)
+            VALUES (?, ?, ?, 'active', ?, ?, 1, 'stripe', ?)
+        """, (sub_id, user_id, plan_id, now, expires_at, now))
+        plan = SUBSCRIPTION_PLANS_EN.get(plan_id, SUBSCRIPTION_PLANS_EN["serenity"])
+        db.execute("""
+            INSERT INTO purchase_history
+            (id, user_id, plan, price, platform, receipt, subscribed_at)
+            VALUES (?, ?, ?, ?, 'stripe', ?, ?)
+        """, (f"ph_{sub_id}", user_id, plan_id, int(plan["price"] * 100), stripe_subscription_id or "", now))
+        db.commit()
+        logger.info(f"[Stripe] 订阅激活: user={user_id}, plan={plan_id}, expires={expires_at}")
+        return {
+            "user_id": user_id,
+            "plan": plan_id,
+            "status": "active",
+            "expires_at": expires_at,
+            "stripe_customer_id": stripe_customer_id,
+            "stripe_subscription_id": stripe_subscription_id,
+        }
+    except Exception:
+        db.rollback()
+        raise
+    finally:
+        close_test_connection(db)
 
 
 # ============ API Endpoints ============
@@ -350,11 +361,9 @@ async def stripe_webhook(request: Request):
 
             # 保存 stripe_customer_id 到用户表
             if customer_id:
-                db = get_db()
-                db.execute("""
+                _execute_and_commit("""
                     UPDATE users SET stripe_customer_id = ? WHERE id = ?
                 """, (customer_id, user_id))
-                db.commit()
 
             result = _activate_subscription(user_id, plan_id, customer_id, subscription_id)
             logger.info(f"[Stripe] 订阅已激活: user={user_id}, plan={plan_id}")
@@ -366,20 +375,17 @@ async def stripe_webhook(request: Request):
             status = data.get("status")
 
             if user_id and new_plan_id and status == "active":
-                db = get_db()
-                db.execute("""
+                _execute_and_commit("""
                     UPDATE users SET subscription_plan = ?, updated_at = ?
                     WHERE id = ?
                 """, (new_plan_id, datetime.now().isoformat(), user_id))
-                db.commit()
                 logger.info(f"[Stripe] 订阅更新: user={user_id}, plan={new_plan_id}")
 
         elif event_type == "customer.subscription.deleted":
             # 订阅取消/过期
             user_id = data.get("metadata", {}).get("user_id", "")
             if user_id:
-                db = get_db()
-                db.execute("""
+                _execute_and_commit("""
                     UPDATE users SET
                         subscription_plan = 'free',
                         is_premium = 0,
@@ -387,7 +393,6 @@ async def stripe_webhook(request: Request):
                         updated_at = ?
                     WHERE id = ?
                 """, (datetime.now().isoformat(), user_id))
-                db.commit()
                 logger.info(f"[Stripe] 订阅已取消: user={user_id}")
 
         elif event_type == "invoice.payment_failed":
