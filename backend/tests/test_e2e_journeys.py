@@ -633,6 +633,7 @@ class TestSubscriptionJourney:
         assert data["subscription"]["status"] == "active", "订阅应已激活"
 
         # 验证订阅状态
+        monkeypatch.setenv("APP_ENV", "testing")
         resp = await client.get(
             "/api/v1/subscription/status",
             params={"user_id": "user-e2e-sub"},

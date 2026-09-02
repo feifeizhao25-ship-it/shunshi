@@ -136,10 +136,16 @@ async def _verify_with_apple(
         pending_renewal = data.get("pending_renewal_info", [])
 
         bundle_id = receipt.get("bundle_id")
-        if bundle_id and bundle_id != BUNDLE_ID:
+        if not bundle_id or bundle_id != BUNDLE_ID:
             logger.warning(
                 f"[AppleReceipt] bundle_id 不匹配: expected={BUNDLE_ID}, got={bundle_id}"
             )
+            return {
+                "valid": False,
+                "status": -1,
+                "bundle_id": bundle_id,
+                "error": "Apple 收据所属应用不匹配",
+            }
 
         # 提取最新交易信息
         transaction_info = latest_receipt[0] if latest_receipt else {}

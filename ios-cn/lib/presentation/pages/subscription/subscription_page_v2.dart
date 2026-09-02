@@ -3,9 +3,8 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../../../design_system/theme.dart';
-import '../../../data/datasources/subscription_service.dart';
+import '../../../data/services/store_service.dart';
 
 class SubscriptionPageV2 extends StatefulWidget {
   const SubscriptionPageV2({super.key});
@@ -20,24 +19,13 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
   Future<void> _purchaseAnnual() async {
     setState(() => _purchasing = true);
     try {
-      final order = await SubscriptionService.createOrder('yiyang_yearly');
-      final paymentUrl = order?.paymentUrl;
-      if (order == null || paymentUrl == null || paymentUrl.isEmpty) {
-        throw Exception('支付渠道未返回有效链接');
-      }
-      final launched = await launchUrl(
-        Uri.parse(paymentUrl),
-        mode: LaunchMode.externalApplication,
-      );
-      if (!launched) throw Exception('无法打开支付宝');
-      final status = await SubscriptionService.pollOrderStatus(order.orderId);
+      final store = StoreService();
+      if (!store.isAvailable) throw Exception('当前设备暂不支持 App Store 内购');
+      final launched = await store.purchase('yiyang_yearly');
+      if (!launched) throw Exception('未能发起 App Store 购买');
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            status == 'paid' ? '支付已确认，会员权益已生效' : '尚未收到支付确认，可稍后刷新会员状态',
-          ),
-        ),
+        const SnackBar(content: Text('购买请求已提交，服务端验证收据后会员权益将自动生效')),
       );
     } catch (error) {
       if (mounted) {

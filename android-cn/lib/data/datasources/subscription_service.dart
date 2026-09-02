@@ -15,12 +15,14 @@ class SubscriptionService {
   );
 
   /// 获取订阅计划列表
-  static Future<List<SubscriptionPlan>> getPlans() async {
+  static Future<List<SubscriptionPlan>> getPlans({
+    String platform = 'alipay',
+  }) async {
     try {
       final userId = await _getUserId();
       final res = await _dio.get(
         '/api/v1/subscription/products',
-        queryParameters: {'platform': 'alipay', 'user_id': userId},
+        queryParameters: {'platform': platform, 'user_id': userId},
       );
       if (res.data?['success'] == true) {
         final List data = res.data['data']['products'];
@@ -60,11 +62,17 @@ class SubscriptionService {
   static Future<SubscriptionOrder?> createOrder(
     String planId, {
     int period = 1,
+    String platform = 'alipay',
+    String paymentScene = 'native',
   }) async {
     try {
       final res = await _dio.post(
         '/api/v1/subscription/create-order',
-        data: {'product_id': planId, 'platform': 'alipay'},
+        data: {
+          'product_id': planId,
+          'platform': platform,
+          'payment_scene': paymentScene,
+        },
         options: Options(headers: _authHeaders()),
       );
       if (res.data?['success'] == true) {

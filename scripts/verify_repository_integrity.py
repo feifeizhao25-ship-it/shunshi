@@ -50,8 +50,9 @@ for forbidden in ("--passWithNoTests", "continue-on-error: true", "|| true"):
         errors.append(f".github/workflows/ci.yml: forbidden false-green option {forbidden}")
 
 payment_sources = {
-    "backend/app/router/subscription.py": ("mock=1", "MOCK_QR_CODE", "MOCK_TRADE"),
+    "backend/app/router/subscription.py": ("mock=1", "MOCK_QR_CODE", "MOCK_TRADE", "_mock_verify_receipt"),
     "backend/app/services/alipay_service.py": ('ALIPAY_MODE", "mock', "跳过回调验签"),
+    "backend/app/services/wechat_pay_service.py": ("MOCK_TRANSACTION", "跳过回调验签"),
     "android-cn/lib/presentation/pages/subscription/subscription_page_v2.dart": ("_simulatePaymentSuccess", "setBool('is_subscribed', true)"),
     "ios-cn/lib/data/datasources/subscription_service.dart": ("_mockOrder",),
     "ios-cn/lib/presentation/pages/subscription/subscription_page_v2.dart": ("setBool('is_subscribed', true)",),
@@ -62,14 +63,60 @@ for relative, forbidden_values in payment_sources.items():
         if forbidden in source:
             errors.append(f"{relative}: forbidden synthetic payment behavior {forbidden!r}")
 
+subscription_source = (ROOT / "backend/app/router/subscription.py").read_text(encoding="utf-8")
+for required in ('"code": "payment_required"', "付费会员请通过创建订单接口完成支付"):
+    if required not in subscription_source:
+        errors.append(f"backend/app/router/subscription.py: legacy paid subscription bypass is not closed ({required!r})")
+for forbidden in ("cs_test_mock", "verified = True", "_mock_verify_receipt"):
+    if forbidden in subscription_source:
+        errors.append(f"backend/app/router/subscription.py: synthetic payment acceptance remains ({forbidden!r})")
+for required in (
+    "国内版不支持 Stripe，请使用支付宝或微信支付",
+    "国内版 Stripe 回调已停用",
+    "客户端验签入口已停用",
+    "请使用 POST /verify-receipt-v2",
+):
+    if required not in subscription_source:
+        errors.append(f"backend/app/router/subscription.py: unsafe legacy payment route is not retired ({required!r})")
+
+wechat_service = (ROOT / "backend/app/services/wechat_pay_service.py").read_text(encoding="utf-8")
+for required in (
+    "WECHATPAY2-SHA256-RSA2048",
+    "AEAD_AES_256_GCM",
+    "WECHAT_PAY_PLATFORM_SERIAL_NO",
+    "abs(int(time.time()) - epoch) > 300",
+    'amount": {"total": int(product["price_cents"]), "currency": "CNY"}',
+):
+    if required not in wechat_service:
+        errors.append(f"backend/app/services/wechat_pay_service.py: verified WeChat Pay flow is missing {required!r}")
+
+wechat_callback = (ROOT / "backend/app/router/wechat_pay.py").read_text(encoding="utf-8")
+for required in ("activate_verified_domestic_payment", 'amount.get("currency") != "CNY"'):
+    if required not in wechat_callback:
+        errors.append(f"backend/app/router/wechat_pay.py: verified activation is missing {required!r}")
+
+apple_receipt = (ROOT / "backend/app/services/apple_receipt.py").read_text(encoding="utf-8")
+for required in ('if not bundle_id or bundle_id != BUNDLE_ID:', '"valid": False', "Apple 收据所属应用不匹配"):
+    if required not in apple_receipt:
+        errors.append(f"backend/app/services/apple_receipt.py: receipt ownership validation is missing {required!r}")
+
+android_payment_ui = (ROOT / "android-cn/lib/presentation/pages/subscription/subscription_page_v2.dart").read_text(encoding="utf-8")
+for required in ("WechatPayClient.pay", "QrImageView", "pollOrderStatus", "status == 'paid'"):
+    if required not in android_payment_ui:
+        errors.append(f"android-cn/lib/presentation/pages/subscription/subscription_page_v2.dart: real payment flow is missing {required!r}")
+
+ios_payment_ui = (ROOT / "ios-cn/lib/presentation/pages/subscription/subscription_page_v2.dart").read_text(encoding="utf-8")
+for required in ("StoreService", "purchase('yiyang_yearly')", "服务端验证收据"):
+    if required not in ios_payment_ui:
+        errors.append(f"ios-cn/lib/presentation/pages/subscription/subscription_page_v2.dart: App Store flow is missing {required!r}")
+
 for relative in (
-    "android-cn/lib/presentation/pages/subscription/subscription_page_v2.dart",
-    "ios-cn/lib/presentation/pages/subscription/subscription_page_v2.dart",
+    "android-cn/lib/data/services/store_service.dart",
+    "ios-cn/lib/data/services/store_service.dart",
 ):
     source = (ROOT / relative).read_text(encoding="utf-8")
-    for required in ("paymentUrl", "launchUrl", "pollOrderStatus", "status == 'paid'"):
-        if required not in source:
-            errors.append(f"{relative}: real payment confirmation flow is missing {required!r}")
+    if "return true; // 模拟模式" in source or "pendingCompletePurchase && platformVerified" not in source:
+        errors.append(f"{relative}: store receipt validation must fail closed before completing a purchase")
 
 for relative in (
     "android-cn/lib/data/datasources/subscription_service.dart",

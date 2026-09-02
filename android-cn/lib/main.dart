@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/router/app_router.dart';
 import 'data/storage/storage_manager.dart';
 import 'data/services/notification_service.dart';
+import 'data/services/wechat_pay_client.dart';
 import 'design_system/theme.dart';
 import 'presentation/widgets/error_boundary.dart';
 
@@ -15,6 +16,7 @@ void main() async {
   Future.wait([
     StorageManager.init(),
     NotificationService().init(),
+    WechatPayClient.initialize(),
   ]).catchError((Object e) {
     debugPrint('Init error: $e');
     return <void>[];

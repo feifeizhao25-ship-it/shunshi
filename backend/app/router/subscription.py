@@ -32,6 +32,8 @@ def _payment_user(
     if credentials is not None:
         settings = getattr(request.app.state, "settings", None)
         if settings is None:
+            if os.getenv("APP_ENV") == "testing":
+                return user_id or "user-001"
             raise HTTPException(status_code=503, detail="认证配置不可用")
         return verify_token(settings, credentials.credentials)
     if os.getenv("APP_ENV") == "testing":
@@ -307,6 +309,11 @@ SUBSCRIPTION_PRODUCTS = [
     },
 ]
 
+SUBSCRIPTION_PRODUCTS.extend(
+    [{**product, "platform": "wechat"} for product in list(SUBSCRIPTION_PRODUCTS)
+     if product["platform"] == "alipay"]
+)
+
 
 # ============ In-memory storage (生产环境用数据库) ============
 
@@ -406,6 +413,7 @@ class CreateOrderRequest(BaseModel):
     """创建订单请求"""
     product_id: str = Field(..., description="产品 SKU ID")
     platform: str = Field("alipay", description="支付平台: alipay/apple/wechat")
+    payment_scene: str = Field("native", description="微信支付场景: native 或 app")
 
 
 class CancelOrderRequest(BaseModel):
@@ -1136,7 +1144,14 @@ async def create_order(
     if product is None:
         raise HTTPException(status_code=400, detail="商品与支付平台不匹配")
 
+    current_sub = get_user_subscription(user_id)
+    new_tier = product["tier"]
+    if TIER_ORDER.get(new_tier, 0) <= TIER_ORDER.get(current_sub.plan, 0):
+        if current_sub.plan == new_tier and current_sub.status == "active":
+            raise HTTPException(status_code=400, detail="当前已是该等级会员，无需重复购买")
+
     alipay_result = None
+    wechat_result = None
     if request.platform == "alipay":
         from app.services.alipay_service import alipay_service
         sku = {"jiahe_monthly": "family_monthly", "jiahe_yearly": "family_yearly"}.get(
@@ -1148,17 +1163,22 @@ async def create_order(
             raise HTTPException(status_code=503, detail=str(exc)) from exc
         except ValueError as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
-
-    # 检查是否已是同等级（同平台不允许重复购买）
-    current_sub = get_user_subscription(user_id)
-    new_tier = product["tier"]
-    if TIER_ORDER.get(new_tier, 0) <= TIER_ORDER.get(current_sub.plan, 0):
-        if current_sub.plan == new_tier and current_sub.status == "active":
-            raise HTTPException(status_code=400, detail="当前已是该等级会员，无需重复购买")
+    elif request.platform == "wechat":
+        from app.services.wechat_pay_service import wechat_pay_service
+        try:
+            wechat_result = await wechat_pay_service.create_order(
+                product=product, user_id=user_id, payment_scene=request.payment_scene
+            )
+        except RuntimeError as exc:
+            raise HTTPException(status_code=503, detail=str(exc)) from exc
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
 
     now = datetime.now(timezone.utc)
     now_iso = now.isoformat()
-    order_no = alipay_result.order_no if alipay_result else generate_order_no()
+    order_no = alipay_result.order_no if alipay_result else (
+        wechat_result.order_no if wechat_result else generate_order_no()
+    )
     order_id = str(uuid.uuid4())
 
     # 订单过期时间（30分钟）
@@ -1205,6 +1225,12 @@ async def create_order(
 
     if request.platform == "alipay":
         pay_params["pay_url"] = alipay_result.pay_url
+    elif request.platform == "wechat":
+        pay_params["payment_scene"] = wechat_result.payment_scene
+        if wechat_result.pay_url:
+            pay_params["pay_url"] = wechat_result.pay_url
+        if wechat_result.app_pay_params:
+            pay_params["app_pay_params"] = wechat_result.app_pay_params
     elif request.platform == "apple":
         pay_params["product_id"] = product["product_id"]
 
@@ -1422,7 +1448,7 @@ def _product_id_to_plan(product_id: str) -> Optional[str]:
 @router.post("/restore", response_model=dict)
 async def restore_purchase(
     request: RestorePurchaseRequest,
-    user_id: str = Query("user-001"),
+    user_id: str = Depends(_payment_user),
 ):
     """
     恢复购买（增强版）
@@ -1446,7 +1472,7 @@ async def restore_purchase(
         "user_id": "xxx" (可选)
     }
     """
-    effective_user_id = request.user_id or user_id
+    effective_user_id = user_id
     now = datetime.now(timezone.utc)
 
     # ── 平台验证 ──
@@ -1661,7 +1687,7 @@ async def restore_purchase(
 # ---- 当前订阅状态 ----
 
 @router.get("/status", response_model=dict)
-async def get_subscription_status(user_id: str = Query("user-001")):
+async def get_subscription_status(user_id: str = Depends(_payment_user)):
     """获取当前订阅状态"""
     sub = get_user_subscription(user_id)
     seats_info = get_family_seats_info(user_id)
@@ -1800,26 +1826,27 @@ def _get_plan_description(plan_id: str) -> str:
 @router.post("/subscribe", response_model=dict)
 async def subscribe(
     request: SubscribeRequest,
-    user_id: str = Query("user-001")
+    user_id: str = Depends(_payment_user),
 ):
-    """订阅/升级（向后兼容）"""
+    """旧入口仅允许选择免费版；付费会员必须走服务端验签支付流程。"""
     plan_id = request.plan
 
     if plan_id not in SUBSCRIPTION_PLANS:
         raise HTTPException(status_code=400, detail="订阅计划不存在")
 
     plan = SUBSCRIPTION_PLANS[plan_id]
-
-    if plan["price"] == 0:
-        expires_at = None
-    else:
-        expires_at = (datetime.now(timezone.utc) + timedelta(days=365)).isoformat()
+    if plan["price"] != 0:
+        return {
+            "success": False,
+            "code": "payment_required",
+            "message": "付费会员请通过创建订单接口完成支付",
+        }
 
     subscriptions[user_id] = {
         "plan": plan_id,
         "status": "active",
-        "expires_at": expires_at,
-        "auto_renew": True if plan.get("price", 0) > 0 else False,
+        "expires_at": None,
+        "auto_renew": False,
         "platform": request.platform,
         "subscribed_at": datetime.now(timezone.utc).isoformat()
     }
@@ -1831,7 +1858,6 @@ async def subscribe(
         "plan": plan_id,
         "price": plan.get("price", 0),
         "platform": request.platform,
-        "receipt": request.receipt,
         "subscribed_at": datetime.now(timezone.utc).isoformat()
     })
 
@@ -1840,14 +1866,14 @@ async def subscribe(
         "data": {
             "plan": plan_id,
             "status": "active",
-            "expires_at": expires_at,
+            "expires_at": None,
             "features": plan["features"]
         }
     }
 
 
 @router.post("/cancel", response_model=dict)
-async def cancel_subscription(user_id: str = Query("user-001")):
+async def cancel_subscription(user_id: str = Depends(_payment_user)):
     """取消订阅"""
     if user_id in subscriptions:
         sub = subscriptions[user_id]
@@ -1863,58 +1889,16 @@ async def cancel_subscription(user_id: str = Query("user-001")):
 
 
 @router.post("/restore-purchase", response_model=dict)
-async def restore_purchase_v2(request: RestorePurchaseRequest, user_id: str = Query("user-001")):
-    """恢复购买 (v2，向后兼容)"""
-    if user_id not in purchase_history or not purchase_history[user_id]:
-        return {"success": False, "message": "未找到购买记录"}
-
-    target_purchase = None
-    for purchase in reversed(purchase_history[user_id]):
-        if purchase.get("platform") in (request.platform, f"iap_{request.platform}"):
-            target_purchase = purchase
-            break
-
-    if not target_purchase:
-        return {"success": False, "message": f"未找到 {request.platform} 平台的购买记录"}
-
-    plan_id = target_purchase["plan"]
-    plan = SUBSCRIPTION_PLANS[plan_id]
-    now = datetime.now(timezone.utc)
-
-    expires_at = (now + timedelta(days=365)).isoformat()
-
-    subscriptions[user_id] = {
-        "plan": plan_id,
-        "status": "active",
-        "expires_at": expires_at,
-        "auto_renew": True,
-        "platform": request.platform,
-        "restored": True,
-        "restored_at": now.isoformat(),
-        "features": plan["features"],
-    }
-
-    _init_family_seats(user_id, plan_id)
-
-    _write_audit_log("purchase_restored", user_id, {
-        "plan": plan_id,
-        "platform": request.platform,
-        "original_order": target_purchase.get("order_id"),
-    })
-
-    return {
-        "success": True,
-        "data": {
-            "plan": plan_id,
-            "expires_at": expires_at,
-            "features": plan["features"],
-            "message": "订阅已恢复",
-        }
-    }
+async def restore_purchase_v2(
+    request: RestorePurchaseRequest,
+    user_id: str = Depends(_payment_user),
+):
+    """旧路径复用正式平台验证，不允许仅凭本地历史延长权益。"""
+    return await restore_purchase(request, user_id=user_id)
 
 
 @router.get("/history", response_model=dict)
-async def get_purchase_history(user_id: str = Query("user-001")):
+async def get_purchase_history(user_id: str = Depends(_payment_user)):
     """获取购买历史"""
     history = purchase_history.get(user_id, [])
 
@@ -1928,110 +1912,40 @@ async def get_purchase_history(user_id: str = Query("user-001")):
 async def verify_receipt(
     receipt: str = Query(...),
     platform: str = Query("ios"),
-    user_id: str = Query("user-001")
+    user_id: str = Depends(_payment_user),
 ):
-    """验证收据 (Apple/Google) - Query 参数方式（向后兼容）"""
-    verified = True
-    plan_id = "yiyang"
-
-    if verified:
-        expires_at = (datetime.now(timezone.utc) + timedelta(days=365)).isoformat()
-
-        subscriptions[user_id] = {
-            "plan": plan_id,
-            "status": "active",
-            "expires_at": expires_at,
-            "auto_renew": True,
-            "platform": platform,
-            "verified": True,
-            "verified_at": datetime.now(timezone.utc).isoformat()
-        }
-
-        return {
-            "success": True,
-            "data": {
-                "plan": plan_id,
-                "expires_at": expires_at
-            }
-        }
-
-    return {
-        "success": False,
-        "message": "验证失败"
-    }
+    """查询参数会泄露收据且旧实现未验签，因此永久停用。"""
+    del receipt, platform, user_id
+    raise HTTPException(status_code=410, detail="请使用 POST /verify-receipt-v2")
 
 
 @router.post("/verify-receipt-v2", response_model=dict)
-async def verify_receipt_v2(request: ReceiptVerifyBody):
-    """验证应用内购收据 v2 - 支持 POST JSON Body"""
-    platform = request.platform
-    receipt_data = request.receipt_data
-    plan_id = request.plan or "yiyang"
-    user_id = request.user_id or "user-001"
-
-    if not receipt_data:
+async def verify_receipt_v2(
+    request: ReceiptVerifyBody,
+    user_id: str = Depends(_payment_user),
+):
+    """验证应用内购收据；权益只取平台验证结果，不信任客户端计划或用户。"""
+    if not request.receipt_data:
         raise HTTPException(status_code=400, detail="收据数据不能为空")
-
-    if plan_id not in SUBSCRIPTION_PLANS:
-        plan_id = "yiyang"
-
-    verified = _mock_verify_receipt(platform, receipt_data, product_id=request.product_id)
-
-    if verified:
-        plan = SUBSCRIPTION_PLANS[plan_id]
-        expires_at = (datetime.now(timezone.utc) + timedelta(days=365)).isoformat()
-
-        subscriptions[user_id] = {
-            "plan": plan_id,
-            "status": "active",
-            "expires_at": expires_at,
-            "auto_renew": True,
-            "platform": f"iap_{platform}",
-            "product_id": request.product_id,
-            "receipt_data_hash": str(hash(receipt_data))[:16],
-            "verified": True,
-            "verified_at": datetime.now(timezone.utc).isoformat(),
-            "activated_at": datetime.now(timezone.utc).isoformat(),
-        }
-
-        if user_id not in purchase_history:
-            purchase_history[user_id] = []
-        purchase_history[user_id].append({
-            "plan": plan_id,
-            "price": plan.get("price", 0),
-            "platform": f"iap_{platform}",
-            "product_id": request.product_id,
-            "subscribed_at": datetime.now(timezone.utc).isoformat()
-        })
-
-        logger.info(f"[IAP] 收据验证成功: user={user_id}, plan={plan_id}, platform={platform}")
-
-        return {
-            "success": True,
-            "data": {
-                "plan": plan_id,
-                "status": "active",
-                "expires_at": expires_at,
-                "features": plan["features"],
-            }
-        }
-
-    logger.warning(f"[IAP] 收据验证失败: user={user_id}, platform={platform}")
-    return {
-        "success": False,
-        "message": "Receipt verification failed"
-    }
-
-
-def _mock_verify_receipt(platform: str, receipt_data: str, product_id: str = None) -> bool:
-    """模拟收据验证"""
-    return bool(receipt_data and len(receipt_data) > 10)
+    if request.platform not in {"ios", "android"}:
+        raise HTTPException(status_code=400, detail="不支持的内购平台")
+    restore_request = RestorePurchaseRequest(
+        platform=request.platform,
+        receipt=request.receipt_data if request.platform == "ios" else None,
+        purchase_token=request.receipt_data if request.platform == "android" else None,
+        product_id=request.product_id,
+        user_id=user_id,
+    )
+    return await restore_purchase(restore_request, user_id=user_id)
 
 
 # ---- 旧版发起支付（兼容） ----
 
 @router.post("/purchase", response_model=dict)
-async def create_purchase(request: PurchaseRequest, user_id: str = Query("user-001")):
+async def create_purchase(
+    request: PurchaseRequest,
+    user_id: str = Depends(_payment_user),
+):
     """旧路径复用正式创建订单逻辑，不维护第二套支付实现。"""
     return await create_order(
         CreateOrderRequest(product_id=request.product_id, platform=request.platform), user_id
@@ -2043,104 +1957,17 @@ async def create_purchase(request: PurchaseRequest, user_id: str = Query("user-0
 @router.post("/verify", response_model=dict)
 async def verify_purchase(request: PurchaseVerifyRequest):
     """支付回调验签（向后兼容）"""
-    order = payment_orders.get(request.order_id)
-
-    if not order:
-        raise HTTPException(status_code=404, detail="订单不存在")
-
-    if order["status"] == "paid":
-        return {
-            "success": True,
-            "data": {
-                "order_id": request.order_id,
-                "status": "already_paid",
-                "message": "订单已支付",
-            }
-        }
-
-    if order["status"] != "pending":
-        raise HTTPException(status_code=400, detail=f"订单状态不正确: {order['status']}")
-
-    now = datetime.now(timezone.utc)
-    now_iso = now.isoformat()
-
-    verified = await _verify_payment_signature(request, order)
-
-    if not verified:
-        order["status"] = "failed"
-        _write_audit_log("payment_verify_failed", order["user_id"], {
-            "order_id": request.order_id,
-            "reason": "signature verification failed",
-        })
-        raise HTTPException(status_code=400, detail="签名验证失败")
-
-    order["status"] = "paid"
-    order["paid_at"] = now_iso
-    order["transaction_id"] = request.transaction_id or f"TXN_{uuid.uuid4().hex[:16]}"
-
-    tier = order["tier"]
-    product_info = SUBSCRIPTION_PLANS.get(tier, SUBSCRIPTION_PLANS["free"])
-
-    duration_days = 365
-    for p in SUBSCRIPTION_PRODUCTS:
-        if p["product_id"] == order["product_id"]:
-            duration_days = p["duration_days"]
-            break
-
-    expires_at = (now + timedelta(days=duration_days)).isoformat()
-
-    subscriptions[order["user_id"]] = {
-        "plan": tier,
-        "status": "active",
-        "expires_at": expires_at,
-        "auto_renew": True,
-        "platform": order["platform"],
-        "order_id": order["id"],
-        "activated_at": now_iso,
-        "features": product_info["features"],
-    }
-
-    _init_family_seats(order["user_id"], tier, order["id"])
-
-    if order["user_id"] not in purchase_history:
-        purchase_history[order["user_id"]] = []
-    purchase_history[order["user_id"]].append({
-        "plan": tier,
-        "price_cents": order["amount_cents"],
-        "platform": order["platform"],
-        "order_id": order["id"],
-        "trade_no": order["transaction_id"],
-        "subscribed_at": now_iso,
-    })
-
-    _write_audit_log("payment_verified", order["user_id"], {
-        "order_id": request.order_id,
-        "tier": tier,
-        "amount_cents": order["amount_cents"],
-        "transaction_id": order["transaction_id"],
-    })
-
-    return {
-        "success": True,
-        "data": {
-            "order_id": order["id"],
-            "transaction_id": order["transaction_id"],
-            "plan": tier,
-            "status": "paid",
-            "subscription": {
-                "plan": tier,
-                "expires_at": expires_at,
-                "status": "active",
-                "features": product_info["features"],
-            }
-        }
-    }
+    del request
+    raise HTTPException(status_code=410, detail="客户端验签入口已停用，请使用支付平台异步通知")
 
 
 # ============ 支付宝兼容接口 ============
 
 @router.post("/alipay/create-order", response_model=dict)
-async def alipay_create_order(request: AlipayOrderRequest):
+async def alipay_create_order(
+    request: AlipayOrderRequest,
+    user_id: str = Depends(_payment_user),
+):
     """创建支付宝订单（向后兼容）"""
     if request.plan not in SUBSCRIPTION_PLANS:
         raise HTTPException(status_code=400, detail="订阅计划不存在")
@@ -2149,7 +1976,7 @@ async def alipay_create_order(request: AlipayOrderRequest):
         raise HTTPException(status_code=400, detail="免费方案无需创建支付订单")
     return await create_order(
         CreateOrderRequest(product_id=f"{request.plan}_yearly", platform="alipay"),
-        request.user_id,
+        user_id,
     )
 
 
@@ -2222,95 +2049,20 @@ async def alipay_query_order(
     }
 
 
-# ============ Stripe 模拟支付接口 ============
+# ============ Stripe 旧接口（国内版永久停用） ============
 
 @router.post("/stripe/create-checkout", response_model=dict)
 async def stripe_create_checkout(request: StripeCheckoutRequest):
-    """创建 Stripe checkout session"""
-    if request.plan not in SUBSCRIPTION_PLANS:
-        raise HTTPException(status_code=400, detail="订阅计划不存在")
-
-    plan = SUBSCRIPTION_PLANS[request.plan]
-
-    session_id = f"cs_test_{uuid.uuid4().hex}"
-
-    logger.info(f"[Stripe] Checkout 创建: {session_id}, plan={request.plan}")
-
-    return {
-        "success": True,
-        "data": {
-            "session_id": session_id,
-            "plan": request.plan,
-            "amount": plan.get("price", 0),
-            "currency": "usd",
-            "status": "pending",
-            "url": f"https://checkout.stripe.com/c/pay/cs_test_mock?plan={request.plan}",
-            "success_url": request.success_url,
-            "cancel_url": request.cancel_url,
-        }
-    }
+    """国内版不创建 Stripe 测试会话。"""
+    del request
+    raise HTTPException(status_code=410, detail="国内版不支持 Stripe，请使用支付宝或微信支付")
 
 
 @router.post("/stripe/webhook", response_model=dict)
 async def stripe_webhook(request: StripeWebhookRequest):
-    """Stripe webhook 接收端"""
-    event_type = request.type
-    logger.info(f"[Stripe] Webhook 收到: {event_type}")
-
-    if event_type == "checkout.session.completed":
-        session_data = request.data or {}
-        user_id = session_data.get("metadata", {}).get("user_id", "user-001")
-        plan_id = session_data.get("metadata", {}).get("plan", "yiyang")
-
-        if plan_id not in SUBSCRIPTION_PLANS:
-            plan_id = "yiyang"
-
-        plan = SUBSCRIPTION_PLANS[plan_id]
-        now = datetime.now(timezone.utc)
-        expires_at = (now + timedelta(days=365)).isoformat()
-
-        subscriptions[user_id] = {
-            "plan": plan_id,
-            "status": "active",
-            "expires_at": expires_at,
-            "auto_renew": True,
-            "platform": "stripe",
-            "stripe_session": session_data.get("id"),
-            "activated_at": now.isoformat(),
-        }
-
-        _init_family_seats(user_id, plan_id)
-
-        if user_id not in purchase_history:
-            purchase_history[user_id] = []
-        purchase_history[user_id].append({
-            "plan": plan_id,
-            "price": plan.get("price", 0),
-            "platform": "stripe",
-            "stripe_session": session_data.get("id"),
-            "subscribed_at": now.isoformat()
-        })
-
-        _write_audit_log("stripe_webhook_completed", user_id, {
-            "plan": plan_id,
-            "session_id": session_data.get("id"),
-        })
-
-        return {"success": True, "message": "订阅已激活"}
-
-    elif event_type == "customer.subscription.deleted":
-        session_data = request.data or {}
-        user_id = session_data.get("metadata", {}).get("user_id", "user-001")
-        if user_id in subscriptions:
-            subscriptions[user_id]["status"] = "cancelled"
-            subscriptions[user_id]["auto_renew"] = False
-        return {"success": True, "message": "订阅已取消"}
-
-    elif event_type == "invoice.payment_failed":
-        logger.warning(f"[Stripe] 支付失败")
-        return {"success": True, "message": "支付失败已记录"}
-
-    return {"success": True, "message": f"事件 {event_type} 已接收"}
+    """国内版不接收 Stripe 事件，避免未验签事件开通权益。"""
+    del request
+    raise HTTPException(status_code=410, detail="国内版 Stripe 回调已停用")
 
 
 # ============ 过期检查（向后兼容） ============
@@ -2335,7 +2087,7 @@ async def check_expiry():
 # ============ 使用量统计 ============
 
 @router.get("/usage", response_model=dict)
-async def get_usage_stats(user_id: str = Query("user-001")):
+async def get_usage_stats(user_id: str = Depends(_payment_user)):
     """获取用户使用量统计"""
     stats = usage_stats.get(user_id, {
         "chat_count": 0,
@@ -2373,7 +2125,7 @@ async def get_usage_stats(user_id: str = Query("user-001")):
 
 @router.post("/usage/record", response_model=dict)
 async def record_usage_endpoint(
-    user_id: str = Query("user-001"),
+    user_id: str = Depends(_payment_user),
     type: str = Query(...),
     amount: int = Query(1),
 ):

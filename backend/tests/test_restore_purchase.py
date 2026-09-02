@@ -139,7 +139,8 @@ class TestIOSRestorePurchase:
 
         assert response.status_code == 200
         data = response.json()
-        assert data.get("success") is True
+        assert data.get("success") is False
+        assert data["code"] == "no_history"
 
 
 # ==================== Android 恢复购买 ====================
@@ -230,7 +231,8 @@ class TestAndroidRestorePurchase:
 
         assert response.status_code == 200
         data = response.json()
-        assert data.get("success") is True
+        assert data.get("success") is False
+        assert data["code"] == "no_history"
 
 
 # ==================== 边界情况 ====================

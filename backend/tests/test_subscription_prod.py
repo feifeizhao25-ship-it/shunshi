@@ -87,18 +87,14 @@ class TestCreateOrder:
         assert response.status_code == 400
 
     def test_create_stripe_checkout(self, client):
-        """创建 Stripe checkout"""
+        """国内版不得创建 Stripe 测试会话。"""
         response = client.post("/api/v1/subscription/stripe/create-checkout", json={
             "user_id": "test-user-001",
             "plan": "yiyang",
             "success_url": "https://app.shunshi.com/success",
             "cancel_url": "https://app.shunshi.com/cancel",
         })
-        assert response.status_code == 200
-        data = response.json()
-        assert data.get("success") is True
-        checkout = data.get("data", {})
-        assert "session_id" in checkout, "Stripe checkout 应有 session_id"
+        assert response.status_code == 410
 
 
 # ==================== 支付验签 ====================
@@ -188,7 +184,7 @@ class TestSubscriptionActivation:
         assert sub_data.get("expires_at") is None
 
     def test_stripe_webhook_activates_subscription(self, client):
-        """Stripe webhook 应激活订阅"""
+        """国内版未验签 Stripe webhook 不得激活订阅。"""
         webhook_resp = client.post(
             "/api/v1/subscription/stripe/webhook",
             json={
@@ -204,12 +200,12 @@ class TestSubscriptionActivation:
             },
             headers={"Stripe-Signature": "mock_sig"},
         )
-        assert webhook_resp.status_code == 200
+        assert webhook_resp.status_code == 410
 
         # 验证订阅已激活
         sub_resp = client.get("/api/v1/subscription?user_id=complete-test-user")
         sub_data = sub_resp.json().get("data", {})
-        assert sub_data.get("status") == "active", "Stripe webhook 后订阅应激活"
+        assert sub_data.get("plan") == "free"
 
 
 # ==================== 恢复购买 ====================
@@ -293,8 +289,8 @@ class TestSubscriptionExpired:
 class TestUpgradeSubscription:
     """升级会员（补差价）"""
 
-    def test_upgrade_from_yangxin_to_yiyang(self, client):
-        """从养心版升级到颐养版"""
+    def test_paid_upgrade_requires_verified_payment(self, client):
+        """旧订阅接口不得绕过支付升级会员。"""
         # 先订阅养心版
         client.post(
             "/api/v1/subscription/subscribe",
@@ -310,17 +306,18 @@ class TestUpgradeSubscription:
         )
         assert upgrade_resp.status_code == 200
         data = upgrade_resp.json()
-        assert data.get("success") is True
+        assert data.get("success") is False
+        assert data.get("code") == "payment_required"
 
         # 验证已升级
         sub_resp = client.get("/api/v1/subscription?user_id=test-user-001")
         sub_data = sub_resp.json().get("data", {})
-        assert sub_data.get("plan") == "yiyang", (
-            f"升级后计划应为 yiyang，实际: {sub_data.get('plan')}"
+        assert sub_data.get("plan") == "free", (
+            f"未验证支付后计划应保持 free，实际: {sub_data.get('plan')}"
         )
 
-    def test_upgrade_features_expanded(self, client):
-        """升级后功能应扩展"""
+    def test_unverified_upgrade_does_not_expand_features(self, client):
+        """未验证支付不得扩展会员权益。"""
         # 订阅免费版
         client.post(
             "/api/v1/subscription/subscribe",
@@ -339,10 +336,8 @@ class TestUpgradeSubscription:
         paid_resp = client.get("/api/v1/subscription?user_id=cancel-test-user")
         paid_features = paid_resp.json().get("data", {}).get("features", {})
 
-        # 付费版功能应 >= 免费版
-        assert paid_features.get("unlimited_chat") is True, (
-            "养心版应支持无限聊天"
-        )
+        assert paid_features == free_features
+        assert paid_features.get("unlimited_chat") is not True
 
 
 # ==================== 并发购买防护 ====================
@@ -444,7 +439,7 @@ class TestRefund:
                 },
             },
         )
-        assert cancel_webhook.status_code == 200
+        assert cancel_webhook.status_code == 410
 
     def test_usage_stats_available(self, client):
         """使用量统计应可获取"""

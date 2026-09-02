@@ -235,8 +235,8 @@ class TestProductQuery:
         body = resp.json()
         assert body["success"] is True
         products = body["data"]["products"]
-        # 12 个 SKU: 3 tiers × 2 durations × 2 platforms
-        assert len(products) == 12
+        # 18 个 SKU: 3 tiers × 2 durations × 支付宝/微信/Apple
+        assert len(products) == 18
 
     @pytest.mark.asyncio
     async def test_products_have_valid_pricing(self, client):
@@ -1025,9 +1025,10 @@ class TestBackwardCompatAPI:
             params={"user_id": "user-compat-sub"},
         )
         assert resp.status_code == 200
-        data = resp.json()["data"]
-        assert data["plan"] == "yangxin"
-        assert data["status"] == "active"
+        body = resp.json()
+        assert body["success"] is False
+        assert body["code"] == "payment_required"
+        assert "data" not in body
 
     @pytest.mark.asyncio
     async def test_get_subscription_backward_compat(self, client):
@@ -1065,9 +1066,10 @@ class TestBackwardCompatAPI:
             },
         )
         assert resp.status_code == 200
-        data = resp.json()["data"]
-        assert data["plan"] == "yangxin"
-        assert data["status"] == "active"
+        body = resp.json()
+        assert body["success"] is False
+        assert body["code"] == "verify_failed"
+        assert "data" not in body
 
     @pytest.mark.asyncio
     async def test_alipay_legacy_verify_is_retired(self, client):
@@ -1105,14 +1107,13 @@ class TestBackwardCompatAPI:
                 },
             },
         )
-        assert resp.status_code == 200
-        assert "订阅已激活" in resp.json()["message"]
+        assert resp.status_code == 410
 
         # 验证用户状态
         resp_status = await client.get(
             f"{API_BASE}/status", params={"user_id": "user-stripe-webhook"}
         )
-        assert resp_status.json()["data"]["plan"] == "yiyang"
+        assert resp_status.json()["data"]["plan"] == "free"
 
     @pytest.mark.asyncio
     async def test_usage_stats(self, client):

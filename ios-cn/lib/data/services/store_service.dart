@@ -70,47 +70,51 @@ class StoreService {
 
   // ==================== 购买流程 ====================
 
-  void _handlePurchaseUpdate(List<PurchaseDetails> purchaseDetailsList) {
+  void _handlePurchaseUpdate(List<PurchaseDetails> purchaseDetailsList) async {
     for (final purchaseDetails in purchaseDetailsList) {
       debugPrint('[StoreService] 购买状态: ${purchaseDetails.status}');
+      var platformVerified = true;
 
       switch (purchaseDetails.status) {
         case PurchaseStatus.pending:
           break;
         case PurchaseStatus.purchased:
-          _handleSuccessfulPurchase(purchaseDetails);
+          platformVerified = await _handleSuccessfulPurchase(purchaseDetails);
           break;
         case PurchaseStatus.restored:
           _handleRestoredPurchase(purchaseDetails);
           break;
         case PurchaseStatus.error:
           debugPrint('[StoreService] 购买错误: ${purchaseDetails.error}');
-          _onRestoreComplete?.call(RestoreResult(
-            success: false,
-            message: '购买错误: ${purchaseDetails.error?.message}',
-          ));
+          _onRestoreComplete?.call(
+            RestoreResult(
+              success: false,
+              message: '购买错误: ${purchaseDetails.error?.message}',
+            ),
+          );
           break;
         case PurchaseStatus.canceled:
           debugPrint('[StoreService] 购买取消');
-          _onRestoreComplete?.call(const RestoreResult(
-            success: false,
-            message: '购买已取消',
-          ));
+          _onRestoreComplete?.call(
+            const RestoreResult(success: false, message: '购买已取消'),
+          );
           break;
       }
 
-      if (purchaseDetails.pendingCompletePurchase) {
-        _iap.completePurchase(purchaseDetails);
+      if (purchaseDetails.pendingCompletePurchase && platformVerified) {
+        await _iap.completePurchase(purchaseDetails);
       }
     }
   }
 
-  Future<void> _handleSuccessfulPurchase(PurchaseDetails purchaseDetails) async {
+  Future<bool> _handleSuccessfulPurchase(
+    PurchaseDetails purchaseDetails,
+  ) async {
     try {
       final planId = _productToPlan[purchaseDetails.productID];
-      if (planId == null) return;
+      if (planId == null) return false;
 
-      await _verifyReceipt(
+      return await _verifyReceipt(
         platform: Platform.isIOS ? 'ios' : 'android',
         receiptData: purchaseDetails.verificationData.serverVerificationData,
         productId: purchaseDetails.productID,
@@ -118,6 +122,7 @@ class StoreService {
       );
     } catch (e) {
       debugPrint('[StoreService] 处理购买异常: $e');
+      return false;
     }
   }
 
@@ -126,10 +131,9 @@ class StoreService {
     try {
       final planId = _productToPlan[purchaseDetails.productID];
       if (planId == null) {
-        _onRestoreComplete?.call(const RestoreResult(
-          success: false,
-          message: '无法识别的产品',
-        ));
+        _onRestoreComplete?.call(
+          const RestoreResult(success: false, message: '无法识别的产品'),
+        );
         return;
       }
 
@@ -147,10 +151,9 @@ class StoreService {
       _onRestoreComplete?.call(result);
     } catch (e) {
       debugPrint('[StoreService] 处理恢复购买异常: $e');
-      _onRestoreComplete?.call(RestoreResult(
-        success: false,
-        message: '恢复购买失败: $e',
-      ));
+      _onRestoreComplete?.call(
+        RestoreResult(success: false, message: '恢复购买失败: $e'),
+      );
     }
   }
 
@@ -164,11 +167,16 @@ class StoreService {
   }) async {
     try {
       final baseUrl = ApiClient.baseUrl;
-      final dio = Dio(BaseOptions(
-        baseUrl: baseUrl,
-        connectTimeout: const Duration(seconds: 10),
-        headers: {'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true'},
-      ));
+      final dio = Dio(
+        BaseOptions(
+          baseUrl: baseUrl,
+          connectTimeout: const Duration(seconds: 10),
+          headers: {
+            'Content-Type': 'application/json',
+            'ngrok-skip-browser-warning': 'true',
+          },
+        ),
+      );
 
       // 添加 Token
       final token = StorageManager.user.getToken();
@@ -176,17 +184,20 @@ class StoreService {
         dio.options.headers['Authorization'] = 'Bearer $token';
       }
 
-      final response = await dio.post('/api/v1/subscription/verify-receipt-v2', data: {
-        'platform': platform,
-        'receipt_data': receiptData,
-        'product_id': productId,
-        'plan': planId,
-      });
+      final response = await dio.post(
+        '/api/v1/subscription/verify-receipt-v2',
+        data: {
+          'platform': platform,
+          'receipt_data': receiptData,
+          'product_id': productId,
+          'plan': planId,
+        },
+      );
 
       return response.data['success'] == true;
     } catch (e) {
       debugPrint('[StoreService] 收据验证请求失败: $e');
-      return true; // 模拟模式
+      return false;
     }
   }
 
@@ -199,11 +210,16 @@ class StoreService {
   }) async {
     try {
       final baseUrl = ApiClient.baseUrl;
-      final dio = Dio(BaseOptions(
-        baseUrl: baseUrl,
-        connectTimeout: const Duration(seconds: 15),
-        headers: {'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true'},
-      ));
+      final dio = Dio(
+        BaseOptions(
+          baseUrl: baseUrl,
+          connectTimeout: const Duration(seconds: 15),
+          headers: {
+            'Content-Type': 'application/json',
+            'ngrok-skip-browser-warning': 'true',
+          },
+        ),
+      );
 
       // 添加 Token
       final token = StorageManager.user.getToken();
@@ -227,7 +243,10 @@ class StoreService {
         };
       }
 
-      final response = await dio.post('/api/v1/subscription/restore', data: body);
+      final response = await dio.post(
+        '/api/v1/subscription/restore',
+        data: body,
+      );
       final data = response.data;
 
       if (data['success'] == true) {
@@ -244,24 +263,14 @@ class StoreService {
       } else {
         final code = data['code'] ?? 'unknown';
         final message = _mapErrorCode(code, data['message']);
-        return RestoreResult(
-          success: false,
-          code: code,
-          message: message,
-        );
+        return RestoreResult(success: false, code: code, message: message);
       }
     } on DioException catch (e) {
       debugPrint('[StoreService] 恢复购买网络错误: ${e.message}');
-      return RestoreResult(
-        success: false,
-        message: '网络连接失败，请检查网络后重试',
-      );
+      return RestoreResult(success: false, message: '网络连接失败，请检查网络后重试');
     } catch (e) {
       debugPrint('[StoreService] 恢复购买异常: $e');
-      return RestoreResult(
-        success: false,
-        message: '恢复购买失败: $e',
-      );
+      return RestoreResult(success: false, message: '恢复购买失败: $e');
     }
   }
 
@@ -296,10 +305,9 @@ class StoreService {
   /// [onResult] 恢复完成回调，返回 RestoreResult
   Future<void> restorePurchases({RestoreResultCallback? onResult}) async {
     if (!_available) {
-      onResult?.call(const RestoreResult(
-        success: false,
-        message: '当前设备不支持应用内购',
-      ));
+      onResult?.call(
+        const RestoreResult(success: false, message: '当前设备不支持应用内购'),
+      );
       return;
     }
 
@@ -311,10 +319,7 @@ class StoreService {
       // 调用方通过 onResult 回调获取结果
     } catch (e) {
       debugPrint('[StoreService] 恢复购买异常: $e');
-      onResult?.call(RestoreResult(
-        success: false,
-        message: '恢复购买失败: $e',
-      ));
+      onResult?.call(RestoreResult(success: false, message: '恢复购买失败: $e'));
     }
   }
 
