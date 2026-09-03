@@ -37,6 +37,14 @@ for relative in ("backend/app/router/chat.py", "backend/app/routers/chat.py"):
     if "verified_cn_context" not in chat_source:
         errors.append(f"{relative}: verified RAG context is not connected")
 
+ingredient_scan = (ROOT / "backend/app/router/ai_ingredient_scan.py").read_text(encoding="utf-8")
+for forbidden in ('recognized_name = "枸杞"', "模拟识别结果"):
+    if forbidden in ingredient_scan:
+        errors.append(f"backend/app/router/ai_ingredient_scan.py: fabricated vision result remains {forbidden!r}")
+for required in ("OPENROUTER_VISION_MODEL", '"type": "image_url"', "confidence < 0.6"):
+    if required not in ingredient_scan:
+        errors.append(f"backend/app/router/ai_ingredient_scan.py: verified vision flow missing {required!r}")
+
 admin_manifest = json.loads((ROOT / "admin/package.json").read_text(encoding="utf-8"))
 if not admin_manifest.get("scripts", {}).get("test"):
     errors.append("admin/package.json: fail-closed test command is required")

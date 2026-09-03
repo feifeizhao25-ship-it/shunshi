@@ -14,10 +14,25 @@ class TestIngredientScan:
         assert data["success"] is True
         assert "recognized" in data["data"]
 
-    def test_scan_by_image_url(self, client):
+    def test_scan_by_image_url(self, client, monkeypatch):
+        from app.router import ai_ingredient_scan
+
+        async def recognize(_url):
+            return "枸杞", 0.94, "verified-test-model"
+
+        monkeypatch.setattr(ai_ingredient_scan, "_recognize_ingredient_image", recognize)
         payload = {"image_url": "https://example.com/goji.jpg"}
         response = client.post("/api/v1/ingredient-scan/scan", json=payload)
         assert response.status_code == 200
+        assert response.json()["data"]["recognition_model"] == "verified-test-model"
+
+    def test_scan_by_image_fails_without_ai_configuration(self, client, monkeypatch):
+        monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
+        response = client.post(
+            "/api/v1/ingredient-scan/scan",
+            json={"image_url": "https://example.com/ingredient.jpg"},
+        )
+        assert response.status_code == 503
 
     def test_scan_no_input_returns_400(self, client):
         response = client.post("/api/v1/ingredient-scan/scan", json={})

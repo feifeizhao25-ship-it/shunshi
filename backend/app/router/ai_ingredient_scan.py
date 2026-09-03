@@ -3,7 +3,12 @@
 扫描食材识别、营养分析、中医属性查询
 """
 
-from fastapi import APIRouter, HTTPException, Query, Path
+import json
+import os
+import re
+
+import aiohttp
+from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict
 
@@ -69,7 +74,7 @@ class ScanResultRequest(BaseModel):
 
 
 class MultiIngredientAnalysisRequest(BaseModel):
-    ingredients: List[str] = Field(..., min_items=2, max_items=10, description="食材名称列表")
+    ingredients: List[str] = Field(..., min_length=2, max_length=10, description="食材名称列表")
     user_constitution: Optional[str] = Field(None)
 
 
@@ -81,18 +86,73 @@ def _find_ingredient(name: str) -> Optional[dict]:
     return None
 
 
+async def _recognize_ingredient_image(image_url: str) -> tuple[str, float, str]:
+    """使用可配置的 OpenRouter 视觉模型识别，不提供任何虚构降级结果。"""
+    if not image_url.startswith("https://"):
+        raise HTTPException(status_code=400, detail="食材图片必须使用可公开访问的 HTTPS 地址")
+    api_key = os.getenv("OPENROUTER_API_KEY", "").strip()
+    if not api_key:
+        raise HTTPException(status_code=503, detail="图片识别服务暂未配置，请改为输入食材名称")
+    model = os.getenv("OPENROUTER_VISION_MODEL", "google/gemini-3.7-flash").strip()
+    payload = {
+        "model": model,
+        "temperature": 0,
+        "max_tokens": 120,
+        "messages": [{
+            "role": "user",
+            "content": [
+                {"type": "text", "text": "识别图片中最主要的可食用食材。只返回JSON：{\"ingredient_name_cn\":\"名称或未知\",\"confidence\":0到1}。不确定时必须返回未知，禁止猜测。"},
+                {"type": "image_url", "image_url": {"url": image_url}},
+            ],
+        }],
+        "response_format": {"type": "json_object"},
+    }
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://shunshi.ai",
+        "X-Title": "ShunShi Ingredient Recognition",
+    }
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                "https://openrouter.ai/api/v1/chat/completions",
+                headers=headers,
+                json=payload,
+                timeout=aiohttp.ClientTimeout(total=45),
+            ) as response:
+                if response.status != 200:
+                    raise HTTPException(status_code=502, detail="图片识别服务暂时不可用")
+                result = await response.json()
+    except HTTPException:
+        raise
+    except (aiohttp.ClientError, TimeoutError) as exc:
+        raise HTTPException(status_code=502, detail="图片识别服务连接失败") from exc
+
+    try:
+        content = result["choices"][0]["message"]["content"]
+        content = re.sub(r"^```(?:json)?\s*|\s*```$", "", content.strip())
+        parsed = json.loads(content)
+        name = str(parsed["ingredient_name_cn"]).strip()
+        confidence = max(0.0, min(1.0, float(parsed["confidence"])))
+    except (KeyError, IndexError, TypeError, ValueError, json.JSONDecodeError) as exc:
+        raise HTTPException(status_code=502, detail="图片识别服务返回格式无效") from exc
+    if not name or name == "未知" or confidence < 0.6:
+        name = "未知"
+    return name, confidence, model
+
+
 @router.post("/scan", summary="扫描/识别食材")
 async def scan_ingredient(request: ScanResultRequest):
     if not request.ingredient_name and not request.image_url:
         raise HTTPException(status_code=400, detail="请提供食材图片或名称")
 
-    # 模拟图像识别（实际生产中调用AI视觉API）
     if request.image_url and not request.ingredient_name:
-        recognized_name = "枸杞"  # 模拟识别结果
-        confidence = 0.92
+        recognized_name, confidence, recognition_model = await _recognize_ingredient_image(request.image_url)
     else:
         recognized_name = request.ingredient_name
         confidence = 1.0
+        recognition_model = None
 
     ingredient = _find_ingredient(recognized_name)
     if not ingredient:
@@ -102,7 +162,8 @@ async def scan_ingredient(request: ScanResultRequest):
                 "recognized": recognized_name,
                 "confidence": confidence,
                 "found_in_database": False,
-                "message": "未在数据库中找到该食材的详细信息"
+                "recognition_model": recognition_model,
+                "message": "未能可靠匹配食材资料，请核对识别结果或直接输入名称"
             }
         }
 
@@ -129,10 +190,12 @@ async def scan_ingredient(request: ScanResultRequest):
         "data": {
             "recognized": recognized_name,
             "confidence": confidence,
+            "recognition_model": recognition_model,
             "found_in_database": True,
             "ingredient": ingredient,
             "personalized_advice": personalized_advice,
-            "season_advice": season_advice
+            "season_advice": season_advice,
+            "disclaimer": "营养及中医属性仅作一般信息参考，不能替代医生或营养师建议"
         }
     }
 
