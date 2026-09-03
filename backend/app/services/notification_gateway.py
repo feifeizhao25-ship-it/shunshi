@@ -23,7 +23,6 @@
 """
 import os
 import logging
-from datetime import datetime
 from typing import Optional
 
 from pydantic import BaseModel
@@ -32,7 +31,7 @@ logger = logging.getLogger(__name__)
 
 # ==================== 配置 ====================
 
-NOTIFICATION_MODE = os.getenv("NOTIFICATION_MODE", "mock")  # mock / production
+NOTIFICATION_MODE = os.getenv("NOTIFICATION_MODE", "production")
 
 # ==================== 数据模型 ====================
 
@@ -95,15 +94,10 @@ class NotificationGateway:
     async def send(self, request: SendNotificationRequest) -> SendNotificationResponse:
         """发送单条通知"""
         if self.mode == "mock":
-            message_id = f"notif_mock_{datetime.now().timestamp()}"
-            logger.info(
-                f"[Gateway] Mock 通知: user={request.user_id}, "
-                f"title={request.title}, type={request.notification_type}"
-            )
+            logger.error("[Gateway] 通知服务处于未配置状态，消息未送达")
             return SendNotificationResponse(
-                success=True,
-                message_id=message_id,
-                platform="mock",
+                success=False,
+                error="notification_service_not_configured",
             )
 
         # 确定平台
@@ -166,8 +160,8 @@ class NotificationGateway:
     ) -> dict:
         """广播通知"""
         if self.mode == "mock":
-            logger.info(f"[Gateway] Mock 广播: title={title}, type={notification_type}")
-            return {"success": True, "mode": "mock"}
+            logger.error("[Gateway] 通知服务处于未配置状态，广播未送达")
+            return {"success": False, "error": "notification_service_not_configured"}
 
         fcm = self._get_fcm()
         result = await fcm.send_to_topic(
