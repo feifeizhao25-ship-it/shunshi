@@ -1,6 +1,5 @@
 # Stripe 支付 API 路由
 # 国际版 SEASONS 专用 - 使用 Stripe Checkout 处理订阅支付
-# 注意: 当前使用 Stripe 测试模式 (sk_test_)
 import stripe
 import os
 import logging
@@ -18,26 +17,26 @@ router = APIRouter(prefix="/api/v1/stripe", tags=["Stripe支付"])
 
 # ============ 配置 ============
 
-STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY", "sk_test_placeholder")
-STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET", "whsec_placeholder")
-STRIPE_PUBLISHABLE_KEY = os.getenv("STRIPE_PUBLISHABLE_KEY", "pk_test_placeholder")
+STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY", "").strip()
+STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET", "").strip()
+STRIPE_PUBLISHABLE_KEY = os.getenv("STRIPE_PUBLISHABLE_KEY", "").strip()
 
 # Stripe 价格 ID (需要在 Stripe Dashboard 中创建)
 # 测试模式下创建 Price Objects 后填入
 STRIPE_PRICE_IDS = {
-    "serenity": os.getenv("STRIPE_PRICE_SERENITY", "price_serenity_monthly"),
-    "harmony": os.getenv("STRIPE_PRICE_HARMONY", "price_harmony_monthly"),
-    "family": os.getenv("STRIPE_PRICE_FAMILY", "price_family_monthly"),
+    "serenity": os.getenv("STRIPE_PRICE_SERENITY", "").strip(),
+    "harmony": os.getenv("STRIPE_PRICE_HARMONY", "").strip(),
+    "family": os.getenv("STRIPE_PRICE_FAMILY", "").strip(),
 }
 
 # 初始化 Stripe SDK (仅在配置了有效 key 时)
-_stripe_configured = False
-if STRIPE_SECRET_KEY and not STRIPE_SECRET_KEY.startswith("sk_test_placeholder"):
+_stripe_configured = bool(STRIPE_SECRET_KEY)
+if _stripe_configured:
     stripe.api_key = STRIPE_SECRET_KEY
     _stripe_configured = True
-    logger.info("[Stripe] SDK 初始化完成 (测试模式)")
+    logger.info("[Stripe] SDK 初始化完成")
 else:
-    logger.warning("[Stripe] 未配置有效密钥，运行在模拟模式")
+    logger.warning("[Stripe] 未配置密钥，支付接口将拒绝请求")
 
 # ============ 英文版订阅计划 (USD) ============
 
@@ -205,6 +204,8 @@ async def get_plans(locale: str = Query("en-US")):
 @router.get("/config", response_model=dict)
 async def get_stripe_config():
     """返回前端需要的 Stripe 配置 (publishable key)"""
+    if not STRIPE_PUBLISHABLE_KEY:
+        raise HTTPException(status_code=503, detail="Stripe is not configured")
     return {
         "success": True,
         "data": {
@@ -225,60 +226,42 @@ async def create_checkout_session(request: CreateCheckoutRequest):
         raise HTTPException(status_code=400, detail="Free plan does not require checkout")
 
     price_id = STRIPE_PRICE_IDS.get(request.plan_id)
-    if not price_id:
-        logger.warning(f"[Stripe] 未配置价格 ID: {request.plan_id}")
+    if not _stripe_configured or not price_id:
+        logger.error("[Stripe] Checkout 配置不完整: plan=%s", request.plan_id)
+        raise HTTPException(status_code=503, detail="Stripe checkout is not configured")
 
-    if _stripe_configured and price_id:
-        # 真实 Stripe 调用
-        try:
-            session = stripe.checkout.Session.create(
-                payment_method_types=["card"],
-                mode="subscription",
-                line_items=[{"price": price_id, "quantity": 1}],
-                success_url=request.success_url,
-                cancel_url=request.cancel_url,
-                metadata={
+    try:
+        session = stripe.checkout.Session.create(
+            payment_method_types=["card"],
+            mode="subscription",
+            line_items=[{"price": price_id, "quantity": 1}],
+            success_url=request.success_url,
+            cancel_url=request.cancel_url,
+            metadata={
+                "user_id": request.user_id,
+                "plan_id": request.plan_id,
+                "locale": request.locale,
+            },
+            subscription_data={
+                "metadata": {
                     "user_id": request.user_id,
                     "plan_id": request.plan_id,
-                    "locale": request.locale,
                 },
-                subscription_data={
-                    "metadata": {
-                        "user_id": request.user_id,
-                        "plan_id": request.plan_id,
-                    },
-                    "trial_period_days": 7,  # 7 天免费试用
-                },
-                locale=request.locale.split("-")[0],  # Stripe locale: "en"
-            )
-
-            return {
-                "success": True,
-                "data": {
-                    "checkout_url": session.url,
-                    "session_id": session.id,
-                }
-            }
-        except stripe.error.StripeError as e:
-            logger.error(f"[Stripe] 创建 checkout 失败: {e}")
-            raise HTTPException(status_code=500, detail=f"Stripe error: {str(e)}")
-
-    else:
-        # 模拟模式: 返回 mock URL
-        import uuid
-        session_id = f"cs_test_{uuid.uuid4().hex[:24]}"
-        mock_url = f"https://checkout.stripe.com/c/pay/{session_id}?mock=1"
-
-        logger.info(f"[Stripe] 模拟模式 - Checkout 创建: {session_id}, plan={request.plan_id}")
+                "trial_period_days": 7,
+            },
+            locale=request.locale.split("-")[0],
+        )
 
         return {
             "success": True,
             "data": {
-                "checkout_url": mock_url,
-                "session_id": session_id,
-                "mode": "test",
+                "checkout_url": session.url,
+                "session_id": session.id,
             }
         }
+    except stripe.error.StripeError as e:
+        logger.error(f"[Stripe] 创建 checkout 失败: {e}")
+        raise HTTPException(status_code=502, detail="Stripe checkout failed") from e
 
 
 @router.post("/create-portal-session", response_model=dict)
@@ -287,33 +270,30 @@ async def create_portal_session(user_id: str = Query(..., min_length=1)):
     创建 Stripe Customer Portal Session
     用户可在此管理订阅: 升级、降级、取消
     """
+    if not _stripe_configured:
+        raise HTTPException(status_code=503, detail="Stripe is not configured")
     db = get_db()
-    row = db.execute("SELECT stripe_customer_id FROM users WHERE id = ?", (user_id,)).fetchone()
-    customer_id = row["stripe_customer_id"] if row else None
+    from app.database.db import close_test_connection
+    try:
+        row = db.execute("SELECT stripe_customer_id FROM users WHERE id = ?", (user_id,)).fetchone()
+        customer_id = row["stripe_customer_id"] if row else None
+    finally:
+        close_test_connection(db)
 
     if not customer_id:
         raise HTTPException(status_code=404, detail="No Stripe customer found for this user")
 
-    if _stripe_configured:
-        try:
-            session = stripe.billing_portal.Session.create(
-                customer=customer_id,
-                return_url="https://app.seasons.care/profile",
-            )
-            return {
-                "success": True,
-                "data": {"portal_url": session.url}
-            }
-        except stripe.error.StripeError as e:
-            raise HTTPException(status_code=500, detail=f"Stripe error: {str(e)}")
-    else:
+    try:
+        session = stripe.billing_portal.Session.create(
+            customer=customer_id,
+            return_url="https://app.seasons.care/profile",
+        )
         return {
             "success": True,
-            "data": {
-                "portal_url": "https://billing.stripe.com/p/mock_portal",
-                "mode": "test",
-            }
+            "data": {"portal_url": session.url}
         }
+    except stripe.error.StripeError as e:
+        raise HTTPException(status_code=502, detail="Stripe portal failed") from e
 
 
 @router.post("/webhook", response_model=dict)
@@ -326,22 +306,15 @@ async def stripe_webhook(request: Request):
     payload = await request.body()
     sig_header = request.headers.get("stripe-signature", "")
 
-    if _stripe_configured and STRIPE_WEBHOOK_SECRET:
-        # 真实验签
-        try:
-            event = stripe.Webhook.construct_event(
-                payload, sig_header, STRIPE_WEBHOOK_SECRET
-            )
-        except (stripe.error.SignatureVerificationError, ValueError) as e:
-            logger.error(f"[Stripe] Webhook 验签失败: {e}")
-            raise HTTPException(status_code=400, detail="Invalid signature")
-    else:
-        # 模拟模式: 直接解析 JSON
-        import json
-        try:
-            event = json.loads(payload)
-        except json.JSONDecodeError:
-            raise HTTPException(status_code=400, detail="Invalid payload")
+    if not _stripe_configured or not STRIPE_WEBHOOK_SECRET:
+        raise HTTPException(status_code=503, detail="Stripe webhook is not configured")
+    if not sig_header:
+        raise HTTPException(status_code=400, detail="Missing Stripe signature")
+    try:
+        event = stripe.Webhook.construct_event(payload, sig_header, STRIPE_WEBHOOK_SECRET)
+    except (stripe.error.SignatureVerificationError, ValueError) as e:
+        logger.error(f"[Stripe] Webhook 验签失败: {e}")
+        raise HTTPException(status_code=400, detail="Invalid signature") from e
 
     event_type = event.get("type", "")
     data = event.get("data", {}).get("object", {})

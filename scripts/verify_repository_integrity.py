@@ -51,6 +51,7 @@ for forbidden in ("--passWithNoTests", "continue-on-error: true", "|| true"):
 
 payment_sources = {
     "backend/app/router/subscription.py": ("mock=1", "MOCK_QR_CODE", "MOCK_TRADE", "_mock_verify_receipt"),
+    "backend/app/router/stripe.py": ("mock=1", "mock_portal", "sk_test_placeholder", "直接解析 JSON"),
     "backend/app/services/alipay_service.py": ('ALIPAY_MODE", "mock', "跳过回调验签"),
     "backend/app/services/wechat_pay_service.py": ("MOCK_TRANSACTION", "跳过回调验签"),
     "android-cn/lib/presentation/pages/subscription/subscription_page_v2.dart": ("_simulatePaymentSuccess", "setBool('is_subscribed', true)"),
