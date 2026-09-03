@@ -18,7 +18,7 @@ try:
     _FCM_AVAILABLE = True
 except ImportError:
     _FCM_AVAILABLE = False
-    logger.info("[Notifications] firebase-admin 未安装，FCM 推送将使用模拟模式")
+    logger.warning("[Notifications] firebase-admin 未安装，远程推送不可用")
 
 router = APIRouter(prefix="/api/v1/notifications", tags=["通知"])
 
@@ -86,7 +86,7 @@ def send_push_notification(
     FCM: 使用 firebase-admin SDK
     APNs: 通过 FCM 统一推送 (iOS 设备通过 FCM token 推送)
     
-    降级: 当 SDK 不可用时，记录日志
+    SDK 或凭据不可用时明确返回失败，绝不伪造已送达结果。
     """
     message_data = {
         "title": title,
@@ -132,19 +132,18 @@ def send_push_notification(
                 "provider": "fcm",
             }
         except Exception as e:
-            logger.warning(f"[FCM] 推送失败，降级到日志: {e}")
+            logger.warning(f"[FCM] 推送失败: {e}")
             return {
                 "success": False,
                 "error": str(e),
                 "provider": "fcm",
             }
     else:
-        # 模拟模式
-        logger.info(f"[Push-MOCK] 推送通知: token={device_token[:20]}..., title={title}, body={body}")
+        logger.error("[FCM] 推送服务未配置，消息未送达: token=%s...", device_token[:20])
         return {
-            "success": True,
-            "message_id": f"mock_{random.randint(100000, 999999)}",
-            "provider": "mock",
+            "success": False,
+            "error": "推送服务未配置",
+            "provider": "fcm",
         }
 
 def send_push_to_user(user_id: str, title: str, body: str, data: Optional[dict] = None) -> dict:
@@ -182,7 +181,7 @@ def initialize_fcm(credentials_path: Optional[str] = None):
     credentials_path: 服务账号 JSON 文件路径
     """
     if not _FCM_AVAILABLE:
-        logger.info("[FCM] firebase-admin 未安装，使用模拟模式")
+        logger.warning("[FCM] firebase-admin 未安装，无法初始化推送")
         return False
     
     if firebase_admin._apps:
@@ -199,7 +198,7 @@ def initialize_fcm(credentials_path: Optional[str] = None):
         logger.info("[FCM] Firebase Admin SDK 初始化成功")
         return True
     except Exception as e:
-        logger.warning(f"[FCM] 初始化失败，使用模拟模式: {e}")
+        logger.warning(f"[FCM] 初始化失败: {e}")
         return False
 
 # ============ 通知调度器 ============
@@ -253,7 +252,7 @@ class NotificationScheduler:
                 
                 if now >= scheduled_at:
                     # 发送通知
-                    send_push_to_user(
+                    push_result = send_push_to_user(
                         user_id=user_id,
                         title=scheduled["title"],
                         body=scheduled["body"],
@@ -276,11 +275,11 @@ class NotificationScheduler:
                         notifications[user_id] = []
                     notifications[user_id].append(notification)
                     
-                    # 标记已发送
-                    scheduled["status"] = "sent"
-                    scheduled["sent_at"] = now.isoformat()
-                    
-                    logger.info(f"[Scheduler] 定时通知已发送: {notif_id} to {user_id}")
+                    push_succeeded = bool(push_result.get("success"))
+                    scheduled["status"] = "sent" if push_succeeded else "push_failed"
+                    scheduled["sent_at"] = now.isoformat() if push_succeeded else None
+                    scheduled["push_result"] = push_result
+                    logger.info("[Scheduler] 定时通知处理完成: %s to %s, status=%s", notif_id, user_id, scheduled["status"])
 
 
 # 全局调度器实例
