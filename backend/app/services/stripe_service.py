@@ -1,7 +1,7 @@
 """
 顺时 ShunShi - Stripe 支付服务 (GL版/国际版)
 支持: 创建 Checkout / Portal / Webhook 处理 / 订阅管理
-Mock 模式: STRIPE_MODE=mock 或无有效密钥时自动降级
+缺少 Stripe 配置时所有支付写操作失败关闭。
 
 产品:
   serenity  ($9.99/月)  - 个人基础版
@@ -10,7 +10,6 @@ Mock 模式: STRIPE_MODE=mock 或无有效密钥时自动降级
 """
 from __future__ import annotations
 import os
-import json
 import uuid
 import logging
 from datetime import datetime, timedelta
@@ -22,16 +21,16 @@ logger = logging.getLogger(__name__)
 
 # ==================== 配置 ====================
 
-STRIPE_MODE = os.getenv("STRIPE_MODE", "mock")  # mock / test / live
+STRIPE_MODE = os.getenv("STRIPE_MODE", "live")
 
 STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY", "")
 STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET", "")
-STRIPE_PUBLISHABLE_KEY = os.getenv("STRIPE_PUBLISHABLE_KEY", "pk_test_placeholder")
+STRIPE_PUBLISHABLE_KEY = os.getenv("STRIPE_PUBLISHABLE_KEY", "").strip()
 
 STRIPE_PRICE_IDS: dict[str, str] = {
-    "serenity": os.getenv("STRIPE_PRICE_SERENITY", "price_serenity_monthly"),
-    "harmony": os.getenv("STRIPE_PRICE_HARMONY", "price_harmony_monthly"),
-    "family": os.getenv("STRIPE_PRICE_FAMILY", "price_family_monthly"),
+    "serenity": os.getenv("STRIPE_PRICE_SERENITY", "").strip(),
+    "harmony": os.getenv("STRIPE_PRICE_HARMONY", "").strip(),
+    "family": os.getenv("STRIPE_PRICE_FAMILY", "").strip(),
 }
 
 # ==================== 产品定义 ====================
@@ -131,21 +130,16 @@ class StripeService:
 
     def _init_sdk(self) -> None:
         """初始化 Stripe SDK"""
-        if self.mode == "mock":
-            return
-
-        if STRIPE_SECRET_KEY and not STRIPE_SECRET_KEY.startswith("sk_test_placeholder"):
+        if STRIPE_SECRET_KEY:
             try:
                 import stripe
                 stripe.api_key = STRIPE_SECRET_KEY
                 self._configured = True
                 logger.info(f"[Stripe] SDK 初始化完成 (mode={self.mode})")
             except ImportError:
-                logger.warning("[Stripe] stripe 包未安装，降级到 mock 模式")
-                self.mode = "mock"
+                logger.error("[Stripe] stripe 包未安装，支付服务不可用")
         else:
-            logger.warning("[Stripe] 无有效密钥，运行 mock 模式")
-            self.mode = "mock"
+            logger.warning("[Stripe] 无有效密钥，支付服务不可用")
 
     def create_checkout_session(
         self,
@@ -211,17 +205,12 @@ class StripeService:
         sig_header: str,
     ) -> dict:
         """验证 Webhook 签名并返回事件"""
-        if self._configured and STRIPE_WEBHOOK_SECRET:
-            import stripe
-            event = stripe.Webhook.construct_event(
-                payload, sig_header, STRIPE_WEBHOOK_SECRET
-            )
-            return event
-        else:
-            try:
-                return json.loads(payload)
-            except json.JSONDecodeError:
-                raise ValueError("Invalid webhook payload")
+        if not self._configured or not STRIPE_WEBHOOK_SECRET:
+            raise RuntimeError("Stripe Webhook 未配置")
+        if not sig_header:
+            raise ValueError("Stripe-Signature 请求头缺失")
+        import stripe
+        return stripe.Webhook.construct_event(payload, sig_header, STRIPE_WEBHOOK_SECRET)
 
     def handle_webhook_event(self, event: dict) -> WebhookResult:
         """
@@ -398,25 +387,20 @@ class StripeGateway:
             )
 
     async def verify_callback(self, request_data: dict) -> "PaymentResult":  # noqa: F821
-        """验证支付回调 — 委托给 handle_webhook_event"""
-        from .payment_gateway import PaymentResult
-        try:
-            result = self._svc.handle_webhook_event(request_data)
-            return PaymentResult(
-                success=result.success,
-                order_id="",
-                message=result.error or "processed",
-                raw_response={"event_type": result.event_type, "user_id": result.user_id},
-            )
-        except Exception as e:
-            return PaymentResult(success=False, order_id="", message=str(e))
-
-    async def query_order(self, order_id: str) -> "PaymentResult":  # noqa: F821
-        """查询订单状态 — Stripe 不直接支持 out_trade_no 查询，返回 stub"""
+        """字典回调无法携带可验证原始载荷，必须拒绝。"""
         from .payment_gateway import PaymentResult
         return PaymentResult(
-            success=True, order_id=order_id,
-            message="Stripe order query via session_id — use webhook events instead",
+            success=False,
+            order_id="",
+            message="Stripe 回调必须通过带原始请求体和签名的 verify_webhook 入口",
+        )
+
+    async def query_order(self, order_id: str) -> "PaymentResult":  # noqa: F821
+        """此适配器尚未实现可靠的 Stripe Session 查询。"""
+        from .payment_gateway import PaymentResult
+        return PaymentResult(
+            success=False, order_id=order_id,
+            message="请通过已验签 Stripe Webhook 更新订单状态",
         )
 
     async def refund(self, order_id: str, amount: float, reason: str = "") -> "RefundResult":  # noqa: F821

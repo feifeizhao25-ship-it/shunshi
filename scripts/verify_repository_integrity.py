@@ -54,6 +54,7 @@ payment_sources = {
     "backend/app/router/stripe.py": ("mock=1", "mock_portal", "sk_test_placeholder", "直接解析 JSON"),
     "backend/app/router/notifications.py": ("Push-MOCK", '"provider": "mock"', '"message_id": f"mock_'),
     "backend/app/router/seasons_subscription.py": ("checkout.seasons.app/session", "Mock offer codes", "json.loads(body)", "In production, verify the Stripe signature"),
+    "backend/app/services/stripe_service.py": ('STRIPE_MODE", "mock"', "json.loads(payload)", "降级到 mock 模式", 'success=True, order_id=order_id'),
     "backend/app/services/alipay_service.py": ('ALIPAY_MODE", "mock', "跳过回调验签"),
     "backend/app/services/wechat_pay_service.py": ("MOCK_TRANSACTION", "跳过回调验签"),
     "android-cn/lib/presentation/pages/subscription/subscription_page_v2.dart": ("_simulatePaymentSuccess", "setBool('is_subscribed', true)"),
