@@ -168,8 +168,8 @@ async def unregister_device(body: UnregisterDeviceRequest):
         db.commit()
         return {"success": True, "message": "设备已注销"}
     except Exception as e:
-        logger.warning(f"[Push] 注销设备失败: {e}")
-        return {"success": True, "message": "设备已注销(内存模式)"}
+        logger.error(f"[Push] 注销设备失败: {e}")
+        raise HTTPException(status_code=500, detail="设备注销失败") from e
 
 
 # ==================== 通知已读管理 ====================

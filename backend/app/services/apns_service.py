@@ -4,7 +4,7 @@
 支持: 注册 Token / 发送通知 / 静默推送
 
 配置:
-  APNS_MODE=mock → 返回模拟数据
+  缺少生产配置时返回未送达
   APNS_KEY_ID / APNS_TEAM_ID / APNS_KEY_PATH → 生产模式
   APNS_BUNDLE_ID → App Bundle Identifier
 
@@ -21,12 +21,12 @@ logger = logging.getLogger(__name__)
 
 # ==================== 配置 ====================
 
-APNS_MODE = os.getenv("APNS_MODE", "mock")  # mock / production
+APNS_MODE = os.getenv("APNS_MODE", "production")
 
 APNS_KEY_ID = os.getenv("APNS_KEY_ID", "")
 APNS_TEAM_ID = os.getenv("APNS_TEAM_ID", "")
 APNS_KEY_PATH = os.getenv("APNS_KEY_PATH", "")
-APNS_BUNDLE_ID = os.getenv("APNS_BUNDLE_ID", "care.seasons.shunshi")
+APNS_BUNDLE_ID = os.getenv("APNS_BUNDLE_ID", "")
 APNS_USE_SANDBOX = os.getenv("APNS_USE_SANDBOX", "false").lower() == "true"
 
 # 静默时段配置
@@ -66,7 +66,7 @@ class APNSResult(BaseModel):
     success: bool
     message_id: str = ""
     error: str = ""
-    mode: str = "mock"
+    mode: str = "production"
 
 
 # ==================== 服务实现 ====================
@@ -85,7 +85,7 @@ class APNsService:
             return
 
         if not all([APNS_KEY_ID, APNS_TEAM_ID, APNS_KEY_PATH, APNS_BUNDLE_ID]):
-            logger.warning("[APNs] 缺少必要配置，降级到 mock 模式")
+            logger.warning("[APNs] 缺少必要配置，推送服务不可用")
             self.mode = "mock"
             return
 
@@ -115,7 +115,7 @@ class APNsService:
                 f"[APNs] 初始化完成 (bundle={topic}, sandbox={use_sandbox})"
             )
         except ImportError:
-            logger.warning("[APNs] apns2 未安装，降级到 mock 模式")
+            logger.warning("[APNs] apns2 未安装，推送服务不可用")
             self.mode = "mock"
 
     def _is_quiet_hours(self) -> bool:
@@ -147,6 +147,7 @@ class APNsService:
             db.commit()
         except Exception as e:
             logger.error(f"[APNs] Token 注册失败: {e}")
+            return False
 
         logger.info(
             f"[APNs] Token 注册: user={user_id}, mode={self.mode}"
@@ -193,10 +194,8 @@ class APNsService:
                     topic=self._topic,
                 )
 
-                message_id = f"apns_{datetime.now().timestamp()}"
                 return APNSResult(
                     success=True,
-                    message_id=message_id,
                     mode=self.mode,
                 )
 

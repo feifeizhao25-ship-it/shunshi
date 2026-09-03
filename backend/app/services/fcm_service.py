@@ -8,7 +8,7 @@
   - Seasonal: 节气/季节变化提醒
   - Reflection: 反思/情绪关怀
 
-Mock 模式: FCM_MODE=mock 或无有效凭据时自动降级
+缺少有效凭据时返回未送达，不伪造成功。
 """
 import os
 import json
@@ -22,11 +22,11 @@ logger = logging.getLogger(__name__)
 
 # ==================== 配置 ====================
 
-FCM_MODE = os.getenv("FCM_MODE", "mock")  # mock / production
+FCM_MODE = os.getenv("FCM_MODE", "production")
 
 FCM_CREDENTIALS_PATH = os.getenv("FCM_CREDENTIALS_PATH", "")
 FCM_CREDENTIALS_JSON = os.getenv("FCM_CREDENTIALS_JSON", "")  # JSON 字符串
-FCM_PROJECT_ID = os.getenv("FCM_PROJECT_ID", "shunshi-push")
+FCM_PROJECT_ID = os.getenv("FCM_PROJECT_ID", "")
 
 # ==================== 通知类型 ====================
 
@@ -68,7 +68,7 @@ class PushResult(BaseModel):
     success: bool
     message_id: str = ""
     error: str = ""
-    mode: str = "mock"
+    mode: str = "production"
 
 
 class TokenRegistration(BaseModel):
@@ -123,12 +123,12 @@ class FCMService:
                 logger.info(f"[FCM] Firebase 初始化完成 (project={FCM_PROJECT_ID})")
                 return self._app
             else:
-                logger.warning("[FCM] 无有效凭据，降级到 mock 模式")
+                logger.warning("[FCM] 无有效凭据，推送服务不可用")
                 self.mode = "mock"
                 return None
 
         except ImportError:
-            logger.warning("[FCM] firebase-admin 未安装，降级到 mock 模式")
+            logger.warning("[FCM] firebase-admin 未安装，推送服务不可用")
             self.mode = "mock"
             return None
 
@@ -149,6 +149,7 @@ class FCMService:
             db.commit()
         except Exception as e:
             logger.error(f"[FCM] Token 注册失败: {e}")
+            return False
 
         logger.info(
             f"[FCM] Token 注册: user={registration.user_id}, "
@@ -248,8 +249,6 @@ class FCMService:
     ) -> PushResult:
         """向主题发送通知"""
         app = self._get_app()
-        message_id = f"fcm_topic_{datetime.now().timestamp()}"
-
         if app and self.mode != "mock":
             try:
                 from firebase_admin import messaging
