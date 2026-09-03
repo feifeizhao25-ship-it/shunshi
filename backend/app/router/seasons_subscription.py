@@ -2,9 +2,9 @@
 SEASONS Global Version - Subscription Management API
 """
 
-import uuid
-import json
+import os
 import logging
+import stripe
 from datetime import datetime, timedelta, timezone
 from typing import Optional, List, Any
 from fastapi import APIRouter, Query, HTTPException, Header, Request
@@ -124,30 +124,8 @@ async def get_subscription_status(user_id: str = Query(...)):
 
 @router.post("/trial")
 async def start_trial(body: TrialRequest, user_id: str = Query(...)):
-    """Start a free trial"""
-    product_id = body.product_id
-    
-    if product_id not in SUBSCRIPTION_PLANS:
-        raise HTTPException(status_code=400, detail="Invalid product")
-    
-    plan = SUBSCRIPTION_PLANS[product_id]
-    trial_days = plan.get("trial_days", 7)
-    trial_end = datetime.now() + timedelta(days=trial_days)
-    
-    subscriptions_db[user_id] = {
-        "tier": product_id,
-        "product_id": product_id,
-        "status": "trial",
-        "trial_ends_at": trial_end.isoformat(),
-        "started_at": datetime.now().isoformat(),
-    }
-    
-    return {
-        "success": True,
-        "tier": product_id,
-        "trial_ends_at": trial_end.isoformat(),
-        "trial_days": trial_days,
-    }
+    """Legacy client-granted trials are retired; Stripe owns trial eligibility."""
+    raise HTTPException(status_code=410, detail="Start trials through Stripe Checkout")
 
 
 @router.post("/checkout")
@@ -159,128 +137,40 @@ async def create_checkout(body: CheckoutRequest, user_id: str = Query(...)):
     if product_id not in SUBSCRIPTION_PLANS:
         raise HTTPException(status_code=400, detail="Invalid product")
     
-    plan = SUBSCRIPTION_PLANS[product_id]
-    
-    # In production, this would create a real Stripe checkout session
-    # For now, return a mock URL
-    price = plan["yearly_price"] if billing == "yearly" else plan["monthly_price"]
-    
+    if billing not in {"monthly", "yearly"}:
+        raise HTTPException(status_code=400, detail="Invalid billing period")
+    secret_key = os.getenv("STRIPE_SECRET_KEY", "").strip()
+    price_id = os.getenv(f"STRIPE_PRICE_{product_id.upper()}_{billing.upper()}", "").strip()
+    success_url = os.getenv("SEASONS_CHECKOUT_SUCCESS_URL", "").strip()
+    cancel_url = os.getenv("SEASONS_CHECKOUT_CANCEL_URL", "").strip()
+    if not all((secret_key, price_id, success_url, cancel_url)):
+        raise HTTPException(status_code=503, detail="Stripe checkout is not configured")
+    stripe.api_key = secret_key
+    try:
+        session = stripe.checkout.Session.create(
+            mode="subscription",
+            line_items=[{"price": price_id, "quantity": 1}],
+            success_url=success_url,
+            cancel_url=cancel_url,
+            metadata={"user_id": user_id, "plan_id": product_id},
+            subscription_data={
+                "metadata": {"user_id": user_id, "plan": product_id},
+                "trial_period_days": TRIAL_DAYS[product_id],
+            },
+        )
+    except stripe.error.StripeError as exc:
+        logger.exception("[SEASONS Stripe] checkout creation failed")
+        raise HTTPException(status_code=502, detail="Stripe checkout failed") from exc
     return {
-        "checkout_url": f"https://checkout.seasons.app/session?product={product_id}&billing={billing}&user={user_id}",
-        "session_id": f"cs_{uuid.uuid4().hex[:24]}",
-        "amount": price,
-        "currency": "usd",
-        "product_name": plan["name"],
+        "checkout_url": session.url,
+        "session_id": session.id,
     }
 
 
 @router.post("/restore")
 async def restore_purchases(body: Optional[RestoreRequest] = None, user_id: Optional[str] = Query(None)):
-    """
-    Restore purchases from app stores.
-
-    Accepts either JSON body (RestoreRequest) or query params.
-    For iOS: provide receipt_data (base64 App Store receipt)
-    For Android: provide purchase_token (Google Play purchase token)
-
-    Returns the restored subscription tier and status.
-    """
-    # Support both body and query params for backward compatibility
-    if body is not None:
-        uid = body.user_id or user_id or "unknown"
-        receipt = body.receipt_data
-        token = body.purchase_token
-        platform = body.platform or "ios"
-    else:
-        uid = user_id or "unknown"
-        receipt = None
-        token = None
-        platform = "ios"
-
-    now = datetime.now(timezone.utc)
-
-    # Check if user already has an active subscription
-    if uid in subscriptions_db:
-        sub = subscriptions_db[uid]
-        tier = sub.get("tier", "free")
-        expires_at = sub.get("expires_at")
-        status = sub.get("status", "active")
-
-        # Check if expired
-        if expires_at:
-            try:
-                exp = datetime.fromisoformat(expires_at)
-                if exp.tzinfo is None:
-                    exp = exp.replace(tzinfo=timezone.utc)
-                if exp < now:
-                    status = "expired"
-                    tier = "free"
-            except Exception:
-                pass
-
-        if status == "active" and tier != "free":
-            return {
-                "success": True,
-                "restored": True,
-                "tier": tier,
-                "status": status,
-                "expires_at": expires_at,
-                "message": "Subscription restored from existing record.",
-            }
-
-    # Try to verify with Apple/Google in production
-    # For now, fall back to purchase history
-    restored_tier = _find_restored_tier(uid, platform, receipt, token)
-
-    if restored_tier:
-        tier_id = restored_tier["tier"]
-        expires_at = restored_tier.get("expires_at")
-
-        subscriptions_db[uid] = {
-            "tier": tier_id,
-            "product_id": tier_id,
-            "status": "active",
-            "expires_at": expires_at,
-            "restored": True,
-            "restored_at": now.isoformat(),
-            "platform": platform,
-        }
-        return {
-            "success": True,
-            "restored": True,
-            "tier": tier_id,
-            "status": "active",
-            "expires_at": expires_at,
-            "message": "Subscription restored successfully.",
-        }
-
-    return {
-        "success": True,
-        "restored": False,
-        "tier": "free",
-        "status": "none",
-        "expires_at": None,
-        "message": "No active subscriptions found to restore.",
-    }
-
-
-def _find_restored_tier(user_id: str, platform: str, receipt_data: Optional[str] = None, purchase_token: Optional[str] = None) -> Optional[dict]:
-    """
-    Find a previously purchased subscription for the user.
-    In production, this would verify receipts with Apple/Google servers.
-    """
-    # Check in-memory purchase history
-    global _seasons_purchase_history
-    history = _seasons_purchase_history.get(user_id, [])
-
-    for entry in reversed(history):
-        if entry.get("platform") == platform or entry.get("platform") == f"iap_{platform}":
-            return {
-                "tier": entry.get("tier", "serenity"),
-                "expires_at": entry.get("expires_at"),
-            }
-
-    return None
+    """Retired because this route cannot verify App Store or Play receipts."""
+    raise HTTPException(status_code=410, detail="Use the verified App Store or Google Play receipt endpoint")
 
 
 # Global purchase history for SEASONS Global (separate from CN version)
@@ -289,28 +179,8 @@ _seasons_purchase_history: dict = {}
 
 @router.post("/validate-code")
 async def validate_offer_code(body: ValidateCodeRequest, user_id: str = Query(...)):
-    """Validate an offer code"""
-    code = body.code.upper()
-    
-    # Mock offer codes
-    offer_codes = {
-        "WELCOME20": {"discount_percent": 20, "message": "20% off your first year"},
-        "CALM10": {"discount_percent": 10, "message": "10% off any plan"},
-        "LAUNCH": {"discount_percent": 30, "message": "30% off for early supporters"},
-    }
-    
-    if code in offer_codes:
-        return {
-            "valid": True,
-            "discount_percent": offer_codes[code]["discount_percent"],
-            "message": offer_codes[code]["message"],
-        }
-    
-    return {
-        "valid": False,
-        "discount_percent": None,
-        "message": "Invalid or expired offer code",
-    }
+    """Legacy hard-coded offer codes are retired; use Stripe Promotion Codes."""
+    raise HTTPException(status_code=410, detail="Validate promotion codes during Stripe Checkout")
 
 
 @router.get("/products")
@@ -345,17 +215,17 @@ async def stripe_webhook(request: Request):
 
     Returns 200 OK for all handled events (required by Stripe).
     """
+    body = await request.body()
+    signature = request.headers.get("stripe-signature", "")
+    secret_key = os.getenv("STRIPE_SECRET_KEY", "").strip()
+    webhook_secret = os.getenv("STRIPE_WEBHOOK_SECRET", "").strip()
+    if not secret_key or not webhook_secret:
+        raise HTTPException(status_code=503, detail="Stripe webhook is not configured")
+    if not signature:
+        raise HTTPException(status_code=400, detail="Missing Stripe signature")
+    stripe.api_key = secret_key
     try:
-        body = await request.body()
-        signature = request.headers.get("stripe-signature", "")
-
-        # In production, verify the Stripe signature
-        # stripe_event = stripe.Webhook.construct_event(
-        #     body, signature, os.getenv("STRIPE_WEBHOOK_SECRET")
-        # )
-
-        import json
-        event = json.loads(body)
+        event = stripe.Webhook.construct_event(body, signature, webhook_secret)
         event_type = event.get("type", "")
         data_object = event.get("data", {}).get("object", {})
 
@@ -370,10 +240,12 @@ async def stripe_webhook(request: Request):
         else:
             logger.info(f"[Stripe Webhook] Unhandled event type: {event_type}")
 
-    except Exception as e:
-        logger.error(f"[Stripe Webhook] Error processing webhook: {e}")
+    except (stripe.error.SignatureVerificationError, ValueError) as exc:
+        raise HTTPException(status_code=400, detail="Invalid Stripe signature") from exc
+    except Exception as exc:
+        logger.exception("[Stripe Webhook] Error processing webhook")
+        raise HTTPException(status_code=500, detail="Webhook processing failed") from exc
 
-    # Always return 200 to acknowledge receipt (prevents Stripe retries)
     return {"received": True}
 
 

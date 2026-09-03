@@ -53,6 +53,7 @@ payment_sources = {
     "backend/app/router/subscription.py": ("mock=1", "MOCK_QR_CODE", "MOCK_TRADE", "_mock_verify_receipt"),
     "backend/app/router/stripe.py": ("mock=1", "mock_portal", "sk_test_placeholder", "直接解析 JSON"),
     "backend/app/router/notifications.py": ("Push-MOCK", '"provider": "mock"', '"message_id": f"mock_'),
+    "backend/app/router/seasons_subscription.py": ("checkout.seasons.app/session", "Mock offer codes", "json.loads(body)", "In production, verify the Stripe signature"),
     "backend/app/services/alipay_service.py": ('ALIPAY_MODE", "mock', "跳过回调验签"),
     "backend/app/services/wechat_pay_service.py": ("MOCK_TRANSACTION", "跳过回调验签"),
     "android-cn/lib/presentation/pages/subscription/subscription_page_v2.dart": ("_simulatePaymentSuccess", "setBool('is_subscribed', true)"),
