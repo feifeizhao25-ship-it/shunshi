@@ -274,12 +274,18 @@ async def execute_skill(request: ExecuteRequest):
     根据用户消息和上下文，自动识别意图并执行对应 Skill。
     也可通过 skill_ids 指定特定 Skill。
     """
+    if request.skill_ids is not None and (
+        not request.skill_ids or len(request.skill_ids) > 10 or
+        any(skill_registry.get(skill_id) is None for skill_id in request.skill_ids)
+    ):
+        raise HTTPException(status_code=400, detail="请选择有效的能力，每次最多 10 项")
     orchestrator = get_orchestrator()
 
     try:
         result: SkillExecutionResult = await orchestrator.execute(
             user_message=request.message,
             user_context=request.context,
+            skill_ids=request.skill_ids,
         )
         return ExecuteResponse(
             status=result.status.value,
@@ -301,8 +307,8 @@ async def execute_skill(request: ExecuteRequest):
             safety_flag=result.safety_flag,
             follow_up=result.follow_up,
         )
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Skill execution failed: {str(e)}")
+    except Exception:
+        raise HTTPException(status_code=503, detail="建议生成服务暂时不可用，请稍后重试") from None
 
 
 @router.post("/daily-plan", response_model=ExecuteResponse)
@@ -328,12 +334,14 @@ async def generate_daily_plan(request: DailyPlanRequest):
         "season": "generate_daily_plan_season",
     }
 
-    skill_id = plan_skill_map.get(request.plan_type, "generate_daily_plan_light")
+    skill_id = plan_skill_map.get(request.plan_type)
+    if skill_id is None:
+        raise HTTPException(status_code=400, detail="不支持的计划类型，请重新选择")
     skill = skill_registry.get(skill_id)
     if not skill:
         raise HTTPException(
-            status_code=400,
-            detail=f"Unknown plan_type: {request.plan_type}"
+            status_code=503,
+            detail="所选计划暂时不可用，请稍后重试"
         )
 
     orchestrator = get_orchestrator()
@@ -343,6 +351,7 @@ async def generate_daily_plan(request: DailyPlanRequest):
         result: SkillExecutionResult = await orchestrator.execute(
             user_message=message,
             user_context=request.context or {},
+            skill_ids=[skill_id],
         )
         return ExecuteResponse(
             status=result.status.value,
@@ -364,5 +373,5 @@ async def generate_daily_plan(request: DailyPlanRequest):
             safety_flag=result.safety_flag,
             follow_up=result.follow_up,
         )
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Plan generation failed: {str(e)}")
+    except Exception:
+        raise HTTPException(status_code=503, detail="计划生成服务暂时不可用，请稍后重试") from None

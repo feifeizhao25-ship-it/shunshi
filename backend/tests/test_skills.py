@@ -341,4 +341,5 @@ class TestDailyPlan:
             "plan_type": "invalid_type"
         }
         response = client.post("/api/v1/skills/daily-plan", json=payload)
-        assert response.status_code == 200  # 无效 plan_type 回退到 light 方案
+        assert response.status_code == 400  # 不得把用户选错的类型悄悄替换为另一份计划
+        assert response.json()["detail"] == "不支持的计划类型，请重新选择"

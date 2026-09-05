@@ -172,6 +172,7 @@ class SkillOrchestrator:
         self,
         user_message: str,
         user_context: Optional[Dict[str, Any]] = None,
+        skill_ids: Optional[List[str]] = None,
     ) -> SkillExecutionResult:
         """
         执行 Skill 编排
@@ -218,7 +219,15 @@ class SkillOrchestrator:
             return await self._execute_generic(user_message, user_context, start_time)
 
         # Step 3: Skill 匹配（每个意图映射 1-3 个 Skill）
-        matched_skills = self._match_skills(intent_pairs, user_context)
+        if skill_ids is not None:
+            matched_skills = []
+            for skill_id in dict.fromkeys(skill_ids):
+                selected = self._registry.get(skill_id)
+                if selected is None:
+                    raise ValueError("指定的能力不存在")
+                matched_skills.append(selected)
+        else:
+            matched_skills = self._match_skills(intent_pairs, user_context)
         logger.info(f"[Orchestrator] 匹配 Skill: {[s.skill_id for s in matched_skills]}")
 
         if not matched_skills:
@@ -258,27 +267,8 @@ class SkillOrchestrator:
             None → 安全通过
             Dict → 需要拦截，包含 response, flag, follow_up
         """
-        # 医疗意图检测
-        medical_skill = self._registry.search("医疗意图检测")
-        if medical_skill:
-            keywords = ["诊断", "确诊", "开药", "处方", "治疗",
-                        "手术", "化验单", "检查报告", "怀孕", "孕期"]
-            for kw in keywords:
-                if kw in message:
-                    return {
-                        "response": (
-                            "我是顺时，一个养生健康陪伴助手。关于医疗诊断、"
-                            "用药等问题，建议您咨询专业医生哦。我可以为您提供"
-                            "日常养生调理方面的建议。"
-                        ),
-                        "flag": "medical",
-                        "follow_up": {
-                            "in_days": 1,
-                            "intent": "general_check",
-                            "soft": True,
-                        },
-                    }
-
+        # 危机优先；热线依据国家卫健委通知，2026-09-05 复核。
+        # https://www.nhc.gov.cn/yzygj/c100068/202412/49a1a65386cd4be582d4702fd0926ee8.shtml
         # 危机情绪检测
         crisis_keywords = ["自杀", "不想活", "活着没意思", "结束生命",
                           "伤害自己", "轻生"]
@@ -287,15 +277,34 @@ class SkillOrchestrator:
                 return {
                     "response": (
                         "听到您这样说，我很关心您的安全。如果您正在经历"
-                        "困难时刻，请拨打24小时心理援助热线：\n\n"
-                        "• 全国心理援助热线：400-161-9995\n"
-                        "• 北京心理危机研究与干预中心：010-82951332\n"
-                        "• 生命热线：400-821-1215\n\n"
+                        "困难时刻，可以拨打全国统一心理援助热线 12356。\n\n"
+                        "如果您已受伤或有立即伤害自己的危险，请拨打 120 或 110，"
+                        "并请身边可信任的人陪伴您。\n\n"
                         "您并不孤单，专业的帮助就在身边。"
                     ),
                     "flag": "crisis",
                     "follow_up": None,
                 }
+
+        # 医疗意图检测
+        keywords = ["诊断", "确诊", "开药", "处方", "治疗",
+                    "手术", "化验单", "检查报告", "怀孕", "孕期"]
+        for kw in keywords:
+            if kw in message:
+                return {
+                    "response": (
+                        "我是顺时，一个养生健康陪伴助手。关于医疗诊断、"
+                        "用药等问题，建议您咨询专业医生哦。我可以为您提供"
+                        "日常养生调理方面的建议。"
+                    ),
+                    "flag": "medical",
+                    "follow_up": {
+                        "in_days": 1,
+                        "intent": "general_check",
+                        "soft": True,
+                    },
+                }
+
 
         return None
 
