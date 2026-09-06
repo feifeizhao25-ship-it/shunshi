@@ -13,7 +13,7 @@ Core Skills API - 统一 Schema 输出
 """
 
 from typing import Optional, Dict, Any, List
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel, Field
 
 from ..skills.core_skills import (
@@ -23,6 +23,8 @@ from ..skills.core_skills import (
     SafetyFlag,
     PresenceLevel,
 )
+
+from ..skill_access import SkillAccess, get_skill_access
 
 router = APIRouter(prefix="/api/v1/core-skills", tags=["核心 Skills"])
 
@@ -101,7 +103,7 @@ def _classify_intent(message: str) -> tuple[str, float]:
     for keywords, skill, threshold in INTENT_SKILL_MAP:
         match_count = sum(1 for kw in keywords if kw in message_lower)
         if match_count > 0:
-            confidence = min(match_count * 0.3, 1.0)
+            confidence = min(threshold + (match_count - 1) * 0.05, 1.0)
             if confidence >= threshold and confidence > best_confidence:
                 best_skill = skill
                 best_confidence = confidence
@@ -109,34 +111,37 @@ def _classify_intent(message: str) -> tuple[str, float]:
     return best_skill, best_confidence
 
 
+PREMIUM_CORE_SKILLS = {"BodyConstitutionLite", "FoodTeaRecommender", "FamilyCareDigest"}
+VALID_CORE_SKILLS = {
+    "DailyRhythmPlan", "SleepWindDown", "OfficeMicroBreak", "MoodFirstAid",
+    "SolarTermGuide", "BodyConstitutionLite", "FoodTeaRecommender",
+    "AcupressureRoutineLite", "FollowUpGenerator", "PresencePolicyDecider",
+    "CareStatusUpdater", "FamilyCareDigest",
+}
+
+def _authorize_core(access: SkillAccess, user_id: str, skill: str):
+    if skill not in VALID_CORE_SKILLS:
+        raise HTTPException(status_code=400, detail="请选择有效的能力")
+    access.require(user_id, skill in PREMIUM_CORE_SKILLS)
+
+
 # ==================== API 端点 ====================
 
 @router.post("/run", response_model=CoreSkillResponse)
-async def run_core_skill(request: CoreSkillRunRequest):
+async def run_core_skill(request: CoreSkillRunRequest, access: SkillAccess = Depends(get_skill_access)):
     """
     执行指定核心 Skill
     
     根据 skill 名称执行对应的核心 Skill，返回统一 Schema 输出。
     """
-    valid_skills = [
-        "DailyRhythmPlan", "SleepWindDown", "OfficeMicroBreak", "MoodFirstAid",
-        "SolarTermGuide", "BodyConstitutionLite", "FoodTeaRecommender",
-        "AcupressureRoutineLite", "FollowUpGenerator", "PresencePolicyDecider",
-        "CareStatusUpdater", "FamilyCareDigest",
-    ]
-    
-    if request.skill not in valid_skills:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Invalid skill: {request.skill}. Valid skills: {valid_skills}",
-        )
-    
+    _authorize_core(access, request.user_id, request.skill)
+
     input_data = CoreSkillInput(
         user_id=request.user_id,
         user_context=request.user_context,
         task_params=request.task_params,
         signals=request.signals,
-        locale=request.locale,
+        locale="zh-CN",
     )
     
     try:
@@ -145,25 +150,28 @@ async def run_core_skill(request: CoreSkillRunRequest):
             success=True,
             data=output.to_dict(),
         )
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Core skill execution failed: {str(e)}")
+    except Exception:
+        raise HTTPException(status_code=503, detail="能力服务暂时不可用，请稍后重试") from None
 
 
 @router.post("/chat", response_model=CoreSkillResponse)
-async def chat_core_skill(request: CoreSkillChatRequest):
+async def chat_core_skill(request: CoreSkillChatRequest, access: SkillAccess = Depends(get_skill_access)):
     """
     智能路由聊天（消息 → 自动匹配 Skill）
     
     根据用户消息自动识别意图，路由到对应的核心 Skill 执行。
     """
+    if not request.message.strip():
+        raise HTTPException(status_code=400, detail="请输入问题")
     skill_name, confidence = _classify_intent(request.message)
+    _authorize_core(access, request.user_id, skill_name)
     
     input_data = CoreSkillInput(
         user_id=request.user_id,
         user_context=request.user_context,
         task_params={"message": request.message, "confidence": confidence},
         signals=request.signals,
-        locale=request.locale,
+        locale="zh-CN",
     )
     
     try:
@@ -173,6 +181,8 @@ async def chat_core_skill(request: CoreSkillChatRequest):
         result["_routing"] = {
             "skill": skill_name,
             "confidence": confidence,
+            "method": "keyword_rules",
+            "confidence_is_probability": False,
             "message": request.message,
         }
         
@@ -180,8 +190,8 @@ async def chat_core_skill(request: CoreSkillChatRequest):
             success=True,
             data=result,
         )
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Chat routing failed: {str(e)}")
+    except Exception:
+        raise HTTPException(status_code=503, detail="对话服务暂时不可用，请稍后重试") from None
 
 
 @router.get("/list", response_model=CoreSkillListResponse)
@@ -294,12 +304,16 @@ async def list_core_skills():
 
 
 @router.post("/batch", response_model=CoreSkillResponse)
-async def batch_core_skills(requests: List[CoreSkillRunRequest]):
+async def batch_core_skills(requests: List[CoreSkillRunRequest], access: SkillAccess = Depends(get_skill_access)):
     """
     批量执行多个核心 Skill
     
     用于需要同时获取多个 Skill 结果的场景（如首页加载）。
     """
+    if not requests or len(requests) > 12 or len({req.skill for req in requests}) != len(requests):
+        raise HTTPException(status_code=400, detail="每次请选择 1 至 12 项不同的能力")
+    for req in requests:
+        _authorize_core(access, req.user_id, req.skill)
     results = {}
     
     for req in requests:
@@ -308,20 +322,20 @@ async def batch_core_skills(requests: List[CoreSkillRunRequest]):
             user_context=req.user_context,
             task_params=req.task_params,
             signals=req.signals,
-            locale=req.locale,
+            locale="zh-CN",
         )
         
         try:
             output = await core_skill_executor.execute(req.skill, input_data)
             results[req.skill] = output.to_dict()
-        except Exception as e:
+        except Exception:
             results[req.skill] = {
                 "skill": req.skill,
-                "error": str(e),
+                "error": "能力服务暂时不可用，请稍后重试",
                 "success": False,
             }
     
     return CoreSkillResponse(
-        success=True,
+        success=all(item.get("success", True) for item in results.values()),
         data={"results": results, "count": len(results)},
     )

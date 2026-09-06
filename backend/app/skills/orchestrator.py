@@ -173,6 +173,7 @@ class SkillOrchestrator:
         user_message: str,
         user_context: Optional[Dict[str, Any]] = None,
         skill_ids: Optional[List[str]] = None,
+        allow_premium: bool = False,
     ) -> SkillExecutionResult:
         """
         执行 Skill 编排
@@ -225,9 +226,12 @@ class SkillOrchestrator:
                 selected = self._registry.get(skill_id)
                 if selected is None:
                     raise ValueError("指定的能力不存在")
+                if selected.is_premium and not allow_premium:
+                    raise PermissionError("此能力需要有效会员权益")
                 matched_skills.append(selected)
         else:
-            matched_skills = self._match_skills(intent_pairs, user_context)
+            matched_skills = [skill for skill in self._match_skills(intent_pairs, user_context)
+                              if allow_premium or not skill.is_premium]
         logger.info(f"[Orchestrator] 匹配 Skill: {[s.skill_id for s in matched_skills]}")
 
         if not matched_skills:

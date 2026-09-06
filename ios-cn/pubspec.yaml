@@ -30,6 +30,7 @@ dependencies:
   json_annotation: ^4.9.0
   
   # UI
+  flutter_markdown: ^0.7.4
   cached_network_image: ^3.4.1
   shimmer: ^3.0.0
   flutter_svg: ^2.2.4

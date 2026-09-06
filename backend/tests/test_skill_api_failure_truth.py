@@ -8,6 +8,8 @@ from app.router import skills
 def client():
     app = FastAPI()
     app.include_router(skills.router)
+    from app.skill_access import SkillAccess, get_skill_access
+    app.dependency_overrides[get_skill_access] = lambda: SkillAccess("u", True)
     return TestClient(app)
 
 

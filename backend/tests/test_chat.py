@@ -74,12 +74,10 @@ def test_ai_chat_contract_via_shunshi_router(gateway_client):
     )
     assert response.status_code == 200
     assert response.json()["content"]
-    # 客户端已组装完整 prompt 时以它为准作为 system 消息
-    assert captured["payload"]["messages"] == [
-        {"role": "system", "content": "系统提示词"},
-        {"role": "user", "content": "最近总是失眠"},
-    ]
-    assert captured["tier"] == "premium"
+    assert captured["payload"]["messages"][0] == {"role": "system", "content": chat_module.SYSTEM_PROMPT}
+    assert all(item["content"] != "系统提示词" for item in captured["payload"]["messages"])
+    assert captured["payload"]["messages"][-1] == {"role": "user", "content": "最近总是失眠"}
+    assert captured["tier"] == "free"
 
 
 def test_chat_injects_only_verified_current_rag_and_returns_sources(gateway_client):
@@ -191,7 +189,7 @@ def test_request_gateway_forwards_429_and_503(monkeypatch):
             asyncio.run(chat_module.request_gateway("http://gw", {"scene": "chat"}))
         assert exc_info.value.status_code == status
         assert exc_info.value.detail["gateway_status"] == status
-        assert exc_info.value.detail["gateway_detail"]["code"] == "X"
+        assert "gateway_detail" not in exc_info.value.detail
 
 
 def test_request_gateway_maps_other_errors_to_502(monkeypatch):
@@ -254,3 +252,29 @@ def test_request_gateway_rejects_empty_content(monkeypatch):
     with pytest.raises(chat_module.HTTPException) as exc_info:
         asyncio.run(chat_module.request_gateway("http://gw", {"scene": "chat"}))
     assert exc_info.value.status_code == 502
+
+
+def test_paid_model_tier_comes_from_persisted_entitlement(gateway_client):
+    import time
+    from app.entitlements import get_registry
+    from app.simple_models import Entitlement
+    client, headers, captured = gateway_client
+    client.post('/api/v1/chat/send', headers=headers, json={'message': '你好'})
+    user_id = captured['payload']['user_id']
+    product_id = next(product for product, tier in get_registry()['product_tier_map'].items() if tier == 'pro')
+    with client.app.state.session_factory() as session:
+        session.add(Entitlement(user_id=user_id, product_id=product_id, store='test', expires_at=int(time.time()) + 3600, original_transaction_id='test-verified-entitlement'))
+        session.commit()
+    response = client.post('/api/v1/chat/send', headers=headers, json={'message': '你好', 'model_tier': 'enterprise'})
+    assert response.status_code == 200
+    assert captured['tier'] == 'pro'
+
+
+def test_unsafe_model_answer_is_replaced_not_disclaimed(gateway_client, monkeypatch):
+    from types import SimpleNamespace
+    from app.safety.guard import safety_guard
+    client, headers, _ = gateway_client
+    monkeypatch.setattr(safety_guard, 'check_output', lambda *args: SimpleNamespace(should_block=False, flag='output_violation', override_response=None, prefix='请咨询医生'))
+    response = client.post('/api/v1/chat/send', headers=headers, json={'message': '你好'})
+    assert response.status_code == 200
+    assert response.json()['content'] == '请咨询医生'

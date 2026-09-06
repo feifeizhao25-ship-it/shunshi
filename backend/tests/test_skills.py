@@ -9,6 +9,18 @@ from app.main import app
 
 client = TestClient(app)
 
+@pytest.fixture(autouse=True)
+def authorized_skill_account():
+    from app.skill_access import get_skill_access, SkillAccess
+    old = app.dependency_overrides.get(get_skill_access)
+    app.dependency_overrides[get_skill_access] = lambda: SkillAccess('user-001', True)
+    yield
+    if old is None:
+        app.dependency_overrides.pop(get_skill_access, None)
+    else:
+        app.dependency_overrides[get_skill_access] = old
+
+
 
 class TestSkillsList:
     """Skill 列表端点测试"""

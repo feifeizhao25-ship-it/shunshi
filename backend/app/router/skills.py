@@ -15,11 +15,13 @@
 """
 
 from typing import Optional, Dict, Any, List, Union
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Depends
 from pydantic import BaseModel, Field, field_validator
 
 from ..skills.skill_registry import skill_registry
 from ..skills.orchestrator import SkillOrchestrator, SkillExecutionResult
+
+from ..skill_access import SkillAccess, get_skill_access
 
 router = APIRouter(prefix="/api/v1/skills")
 
@@ -76,7 +78,7 @@ class CategoryInfo(BaseModel):
 
 class ExecuteRequest(BaseModel):
     """Skill 执行请求"""
-    user_id: str
+    user_id: Optional[str] = None
     message: str
     context: Optional[Dict[str, Any]] = None
     skill_ids: Optional[List[str]] = None  # 可指定特定 Skill
@@ -95,7 +97,7 @@ class ExecuteResponse(BaseModel):
 
 class DailyPlanRequest(BaseModel):
     """今日计划请求"""
-    user_id: str
+    user_id: Optional[str] = None
     context: Optional[Dict[str, Any]] = None
     plan_type: str = "light"  # light / deep / emotion / sleep / constitution / season
 
@@ -267,18 +269,21 @@ async def get_skill(skill_id: str):
 
 
 @router.post("/execute", response_model=ExecuteResponse)
-async def execute_skill(request: ExecuteRequest):
+async def execute_skill(request: ExecuteRequest, access: SkillAccess = Depends(get_skill_access)):
     """
     执行 Skill
 
     根据用户消息和上下文，自动识别意图并执行对应 Skill。
     也可通过 skill_ids 指定特定 Skill。
     """
+    access.require(request.user_id)
     if request.skill_ids is not None and (
         not request.skill_ids or len(request.skill_ids) > 10 or
         any(skill_registry.get(skill_id) is None for skill_id in request.skill_ids)
     ):
         raise HTTPException(status_code=400, detail="请选择有效的能力，每次最多 10 项")
+    for skill_id in request.skill_ids or []:
+        access.require(request.user_id, skill_registry.get(skill_id).is_premium)
     orchestrator = get_orchestrator()
 
     try:
@@ -286,6 +291,7 @@ async def execute_skill(request: ExecuteRequest):
             user_message=request.message,
             user_context=request.context,
             skill_ids=request.skill_ids,
+            allow_premium=access.premium,
         )
         return ExecuteResponse(
             status=result.status.value,
@@ -312,7 +318,7 @@ async def execute_skill(request: ExecuteRequest):
 
 
 @router.post("/daily-plan", response_model=ExecuteResponse)
-async def generate_daily_plan(request: DailyPlanRequest):
+async def generate_daily_plan(request: DailyPlanRequest, access: SkillAccess = Depends(get_skill_access)):
     """
     生成今日养生计划
 
@@ -324,6 +330,7 @@ async def generate_daily_plan(request: DailyPlanRequest):
     - constitution: 体质调理计划
     - season: 节气养生计划
     """
+    access.require(request.user_id)
     # 映射 plan_type 到 skill_id
     plan_skill_map = {
         "light": "generate_daily_plan_light",
@@ -344,6 +351,7 @@ async def generate_daily_plan(request: DailyPlanRequest):
             detail="所选计划暂时不可用，请稍后重试"
         )
 
+    access.require(request.user_id, skill.is_premium)
     orchestrator = get_orchestrator()
     message = f"请为我生成{skill.name}"
 
@@ -352,6 +360,7 @@ async def generate_daily_plan(request: DailyPlanRequest):
             user_message=message,
             user_context=request.context or {},
             skill_ids=[skill_id],
+            allow_premium=access.premium,
         )
         return ExecuteResponse(
             status=result.status.value,
