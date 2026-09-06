@@ -367,6 +367,19 @@ async def client(mock_db):
         yield ac
 
 
+@pytest_asyncio.fixture
+async def production_chat_client(tmp_path):
+    from app.config import Settings
+    from app.main import create_app
+
+    app = create_app(Settings(env="test", database_url=f"sqlite:///{tmp_path}/chat.db", jwt_secret="fixture-only-secret-at-least-32-chars", model_router_url="http://fixture-gateway"))
+    async with app.router.lifespan_context(app):
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://testserver") as client:
+            login = await client.post("/api/v1/auth/guest-login", json={})
+            client.headers["Authorization"] = "Bearer " + login.json()["access_token"]
+            yield client
+
+
 # ============================================================
 # 辅助
 # ============================================================
@@ -514,11 +527,12 @@ class TestNewUserJourney:
         search_data = resp.json()["data"]
         assert "items" in search_data
 
-    @patch("app.llm.siliconflow.SiliconFlowClient.chat_completion", new_callable=AsyncMock)
+    @patch("app.routers.chat.request_gateway", new_callable=AsyncMock)
     @pytest.mark.asyncio
-    async def test_chat_first_message(self, mock_chat, client: AsyncClient):
+    async def test_chat_first_message(self, mock_chat, production_chat_client):
         """发送第一条AI消息"""
-        mock_chat.return_value = MOCK_LLM_RESPONSE
+        client = production_chat_client
+        mock_chat.return_value = "这是AI的养生建议回复。"
 
         resp = await client.post(
             "/api/v1/chat",
@@ -842,8 +856,9 @@ class TestCrisisJourney:
     """危机场景: 安全过滤应拦截并返回热线, 不调用LLM"""
 
     @pytest.mark.asyncio
-    async def test_crisis_input_returns_hotline(self, client: AsyncClient):
+    async def test_crisis_input_returns_hotline(self, production_chat_client):
         """危机输入返回热线信息"""
+        client = production_chat_client
         # 使用明确的危机关键词
         crisis_messages = [
             "我想自杀",
@@ -868,10 +883,11 @@ class TestCrisisJourney:
                 f"危机回复应包含热线信息, 实际: {text[:100]}"
             )
 
-    @patch("app.llm.siliconflow.SiliconFlowClient.chat_completion", new_callable=AsyncMock)
+    @patch("app.routers.chat.request_gateway", new_callable=AsyncMock)
     @pytest.mark.asyncio
-    async def test_crisis_does_not_call_llm(self, mock_chat, client: AsyncClient):
+    async def test_crisis_does_not_call_llm(self, mock_chat, production_chat_client):
         """危机场景不调用LLM（快速响应）"""
+        client = production_chat_client
         mock_chat.return_value = MOCK_LLM_RESPONSE
 
         resp = await client.post(

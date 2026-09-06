@@ -284,6 +284,19 @@ async def client(mock_db):
         yield ac
 
 
+@pytest_asyncio.fixture
+async def production_chat_client(tmp_path):
+    from app.config import Settings
+    from app.main import create_app
+
+    app = create_app(Settings(env="test", database_url=f"sqlite:///{tmp_path}/chat.db", jwt_secret="fixture-only-secret-at-least-32-chars", model_router_url="http://fixture-gateway"))
+    async with app.router.lifespan_context(app):
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://testserver") as client:
+            login = await client.post("/api/v1/auth/guest-login", json={})
+            client.headers["Authorization"] = "Bearer " + login.json()["access_token"]
+            yield client
+
+
 # ============================================================
 # Mock LLM 响应
 # ============================================================
@@ -321,19 +334,8 @@ def _mock_fallback_result(text="这是测试回复，建议适当运动保持健
 
 
 def _patch_chat_llm():
-    """
-    返回一个 patch context manager，mock 掉 chat 路由中的 LLM 调用链。
-    需要同时 mock fallback chain.chat() 以避免真实 API 调用和超时。
-    """
-    from app.llm.fallback import get_fallback_chain
-
-    async def _mock_chain_chat(*args, **kwargs):
-        return _mock_fallback_result()
-
-    mock_chain = MagicMock()
-    mock_chain.chat = AsyncMock(side_effect=_mock_chain_chat)
-
-    return patch("app.router.chat.get_fallback_chain", return_value=mock_chain)
+    """Intercept the canonical gateway; local timing is not provider latency."""
+    return patch("app.routers.chat.request_gateway", new=AsyncMock(return_value="这是测试回复，建议适当运动保持健康。"))
 
 
 # ============================================================
@@ -423,8 +425,9 @@ class TestResponseTime:
         assert avg_ms < 1000, f"Auth login too slow: avg={avg_ms:.1f}ms"
 
     @pytest.mark.asyncio
-    async def test_chat_single_under_5s(self, client: AsyncClient):
+    async def test_chat_single_under_5s(self, production_chat_client):
         """POST /api/v1/chat 单条消息 < 5s (mock LLM, 宽松阈值: 1s)"""
+        client = production_chat_client
         with _patch_chat_llm():
             # Warm up
             await client.post("/api/v1/chat?message=你好&user_id=perf-test-001")
@@ -547,8 +550,9 @@ class TestConcurrency:
         assert overall_ms < 3000, f"10 concurrent content requests took {overall_ms:.1f}ms"
 
     @pytest.mark.asyncio
-    async def test_5_consecutive_chats(self, client: AsyncClient):
+    async def test_5_consecutive_chats(self, production_chat_client):
         """5个连续聊天请求 (不并发，模拟真实使用) — 每个应在 1s 内"""
+        client = production_chat_client
         with _patch_chat_llm():
             messages = [
                 "你好，今天心情不错",
@@ -746,11 +750,12 @@ class TestLargeData:
         assert elapsed < 1000, f"100 item query too slow: {elapsed:.1f}ms"
 
     @pytest.mark.asyncio
-    async def test_long_chat_message(self, client: AsyncClient):
+    async def test_long_chat_message(self, production_chat_client):
         """长消息 (5000字) 处理 — 应在 1s 内完成"""
         # 构造 5000 字长消息
         long_message = "你好，" + "今天天气真好，" * 833 + "谢谢！"  # ~5000 chars
 
+        client = production_chat_client
         with _patch_chat_llm():
             start = time.perf_counter()
             resp = await client.post(
@@ -759,7 +764,7 @@ class TestLargeData:
             )
             elapsed = (time.perf_counter() - start) * 1000
 
-            assert resp.status_code == 200, f"Long message chat failed: {resp.text}"
+            assert resp.status_code == 422, f"Oversized message must be rejected: {resp.text}"
             print(f"\n  Long message ({len(long_message)} chars): {elapsed:.1f}ms")
             assert elapsed < 1000, f"Long message processing too slow: {elapsed:.1f}ms"
 

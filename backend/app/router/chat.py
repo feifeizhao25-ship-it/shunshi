@@ -1,6 +1,9 @@
 # 聊天 API 路由
-from fastapi import APIRouter, HTTPException, Query
-from pydantic import BaseModel
+from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy.orm import Session
+from app.config import Settings
+from app.deps import current_user, get_session, get_settings
+from pydantic import BaseModel, Field
 from typing import List, Optional, Dict
 from datetime import datetime
 import random
@@ -14,27 +17,10 @@ router = APIRouter(prefix="/api/v1/chat", tags=["聊天"])
 # ============ LLM & Intent & Safety ============
 
 from app.llm.siliconflow import (
-    SiliconFlowClient, ChatMessage, MessageRole, get_client,
+    ChatMessage, MessageRole,
 )
-from app.router.config import UserTier, RoutingContext
 from app.router.router import ModelRouter
-from app.llm.fallback import (
-    ModelFallbackChain,
-    get_fallback_chain,
-    FallbackResult,
-    FALLBACK_TEMPLATES,
-)
-from app.prompts.registry import prompt_registry
-from app.prompts.store import prompt_store
-from app.core.intent_detector import intent_detector, INTENT_SYSTEM_PROMPTS
-from app.core.safety_filter import safety_filter as _legacy_safety_filter, SafetyLevel as _LegacySafetyLevel
-from app.middleware.llm_quota import llm_quota
 # 优先使用新的 SafetyGuard 模块
-from app.safety.guard import safety_guard, SafetyLevel, SafetyResult
-from app.skills.executor import init_skill_executor
-from app.services.response_parser import parse_ai_response
-from app.services.presence_level import calculate_presence_level
-from sqlalchemy import text
 
 # 模型路由器
 model_router = ModelRouter()
@@ -269,7 +255,7 @@ def _generate_follow_up(intent: str) -> Optional[dict]:
 
 class ChatRequest(BaseModel):
     model_config = {"extra": "ignore"}  # 允许额外字段，兼容旧测试
-    message: str
+    message: str = Field(min_length=1, max_length=4000)
     conversation_id: Optional[str] = None
     user_id: Optional[str] = None  # 兼容测试脚本通过 body 传 user_id
 
@@ -295,296 +281,49 @@ class ChatResponse(BaseModel):
 @router.post("", response_model=dict, summary="发送聊天消息", description="发送消息给AI，经过安全过滤、意图识别、模型路由后返回AI回复，支持RAG知识增强和fallback降级")
 async def chat(
     request: ChatRequest = None,
-    message: str = Query(None),
+    message: str = Query(None, min_length=1, max_length=4000),
     conversation_id: Optional[str] = Query(None),
-    user_id: str = Query("user-001")
+    user_id: str = Depends(current_user),
+    session: Session = Depends(get_session),
+    settings: Settings = Depends(get_settings),
 ):
-    # 同时支持 JSON body 和 Query 参数
-    if request and request.message:
+    """Compatibility envelope around the authenticated domestic chat service."""
+    from app.routers.chat import ChatBody, chat as domestic_chat
+
+    if request is not None:
         message = request.message
-        if request.conversation_id:
-            conversation_id = request.conversation_id
-        if request.user_id:
-            user_id = request.user_id
+        conversation_id = request.conversation_id or conversation_id
     if not message:
-        raise HTTPException(status_code=422, detail="message is required")
-    """发送消息"""
-    # LLM 配额检查
-    try:
-        from ..middleware.llm_quota import llm_quota
-        if not llm_quota.check_quota(user_id, "free"):
-            raise HTTPException(status_code=429, detail="今日AI对话次数已达上限，明天再来哦")
-    except HTTPException:
-        raise
-    except Exception:
-        pass
-    # 创建或获取会话
-    if not conversation_id:
-        conversation_id = f"conv_{user_id}_{datetime.now().strftime('%Y%m%d%H%M%S')}"
-    
+        raise HTTPException(status_code=422, detail="消息内容不能为空")
+    if conversation_id:
+        existing = conversations_db.get(conversation_id)
+        if existing is None or existing.get("user_id") != user_id:
+            raise HTTPException(status_code=404, detail="会话不存在")
+    result = await domestic_chat(
+        body=ChatBody(message=message), user_id=user_id,
+        session=session, settings=settings,
+    )
+    from app.simple_models import Message as StoredMessage
+    stored = [item for item in session.new if isinstance(item, StoredMessage) and item.user_id == user_id]
+    session.flush()
+    conversation_id = conversation_id or f"conv_{uuid.uuid4().hex}"
     if conversation_id not in conversations_db:
         conversations_db[conversation_id] = {
-            "id": conversation_id,
-            "user_id": user_id,
-            "title": message[:20] + "...",
-            "created_at": datetime.now().isoformat(),
-            "messages": []
+            "id": conversation_id, "user_id": user_id, "title": message[:20],
+            "created_at": datetime.now().isoformat(), "messages": [],
         }
-    
-    # 保存用户消息
-    user_message_id = str(uuid.uuid4())
-    user_message = {
-        "id": user_message_id,
-        "role": "user",
-        "content": message,
-        "created_at": datetime.now().isoformat()
-    }
-    conversations_db[conversation_id]["messages"].append(user_message)
-    
-    # ============ Step 1: Safety Check (输入安全过滤) ============
-    safety_result = safety_guard.check_input(message, {"user_id": user_id})
-
-    # Crisis 模式：直接阻断，返回安全资源
-    if safety_result.level == SafetyLevel.CRISIS:
-        ai_message_id = str(uuid.uuid4())
-        ai_message = {
-            "id": ai_message_id,
-            "role": "assistant",
-            "content": safety_result.override_response,
-            "created_at": datetime.now().isoformat()
-        }
-        conversations_db[conversation_id]["messages"].append(ai_message)
-
-        return {
-            "success": True,
-            "data": {
-                "message_id": ai_message_id,
-                "conversation_id": conversation_id,
-                "text": safety_result.override_response,
-                "tone": "empathetic",
-                "care_status": "crisis",
-                "follow_up": None,
-                "offline_encouraged": False,
-                "presence_level": "normal",
-                "safety_flag": "crisis",
-            }
-        }
-
-    # Block 模式（医疗边界等）：不调用LLM，直接返回
-    if safety_result.should_block and safety_result.override_response:
-        ai_message_id = str(uuid.uuid4())
-        ai_message = {
-            "id": ai_message_id,
-            "role": "assistant",
-            "content": safety_result.override_response,
-            "created_at": datetime.now().isoformat()
-        }
-        conversations_db[conversation_id]["messages"].append(ai_message)
-
-        return {
-            "success": True,
-            "data": {
-                "message_id": ai_message_id,
-                "conversation_id": conversation_id,
-                "text": safety_result.override_response,
-                "tone": "gentle",
-                "care_status": "stable",
-                "follow_up": None,
-                "offline_encouraged": True,
-                "presence_level": "normal",
-                "safety_flag": safety_result.flag,
-            }
-        }
-    
-    # ============ Step 2: LLM Quota Check ============
-    tier = "paid" if user_id and not user_id.startswith("guest_") else "free"
-    if not llm_quota.check_quota(user_id, tier):
-        raise HTTPException(
-            status_code=429,
-            detail="今日AI对话次数已达上限，明天再来哦",
-        )
-
-    # ============ Step 3: Intent Detection ============
-    intent_result = intent_detector.detect(message)
-    logger.info(f"[Chat] Intent: {intent_result.intent} (confidence: {intent_result.confidence})")
-    
-    # ============ Step 3: Get System Prompt ============
-    # 优先使用 PromptStore（版本管理 + 灰度），降级到内存 registry
-    base_system_prompt = prompt_store.get_prompt("chat.system", user_id=user_id)
-    if not base_system_prompt:
-        base_system_prompt = prompt_registry.get("core") or ""
-    intent_system_prompt = INTENT_SYSTEM_PROMPTS.get(intent_result.intent, "")
-    
-    # 拼接：base + intent-specific
-    if base_system_prompt and intent_system_prompt:
-        system_prompt = f"{base_system_prompt}\n\n---\n\n{intent_system_prompt}"
-    else:
-        system_prompt = intent_system_prompt or base_system_prompt or "你是顺时，一个温暖贴心的 AI 养生健康陪伴助手。"
-    
-    # EmotionalDistress 模式：添加共情前缀
-    if safety_result.level == SafetyLevel.EMOTIONAL_DISTRESS and safety_result.prefix:
-        system_prompt = safety_result.prefix + system_prompt
-    elif safety_result.level == SafetyLevel.SENSITIVE and safety_result.prefix:
-        system_prompt = safety_result.prefix + system_prompt
-    
-    # ============ Step 4: Build Context Window ============
-    history = _get_conversation_history(conversation_id)
-    context_messages = _build_context_window(system_prompt, history, message)
-    
-    # ============ Step 5: Route Model Selection ============
-    # 从数据库查询用户订阅等级
-    try:
-        from app.database.db import get_db
-        db = get_db()
-        row = db.execute(
-            "SELECT subscription_plan FROM users WHERE id = ?",
-            (user_id,)
-        ).fetchone()
-        user_tier_str = row["subscription_plan"] if row else "free"
-    except Exception:
-        user_tier_str = "free"
-    
-    tier_map = {"free": UserTier.FREE, "yangxin": UserTier.PREMIUM, "yiyang": UserTier.PREMIUM, "jiahe": UserTier.FAMILY}
-    user_tier = tier_map.get(user_tier_str, UserTier.FREE)
-    
-    routing_context = RoutingContext(
-        user_id=user_id,
-        user_tier=user_tier,
-        api_path="/chat/send",
-        prompt=message,
-    )
-    route_result = model_router.select_model(routing_context)
-    selected_model = route_result.selected_model
-
-    # ============ Step 5.5: RAG Knowledge Enhancement ============
-    rag_sources = []
-    rag_source_details = []
-    try:
-        from app.rag.evidence import verified_cn_context
-
-        knowledge_context, rag_sources, rag_source_details = verified_cn_context(message)
-        if knowledge_context:
-            system_prompt += (
-                "\n\n--- 已核验官方参考知识 ---\n"
-                "只能按原文范围回答，不得扩展为诊断、处方或疗效承诺。\n"
-                f"{knowledge_context}"
-            )
-            logger.info("[Chat] RAG 注入 %s 个已核验 chunks", len(rag_sources))
-    except Exception as rag_err:
-        logger.error("[Chat] RAG 检索失败，未注入知识: %s", rag_err)
-
-    # ============ Step 6: Call LLM (with Fallback Chain) ============
-    ai_response = None
-    tone = "gentle"
-    care_status = "stable"
-    safety_flag = "none"
-    
-    try:
-        fallback_chain = get_fallback_chain()
-        fb_result: FallbackResult = await fallback_chain.chat(
-            user_id=user_id,
-            messages=context_messages,
-            primary_provider="deepseek",
-            primary_model=selected_model,
-            skill_chain=[intent_result.intent] if intent_result else [],
-            route_decision=f"model_router_selected={selected_model}",
-            temperature=0.7,
-            max_tokens=4096,
-            user_tier=user_tier_str,
-        )
-        
-        if fb_result.response_text:
-            ai_text = fb_result.response_text
-            
-            # 使用3级降级解析 AI 响应
-            parsed = parse_ai_response(ai_text)
-            
-            # 计算 presence_level
-            conv_messages = conversations_db[conversation_id].get("messages", [])
-            user_timestamps = [
-                msg["created_at"] for msg in conv_messages if msg["role"] == "user"
-            ]
-            presence = calculate_presence_level(
-                message_timestamps=user_timestamps[-20:]  # 最近20条用户消息
-            )
-            
-            ai_response = {
-                "text": parsed["text"],
-                "tone": parsed.get("tone") or _determine_tone(message, intent_result.intent),
-                "care_status": parsed.get("care_status") or ("distressed" if safety_result.level == SafetyLevel.EMOTIONAL_DISTRESS else "stable"),
-                "follow_up": parsed.get("follow_up") or _generate_follow_up(intent_result.intent),
-                "offline_encouraged": parsed.get("offline_encouraged", True),
-                "presence_level": presence,
-                "safety_flag": parsed.get("safety_flag") or safety_result.level.value,
-            }
-
-            # Fallback 事件日志
-            if fb_result.fallback_reason:
-                logger.warning(
-                    f"[Chat] Fallback 发生: reason={fb_result.fallback_reason.value}, "
-                    f"from={fb_result.fallback_from}, to={fb_result.provider}/{fb_result.model}, "
-                    f"tried={fb_result.tried_providers}"
-                )
-            else:
-                logger.info(
-                    f"[Chat] LLM 回复成功: model={fb_result.model}, "
-                    f"provider={fb_result.provider}, tokens={fb_result.tokens_in + fb_result.tokens_out}, "
-                    f"presence={presence}"
-                )
-    
-    except Exception as e:
-        logger.error(f"[Chat] LLM 调用失败: {e}, 降级到模板匹配")
-    
-    # ============ Step 7: Fallback to Template ============
-    if ai_response is None:
-        ai_response = generate_ai_response(message)
-        ai_response["safety_flag"] = safety_result.level.value
-        if safety_result.level == SafetyLevel.EMOTIONAL_DISTRESS:
-            ai_response["care_status"] = "distressed"
-        # 为模板响应也计算 presence_level
-        conv_msgs = conversations_db[conversation_id].get("messages", [])
-        user_ts = [m["created_at"] for m in conv_msgs if m["role"] == "user"]
-        ai_response["presence_level"] = calculate_presence_level(
-            message_timestamps=user_ts[-20:]
-        )
-    
-    # ============ Step 7.5: Output Safety Check ============
-    if ai_response is not None and ai_response.get("text"):
-        output_safety = safety_guard.check_output(
-            ai_response["text"],
-            {"user_id": user_id, "model": selected_model},
-        )
-        if output_safety.level != SafetyLevel.NORMAL:
-            # 追加警告后缀到AI回复
-            if output_safety.prefix:
-                ai_response["text"] = ai_response["text"] + output_safety.prefix
-                ai_response["safety_flag"] = output_safety.flag
-
-    # ============ Step 8: Save & Return ============
-    ai_message_id = str(uuid.uuid4())
-    ai_message = {
-        "id": ai_message_id,
-        "role": "assistant",
-        "content": ai_response["text"],
-        "created_at": datetime.now().isoformat()
-    }
-    conversations_db[conversation_id]["messages"].append(ai_message)
-    
-    return {
-        "success": True,
-        "data": {
-            "message_id": ai_message_id,
-            "conversation_id": conversation_id,
-            "sources": rag_sources,
-            "source_details": rag_source_details,
-            **ai_response
-        }
-    }
+    conversations_db[conversation_id].setdefault("stored_message_ids", []).extend(item.id for item in stored)
+    message_id = str(uuid.uuid4())
+    conversations_db[conversation_id]["messages"].extend([
+        {"id": str(uuid.uuid4()), "role": "user", "content": message, "created_at": datetime.now().isoformat()},
+        {"id": message_id, "role": "assistant", "content": result["text"], "created_at": datetime.now().isoformat()},
+    ])
+    return {"success": True, "data": {**result, "message_id": message_id, "conversation_id": conversation_id}}
 
 
 @router.get("/conversations", response_model=dict, summary="获取会话列表", description="返回当前用户的所有会话，按时间倒序排列")
 async def get_conversations(
-    user_id: str = Query("user-001"),
+    user_id: str = Depends(current_user),
     limit: int = Query(20, ge=1, le=100)
 ):
     """获取会话列表"""
@@ -607,7 +346,7 @@ async def get_conversations(
 @router.get("/conversations/{conversation_id}", response_model=dict, summary="获取会话详情", description="返回指定会话的完整信息，包括所有消息")
 async def get_conversation(
     conversation_id: str,
-    user_id: str = Query("user-001")
+    user_id: str = Depends(current_user)
 ):
     """获取会话详情"""
     if conversation_id not in conversations_db:
@@ -626,13 +365,20 @@ async def get_conversation(
 @router.delete("/conversations/{conversation_id}", response_model=dict, summary="删除会话", description="删除指定的聊天会话及其所有消息")
 async def delete_conversation(
     conversation_id: str,
-    user_id: str = Query("user-001")
+    user_id: str = Depends(current_user),
+    session: Session = Depends(get_session),
 ):
     """删除会话"""
     if conversation_id in conversations_db:
         conv = conversations_db[conversation_id]
         if conv.get("user_id") != user_id:
             raise HTTPException(status_code=403, detail="无权删除此会话")
+        from app.simple_models import Message as StoredMessage
+        for message_id in conv.get("stored_message_ids", []):
+            stored = session.get(StoredMessage, message_id)
+            if stored is not None and stored.user_id == user_id:
+                session.delete(stored)
+        session.flush()
         del conversations_db[conversation_id]
     
     return {"success": True, "message": "会话已删除"}
@@ -640,7 +386,7 @@ async def delete_conversation(
 @router.get("/history/{conversation_id}", response_model=dict, summary="获取历史消息", description="返回指定会话的最近N条消息记录")
 async def get_history(
     conversation_id: str,
-    user_id: str = Query("user-001"),
+    user_id: str = Depends(current_user),
     limit: int = Query(50, ge=1, le=200)
 ):
     """获取历史消息"""
@@ -648,6 +394,8 @@ async def get_history(
         raise HTTPException(status_code=404, detail="会话不存在")
     
     conv = conversations_db[conversation_id]
+    if conv.get("user_id") != user_id:
+        raise HTTPException(status_code=404, detail="会话不存在")
     messages = conv.get("messages", [])[-limit:]
     
     return {
