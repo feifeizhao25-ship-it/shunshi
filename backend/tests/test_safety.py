@@ -155,7 +155,7 @@ class TestSafetyGuard:
         assert result.should_block is True
         assert result.redirect_to_resource is True
         assert result.override_response is not None
-        assert "400-161-9995" in result.override_response
+        assert "12356" in result.override_response
 
     def test_crisis_input_variants(self, guard, user_context):
         """多种危机输入变体"""
@@ -278,8 +278,8 @@ class TestSafetyGuard:
         """危机响应(中文)包含热线"""
         result = SafetyResult(level=SafetyLevel.CRISIS)
         response = guard.build_crisis_response(result, "cn")
-        assert "400-161-9995" in response
-        assert "010-82951332" in response
+        assert "12356" in response
+        assert "120" in response and "110" in response
         assert "120" in response
         assert "110" in response
 
@@ -374,8 +374,8 @@ class TestConfig:
 
     def test_crisis_hotlines(self):
         """危机热线配置正确"""
-        assert SAFETY_CONFIG["crisis_hotline_cn"] == "400-161-9995"
-        assert SAFETY_CONFIG["crisis_hotline_life"] == "010-82951332"
+        assert SAFETY_CONFIG["crisis_hotline_cn"] == "12356"
+        assert SAFETY_CONFIG["crisis_emergency"] == "120"
         assert SAFETY_CONFIG["crisis_emergency"] == "120"
         assert SAFETY_CONFIG["crisis_police"] == "110"
 

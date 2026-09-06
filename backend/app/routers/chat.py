@@ -105,12 +105,6 @@ async def chat(
     session: Session = Depends(get_session),
     settings: Settings = Depends(get_settings),
 ):
-    if not settings.model_router_url:
-        # fail-closed：不返回兜底文案冒充 AI 回复
-        raise HTTPException(
-            status_code=503,
-            detail={"detail": "模型网关未配置（缺少 SHUNSHI_MODEL_ROUTER_URL）", "configured": False},
-        )
     message = body.text()
     from ..safety.guard import SafetyLevel, safety_guard
 
@@ -131,6 +125,12 @@ async def chat(
             "sources": [],
             "source_details": [],
         }
+    if not settings.model_router_url:
+        # fail-closed：不返回兜底文案冒充 AI 回复
+        raise HTTPException(
+            status_code=503,
+            detail={"detail": "模型网关未配置（缺少 SHUNSHI_MODEL_ROUTER_URL）", "configured": False},
+        )
     messages = [{"role": "system", "content": SYSTEM_PROMPT}]
     # Client-provided prompts and tiers are untrusted; never replace server policy.
     if body.context:

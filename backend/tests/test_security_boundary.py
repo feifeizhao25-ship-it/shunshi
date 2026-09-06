@@ -310,7 +310,7 @@ class TestCrisisDetection:
         """检测自杀意图：想自杀"""
         result = guard.check_input("我想自杀", user_context)
         assert result.level == SafetyLevel.CRISIS
-        assert "400-161-9995" in result.override_response or "120" in result.override_response, \
+        assert "12356" in result.override_response or "120" in result.override_response, \
             "危机响应应包含热线号码"
 
     def test_self_harm_detection(self, guard, user_context):
@@ -355,7 +355,7 @@ class TestCrisisDetection:
     def test_crisis_response_contains_hotline(self, guard, user_context):
         """危机响应包含热线信息"""
         result = guard.check_input("想死", user_context)
-        assert "400-161-9995" in result.override_response, "应包含全国心理援助热线"
+        assert "12356" in result.override_response, "应包含全国心理援助热线"
         assert "110" in result.override_response or "120" in result.override_response, "应包含紧急电话"
 
     def test_crisis_response_is_empathetic(self, guard, user_context):

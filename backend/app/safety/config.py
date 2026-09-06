@@ -9,11 +9,10 @@ SAFETY_CONFIG = {
     "enable_output_check": True,
     "log_all_checks": True,
 
+    # 国家卫健委统一号码，核验于 2026-09-06。
+    # https://www.nhc.gov.cn/yzygj/c100068/202412/49a1a65386cd4be582d4702fd0926ee8.shtml
     # 危机热线
-    "crisis_hotline_cn": "400-161-9995",       # 全国24小时心理援助热线
-    "crisis_hotline_life": "010-82951332",      # 生命热线
-    "crisis_hotline_hope": "400-161-9995",      # 希望24热线
-    "crisis_hotline_lifeline": "400-821-1215",  # 生命热线(全国)
+    "crisis_hotline_cn": "12356",       # 全国心理援助热线
     "crisis_emergency": "120",                   # 医疗急救
     "crisis_police": "110",                      # 报警
 

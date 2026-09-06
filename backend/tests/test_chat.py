@@ -278,3 +278,13 @@ def test_unsafe_model_answer_is_replaced_not_disclaimed(gateway_client, monkeypa
     response = client.post('/api/v1/chat/send', headers=headers, json={'message': '你好'})
     assert response.status_code == 200
     assert response.json()['content'] == '请咨询医生'
+
+@pytest.mark.parametrize("path", ["/api/v1/chat/send", "/api/v1/ai/chat"])
+def test_crisis_help_available_without_model_configuration(client, auth_headers, monkeypatch, path):
+    async def forbidden_gateway(*args, **kwargs):
+        pytest.fail("危机求助不应调用模型服务")
+    monkeypatch.setattr(chat_module, "request_gateway", forbidden_gateway)
+    response = client.post(path, headers=auth_headers, json={"message": "我想自杀，不想活了"})
+    assert response.status_code == 200
+    assert response.json()["safety_flag"] == "crisis"
+    assert "12356" in response.json()["content"]
