@@ -18,7 +18,8 @@ def test_chat_fail_closed_when_gateway_unconfigured(client, auth_headers):
 
 
 @pytest.fixture()
-def gateway_client(settings, monkeypatch):
+def gateway_client(settings, monkeypatch, chat_redis_url):
+    settings.redis_url = chat_redis_url
     settings.model_router_url = "http://fake-gateway"
     captured = {}
 

@@ -8,7 +8,8 @@ def test_requires_login(client, method, path):
     assert getattr(client, method)(path, params={"user_id": "victim", "message": "你好"}).status_code == 401
 
 
-def test_two_users_cannot_impersonate(client, auth_headers, settings, monkeypatch):
+def test_two_users_cannot_impersonate(client, auth_headers, settings, monkeypatch, chat_redis_url):
+    settings.redis_url = chat_redis_url
     settings.model_router_url = "http://fixture-gateway"
     calls = []
     async def gateway(url, payload, tier=None):

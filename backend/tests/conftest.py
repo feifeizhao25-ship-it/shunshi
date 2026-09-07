@@ -101,3 +101,38 @@ def test_user_token(client, test_user):
     )
     assert response.status_code == 200, response.text
     return response.json()["data"]["token"]
+
+
+@pytest.fixture(scope="session")
+def chat_redis_url(tmp_path_factory):
+    """Private real Redis for quota tests, never the developer's configured DB."""
+    import shutil
+    import socket
+    import subprocess
+    import time
+    import redis
+
+    executable = shutil.which("redis-server")
+    if executable is None:
+        pytest.fail("Quota integration tests require redis-server (installed in CI)")
+    with socket.socket() as sock:
+        sock.bind(("127.0.0.1", 0))
+        port = sock.getsockname()[1]
+    directory = tmp_path_factory.mktemp("chat-redis")
+    process = subprocess.Popen([executable, "--bind", "127.0.0.1", "--port", str(port), "--save", "", "--appendonly", "no", "--dir", str(directory)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    url = f"redis://127.0.0.1:{port}/0"
+    client = redis.from_url(url, socket_timeout=1)
+    try:
+        for _ in range(100):
+            try:
+                if client.ping():
+                    break
+            except redis.RedisError:
+                time.sleep(0.02)
+        else:
+            pytest.fail("Private quota Redis did not start")
+        yield url
+    finally:
+        client.close()
+        process.terminate()
+        process.wait(timeout=5)

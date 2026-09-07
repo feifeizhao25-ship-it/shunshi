@@ -154,16 +154,22 @@ async def chat(
             }
         )
     messages.append({"role": "user", "content": message})
-    answer = await request_gateway(
-        settings.model_router_url,
-        {
-            "scene": "chat",
-            "market": "cn",
-            "messages": messages,
-            "user_id": user_id,
-        },
-        tier=tier,
-    )
+    from ..services.chat_quota import reserve, refund
+    reservation = await reserve(settings.redis_url, user_id, tier)
+    try:
+        answer = await request_gateway(
+            settings.model_router_url,
+            {
+                "scene": "chat",
+                "market": "cn",
+                "messages": messages,
+                "user_id": user_id,
+            },
+            tier=tier,
+        )
+    except BaseException:
+        await refund(settings.redis_url, reservation)
+        raise
     output_safety = safety_guard.check_output(
         answer,
         {"user_id": user_id, "model": tier},

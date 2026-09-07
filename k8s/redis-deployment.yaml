@@ -7,6 +7,8 @@ metadata:
     app: redis
 spec:
   replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: redis
@@ -28,7 +30,9 @@ spec:
             - --maxmemory
             - 256mb
             - --maxmemory-policy
-            - allkeys-lru
+            - noeviction
+            - --appendfsync
+            - always
           resources:
             requests:
               memory: "64Mi"

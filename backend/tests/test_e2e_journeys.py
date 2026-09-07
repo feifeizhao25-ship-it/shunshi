@@ -368,11 +368,11 @@ async def client(mock_db):
 
 
 @pytest_asyncio.fixture
-async def production_chat_client(tmp_path):
+async def production_chat_client(tmp_path, chat_redis_url):
     from app.config import Settings
     from app.main import create_app
 
-    app = create_app(Settings(env="test", database_url=f"sqlite:///{tmp_path}/chat.db", jwt_secret="fixture-only-secret-at-least-32-chars", model_router_url="http://fixture-gateway"))
+    app = create_app(Settings(redis_url=chat_redis_url, env="test", database_url=f"sqlite:///{tmp_path}/chat.db", jwt_secret="fixture-only-secret-at-least-32-chars", model_router_url="http://fixture-gateway"))
     async with app.router.lifespan_context(app):
         async with AsyncClient(transport=ASGITransport(app=app), base_url="http://testserver") as client:
             login = await client.post("/api/v1/auth/guest-login", json={})

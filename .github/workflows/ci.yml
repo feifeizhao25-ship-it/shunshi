@@ -63,7 +63,9 @@ jobs:
           ADMIN_JWT_SECRET: ci-admin-secret-with-at-least-32-characters
           ADMIN_PASSWORD_HASH: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
           APP_ENV: testing
-        run: python -m pytest tests/ -x --tb=short
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y redis-server
+          python -m pytest tests/ -x --tb=short
 
   flutter-cn:
     needs: mobile-network-security
