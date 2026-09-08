@@ -623,22 +623,22 @@ class TestSubscriptionJourney:
 
     @pytest.mark.asyncio
     async def test_verify_payment(self, client: AsyncClient, monkeypatch):
-        """验证支付（模拟）"""
-        # Simulation is allowed only under the endpoint's explicit development
-        # switch. Production and default test environments must keep rejecting
-        # unsigned payment callbacks.
-        monkeypatch.setenv("APP_ENV", "development")
-        order_id = getattr(TestSubscriptionJourney, "_order_id", None)
-        assert order_id is not None, "缺少 order_id, 请先运行 test_create_order"
+        """使用测试 RSA 密钥签名验证，不依赖开发环境免验签。"""
+        import base64
+        from cryptography.hazmat.primitives import hashes, serialization
+        from cryptography.hazmat.primitives.asymmetric import padding, rsa
 
-        resp = await client.post(
-            "/api/v1/subscription/verify-payment",
-            json={
-                "order_id": order_id,
-                "platform": "alipay",
-                "transaction_id": "MOCK_TXN_001",
-            },
-        )
+        created = await client.post("/api/v1/subscription/create-order", params={"user_id": "user-e2e-sub"}, json={"product_id": "yiyang_monthly", "platform": "alipay"})
+        assert created.status_code == 200
+        order_id = created.json()["data"]["order_id"]
+        key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+        public = key.public_key().public_bytes(serialization.Encoding.PEM, serialization.PublicFormat.SubjectPublicKeyInfo).decode()
+        monkeypatch.setenv("ALIPAY_PUBLIC_KEY", public)
+        payload = {"order_id": order_id, "transaction_id": "MOCK_TXN_001", "trade_status": "TRADE_SUCCESS", "total_amount": "59.00"}
+        signed = "&".join(f"{name}={value}" for name, value in sorted(payload.items()))
+        payload["sign"] = base64.b64encode(key.sign(signed.encode(), padding.PKCS1v15(), hashes.SHA256())).decode()
+        payload["platform"] = "alipay"
+        resp = await client.post("/api/v1/subscription/verify-payment", json=payload)
         assert resp.status_code == 200, f"支付验证失败: {resp.text}"
         data = resp.json()["data"]
         assert data["status"] == "paid", f"支付状态应为 paid: {data['status']}"
@@ -657,27 +657,27 @@ class TestSubscriptionJourney:
         assert status["plan"] == "yiyang"
 
     @pytest.mark.asyncio
-    async def test_premium_content_access(self, client: AsyncClient):
-        """付费用户访问高级内容 — 推荐系统"""
-        # 免费用户也可以访问推荐, 但付费用户有更多权益
+    async def test_public_recommendations_do_not_grant_membership(self, client: AsyncClient):
+        """公共推荐不应给免费用户开通付费权益。"""
+        # 使用独立免费用户，避免依赖上一个测试的支付状态。
         resp = await client.get(
             "/api/v1/contents/recommend",
-            params={"user_id": "user-e2e-sub", "limit": 5},
+            params={"user_id": "user-e2e-free-recommendations", "limit": 5},
         )
         assert resp.status_code == 200, f"获取推荐内容失败: {resp.text}"
         data = resp.json()["data"]
         assert "items" in data
         assert "season" in data
 
-        # 检查使用量 (付费用户应 unlimited)
+        # 公共内容访问不授予无限额度。
         resp = await client.get(
             "/api/v1/subscription/usage",
-            params={"user_id": "user-e2e-sub"},
+            params={"user_id": "user-e2e-free-recommendations"},
         )
         assert resp.status_code == 200
         usage = resp.json()["data"]
-        assert usage["limits"]["daily_chat"] == "unlimited", "付费用户应有无限聊天"
-        assert usage["limits"]["daily_api"] == "unlimited", "付费用户应有无限API"
+        assert usage["limits"]["daily_chat"] != "unlimited", "公共内容不能授予无限聊天"
+        assert usage["limits"]["daily_api"] != "unlimited", "公共内容不能授予无限API"
 
 
 # ============================================================

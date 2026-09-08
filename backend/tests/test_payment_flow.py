@@ -16,6 +16,7 @@
   pytest test/test_payment_flow.py -v
 """
 
+from app.router import subscription as live_subscription
 import os
 import sys
 import re
@@ -124,6 +125,8 @@ def app(db, monkeypatch):
     monkeypatch.setattr(db_mod, "get_db", lambda: db)
 
     test_app = FastAPI(title="Test Subscription API")
+    from app.config import Settings
+    test_app.state.settings = Settings(env="test", jwt_secret="payment-fixture-secret-at-least-32-characters")
     test_app.include_router(sub_mod.router)
     return test_app
 
@@ -181,17 +184,27 @@ def _sign_test_alipay_callback(payload):
     return base64.b64encode(signature).decode("ascii")
 
 
+def _order_auth(order_id):
+    from app.config import Settings
+    from app.security import issue_token
+    user_id = live_subscription.payment_orders.get(order_id, {}).get("user_id", "user-001")
+    token = issue_token(Settings(env="test", jwt_secret="payment-fixture-secret-at-least-32-characters"), user_id)
+    return {"Authorization": "Bearer " + token["access_token"]}
+
+
 def _test_alipay_callback(order_id, transaction_id):
     callback = {
         "order_id": order_id,
         "platform": "alipay",
         "transaction_id": transaction_id,
+        "trade_status": "TRADE_SUCCESS",
+        "total_amount": f"{live_subscription.payment_orders[order_id]['amount_cents'] / 100:.2f}",
     }
     callback["sign"] = _sign_test_alipay_callback({
         "order_id": order_id,
         "transaction_id": transaction_id,
-        "trade_status": None,
-        "total_amount": None,
+        "trade_status": callback["trade_status"],
+        "total_amount": callback["total_amount"],
     })
     callback["sign_type"] = "RSA2"
     return callback
@@ -426,8 +439,7 @@ class TestPaymentVerification:
 
         # 先取消订单
         resp_cancel = await client.post(
-            f"{API_BASE}/cancel-order",
-            json={"order_id": order_id},
+            f"{API_BASE}/cancel-order", headers=_order_auth(order_id), json={"order_id": order_id},
         )
         assert resp_cancel.status_code == 200
 
@@ -448,7 +460,7 @@ class TestPaymentVerification:
         # 再次支付同一订单
         resp2 = await client.post(
             f"{API_BASE}/verify-payment",
-            json={"order_id": order_id, "platform": "alipay"},
+            json=_test_alipay_callback(order_id, live_subscription.payment_orders[order_id]["transaction_id"]),
         )
         assert resp2.status_code == 200
         assert resp2.json()["data"]["status"] == "already_paid"
@@ -971,8 +983,7 @@ class TestEndToEndFlow:
 
         # 2. 取消订单
         resp_cancel = await client.post(
-            f"{API_BASE}/cancel-order",
-            json={"order_id": order_id},
+            f"{API_BASE}/cancel-order", headers=_order_auth(order_id), json={"order_id": order_id},
         )
         assert resp_cancel.status_code == 200
         assert resp_cancel.json()["data"]["status"] == "cancelled"
@@ -991,7 +1002,7 @@ class TestEndToEndFlow:
             params={"user_id": "user-trans-001"},
         )
         oid1 = resp1.json()["data"]["order_id"]
-        resp1c = await client.post(f"{API_BASE}/cancel-order", json={"order_id": oid1})
+        resp1c = await client.post(f"{API_BASE}/cancel-order", headers=_order_auth(oid1), json={"order_id": oid1})
         assert resp1c.json()["data"]["status"] == "cancelled"
 
         # pending → paid
@@ -1149,8 +1160,7 @@ class TestEdgeCases:
     async def test_cancel_nonexistent_order(self, client):
         """取消不存在的订单"""
         resp = await client.post(
-            f"{API_BASE}/cancel-order",
-            json={"order_id": "nonexistent-order-id"},
+            f"{API_BASE}/cancel-order", headers=_order_auth("nonexistent-order-id"), json={"order_id": "nonexistent-order-id"},
         )
         assert resp.status_code == 404
 
@@ -1161,8 +1171,7 @@ class TestEdgeCases:
         order_id, _ = await _create_and_pay_order(client, user_id, "yangxin_monthly")
 
         resp = await client.post(
-            f"{API_BASE}/cancel-order",
-            json={"order_id": order_id},
+            f"{API_BASE}/cancel-order", headers=_order_auth(order_id), json={"order_id": order_id},
         )
         assert resp.status_code == 400
         assert "无法" in resp.json()["detail"] or "状态" in resp.json()["detail"]
@@ -1248,3 +1257,81 @@ class TestEdgeCases:
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("field,value", [
+    ("total_amount", "0.01"), ("total_amount", "NaN"),
+    ("total_amount", "Infinity"), ("total_amount", None),
+    ("trade_status", "WAIT_BUYER_PAY"), ("trade_status", "TRADE_CLOSED"),
+    ("transaction_id", ""), ("platform", "google"),
+])
+async def test_signed_invalid_transaction_cannot_mutate_order(client, field, value):
+    created = await client.post(f"{API_BASE}/create-order", json={"product_id": "yangxin_monthly", "platform": "alipay"})
+    order_id = created.json()["data"]["order_id"]
+    callback = _test_alipay_callback(order_id, "TXN_VALID")
+    callback[field] = value
+    callback["sign"] = _sign_test_alipay_callback({key: callback.get(key) for key in ["order_id", "transaction_id", "trade_status", "total_amount"]})
+    response = await client.post(f"{API_BASE}/verify-payment", json=callback)
+    assert response.status_code == 400
+    assert live_subscription.payment_orders[order_id]["status"] == "pending"
+    assert not live_subscription.subscriptions
+    # A rejected malicious callback cannot prevent the later valid notification.
+    response = await client.post(f"{API_BASE}/verify-payment", json=_test_alipay_callback(order_id, "TXN_VALID"))
+    assert response.status_code == 200
+    assert live_subscription.payment_orders[order_id]["status"] == "paid"
+
+
+@pytest.mark.asyncio
+async def test_cancel_requires_owner_even_in_testing_environment(client):
+    from app.config import Settings
+    from app.security import issue_token
+    created = await client.post(f"{API_BASE}/create-order", params={"user_id": "owner-fixture"}, json={"product_id": "yangxin_monthly", "platform": "alipay"})
+    order_id = created.json()["data"]["order_id"]
+    assert (await client.post(f"{API_BASE}/cancel-order", json={"order_id": order_id})).status_code == 401
+    token = issue_token(Settings(env="test", jwt_secret="payment-fixture-secret-at-least-32-characters"), "another-user")
+    response = await client.post(f"{API_BASE}/cancel-order", params={"user_id": "owner-fixture"}, headers={"Authorization": "Bearer " + token["access_token"]}, json={"order_id": order_id})
+    assert response.status_code == 404
+    assert live_subscription.payment_orders[order_id]["status"] == "pending"
+    assert (await client.post(f"{API_BASE}/cancel-order", headers=_order_auth(order_id), json={"order_id": order_id})).status_code == 200
+    live_subscription.payment_orders.pop(order_id)
+    from app.router.subscription import _get_payment_order
+    assert _get_payment_order(order_id)["status"] == "cancelled"
+
+
+@pytest.mark.asyncio
+async def test_development_flag_and_long_google_token_are_not_payment_proof(monkeypatch):
+    from app.router.subscription import PurchaseVerifyRequest, _verify_google_purchase, _verify_payment_signature
+    monkeypatch.setenv("APP_ENV", "development")
+    assert not await _verify_google_purchase("com.fixture", "sku", "invented-token-at-least-ten-characters")
+    assert not await _verify_payment_signature(PurchaseVerifyRequest(order_id="fixture", platform="alipay"), {"platform": "alipay"})
+
+
+@pytest.mark.asyncio
+async def test_paid_order_replay_still_requires_matching_signed_transaction(client):
+    order_id, _ = await _create_and_pay_order(client, "replay-fixture", "yangxin_monthly")
+    assert (await client.post(f"{API_BASE}/verify-payment", json={"order_id": order_id})).status_code == 400
+    assert (await client.post(f"{API_BASE}/verify-payment", json=_test_alipay_callback(order_id, "different-transaction"))).status_code == 409
+    assert live_subscription.payment_orders[order_id]["status"] == "paid"
+
+
+@pytest.mark.asyncio
+async def test_transaction_reuse_cannot_pay_another_order(client):
+    first, _ = await _create_and_pay_order(client, "first-owner", "yangxin_monthly")
+    transaction = live_subscription.payment_orders[first]["transaction_id"]
+    created = await client.post(f"{API_BASE}/create-order", json={"product_id": "yangxin_monthly", "platform": "alipay"})
+    second = created.json()["data"]["order_id"]
+    response = await client.post(f"{API_BASE}/verify-payment", json=_test_alipay_callback(second, transaction))
+    assert response.status_code == 409
+    assert live_subscription.payment_orders[second]["status"] == "pending"
+
+
+@pytest.mark.asyncio
+async def test_stale_cache_cannot_cancel_paid_order(client, db):
+    created = await client.post(f"{API_BASE}/create-order", json={"product_id": "yangxin_monthly", "platform": "alipay"})
+    order_id = created.json()["data"]["order_id"]
+    db.execute("UPDATE payment_orders SET status='paid', transaction_id='external-paid' WHERE id=?", (order_id,))
+    db.commit()
+    response = await client.post(f"{API_BASE}/cancel-order", headers=_order_auth(order_id), json={"order_id": order_id})
+    assert response.status_code == 409
+    assert db.execute("SELECT status FROM payment_orders WHERE id=?", (order_id,)).fetchone()[0] == "paid"

@@ -13,6 +13,8 @@ import os
 import secrets
 
 from app.security import verify_token
+from app.deps import current_user
+from decimal import Decimal, InvalidOperation
 
 logger = logging.getLogger(__name__)
 
@@ -772,6 +774,32 @@ def _persist_payment_order(order: dict) -> None:
     db.commit()
 
 
+def _transition_pending_order(order: dict, target: str, transaction_id=None, paid_at=None) -> None:
+    """Persist one terminal transition before updating the process cache."""
+    from app.database.db import get_db
+    db = get_db()
+    try:
+        result = db.execute(
+            """UPDATE payment_orders SET status=?, transaction_id=?, paid_at=?
+               WHERE id=? AND user_id=? AND status='pending'
+               AND (? IS NULL OR NOT EXISTS (
+                 SELECT 1 FROM payment_orders other WHERE other.transaction_id=? AND other.id<>?
+               ))""",
+            (target, transaction_id, paid_at, order["id"], order["user_id"],
+             transaction_id, transaction_id, order["id"]),
+        )
+        if result.rowcount != 1:
+            db.rollback()
+            raise HTTPException(status_code=409, detail="订单状态已变化或交易号已使用，请刷新订单")
+        db.commit()
+    except HTTPException:
+        raise
+    except Exception:
+        db.rollback()
+        raise HTTPException(status_code=503, detail="订单服务暂不可用，请稍后重试") from None
+    order.update(status=target, transaction_id=transaction_id, paid_at=paid_at)
+
+
 def _get_payment_order(order_id: str) -> Optional[dict]:
     order = payment_orders.get(order_id)
     if order:
@@ -990,23 +1018,8 @@ async def _verify_apple_receipt(transaction_id: str, receipt: str) -> bool:
 
 
 async def _verify_google_purchase(package_name: str, product_id: str, purchase_token: str) -> bool:
-    """Google Play 购买验证"""
-    try:
-        # 生产环境需要 Google Play Developer API 服务账号
-        # 简化实现：检查凭证非空且格式正确
-        if not purchase_token or len(purchase_token) < 10:
-            return False
-        # TODO: 完整实现需接入 Google Play Developer API
-        # from googleapiclient.discovery import build
-        # service = build('androidpublisher', 'v3', credentials=creds)
-        # result = service.purchases().products().get(
-        #     packageName=package_name, productId=product_id, token=purchase_token
-        # ).execute()
-        # return result.get('purchaseState') == 0
-        return True
-    except Exception as e:
-        logger.warning(f"[Payment] Google 验签失败: {e}")
-        return False
+    """No verified store transaction adapter is installed on this legacy path."""
+    return False
 
 
 async def _verify_payment_signature(request: PurchaseVerifyRequest, order: dict) -> bool:
@@ -1020,15 +1033,29 @@ async def _verify_payment_signature(request: PurchaseVerifyRequest, order: dict)
 
     无签名时返回 False（生产环境不允许模拟支付）
     """
-    # 开发环境跳过验签（需显式配置）
-    if os.getenv("APP_ENV") == "development" and not request.sign:
-        return True
     
     if not request.sign:
         logger.error("[Payment] 缺少支付签名")
         return False
 
     platform = request.platform.lower()
+    if platform != str(order.get("platform", "")).lower():
+        return False
+    if not request.transaction_id or not request.transaction_id.strip():
+        return False
+    # Legacy store verification does not bind receipt to SKU/account/environment.
+    # Do not treat a successful receipt parse as proof of this purchase.
+    if platform in ("apple", "google"):
+        return False
+    if platform == "alipay":
+        if request.trade_status not in ("TRADE_SUCCESS", "TRADE_FINISHED"):
+            return False
+        try:
+            amount = Decimal(request.total_amount or "")
+            if not amount.is_finite() or amount <= 0 or amount * 100 != order["amount_cents"]:
+                return False
+        except (InvalidOperation, ValueError, TypeError):
+            return False
     
     if platform == "alipay":
         public_key = os.getenv("ALIPAY_PUBLIC_KEY", "")
@@ -1257,41 +1284,23 @@ async def verify_payment(request: PurchaseVerifyRequest):
     if not order:
         raise HTTPException(status_code=404, detail="订单不存在")
 
-    if order["status"] == OrderStatus.PAID.value:
-        return {
-            "success": True,
-            "data": {
-                "order_id": request.order_id,
-                "order_no": order["order_no"],
-                "status": "already_paid",
-                "message": "订单已支付",
-            }
-        }
-
-    if order["status"] != OrderStatus.PENDING.value:
-        raise HTTPException(status_code=400, detail=f"订单状态不正确: {order['status']}，当前状态不允许支付")
-
-    # === 签名验证（支付回调必须验签） ===
+    # Authenticate callbacks before trusting status, including replay responses.
     verified = await _verify_payment_signature(request, order)
     if not verified:
-        # 状态转换: pending → failed
-        if transition_order(order["status"], OrderStatus.FAILED.value):
-            order["status"] = OrderStatus.FAILED.value
         _write_audit_log("payment_verify_failed", order["user_id"], {
-            "order_id": request.order_id,
-            "reason": "signature verification failed",
+            "order_id": request.order_id, "reason": "signature or transaction validation failed",
         })
-        # 发送告警
-        try:
-            from app.alerts import alert_sender, AlertRules
-            event = AlertRules.payment_failed(request.order_id, "签名验证失败", order.get("amount_cents", 0) / 100)
-            alert_store_recorded = await alert_sender.send(event)
-            if alert_store_recorded:
-                from app.alerts.store import alert_store
-                alert_store.record(event, alert_store_recorded, "webhook")
-        except Exception as alert_err:
-            logger.warning(f"[Alert] 支付失败告警发送异常: {alert_err}")
+        # An attacker-controlled invalid callback must not poison a pending order.
         raise HTTPException(status_code=400, detail="签名验证失败")
+    if order["status"] == OrderStatus.PAID.value:
+        if order.get("transaction_id") != request.transaction_id:
+            raise HTTPException(status_code=409, detail="订单交易号不一致")
+        return {"success": True, "data": {
+            "order_id": request.order_id, "order_no": order["order_no"],
+            "status": "already_paid", "message": "订单已支付",
+        }}
+    if order["status"] != OrderStatus.PENDING.value:
+        raise HTTPException(status_code=400, detail="当前订单状态不允许支付")
 
     # === 验证状态转换 ===
     if not transition_order(order["status"], OrderStatus.PAID.value):
@@ -1301,10 +1310,7 @@ async def verify_payment(request: PurchaseVerifyRequest):
     now_iso = now.isoformat()
 
     # === 更新订单状态 ===
-    order["status"] = OrderStatus.PAID.value
-    order["paid_at"] = now_iso
-    order["transaction_id"] = request.transaction_id or f"TXN_{uuid.uuid4().hex[:16]}"
-    _persist_payment_order(order)
+    _transition_pending_order(order, OrderStatus.PAID.value, request.transaction_id, now_iso)
 
     # === 激活订阅 ===
     tier = order["tier"]
@@ -1378,10 +1384,10 @@ async def verify_payment(request: PurchaseVerifyRequest):
 # ---- 取消订单 ----
 
 @router.post("/cancel-order", response_model=dict)
-async def cancel_order(request: CancelOrderRequest):
+async def cancel_order(request: CancelOrderRequest, user_id: str = Depends(current_user)):
     """取消订单（pending → cancelled）"""
-    order = payment_orders.get(request.order_id)
-    if not order:
+    order = _get_payment_order(request.order_id)
+    if not order or order.get("user_id") != user_id:
         raise HTTPException(status_code=404, detail="订单不存在")
 
     if not transition_order(order["status"], OrderStatus.CANCELLED.value):
@@ -1390,7 +1396,7 @@ async def cancel_order(request: CancelOrderRequest):
             detail=f"无法从 {order['status']} 状态取消订单"
         )
 
-    order["status"] = OrderStatus.CANCELLED.value
+    _transition_pending_order(order, OrderStatus.CANCELLED.value)
 
     _write_audit_log("order_cancelled", order["user_id"], {
         "order_id": request.order_id,
