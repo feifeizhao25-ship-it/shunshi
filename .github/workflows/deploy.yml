@@ -219,12 +219,23 @@ jobs:
           STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
           STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
           ALIPAY_APP_ID: ${{ secrets.ALIPAY_APP_ID }}
+          ALIPAY_SELLER_ID: ${{ secrets.ALIPAY_SELLER_ID }}
           ALIPAY_PRIVATE_KEY: ${{ secrets.ALIPAY_PRIVATE_KEY }}
+          ALIPAY_PUBLIC_KEY: ${{ secrets.ALIPAY_PUBLIC_KEY }}
+          ALIPAY_NOTIFY_URL: ${{ secrets.ALIPAY_NOTIFY_URL }}
+          ALIPAY_RETURN_URL: ${{ secrets.ALIPAY_RETURN_URL }}
           WECHAT_APP_SECRET: ${{ secrets.WECHAT_APP_SECRET }}
         run: |
           for required in DB_PASSWORD SHUNSHI_DATABASE_URL SHUNSHI_JWT_SECRET JWT_SECRET ADMIN_JWT_SECRET ADMIN_PASSWORD_HASH SILICONFLOW_API_KEY; do
             test -n "${!required}" || { echo "::error::GitHub Secret $required 未配置"; exit 1; }
           done
+          # Disabled payments may have no credentials; partial setup must not deploy.
+          if [[ -n "$ALIPAY_APP_ID$ALIPAY_SELLER_ID$ALIPAY_PRIVATE_KEY$ALIPAY_PUBLIC_KEY$ALIPAY_NOTIFY_URL$ALIPAY_RETURN_URL" ]]; then
+            for required in ALIPAY_APP_ID ALIPAY_SELLER_ID ALIPAY_PRIVATE_KEY ALIPAY_PUBLIC_KEY ALIPAY_NOTIFY_URL ALIPAY_RETURN_URL; do
+              test -n "${!required}" || { echo "::error::支付宝配置不完整: $required"; exit 1; }
+            done
+            [[ "$ALIPAY_NOTIFY_URL" == https://* && "$ALIPAY_RETURN_URL" == https://* ]] || { echo "::error::支付宝生产通知和返回地址必须使用 HTTPS"; exit 1; }
+          fi
           kubectl create namespace shunshi --dry-run=client -o yaml | kubectl apply -f -
           kubectl -n shunshi create secret generic shunshi-secret \
             --from-literal=DB_PASSWORD="$DB_PASSWORD" \
@@ -237,7 +248,12 @@ jobs:
             --from-literal=STRIPE_SECRET_KEY="$STRIPE_SECRET_KEY" \
             --from-literal=STRIPE_WEBHOOK_SECRET="$STRIPE_WEBHOOK_SECRET" \
             --from-literal=ALIPAY_APP_ID="$ALIPAY_APP_ID" \
+            --from-literal=ALIPAY_SELLER_ID="$ALIPAY_SELLER_ID" \
             --from-literal=ALIPAY_PRIVATE_KEY="$ALIPAY_PRIVATE_KEY" \
+            --from-literal=ALIPAY_PUBLIC_KEY="$ALIPAY_PUBLIC_KEY" \
+            --from-literal=ALIPAY_NOTIFY_URL="$ALIPAY_NOTIFY_URL" \
+            --from-literal=ALIPAY_RETURN_URL="$ALIPAY_RETURN_URL" \
+            --from-literal=ALIPAY_MODE=production \
             --from-literal=WECHAT_APP_SECRET="$WECHAT_APP_SECRET" \
             --dry-run=client -o yaml | kubectl apply -f -
 

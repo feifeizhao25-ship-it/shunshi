@@ -114,6 +114,8 @@ def test_verified_alipay_callback_activates_mobile_entitlement(
         data={"sign": "verified-by-test-adapter"},
     )
     assert callback.status_code == 200, callback.text
+    assert callback.text == "success"
+    assert callback.headers["content-type"].startswith("text/plain")
     assert subscription.payment_orders[order_id]["status"] == "paid"
 
     # 模拟进程重启清空内存，订单查询仍须从持久化存储恢复。

@@ -14,6 +14,7 @@ import hmac
 import hashlib
 import base64
 import logging
+import re
 from datetime import datetime, timedelta
 from typing import Optional
 from decimal import Decimal
@@ -27,6 +28,7 @@ logger = logging.getLogger(__name__)
 ALIPAY_MODE = os.getenv("ALIPAY_MODE", "production")  # sandbox / production
 
 ALIPAY_APP_ID = os.getenv("ALIPAY_APP_ID", "")
+ALIPAY_SELLER_ID = os.getenv("ALIPAY_SELLER_ID", "")
 ALIPAY_PRIVATE_KEY = os.getenv("ALIPAY_PRIVATE_KEY", "")
 ALIPAY_PUBLIC_KEY = os.getenv("ALIPAY_PUBLIC_KEY", "")
 ALIPAY_NOTIFY_URL = os.getenv("ALIPAY_NOTIFY_URL", "https://api.shunshi.cn/api/v1/payments/alipay/notify")
@@ -100,6 +102,15 @@ ALIPAY_PRODUCTS: dict[str, dict] = {
 
 # ==================== 数据模型 ====================
 
+def alipay_amount_cents(value: str) -> int:
+    """按人民币分精确解析；不接受舍入、指数、非有限值或负数。"""
+    if not isinstance(value, str) or not re.fullmatch(r"[0-9]{1,9}(?:\.[0-9]{1,2})?", value):
+        raise ValueError("支付金额格式无效")
+    cents = int(Decimal(value) * 100)
+    if cents <= 0:
+        raise ValueError("支付金额必须大于零")
+    return cents
+
 class AlipayOrderResult(BaseModel):
     """支付宝订单创建结果"""
     order_no: str
@@ -155,7 +166,7 @@ class AlipayService:
         if self.mode not in {"sandbox", "production"}:
             raise RuntimeError("ALIPAY_MODE 必须是 sandbox 或 production")
 
-        if not ALIPAY_APP_ID or not ALIPAY_PRIVATE_KEY:
+        if not all((ALIPAY_APP_ID, ALIPAY_SELLER_ID, ALIPAY_PRIVATE_KEY, ALIPAY_PUBLIC_KEY)):
             raise RuntimeError("支付宝商户配置不完整")
 
         try:
@@ -258,15 +269,31 @@ class AlipayService:
 
     def verify_notify(self, params: dict) -> AlipayNotifyData:
         """验证支付宝回调签名并解析数据"""
+        if not ALIPAY_APP_ID or not ALIPAY_SELLER_ID:
+            raise RuntimeError("支付宝商户配置不完整")
+        params = dict(params)
+        signature = params.pop("sign", None)
+        sign_type = params.pop("sign_type", None)
+        if not isinstance(signature, str) or not signature.strip() or sign_type != "RSA2":
+            raise ValueError("支付宝回调签名参数无效")
         client = self._get_client()
-
-        if client:
-            signature = params.pop("sign", None)
-            sign_type = params.pop("sign_type", None)
-            # python-alipay-sdk 验签
+        if client is None:
+            raise RuntimeError("支付宝验签服务不可用")
+        try:
             is_valid = client.verify(params, signature)
-            if not is_valid:
-                raise ValueError("支付宝回调签名验证失败")
+        except Exception as exc:
+            raise ValueError("支付宝回调签名验证失败") from exc
+        if not is_valid:
+            raise ValueError("支付宝回调签名验证失败")
+        if params.get("app_id") != ALIPAY_APP_ID or params.get("seller_id") != ALIPAY_SELLER_ID:
+            raise ValueError("支付宝应用或收款商户不匹配")
+        for key in ("out_trade_no", "trade_no"):
+            value = params.get(key)
+            if not isinstance(value, str) or not value.strip() or value != value.strip():
+                raise ValueError("支付宝交易标识缺失或无效")
+        if params.get("trade_status") not in {"WAIT_BUYER_PAY", "TRADE_SUCCESS", "TRADE_FINISHED", "TRADE_CLOSED"}:
+            raise ValueError("支付宝交易状态无效")
+        alipay_amount_cents(params.get("total_amount"))
 
         return AlipayNotifyData(
             out_trade_no=params.get("out_trade_no", ""),

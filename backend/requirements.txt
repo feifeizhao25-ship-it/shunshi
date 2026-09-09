@@ -13,6 +13,7 @@ scikit-learn>=1.5,<2
 bcrypt>=4.1,<5
 cryptography>=50.0.1,<51
 stripe>=11,<15
+python-alipay-sdk==3.4.0
 python-multipart>=0.0.12,<1
 redis>=5,<6
 psycopg[binary]>=3.1,<4

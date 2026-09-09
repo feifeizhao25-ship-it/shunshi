@@ -81,15 +81,22 @@ def test_ai_chat_contract_via_shunshi_router(gateway_client):
     assert captured["tier"] == "free"
 
 
-def test_chat_injects_only_verified_current_rag_and_returns_sources(gateway_client):
+@pytest.mark.parametrize("path", ["/api/v1/chat/send", "/api/v1/ai/chat", "/api/v1/chat"])
+def test_chat_injects_only_verified_current_rag_and_returns_sources(gateway_client, path):
     client, headers, captured = gateway_client
     response = client.post(
-        "/api/v1/chat/send",
+        path,
         headers=headers,
         json={"message": "怎样做到食物多样、少盐少油的平衡膳食？"},
     )
     assert response.status_code == 200
     body = response.json()
+    if path == "/api/v1/chat":
+        body = body["data"]
+        from app.router.chat import conversations_db, messages_db
+        conversation = conversations_db.pop(body["conversation_id"])
+        for message in conversation["messages"]:
+            messages_db.pop(message["id"], None)
     assert body["sources"]
     assert all("官方资料已核验" in source for source in body["sources"])
     assert all(

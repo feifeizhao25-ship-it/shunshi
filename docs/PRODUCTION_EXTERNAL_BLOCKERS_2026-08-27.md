@@ -1,6 +1,6 @@
 # 顺时生产上线：必须人工完成的外部配置
 
-> 更新日期：2026-08-27。代码、测试、Web/Android/iOS 构建均已通过；以下事项涉及云账号、域名或真实密钥，不能安全地写入仓库。
+> 增量更新：2026-09-09。历史构建记录不代表当前生产验收通过；支付与权益跨存储一致性等代码缺口仍见 `CN_PAYMENT_STATE_REVIEW_2026-09-08.md`。以下部署配置不得包含真实密钥提交入库。
 
 ## 1. 准备 Kubernetes 集群
 
@@ -25,7 +25,9 @@
 | `ADMIN_PASSWORD_HASH` | 使用后台文档指定的密码哈希工具生成，禁止填写明文密码 |
 | `SILICONFLOW_API_KEY` | 硅基流动生产账号控制台创建，并设置额度告警与调用限制 |
 
-启用对应功能后再录入：`STRIPE_SECRET_KEY`、`STRIPE_WEBHOOK_SECRET`、`ALIPAY_APP_ID`、`ALIPAY_PRIVATE_KEY`、`WECHAT_APP_SECRET`。未完成商户审核前不得打开真实支付入口。
+启用对应功能后再录入：`STRIPE_SECRET_KEY`、`STRIPE_WEBHOOK_SECRET`、`WECHAT_APP_SECRET`。
+
+支付宝须成套配置 `ALIPAY_APP_ID`、`ALIPAY_SELLER_ID`（实际收款商户）、`ALIPAY_PRIVATE_KEY`、`ALIPAY_PUBLIC_KEY`（支付宝验签公钥）、`ALIPAY_NOTIFY_URL`、`ALIPAY_RETURN_URL`。通知地址为实际 API 域名的 `/api/v1/payments/alipay/notify`，两地址均使用 HTTPS；不能沿用未绑定域名的示例地址。工作流在部分配置缺失时阻止部署，全空时支付保持不可用。SDK 已纳入镜像依赖。未完成商户审核、权益一致性修复和商户联调前不能把配置齐全称为收款就绪。
 
 工作流会在部署前逐项检查必填值，并用 `kubectl create secret ... --dry-run | kubectl apply` 注入集群；仓库中的 `k8s/secret.yaml` 只作为字段说明模板，不再被生产工作流应用。
 

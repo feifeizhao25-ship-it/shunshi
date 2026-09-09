@@ -4,9 +4,9 @@
 """
 import logging
 from typing import Optional
-from decimal import Decimal, InvalidOperation
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Query
+from fastapi.responses import PlainTextResponse
 from pydantic import BaseModel
 
 from app.database.db import get_db
@@ -103,41 +103,38 @@ def _require_order_owner(order_no: str, user_id: str) -> None:
 @router.post("/notify")
 async def alipay_notify(request: Request):
     """支付宝回调通知"""
-    from app.services.alipay_service import alipay_service
-    from app.database.db import get_db
-    from datetime import datetime, timedelta
+    from app.services.alipay_service import alipay_service, alipay_amount_cents
 
     # 解析表单数据
     form_data = await request.form()
+    if len(list(form_data.multi_items())) != len(form_data):
+        raise HTTPException(status_code=400, detail="支付通知包含重复参数")
     params = dict(form_data)
 
     try:
         notify_data = alipay_service.verify_notify(params)
-    except ValueError as e:
-        logger.error(f"[Alipay] 回调验签失败: {e}")
+    except ValueError:
+        logger.warning("[Alipay] 回调校验失败")
         raise HTTPException(status_code=400, detail="签名验证失败")
+    except RuntimeError:
+        raise HTTPException(status_code=503, detail="支付宝通知验证服务不可用")
 
     trade_status = notify_data.trade_status
     out_trade_no = notify_data.out_trade_no
     if not out_trade_no or not notify_data.trade_no:
         raise HTTPException(status_code=400, detail="支付宝交易标识缺失")
 
-    logger.info(
-        f"[Alipay] 回调: order={out_trade_no}, "
-        f"status={trade_status}, trade_no={notify_data.trade_no}"
-    )
-
     if trade_status in {"TRADE_SUCCESS", "TRADE_FINISHED"}:
         from app.services.payment_activation import activate_verified_domestic_payment
         try:
-            amount_cents = int((Decimal(notify_data.total_amount) * 100).quantize(Decimal("1")))
-        except (InvalidOperation, ValueError) as exc:
+            amount_cents = alipay_amount_cents(notify_data.total_amount)
+        except ValueError as exc:
             raise HTTPException(status_code=400, detail="支付金额格式无效") from exc
         activate_verified_domestic_payment(
             request, order_no=out_trade_no, transaction_id=notify_data.trade_no,
             amount_cents=amount_cents, provider="alipay",
         )
-        return {"success": True}
+        return PlainTextResponse("success")
 
     # 支付宝要求返回 success
-    return {"success": True}
+    return PlainTextResponse("success")

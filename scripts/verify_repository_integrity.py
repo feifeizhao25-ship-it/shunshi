@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Fail closed on non-portable production sources and false-green CI."""
 
+import ast
 import json
 import os
 from pathlib import Path
@@ -32,10 +33,22 @@ rag_evidence = (ROOT / "backend/app/rag/evidence.py").read_text(encoding="utf-8"
 for required in ("verified_official", "valid_until", "date.today()"):
     if required not in rag_evidence:
         errors.append(f"backend/app/rag/evidence.py: verified RAG gate missing {required!r}")
-for relative in ("backend/app/router/chat.py", "backend/app/routers/chat.py"):
-    chat_source = (ROOT / relative).read_text(encoding="utf-8")
-    if "verified_cn_context" not in chat_source:
-        errors.append(f"{relative}: verified RAG context is not connected")
+for relative, module, function in (
+    ("backend/app/routers/chat.py", "rag.evidence", "verified_cn_context"),
+    ("backend/app/router/chat.py", "app.routers.chat", "chat"),
+):
+    tree = ast.parse((ROOT / relative).read_text(encoding="utf-8"))
+    aliases = {
+        alias.asname or alias.name
+        for node in ast.walk(tree)
+        if isinstance(node, ast.ImportFrom) and node.module == module
+        for alias in node.names if alias.name == function
+    }
+    if not any(
+        isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+        and node.func.id in aliases for node in ast.walk(tree)
+    ):
+        errors.append(f"{relative}: verified RAG call or canonical delegation is missing")
 
 ingredient_scan = (ROOT / "backend/app/router/ai_ingredient_scan.py").read_text(encoding="utf-8")
 for forbidden in ('recognized_name = "枸杞"', "模拟识别结果"):
