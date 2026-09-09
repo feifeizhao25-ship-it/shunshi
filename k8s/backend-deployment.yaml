@@ -6,12 +6,10 @@ metadata:
   labels:
     app: backend
 spec:
-  replicas: 2
+  # Legacy records/payments still use local SQLite. Do not scale until migrated.
+  replicas: 1
   strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 0
+    type: Recreate
   selector:
     matchLabels:
       app: backend
@@ -62,7 +60,8 @@ spec:
               mountPath: /app/logs
       volumes:
         - name: data
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: backend-data
         - name: logs
           emptyDir: {}
       restartPolicy: Always

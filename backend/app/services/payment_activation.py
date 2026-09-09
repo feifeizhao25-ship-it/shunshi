@@ -44,18 +44,30 @@ def activate_verified_domestic_payment(
     now = now_dt.isoformat()
     expires_at = (now_dt + timedelta(days=int(product["duration_days"]))).isoformat()
     subscription_id = f"sub_{provider}_{order_no}"
-    db.execute("INSERT OR IGNORE INTO users (id, name) VALUES (?, ?)", (order["user_id"], "顺时用户"))
-    db.execute(
-        """INSERT OR REPLACE INTO subscriptions
-        (id,user_id,plan,status,started_at,expires_at,auto_renew,platform,subscribed_at)
-        VALUES (?,?,?,'active',?,?,0,?,?)""",
-        (subscription_id, order["user_id"], order["tier"], now, expires_at, provider, now),
-    )
-    db.execute(
-        """UPDATE payment_orders SET status='paid',transaction_id=?,payment_method=?,paid_at=?
-        WHERE order_no=? AND status='pending'""", (transaction_id, provider, now, order_no),
-    )
-    db.commit()
+    # The reads above are advisory: another worker may cancel the order or
+    # claim this transaction before we write. Claim and subscription must
+    # commit together, and only the winning pending transition may grant.
+    try:
+        changed = db.execute(
+            """UPDATE payment_orders SET status='paid',transaction_id=?,payment_method=?,paid_at=?
+            WHERE order_no=? AND status='pending'
+            AND NOT EXISTS (SELECT 1 FROM payment_orders
+                            WHERE transaction_id=? AND order_no<>?)""",
+            (transaction_id, provider, now, order_no, transaction_id, order_no),
+        )
+        if changed.rowcount != 1:
+            raise HTTPException(status_code=409, detail="订单状态或支付流水已变更，请重新核对")
+        db.execute("INSERT OR IGNORE INTO users (id, name) VALUES (?, ?)", (order["user_id"], "顺时用户"))
+        db.execute(
+            """INSERT OR REPLACE INTO subscriptions
+            (id,user_id,plan,status,started_at,expires_at,auto_renew,platform,subscribed_at)
+            VALUES (?,?,?,'active',?,?,0,?,?)""",
+            (subscription_id, order["user_id"], order["tier"], now, expires_at, provider, now),
+        )
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
 
     session_factory = getattr(request.app.state, "session_factory", None)
     if session_factory is None:
@@ -106,4 +118,3 @@ def activate_verified_domestic_payment(
         "amount_cents": amount_cents, "transaction_id": transaction_id, "provider": provider,
     })
     return {**order, "status": "paid", "transaction_id": transaction_id, "paid_at": now}
-

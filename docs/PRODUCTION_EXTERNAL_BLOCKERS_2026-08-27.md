@@ -4,6 +4,10 @@
 
 ## 1. 准备 Kubernetes 集群
 
+后端当前仍包含本地 SQLite 订单及记录存储，因此部署改为单副本、Recreate 更新、10Gi ReadWriteOnce 持久卷；HPA 暂时固定为 1。更新会短暂停机，尚不具备高可用扩容条件。阿里云集群须配置可用的默认 StorageClass，数据库完全迁移并验收后才能恢复多副本。
+
+若曾部署旧镜像，必须先备份每个旧 Pod 中实际的 `/srv/app/data`（以及可能使用过的 `/app/data`），检查和合并各副本的订单/记录，恢复到 `backend-data` 持久卷并校验；不能直接覆盖 Pod 或宣称旧 emptyDir 挂载提供了持久化。自动发布检测到旧临时卷配置会停止，迁移完成后由运维更新已有 Deployment 的卷和单副本策略，再继续发布。此步骤尚未执行，仓库变更不会自动迁移历史数据。
+
 1. 创建生产集群，并安装 Nginx Ingress Controller。
 2. 安装 cert-manager，创建名为 `letsencrypt-prod` 的 `ClusterIssuer`。
 3. 在本机确认：`kubectl get nodes`、`kubectl get ingressclass nginx`、`kubectl get clusterissuer letsencrypt-prod` 均正常。
@@ -24,6 +28,9 @@
 | `ADMIN_JWT_SECRET` | `openssl rand -hex 32` |
 | `ADMIN_PASSWORD_HASH` | 使用后台文档指定的密码哈希工具生成，禁止填写明文密码 |
 | `SILICONFLOW_API_KEY` | 硅基流动生产账号控制台创建，并设置额度告警与调用限制 |
+| `SHUNSHI_MODEL_ROUTER_URL` | 已部署的国内模型网关基址，须实现 `/v1/scene/complete`，并能被后端访问 |
+
+只配置硅基流动密钥不会自动部署模型网关。国内统一聊天入口实际调用此网关；未配置基址时会返回 503。须在国内部署并配置模型与地域策略，联调中文输出、引用、额度和超时后验收；本轮补齐发布注入和缺失检查，未创建网关服务。
 
 启用对应功能后再录入：`STRIPE_SECRET_KEY`、`STRIPE_WEBHOOK_SECRET`、`WECHAT_APP_SECRET`。
 

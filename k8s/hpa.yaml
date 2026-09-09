@@ -8,8 +8,10 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: backend
-  minReplicas: 2
-  maxReplicas: 10
+  # Keep an existing HPA from restoring unsafe multi-pod SQLite operation.
+  # Raise these limits only after the records database has been migrated.
+  minReplicas: 1
+  maxReplicas: 1
   metrics:
     - type: Resource
       resource:

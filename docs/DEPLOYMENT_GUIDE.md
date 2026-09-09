@@ -157,9 +157,8 @@ kubectl apply -f k8s/namespace.yaml
 kubectl apply -f k8s/configmap.yaml
 
 # 3. 配置 Secret (敏感配置)
-# ⚠️ 修改 k8s/secret.yaml 中的 base64 值
-# echo -n 'your_password' | base64
-kubectl apply -f k8s/secret.yaml
+# 使用 GitHub 生产 Secrets 注入真实配置；secret.yaml 仅为字段模板，禁止直接应用。
+# 具体字段及历史数据迁移要求见 PRODUCTION_EXTERNAL_BLOCKERS_2026-08-27.md。
 
 # 4. 部署 PostgreSQL (StatefulSet)
 kubectl apply -f k8s/postgres-statefulset.yaml
@@ -172,6 +171,8 @@ kubectl -n shunshi rollout status statefulset/postgres --timeout=300s
 kubectl -n shunshi rollout status deployment/redis --timeout=120s
 
 # 7. 部署后端
+kubectl apply -f k8s/backend-pvc.yaml
+kubectl apply -f k8s/hpa.yaml
 kubectl apply -f k8s/backend-deployment.yaml
 kubectl apply -f k8s/backend-service.yaml
 
@@ -183,8 +184,7 @@ kubectl apply -f k8s/nginx-configmap.yaml
 kubectl apply -f k8s/nginx-deployment.yaml
 kubectl apply -f k8s/ingress.yaml
 
-# 10. 配置自动扩缩
-kubectl apply -f k8s/hpa.yaml
+# 10. 当前后端必须单副本；SQLite 迁移验收前 HPA 固定为 1。
 
 # 11. 验证
 kubectl -n shunshi get all

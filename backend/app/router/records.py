@@ -3,7 +3,7 @@ from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel
 from typing import List, Optional
 from datetime import datetime, date
-import random
+import uuid
 
 from app.database.db import get_db
 
@@ -46,7 +46,7 @@ class SleepRecord(BaseModel):
 # ============ Helper Functions ============
 
 def generate_id(prefix: str) -> str:
-    return f"{prefix}_{datetime.now().strftime('%Y%m%d%H%M%S')}_{random.randint(1000, 9999)}"
+    return f"{prefix}_{uuid.uuid4().hex}"
 
 # ============ CareStatus API ============
 

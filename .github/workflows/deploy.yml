@@ -45,6 +45,11 @@ jobs:
           sudo apt-get update -qq && sudo apt-get install -y redis-server
           python -m pytest tests/ -v --tb=short
 
+      - name: Verify backend image and storage contract
+        run: |
+          python -m pip install PyYAML==6.0.3
+          python scripts/verify_backend_deployment.py
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -216,6 +221,7 @@ jobs:
           ADMIN_JWT_SECRET: ${{ secrets.ADMIN_JWT_SECRET }}
           ADMIN_PASSWORD_HASH: ${{ secrets.ADMIN_PASSWORD_HASH }}
           SILICONFLOW_API_KEY: ${{ secrets.SILICONFLOW_API_KEY }}
+          SHUNSHI_MODEL_ROUTER_URL: ${{ secrets.SHUNSHI_MODEL_ROUTER_URL }}
           STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
           STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
           ALIPAY_APP_ID: ${{ secrets.ALIPAY_APP_ID }}
@@ -226,7 +232,7 @@ jobs:
           ALIPAY_RETURN_URL: ${{ secrets.ALIPAY_RETURN_URL }}
           WECHAT_APP_SECRET: ${{ secrets.WECHAT_APP_SECRET }}
         run: |
-          for required in DB_PASSWORD SHUNSHI_DATABASE_URL SHUNSHI_JWT_SECRET JWT_SECRET ADMIN_JWT_SECRET ADMIN_PASSWORD_HASH SILICONFLOW_API_KEY; do
+          for required in DB_PASSWORD SHUNSHI_DATABASE_URL SHUNSHI_JWT_SECRET JWT_SECRET ADMIN_JWT_SECRET ADMIN_PASSWORD_HASH SILICONFLOW_API_KEY SHUNSHI_MODEL_ROUTER_URL; do
             test -n "${!required}" || { echo "::error::GitHub Secret $required 未配置"; exit 1; }
           done
           # Disabled payments may have no credentials; partial setup must not deploy.
@@ -245,6 +251,7 @@ jobs:
             --from-literal=ADMIN_JWT_SECRET="$ADMIN_JWT_SECRET" \
             --from-literal=ADMIN_PASSWORD_HASH="$ADMIN_PASSWORD_HASH" \
             --from-literal=SILICONFLOW_API_KEY="$SILICONFLOW_API_KEY" \
+            --from-literal=SHUNSHI_MODEL_ROUTER_URL="$SHUNSHI_MODEL_ROUTER_URL" \
             --from-literal=STRIPE_SECRET_KEY="$STRIPE_SECRET_KEY" \
             --from-literal=STRIPE_WEBHOOK_SECRET="$STRIPE_WEBHOOK_SECRET" \
             --from-literal=ALIPAY_APP_ID="$ALIPAY_APP_ID" \
@@ -273,11 +280,26 @@ jobs:
 
       - name: Apply Kubernetes manifests
         run: |
+          # Never replace an old ephemeral record store without an operator
+          # backup/migration. A new installation returns an empty document.
+          kubectl -n shunshi get deployment backend --ignore-not-found -o json > /tmp/shunshi-existing-backend.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          raw = Path('/tmp/shunshi-existing-backend.json').read_text().strip()
+          if raw:
+              deployment = json.loads(raw)
+              volumes = deployment['spec']['template']['spec'].get('volumes', [])
+              if any(v.get('name') == 'data' and 'emptyDir' in v for v in volumes):
+                  raise SystemExit('旧后端仍使用临时数据卷：请先备份每个 Pod 的 SQLite 数据并完成持久卷迁移，再发布。')
+          PY
           kubectl apply -f k8s/namespace.yaml
           kubectl apply -f k8s/configmap.yaml
           kubectl apply -f k8s/postgres-statefulset.yaml
           kubectl apply -f k8s/redis-deployment.yaml
           kubectl apply -f k8s/redis-service.yaml
+          kubectl apply -f k8s/backend-pvc.yaml
+          kubectl apply -f k8s/hpa.yaml
           kubectl apply -f k8s/backend-deployment.yaml
           kubectl apply -f k8s/backend-service.yaml
           kubectl apply -f k8s/admin-deployment.yaml
@@ -285,7 +307,6 @@ jobs:
           kubectl apply -f k8s/nginx-configmap.yaml
           kubectl apply -f k8s/nginx-deployment.yaml
           kubectl apply -f k8s/ingress.yaml
-          kubectl apply -f k8s/hpa.yaml
 
       - name: Wait for rollout
         run: |
