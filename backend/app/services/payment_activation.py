@@ -42,7 +42,6 @@ def activate_verified_domestic_payment(
 
     now_dt = datetime.now(timezone.utc)
     now = now_dt.isoformat()
-    expires_at = (now_dt + timedelta(days=int(product["duration_days"]))).isoformat()
     subscription_id = f"sub_{provider}_{order_no}"
     # The reads above are advisory: another worker may cancel the order or
     # claim this transaction before we write. Claim and subscription must
@@ -57,6 +56,23 @@ def activate_verified_domestic_payment(
         )
         if changed.rowcount != 1:
             raise HTTPException(status_code=409, detail="订单状态或支付流水已变更，请重新核对")
+        # Read the remaining term only after acquiring the SQLite write lock.
+        # Sequential purchases of the same domestic tier preserve paid days;
+        # past subscription rows overlap, so take the latest end, never sum.
+        renewal_base = now_dt
+        for existing in db.execute(
+            """SELECT expires_at FROM subscriptions WHERE user_id=? AND plan=?
+            AND status='active' AND platform IN ('alipay','wechat')""",
+            (order["user_id"], order["tier"]),
+        ).fetchall():
+            try:
+                previous_end = datetime.fromisoformat(existing["expires_at"])
+                if previous_end.tzinfo is None:
+                    previous_end = previous_end.replace(tzinfo=timezone.utc)
+            except (TypeError, ValueError):
+                raise HTTPException(status_code=409, detail="原会员到期时间异常，请核对后重试")
+            renewal_base = max(renewal_base, previous_end)
+        expires_at = (renewal_base + timedelta(days=int(product["duration_days"]))).isoformat()
         db.execute("INSERT OR IGNORE INTO users (id, name) VALUES (?, ?)", (order["user_id"], "顺时用户"))
         db.execute(
             """INSERT OR REPLACE INTO subscriptions

@@ -340,8 +340,11 @@ class TestOrderCreation:
         assert re.match(r"^SHUNSHI-\d{8}-[A-F0-9]{12}$", data["order_no"])
 
     @pytest.mark.asyncio
-    async def test_create_duplicate_order_same_product(self, client, monkeypatch):
-        """已是同等级会员时不能重复购买"""
+    @pytest.mark.parametrize("platform,product_id", [
+        ("alipay", "yangxin_monthly"), ("apple", "yangxin_apple_monthly"),
+    ])
+    async def test_create_duplicate_order_same_product(self, client, monkeypatch, platform, product_id):
+        """国内同档可创建待付款续费订单，应用商店保留原购买规则。"""
         user_id = "user-dup-001"
         # 先激活一个 yangxin 订阅
         monkeypatch.setattr("app.router.subscription.subscriptions", {user_id: {
@@ -355,11 +358,15 @@ class TestOrderCreation:
         # 尝试再次购买同等级
         resp = await client.post(
             f"{API_BASE}/create-order",
-            json={"product_id": "yangxin_monthly", "platform": "alipay"},
+            json={"product_id": product_id, "platform": platform},
             params={"user_id": user_id},
         )
-        assert resp.status_code == 400
-        assert "无需重复购买" in resp.json()["detail"]
+        if platform == "alipay":
+            assert resp.status_code == 200
+            assert resp.json()["data"]["status"] == "pending"
+        else:
+            assert resp.status_code == 400
+            assert "无需重复购买" in resp.json()["detail"]
 
 
 # ============================================================

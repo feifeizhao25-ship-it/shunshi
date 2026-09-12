@@ -1174,7 +1174,8 @@ async def create_order(
     current_sub = get_user_subscription(user_id)
     new_tier = product["tier"]
     if TIER_ORDER.get(new_tier, 0) <= TIER_ORDER.get(current_sub.plan, 0):
-        if current_sub.plan == new_tier and current_sub.status == "active":
+        if (current_sub.plan == new_tier and current_sub.status == "active"
+                and request.platform not in {"alipay", "wechat"}):
             raise HTTPException(status_code=400, detail="当前已是该等级会员，无需重复购买")
 
     alipay_result = None
