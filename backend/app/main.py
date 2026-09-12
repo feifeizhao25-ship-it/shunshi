@@ -1,6 +1,7 @@
 """顺时后端骨架入口：单 FastAPI 应用，按模块分 router。"""
 
 from contextlib import asynccontextmanager
+import asyncio
 import importlib
 import pkgutil
 
@@ -57,9 +58,17 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         from .rag.knowledge_base import load_knowledge_bases
 
         load_knowledge_bases()
+        recovery_stop = asyncio.Event()
+        recovery_task = None
+        if settings.env == "production":
+            from .services.payment_recovery import payment_recovery_loop
+            recovery_task = asyncio.create_task(payment_recovery_loop(app, recovery_stop))
         try:
             yield
         finally:
+            recovery_stop.set()
+            if recovery_task is not None:
+                await recovery_task
             close_all_test_connections()
             engine.dispose()
 

@@ -11,10 +11,12 @@ def activate_verified_domestic_payment(
     """只信任服务端订单中的用户、SKU 与金额，并同步所有权益存储。"""
     from app.database.db import get_db
     from app.router import subscription as sub
+    from .payment_recovery import ensure_recovery_jobs, enqueue_recovery
 
     if not order_no or not transaction_id:
         raise HTTPException(status_code=400, detail="支付交易标识缺失")
     db = get_db()
+    ensure_recovery_jobs(db)
     row = db.execute("SELECT * FROM payment_orders WHERE order_no = ?", (order_no,)).fetchone()
     if not row:
         raise HTTPException(status_code=404, detail="支付订单不存在")
@@ -26,6 +28,12 @@ def activate_verified_domestic_payment(
     if order["status"] == "paid":
         if order.get("transaction_id") != transaction_id:
             raise HTTPException(status_code=409, detail="订单支付流水号冲突")
+        try:
+            enqueue_recovery(db, order["user_id"])
+            db.commit()
+        except Exception:
+            db.rollback()
+            raise
         sub.payment_orders[order["id"]] = order
         _restore_domestic_entitlement(request, db, order["user_id"])
         return order
@@ -81,6 +89,7 @@ def activate_verified_domestic_payment(
             VALUES (?,?,?,'active',?,?,0,?,?)""",
             (subscription_id, order["user_id"], order["tier"], now, expires_at, provider, now),
         )
+        enqueue_recovery(db, order["user_id"])
         db.commit()
     except Exception:
         db.rollback()
@@ -102,10 +111,11 @@ def _restore_domestic_entitlement(request, db, user_id):
     Serialize domestic projections with SQLite writers, including the separate
     entitlement commit. An uncertain commit is retried, never compensated by
     deleting a verified payment. This is recoverability, not a distributed
-    transaction: a provider retry is still required after interruption.
+    transaction: a durable recovery job or verified callback completes an
+    interrupted projection.
     """
     from app.router import subscription as sub
-    from app.simple_models import Entitlement
+    from app.simple_models import Entitlement, User
 
     session_factory = getattr(request.app.state, "session_factory", None)
     if session_factory is None:
@@ -127,6 +137,8 @@ def _restore_domestic_entitlement(request, db, user_id):
         paid_at = latest["paid_at"]
         paid_ts = int(datetime.fromisoformat(paid_at).timestamp())
         with session_factory() as session:
+            if session.get(User, user_id) is None:
+                raise HTTPException(status_code=410, detail="账号已不存在，不能恢复会员权益")
             entitlement = session.get(Entitlement, user_id)
             values = dict(product_id=latest["product_id"], store=latest["platform"],
                 expires_at=expires_ts, original_transaction_id=latest["transaction_id"],
@@ -163,6 +175,8 @@ def _restore_domestic_entitlement(request, db, user_id):
             sub._init_family_seats(user_id, latest["tier"], latest["id"])
         else:
             sub.family_seats[user_id]["order_id"] = latest["id"]
+        db.execute("""UPDATE domestic_payment_recovery SET status='done',
+            attempts=0,next_attempt_at=0,last_error=NULL WHERE user_id=?""", (user_id,))
         db.commit()
     except HTTPException:
         db.rollback()

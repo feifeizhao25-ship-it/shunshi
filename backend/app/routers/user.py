@@ -258,17 +258,35 @@ def delete_account(
     session: Session = Depends(get_session),
 ):
     """账号注销：真实删除该用户全部数据与账号行，返回删除确认与各表删除条数。"""
-    counts = {}
-    for model, column in (
-        (Message, Message.user_id),
-        (UserSetting, UserSetting.user_id),
-        (Reflection, Reflection.user_id),
-        (Feedback, Feedback.user_id),
-        (AudioProgress, AudioProgress.user_id),
-        (Entitlement, Entitlement.user_id),
-    ):
-        result = session.execute(delete(model).where(column == user_id))
-        counts[model.__tablename__] = result.rowcount
-    result = session.execute(delete(User).where(User.id == user_id))
-    counts["users"] = result.rowcount
-    return {"deleted": True, "user_id": user_id, "deleted_rows": counts}
+    from ..database.db import get_db, close_test_connection
+    from ..services.payment_recovery import ensure_recovery_jobs
+
+    db = get_db()
+    try:
+        ensure_recovery_jobs(db)
+        # Coordinate deletion with domestic recovery before taking SQLAlchemy
+        # write locks, using the same lock order as the recovery worker.
+        db.execute("BEGIN IMMEDIATE")
+        counts = {}
+        for model, column in (
+            (Message, Message.user_id),
+            (UserSetting, UserSetting.user_id),
+            (Reflection, Reflection.user_id),
+            (Feedback, Feedback.user_id),
+            (AudioProgress, AudioProgress.user_id),
+            (Entitlement, Entitlement.user_id),
+        ):
+            result = session.execute(delete(model).where(column == user_id))
+            counts[model.__tablename__] = result.rowcount
+        result = session.execute(delete(User).where(User.id == user_id))
+        counts["users"] = result.rowcount
+        session.commit()
+        db.execute("DELETE FROM domestic_payment_recovery WHERE user_id=?", (user_id,))
+        db.commit()
+        return {"deleted": True, "user_id": user_id, "deleted_rows": counts}
+    except Exception:
+        session.rollback()
+        db.rollback()
+        raise
+    finally:
+        close_test_connection(db)
