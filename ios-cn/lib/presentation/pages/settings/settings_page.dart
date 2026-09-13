@@ -1,7 +1,6 @@
 import '../../../core/router/safe_pop.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../../design_system/theme.dart';
 import '../../../design_system/theme_helper.dart';
 
@@ -123,22 +122,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ],
           const SizedBox(height: ShunShiSpacing.lg),
 
-          _buildTile(Icons.delete_forever_rounded, '删除账户与数据', onTap: () {
-            showDialog(context: context, builder: (_) => AlertDialog(
-              backgroundColor: ShunShiColors.surface,
-              title: const Text('确认删除？', style: TextStyle(color: ShunShiColors.textPrimary)),
-              content: const Text('删除后所有数据将无法恢复，包括体质测试记录、对话历史、打卡记录等。\n\n根据GDPR规定，您有权要求删除个人数据。', style: TextStyle(color: ShunShiColors.textSecondary, height: 1.6)),
-              actions: [
-                TextButton(onPressed: () => Navigator.pop(context), child: const Text('取消', style: TextStyle(color: ShunShiColors.textTertiary))),
-                TextButton(onPressed: () {
-                  // 清除本地数据
-                  SharedPreferences.getInstance().then((prefs) => prefs.clear());
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('数据已清除，感谢使用'), duration: Duration(seconds: 2)));
-                }, child: const Text('确认删除', style: TextStyle(color: Colors.red))),
-              ],
-            ));
-          }),
+          _buildTile(Icons.delete_forever_rounded, '账号与隐私数据', onTap: () => context.push('/privacy')),
           _sectionHeader('关于'),
           _buildTile(Icons.description_outlined, '用户协议', onTap: () { ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('用户协议页面开发中'), duration: Duration(seconds: 1))); }),
           _buildTile(Icons.policy_outlined, '隐私政策', onTap: () => context.push('/privacy')),

@@ -58,7 +58,7 @@ def test_delete_account_requires_auth(client):
     assert client.delete("/api/v1/auth/account").status_code == 401
 
 
-def test_delete_account_removes_everything(client, settings, auth_headers):
+def test_delete_account_removes_core_data_and_rejects_export(client, settings, auth_headers):
     _seed_user_data(client, auth_headers)
     user_id = _user_id(settings, auth_headers)
 
@@ -70,15 +70,14 @@ def test_delete_account_removes_everything(client, settings, auth_headers):
     assert body["deleted_rows"]["reflections"] == 1
     assert body["deleted_rows"]["feedback"] == 1
 
-    # 数据完整性：删除后导出应为全空（token 仍有效，但库内已无任何记录）
-    exported = client.post("/api/v1/auth/data/export", headers=auth_headers).json()
-    assert exported["user"] is None
-    assert exported["settings"] == {}
-    assert exported["messages"] == []
-    assert exported["reflections"] == []
-    assert exported["feedback"] == []
-    assert exported["audio_progress"] == []
-    assert exported["entitlement"] is None
+    # 注销后的旧令牌不能再导出；直接核验核心数据库，避免把拒绝访问当作删除证据。
+    assert client.post("/api/v1/auth/data/export", headers=auth_headers).status_code == 401
+    from sqlalchemy import select, func
+    from app.simple_models import User, UserSetting, Message, Reflection, Feedback, AudioProgress, Entitlement
+    with client.app.state.session_factory() as session:
+        assert session.get(User, user_id) is None
+        for model in (UserSetting, Message, Reflection, Feedback, AudioProgress, Entitlement):
+            assert session.scalar(select(func.count()).select_from(model).where(model.user_id == user_id)) == 0
 
     # 同一 user_id 不应再能被登录体系外的接口看到任何残留
     listed = client.get("/api/v1/reflections", headers=auth_headers).json()

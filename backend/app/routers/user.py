@@ -158,8 +158,12 @@ def sms_verify(
 
 
 def _collect_user_data(session: Session, user_id: str) -> dict:
-    """归集该用户在库内的全部数据（真实读库，不抽样不截断到假数据）。"""
+    """归集核心账号数据及国内付款、退款申请记录。"""
     user = session.get(User, user_id)
+    if user is None:
+        raise HTTPException(status_code=401, detail="账号已不存在，请重新登录")
+    from ..services.billing_data import collect_domestic_billing_data
+    billing = collect_domestic_billing_data(user_id)
     settings_rows = session.scalars(
         select(UserSetting).where(UserSetting.user_id == user_id)
     ).all()
@@ -179,6 +183,7 @@ def _collect_user_data(session: Session, user_id: str) -> dict:
     return {
         "product": "shunshi",
         "exported_at": int(time.time()),
+        "domestic_billing": billing,
         "user": (
             {
                 "id": user.id,
@@ -257,7 +262,7 @@ def delete_account(
     user_id: str = Depends(current_user),
     session: Session = Depends(get_session),
 ):
-    """账号注销：真实删除该用户全部数据与账号行，返回删除确认与各表删除条数。"""
+    """删除核心账号数据，并报告尚保留的国内付款、退款申请记录。"""
     from ..database.db import get_db, close_test_connection
     from ..services.payment_recovery import ensure_recovery_jobs
 
@@ -267,6 +272,15 @@ def delete_account(
         # Coordinate deletion with domestic recovery before taking SQLAlchemy
         # write locks, using the same lock order as the recovery worker.
         db.execute("BEGIN IMMEDIATE")
+        # Financial evidence is not silently destroyed by account deletion.
+        # Report it explicitly; retention policy and refund settlement remain
+        # separate deployment requirements.
+        tables = {row[0] for row in db.execute(
+            "SELECT name FROM sqlite_master WHERE type='table'").fetchall()}
+        retained = {}
+        for table in ('payment_orders', 'domestic_refund_requests'):
+            retained[table] = (db.execute(f'SELECT count(*) FROM {table} WHERE user_id=?',
+                (user_id,)).fetchone()[0] if table in tables else 0)
         counts = {}
         for model, column in (
             (Message, Message.user_id),
@@ -283,7 +297,9 @@ def delete_account(
         session.commit()
         db.execute("DELETE FROM domestic_payment_recovery WHERE user_id=?", (user_id,))
         db.commit()
-        return {"deleted": True, "user_id": user_id, "deleted_rows": counts}
+        return {"deleted": True, "user_id": user_id, "deleted_rows": counts,
+            "retained_billing_records": retained,
+            "billing_notice": "支付与退款申请记录仍保留，注销不表示退款已完成"}
     except Exception:
         session.rollback()
         db.rollback()

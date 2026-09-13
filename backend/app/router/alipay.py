@@ -8,13 +8,21 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Request, Query
 from fastapi.responses import PlainTextResponse
 from pydantic import BaseModel, Field
+from sqlalchemy.orm import Session
 
 from app.database.db import get_db
-from app.deps import current_user
+from app.deps import current_user, get_session
+from app.simple_models import User
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/v1/payments/alipay", tags=["Alipay支付"])
+
+
+def _active_payment_user(user_id: str = Depends(current_user), session: Session = Depends(get_session)):
+    if session.get(User, user_id) is None:
+        raise HTTPException(status_code=401, detail="账号已不存在，请重新登录")
+    return user_id
 
 
 # ==================== 请求模型 ====================
@@ -65,7 +73,7 @@ async def create_order(request: CreateAlipayOrderRequest):
 @router.get("/query-order")
 async def query_order(
     order_no: str = Query(...),
-    user_id: str = Depends(current_user),
+    user_id: str = Depends(_active_payment_user),
 ):
     """查询订单状态"""
     from app.services.alipay_service import alipay_service
@@ -78,7 +86,7 @@ async def query_order(
 @router.post("/refund", status_code=202)
 async def refund_order(
     request: RefundRequest,
-    user_id: str = Depends(current_user),
+    user_id: str = Depends(_active_payment_user),
 ):
     """登记退款申请；商户退款与权益结算尚未完成时不得宣称退款成功。"""
     from app.services.refund_requests import submit_refund_request
@@ -88,7 +96,7 @@ async def refund_order(
 
 
 @router.get("/refund")
-async def query_refund_request(order_no: str = Query(...), user_id: str = Depends(current_user)):
+async def query_refund_request(order_no: str = Query(...), user_id: str = Depends(_active_payment_user)):
     from app.services.refund_requests import get_refund_request
     return {"success": True, "data": get_refund_request(order_no, user_id)}
 
