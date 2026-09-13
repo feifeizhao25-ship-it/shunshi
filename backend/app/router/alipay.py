@@ -7,7 +7,7 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Query
 from fastapi.responses import PlainTextResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.database.db import get_db
 from app.deps import current_user
@@ -30,9 +30,9 @@ class QueryOrderRequest(BaseModel):
 
 
 class RefundRequest(BaseModel):
-    order_no: str
-    refund_amount: str
-    refund_reason: str = "用户申请退款"
+    order_no: str = Field(min_length=1, max_length=128)
+    refund_amount: str = Field(min_length=1, max_length=16)
+    refund_reason: str = Field(default="用户申请退款", min_length=1, max_length=500)
 
 
 # ==================== API 端点 ====================
@@ -75,21 +75,22 @@ async def query_order(
     return {"success": True, "data": result.model_dump()}
 
 
-@router.post("/refund")
+@router.post("/refund", status_code=202)
 async def refund_order(
     request: RefundRequest,
     user_id: str = Depends(current_user),
 ):
-    """申请退款"""
-    from app.services.alipay_service import alipay_service
+    """登记退款申请；商户退款与权益结算尚未完成时不得宣称退款成功。"""
+    from app.services.refund_requests import submit_refund_request
+    result = submit_refund_request(request.order_no, user_id,
+        request.refund_amount, request.refund_reason)
+    return {"success": True, "message": "退款申请已记录，退款尚未执行", "data": result}
 
-    _require_order_owner(request.order_no, user_id)
-    result = alipay_service.refund(
-        order_no=request.order_no,
-        refund_amount=request.refund_amount,
-        refund_reason=request.refund_reason,
-    )
-    return {"success": True, "data": result.model_dump()}
+
+@router.get("/refund")
+async def query_refund_request(order_no: str = Query(...), user_id: str = Depends(current_user)):
+    from app.services.refund_requests import get_refund_request
+    return {"success": True, "data": get_refund_request(order_no, user_id)}
 
 
 def _require_order_owner(order_no: str, user_id: str) -> None:
