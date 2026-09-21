@@ -66,6 +66,13 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             "注意变量名要带 SHUNSHI_ 前缀，不带前缀的 DATABASE_URL 不会被读取。"
         )
 
+    import os
+
+    legacy_secret = os.environ.get("JWT_SECRET", "")
+    if legacy_secret and settings.jwt_secret and legacy_secret != settings.jwt_secret:
+        # 登录接口与核心接口必须用同一把密钥，否则登录成功后处处 401（见 core/settings.py）。
+        raise RuntimeError("JWT_SECRET 与 SHUNSHI_JWT_SECRET 同时配置且不一致；只保留 SHUNSHI_JWT_SECRET")
+
     engine = make_engine(settings.database_url)
 
     @asynccontextmanager

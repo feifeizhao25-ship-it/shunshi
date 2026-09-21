@@ -68,3 +68,19 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+# 两套认证共用一把密钥。
+#
+# 登录（/api/v1/auth/login，本模块的 JWT_SECRET 签发）拿到的 token，要在
+# /api/v1/chat、/api/v1/user 等核心接口（app/config.py 的 SHUNSHI_JWT_SECRET 验签）
+# 上用。原来两边各读各的变量：部署文档只写了 SHUNSHI_JWT_SECRET，于是
+# router/auth.py 在导入时抛 RuntimeError，**整个后端起不来**；两个都配了但不一样，
+# 则登录成功后所有核心接口一律 401。
+#
+# 现在以带前缀的 SHUNSHI_JWT_SECRET 为准；只配了旧名 JWT_SECRET 的沿用旧名；
+# 两个都配了且不一致时拒绝启动（见 app/main.py）。
+import os as _os
+
+_prefixed_secret = _os.environ.get("SHUNSHI_JWT_SECRET", "")
+if _prefixed_secret:
+    settings.JWT_SECRET = _prefixed_secret

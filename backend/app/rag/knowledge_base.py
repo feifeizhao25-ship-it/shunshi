@@ -15,8 +15,13 @@ from dataclasses import dataclass, field
 logger = logging.getLogger(__name__)
 
 # 运行时直接读取仓库内受版本控制的权威文稿目录。
+#
+# 这个目录在仓库根上，而后端镜像的构建上下文是 backend/（Dockerfile 只 COPY app），
+# 镜像里根本没有它：启动时 load_knowledge_bases() 抛 FileNotFoundError，
+# **整个后端起不来**。部署时由 compose 把目录只读挂进容器，并用
+# SHUNSHI_KNOWLEDGE_DIR 指过去；本地开发不设变量，仍读仓库根上的目录。
 _ROOT = Path(__file__).resolve().parents[3]
-_DATA_DIR = _ROOT / "参考文档，知识库"
+_DATA_DIR = Path(os.environ.get("SHUNSHI_KNOWLEDGE_DIR") or (_ROOT / "参考文档，知识库"))
 _CN_PATH = _DATA_DIR / "顺时知识库_中文版.md"
 _GL_PATH = _DATA_DIR / "SEASONS_Knowledge_Base_English.md"
 _CN_SUPP_PATH = _DATA_DIR / "顺时知识库_补充篇_中文版.md"
@@ -377,7 +382,9 @@ class KnowledgeBase:
             path = _CN_PATH if self.lang == "cn" else _GL_PATH
 
         if not os.path.exists(path):
-            raise FileNotFoundError(f"知识库文件不存在: {path}")
+            raise FileNotFoundError(
+                f"知识库文件不存在: {path}（部署时请挂载知识库目录并设置 SHUNSHI_KNOWLEDGE_DIR）"
+            )
 
         with open(path, "r", encoding="utf-8") as f:
             text = f.read()

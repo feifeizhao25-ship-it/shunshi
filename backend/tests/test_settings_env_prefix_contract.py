@@ -7,7 +7,7 @@
 而 `docker-compose.yml` 里写的是不带前缀的：
 
     environment:
-      DATABASE_URL: postgresql+psycopg2://...@postgres:5432/shunshi
+      DATABASE_URL: postgresql+psycopg://...@postgres:5432/shunshi
       REDIS_URL: redis://redis:6379/0
 
 pydantic-settings **不读**这两个名字。于是 `database_url` 一路用了缺省值
@@ -47,14 +47,14 @@ def test_unprefixed_database_url_is_ignored(monkeypatch):
     那时要一并检查 compose 和 .env.example，而不是直接改这条用例。
     """
     monkeypatch.delenv("SHUNSHI_DATABASE_URL", raising=False)
-    monkeypatch.setenv("DATABASE_URL", "postgresql+psycopg2://u:p@postgres:5432/shunshi")
+    monkeypatch.setenv("DATABASE_URL", "postgresql+psycopg://u:p@postgres:5432/shunshi")
     assert Settings(_env_file=None).database_url.startswith("sqlite"), (
         "不带前缀的 DATABASE_URL 被读进来了；compose 与 .env.example 需要同步复查"
     )
 
 
 def test_prefixed_database_url_is_read(monkeypatch):
-    monkeypatch.setenv("SHUNSHI_DATABASE_URL", "postgresql+psycopg2://u:p@postgres:5432/shunshi")
+    monkeypatch.setenv("SHUNSHI_DATABASE_URL", "postgresql+psycopg://u:p@postgres:5432/shunshi")
     assert Settings(_env_file=None).database_url.startswith("postgresql")
 
 

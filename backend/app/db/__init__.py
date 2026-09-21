@@ -14,6 +14,10 @@ from app.simple_models import Base
 
 
 def make_engine(database_url: str) -> Engine:
+    from app.db.url import normalize_database_url
+
+    # postgresql:// 与 postgresql+psycopg2:// 都会选到没安装的 psycopg2，统一到 psycopg（3）。
+    database_url = normalize_database_url(database_url)
     connect_args = {"check_same_thread": False} if database_url.startswith("sqlite") else {}
     return create_engine(database_url, connect_args=connect_args, pool_pre_ping=True)
 

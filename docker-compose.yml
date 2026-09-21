@@ -19,7 +19,7 @@
 
 services:
   # ─── PostgreSQL 16 主数据库 ───
-  # 注意: 后端使用 SQLAlchemy + psycopg2，必须使用 PostgreSQL
+  # 注意: 后端使用 SQLAlchemy + psycopg（3），必须使用 PostgreSQL
   postgres:
     image: postgres:16-alpine
     container_name: shunshi-postgres
@@ -105,8 +105,12 @@ services:
       # 这里原先写的是不带前缀的 DATABASE_URL / REDIS_URL —— 后端**根本读不到**，
       # database_url 就悄悄用了缺省的 sqlite:///./shunshi_dev.db。
       # 也就是说 postgres 容器一直健康地空跑，数据全写在容器可写层里。
-      SHUNSHI_DATABASE_URL: postgresql+psycopg2://${DB_USER:-shunshi}:${DB_PASSWORD:?DB_PASSWORD is required}@postgres:5432/${DB_NAME:-shunshi}
+      # 驱动必须是 psycopg（3）：requirements 装的是 psycopg[binary]，没有 psycopg2。
+      # 此前这里写的是 +psycopg2，后端一建 engine 就 ModuleNotFoundError。
+      # 产品模型（体质、日记、社区…）用同一个库里的 shunshi_product schema，见 app/db/url.py。
+      SHUNSHI_DATABASE_URL: postgresql+psycopg://${DB_USER:-shunshi}:${DB_PASSWORD:?DB_PASSWORD is required}@postgres:5432/${DB_NAME:-shunshi}
       # Redis 现在要口令，连接串必须一起带上，否则后端一连就 NOAUTH。
+      SHUNSHI_KNOWLEDGE_DIR: /app/knowledge
       SHUNSHI_REDIS_URL: redis://:${REDIS_PASSWORD:?REDIS_PASSWORD is required}@redis:6379/0
     depends_on:
       postgres:
@@ -116,8 +120,15 @@ services:
     volumes:
       - backend_data:/app/data
       - backend_logs:/app/logs
+      # 知识库文稿在仓库根上，不在镜像构建上下文（backend/）里。不挂载时
+      # 启动阶段加载知识库抛 FileNotFoundError，后端起不来。
+      - ./参考文档，知识库:/app/knowledge:ro
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:4000/health')"]
+      # 此前探的是 /health —— 后端没有这条路由（有的是 /healthz 与 /api/health），
+      # 永远 404，容器永远 unhealthy；admin 与 web-cn 以 service_healthy 依赖它，
+      # 于是这两个容器**永远不会启动**。/api/health 在 Redis 或模型网关抖动时返回 503，
+      # 不适合做存活探针，这里用进程级的 /healthz。
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:4000/healthz')"]
       interval: 30s
       timeout: 10s
       retries: 3
