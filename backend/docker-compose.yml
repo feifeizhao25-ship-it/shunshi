@@ -1,3 +1,7 @@
+# 仅供本地开发：只起后端 + Postgres + Redis，端口只绑 127.0.0.1。
+# **生产请用仓库根目录的 docker-compose.yml**（带 nginx、TLS、限流、管理后台与 Web）。
+# 原来这份写着 SHUNSHI_ENV: production、端口对公网、数据库口令写死、Redis 无口令，
+# 又缺 ADMIN_* 与知识库目录（后端导入时就会退出）——照着它上线等于裸奔。
 services:
   postgres:
     image: postgres:16-alpine
@@ -15,8 +19,9 @@ services:
 
   redis:
     image: redis:7-alpine
+    command: ["redis-server", "--requirepass", "shunshi_dev_only"]
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD", "redis-cli", "-a", "shunshi_dev_only", "ping"]
       interval: 5s
       timeout: 3s
       retries: 10
@@ -24,31 +29,22 @@ services:
   app:
     build: .
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
     environment:
-      SHUNSHI_ENV: production
+      SHUNSHI_ENV: development
       SHUNSHI_DATABASE_URL: postgresql+psycopg://shunshi:shunshi_dev_password@postgres:5432/shunshi
-      SHUNSHI_REDIS_URL: redis://redis:6379/0
+      SHUNSHI_REDIS_URL: redis://:shunshi_dev_only@redis:6379/0
       SHUNSHI_JWT_SECRET: ${SHUNSHI_JWT_SECRET:?请通过环境变量提供至少 32 位 JWT 密钥}
       SHUNSHI_CORS_ORIGINS: ${SHUNSHI_CORS_ORIGINS:-http://localhost:3000}
-      SHUNSHI_MODEL_ROUTER_URL: ${SHUNSHI_MODEL_ROUTER_URL:-}
-      SHUNSHI_SMS_PROVIDER_URL: ${SHUNSHI_SMS_PROVIDER_URL:-}
-      SHUNSHI_SMS_PROVIDER_TOKEN: ${SHUNSHI_SMS_PROVIDER_TOKEN:-}
-      SHUNSHI_PAYMENT_CALLBACK_SECRET: ${SHUNSHI_PAYMENT_CALLBACK_SECRET:-}
-      ALIPAY_MODE: ${ALIPAY_MODE:-production}
-      ALIPAY_APP_ID: ${ALIPAY_APP_ID:-}
-      ALIPAY_PRIVATE_KEY: ${ALIPAY_PRIVATE_KEY:-}
-      ALIPAY_PUBLIC_KEY: ${ALIPAY_PUBLIC_KEY:-}
-      ALIPAY_NOTIFY_URL: ${ALIPAY_NOTIFY_URL:-}
-      ALIPAY_RETURN_URL: ${ALIPAY_RETURN_URL:-}
-      WECHAT_PAY_MCH_ID: ${WECHAT_PAY_MCH_ID:-}
-      WECHAT_PAY_APP_ID: ${WECHAT_PAY_APP_ID:-}
-      WECHAT_PAY_SERIAL_NO: ${WECHAT_PAY_SERIAL_NO:-}
-      WECHAT_PAY_PRIVATE_KEY: ${WECHAT_PAY_PRIVATE_KEY:-}
-      WECHAT_PAY_API_V3_KEY: ${WECHAT_PAY_API_V3_KEY:-}
-      WECHAT_PAY_NOTIFY_URL: ${WECHAT_PAY_NOTIFY_URL:-}
-      WECHAT_PAY_PLATFORM_SERIAL_NO: ${WECHAT_PAY_PLATFORM_SERIAL_NO:-}
-      WECHAT_PAY_PLATFORM_PUBLIC_KEY: ${WECHAT_PAY_PLATFORM_PUBLIC_KEY:-}
+      SHUNSHI_KNOWLEDGE_DIR: /app/knowledge
+      ADMIN_PASSWORD_HASH: ${ADMIN_PASSWORD_HASH:?请提供管理员口令的哈希}
+      ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET:?请提供管理员令牌密钥}
+      # 境内模型 key、短信与支付配置请写在 backend/.env（不进仓库），见 .env.example。
+    env_file:
+      - path: ./.env
+        required: false
+    volumes:
+      - ../参考文档，知识库:/app/knowledge:ro
     depends_on:
       postgres:
         condition: service_healthy

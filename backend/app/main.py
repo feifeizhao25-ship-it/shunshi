@@ -191,6 +191,13 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
     app.include_router(content_proxy)
     _include_product_routers(app)
+    # 隐私政策、医疗免责声明：客户端「隐私政策」入口、应用商店审核与 nginx 的 /privacy 都指向这里。
+    # 原来 app/static 在镜像里，却没有任何路由挂出来——/static/privacy-policy.html 一直是 404。
+    from pathlib import Path
+
+    from fastapi.staticfiles import StaticFiles
+
+    app.mount("/static", StaticFiles(directory=Path(__file__).resolve().parent / "static"), name="static")
     return app
 
 
