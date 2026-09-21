@@ -47,6 +47,25 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     ):
         raise RuntimeError("生产环境必须配置至少 32 位 SHUNSHI_JWT_SECRET 和明确的 SHUNSHI_CORS_ORIGINS")
 
+    # 生产环境不允许回落到 SQLite 缺省值。
+    #
+    # `Settings` 的 env_prefix 是 "SHUNSHI_"，而 docker-compose.yml 里写的是
+    # 不带前缀的 DATABASE_URL —— pydantic-settings 根本不读它。于是
+    # database_url 悄悄用了缺省值 sqlite:///./shunshi_dev.db，落在容器的
+    # WORKDIR /app 下，而 compose 只把 /app/data 和 /app/logs 做成了 volume。
+    #
+    # 结果：postgres 容器健康地跑着、一个字节都没写进去；用户数据全在
+    # 容器可写层里，**下一次 docker compose up --build 就清零**。
+    #
+    # JWT 与 CORS 都是 fail-closed 的，唯独"数据存在哪"不是——偏偏它是
+    # 唯一一个错了不会报错、只会在重新部署那天才暴露的配置。补上。
+    if settings.env == "production" and settings.database_url.startswith("sqlite"):
+        raise RuntimeError(
+            "生产环境必须显式配置 SHUNSHI_DATABASE_URL（PostgreSQL DSN）。"
+            "当前回落到了 SQLite 缺省值，数据不会持久化。"
+            "注意变量名要带 SHUNSHI_ 前缀，不带前缀的 DATABASE_URL 不会被读取。"
+        )
+
     engine = make_engine(settings.database_url)
 
     @asynccontextmanager

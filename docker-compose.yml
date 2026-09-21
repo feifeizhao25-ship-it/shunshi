@@ -4,6 +4,18 @@
 #   docker compose up -d                    # 启动所有服务
 #   docker compose logs -f backend          # 查看后端日志
 #   docker compose down                     # 停止所有服务
+#
+# ⚠️ 端口绑定约定（2026-09-20 加）
+#
+# 除 nginx 的 80/443 之外，**所有端口一律绑到 127.0.0.1**。
+# 在此之前它们写的是裸端口号，Docker 会解释成 0.0.0.0，
+# 也就是"公网任何人可直连"，而且会**绕过 iptables 的 INPUT 链**
+# （docker-proxy 走的是 DOCKER 链），云厂商安全组之外再加的
+# 本机防火墙规则对它无效。
+#
+# 对外服务只经 nginx 进：那里才有 TLS、限流与安全响应头。
+# 需要从外网连数据库或看监控时走 SSH 隧道：
+#   ssh -L 5432:127.0.0.1:5432 -L 3000:127.0.0.1:3000 <server>
 
 services:
   # ─── PostgreSQL 16 主数据库 ───
@@ -13,11 +25,13 @@ services:
     container_name: shunshi-postgres
     restart: unless-stopped
     ports:
-      - "${DB_PORT:-5432}:5432"
+      - "127.0.0.1:${DB_PORT:-5432}:5432"
     environment:
       POSTGRES_DB: ${DB_NAME:-shunshi}
       POSTGRES_USER: ${DB_USER:-shunshi}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      # 没设就拒绝启动。此前是 ${DB_PASSWORD}：变量为空时 postgres 镜像
+      # 直接退出，但错误信息埋在日志里，容易被当成"起不来、重试一下"。
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./backend/migrations/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
@@ -41,12 +55,27 @@ services:
     container_name: shunshi-redis
     restart: unless-stopped
     ports:
-      - "6379:6379"
+      - "127.0.0.1:6379:6379"
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?REDIS_PASSWORD is required}
     volumes:
       - redis_data:/data
-    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    # 此前既公网监听又不设密码。开放的 Redis 是一条成熟的 RCE 路径：
+    # 攻击者 CONFIG SET dir /root/.ssh + dbfilename authorized_keys，
+    # 写入自己的公钥就拿到宿主机。姐妹项目（分发侠、新能源）都已用
+    # --requirepass，这里是唯一的缺口。
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+      - --maxmemory
+      - 256mb
+      - --maxmemory-policy
+      - allkeys-lru
+      - --requirepass
+      - ${REDIS_PASSWORD:?REDIS_PASSWORD is required}
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD-SHELL", "redis-cli -a \"$${REDIS_PASSWORD}\" ping | grep PONG"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -67,12 +96,18 @@ services:
     container_name: shunshi-backend
     restart: unless-stopped
     ports:
-      - "4000:4000"
+      - "127.0.0.1:4000:4000"
     env_file:
       - ./backend/.env
     environment:
-      DATABASE_URL: postgresql+psycopg2://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
-      REDIS_URL: redis://redis:6379/0
+      # ⚠️ 变量名必须带 SHUNSHI_ 前缀。
+      # app/config.py 的 Settings 用的是 env_prefix="SHUNSHI_"，
+      # 这里原先写的是不带前缀的 DATABASE_URL / REDIS_URL —— 后端**根本读不到**，
+      # database_url 就悄悄用了缺省的 sqlite:///./shunshi_dev.db。
+      # 也就是说 postgres 容器一直健康地空跑，数据全写在容器可写层里。
+      SHUNSHI_DATABASE_URL: postgresql+psycopg2://${DB_USER:-shunshi}:${DB_PASSWORD:?DB_PASSWORD is required}@postgres:5432/${DB_NAME:-shunshi}
+      # Redis 现在要口令，连接串必须一起带上，否则后端一连就 NOAUTH。
+      SHUNSHI_REDIS_URL: redis://:${REDIS_PASSWORD:?REDIS_PASSWORD is required}@redis:6379/0
     depends_on:
       postgres:
         condition: service_healthy
@@ -106,7 +141,7 @@ services:
     container_name: shunshi-admin
     restart: unless-stopped
     ports:
-      - "3001:3000"
+      - "127.0.0.1:3001:3000"
     environment:
       API_URL: http://backend:4000
     depends_on:
@@ -130,7 +165,7 @@ services:
     container_name: shunshi-web-cn
     restart: unless-stopped
     ports:
-      - "8080:8080"
+      - "127.0.0.1:8080:8080"
     depends_on:
       backend:
         condition: service_healthy
@@ -173,7 +208,7 @@ services:
     container_name: shunshi-prometheus
     restart: unless-stopped
     ports:
-      - "9090:9090"
+      - "127.0.0.1:9090:9090"
     volumes:
       - ./backend/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus_data:/prometheus
@@ -183,7 +218,12 @@ services:
       - "--web.console.libraries=/usr/share/prometheus/console_libraries"
       - "--web.console.templates=/usr/share/prometheus/consoles"
     networks:
+      # 也挂到 backend-net：抓取目标改成容器名 backend:4000。
+      # 原先抓的是 host.docker.internal:4000 —— 那个名字在 Linux 上
+      # 不加 extra_hosts 根本解析不了，所以这套监控在服务器上
+      # **从来没有抓到过数据**，只有 macOS 本地跑才像是通的。
       - monitoring-net
+      - backend-net
     deploy:
       resources:
         limits:
@@ -196,10 +236,12 @@ services:
     container_name: shunshi-grafana
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
     environment:
       GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
-      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD}
+      # 此前是 ${GRAFANA_ADMIN_PASSWORD}：变量没设时展开成空串，
+      # Grafana 会回落到内置的 admin/admin，而面板当时还监听公网。
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?GRAFANA_ADMIN_PASSWORD is required}
       GF_USERS_ALLOW_SIGN_UP: "false"
     volumes:
       - grafana_data:/var/lib/grafana

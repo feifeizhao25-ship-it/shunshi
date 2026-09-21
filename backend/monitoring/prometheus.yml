@@ -1,5 +1,12 @@
 # Prometheus 配置 - 顺时后端监控
-# 启动: docker-compose -f docker-compose.monitoring.yml up -d
+# 启动: docker compose up -d prometheus grafana
+#
+# 抓取目标用容器名 backend:4000，prometheus 与它同在 backend-net。
+# 原来写的是 host.docker.internal:4000 —— 那个名字是 Docker Desktop
+# (macOS / Windows) 才有的，Linux 服务器上不加
+#   extra_hosts: ["host.docker.internal:host-gateway"]
+# 就解析不了。也就是说这套监控在服务器上一直抓不到数据，
+# 只有在本机开发时看起来是通的。
 
 global:
   scrape_interval: 15s
@@ -10,7 +17,7 @@ scrape_configs:
   - job_name: 'shunshi-backend'
     metrics_path: '/metrics'
     static_configs:
-      - targets: ['host.docker.internal:4000']
+      - targets: ['backend:4000']
     scrape_interval: 15s
     # 健康检查
     relabel_configs:
