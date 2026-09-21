@@ -6,6 +6,16 @@
 
 set -e
 
+# ── 已停用（2026-09-21）────────────────────────────────────────────────────
+# 这份脚本会把一台服务器上的 nginx 改成：顺时的 /api/v1/auth、/api/v1/users、/api/v1/ai 等
+# 路径转给**新能源**后端（4001 端口），其余转给顺时——两条产品线的登录与账号混在一起，
+# 违反「四条产品线互不交叉」；而且它是国际版 SEASONS 的配置，默认直接改线上、
+# 用 StrictHostKeyChecking=no 连服务器。
+# 国内版请用仓库根目录的 docker compose（nginx 配置见 docker/nginx/，上线前跑
+# python3 scripts/check_nginx_site.py）。
+echo "deploy-nginx.sh 已停用：它会把顺时的登录接口转给新能源后端。请改用 docker compose，见 docker/nginx/。" >&2
+exit 1
+
 SSH_KEY="~/.ssh/openclaw_key"
 ECS_HOST="${ECS_HOST:-}"  # Set via environment variable
 ECS_USER="root"

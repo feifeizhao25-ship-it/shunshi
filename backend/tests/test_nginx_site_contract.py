@@ -117,3 +117,16 @@ def test_privacy_policy_is_served(tmp_path):
         assert response.status_code == 200
         assert "隐私政策" in response.text
         assert client.get("/static/medical-disclaimer.html").status_code == 200
+
+
+def test_legacy_shared_host_nginx_script_is_disabled():
+    """deploy-nginx.sh 会把顺时的 /api/v1/auth 等转给新能源后端（4001）：两条产品线账号混用。"""
+    import subprocess
+
+    script = REPO / "deploy-nginx.sh"
+    if not script.exists():
+        pytest.skip("deploy-nginx.sh not present")
+    for args in ([], ["--dry-run"]):
+        result = subprocess.run(["bash", str(script), *args], capture_output=True, text=True, timeout=10)
+        assert result.returncode != 0
+        assert "已停用" in result.stderr
