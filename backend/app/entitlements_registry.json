@@ -16,8 +16,8 @@
       },
       "personalization": {
         "onboarding_profile": true,
-        "adaptive_suggestions": false,
-        "ai_memory": false
+        "adaptive_suggestions": true,
+        "ai_memory": true
       },
       "export": {
         "data_export": true,
