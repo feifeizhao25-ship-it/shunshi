@@ -118,38 +118,22 @@ class _LoginPageState extends State<LoginPage>
       return;
     }
 
-    if (code != '123456') {
-      setState(() => _errorMessage = '验证码错误（开发阶段请输入 123456）');
-      return;
-    }
-
     setState(() => _isLoading = true);
     _errorMessage = null;
 
+    // 验证码由后端校验（/api/v1/auth/sms/verify：5 分钟有效、最多试 5 次），
+    // 通过后返回的就是这个手机号对应的账号——同一个手机号每次登录都是同一个人。
     try {
       final client = ApiClient();
-      try {
-        final response = await client.post(
-          '/api/v1/auth/phone-login',
-          data: {'phone': phone, 'code': code},
-        );
-        final data = response.data as Map<String, dynamic>;
-        _handleLoginSuccess(data, phone: phone);
-        return;
-      } catch (_) {}
-
       final response = await client.post(
-        '/api/v1/auth/guest-login',
-        data: {
-          'device_id':
-              'phone_${phone}_${DateTime.now().millisecondsSinceEpoch}',
-        },
+        '/api/v1/auth/sms/verify',
+        data: {'phone': phone, 'code': code},
       );
       final data = response.data as Map<String, dynamic>;
       _handleLoginSuccess(data, phone: phone);
     } catch (_) {
       setState(() {
-        _errorMessage = '登录失败，请检查验证码';
+        _errorMessage = '验证码错误或已过期';
         _isLoading = false;
       });
     }

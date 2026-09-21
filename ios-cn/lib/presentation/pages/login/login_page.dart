@@ -80,7 +80,6 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   /// 短信验证码登录
-  /// 开发阶段：验证码固定 123456，使用 guest-login + 手机号绑定
   Future<void> _smsLogin() async {
     final phone = _phoneController.text.trim();
     final code = _codeController.text.trim();
@@ -89,43 +88,22 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
 
-    // 开发阶段：仅接受固定验证码
-    if (code != '123456') {
-      setState(() => _errorMessage = '验证码错误（开发阶段请输入 123456）');
-      return;
-    }
-
     setState(() => _isLoading = true);
     _errorMessage = null;
 
+    // 验证码由后端校验（/api/v1/auth/sms/verify：5 分钟有效、最多试 5 次），
+    // 通过后返回的就是这个手机号对应的账号——同一个手机号每次登录都是同一个人。
     try {
       final client = ApiClient();
-      // 先尝试手机号登录 API
-      try {
-        final response = await client.post(
-          '/api/v1/auth/phone-login',
-          data: {'phone': phone, 'code': code},
-        );
-        final data = response.data as Map<String, dynamic>;
-        _handleLoginSuccess(data, phone: phone);
-        return;
-      } catch (_) {
-        // phone-login 不存在，fallback 到 guest-login
-      }
-
-      // Fallback: guest-login + 绑定手机号
       final response = await client.post(
-        '/api/v1/auth/guest-login',
-        data: {
-          'device_id':
-              'phone_${phone}_${DateTime.now().millisecondsSinceEpoch}',
-        },
+        '/api/v1/auth/sms/verify',
+        data: {'phone': phone, 'code': code},
       );
       final data = response.data as Map<String, dynamic>;
       _handleLoginSuccess(data, phone: phone);
     } catch (_) {
       setState(() {
-        _errorMessage = '登录失败，请检查验证码';
+        _errorMessage = '验证码错误或已过期';
         _isLoading = false;
       });
     }

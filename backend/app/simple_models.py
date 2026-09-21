@@ -40,6 +40,16 @@ class SmsCode(Base):
     attempts: Mapped[int] = mapped_column(Integer, default=0)
 
 
+class SmsSendLog(Base):
+    """每次真正发出的验证码短信一行，用于冷却与每日上限（手机号与来源地址都只存摘要）。"""
+
+    __tablename__ = "sms_send_log"
+    id: Mapped[str] = mapped_column(String(64), primary_key=True, default=new_id)
+    phone_digest: Mapped[str] = mapped_column(String(64), index=True)
+    ip_digest: Mapped[str] = mapped_column(String(64), index=True)
+    sent_at: Mapped[int] = mapped_column(Integer, index=True, default=now_ts)
+
+
 class UserSetting(Base):
     __tablename__ = "user_settings"
     user_id: Mapped[str] = mapped_column(String(64), primary_key=True)

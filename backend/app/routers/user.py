@@ -3,12 +3,15 @@
 路径与方法以 Flutter 客户端实际调用为准（lib/presentation/pages/login/login_page.dart）。
 """
 
+import hashlib
 import json
 import secrets
 import time
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 import httpx
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
@@ -22,6 +25,7 @@ from ..simple_models import (
     Message,
     Reflection,
     SmsCode,
+    SmsSendLog,
     User,
     UserSetting,
 )
@@ -36,6 +40,81 @@ router = APIRouter(prefix="/api/v1/auth", tags=["user"])
 
 SMS_CODE_TTL_SECONDS = 300
 SMS_MAX_ATTEMPTS = 5
+# 发送验证码的节流。每条短信都要花钱，且会打扰手机号的主人（短信轰炸）。
+SMS_COOLDOWN_SECONDS = 60
+SMS_DAILY_PER_PHONE = 5
+SMS_DAILY_PER_IP = 20
+
+
+def _now() -> float:
+    return time.time()
+
+
+def _digest(settings: Settings, value: str) -> str:
+    key = (settings.jwt_secret or "sms-only").encode()
+    return hashlib.sha256(key + b"|" + value.encode()).hexdigest()
+
+
+def _client_ip(request: Request) -> str:
+    # 后端端口只绑 127.0.0.1，外部请求只能经 nginx 进来；nginx 用 $remote_addr 覆盖 X-Real-IP。
+    return (request.headers.get("x-real-ip") or (request.client.host if request.client else "") or "?").strip()
+
+
+def _start_of_day_cn(now: float) -> int:
+    local = datetime.fromtimestamp(now, ZoneInfo("Asia/Shanghai"))
+    return int(local.replace(hour=0, minute=0, second=0, microsecond=0).timestamp())
+
+
+def _enforce_sms_throttle(session: Session, phone_digest: str, ip_digest: str, now: float) -> None:
+    from sqlalchemy import func
+
+    last = session.scalar(
+        select(func.max(SmsSendLog.sent_at)).where(SmsSendLog.phone_digest == phone_digest)
+    )
+    if last and now - last < SMS_COOLDOWN_SECONDS:
+        wait = int(SMS_COOLDOWN_SECONDS - (now - last)) + 1
+        raise HTTPException(
+            status_code=429,
+            detail=f"发送太频繁，请 {wait} 秒后再试",
+            headers={"Retry-After": str(wait)},
+        )
+    day = _start_of_day_cn(now)
+    per_phone = session.scalar(
+        select(func.count()).select_from(SmsSendLog).where(
+            SmsSendLog.phone_digest == phone_digest, SmsSendLog.sent_at >= day
+        )
+    )
+    if per_phone >= SMS_DAILY_PER_PHONE:
+        raise HTTPException(status_code=429, detail="该手机号今日验证码次数已达上限，请明天再试")
+    per_ip = session.scalar(
+        select(func.count()).select_from(SmsSendLog).where(
+            SmsSendLog.ip_digest == ip_digest, SmsSendLog.sent_at >= day
+        )
+    )
+    if per_ip >= SMS_DAILY_PER_IP:
+        raise HTTPException(status_code=429, detail="当前网络今日验证码次数已达上限，请明天再试")
+
+
+def _mirror_to_record_store(user_id: str, *, phone: str | None = None, nickname: str | None = None) -> None:
+    """在记录库（app/database/db.py 的 users 表）里补一行同 id 的账号。
+
+    游客登录、短信登录、手机号注册的账号只写在核心库里；而 ``/api/v1/auth/me`` 与大量产品
+    接口按记录库查人——查不到就 401，客户端登录后第一步取「我的资料」就被踢回登录页。
+    """
+    try:
+        from ..database.db import get_db
+
+        db = get_db()
+        name = nickname or "顺时用户"
+        cursor = db.execute(
+            "INSERT OR IGNORE INTO users (id, name, phone) VALUES (?, ?, ?)", (user_id, name, phone)
+        )
+        if not cursor.rowcount and phone:
+            # 该手机号已被记录库里另一个账号占用：至少保证本账号能被识别。
+            db.execute("INSERT OR IGNORE INTO users (id, name) VALUES (?, ?)", (user_id, name))
+        db.commit()
+    except Exception:  # 记录库不可用时不影响登录本身
+        pass
 
 
 class PhoneBody(BaseModel):
@@ -59,6 +138,7 @@ def guest_login(
     user = User(is_guest=True)
     session.add(user)
     session.flush()
+    _mirror_to_record_store(user.id, nickname="游客")
     return issue_token(settings, user.id)
 
 
@@ -77,6 +157,7 @@ def register(
     )
     session.add(user)
     session.flush()
+    _mirror_to_record_store(user.id, phone=body.phone, nickname=user.nickname)
     return issue_token(settings, user.id)
 
 
@@ -97,6 +178,7 @@ def login(
 @router.post("/sms/send")
 async def sms_send(
     body: PhoneBody,
+    request: Request,
     session: Session = Depends(get_session),
     settings: Settings = Depends(get_settings),
 ):
@@ -106,24 +188,32 @@ async def sms_send(
             status_code=503,
             detail={"detail": "短信服务尚未配置", "configured": False},
         )
+    now = _now()
+    phone_digest = _digest(settings, "phone:" + body.phone)
+    ip_digest = _digest(settings, "ip:" + _client_ip(request))
+    _enforce_sms_throttle(session, phone_digest, ip_digest, now)
     code = f"{secrets.randbelow(1000000):06d}"
-    async with httpx.AsyncClient(timeout=10) as client:
-        response = await client.post(
-            settings.sms_provider_url,
-            json={"phone": body.phone, "code": code},
-            headers={"Authorization": f"Bearer {settings.sms_provider_token}"},
-        )
-        response.raise_for_status()
+    try:
+        async with httpx.AsyncClient(timeout=10) as client:
+            response = await client.post(
+                settings.sms_provider_url,
+                json={"phone": body.phone, "code": code},
+                headers={"Authorization": f"Bearer {settings.sms_provider_token}"},
+            )
+            response.raise_for_status()
+    except httpx.HTTPError:
+        raise HTTPException(status_code=502, detail="短信发送失败，请稍后重试") from None
     digest = hash_sms_code(settings.jwt_secret or "sms-only", body.phone, code)
     session.merge(
         SmsCode(
             phone=body.phone,
             code_hash=digest,
-            expires_at=int(time.time()) + SMS_CODE_TTL_SECONDS,
+            expires_at=int(now) + SMS_CODE_TTL_SECONDS,
             attempts=0,
         )
     )
-    return {"sent": True, "expires_in": SMS_CODE_TTL_SECONDS}
+    session.add(SmsSendLog(phone_digest=phone_digest, ip_digest=ip_digest, sent_at=int(now)))
+    return {"sent": True, "expires_in": SMS_CODE_TTL_SECONDS, "cooldown": SMS_COOLDOWN_SECONDS}
 
 
 @router.post("/sms/verify")
@@ -147,6 +237,8 @@ def sms_verify(
     ):
         if row:
             row.attempts += 1
+            # get_session 在抛异常时回滚——不在这里提交，「最多试 5 次」就从来没生效过。
+            session.commit()
         raise HTTPException(status_code=400, detail="验证码错误或已过期")
     user = session.scalar(select(User).where(User.phone == body.phone))
     if not user:
@@ -154,6 +246,7 @@ def sms_verify(
         session.add(user)
         session.flush()
     session.delete(row)
+    _mirror_to_record_store(user.id, phone=body.phone, nickname=user.nickname)
     return issue_token(settings, user.id)
 
 
