@@ -46,6 +46,18 @@ def health(request: Request):
             "status": "down",
         },
     }
+    # 没配外部网关时，对话走进程内的境内直连（app/llm/domestic_gateway.py）：
+    # 有 key 即视为就绪。不在健康检查里真的调模型（花钱、且会被限流）。
+    if not settings.model_router_url:
+        from ..llm.domestic_gateway import configured_providers
+
+        providers = [p.name for p, _ in configured_providers()]
+        components["model_gateway"] = {
+            "configured": bool(providers),
+            "status": "up" if providers else "down",
+            "mode": "domestic-direct",
+            "providers": providers,
+        }
     if settings.redis_url:
         components["redis"]["status"] = "up" if probe_redis(settings.redis_url) else "down"
     if settings.model_router_url:

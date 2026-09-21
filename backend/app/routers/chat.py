@@ -1,4 +1,5 @@
-"""对话模块：代理到模型网关（SHUNSHI_MODEL_ROUTER_URL），未配置 fail-closed 503。
+"""对话模块：默认进程内直连境内模型（app/llm/domestic_gateway.py）；
+配置了 SHUNSHI_MODEL_ROUTER_URL 时改走顺时自己的模型网关。都不可用时 fail-closed。
 
 客户端契约：
 - ApiService.chat → POST /api/v1/chat/send，body {"user_id", "message"}
@@ -26,6 +27,32 @@ from ..simple_models import Message, Entitlement
 from ..entitlements import tier_for_product
 
 router = APIRouter(prefix="/api/v1", tags=["chat"])
+
+HISTORY_MESSAGES = 6
+
+
+def _memory_enabled(session: Session, user_id: str) -> bool:
+    from .memory import MEMORY_KEY, _read_setting
+
+    return bool(_read_setting(session, user_id, MEMORY_KEY).get("enabled"))
+
+
+def _recent_history(session: Session, user_id: str) -> list[dict[str, str]]:
+    """记忆打开时，取该用户最近几条对话（时间正序）；关闭时不带任何历史。"""
+    if not _memory_enabled(session, user_id):
+        return []
+    from sqlalchemy import select
+
+    rows = session.execute(
+        select(Message)
+        .where(Message.user_id == user_id, Message.role.in_(("user", "assistant")))
+        .order_by(Message.created_at.desc(), Message.id.desc())
+        .limit(HISTORY_MESSAGES)
+    ).scalars().all()
+    # created_at 精确到秒，同一轮的「问」与「答」时间戳相同、id 是随机串，
+    # 所以同一秒内按「先问后答」排。
+    rows = sorted(rows, key=lambda row: (row.created_at, 0 if row.role == "user" else 1))
+    return [{"role": row.role, "content": row.content} for row in rows]
 
 SYSTEM_PROMPT = (
     "你是顺时健康陪伴助手。只用简明中文，不诊断、不替代医生；"
@@ -125,12 +152,6 @@ async def chat(
             "sources": [],
             "source_details": [],
         }
-    if not settings.model_router_url:
-        # fail-closed：不返回兜底文案冒充 AI 回复
-        raise HTTPException(
-            status_code=503,
-            detail={"detail": "模型网关未配置（缺少 SHUNSHI_MODEL_ROUTER_URL）", "configured": False},
-        )
     messages = [{"role": "system", "content": SYSTEM_PROMPT}]
     # Client-provided prompts and tiers are untrusted; never replace server policy.
     if body.context:
@@ -153,20 +174,29 @@ async def chat(
                 ),
             }
         )
+    # 对话记忆（用户在设置里打开后生效；免费档同样可以打开）：最近几轮交给模型。
+    # 原来每一轮只有「系统提示 + 这一句」，上一句说过什么模型完全不知道，
+    # 「记忆」开关只影响清除按钮，不影响回答。
+    messages.extend(_recent_history(session, user_id))
     messages.append({"role": "user", "content": message})
     from ..services.chat_quota import reserve, refund
     reservation = await reserve(settings.redis_url, user_id, tier)
     try:
-        answer = await request_gateway(
-            settings.model_router_url,
-            {
-                "scene": "chat",
-                "market": "cn",
-                "messages": messages,
-                "user_id": user_id,
-            },
-            tier=tier,
-        )
+        if settings.model_router_url:
+            answer = await request_gateway(
+                settings.model_router_url,
+                {
+                    "scene": "chat",
+                    "market": "cn",
+                    "messages": messages,
+                    "user_id": user_id,
+                },
+                tier=tier,
+            )
+        else:
+            from ..llm import domestic_gateway
+
+            answer = await domestic_gateway.complete(messages, tier)
     except BaseException:
         await refund(settings.redis_url, reservation)
         raise
