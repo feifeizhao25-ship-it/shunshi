@@ -13,7 +13,7 @@ from datetime import datetime, timezone
 from io import BytesIO
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Header, BackgroundTasks
+from fastapi import APIRouter, Depends, HTTPException, Header
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
@@ -104,91 +104,6 @@ def _export_user_data(db, user_id: str, categories: list[str]) -> dict:
     return data
 
 
-def _schedule_data_deletion(user_id: str, reason: Optional[str]):
-    """执行数据删除（后台任务）"""
-    logger.info(f"[DataDeletion] 开始删除用户 {user_id} 数据，原因: {reason or '未提供'}")
-    
-    # 数据删除涉及的所有表
-    tables = [
-        ("users", "id"),
-        ("health_records", "user_id"),
-        ("journal_entries", "user_id"),
-        ("conversations", "user_id"),
-        ("messages", "conversation_id"),  # 通过 conversation_id 级联
-        ("chat_conversations", "user_id"),
-        ("chat_memories", "user_id"),
-        ("chat_messages", "user_id"),
-        ("subscriptions", "user_id"),
-        ("subscription_orders", "user_id"),
-        ("family_relations", "user_id"),
-        ("family_invites", "user_id"),
-        ("checkin_records", "user_id"),
-        ("community_posts", "user_id"),
-        ("acupoint_favorites", "user_id"),
-        ("article_bookmarks", "user_id"),
-        ("audio_play_history", "user_id"),
-        ("calorie_goals", "user_id"),
-        ("notifications", "user_id"),
-        ("sa_acupoint_favorites", "user_id"),
-        ("sa_article_bookmarks", "user_id"),
-        ("sa_audio_play_history", "user_id"),
-        ("sa_calorie_goals", "user_id"),
-        ("sa_chat_conversations", "user_id"),
-        ("sa_chat_memories", "user_id"),
-        ("sa_checkin_records", "user_id"),
-        ("sa_community_posts", "user_id"),
-        ("user_deletion_requests", "user_id"),
-    ]
-    
-    deleted_counts = {}
-    try:
-        db = get_db()
-        
-        # 先标记删除请求为处理中
-        db.execute(
-            "INSERT OR REPLACE INTO user_deletion_requests (user_id, status, reason, requested_at) "
-            "VALUES (?, ?, ?, ?)",
-            (user_id, "processing", reason, datetime.now(timezone.utc).isoformat())
-        )
-        db.commit()
-        
-        # 删除 messages（需要先获取 conversation_ids）
-        try:
-            conv_ids = [r["id"] for r in db.execute(
-                "SELECT id FROM conversations WHERE user_id = ?", (user_id,)
-            ).fetchall()]
-            if conv_ids:
-                placeholders = ",".join("?" * len(conv_ids))
-                db.execute(f"DELETE FROM messages WHERE conversation_id IN ({placeholders})", conv_ids)
-                deleted_counts["messages"] = db.total_changes
-        except Exception as e:
-            logger.warning(f"[DataDeletion] 删除 messages 失败: {e}")
-        
-        # 逐个表删除用户数据
-        for table, column in tables:
-            try:
-                cursor = db.execute(f"DELETE FROM {table} WHERE {column} = ?", (user_id,))
-                deleted_counts[table] = cursor.rowcount
-            except Exception as e:
-                logger.warning(f"[DataDeletion] 删除 {table} 失败: {e}")
-        
-        db.commit()
-        total = sum(deleted_counts.values())
-        logger.info(f"[DataDeletion] 用户 {user_id} 数据删除完成，共 {total} 条记录: {deleted_counts}")
-        
-    except Exception as e:
-        logger.error(f"[DataDeletion] 用户 {user_id} 数据删除失败: {e}")
-        try:
-            db = get_db()
-            db.execute(
-                "UPDATE user_deletion_requests SET status = 'failed' WHERE user_id = ?",
-                (user_id,)
-            )
-            db.commit()
-        except Exception:
-            pass
-
-
 # ============ API 端点 ============
 
 @router.post("/export", response_class=StreamingResponse)
@@ -236,94 +151,30 @@ async def get_export_status(
     }
 
 
-@router.post("/delete", response_model=dict)
-async def request_data_deletion(
-    request: DataDeleteRequest,
-    background_tasks: BackgroundTasks,
-    user: dict = Depends(get_current_user),
-):
-    """
-    请求删除所有个人数据（GDPR 被遗忘权）
-    
-    删除流程：
-    1. 账号立即标记为 "deleting"
-    2. 30 天冷静期内可撤销
-    3. 30 天后永久删除所有数据
-    """
-    if not request.confirm:
-        raise HTTPException(status_code=400, detail="必须确认删除（confirm=true）")
-
-    user_id = user["id"]
-
-    # 启动异步删除任务
-    background_tasks.add_task(_schedule_data_deletion, user_id, request.reason)
-
-    return {
-        "success": True,
-        "data": {
-            "status": "scheduled",
-            "message": "数据删除已安排，30 天内可联系客服撤销",
-            "grace_period_days": 30,
-            "contact": "privacy@shunshi.cn",
-        }
-    }
+_DELETION_MOVED = {
+    "error": "endpoint_retired",
+    "message": "账号与数据删除请使用 DELETE /api/v1/auth/account（客户端「注销账号」走的就是这一条）",
+    "authoritative_endpoint": "DELETE /api/v1/auth/account",
+}
 
 
-@router.post("/delete/cancel", response_model=dict)
-async def cancel_data_deletion(
-    user: dict = Depends(get_current_user),
-):
-    """撤销数据删除请求（冷静期内）"""
-    user_id = user["id"]
-    try:
-        db = get_db()
-        db.execute(
-            "UPDATE user_deletion_requests SET status = 'cancelled' WHERE user_id = ? AND status = 'pending'",
-            (user_id,)
-        )
-        db.commit()
-        return {
-            "success": True,
-            "message": "数据删除请求已撤销",
-        }
-    except Exception as e:
-        logger.error(f"[DataDeletion] 撤销删除请求失败: {e}")
-        return {
-            "success": False,
-            "message": "撤销失败，请联系客服",
-        }
+# 删除相关的三条旧接口不再执行任何动作。
+#
+# 原来 POST /delete 回「数据删除已安排，30 天内可联系客服撤销」，而后台任务第一句就往
+# 不存在的 user_deletion_requests 表里写，异常被吞掉——**什么都没删，也没有任何记录**；
+# 冷静期与撤销同样是空的。更糟的是它的身份依赖曾把无效 token 当成演示账号。
+# 客户端（privacy_page.dart）实际走的是 DELETE /api/v1/auth/account，那条是真实删除。
+# 这里保留路由只为给出明确答复，不再冒充已受理。
+@router.post("/delete", response_model=dict, status_code=410)
+async def request_data_deletion(user: dict = Depends(get_current_user)):
+    raise HTTPException(status_code=410, detail=_DELETION_MOVED)
 
 
-@router.get("/delete/status", response_model=dict)
-async def get_deletion_status(
-    user: dict = Depends(get_current_user),
-):
-    """查询数据删除状态"""
-    user_id = user["id"]
-    try:
-        db = get_db()
-        row = db.execute(
-            "SELECT * FROM user_deletion_requests WHERE user_id = ? ORDER BY requested_at DESC LIMIT 1",
-            (user_id,)
-        ).fetchone()
+@router.post("/delete/cancel", response_model=dict, status_code=410)
+async def cancel_data_deletion(user: dict = Depends(get_current_user)):
+    raise HTTPException(status_code=410, detail=_DELETION_MOVED)
 
-        if not row:
-            return {
-                "success": True,
-                "data": {"status": "none", "message": "无删除请求"}
-            }
 
-        return {
-            "success": True,
-            "data": {
-                "status": row["status"],
-                "requested_at": row["requested_at"],
-                "reason": dict(row).get("reason"),
-                "message": "删除请求处理中" if row["status"] == "pending" else "已取消或已完成",
-            }
-        }
-    except Exception:
-        return {
-            "success": True,
-            "data": {"status": "unknown", "message": "无法查询状态"}
-        }
+@router.get("/delete/status", response_model=dict, status_code=410)
+async def get_deletion_status(user: dict = Depends(get_current_user)):
+    raise HTTPException(status_code=410, detail=_DELETION_MOVED)

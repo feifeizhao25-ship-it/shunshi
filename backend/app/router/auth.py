@@ -507,68 +507,27 @@ def _verify_sms_code(phone: str, code: str) -> bool:
 # ============ 依赖注入 ============
 
 async def get_current_user(
-    credentials: Optional[HTTPAuthorizationCredentials] = Depends(_bearer_scheme)
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(_bearer_scheme),
+    settings: Settings = Depends(get_settings),
 ) -> dict:
     """
-    FastAPI 依赖注入：从 Authorization header 解析当前用户
-    - 优先解析 JWT token
-    - 回退到数据库 token 查找 (向后兼容)
+    FastAPI 依赖注入：必须带有效登录态，否则 401。
+
+    原来这里有两个问题，叠在一起：
+    1. 没带 token、或 token 无效/过期时，一律当成 user-001（种子演示账号）；
+    2. 只认产品侧签发、带 ``type=access`` 的 JWT。而登录接口现在签发的 access token
+       走的是核心签发（app/security.py，没有 type 字段）——**真实用户带着有效 token
+       也会落到第 1 条**。
+
+    用它的是 /api/v1/user-data 的导出与删除：用户点「导出我的数据」拿到的是演示账号的
+    数据；点「删除我的数据」被安排删除的是演示账号，接口却回「数据删除已安排」——
+    用户以为行使了删除权，实际什么都没发生。
+
+    现在与严格模式共用同一套解析（核心签发 → 产品签发 → 旧式数据库 token），
+    都不认时 401。
     """
-    token = None
-    if credentials:
-        token = credentials.credentials
-    
-    import logging; logger.debug(f"[Auth] /me token received: {token[:20] if token else 'None'}...")
-    if not token:
-        # 返回匿名用户（演示模式）
-        return {
-            "id": "user-001",
-            "email": "demo@shunshi.com",
-            "name": "演示用户",
-            "life_stage": "exploration",
-            "is_premium": 0,
-            "subscription_plan": "free",
-        }
-    
-    # 尝试 JWT 解码
-    if _JWT_AVAILABLE:
-        payload = decode_token(token)
-        logger.debug(f"[Auth] JWT payload: {payload.get('sub') if payload else 'None'}, type={payload.get('type') if payload else 'None'}")
-        if payload and payload.get("type") == "access":
-            # JWT 有效，查找用户补充完整信息
-            db = get_db()
-            row = db.execute("SELECT * FROM users WHERE id = ?", (payload["sub"],)).fetchone()
-            if row:
-                user = dict(row)
-                # 检查账号是否已注销（软删除中）
-                if user.get("status") == "deleted":
-                    raise HTTPException(status_code=403, detail="账号已注销")
-                return user
-            else:
-                return {
-                    "id": payload["sub"],
-                    "username": payload.get("username", ""),
-                    "email": payload.get("email", ""),
-                }
-    
-    # 回退: 数据库 token 查找 (向后兼容旧 token)
-    db = get_db()
-    row = db.execute(
-        "SELECT u.* FROM users u JOIN auth_tokens t ON u.id = t.user_id WHERE t.token = ?",
-        (token,)
-    ).fetchone()
-    if row:
-        return dict(row)
-    
-    # 无效 token，返回演示用户
-    return {
-        "id": "user-001",
-        "email": "demo@shunshi.com",
-        "name": "演示用户",
-        "life_stage": "exploration",
-        "is_premium": 0,
-        "subscription_plan": "free",
-    }
+    return _get_current_user_from_request(credentials, settings)
+
 
 def get_user_from_token(token: str) -> Optional[dict]:
     """通过 token 查找用户 (向后兼容)"""
@@ -777,9 +736,15 @@ async def login(request: LoginRequest, settings: Settings = Depends(get_settings
     subscription_plan = row["subscription_plan"]
     pw_hash = row["password_hash"]
     
-    # 验证密码（如果有的话）
-    if pw_hash and not verify_password(request.password, pw_hash):
-        raise HTTPException(status_code=401, detail="密码错误")
+    # 没有设置过密码的账号（Apple / Google / 微信 / 游客 / 演示账号）不能走口令登录。
+    #
+    # 原来是 `if pw_hash and not verify_password(...)`：password_hash 为空时**跳过校验**。
+    # Apple 与 Google 登录建号时会写入 email、不写 password_hash——知道一个用这两种方式
+    # 注册的人的邮箱，用任意口令就能登进他的账号。种子里的演示账号 demo@shunshi.com
+    # 同样任意口令可登，所有人共用一个号。
+    # 错误提示与「账号不存在」一致，避免被用来探测哪些邮箱注册过。
+    if not pw_hash or not verify_password(request.password, pw_hash):
+        raise HTTPException(status_code=401, detail="账号或密码错误")
     
     # 生成 JWT token
     access_token = issue_core_token(settings, user_id)["access_token"]
