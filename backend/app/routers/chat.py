@@ -27,6 +27,9 @@ from ..simple_models import Message, Entitlement
 from ..entitlements import tier_for_product
 
 router = APIRouter(prefix="/api/v1", tags=["chat"])
+# 国内客户端的对话页（android-cn chat_page.dart）调的是 ``POST /ai/chat``——原来由国际版
+# seasons_chat 接住：英文人设、不登录、额度按客户端自报的 user_id 计。现在接到这里的国内链路。
+legacy_router = APIRouter(tags=["chat"])
 
 HISTORY_MESSAGES = 6
 
@@ -124,6 +127,7 @@ async def request_gateway(
     raise HTTPException(status_code=502, detail="模型网关未返回有效内容")
 
 
+@legacy_router.post("/ai/chat")
 @router.post("/chat/send")
 @router.post("/ai/chat")
 async def chat(

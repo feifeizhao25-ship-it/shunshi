@@ -16,17 +16,41 @@ from .models.base import Base as product_model_base
 from .routers import chat, content, feedback, health, memory, reflections, seasons, settings as settings_router, subscription, user
 
 
+# 国际版 SEASONS 专用的模块，国内版不挂载：
+# - stripe / seasons_subscription：境外支付与美元定价；
+# - seasons_chat：``POST /ai/chat`` 英文人设、不登录可用、user_id 由客户端自报（额度形同虚设）；
+# - seasons_api / seasons_home / seasons_family / seasons_audio：国际版的用户、家庭与内容接口，
+#   其中 ``/api/v1/seasons/user/{user_id}`` 的删除与导出不校验身份。
+# 国内客户端的对话页仍调 ``/ai/chat``，由 routers/chat.py 的 legacy_router 接到国内对话链路。
+INTERNATIONAL_ONLY_MODULES = frozenset(
+    {
+        "stripe",
+        "seasons_api",
+        "seasons_audio",
+        "seasons_chat",
+        "seasons_family",
+        "seasons_home",
+        "seasons_subscription",
+    }
+)
+
+
 def _include_product_routers(app: FastAPI) -> None:
     """Mount every production router under ``app.router``.
 
     Keeping this discovery fail-closed ensures a missing runtime dependency or
     broken router prevents release instead of silently shipping a partial API.
     """
+    from fastapi import Depends
+
     from . import router as product_router_package
+    from .product_access import product_access_guard
 
     mounted = {id(route) for route in app.router.routes}
     for module_info in pkgutil.iter_modules(product_router_package.__path__):
         if module_info.name.startswith("_"):
+            continue
+        if module_info.name in INTERNATIONAL_ONLY_MODULES:
             continue
         module = importlib.import_module(f"{product_router_package.__name__}.{module_info.name}")
         candidate = getattr(module, "router", None)
@@ -35,7 +59,10 @@ def _include_product_routers(app: FastAPI) -> None:
                 getattr(route, "path", None) == "" for route in candidate.routes
             )
             prefix = f"/api/v1/{module_info.name.replace('_', '-')}" if needs_prefix else ""
-            app.include_router(candidate, prefix=prefix)
+            # 默认关着：见 app/product_access.py。
+            app.include_router(
+                candidate, prefix=prefix, dependencies=[Depends(product_access_guard)]
+            )
             mounted.add(id(candidate))
 
 
@@ -143,6 +170,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(user.router)
     app.include_router(memory.router)
     app.include_router(chat.router)
+    app.include_router(chat.legacy_router)
     app.include_router(subscription.router)
     app.include_router(reflections.router)
     app.include_router(feedback.router)
