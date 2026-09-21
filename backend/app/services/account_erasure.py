@@ -116,3 +116,66 @@ def erase_product_store(user_id: str) -> tuple[dict[str, int], dict[str, int], l
     if leftovers:
         logger.error("account erasure left rows in product tables: %s", ", ".join(leftovers))
     return deleted, retained, leftovers
+
+
+# ── 导出（个人信息保护法第 45 条：查阅、复制）──────────────────────────────
+# 原来「导出我的数据」只含核心库；产品库与记录库里的同一批数据（与注销时删除的范围一致）
+# 都不在导出里。敏感凭证列不导出。
+SECRET_COLUMN = re.compile(r"(password|token|secret|code_hash|private_key)", re.IGNORECASE)
+
+
+def _plain(value):
+    if value is None or isinstance(value, (str, int, float, bool)):
+        return value
+    return str(value)
+
+
+def _row_dict(columns: list[str], row) -> dict:
+    return {c: _plain(v) for c, v in zip(columns, row) if not SECRET_COLUMN.search(c)}
+
+
+def export_record_store(db, user_id: str) -> dict[str, list[dict]]:
+    out: dict[str, list[dict]] = {}
+    tables = [row[0] for row in db.execute(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
+    ).fetchall()]
+    for table in tables:
+        columns = [row[1] for row in db.execute(f'PRAGMA table_info("{table}")').fetchall()]
+        user_columns = [c for c in columns if USER_COLUMN.match(c)]
+        if table == "users":
+            where, params = "id = ?", [user_id]
+        elif user_columns:
+            where = " OR ".join(f'"{c}" = ?' for c in user_columns)
+            params = [user_id] * len(user_columns)
+        else:
+            continue
+        rows = db.execute(f'SELECT * FROM "{table}" WHERE {where}', params).fetchall()
+        if rows:
+            out[table] = [_row_dict(columns, tuple(r)) for r in rows]
+    return out
+
+
+def export_product_store(user_id: str) -> dict[str, list[dict]]:
+    from sqlalchemy import inspect, text
+
+    from ..db.database import engine
+
+    out: dict[str, list[dict]] = {}
+    inspector = inspect(engine)
+    with engine.connect() as connection:
+        for table in inspector.get_table_names():
+            columns = [column["name"] for column in inspector.get_columns(table)]
+            user_columns = [c for c in columns if USER_COLUMN.match(c)]
+            clauses = [f'CAST("{c}" AS TEXT) = :uid' for c in user_columns]
+            if table == "users" and "id" in columns:
+                clauses.append('CAST("id" AS TEXT) = :uid')
+            if not clauses:
+                continue
+            result = connection.execute(
+                text(f'SELECT * FROM "{table}" WHERE {" OR ".join(clauses)}'), {"uid": user_id}
+            )
+            keys = list(result.keys())
+            rows = result.fetchall()
+            if rows:
+                out[table] = [_row_dict(keys, tuple(r)) for r in rows]
+    return out

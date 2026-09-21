@@ -342,7 +342,18 @@ def export_data(
     session: Session = Depends(get_session),
 ):
     """数据导出：真实读库返回该用户全部数据的 JSON。客户端实际用 POST，GET 为等价别名。"""
-    return _collect_user_data(session, user_id)
+    data = _collect_user_data(session, user_id)
+    # 产品模块的数据（家庭成员、饮水、日记……）原来不在导出里；范围与注销时删除的一致。
+    from ..database.db import close_test_connection, get_db
+    from ..services.account_erasure import export_product_store, export_record_store
+
+    db = get_db()
+    try:
+        data["record_store"] = export_record_store(db, user_id)
+    finally:
+        close_test_connection(db)
+    data["product_store"] = export_product_store(user_id)
+    return data
 
 
 @router.post("/account/cancel-delete")

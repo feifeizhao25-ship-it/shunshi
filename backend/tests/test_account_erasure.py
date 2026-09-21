@@ -89,3 +89,21 @@ def test_token_stops_working_after_deletion(client):
     _, headers = _login(client)
     assert client.delete("/api/v1/auth/account", headers=headers).status_code == 200
     assert client.post("/api/v1/water-tracker/log", json={"amount_ml": 250}, headers=headers).status_code == 401
+
+
+def test_export_includes_product_and_record_store_data_without_secrets(client):
+    user_id, headers = _login(client)
+    client.post("/api/v1/family/members", json={"name": "外婆", "relation": "grandma", "age": 78}, headers=headers)
+    client.post("/api/v1/water-tracker/log", json={"amount_ml": 250}, headers=headers)
+    body = client.post("/api/v1/auth/data/export", headers=headers).json()
+    assert any(r.get("member_name") == "外婆" for r in body["record_store"]["family_relations"])
+    assert body["product_store"]["sa_water_logs"][0]["amount_ml"] == 250
+    assert all("password_hash" not in r for r in body["record_store"].get("users", []))
+
+
+def test_export_does_not_include_other_users(client):
+    alice, alice_headers = _login(client)
+    bob, bob_headers = _login(client)
+    client.post("/api/v1/water-tracker/log", json={"amount_ml": 999}, headers=bob_headers)
+    body = client.post("/api/v1/auth/data/export", headers=alice_headers).json()
+    assert "999" not in str(body.get("product_store"))
