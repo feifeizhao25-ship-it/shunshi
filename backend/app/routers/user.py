@@ -34,6 +34,7 @@ from ..security import (
     hash_password,
     hash_sms_code,
     issue_token,
+    revoke_token,
 )
 
 router = APIRouter(prefix="/api/v1/auth", tags=["user"])
@@ -352,8 +353,10 @@ def cancel_delete_account(user_id: str = Depends(current_user)):
 
 @router.delete("/account")
 def delete_account(
+    request: Request,
     user_id: str = Depends(current_user),
     session: Session = Depends(get_session),
+    settings: Settings = Depends(get_settings),
 ):
     """删除核心账号数据，并报告尚保留的国内付款、退款申请记录。"""
     from ..database.db import get_db, close_test_connection
@@ -389,8 +392,22 @@ def delete_account(
         counts["users"] = result.rowcount
         session.commit()
         db.execute("DELETE FROM domestic_payment_recovery WHERE user_id=?", (user_id,))
+        # 记录库与产品库里的个人数据（家庭成员、饮水、日记、情绪……）原来注销后原样留着。
+        from ..services.account_erasure import erase_product_store, erase_record_store
+
+        record_deleted, record_retained = erase_record_store(db, user_id)
         db.commit()
+        product_deleted, product_retained, leftovers = erase_product_store(user_id)
+        for table, count in {**record_retained, **product_retained}.items():
+            retained.setdefault(table, count)
+        # 这把 token 立即作废（否则 1 小时内还能写入新数据）。
+        header = request.headers.get("authorization") or ""
+        if header.lower().startswith("bearer "):
+            revoke_token(settings, header[7:].strip())
         return {"deleted": True, "user_id": user_id, "deleted_rows": counts,
+            "deleted_record_rows": record_deleted,
+            "deleted_product_rows": product_deleted,
+            "erasure_incomplete_tables": leftovers,
             "retained_billing_records": retained,
             "billing_notice": "支付与退款申请记录仍保留，注销不表示退款已完成"}
     except Exception:

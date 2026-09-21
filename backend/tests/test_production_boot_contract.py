@@ -230,3 +230,11 @@ def test_boots_on_postgres_with_documented_variables_only(tmp_path):
         cwd=image,
     )
     assert "BOOT 200" in r.stdout, (r.stdout + r.stderr)[-1500:]
+
+
+def test_explicit_product_url_equal_to_core_still_gets_its_own_schema():
+    core = "postgresql://u:p@db:5432/shunshi"
+    url, schema = resolve_product_database({"SHUNSHI_DATABASE_URL": core, "SHUNSHI_PRODUCT_DATABASE_URL": core})
+    assert schema == PRODUCT_SCHEMA
+    other = resolve_product_database({"SHUNSHI_DATABASE_URL": core, "SHUNSHI_PRODUCT_DATABASE_URL": "postgresql://u:p@db:5432/product"})
+    assert other[1] is None

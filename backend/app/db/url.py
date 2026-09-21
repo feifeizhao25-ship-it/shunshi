@@ -54,9 +54,13 @@ def resolve_product_database(env: dict | None = None) -> tuple[str, str | None]:
     """返回 (连接串, schema)。schema 为 None 表示不需要单独的 schema。"""
     env = os.environ if env is None else env
     explicit = env.get("SHUNSHI_PRODUCT_DATABASE_URL") or env.get("DATABASE_URL")
-    if explicit:
-        return normalize_database_url(explicit), None
     core = env.get("SHUNSHI_DATABASE_URL", "").strip()
+    if explicit:
+        url = normalize_database_url(explicit)
+        # 显式指向与核心同一个库时同样要分 schema，否则两个 users 表撞在一起
+        # （注销删数据时在真实 Postgres 上撞见：外键类型 uuid 对 varchar，建表即失败）。
+        same_as_core = bool(core) and url == normalize_database_url(core)
+        return url, (PRODUCT_SCHEMA if same_as_core and is_postgres(url) else None)
     if core and is_postgres(normalize_database_url(core)):
         return normalize_database_url(core), PRODUCT_SCHEMA
     if env.get("SHUNSHI_ENV") == "production" or env.get("APP_ENV") == "production":
