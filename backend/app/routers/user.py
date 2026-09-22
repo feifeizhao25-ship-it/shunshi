@@ -13,7 +13,7 @@ from zoneinfo import ZoneInfo
 import httpx
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
-from sqlalchemy import delete, select
+from sqlalchemy import delete, select, update
 from sqlalchemy.orm import Session
 
 from ..config import Settings
@@ -230,16 +230,21 @@ def sms_verify(
         )
     row = session.get(SmsCode, body.phone)
     digest = hash_sms_code(settings.jwt_secret or "sms-only", body.phone, body.code)
-    if (
-        not row
-        or row.expires_at < time.time()
-        or row.attempts >= SMS_MAX_ATTEMPTS
-        or not secrets.compare_digest(row.code_hash, digest)
-    ):
-        if row:
-            row.attempts += 1
-            # get_session 在抛异常时回滚——不在这里提交，「最多试 5 次」就从来没生效过。
-            session.commit()
+    if not row:
+        raise HTTPException(status_code=400, detail="验证码错误或已过期")
+    # Conditional update both reserves an attempt and locks the current issuance.
+    # Concurrent guesses cannot overwrite counters, and a replacement code cannot
+    # be consumed using an earlier read. Use the same clock as issuance.
+    claimed = session.execute(
+        update(SmsCode).where(
+            SmsCode.phone == body.phone,
+            SmsCode.code_hash == row.code_hash,
+            SmsCode.expires_at > _now(),
+            SmsCode.attempts < SMS_MAX_ATTEMPTS,
+        ).values(attempts=SmsCode.attempts + 1)
+    ).rowcount
+    if claimed != 1 or not secrets.compare_digest(row.code_hash, digest):
+        session.commit()  # Do not roll back failed-attempt accounting.
         raise HTTPException(status_code=400, detail="验证码错误或已过期")
     user = session.scalar(select(User).where(User.phone == body.phone))
     if not user:

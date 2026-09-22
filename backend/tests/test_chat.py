@@ -10,7 +10,10 @@ from app.main import create_app
 from app.routers import chat as chat_module
 
 
-def test_chat_fail_closed_when_gateway_unconfigured(client, auth_headers):
+def test_chat_fail_closed_when_gateway_unconfigured(client, auth_headers, settings, chat_redis_url, monkeypatch):
+    settings.redis_url = chat_redis_url
+    monkeypatch.delenv("SHUNSHI_DEEPSEEK_API_KEY", raising=False)
+    monkeypatch.delenv("SHUNSHI_SILICONFLOW_API_KEY", raising=False)
     for path in ("/api/v1/chat/send", "/api/v1/ai/chat"):
         response = client.post(path, headers=auth_headers, json={"message": "我昨晚没睡好"})
         assert response.status_code == 503

@@ -430,13 +430,13 @@ class TestResponseTime:
         client = production_chat_client
         with _patch_chat_llm():
             # Warm up
-            await client.post("/api/v1/chat?message=你好&user_id=perf-test-001")
+            await client.post("/api/v1/chat?message=你好")
 
             times = []
             for i in range(3):
                 start = time.perf_counter()
                 resp = await client.post(
-                    f"/api/v1/chat?message=性能测试第{i}条&user_id=perf-test-001"
+                    f"/api/v1/chat?message=性能测试第{i}条"
                 )
                 elapsed = (time.perf_counter() - start) * 1000
                 assert resp.status_code == 200, f"Chat failed: {resp.text}"
@@ -566,7 +566,7 @@ class TestConcurrency:
             for msg in messages:
                 start = time.perf_counter()
                 resp = await client.post(
-                    f"/api/v1/chat?message={msg}&user_id=perf-sequential-001"
+                    f"/api/v1/chat?message={msg}"
                 )
                 elapsed = (time.perf_counter() - start) * 1000
                 assert resp.status_code == 200, f"Chat failed: {resp.text}"

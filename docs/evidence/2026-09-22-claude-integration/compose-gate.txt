@@ -1,0 +1,1 @@
+✓ 3 个 compose 文件：端口均绑回环，Redis 有口令，口令变量 fail-closed

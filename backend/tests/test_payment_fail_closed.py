@@ -40,10 +40,11 @@ def test_alipay_catalog_matches_domestic_display_prices_and_entitlements():
         assert provider["max_family_seats"] == displayed.get("family_seats", 0)
 
 
-def test_alipay_bypass_order_endpoint_is_retired(client):
+def test_alipay_bypass_order_endpoint_is_retired(client, auth_headers):
     response = client.post(
         "/api/v1/payments/alipay/create-order",
-        json={"product_sku": "yangxin_monthly", "user_id": "forged-user"},
+        headers=auth_headers,
+        json={"product_sku": "yangxin_monthly"},
     )
     assert response.status_code == 410
 

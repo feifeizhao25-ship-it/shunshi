@@ -37,12 +37,12 @@ def test_dashboard_rejects_unknown_persona_and_invalid_day():
     assert client.get("/api/v1/personalization/dashboard?persona_id=newcomer&day=8").status_code == 422
 
 
-def test_mobile_personalization_paths_exist():
-    client = _client()
+def test_mobile_personalization_paths_exist(client, auth_headers):
     assert client.get("/api/v1/personalization/life-state").status_code == 200
     assert client.get("/api/v1/personalization/anomaly-alert").status_code == 200
     assert client.get("/api/v1/personalization/weekly-insight").status_code == 200
     assert client.post(
         "/api/v1/personalization/action/complete",
+        headers=auth_headers,
         json={"action_type": "breathing", "completed": True, "rating": 4},
     ).status_code == 200

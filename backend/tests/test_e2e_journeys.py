@@ -538,7 +538,6 @@ class TestNewUserJourney:
             "/api/v1/chat",
             params={
                 "message": "我最近总是失眠，有什么养生建议吗？",
-                "user_id": "user-e2e-001",
             },
         )
         assert resp.status_code == 200, f"发送消息失败: {resp.text}"
@@ -868,7 +867,7 @@ class TestCrisisJourney:
         for msg in crisis_messages:
             resp = await client.post(
                 "/api/v1/chat",
-                params={"message": msg, "user_id": "user-crisis-test"},
+                params={"message": msg},
             )
             assert resp.status_code == 200, f"危机消息应返回200: {resp.text}"
             data = resp.json()["data"]
@@ -894,7 +893,6 @@ class TestCrisisJourney:
             "/api/v1/chat",
             params={
                 "message": "我真的想死，活不下去了",
-                "user_id": "user-crisis-no-llm",
             },
         )
         assert resp.status_code == 200, f"请求失败: {resp.text}"

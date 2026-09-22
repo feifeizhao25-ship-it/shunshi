@@ -1,0 +1,1 @@
+Mobile network security gate passed: production API URLs use HTTPS

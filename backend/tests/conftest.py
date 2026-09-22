@@ -8,7 +8,7 @@ from fastapi.testclient import TestClient
 os.environ.setdefault("APP_ENV", "testing")
 os.environ.setdefault("DATABASE_URL", "sqlite:////tmp/shunshi-pytest-product.db")
 os.environ.setdefault("REDIS_URL", "redis://localhost")
-os.environ.setdefault("JWT_SECRET", "pytest-only-secret-with-at-least-32-characters")
+os.environ.setdefault("SHUNSHI_JWT_SECRET", "s" * 48)
 os.environ.setdefault("ADMIN_JWT_SECRET", "pytest-admin-secret-with-at-least-32-characters")
 os.environ.setdefault("ADMIN_PASSWORD_HASH", "a" * 64)
 
@@ -56,7 +56,7 @@ def settings(tmp_path):
         env="test",
         database_url=f"sqlite:///{tmp_path}/test.db",
         redis_url="",
-        jwt_secret="test-secret-that-is-longer-than-32-characters",
+        jwt_secret=os.environ["SHUNSHI_JWT_SECRET"],
         model_router_url="",
         sms_provider_url="",
         sms_provider_token="",

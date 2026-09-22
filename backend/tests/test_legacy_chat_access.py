@@ -19,6 +19,9 @@ def test_two_users_cannot_impersonate(client, auth_headers, settings, monkeypatc
     other = client.post("/api/v1/auth/guest-login", json={}).json()
     headers = {"Authorization": "Bearer " + other["access_token"]}
     response = client.post("/api/v1/chat", headers=auth_headers, json={"message": "你好", "user_id": "fake-paid-id"})
+    assert response.status_code == 403
+    assert calls == []
+    response = client.post("/api/v1/chat", headers=auth_headers, json={"message": "你好"})
     assert response.status_code == 200
     conversation = response.json()["data"]["conversation_id"]
     owner = calls[0][0]["user_id"]
@@ -34,7 +37,7 @@ def test_two_users_cannot_impersonate(client, auth_headers, settings, monkeypatc
         assert client.delete(f"/api/v1/chat/conversations/{conversation}", headers=headers, params={"user_id": owner}).status_code == 403
         before = len(conversations_db[conversation]["messages"])
         denied = client.post("/api/v1/chat", headers=headers, json={"message": "你好", "user_id": owner, "conversation_id": conversation})
-        assert denied.status_code == 404
+        assert denied.status_code == 403
         assert len(calls) == 1
         assert len(conversations_db[conversation]["messages"]) == before
         stored_ids = list(conversations_db[conversation]["stored_message_ids"])

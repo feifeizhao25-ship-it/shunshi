@@ -150,8 +150,10 @@ def _reject_deleted(user_id: str) -> None:
 
         row = get_db().execute("SELECT status FROM users WHERE id = ?", (user_id,)).fetchone()
     except Exception:
-        return
-    if row is not None and dict(row).get("status") == "deleted":
+        raise HTTPException(status_code=503, detail="暂时无法核验账号状态，请稍后重试") from None
+    if row is None:
+        raise HTTPException(status_code=401, detail="账号不存在或已注销")
+    if dict(row).get("status") == "deleted":
         raise HTTPException(status_code=403, detail="账号已注销")
 
 

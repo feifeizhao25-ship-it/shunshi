@@ -1,7 +1,7 @@
 # 顺时 - 监控服务 Docker Compose
 # 启动: docker-compose -f docker-compose.monitoring.yml up -d
 # 访问:
-#   - Grafana: http://localhost:3000 (admin/admin)
+#   - Grafana: http://localhost:3000 (admin / 配置的 GRAFANA_ADMIN_PASSWORD)
 #   - Prometheus: http://localhost:9090
 # 前提: 后端服务需先启动 (uvicorn app.main:app --host 0.0.0.0 --port 8000)
 
@@ -13,7 +13,7 @@ services:
     container_name: shunshi-prometheus
     restart: unless-stopped
     ports:
-      - "9090:9090"
+      - "127.0.0.1:9090:9090"
     volumes:
       - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus-data:/prometheus
@@ -30,10 +30,10 @@ services:
     container_name: shunshi-grafana
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
     environment:
       - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:?set GRAFANA_ADMIN_PASSWORD}
       - GF_USERS_ALLOW_SIGN_UP=false
       - GF_INSTALL_PLUGINS=grafana-clock-panel
     volumes:

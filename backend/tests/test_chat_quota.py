@@ -48,7 +48,7 @@ def test_aliases_share_quota_and_crisis_remains_available(client, auth_headers, 
     monkeypatch.setattr(chat, "request_gateway", gateway)
     paths = ["/api/v1/chat", "/api/v1/chat/send", "/api/v1/ai/chat"]
     for index in range(20):
-        response = client.post(paths[index % 3], headers=auth_headers, json={"message": "你好", "user_id": str(index), "model_tier": "enterprise"})
+        response = client.post(paths[index % 3], headers=auth_headers, json={"message": "你好", "model_tier": "enterprise"})
         assert response.status_code == 200
     for path in paths:
         assert client.post(path, headers=auth_headers, json={"message": "你好"}).status_code == 429

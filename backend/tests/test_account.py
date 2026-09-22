@@ -80,5 +80,4 @@ def test_delete_account_removes_core_data_and_rejects_export(client, settings, a
             assert session.scalar(select(func.count()).select_from(model).where(model.user_id == user_id)) == 0
 
     # 同一 user_id 不应再能被登录体系外的接口看到任何残留
-    listed = client.get("/api/v1/reflections", headers=auth_headers).json()
-    assert listed["items"] == []
+    assert client.get("/api/v1/reflections", headers=auth_headers).status_code == 401

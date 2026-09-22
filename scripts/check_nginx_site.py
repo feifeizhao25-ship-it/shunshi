@@ -179,6 +179,8 @@ def main() -> int:
         site = SITES / (env.get("SHUNSHI_NGINX_SITE") or "default.conf")
         if site.exists():
             ok, output = nginx_test(site, env)
+            if output:
+                print(output)
             if not ok:
                 problems.append(f"nginx -t 失败（{site.name}）：\n{output}")
     if problems:

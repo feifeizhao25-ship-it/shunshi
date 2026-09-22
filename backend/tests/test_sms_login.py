@@ -165,3 +165,26 @@ def test_clients_verify_the_code_on_the_server(platform):
     assert "/api/v1/auth/sms/verify" in body
     assert "guest-login" not in body
     assert "phone-login" not in body
+
+
+def test_parallel_guesses_do_not_overwrite_attempt_counter(env):
+    from concurrent.futures import ThreadPoolExecutor
+    client, sent, _ = env
+    phone = _phone()
+    assert client.post("/api/v1/auth/sms/send", json={"phone": phone}).status_code == 200
+    wrong = "000000" if sent[-1]["code"] != "000000" else "111111"
+    with ThreadPoolExecutor(max_workers=10) as pool:
+        responses = list(pool.map(lambda _: client.post("/api/v1/auth/sms/verify", json={"phone": phone, "code": wrong}), range(20)))
+    assert all(r.status_code == 400 for r in responses)
+    assert client.post("/api/v1/auth/sms/verify", json={"phone": phone, "code": sent[-1]["code"]}).status_code == 400
+
+
+def test_parallel_correct_code_is_consumed_once(env):
+    from concurrent.futures import ThreadPoolExecutor
+    client, sent, _ = env
+    phone = _phone()
+    assert client.post("/api/v1/auth/sms/send", json={"phone": phone}).status_code == 200
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        responses = list(pool.map(lambda _: client.post("/api/v1/auth/sms/verify", json={"phone": phone, "code": sent[-1]["code"]}), range(8)))
+    assert [r.status_code for r in responses].count(200) == 1
+    assert all(r.status_code in (200, 400) for r in responses)

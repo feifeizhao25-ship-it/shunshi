@@ -37,6 +37,10 @@ def ctx(tmp_path_factory):
     app = create_app(settings)
 
     def bearer(user_id: str) -> dict:
+        from app.database.db import get_db
+        db = get_db()
+        db.execute("INSERT OR IGNORE INTO users (id, name, life_stage, created_at, updated_at) VALUES (?, ?, 'exploration', datetime('now'), datetime('now'))", (user_id, "门禁测试用户"))
+        db.commit()
         return {"Authorization": "Bearer " + issue_token(settings, user_id)["access_token"]}
 
     from app.router import admin_auth
@@ -229,3 +233,26 @@ def test_legacy_ai_chat_path_goes_to_domestic_chat(ctx, monkeypatch):
     response = client.post("/ai/chat", json={"message": "睡不好", "solar_term": "白露"}, headers=bearer(alice))
     assert response.status_code == 200, response.text
     assert response.json()["text"].startswith("早点休息")
+
+
+def test_deleted_user_other_token_is_rejected_after_revocation_cache_is_empty(ctx):
+    client, bearer, _ = ctx
+    from app.database.db import get_db
+    user_id, _ = _ids()
+    headers = bearer(user_id)
+    db = get_db()
+    db.execute("DELETE FROM users WHERE id = ?", (user_id,))
+    db.commit()
+    response = client.post("/api/v1/water-tracker/log", json={"amount_ml": 100}, headers=headers)
+    assert response.status_code == 401
+
+
+def test_record_store_outage_does_not_bypass_account_validation(ctx, monkeypatch):
+    client, bearer, _ = ctx
+    user_id, _ = _ids()
+    headers = bearer(user_id)
+    def unavailable():
+        raise RuntimeError("database unavailable")
+    monkeypatch.setattr("app.database.db.get_db", unavailable)
+    response = client.post("/api/v1/water-tracker/log", json={"amount_ml": 100}, headers=headers)
+    assert response.status_code == 503
