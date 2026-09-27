@@ -20,15 +20,17 @@ def test_cn_acceptance_week_has_five_personas_and_seven_evolving_days():
         assert all(day["evidence_status"] == "demo_disclosed" for day in persona["days"])
 
 
-def test_global_acceptance_week_is_english_only_and_market_native():
-    response = _client().get("/api/v1/personalization/acceptance-week", headers={"Accept-Language": "en-US"})
-    assert response.status_code == 200
-    payload = response.json()["data"]
-    assert payload["locale"] == "en-US"
-    assert len(payload["personas"]) == 5
-    serialized = str(payload)
-    assert not any("\u4e00" <= char <= "\u9fff" for char in serialized)
-    assert payload["personas"][0]["days"][-1]["stage"] == "weekly_review"
+def test_domestic_acceptance_week_cannot_be_switched_by_client_language():
+    client = _client()
+    for query in ("", "?locale=en-US", "?locale=fr-FR"):
+        response = client.get("/api/v1/personalization/acceptance-week" + query, headers={"Accept-Language": "en-US"})
+        assert response.status_code == 200
+        payload = response.json()["data"]
+        assert payload["locale"] == "zh-CN"
+        assert len(payload["personas"]) == 5
+        assert payload["personas"][0]["days"][-1]["hero"]["headline"] == "回顾这一周"
+    result = client.get("/api/v1/personalization/dashboard?locale=en-US", headers={"Accept-Language": "en-US"})
+    assert result.json()["data"]["hero"]["headline"] == "先认识你"
 
 
 def test_dashboard_rejects_unknown_persona_and_invalid_day():

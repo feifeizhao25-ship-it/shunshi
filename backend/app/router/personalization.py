@@ -61,8 +61,9 @@ class ActionCompletion(BaseModel):
 
 
 def _language(accept_language: str | None, locale: str | None) -> Literal["zh", "en"]:
-    requested = (locale or accept_language or "zh-CN").lower()
-    return "zh" if requested.startswith("zh") else "en"
+    # This router belongs to the domestic application. Request headers and query
+    # parameters must not switch its market or content language.
+    return "zh"
 
 
 def _persona(persona_id: str, language: Literal["zh", "en"]) -> Persona:
