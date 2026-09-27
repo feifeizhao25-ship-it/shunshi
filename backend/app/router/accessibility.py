@@ -3,13 +3,16 @@
 无障碍设置、字体大小、色彩对比、辅助功能
 """
 
-from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel, Field
-from typing import Optional, Dict
+from fastapi import APIRouter, HTTPException, Depends
+from pydantic import BaseModel, Field, field_validator
+from typing import Optional, Literal
+from sqlalchemy.orm import Session
+from app.deps import get_session
+from app.routers.settings import _read, _write
 
 router = APIRouter(prefix="/api/v1/accessibility", tags=["accessibility"])
 
-_user_settings: Dict[str, dict] = {}
+SETTINGS_KEY = "settings:accessibility"
 
 DEFAULT_SETTINGS = {
     "font_size": "medium",        # small / medium / large / x-large
@@ -40,22 +43,28 @@ COLOR_BLIND_PALETTES = {
 
 class AccessibilitySettingsRequest(BaseModel):
     user_id: str = Field(..., description="用户ID")
-    font_size: Optional[str] = Field(None, description="small/medium/large/x-large")
+    font_size: Optional[Literal["small", "medium", "large", "x-large"]] = Field(None, description="small/medium/large/x-large")
     high_contrast: Optional[bool] = None
     reduce_motion: Optional[bool] = None
     screen_reader: Optional[bool] = None
     bold_text: Optional[bool] = None
-    color_blind_mode: Optional[str] = Field(None, description="none/deuteranopia/protanopia/tritanopia")
+    color_blind_mode: Optional[Literal["none", "normal", "deuteranopia", "protanopia", "tritanopia"]] = Field(None, description="none/deuteranopia/protanopia/tritanopia")
     haptic_feedback: Optional[bool] = None
     auto_play_audio: Optional[bool] = None
     caption_enabled: Optional[bool] = None
-    button_size: Optional[str] = Field(None, description="normal/large")
-    line_spacing: Optional[str] = Field(None, description="compact/normal/relaxed")
+    button_size: Optional[Literal["normal", "large"]] = Field(None, description="normal/large")
+    line_spacing: Optional[Literal["compact", "normal", "relaxed"]] = Field(None, description="compact/normal/relaxed")
+
+
+    @field_validator("font_size", mode="before")
+    @classmethod
+    def normalize_font_size(cls, value):
+        return "x-large" if value == "extra_large" else value
 
 
 @router.get("/settings/{user_id}", summary="获取无障碍设置")
-async def get_settings(user_id: str):
-    settings = _user_settings.get(user_id, DEFAULT_SETTINGS.copy())
+async def get_settings(user_id: str, session: Session = Depends(get_session)):
+    settings = _read(session, user_id, SETTINGS_KEY, DEFAULT_SETTINGS)
     palette = COLOR_BLIND_PALETTES.get(settings.get("color_blind_mode", "none"), COLOR_BLIND_PALETTES["none"])
     return {
         "success": True,
@@ -68,17 +77,17 @@ async def get_settings(user_id: str):
 
 
 @router.post("/settings", summary="更新无障碍设置")
-async def update_settings(request: AccessibilitySettingsRequest):
-    current = _user_settings.get(request.user_id, DEFAULT_SETTINGS.copy())
-    updates = request.dict(exclude_none=True, exclude={"user_id"})
+async def update_settings(request: AccessibilitySettingsRequest, session: Session = Depends(get_session)):
+    current = _read(session, request.user_id, SETTINGS_KEY, DEFAULT_SETTINGS)
+    updates = request.model_dump(exclude_none=True, exclude={"user_id"})
     current.update(updates)
-    _user_settings[request.user_id] = current
+    _write(session, request.user_id, SETTINGS_KEY, current)
     return {"success": True, "data": {"settings": current, "message": "无障碍设置已更新"}}
 
 
 @router.post("/settings/{user_id}/reset", summary="重置为默认设置")
-async def reset_settings(user_id: str):
-    _user_settings[user_id] = DEFAULT_SETTINGS.copy()
+async def reset_settings(user_id: str, session: Session = Depends(get_session)):
+    _write(session, user_id, SETTINGS_KEY, DEFAULT_SETTINGS.copy())
     return {"success": True, "data": {"settings": DEFAULT_SETTINGS, "message": "设置已重置"}}
 
 

@@ -5,17 +5,23 @@
 """
 
 from fastapi import APIRouter, Query, HTTPException, Depends
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from typing import Optional, List
 from datetime import datetime, date, timedelta
 from uuid import uuid4
+from zoneinfo import ZoneInfo
 from sqlalchemy.orm import Session
 from sqlalchemy import func, and_
 
+from app.deps import current_user
 from app.db.database import get_db
 from app.models.journal import JournalEntry as JournalEntryModel
 
 router = APIRouter(prefix="/api/v1/journal", tags=["journal"])
+
+
+def _today() -> date:
+    return datetime.now(ZoneInfo("Asia/Shanghai")).date()
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -31,6 +37,20 @@ class JournalEntryRequest(BaseModel):
     notes: Optional[str] = Field(None, max_length=1000, description="日记备注")
     tags: Optional[List[str]] = Field(None, description="标签列表，如 ['工作', '运动', '压力']")
     constitution_type: Optional[str] = Field(None, description="体质类型，如 'qi_deficiency', 'yin_deficiency'")
+
+
+    @field_validator("date")
+    @classmethod
+    def validate_entry_date(cls, value):
+        if value is None:
+            return value
+        try:
+            parsed = date.fromisoformat(value)
+        except ValueError:
+            raise ValueError("请输入有效日期，格式为 YYYY-MM-DD") from None
+        if parsed.isoformat() != value or parsed > _today():
+            raise ValueError("日期须为 YYYY-MM-DD 格式，且不能晚于今天")
+        return value
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -161,7 +181,7 @@ async def create_journal_entry(request: JournalEntryRequest, db: Session = Depen
     if not (1 <= request.mood <= 5) or not (1 <= request.energy <= 5) or not (1 <= request.sleep_quality <= 5):
         raise HTTPException(status_code=422, detail="mood, energy, sleep_quality must be between 1 and 5")
 
-    entry_date = request.date or date.today().isoformat()
+    entry_date = request.date or _today().isoformat()
     entry_id = str(uuid4())
     wellness_score = _calculate_wellness_score(request.mood, request.energy, request.sleep_quality)
     tcm_insight = _get_tcm_insight(request.mood, request.energy, request.sleep_quality, request.constitution_type)
@@ -250,7 +270,7 @@ async def get_checkin_streak(user_id: str, db: Session = Depends(get_db)):
         return {"success": True, "data": {"current_streak": 0, "longest_streak": 0, "total_entries": 0, "last_entry_date": None}}
 
     dates = sorted(set(r.date for r in rows))
-    total = len(dates)
+    total = len(rows)
     last_date = dates[-1] if isinstance(dates[-1], date) else date.fromisoformat(str(dates[-1]))
 
     # 计算 current_streak（从最后一天往前数，遇到间隔停止）
@@ -275,7 +295,7 @@ async def get_checkin_streak(user_id: str, db: Session = Depends(get_db)):
         elif (d1 - d0).days > 1:
             streak = 1
 
-    today = date.today()
+    today = _today()
     days_since = (today - last_date).days
     current_streak = current_streak if days_since <= 1 else 0
 
@@ -285,9 +305,9 @@ async def get_checkin_streak(user_id: str, db: Session = Depends(get_db)):
 @router.get("/insights/{user_id}", summary="获取周度健康洞察")
 async def get_wellness_insights(user_id: str, db: Session = Depends(get_db)):
     """获取过去7天的平均指标、趋势分析和中医模式识别。"""
-    seven_days_ago = (date.today() - timedelta(days=7)).isoformat()
+    seven_days_ago = (_today() - timedelta(days=6)).isoformat()
     rows = (db.query(JournalEntryModel)
-            .filter(and_(JournalEntryModel.user_id == user_id, JournalEntryModel.date >= seven_days_ago))
+            .filter(and_(JournalEntryModel.user_id == user_id, JournalEntryModel.date >= seven_days_ago, JournalEntryModel.date <= _today().isoformat()))
             .order_by(JournalEntryModel.date).all())
 
     if not rows:
@@ -314,7 +334,9 @@ async def get_wellness_insights(user_id: str, db: Session = Depends(get_db)):
     first_avg = sum(scores[:mid]) / len(scores[:mid]) if mid > 0 else 0
     second_avg = sum(scores[mid:]) / len(scores[mid:]) if len(scores) > mid else 0
 
-    if second_avg > first_avg * 1.1:
+    if len(scores) < 2:
+        trend, trend_msg = "stable", "记录不足，暂无法判断变化趋势。"
+    elif second_avg > first_avg * 1.1:
         trend, trend_msg = "improving", "状态向好，保持当前的生活方式。"
     elif second_avg < first_avg * 0.9:
         trend, trend_msg = "declining", "状态有所下降，建议增加休息和调理。"
@@ -346,11 +368,11 @@ async def get_wellness_insights(user_id: str, db: Session = Depends(get_db)):
 
 
 @router.delete("/entry/{entry_id}", summary="删除日记条目")
-async def delete_journal_entry(entry_id: str, db: Session = Depends(get_db)):
+async def delete_journal_entry(entry_id: str, db: Session = Depends(get_db), user_id: str = Depends(current_user)):
     """删除指定的日记条目。"""
-    row = db.query(JournalEntryModel).filter(JournalEntryModel.id == entry_id).first()
+    row = db.query(JournalEntryModel).filter(JournalEntryModel.id == entry_id, JournalEntryModel.user_id == user_id).first()
     if not row:
-        raise HTTPException(status_code=404, detail=f"Entry '{entry_id}' not found")
+        raise HTTPException(status_code=404, detail="日记不存在或无权访问")
     db.delete(row)
     db.commit()
     return {"success": True, "data": {"deleted_entry_id": entry_id, "message": "条目已删除"}}

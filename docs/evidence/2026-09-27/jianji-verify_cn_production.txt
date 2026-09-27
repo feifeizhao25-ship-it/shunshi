@@ -1,0 +1,1 @@
+JianJi CN production gate passed: 34 services, memory limits 4032M / reservations 1440M

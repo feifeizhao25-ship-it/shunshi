@@ -1,0 +1,46 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____________________ test_other_user_cannot_delete_journal _____________________
+backend/tests/test_journal_isolation.py:14: in test_other_user_cannot_delete_journal
+    assert client.delete(f'/api/v1/journal/entry/{entry_id}', headers=outsider).status_code == 404
+E   AssertionError: assert 200 == 404
+E    +  where 200 = <Response [200 OK]>.status_code
+E    +    where <Response [200 OK]> = delete('/api/v1/journal/entry/13a22027-6007-4777-aed8-770e4d7a326d', headers={'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI4Zjk4ZTNjYWZmNzI0NzBkOTk1N2VkODU5ZDlmN2IwMSI...3ODg4NDYyYTYyODMyMTEzOWYyIiwiaWF0IjoxNzkwMTA5ODY1LCJleHAiOjE3OTA3MTQ2NjV9.QwCpa580vn7Sc0aLBBOpVNCHKHFquwM9bQ7I32tc5XY'})
+E    +      where delete = <starlette.testclient.TestClient object at 0x10b7c7290>.delete
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+---------------------------- Captured stderr setup -----------------------------
+Building prefix dict from the default dictionary ...
+Loading model from cache /var/folders/76/kgztbzps61vd_rnp4mc1q7980000gn/T/jieba.cache
+Loading model cost 0.251 seconds.
+Prefix dict has been built successfully.
+------------------------------ Captured log setup ------------------------------
+DEBUG    jieba:__init__.py:113 Building prefix dict from the default dictionary ...
+DEBUG    jieba:__init__.py:132 Loading model from cache /var/folders/76/kgztbzps61vd_rnp4mc1q7980000gn/T/jieba.cache
+DEBUG    jieba:__init__.py:164 Loading model cost 0.251 seconds.
+DEBUG    jieba:__init__.py:166 Prefix dict has been built successfully.
+=============================== warnings summary ===============================
+../../../../../tmp/cn-shunshi-verify-0919/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /tmp/cn-shunshi-verify-0919/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+../../../../../tmp/cn-shunshi-verify-0919/lib/python3.12/site-packages/starlette/testclient.py:53
+  /tmp/cn-shunshi-verify-0919/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+backend/app/db/database.py:34
+  /Users/feifei00/Documents/CodexWorktrees/shunshi-production/backend/app/db/database.py:34: MovedIn20Warning: The ``declarative_base()`` function is now available as sqlalchemy.orm.declarative_base(). (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    Base = declarative_base()
+
+backend/app/core/settings.py:9
+  /Users/feifei00/Documents/CodexWorktrees/shunshi-production/backend/app/core/settings.py:9: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class Settings(BaseSettings):
+
+backend/app/router/ai_content.py:413
+  /Users/feifei00/Documents/CodexWorktrees/shunshi-production/backend/app/router/ai_content.py:413: FastAPIDeprecationWarning: `regex` has been deprecated, please use `pattern` instead
+    lang: str = Query("zh", regex="^(zh|en)$"),
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED backend/tests/test_journal_isolation.py::test_other_user_cannot_delete_journal
+1 failed, 5 warnings in 0.49s
