@@ -181,11 +181,12 @@ class FollowUpScheduler:
 
         return self._get_followup_by_id(followup_id)
 
-    def _get_followup_by_id(self, followup_id: str) -> Optional[Dict[str, Any]]:
+    def _get_followup_by_id(self, followup_id: str, user_id: Optional[str] = None) -> Optional[Dict[str, Any]]:
         """根据ID获取follow-up"""
         conn = get_db()
         row = conn.execute(
-            "SELECT * FROM follow_ups WHERE id = ?", (followup_id,)
+            "SELECT * FROM follow_ups WHERE id = ?" + (" AND user_id = ?" if user_id is not None else ""),
+            (followup_id, user_id) if user_id is not None else (followup_id,)
         ).fetchone()
         if not row:
             return None
@@ -232,7 +233,7 @@ class FollowUpScheduler:
         return [dict(r) for r in rows]
 
     def update_followup_status(
-        self, followup_id: str, status: str
+        self, followup_id: str, status: str, user_id: Optional[str] = None
     ) -> Optional[Dict[str, Any]]:
         """
         更新 follow-up 状态
@@ -249,24 +250,19 @@ class FollowUpScheduler:
             raise ValueError(f"无效的状态: {status}，有效值: {valid_statuses}")
 
         conn = get_db()
-
-        if status == "sent":
-            conn.execute(
-                """UPDATE follow_ups
-                   SET status = ?, completed_at = datetime('now')
-                   WHERE id = ?""",
-                (status, followup_id),
-            )
-        else:
-            conn.execute(
-                "UPDATE follow_ups SET status = ? WHERE id = ?",
-                (status, followup_id),
-            )
+        owner_clause = " AND user_id = ?" if user_id is not None else ""
+        params = (status, followup_id, user_id) if user_id is not None else (status, followup_id)
+        timestamp_clause = ", completed_at = datetime('now')" if status == "sent" else ""
+        cursor = conn.execute(
+            "UPDATE follow_ups SET status = ?" + timestamp_clause + " WHERE id = ?" + owner_clause,
+            params,
+        )
         conn.commit()
+        if cursor.rowcount == 0:
+            return None
+        return self._get_followup_by_id(followup_id, user_id=user_id)
 
-        return self._get_followup_by_id(followup_id)
-
-    def cancel_followup(self, followup_id: str) -> bool:
+    def cancel_followup(self, followup_id: str, user_id: Optional[str] = None) -> bool:
         """
         取消 follow-up
 
@@ -278,8 +274,9 @@ class FollowUpScheduler:
         """
         conn = get_db()
         cursor = conn.execute(
-            "UPDATE follow_ups SET status = 'cancelled' WHERE id = ? AND status != 'sent'",
-            (followup_id,),
+            "UPDATE follow_ups SET status = 'cancelled' WHERE id = ? AND status != 'sent'"
+            + (" AND user_id = ?" if user_id is not None else ""),
+            (followup_id, user_id) if user_id is not None else (followup_id,),
         )
         conn.commit()
         return cursor.rowcount > 0

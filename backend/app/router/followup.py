@@ -2,7 +2,7 @@
 顺时 - Follow-up 调度 API 路由
 """
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Depends
 from pydantic import BaseModel
 from typing import Optional, Dict, Any, List
 
@@ -12,6 +12,7 @@ from app.services.followup_scheduler import (
     TYPE_DESCRIPTIONS,
 )
 from app.database.db import get_db
+from app.product_access import _current_user_id
 
 router = APIRouter(prefix="/api/v1/followup", tags=["Follow-up调度"])
 
@@ -122,52 +123,6 @@ async def get_due_followups():
         "count": len(due),
         "due_followups": due,
     }
-
-
-@router.get("/{followup_id}")
-async def get_followup(followup_id: str):
-    """获取单个 follow-up 详情"""
-    followup = followup_scheduler._get_followup_by_id(followup_id)
-    if not followup:
-        raise HTTPException(status_code=404, detail="follow-up not found")
-    return followup
-
-
-@router.put("/{followup_id}")
-async def update_followup_status(
-    followup_id: str,
-    request: UpdateStatusRequest,
-):
-    """
-    更新 follow-up 状态
-
-    可将状态更新为 scheduled / sent / cancelled / expired
-    """
-    try:
-        followup = followup_scheduler.update_followup_status(
-            followup_id, request.status
-        )
-        if not followup:
-            raise HTTPException(status_code=404, detail="follow-up not found")
-        return {"success": True, "followup": followup}
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-
-@router.delete("/{followup_id}")
-async def cancel_followup(followup_id: str):
-    """
-    取消 follow-up
-
-    仅能取消未发送的任务
-    """
-    success = followup_scheduler.cancel_followup(followup_id)
-    if not success:
-        raise HTTPException(
-            status_code=400,
-            detail="follow-up不存在或已发送，无法取消",
-        )
-    return {"success": True, "message": "follow-up已取消"}
 
 
 @router.post("/check")
@@ -295,39 +250,20 @@ async def check_due_followups_user(
     now = datetime.now()
     now_str = now.isoformat()
     
-    db = get_db()
     try:
+        db = get_db()
         rows = db.execute("""
-            SELECT * FROM follow_ups 
-            WHERE user_id = ? AND status = 'pending' AND scheduled_at <= ?
+            SELECT * FROM follow_ups
+            WHERE user_id = ? AND status IN ('pending', 'scheduled') AND scheduled_at <= ?
             ORDER BY scheduled_at ASC
         """, (user_id, now_str)).fetchall()
-        
         due_list = [dict(r) for r in rows]
-        
-        # 同时检查调度器中的到期任务
-        scheduler_due = followup_scheduler.check_due_followups()
-        scheduler_due_for_user = [f for f in scheduler_due if f.get("user_id") == user_id]
-        
-        # 合并去重
-        seen = set(f.get("id") for f in due_list)
-        for f in scheduler_due_for_user:
-            if f.get("id") not in seen:
-                due_list.append(f)
-        
         return {
-            "success": True,
-            "count": len(due_list),
-            "due_followups": due_list,
-            "checked_at": now_str,
+            "success": True, "count": len(due_list),
+            "due_followups": due_list, "checked_at": now_str,
         }
-    except Exception as e:
-        return {
-            "success": True,
-            "count": 0,
-            "due_followups": [],
-            "error": str(e),
-        }
+    except Exception:
+        raise HTTPException(status_code=503, detail="暂时无法读取到期随访，请稍后重试") from None
 
 
 # ============ 快捷创建端点 ============
@@ -370,3 +306,53 @@ async def quick_sleep_followup(
         conversation_id=conversation_id,
     )
     return {"success": True, "followup": followup}
+
+
+# Dynamic IDs must follow all fixed GET paths, including /check-due.
+@router.get("/{followup_id}")
+async def get_followup(followup_id: str, user_id: str = Depends(_current_user_id)):
+    """获取单个 follow-up 详情"""
+    followup = followup_scheduler._get_followup_by_id(followup_id, user_id=user_id)
+    if not followup:
+        raise HTTPException(status_code=404, detail="随访任务不存在或无权访问")
+    return followup
+
+
+@router.put("/{followup_id}")
+async def update_followup_status(
+    followup_id: str,
+    request: UpdateStatusRequest,
+    user_id: str = Depends(_current_user_id),
+):
+    """
+    更新 follow-up 状态
+
+    可将状态更新为 scheduled / sent / cancelled / expired
+    """
+    try:
+        followup = followup_scheduler.update_followup_status(
+            followup_id, request.status, user_id=user_id
+        )
+        if not followup:
+            raise HTTPException(status_code=404, detail="随访任务不存在或无权访问")
+        return {"success": True, "followup": followup}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.delete("/{followup_id}")
+async def cancel_followup(followup_id: str, user_id: str = Depends(_current_user_id)):
+    """
+    取消 follow-up
+
+    仅能取消未发送的任务
+    """
+    if not followup_scheduler._get_followup_by_id(followup_id, user_id=user_id):
+        raise HTTPException(status_code=404, detail="随访任务不存在或无权访问")
+    success = followup_scheduler.cancel_followup(followup_id, user_id=user_id)
+    if not success:
+        raise HTTPException(
+            status_code=400,
+            detail="follow-up不存在或已发送，无法取消",
+        )
+    return {"success": True, "message": "follow-up已取消"}

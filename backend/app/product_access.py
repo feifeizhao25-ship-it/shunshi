@@ -66,7 +66,7 @@ ADMIN_ONLY: tuple[tuple[frozenset[str] | None, re.Pattern[str]], ...] = tuple(
         (None, r"^/api/v1/ai-content/(generate|batch-generate)$"),
         (None, r"^/api/v1/subscription/(check-expired|check-expiry|usage/record)$"),
         # 列出的是**所有用户**的到期随访任务
-        (None, r"^/api/v1/followup/due$"),
+        (None, r"^/api/v1/followup/(due|check)$"),
         (None, r"^/api/v1/analytics/app-stats$"),
         (frozenset({"POST", "PUT", "PATCH", "DELETE"}), r"^/api/v1/banner(/|$)"),
     )

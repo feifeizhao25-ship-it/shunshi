@@ -6,33 +6,19 @@ test_followup.py
 import pytest
 
 
-@pytest.fixture(autouse=True)
-def seed_followup_users():
-    """Follow-up rows must reference real users; seed explicit test owners."""
-    from app.database.db import get_db
-
-    db = get_db()
-    for user_id in (
-        "test-user-001",
-        "due-test-user",
-        "complete-test-user",
-        "cancel-test-user",
-    ):
-        db.execute(
-            """INSERT OR IGNORE INTO users
-               (id, name, password_hash, created_at, updated_at)
-               VALUES (?, '测试用户', '', datetime('now'), datetime('now'))""",
-            (user_id,),
-        )
-    db.commit()
+@pytest.fixture()
+def followup_user(client, auth_headers, settings):
+    from app.security import verify_token
+    client.headers.update(auth_headers)
+    return verify_token(settings, auth_headers["Authorization"].removeprefix("Bearer "))
 
 
 class TestFollowUpCreate:
     """Follow-up 创建测试"""
 
-    def test_create_followup(self, client):
+    def test_create_followup(self, client, followup_user):
         response = client.post("/api/v1/followup/schedule", json={
-            "user_id": "test-user-001",
+            "user_id": followup_user,
             "title": "每日签到提醒",
             "type": "daily_checkin",
             "description": "记得打卡记录今日状态",
@@ -46,9 +32,9 @@ class TestFollowUpCreate:
         # 实际 API 创建时状态为 "scheduled"
         assert data["followup"]["status"] == "scheduled"
 
-    def test_create_followup_mood(self, client):
+    def test_create_followup_mood(self, client, followup_user):
         response = client.post("/api/v1/followup/schedule", json={
-            "user_id": "test-user-001",
+            "user_id": followup_user,
             "title": "情绪跟进",
             "type": "mood_followup",
             "description": "最近心情好些了吗",
@@ -58,9 +44,9 @@ class TestFollowUpCreate:
         data = response.json()
         assert data["followup"]["type"] == "mood_followup"
 
-    def test_create_followup_sleep(self, client):
+    def test_create_followup_sleep(self, client, followup_user):
         response = client.post("/api/v1/followup/schedule", json={
-            "user_id": "test-user-001",
+            "user_id": followup_user,
             "title": "睡眠跟进",
             "type": "sleep_followup",
             "trigger_time": "22:00",
@@ -68,9 +54,9 @@ class TestFollowUpCreate:
         assert response.status_code == 200
         assert response.json()["followup"]["type"] == "sleep_followup"
 
-    def test_create_followup_invalid_type(self, client):
+    def test_create_followup_invalid_type(self, client, followup_user):
         response = client.post("/api/v1/followup/schedule", json={
-            "user_id": "test-user-001",
+            "user_id": followup_user,
             "type": "invalid_type",
             "trigger_time": "20:00",
         })
@@ -80,18 +66,18 @@ class TestFollowUpCreate:
 class TestFollowUpList:
     """Follow-up 列表测试"""
 
-    def test_get_list(self, client):
-        response = client.get("/api/v1/followup/list?user_id=test-user-001")
+    def test_get_list(self, client, followup_user):
+        response = client.get(f"/api/v1/followup/list?user_id={followup_user}")
         assert response.status_code == 200
         data = response.json()
         assert "followups" in data
         assert "count" in data
 
-    def test_get_list_filter_by_type(self, client):
-        response = client.get("/api/v1/followup/list?user_id=test-user-001&type=daily_checkin")
+    def test_get_list_filter_by_type(self, client, followup_user):
+        response = client.get(f"/api/v1/followup/list?user_id={followup_user}&type=daily_checkin")
         assert response.status_code == 200
 
-    def test_get_list_filter_by_status(self, client):
+    def test_get_list_filter_by_status(self, client, followup_user):
         response = client.get("/api/v1/followup/list?status=scheduled")
         assert response.status_code == 200
 
@@ -99,18 +85,18 @@ class TestFollowUpList:
 class TestFollowUpDueCheck:
     """到期检查测试"""
 
-    def test_check_due_tasks(self, client):
+    def test_check_due_tasks(self, client, followup_user):
         # 创建一个已过期的任务（user_id 需存在于 users 表）
         from datetime import datetime, timedelta
         past_time = (datetime.now() - timedelta(hours=1)).strftime("%Y-%m-%dT%H:%M:%S")
         client.post("/api/v1/followup/schedule", json={
-            "user_id": "due-test-user",
+            "user_id": followup_user,
             "title": "过期任务",
             "type": "care_reminder",
             "trigger_time": past_time,
         })
 
-        response = client.get("/api/v1/followup/due")
+        response = client.get("/api/v1/followup/check-due")
         assert response.status_code == 200
         data = response.json()
         assert "due_followups" in data
@@ -119,10 +105,10 @@ class TestFollowUpDueCheck:
 class TestFollowUpComplete:
     """完成 Follow-up 测试"""
 
-    def test_complete_followup(self, client):
+    def test_complete_followup(self, client, followup_user):
         # 创建（user_id 需存在于 users 表）
         create_resp = client.post("/api/v1/followup/schedule", json={
-            "user_id": "complete-test-user",
+            "user_id": followup_user,
             "title": "待完成任务",
             "type": "daily_checkin",
             "trigger_time": "20:00",
@@ -141,9 +127,9 @@ class TestFollowUpComplete:
 class TestFollowUpCancel:
     """取消 Follow-up 测试"""
 
-    def test_cancel_followup(self, client):
+    def test_cancel_followup(self, client, followup_user):
         create_resp = client.post("/api/v1/followup/schedule", json={
-            "user_id": "cancel-test-user",
+            "user_id": followup_user,
             "title": "待取消任务",
             "type": "care_reminder",
             "trigger_time": "20:00",
@@ -158,7 +144,7 @@ class TestFollowUpCancel:
 class TestFollowUpTypes:
     """Follow-up 类型列表测试"""
 
-    def test_get_types(self, client):
+    def test_get_types(self, client, followup_user):
         response = client.get("/api/v1/followup/types")
         assert response.status_code == 200
         data = response.json()
@@ -173,6 +159,6 @@ class TestFollowUpTypes:
 class TestFollowUpStats:
     """统计测试"""
 
-    def test_get_stats(self, client):
-        response = client.get("/api/v1/followup/stats?user_id=test-user-001")
+    def test_get_stats(self, client, followup_user):
+        response = client.get(f"/api/v1/followup/stats?user_id={followup_user}")
         assert response.status_code == 200

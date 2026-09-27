@@ -9,19 +9,11 @@ import pytest
 from datetime import datetime, timedelta
 
 
-@pytest.fixture(autouse=True)
-def seed_followup_users():
-    from app.database.db import get_db
-
-    db = get_db()
-    for user_id in ("test-user-001", "complete-test-user", "cancel-test-user"):
-        db.execute(
-            """INSERT OR IGNORE INTO users
-               (id, name, password_hash, created_at, updated_at)
-               VALUES (?, '测试用户', '', datetime('now'), datetime('now'))""",
-            (user_id,),
-        )
-    db.commit()
+@pytest.fixture()
+def followup_user(client, auth_headers, settings):
+    from app.security import verify_token
+    client.headers.update(auth_headers)
+    return verify_token(settings, auth_headers["Authorization"].removeprefix("Bearer "))
 
 
 # ==================== 生成跟进 ====================
@@ -29,10 +21,10 @@ def seed_followup_users():
 class TestGenerateFollowUp:
     """生成跟进"""
 
-    def test_generate_follow_up_daily_checkin(self, client):
+    def test_generate_follow_up_daily_checkin(self, client, followup_user):
         """生成每日签到跟进"""
         response = client.post("/api/v1/followup/schedule", json={
-            "user_id": "test-user-001",
+            "user_id": followup_user,
             "title": "每日签到提醒",
             "type": "daily_checkin",
             "description": "记得打卡记录今日状态",
@@ -45,10 +37,10 @@ class TestGenerateFollowUp:
         assert data["followup"]["type"] == "daily_checkin"
         assert data["followup"]["status"] == "scheduled"
 
-    def test_generate_follow_up_mood(self, client):
+    def test_generate_follow_up_mood(self, client, followup_user):
         """生成情绪跟进"""
         response = client.post("/api/v1/followup/schedule", json={
-            "user_id": "test-user-001",
+            "user_id": followup_user,
             "title": "情绪跟进",
             "type": "mood_followup",
             "description": "最近心情好些了吗",
@@ -57,10 +49,10 @@ class TestGenerateFollowUp:
         assert response.status_code == 200
         assert response.json()["followup"]["type"] == "mood_followup"
 
-    def test_generate_follow_up_sleep(self, client):
+    def test_generate_follow_up_sleep(self, client, followup_user):
         """生成睡眠跟进"""
         response = client.post("/api/v1/followup/schedule", json={
-            "user_id": "test-user-001",
+            "user_id": followup_user,
             "title": "睡眠跟进",
             "type": "sleep_followup",
             "trigger_time": "22:00",
@@ -68,10 +60,10 @@ class TestGenerateFollowUp:
         assert response.status_code == 200
         assert response.json()["followup"]["type"] == "sleep_followup"
 
-    def test_generate_follow_up_care(self, client):
+    def test_generate_follow_up_care(self, client, followup_user):
         """生成关怀提醒"""
         response = client.post("/api/v1/followup/schedule", json={
-            "user_id": "test-user-001",
+            "user_id": followup_user,
             "title": "关怀提醒",
             "type": "care_reminder",
             "trigger_time": "10:00",
@@ -85,11 +77,11 @@ class TestGenerateFollowUp:
 class TestFollowUpInDays:
     """3天/7天/14天/30天递增"""
 
-    def test_follow_up_3_days(self, client):
+    def test_follow_up_3_days(self, client, followup_user):
         """3天后的跟进"""
         trigger_time = (datetime.now() + timedelta(days=3)).strftime("%Y-%m-%dT%H:%M:%S")
         response = client.post("/api/v1/followup/schedule", json={
-            "user_id": "test-user-001",
+            "user_id": followup_user,
             "title": "3天跟进",
             "type": "care_reminder",
             "trigger_time": trigger_time,
@@ -101,33 +93,33 @@ class TestFollowUpInDays:
         scheduled = followup.get("scheduled_at") or followup.get("trigger_time")
         assert scheduled is not None, "跟进应有调度时间"
 
-    def test_follow_up_7_days(self, client):
+    def test_follow_up_7_days(self, client, followup_user):
         """7天后的跟进"""
         trigger_time = (datetime.now() + timedelta(days=7)).strftime("%Y-%m-%dT%H:%M:%S")
         response = client.post("/api/v1/followup/schedule", json={
-            "user_id": "test-user-001",
+            "user_id": followup_user,
             "title": "7天跟进",
             "type": "care_reminder",
             "trigger_time": trigger_time,
         })
         assert response.status_code == 200
 
-    def test_follow_up_14_days(self, client):
+    def test_follow_up_14_days(self, client, followup_user):
         """14天后的跟进"""
         trigger_time = (datetime.now() + timedelta(days=14)).strftime("%Y-%m-%dT%H:%M:%S")
         response = client.post("/api/v1/followup/schedule", json={
-            "user_id": "test-user-001",
+            "user_id": followup_user,
             "title": "14天跟进",
             "type": "care_reminder",
             "trigger_time": trigger_time,
         })
         assert response.status_code == 200
 
-    def test_follow_up_30_days(self, client):
+    def test_follow_up_30_days(self, client, followup_user):
         """30天后的跟进"""
         trigger_time = (datetime.now() + timedelta(days=30)).strftime("%Y-%m-%dT%H:%M:%S")
         response = client.post("/api/v1/followup/schedule", json={
-            "user_id": "test-user-001",
+            "user_id": followup_user,
             "title": "30天跟进",
             "type": "care_reminder",
             "trigger_time": trigger_time,
@@ -140,11 +132,11 @@ class TestFollowUpInDays:
 class TestFollowUpDecay:
     """连续3次无响应降频"""
 
-    def test_follow_up_sent_marked(self, client):
+    def test_follow_up_sent_marked(self, client, followup_user):
         """跟进发送后应标记为 sent"""
         # 创建跟进
         create_resp = client.post("/api/v1/followup/schedule", json={
-            "user_id": "complete-test-user",
+            "user_id": followup_user,
             "title": "降频测试",
             "type": "daily_checkin",
             "trigger_time": "20:00",
@@ -159,9 +151,9 @@ class TestFollowUpDecay:
         assert complete_resp.status_code == 200
         assert complete_resp.json()["followup"]["status"] == "sent"
 
-    def test_follow_up_multiple_sends(self, client):
+    def test_follow_up_multiple_sends(self, client, followup_user):
         """多次发送跟进应记录状态变化"""
-        user_id = "complete-test-user"
+        user_id = followup_user
         statuses = ["scheduled", "sent", "cancelled"]
         created_ids = []
 
@@ -172,39 +164,41 @@ class TestFollowUpDecay:
                 "type": "daily_checkin",
                 "trigger_time": "20:00",
             })
+            assert resp.status_code == 200, resp.text
             if resp.status_code == 200:
                 task_id = resp.json()["followup"]["id"]
                 created_ids.append(task_id)
                 # 标记为已发送
                 client.put(f"/api/v1/followup/{task_id}", json={"status": "sent"})
 
+        assert len(created_ids) == 3
         # 验证所有都已发送
         for task_id in created_ids:
             # 列表中应能看到状态
-            pass  # 通过列表 API 间接验证
+            assert client.get(f"/api/v1/followup/{task_id}").json()["status"] == "sent"
 
-    def test_follow_up_list_filters(self, client):
+    def test_follow_up_list_filters(self, client, followup_user):
         """跟进列表可按状态和类型过滤"""
         # 创建不同类型的跟进
         client.post("/api/v1/followup/schedule", json={
-            "user_id": "test-user-001",
+            "user_id": followup_user,
             "title": "筛选测试-签到",
             "type": "daily_checkin",
             "trigger_time": "20:00",
         })
         client.post("/api/v1/followup/schedule", json={
-            "user_id": "test-user-001",
+            "user_id": followup_user,
             "title": "筛选测试-情绪",
             "type": "mood_followup",
             "trigger_time": "20:00",
         })
 
         # 按类型过滤
-        resp = client.get("/api/v1/followup/list?user_id=test-user-001&type=daily_checkin")
+        resp = client.get(f"/api/v1/followup/list?user_id={followup_user}&type=daily_checkin")
         assert resp.status_code == 200
 
         # 按状态过滤
-        resp = client.get("/api/v1/followup/list?user_id=test-user-001&status=scheduled")
+        resp = client.get(f"/api/v1/followup/list?user_id={followup_user}&status=scheduled")
         assert resp.status_code == 200
 
 
@@ -213,10 +207,10 @@ class TestFollowUpDecay:
 class TestFollowUpCancel:
     """取消跟进"""
 
-    def test_follow_up_cancel(self, client):
+    def test_follow_up_cancel(self, client, followup_user):
         """应能取消跟进"""
         create_resp = client.post("/api/v1/followup/schedule", json={
-            "user_id": "cancel-test-user",
+            "user_id": followup_user,
             "title": "待取消",
             "type": "care_reminder",
             "trigger_time": "20:00",
@@ -227,11 +221,11 @@ class TestFollowUpCancel:
         assert cancel_resp.status_code == 200, "取消跟进应成功"
         assert cancel_resp.json().get("success") is True
 
-    def test_follow_up_cancel_nonexistent(self, client):
+    def test_follow_up_cancel_nonexistent(self, client, followup_user):
         """取消不存在的跟进应返回错误状态"""
         resp = client.delete("/api/v1/followup/nonexistent-id")
         # 取消不存在的任务返回错误码（400/404）
-        assert resp.status_code in (200, 400, 404)
+        assert resp.status_code == 404
 
 
 # ==================== 静默时段 ====================
@@ -293,7 +287,7 @@ class TestFollowUpQuietHours:
         data = response.json()
         assert data.get("enabled") is False, "静默时段应已关闭"
 
-    def test_followup_types_include_all(self, client):
+    def test_followup_types_include_all(self, client, followup_user):
         """跟进类型列表应包含所有预定义类型"""
         response = client.get("/api/v1/followup/types")
         assert response.status_code == 200
@@ -310,38 +304,38 @@ class TestFollowUpQuietHours:
 class TestFollowUpLimit:
     """每日最多1条跟进"""
 
-    def test_follow_up_list_count(self, client):
+    def test_follow_up_list_count(self, client, followup_user):
         """跟进列表应返回 count"""
-        response = client.get("/api/v1/followup/list?user_id=test-user-001")
+        response = client.get(f"/api/v1/followup/list?user_id={followup_user}")
         assert response.status_code == 200
         data = response.json()
         assert "count" in data, "跟进列表应返回 count"
         assert "followups" in data, "跟进列表应返回 followups"
 
-    def test_follow_up_stats(self, client):
+    def test_follow_up_stats(self, client, followup_user):
         """跟进统计应可获取"""
-        response = client.get("/api/v1/followup/stats?user_id=test-user-001")
+        response = client.get(f"/api/v1/followup/stats?user_id={followup_user}")
         assert response.status_code in (200, 404), "统计端点应可访问"
 
-    def test_due_followups_check(self, client):
+    def test_due_followups_check(self, client, followup_user):
         """到期检查应返回到期任务列表"""
         # 创建一个已过期的任务
         past_time = (datetime.now() - timedelta(hours=1)).strftime("%Y-%m-%dT%H:%M:%S")
         client.post("/api/v1/followup/schedule", json={
-            "user_id": "due-test-user",
+            "user_id": followup_user,
             "title": "过期任务",
             "type": "care_reminder",
             "trigger_time": past_time,
         })
 
-        response = client.get("/api/v1/followup/due")
+        response = client.get("/api/v1/followup/check-due")
         assert response.status_code == 200
         data = response.json()
         assert "due_followups" in data, "到期检查应返回 due_followups"
 
-    def test_multiple_followups_same_day(self, client):
+    def test_multiple_followups_same_day(self, client, followup_user):
         """同一天可创建多条不同类型的跟进"""
-        user_id = "test-user-001"
+        user_id = followup_user
         types = ["daily_checkin", "mood_followup", "sleep_followup"]
         created = []
 
@@ -352,11 +346,13 @@ class TestFollowUpLimit:
                 "type": ft,
                 "trigger_time": f"{20 + types.index(ft):02d}:00",
             })
+            assert resp.status_code == 200, resp.text
             if resp.status_code == 200:
                 created.append(resp.json()["followup"]["id"])
 
         # 验证列表中有这些跟进
         list_resp = client.get(f"/api/v1/followup/list?user_id={user_id}")
+        assert list_resp.status_code == 200, list_resp.text
         if list_resp.status_code == 200:
             followups = list_resp.json().get("followups", [])
             # 所有创建的跟进应在列表中

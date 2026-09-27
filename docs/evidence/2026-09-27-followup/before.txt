@@ -1,0 +1,185 @@
+FFFFEF                                                                   [100%]
+==================================== ERRORS ====================================
+____ ERROR at teardown of test_normal_user_cannot_trigger_global_scheduler _____
+backend/tests/conftest.py:69: in client
+    with TestClient(create_app(settings)) as test_client:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/tmp/shunshi-verify-20260927/lib/python3.12/site-packages/starlette/testclient.py:528: in __exit__
+    self.exit_stack.close()
+../../../.local/share/uv/python/cpython-3.12.12-macos-aarch64-none/lib/python3.12/contextlib.py:618: in close
+    self.__exit__(None, None, None)
+../../../.local/share/uv/python/cpython-3.12.12-macos-aarch64-none/lib/python3.12/contextlib.py:610: in __exit__
+    raise exc_details[1]
+../../../.local/share/uv/python/cpython-3.12.12-macos-aarch64-none/lib/python3.12/contextlib.py:595: in __exit__
+    if cb(*exc_details):
+       ^^^^^^^^^^^^^^^^
+../../../.local/share/uv/python/cpython-3.12.12-macos-aarch64-none/lib/python3.12/contextlib.py:478: in _exit_wrapper
+    callback(*args, **kwds)
+/tmp/shunshi-verify-20260927/lib/python3.12/site-packages/starlette/testclient.py:521: in wait_shutdown
+    portal.call(self.wait_shutdown)
+/tmp/shunshi-verify-20260927/lib/python3.12/site-packages/anyio/from_thread.py:340: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/tmp/shunshi-verify-20260927/lib/python3.12/site-packages/anyio/from_thread.py:382: in start_task_soon
+    self._check_running()
+/tmp/shunshi-verify-20260927/lib/python3.12/site-packages/anyio/from_thread.py:216: in _check_running
+    raise RuntimeError("This portal is not running")
+E   RuntimeError: This portal is not running
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+=================================== FAILURES ===================================
+______________ test_other_users_cannot_read_or_mutate_tasks[get] _______________
+backend/tests/test_followup_isolation.py:16: in test_other_users_cannot_read_or_mutate_tasks
+    assert getattr(client, method)(path, **args).status_code == 401
+E   AssertionError: assert 200 == 401
+E    +  where 200 = <Response [200 OK]>.status_code
+E    +    where <Response [200 OK]> = get('/api/v1/followup/5aaad364-1caa-48e3-8cc1-164756b98920', **{})
+E    +      where get = getattr(<starlette.testclient.TestClient object at 0x1225cb890>, 'get')
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+---------------------------- Captured stderr setup -----------------------------
+Building prefix dict from the default dictionary ...
+Loading model from cache /var/folders/76/kgztbzps61vd_rnp4mc1q7980000gn/T/jieba.cache
+Loading model cost 0.242 seconds.
+Prefix dict has been built successfully.
+------------------------------ Captured log setup ------------------------------
+DEBUG    jieba:__init__.py:113 Building prefix dict from the default dictionary ...
+DEBUG    jieba:__init__.py:132 Loading model from cache /var/folders/76/kgztbzps61vd_rnp4mc1q7980000gn/T/jieba.cache
+DEBUG    jieba:__init__.py:164 Loading model cost 0.242 seconds.
+DEBUG    jieba:__init__.py:166 Prefix dict has been built successfully.
+______________ test_other_users_cannot_read_or_mutate_tasks[put] _______________
+backend/tests/test_followup_isolation.py:19: in test_other_users_cannot_read_or_mutate_tasks
+    assert getattr(client, method)(path, headers=outsider, **args).status_code == 404
+E   AssertionError: assert 200 == 404
+E    +  where 200 = <Response [200 OK]>.status_code
+E    +    where <Response [200 OK]> = put('/api/v1/followup/c55a3480-7fd7-49ff-8aa5-d29eb7150f2a', headers={'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkMTQ1MWE5YzJmNjA0ZjIyYTMzM2RjYzRkNDQ2NTY1NiI...4MDA5ZmNkZGNmNWU2YmFhOWYzIiwiaWF0IjoxNzkwNTAyODk3LCJleHAiOjE3OTExMDc2OTd9.-9P3ehGbsvJ9hBz-hw2di07LWo3YDNMEMzdk6Uv9LMo'}, **{'json': {'status': 'sent'}})
+E    +      where put = getattr(<starlette.testclient.TestClient object at 0x1277ff950>, 'put')
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_____________ test_other_users_cannot_read_or_mutate_tasks[delete] _____________
+backend/tests/test_followup_isolation.py:19: in test_other_users_cannot_read_or_mutate_tasks
+    assert getattr(client, method)(path, headers=outsider, **args).status_code == 404
+E   AssertionError: assert 200 == 404
+E    +  where 200 = <Response [200 OK]>.status_code
+E    +    where <Response [200 OK]> = delete('/api/v1/followup/af9dc8a7-637d-4998-b926-32d7f374b18b', headers={'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmMjM5NGE1YWU3NGM0NDk5YmFmOTI3YzE5M2U3ODdkNyI...iY2RhMGZkZWQ3NDNjZDRjYzUxIiwiaWF0IjoxNzkwNTAyODk3LCJleHAiOjE3OTExMDc2OTd9.5qCAtMY92iafcqcsqhJUdlXKvbcCeuH_GPj2oROZ5oc'}, **{})
+E    +      where delete = getattr(<starlette.testclient.TestClient object at 0x127a48830>, 'delete')
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_______________ test_normal_user_cannot_trigger_global_scheduler _______________
+backend/tests/test_followup_isolation.py:30: in test_normal_user_cannot_trigger_global_scheduler
+    assert client.post('/api/v1/followup/check', headers=auth_headers).status_code == 403
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/tmp/shunshi-verify-20260927/lib/python3.12/site-packages/httpx/_client.py:1144: in post
+    return self.request(
+/tmp/shunshi-verify-20260927/lib/python3.12/site-packages/starlette/testclient.py:463: in request
+    return super().request(
+/tmp/shunshi-verify-20260927/lib/python3.12/site-packages/httpx/_client.py:825: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/tmp/shunshi-verify-20260927/lib/python3.12/site-packages/httpx/_client.py:914: in send
+    response = self._send_handling_auth(
+/tmp/shunshi-verify-20260927/lib/python3.12/site-packages/httpx/_client.py:942: in _send_handling_auth
+    response = self._send_handling_redirects(
+/tmp/shunshi-verify-20260927/lib/python3.12/site-packages/httpx/_client.py:979: in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/tmp/shunshi-verify-20260927/lib/python3.12/site-packages/httpx/_client.py:1014: in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/tmp/shunshi-verify-20260927/lib/python3.12/site-packages/starlette/testclient.py:360: in handle_request
+    raise exc
+/tmp/shunshi-verify-20260927/lib/python3.12/site-packages/starlette/testclient.py:357: in handle_request
+    portal.call(self.app, scope, receive, send)
+/tmp/shunshi-verify-20260927/lib/python3.12/site-packages/anyio/from_thread.py:340: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../.local/share/uv/python/cpython-3.12.12-macos-aarch64-none/lib/python3.12/concurrent/futures/_base.py:456: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+../../../.local/share/uv/python/cpython-3.12.12-macos-aarch64-none/lib/python3.12/concurrent/futures/_base.py:401: in __get_result
+    raise self._exception
+/tmp/shunshi-verify-20260927/lib/python3.12/site-packages/anyio/from_thread.py:265: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+/tmp/shunshi-verify-20260927/lib/python3.12/site-packages/fastapi/applications.py:1163: in __call__
+    await super().__call__(scope, receive, send)
+/tmp/shunshi-verify-20260927/lib/python3.12/site-packages/starlette/applications.py:96: in __call__
+    await self.middleware_stack(scope, receive, send)
+/tmp/shunshi-verify-20260927/lib/python3.12/site-packages/starlette/middleware/errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+/tmp/shunshi-verify-20260927/lib/python3.12/site-packages/starlette/middleware/cors.py:91: in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+/tmp/shunshi-verify-20260927/lib/python3.12/site-packages/starlette/middleware/cors.py:149: in simple_response
+    await self.app(scope, receive, send)
+/tmp/shunshi-verify-20260927/lib/python3.12/site-packages/starlette/middleware/exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+/tmp/shunshi-verify-20260927/lib/python3.12/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+/tmp/shunshi-verify-20260927/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+/tmp/shunshi-verify-20260927/lib/python3.12/site-packages/starlette/routing.py:676: in __call__
+    await self.middleware_stack(scope, receive, send)
+/tmp/shunshi-verify-20260927/lib/python3.12/site-packages/fastapi/routing.py:2734: in app
+    await route.handle(scope, receive, send)
+/tmp/shunshi-verify-20260927/lib/python3.12/site-packages/fastapi/routing.py:1780: in handle
+    await self.original_router.handle(scope, receive, send)
+/tmp/shunshi-verify-20260927/lib/python3.12/site-packages/fastapi/routing.py:2789: in handle
+    await included_router._handle_selected(scope, receive, send)
+/tmp/shunshi-verify-20260927/lib/python3.12/site-packages/fastapi/routing.py:1800: in _handle_selected
+    await original_route.handle(scope, receive, send)
+/tmp/shunshi-verify-20260927/lib/python3.12/site-packages/fastapi/routing.py:1279: in handle
+    await app(scope, receive, send)
+/tmp/shunshi-verify-20260927/lib/python3.12/site-packages/fastapi/routing.py:158: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+/tmp/shunshi-verify-20260927/lib/python3.12/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+/tmp/shunshi-verify-20260927/lib/python3.12/site-packages/fastapi/routing.py:144: in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+/tmp/shunshi-verify-20260927/lib/python3.12/site-packages/fastapi/routing.py:706: in app
+    raw_response = await run_endpoint_function(
+/tmp/shunshi-verify-20260927/lib/python3.12/site-packages/fastapi/routing.py:352: in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend/app/router/followup.py:181: in check_and_trigger
+    results = followup_scheduler.check_and_trigger_due()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend/tests/test_followup_isolation.py:28: in <lambda>
+    monkeypatch.setattr(followup_scheduler, 'check_and_trigger_due', lambda: pytest.fail('must not run'))
+                                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: must not run
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+____________________ test_check_due_is_routable_and_scoped _____________________
+backend/tests/test_followup_isolation.py:36: in test_check_due_is_routable_and_scoped
+    assert response.status_code == 200
+E   assert 404 == 200
+E    +  where 404 = <Response [404 Not Found]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+=============================== warnings summary ===============================
+../../../../../tmp/shunshi-verify-20260927/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /tmp/shunshi-verify-20260927/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+backend/app/db/database.py:34
+  /Users/feifei00/Documents/CodexWorktrees/shunshi-production/backend/app/db/database.py:34: MovedIn20Warning: The ``declarative_base()`` function is now available as sqlalchemy.orm.declarative_base(). (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    Base = declarative_base()
+
+backend/app/core/settings.py:9
+  /Users/feifei00/Documents/CodexWorktrees/shunshi-production/backend/app/core/settings.py:9: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class Settings(BaseSettings):
+
+backend/app/router/ai_content.py:413
+  /Users/feifei00/Documents/CodexWorktrees/shunshi-production/backend/app/router/ai_content.py:413: FastAPIDeprecationWarning: `regex` has been deprecated, please use `pattern` instead
+    lang: str = Query("zh", regex="^(zh|en)$"),
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED backend/tests/test_followup_isolation.py::test_other_users_cannot_read_or_mutate_tasks[get]
+FAILED backend/tests/test_followup_isolation.py::test_other_users_cannot_read_or_mutate_tasks[put]
+FAILED backend/tests/test_followup_isolation.py::test_other_users_cannot_read_or_mutate_tasks[delete]
+FAILED backend/tests/test_followup_isolation.py::test_normal_user_cannot_trigger_global_scheduler
+FAILED backend/tests/test_followup_isolation.py::test_check_due_is_routable_and_scoped
+ERROR backend/tests/test_followup_isolation.py::test_normal_user_cannot_trigger_global_scheduler
+5 failed, 4 warnings, 1 error in 0.94s
