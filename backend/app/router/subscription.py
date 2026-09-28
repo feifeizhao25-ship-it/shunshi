@@ -1430,17 +1430,13 @@ def _product_id_to_plan(product_id: str) -> Optional[str]:
     if not product_id:
         return None
 
-    pid = product_id.lower()
-
-    # Apple 产品 ID 映射
-    if "yangxin" in pid:
-        return "yangxin"
-    elif "yiyang" in pid:
-        return "yiyang"
-    elif "jiahe" in pid:
-        return "jiahe"
-    elif "family" in pid:
-        return "jiahe"
+    aliases = {
+        f"com.shunshi.{name}.{period}": tier
+        for name, tier in (("yangxin", "yangxin"), ("yiyang", "yiyang"), ("jiahe", "jiahe"), ("family", "jiahe"))
+        for period in ("monthly", "yearly")
+    }
+    if product_id in aliases:
+        return aliases[product_id]
 
     # 后端内部产品 ID 映射
     for p in SUBSCRIPTION_PRODUCTS:
@@ -1534,82 +1530,39 @@ async def restore_purchase(
             "message": f"验证失败: {error_msg}",
         }
 
-    # ── 确定订阅计划 ──
-    plan_id = None
-    txn_id = request.transaction_id
+    if not verify_result or verify_result.get("valid") is not True:
+        return {"success": False, "code": "verification_required", "message": "请提供平台购买凭证，不能仅凭本地历史恢复会员"}
 
-    if verify_result and verify_result.get("valid"):
-        # 从验证结果中提取产品信息
-        product_id = verify_result.get("product_id", "")
-        txn_id = verify_result.get("transaction_id") or txn_id
-
-        # 产品 ID → 计划映射
-        plan_id = _product_id_to_plan(product_id)
-
-    if not plan_id:
-        # 回退到本地历史记录
-        if effective_user_id not in purchase_history or not purchase_history[effective_user_id]:
-            return {"success": False, "code": "no_history", "message": "未找到购买记录"}
-
-        target_purchase = None
-        for purchase in reversed(purchase_history[effective_user_id]):
-            if purchase.get("platform") in (request.platform, f"iap_{request.platform}"):
-                target_purchase = purchase
-                break
-
-        if not target_purchase:
-            return {
-                "success": False,
-                "code": "no_platform_history",
-                "message": f"未找到 {request.platform} 平台的购买记录",
-            }
-
-        plan_id = target_purchase["plan"]
-
-    if plan_id not in SUBSCRIPTION_PLANS:
-        plan_id = "yiyang"  # 默认恢复颐养版
-
+    product_id = verify_result.get("product_id", "")
+    plan_id = _product_id_to_plan(product_id)
+    if plan_id not in SUBSCRIPTION_PLANS or plan_id == "free":
+        return {"success": False, "code": "unknown_product", "message": "购买凭证中的商品未登记，请核对"}
     plan = SUBSCRIPTION_PLANS[plan_id]
+    txn_id = verify_result.get("transaction_id") if request.platform == "ios" else verify_result.get("order_id")
+    if not isinstance(txn_id, str) or not txn_id.strip():
+        return {"success": False, "code": "verify_failed", "message": "平台验证结果缺少交易编号"}
 
-    # ── 检查过期（验证结果中包含过期时间） ──
-    expires_at_ms = None
-    if verify_result and verify_result.get("valid"):
-        expires_at_ms = verify_result.get("expires_at_ms")
-
-    if expires_at_ms:
-        import time
-        if expires_at_ms < int(time.time() * 1000):
-            return {
-                "success": False,
-                "code": "expired",
-                "message": "订阅已过期，请重新订阅",
-            }
-
-    # ── 计算过期时间 ──
-    if expires_at_ms:
-        expires_at = datetime.fromtimestamp(expires_at_ms / 1000, tz=timezone.utc).isoformat()
-    else:
-        # 从产品 SKU 获取 duration
-        duration_days = 365
-        matched_product_id = verify_result.get("product_id") if verify_result else request.product_id
-        if matched_product_id:
-            for p in SUBSCRIPTION_PRODUCTS:
-                if p["product_id"] == matched_product_id:
-                    duration_days = p["duration_days"]
-                    break
-        # 如果从历史记录获取，尝试匹配计划
-        if duration_days == 365:
-            for p in SUBSCRIPTION_PRODUCTS:
-                if p["tier"] == plan_id and "yearly" in p["product_id"]:
-                    duration_days = p["duration_days"]
-                    break
-        expires_at = (now + timedelta(days=duration_days)).isoformat()
+    raw_expiry = verify_result.get("expires_at_ms" if request.platform == "ios" else "expiry_time_ms")
+    try:
+        if isinstance(raw_expiry, bool) or raw_expiry is None:
+            raise ValueError("missing expiry")
+        expiry_ms = Decimal(str(raw_expiry))
+        if not expiry_ms.is_finite() or expiry_ms != expiry_ms.to_integral_value():
+            raise ValueError("invalid expiry")
+        expiry = datetime.fromtimestamp(int(expiry_ms) / 1000, tz=timezone.utc)
+    except (ValueError, TypeError, OverflowError, OSError, InvalidOperation):
+        return {"success": False, "code": "verify_failed", "message": "平台验证结果缺少有效的订阅到期时间"}
+    if expiry <= now:
+        return {"success": False, "code": "expired", "message": "订阅已过期，请重新订阅"}
+    expires_at = expiry.isoformat()
 
     # ── 幂等检查 ──
     current_sub = _get_user_subscription_lazy(effective_user_id)
     if (current_sub.get("plan") == plan_id and
             current_sub.get("status") == "active" and
-            current_sub.get("restored")):
+            current_sub.get("restored") and
+            current_sub.get("transaction_id") == txn_id and
+            current_sub.get("expires_at") == expires_at):
         # 已恢复过，返回当前状态
         return {
             "success": True,
@@ -1626,7 +1579,7 @@ async def restore_purchase(
     # ── 激活订阅 ──
     auto_renew = True
     if verify_result and verify_result.get("valid"):
-        auto_renew = verify_result.get("auto_renew", True)
+        auto_renew = bool(verify_result.get("auto_renew" if request.platform == "ios" else "auto_renewing", False))
 
     # 收据 hash（不存储明文）
     receipt_hash = None

@@ -681,110 +681,53 @@ class TestExpiryRollback:
 
 
 class TestRestorePurchaseFlow:
-    """恢复购买测试"""
+    """Only verified platform expiry may restore membership."""
 
     @pytest.mark.asyncio
-    async def test_restore_valid_subscription(self, client):
-        """有购买历史时恢复成功"""
-        from app.router import subscription as sub_mod
-        user_id = "user-restore-001"
-        # 手动设置 ios 平台购买历史 (模拟之前通过 IAP 购买)
-        sub_mod.purchase_history[user_id] = [{
-            "plan": "yiyang",
-            "price_cents": 39900,
-            "platform": "ios",
-            "order_id": "ord-restore-001",
-            "order_no": "SHUNSHI-20260318-RESTORE001",
-            "trade_no": "TXN_RESTORE_001",
-            "subscribed_at": datetime.now(timezone.utc).isoformat(),
-        }]
-
-        # 恢复购买 (无 receipt，回退到本地历史)
-        resp = await client.post(
-            f"{API_BASE}/restore",
-            json={"platform": "ios"},
-            params={"user_id": user_id},
-        )
+    async def test_restore_valid_subscription(self, client, monkeypatch):
+        from unittest.mock import AsyncMock
+        expiry = int((datetime.now(timezone.utc) + timedelta(days=3)).timestamp() * 1000)
+        monkeypatch.setattr("app.services.apple_receipt.verify_apple_receipt", AsyncMock(return_value={
+            "valid": True, "product_id": "com.shunshi.yiyang.yearly",
+            "transaction_id": "verified-flow", "expires_at_ms": expiry,
+        }))
+        resp = await client.post(f"{API_BASE}/restore", json={"platform": "ios", "receipt": "fixture"}, params={"user_id": "user-restore-001"})
         assert resp.status_code == 200
-        data = resp.json()
-        assert data["success"] is True
-        assert data["data"]["plan"] == "yiyang"
+        assert resp.json()["success"] is True
+        assert resp.json()["data"]["expires_at"] == datetime.fromtimestamp(expiry / 1000, timezone.utc).isoformat()
 
     @pytest.mark.asyncio
-    async def test_restore_expired_subscription(self, client):
-        """有购买历史但平台不匹配时返回错误"""
-        from app.router import subscription as sub_mod
-        user_id = "user-restore-exp"
-        # 只有 alipay 购买历史
-        sub_mod.purchase_history[user_id] = [{
-            "plan": "yangxin",
-            "price_cents": 2900,
-            "platform": "alipay",
-            "subscribed_at": datetime.now(timezone.utc).isoformat(),
-        }]
-
-        # 用 android 平台恢复 — 找不到 android 历史
-        resp = await client.post(
-            f"{API_BASE}/restore",
-            json={"platform": "android"},
-            params={"user_id": user_id},
-        )
-        # 没有 android/iap_android 历史记录
-        assert resp.status_code == 200
-        # 回退: 没有 iap_android 也没有 android 平台的历史
-        # 最后会匹配到 alipay (fallback), 取第一个 reversed match
-        # 但 platform check: alipay 不匹配 android 也不匹配 iap_android
-        data = resp.json()
-        # 如果找不到，success=False
-        # 但 restore 端点的 fallback 逻辑会匹配 alipay 因为 request.platform=android, 
-        # purchase.platform=alipay 不在 (android, iap_android) 中
-        # 所以会返回 no_platform_history
-        if not data["success"]:
-            assert data["code"] == "no_platform_history"
+    async def test_restore_expired_subscription(self, client, monkeypatch):
+        from unittest.mock import AsyncMock
+        monkeypatch.setattr("app.services.apple_receipt.verify_apple_receipt", AsyncMock(return_value={
+            "valid": True, "product_id": "com.shunshi.yiyang.yearly",
+            "transaction_id": "expired-flow", "expires_at_ms": 1,
+        }))
+        resp = await client.post(f"{API_BASE}/restore", json={"platform": "ios", "receipt": "fixture"}, params={"user_id": "user-restore-exp"})
+        assert resp.json()["success"] is False
+        assert resp.json()["code"] == "expired"
 
     @pytest.mark.asyncio
     async def test_restore_no_purchase_history(self, client):
-        """无购买历史恢复失败"""
-        resp = await client.post(
-            f"{API_BASE}/restore",
-            json={"platform": "ios"},
-            params={"user_id": "user-no-history"},
-        )
+        resp = await client.post(f"{API_BASE}/restore", json={"platform": "ios"}, params={"user_id": "user-no-history"})
         assert resp.status_code == 200
-        data = resp.json()
-        assert data["success"] is False
-        assert data["code"] == "no_history"
+        assert resp.json()["success"] is False
+        assert resp.json()["code"] == "verification_required"
 
     @pytest.mark.asyncio
-    async def test_restore_idempotent(self, client):
-        """重复恢复不影响结果 (幂等)"""
-        from app.router import subscription as sub_mod
-        user_id = "user-restore-idem"
-        # 手动设置 ios 平台购买历史
-        sub_mod.purchase_history[user_id] = [{
-            "plan": "yangxin",
-            "price_cents": 19900,
-            "platform": "ios",
-            "subscribed_at": datetime.now(timezone.utc).isoformat(),
-        }]
-
-        # 第一次恢复
-        resp1 = await client.post(
-            f"{API_BASE}/restore",
-            json={"platform": "ios"},
-            params={"user_id": user_id},
-        )
-        assert resp1.json()["success"] is True
-
-        # 第二次恢复 (幂等)
-        resp2 = await client.post(
-            f"{API_BASE}/restore",
-            json={"platform": "ios"},
-            params={"user_id": user_id},
-        )
-        assert resp2.status_code == 200
-        data2 = resp2.json()
-        assert data2["success"] is True
+    async def test_restore_idempotent(self, client, monkeypatch):
+        from unittest.mock import AsyncMock
+        expiry = int((datetime.now(timezone.utc) + timedelta(days=3)).timestamp() * 1000)
+        monkeypatch.setattr("app.services.apple_receipt.verify_apple_receipt", AsyncMock(return_value={
+            "valid": True, "product_id": "com.shunshi.yiyang.yearly",
+            "transaction_id": "idempotent-flow", "expires_at_ms": expiry,
+        }))
+        args = {"json": {"platform": "ios", "receipt": "fixture"}, "params": {"user_id": "user-restore-idem"}}
+        first = await client.post(f"{API_BASE}/restore", **args)
+        second = await client.post(f"{API_BASE}/restore", **args)
+        assert first.json()["success"] is True
+        assert second.json()["code"] == "already_restored"
+        assert second.json()["data"]["expires_at"] == first.json()["data"]["expires_at"]
 
 
 # ============================================================

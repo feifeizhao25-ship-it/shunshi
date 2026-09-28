@@ -147,9 +147,21 @@ async def _verify_with_apple(
                 "error": "Apple 收据所属应用不匹配",
             }
 
-        # 提取最新交易信息
-        transaction_info = latest_receipt[0] if latest_receipt else {}
-        renewal_info = pending_renewal[0] if pending_renewal else {}
+        # Select a transaction actually returned by Apple, never a client-supplied ID.
+        candidates = latest_receipt or receipt.get("in_app", [])
+        if transaction_id:
+            candidates = [item for item in candidates if transaction_id in (
+                item.get("transaction_id"), item.get("original_transaction_id"))]
+        if not candidates:
+            return {"valid": False, "status": -1, "error": "收据中没有匹配的订阅交易"}
+        transaction_info = max(candidates, key=lambda item: int(item.get("expires_date_ms") or 0))
+        if transaction_info.get("cancellation_date_ms") or transaction_info.get("cancellation_date"):
+            return {"valid": False, "status": -1, "error": "该交易已退款或撤销"}
+        if not transaction_info.get("transaction_id") or not transaction_info.get("expires_date_ms"):
+            return {"valid": False, "status": -1, "error": "订阅交易缺少必要信息"}
+        renewal_info = next((item for item in pending_renewal if
+            item.get("original_transaction_id") == transaction_info.get("original_transaction_id") and
+            item.get("product_id") == transaction_info.get("product_id")), {})
 
         # 过期时间（毫秒级时间戳）
         expires_at_ms = None
@@ -172,9 +184,7 @@ async def _verify_with_apple(
         product_id = transaction_info.get("product_id") or receipt.get("product_id")
 
         # 交易 ID
-        txn_id = (transaction_id or
-                  transaction_info.get("original_transaction_id") or
-                  transaction_info.get("transaction_id"))
+        txn_id = transaction_info["transaction_id"]
 
         return {
             "valid": True,

@@ -16,6 +16,7 @@
 """
 
 import pytest
+from app.security import verify_token
 import asyncio
 from unittest.mock import AsyncMock, patch, MagicMock
 from datetime import datetime, timedelta
@@ -28,12 +29,14 @@ import time
 class TestIOSRestorePurchase:
     """iOS 恢复购买"""
 
-    def test_restore_ios_valid_receipt(self, client):
+    def test_restore_ios_valid_receipt(self, client, auth_headers, settings):
+        client.headers.update(auth_headers)
+        actor = verify_token(settings, auth_headers["Authorization"].removeprefix("Bearer "))
         """iOS 有效收据 → 恢复权益"""
         # 先创建购买历史
         client.post(
             "/api/v1/subscription/subscribe",
-            params={"user_id": "restore-ios-user"},
+            params={"user_id": actor},
             json={"plan": "yiyang", "platform": "ios"},
         )
 
@@ -41,7 +44,7 @@ class TestIOSRestorePurchase:
         mock_result = {
             "valid": True,
             "status": 0,
-            "expires_at_ms": None,
+            "expires_at_ms": int((time.time() + 86400) * 1000),
             "product_id": "com.shunshi.yiyang.yearly",
             "transaction_id": "IOS_TXN_RESTORE_001",
             "bundle_id": "com.shunshi.app",
@@ -54,7 +57,7 @@ class TestIOSRestorePurchase:
         with patch("app.services.apple_receipt.verify_apple_receipt", new_callable=AsyncMock, return_value=mock_result):
             response = client.post(
                 "/api/v1/subscription/restore",
-                params={"user_id": "restore-ios-user"},
+                params={"user_id": actor},
                 json={
                     "platform": "ios",
                     "receipt": "MOCK_IOS_RECEIPT_VALID_DATA_1234567890",
@@ -68,12 +71,14 @@ class TestIOSRestorePurchase:
         assert data.get("code") in ("restored", "already_restored")
 
         # 验证订阅已恢复
-        sub_resp = client.get("/api/v1/subscription?user_id=restore-ios-user")
+        sub_resp = client.get(f"/api/v1/subscription?user_id={actor}")
         sub_data = sub_resp.json().get("data", {})
         assert sub_data.get("plan") == "yiyang"
         assert sub_data.get("status") == "active"
 
-    def test_restore_ios_invalid_receipt(self, client):
+    def test_restore_ios_invalid_receipt(self, client, auth_headers, settings):
+        client.headers.update(auth_headers)
+        actor = verify_token(settings, auth_headers["Authorization"].removeprefix("Bearer "))
         """iOS 无效收据 → 拒绝"""
         mock_result = {
             "valid": False,
@@ -84,7 +89,7 @@ class TestIOSRestorePurchase:
         with patch("app.services.apple_receipt.verify_apple_receipt", new_callable=AsyncMock, return_value=mock_result):
             response = client.post(
                 "/api/v1/subscription/restore",
-                params={"user_id": "restore-ios-invalid-user"},
+                params={"user_id": actor},
                 json={
                     "platform": "ios",
                     "receipt": "INVALID_RECEIPT",
@@ -97,7 +102,9 @@ class TestIOSRestorePurchase:
         assert data.get("success") is False
         assert data.get("code") == "verify_failed"
 
-    def test_restore_ios_expired_receipt(self, client):
+    def test_restore_ios_expired_receipt(self, client, auth_headers, settings):
+        client.headers.update(auth_headers)
+        actor = verify_token(settings, auth_headers["Authorization"].removeprefix("Bearer "))
         """iOS 过期收据 → 告知用户"""
         mock_result = {
             "valid": False,
@@ -108,7 +115,7 @@ class TestIOSRestorePurchase:
         with patch("app.services.apple_receipt.verify_apple_receipt", new_callable=AsyncMock, return_value=mock_result):
             response = client.post(
                 "/api/v1/subscription/restore",
-                params={"user_id": "restore-ios-expired-user"},
+                params={"user_id": actor},
                 json={
                     "platform": "ios",
                     "receipt": "EXPIRED_RECEIPT_DATA",
@@ -120,18 +127,20 @@ class TestIOSRestorePurchase:
         assert data.get("success") is False
         assert data.get("code") == "expired"
 
-    def test_restore_ios_no_receipt_fallback(self, client):
+    def test_restore_ios_no_receipt_fallback(self, client, auth_headers, settings):
+        client.headers.update(auth_headers)
+        actor = verify_token(settings, auth_headers["Authorization"].removeprefix("Bearer "))
         """iOS 无 receipt 时回退到本地历史"""
         # 先创建购买历史
         client.post(
             "/api/v1/subscription/subscribe",
-            params={"user_id": "restore-ios-fallback-user"},
+            params={"user_id": actor},
             json={"plan": "yangxin", "platform": "ios"},
         )
 
         response = client.post(
             "/api/v1/subscription/restore",
-            params={"user_id": "restore-ios-fallback-user"},
+            params={"user_id": actor},
             json={
                 "platform": "ios",
             },
@@ -140,7 +149,7 @@ class TestIOSRestorePurchase:
         assert response.status_code == 200
         data = response.json()
         assert data.get("success") is False
-        assert data["code"] == "no_history"
+        assert data["code"] == "verification_required"
 
 
 # ==================== Android 恢复购买 ====================
@@ -148,18 +157,20 @@ class TestIOSRestorePurchase:
 class TestAndroidRestorePurchase:
     """Android 恢复购买"""
 
-    def test_restore_android_valid_token(self, client):
+    def test_restore_android_valid_token(self, client, auth_headers, settings):
+        client.headers.update(auth_headers)
+        actor = verify_token(settings, auth_headers["Authorization"].removeprefix("Bearer "))
         """Android 有效令牌 → 恢复权益"""
         # 先创建购买历史
         client.post(
             "/api/v1/subscription/subscribe",
-            params={"user_id": "restore-android-user"},
+            params={"user_id": actor},
             json={"plan": "jiahe", "platform": "android"},
         )
 
         mock_result = {
             "valid": True,
-            "expiry_time_ms": None,
+            "expiry_time_ms": int((time.time() + 86400) * 1000),
             "auto_renewing": True,
             "product_id": "com.shunshi.jiahe.yearly",
             "purchase_token": "MOCK_ANDROID_TOKEN",
@@ -170,7 +181,7 @@ class TestAndroidRestorePurchase:
         with patch("app.services.google_purchase.verify_google_purchase", new_callable=AsyncMock, return_value=mock_result):
             response = client.post(
                 "/api/v1/subscription/restore",
-                params={"user_id": "restore-android-user"},
+                params={"user_id": actor},
                 json={
                     "platform": "android",
                     "purchase_token": "MOCK_ANDROID_TOKEN_1234567890",
@@ -183,12 +194,14 @@ class TestAndroidRestorePurchase:
         assert data.get("success") is True, f"恢复购买应成功: {data}"
 
         # 验证订阅已恢复
-        sub_resp = client.get("/api/v1/subscription?user_id=restore-android-user")
+        sub_resp = client.get(f"/api/v1/subscription?user_id={actor}")
         sub_data = sub_resp.json().get("data", {})
         assert sub_data.get("plan") == "jiahe"
         assert sub_data.get("status") == "active"
 
-    def test_restore_android_invalid_token(self, client):
+    def test_restore_android_invalid_token(self, client, auth_headers, settings):
+        client.headers.update(auth_headers)
+        actor = verify_token(settings, auth_headers["Authorization"].removeprefix("Bearer "))
         """Android 无效令牌 → 拒绝"""
         mock_result = {
             "valid": False,
@@ -200,7 +213,7 @@ class TestAndroidRestorePurchase:
         with patch("app.services.google_purchase.verify_google_purchase", new_callable=AsyncMock, return_value=mock_result):
             response = client.post(
                 "/api/v1/subscription/restore",
-                params={"user_id": "restore-android-invalid-user"},
+                params={"user_id": actor},
                 json={
                     "platform": "android",
                     "purchase_token": "SHORT",
@@ -213,17 +226,19 @@ class TestAndroidRestorePurchase:
         assert data.get("success") is False
         assert data.get("code") == "verify_failed"
 
-    def test_restore_android_no_token_fallback(self, client):
+    def test_restore_android_no_token_fallback(self, client, auth_headers, settings):
+        client.headers.update(auth_headers)
+        actor = verify_token(settings, auth_headers["Authorization"].removeprefix("Bearer "))
         """Android 无 token 时回退到本地历史"""
         client.post(
             "/api/v1/subscription/subscribe",
-            params={"user_id": "restore-android-fallback-user"},
+            params={"user_id": actor},
             json={"plan": "yiyang", "platform": "android"},
         )
 
         response = client.post(
             "/api/v1/subscription/restore",
-            params={"user_id": "restore-android-fallback-user"},
+            params={"user_id": actor},
             json={
                 "platform": "android",
             },
@@ -232,7 +247,7 @@ class TestAndroidRestorePurchase:
         assert response.status_code == 200
         data = response.json()
         assert data.get("success") is False
-        assert data["code"] == "no_history"
+        assert data["code"] == "verification_required"
 
 
 # ==================== 边界情况 ====================
@@ -240,13 +255,15 @@ class TestAndroidRestorePurchase:
 class TestRestoreEdgeCases:
     """恢复购买边界情况"""
 
-    def test_restore_no_purchase_history(self, client):
+    def test_restore_no_purchase_history(self, client, auth_headers, settings):
+        client.headers.update(auth_headers)
+        actor = verify_token(settings, auth_headers["Authorization"].removeprefix("Bearer "))
         """无购买历史 + 验证失败 → 应失败"""
         mock_result = {
             "valid": True,
             "product_id": "unknown.product.id",
             "transaction_id": "TXN_UNKNOWN",
-            "expires_at_ms": None,
+            "expires_at_ms": int((time.time() + 86400) * 1000),
             "auto_renew": True,
             "error": None,
         }
@@ -254,7 +271,7 @@ class TestRestoreEdgeCases:
         with patch("app.services.apple_receipt.verify_apple_receipt", new_callable=AsyncMock, return_value=mock_result):
             response = client.post(
                 "/api/v1/subscription/restore",
-                params={"user_id": "restore-no-history-user-2"},
+                params={"user_id": actor},
                 json={
                     "platform": "ios",
                     "receipt": "SOME_RECEIPT",
@@ -265,11 +282,13 @@ class TestRestoreEdgeCases:
         data = response.json()
         assert data.get("success") is False
 
-    def test_restore_idempotent(self, client):
+    def test_restore_idempotent(self, client, auth_headers, settings):
+        client.headers.update(auth_headers)
+        actor = verify_token(settings, auth_headers["Authorization"].removeprefix("Bearer "))
         """幂等操作：重复调用不影响"""
         client.post(
             "/api/v1/subscription/subscribe",
-            params={"user_id": "restore-idempotent-user"},
+            params={"user_id": actor},
             json={"plan": "yiyang", "platform": "ios"},
         )
 
@@ -277,7 +296,7 @@ class TestRestoreEdgeCases:
             "valid": True,
             "product_id": "com.shunshi.yiyang.yearly",
             "transaction_id": "TXN_IDEMPOTENT",
-            "expires_at_ms": None,
+            "expires_at_ms": int((time.time() + 86400) * 1000),
             "auto_renew": True,
             "error": None,
         }
@@ -286,7 +305,7 @@ class TestRestoreEdgeCases:
             # 第一次恢复
             r1 = client.post(
                 "/api/v1/subscription/restore",
-                params={"user_id": "restore-idempotent-user"},
+                params={"user_id": actor},
                 json={
                     "platform": "ios",
                     "receipt": "RECEIPT_IDEMPOTENT",
@@ -298,7 +317,7 @@ class TestRestoreEdgeCases:
             # 第二次恢复（幂等）
             r2 = client.post(
                 "/api/v1/subscription/restore",
-                params={"user_id": "restore-idempotent-user"},
+                params={"user_id": actor},
                 json={
                     "platform": "ios",
                     "receipt": "RECEIPT_IDEMPOTENT",
@@ -309,18 +328,20 @@ class TestRestoreEdgeCases:
             assert r2.json().get("code") == "already_restored"
 
             # 状态一致
-            sub = client.get("/api/v1/subscription?user_id=restore-idempotent-user")
+            sub = client.get(f"/api/v1/subscription?user_id={actor}")
             sub_data = sub.json().get("data", {})
             assert sub_data.get("plan") == "yiyang"
 
-    def test_restore_receipt_hashed_not_plaintext(self, client):
+    def test_restore_receipt_hashed_not_plaintext(self, client, auth_headers, settings):
+        client.headers.update(auth_headers)
+        actor = verify_token(settings, auth_headers["Authorization"].removeprefix("Bearer "))
         """收据不存储明文，使用 hash"""
         receipt_data = "SENSITIVE_RECEIPT_DATA_SHOULD_NOT_BE_STORED"
         expected_hash = hashlib.sha256(receipt_data.encode()).hexdigest()[:32]
 
         client.post(
             "/api/v1/subscription/subscribe",
-            params={"user_id": "restore-hash-user"},
+            params={"user_id": actor},
             json={"plan": "yiyang", "platform": "ios"},
         )
 
@@ -328,7 +349,7 @@ class TestRestoreEdgeCases:
             "valid": True,
             "product_id": "com.shunshi.yiyang.yearly",
             "transaction_id": "TXN_HASH_TEST",
-            "expires_at_ms": None,
+            "expires_at_ms": int((time.time() + 86400) * 1000),
             "auto_renew": True,
             "error": None,
         }
@@ -336,7 +357,7 @@ class TestRestoreEdgeCases:
         with patch("app.services.apple_receipt.verify_apple_receipt", new_callable=AsyncMock, return_value=mock_result):
             client.post(
                 "/api/v1/subscription/restore",
-                params={"user_id": "restore-hash-user"},
+                params={"user_id": actor},
                 json={
                     "platform": "ios",
                     "receipt": receipt_data,
@@ -346,7 +367,8 @@ class TestRestoreEdgeCases:
 
         # 检查购买历史中不包含明文收据
         from app.router.subscription import purchase_history
-        history = purchase_history.get("restore-hash-user", [])
+        history = purchase_history.get(actor, [])
+        assert history, "成功恢复必须留下历史记录"
         for record in history:
             if record.get("source") == "restore":
                 assert receipt_data not in record.get("receipt_hash", ""), \
@@ -355,11 +377,13 @@ class TestRestoreEdgeCases:
                     "应存储收据 hash"
                 break
 
-    def test_restore_unsupported_platform(self, client):
+    def test_restore_unsupported_platform(self, client, auth_headers, settings):
+        client.headers.update(auth_headers)
+        actor = verify_token(settings, auth_headers["Authorization"].removeprefix("Bearer "))
         """不支持的平台应返回 400"""
         response = client.post(
             "/api/v1/subscription/restore",
-            params={"user_id": "restore-bad-platform-user"},
+            params={"user_id": actor},
             json={
                 "platform": "windows",
             },
