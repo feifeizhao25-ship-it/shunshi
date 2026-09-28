@@ -4,7 +4,7 @@
 """
 import uuid
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional, List, Literal
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
@@ -16,19 +16,19 @@ router = APIRouter(prefix="/api/v1/smart-alarm", tags=["smart-alarm"])
 
 _SHICHEN_ALARMS = [
     {"type": "wake_up",      "time": "07:00", "shichen": "辰时 (07-09)",
-     "organ": "胃", "reason": "辰时胃经当令，此时起床进食早餐最佳"},
+     "organ": None, "reason": "示例时间，请按自己的工作、休息和生活安排调整"},
     {"type": "breakfast",    "time": "07:30", "shichen": "辰时 (07-09)",
-     "organ": "胃", "reason": "辰时胃气最旺，适合进食早餐补充能量"},
+     "organ": None, "reason": "示例时间，请按自己的工作、休息和生活安排调整"},
     {"type": "exercise",     "time": "06:30", "shichen": "卯时 (05-07)",
-     "organ": "大肠", "reason": "卯时大肠经当令，晨练有助排毒"},
+     "organ": None, "reason": "示例时间，请按自己的工作、休息和生活安排调整"},
     {"type": "lunch",        "time": "12:00", "shichen": "午时 (11-13)",
-     "organ": "心", "reason": "午时稍事休息，养心护神"},
+     "organ": None, "reason": "示例时间，请按自己的工作、休息和生活安排调整"},
     {"type": "afternoon_rest", "time": "13:00", "shichen": "未时 (13-15)",
-     "organ": "小肠", "reason": "未时小肠经当令，午休片刻助消化"},
+     "organ": None, "reason": "示例时间，请按自己的工作、休息和生活安排调整"},
     {"type": "meditation",   "time": "17:00", "shichen": "酉时 (17-19)",
-     "organ": "肾", "reason": "酉时肾经当令，适合冥想养肾"},
+     "organ": None, "reason": "示例时间，请按自己的工作、休息和生活安排调整"},
     {"type": "sleep",        "time": "22:30", "shichen": "亥时 (21-23)",
-     "organ": "三焦", "reason": "亥时三焦经当令，23:00前入睡保护肝胆"},
+     "organ": None, "reason": "示例时间，请按自己的工作、休息和生活安排调整"},
 ]
 
 _SOUNDS = [
@@ -43,17 +43,17 @@ _SOUNDS = [
 
 class AlarmIn(BaseModel):
     user_id: str
-    type: str
-    time: str = Field(..., pattern=r"^\d{2}:\d{2}$")
-    days: List[str] = []
-    sound: str = "morning_bell"
+    type: str = Field(..., min_length=1, max_length=32)
+    time: str = Field(..., pattern=r"^(?:[01][0-9]|2[0-3]):[0-5][0-9]$")
+    days: List[Literal["mon", "tue", "wed", "thu", "fri", "sat", "sun"]] = Field(default_factory=list, max_length=7)
+    sound: Literal["morning_bell", "bamboo_flute", "nature_birds", "guqin", "bowl_bell", "spring_rain"] = "morning_bell"
     shichen_aligned: bool = False
 
 
 class AlarmUpdateIn(BaseModel):
-    time: Optional[str] = Field(None, pattern=r"^\d{2}:\d{2}$")
-    days: Optional[List[str]] = None
-    sound: Optional[str] = None
+    time: Optional[str] = Field(None, pattern=r"^(?:[01][0-9]|2[0-3]):[0-5][0-9]$")
+    days: Optional[List[Literal["mon", "tue", "wed", "thu", "fri", "sat", "sun"]]] = Field(None, max_length=7)
+    sound: Optional[Literal["morning_bell", "bamboo_flute", "nature_birds", "guqin", "bowl_bell", "spring_rain"]] = None
     enabled: Optional[bool] = None
 
 
@@ -75,18 +75,18 @@ def recommend_alarms(
     constitution: Optional[str] = Query(None),
     lifestyle: Optional[str] = Query(None),
 ):
-    recommendations = _SHICHEN_ALARMS.copy()
+    recommendations = [dict(item) for item in _SHICHEN_ALARMS]
     # For yang-deficiency: suggest earlier sleep
     if constitution == "yang_deficiency":
         for r in recommendations:
             if r["type"] == "sleep":
                 r["time"] = "22:00"
-                r["reason"] += "（阳虚体质更应早睡温养）"
+                r["reason"] = "较早入睡的示例时间，请按实际作息调整，不代表体质诊断或治疗建议"
     return {
         "success": True,
         "data": {
             "recommendations": recommendations,
-            "principle": "顺时闹钟依据十二时辰经络运行规律设定，助您顺应自然节律作息。",
+            "principle": "以下为作息提醒示例，时辰名称仅作传统文化说明，不代表最佳生理时间或医疗建议。",
         }
     }
 
