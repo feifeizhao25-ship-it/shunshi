@@ -1,6 +1,6 @@
 """
 健康数据集成与 TCM 分析 - 单元测试
-覆盖数据同步、TCM 分析规则、体质评分、个性化建议及数据删除功能。
+覆盖数据同步、非诊断性说明、禁止虚构评分、记录建议及数据删除。
 """
 
 import pytest
@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 # 假设 FastAPI app 已正确导入
 from app.main import app
 
-client = TestClient(app)
+from app.security import verify_token
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -21,10 +21,12 @@ client = TestClient(app)
 class TestHealthDataSync:
     """POST /api/v1/health-data/sync 端点测试"""
 
-    def test_sync_steps_under_3000(self):
-        """步数 < 3000 → 重度气虚"""
+    def test_sync_steps_under_3000(self, client, auth_headers, settings):
+        client.headers.update(auth_headers)
+        actor = verify_token(settings, auth_headers["Authorization"].removeprefix("Bearer "))
+        """步数 < 3000：只记录，不推导体质"""
         payload = {
-            "user_id": "user_sync_001",
+            "user_id": actor,
             "data_type": "steps",
             "value": 2500,
             "unit": "steps",
@@ -35,13 +37,15 @@ class TestHealthDataSync:
         assert response.status_code == 200
         data = response.json()
         assert data["success"] is True
-        assert data["data"]["tcm_analysis"]["constitution"] == "重度气虚"
-        assert data["data"]["tcm_analysis"]["score"] == 90
+        assert data["data"]["tcm_analysis"]["constitution"] == "无法仅凭该数据判定体质"
+        assert data["data"]["tcm_analysis"]["score"] is None
 
-    def test_sync_steps_between_3000_5000(self):
-        """步数 3000-5000 → 轻度气虚"""
+    def test_sync_steps_between_3000_5000(self, client, auth_headers, settings):
+        client.headers.update(auth_headers)
+        actor = verify_token(settings, auth_headers["Authorization"].removeprefix("Bearer "))
+        """步数 3000-5000：只记录，不推导体质"""
         payload = {
-            "user_id": "user_sync_002",
+            "user_id": actor,
             "data_type": "steps",
             "value": 4500,
             "unit": "steps",
@@ -51,13 +55,15 @@ class TestHealthDataSync:
         response = client.post("/api/v1/health-data/sync", json=payload)
         assert response.status_code == 200
         data = response.json()
-        assert data["data"]["tcm_analysis"]["constitution"] == "轻度气虚"
-        assert data["data"]["tcm_analysis"]["score"] == 65
+        assert data["data"]["tcm_analysis"]["constitution"] == "无法仅凭该数据判定体质"
+        assert data["data"]["tcm_analysis"]["score"] is None
 
-    def test_sync_steps_8000_12000(self):
-        """步数 8000-12000 → 气血均衡"""
+    def test_sync_steps_8000_12000(self, client, auth_headers, settings):
+        client.headers.update(auth_headers)
+        actor = verify_token(settings, auth_headers["Authorization"].removeprefix("Bearer "))
+        """步数 8000-12000：只记录，不推导体质"""
         payload = {
-            "user_id": "user_sync_003",
+            "user_id": actor,
             "data_type": "steps",
             "value": 10000,
             "unit": "steps",
@@ -67,13 +73,15 @@ class TestHealthDataSync:
         response = client.post("/api/v1/health-data/sync", json=payload)
         assert response.status_code == 200
         data = response.json()
-        assert data["data"]["tcm_analysis"]["constitution"] == "气血均衡"
-        assert data["data"]["tcm_analysis"]["score"] == 10
+        assert data["data"]["tcm_analysis"]["constitution"] == "无法仅凭该数据判定体质"
+        assert data["data"]["tcm_analysis"]["score"] is None
 
-    def test_sync_steps_over_12000(self):
-        """步数 > 12000 → 气血充足"""
+    def test_sync_steps_over_12000(self, client, auth_headers, settings):
+        client.headers.update(auth_headers)
+        actor = verify_token(settings, auth_headers["Authorization"].removeprefix("Bearer "))
+        """步数 > 12000：只记录，不推导体质"""
         payload = {
-            "user_id": "user_sync_004",
+            "user_id": actor,
             "data_type": "steps",
             "value": 15000,
             "unit": "steps",
@@ -83,13 +91,15 @@ class TestHealthDataSync:
         response = client.post("/api/v1/health-data/sync", json=payload)
         assert response.status_code == 200
         data = response.json()
-        assert data["data"]["tcm_analysis"]["constitution"] == "气血充足"
-        assert data["data"]["tcm_analysis"]["score"] == 5
+        assert data["data"]["tcm_analysis"]["constitution"] == "无法仅凭该数据判定体质"
+        assert data["data"]["tcm_analysis"]["score"] is None
 
-    def test_sync_sleep_under_5_hours(self):
-        """睡眠 < 5 小时 → 重度心神失养"""
+    def test_sync_sleep_under_5_hours(self, client, auth_headers, settings):
+        client.headers.update(auth_headers)
+        actor = verify_token(settings, auth_headers["Authorization"].removeprefix("Bearer "))
+        """睡眠 < 5 小时：只记录，不推导体质"""
         payload = {
-            "user_id": "user_sync_005",
+            "user_id": actor,
             "data_type": "sleep",
             "value": 4.5,
             "unit": "hours",
@@ -99,13 +109,15 @@ class TestHealthDataSync:
         response = client.post("/api/v1/health-data/sync", json=payload)
         assert response.status_code == 200
         data = response.json()
-        assert data["data"]["tcm_analysis"]["constitution"] == "重度心神失养"
-        assert data["data"]["tcm_analysis"]["score"] == 95
+        assert data["data"]["tcm_analysis"]["constitution"] == "无法仅凭该数据判定体质"
+        assert data["data"]["tcm_analysis"]["score"] is None
 
-    def test_sync_sleep_5_6_hours(self):
-        """睡眠 5-6 小时 → 轻度心神失养"""
+    def test_sync_sleep_5_6_hours(self, client, auth_headers, settings):
+        client.headers.update(auth_headers)
+        actor = verify_token(settings, auth_headers["Authorization"].removeprefix("Bearer "))
+        """睡眠 5-6 小时：只记录，不推导体质"""
         payload = {
-            "user_id": "user_sync_006",
+            "user_id": actor,
             "data_type": "sleep",
             "value": 5.5,
             "unit": "hours",
@@ -115,13 +127,15 @@ class TestHealthDataSync:
         response = client.post("/api/v1/health-data/sync", json=payload)
         assert response.status_code == 200
         data = response.json()
-        assert data["data"]["tcm_analysis"]["constitution"] == "轻度心神失养"
-        assert data["data"]["tcm_analysis"]["score"] == 60
+        assert data["data"]["tcm_analysis"]["constitution"] == "无法仅凭该数据判定体质"
+        assert data["data"]["tcm_analysis"]["score"] is None
 
-    def test_sync_sleep_7_8_hours(self):
-        """睡眠 7-8 小时 → 心神得养"""
+    def test_sync_sleep_7_8_hours(self, client, auth_headers, settings):
+        client.headers.update(auth_headers)
+        actor = verify_token(settings, auth_headers["Authorization"].removeprefix("Bearer "))
+        """睡眠 7-8 小时：只记录，不推导体质"""
         payload = {
-            "user_id": "user_sync_007",
+            "user_id": actor,
             "data_type": "sleep",
             "value": 7.5,
             "unit": "hours",
@@ -131,13 +145,15 @@ class TestHealthDataSync:
         response = client.post("/api/v1/health-data/sync", json=payload)
         assert response.status_code == 200
         data = response.json()
-        assert data["data"]["tcm_analysis"]["constitution"] == "心神得养"
-        assert data["data"]["tcm_analysis"]["score"] == 5
+        assert data["data"]["tcm_analysis"]["constitution"] == "无法仅凭该数据判定体质"
+        assert data["data"]["tcm_analysis"]["score"] is None
 
-    def test_sync_sleep_over_8_hours(self):
-        """睡眠 > 8 小时 → 睡眠过度"""
+    def test_sync_sleep_over_8_hours(self, client, auth_headers, settings):
+        client.headers.update(auth_headers)
+        actor = verify_token(settings, auth_headers["Authorization"].removeprefix("Bearer "))
+        """睡眠 > 8 小时：只记录，不推导体质"""
         payload = {
-            "user_id": "user_sync_008",
+            "user_id": actor,
             "data_type": "sleep",
             "value": 9.0,
             "unit": "hours",
@@ -147,13 +163,15 @@ class TestHealthDataSync:
         response = client.post("/api/v1/health-data/sync", json=payload)
         assert response.status_code == 200
         data = response.json()
-        assert data["data"]["tcm_analysis"]["constitution"] == "睡眠过度"
-        assert data["data"]["tcm_analysis"]["score"] == 15
+        assert data["data"]["tcm_analysis"]["constitution"] == "无法仅凭该数据判定体质"
+        assert data["data"]["tcm_analysis"]["score"] is None
 
-    def test_sync_hrv_under_20(self):
-        """HRV < 20 → 重度肝气郁结"""
+    def test_sync_hrv_under_20(self, client, auth_headers, settings):
+        client.headers.update(auth_headers)
+        actor = verify_token(settings, auth_headers["Authorization"].removeprefix("Bearer "))
+        """HRV < 20：只记录，不推导体质"""
         payload = {
-            "user_id": "user_sync_009",
+            "user_id": actor,
             "data_type": "hrv",
             "value": 15,
             "unit": "ms",
@@ -163,13 +181,15 @@ class TestHealthDataSync:
         response = client.post("/api/v1/health-data/sync", json=payload)
         assert response.status_code == 200
         data = response.json()
-        assert data["data"]["tcm_analysis"]["constitution"] == "重度肝气郁结"
-        assert data["data"]["tcm_analysis"]["score"] == 85
+        assert data["data"]["tcm_analysis"]["constitution"] == "无法仅凭该数据判定体质"
+        assert data["data"]["tcm_analysis"]["score"] is None
 
-    def test_sync_hrv_20_40(self):
-        """HRV 20-40 → 轻度肝气郁结"""
+    def test_sync_hrv_20_40(self, client, auth_headers, settings):
+        client.headers.update(auth_headers)
+        actor = verify_token(settings, auth_headers["Authorization"].removeprefix("Bearer "))
+        """HRV 20-40：只记录，不推导体质"""
         payload = {
-            "user_id": "user_sync_010",
+            "user_id": actor,
             "data_type": "hrv",
             "value": 35,
             "unit": "ms",
@@ -179,13 +199,15 @@ class TestHealthDataSync:
         response = client.post("/api/v1/health-data/sync", json=payload)
         assert response.status_code == 200
         data = response.json()
-        assert data["data"]["tcm_analysis"]["constitution"] == "轻度肝气郁结"
-        assert data["data"]["tcm_analysis"]["score"] == 55
+        assert data["data"]["tcm_analysis"]["constitution"] == "无法仅凭该数据判定体质"
+        assert data["data"]["tcm_analysis"]["score"] is None
 
-    def test_sync_hrv_60_100(self):
-        """HRV 60-100 → 肝气疏泄正常"""
+    def test_sync_hrv_60_100(self, client, auth_headers, settings):
+        client.headers.update(auth_headers)
+        actor = verify_token(settings, auth_headers["Authorization"].removeprefix("Bearer "))
+        """HRV 60-100：只记录，不推导体质"""
         payload = {
-            "user_id": "user_sync_011",
+            "user_id": actor,
             "data_type": "hrv",
             "value": 80,
             "unit": "ms",
@@ -195,13 +217,15 @@ class TestHealthDataSync:
         response = client.post("/api/v1/health-data/sync", json=payload)
         assert response.status_code == 200
         data = response.json()
-        assert data["data"]["tcm_analysis"]["constitution"] == "肝气疏泄正常"
-        assert data["data"]["tcm_analysis"]["score"] == 8
+        assert data["data"]["tcm_analysis"]["constitution"] == "无法仅凭该数据判定体质"
+        assert data["data"]["tcm_analysis"]["score"] is None
 
-    def test_sync_hr_50_60(self):
-        """静息心率 50-60 → 气阴充足"""
+    def test_sync_hr_50_60(self, client, auth_headers, settings):
+        client.headers.update(auth_headers)
+        actor = verify_token(settings, auth_headers["Authorization"].removeprefix("Bearer "))
+        """静息心率 50-60：只记录，不推导体质"""
         payload = {
-            "user_id": "user_sync_012",
+            "user_id": actor,
             "data_type": "heart_rate",
             "value": 55,
             "unit": "bpm",
@@ -211,13 +235,15 @@ class TestHealthDataSync:
         response = client.post("/api/v1/health-data/sync", json=payload)
         assert response.status_code == 200
         data = response.json()
-        assert data["data"]["tcm_analysis"]["constitution"] == "气阴充足"
-        assert data["data"]["tcm_analysis"]["score"] == 8
+        assert data["data"]["tcm_analysis"]["constitution"] == "无法仅凭该数据判定体质"
+        assert data["data"]["tcm_analysis"]["score"] is None
 
-    def test_sync_hr_over_80(self):
-        """静息心率 > 80 → 明显虚热倾向"""
+    def test_sync_hr_over_80(self, client, auth_headers, settings):
+        client.headers.update(auth_headers)
+        actor = verify_token(settings, auth_headers["Authorization"].removeprefix("Bearer "))
+        """静息心率 > 80：只记录，不推导体质"""
         payload = {
-            "user_id": "user_sync_013",
+            "user_id": actor,
             "data_type": "heart_rate",
             "value": 85,
             "unit": "bpm",
@@ -227,13 +253,15 @@ class TestHealthDataSync:
         response = client.post("/api/v1/health-data/sync", json=payload)
         assert response.status_code == 200
         data = response.json()
-        assert data["data"]["tcm_analysis"]["constitution"] == "明显虚热倾向"
-        assert data["data"]["tcm_analysis"]["score"] == 75
+        assert data["data"]["tcm_analysis"]["constitution"] == "无法仅凭该数据判定体质"
+        assert data["data"]["tcm_analysis"]["score"] is None
 
-    def test_sync_weight_normal(self):
-        """体重在合理范围 → 脾胃功能正常"""
+    def test_sync_weight_normal(self, client, auth_headers, settings):
+        client.headers.update(auth_headers)
+        actor = verify_token(settings, auth_headers["Authorization"].removeprefix("Bearer "))
+        """体重在合理范围：只记录，不推导体质"""
         payload = {
-            "user_id": "user_sync_014",
+            "user_id": actor,
             "data_type": "weight",
             "value": 65.0,
             "unit": "kg",
@@ -243,8 +271,8 @@ class TestHealthDataSync:
         response = client.post("/api/v1/health-data/sync", json=payload)
         assert response.status_code == 200
         data = response.json()
-        assert data["data"]["tcm_analysis"]["constitution"] == "脾胃功能正常"
-        assert data["data"]["tcm_analysis"]["score"] == 15
+        assert data["data"]["tcm_analysis"]["constitution"] == "无法仅凭该数据判定体质"
+        assert data["data"]["tcm_analysis"]["score"] is None
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -254,19 +282,23 @@ class TestHealthDataSync:
 class TestHealthDataSummary:
     """GET /api/v1/health-data/summary/{user_id} 端点测试"""
 
-    def test_summary_no_data(self):
+    def test_summary_no_data(self, client, auth_headers, settings):
+        client.headers.update(auth_headers)
+        actor = verify_token(settings, auth_headers["Authorization"].removeprefix("Bearer "))
         """用户无数据时的摘要"""
-        response = client.get("/api/v1/health-data/summary/nonexistent_user")
+        response = client.get(f"/api/v1/health-data/summary/{actor}")
         assert response.status_code == 200
         data = response.json()
         assert data["success"] is True
         assert data["data"]["summary"] == "暂无数据"
 
-    def test_summary_with_data(self):
+    def test_summary_with_data(self, client, auth_headers, settings):
+        client.headers.update(auth_headers)
+        actor = verify_token(settings, auth_headers["Authorization"].removeprefix("Bearer "))
         """用户有数据时的摘要"""
         # 先同步数据
         client.post("/api/v1/health-data/sync", json={
-            "user_id": "user_summary_001",
+            "user_id": actor,
             "data_type": "steps",
             "value": 8000,
             "unit": "steps",
@@ -275,7 +307,7 @@ class TestHealthDataSummary:
         })
 
         # 查询摘要
-        response = client.get("/api/v1/health-data/summary/user_summary_001")
+        response = client.get(f"/api/v1/health-data/summary/{actor}")
         assert response.status_code == 200
         data = response.json()
         assert data["success"] is True
@@ -290,7 +322,9 @@ class TestHealthDataSummary:
 class TestTCMAnalysis:
     """POST /api/v1/health-data/analyze 端点测试"""
 
-    def test_analyze_all_parameters(self):
+    def test_analyze_all_parameters(self, client, auth_headers, settings):
+        client.headers.update(auth_headers)
+        actor = verify_token(settings, auth_headers["Authorization"].removeprefix("Bearer "))
         """包含所有指标的综合分析"""
         payload = {
             "steps": 3000,
@@ -304,9 +338,11 @@ class TestTCMAnalysis:
         assert data["success"] is True
         assert len(data["data"]["analyses"]) == 4
         assert "overall_score" in data["data"]
-        assert data["data"]["overall_score"] > 0
+        assert data["data"]["overall_score"] is None
 
-    def test_analyze_steps_only(self):
+    def test_analyze_steps_only(self, client, auth_headers, settings):
+        client.headers.update(auth_headers)
+        actor = verify_token(settings, auth_headers["Authorization"].removeprefix("Bearer "))
         """仅分析步数"""
         payload = {
             "steps": 10000,
@@ -318,9 +354,11 @@ class TestTCMAnalysis:
         assert response.status_code == 200
         data = response.json()
         assert len(data["data"]["analyses"]) == 1
-        assert "气血均衡" in data["data"]["analyses"][0]["constitution"]
+        assert data["data"]["analyses"][0]["diagnostic"] is False
 
-    def test_analyze_poor_metrics(self):
+    def test_analyze_poor_metrics(self, client, auth_headers, settings):
+        client.headers.update(auth_headers)
+        actor = verify_token(settings, auth_headers["Authorization"].removeprefix("Bearer "))
         """所有指标都不好的综合分析"""
         payload = {
             "steps": 2000,
@@ -331,7 +369,7 @@ class TestTCMAnalysis:
         response = client.post("/api/v1/health-data/analyze", json=payload)
         assert response.status_code == 200
         data = response.json()
-        assert data["data"]["health_status"] == "需要调理"
+        assert data["data"]["health_status"] == "无法仅凭这些记录判断健康状况"
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -341,19 +379,23 @@ class TestTCMAnalysis:
 class TestTCMMetrics:
     """GET /api/v1/health-data/tcm-metrics/{user_id} 端点测试"""
 
-    def test_metrics_no_data(self):
+    def test_metrics_no_data(self, client, auth_headers, settings):
+        client.headers.update(auth_headers)
+        actor = verify_token(settings, auth_headers["Authorization"].removeprefix("Bearer "))
         """用户无数据时的体质评分"""
-        response = client.get("/api/v1/health-data/tcm-metrics/user_metrics_empty")
+        response = client.get(f"/api/v1/health-data/tcm-metrics/{actor}")
         assert response.status_code == 200
         data = response.json()
         assert data["success"] is True
-        assert data["data"]["qi_deficiency_score"] == 50
+        assert data["data"]["qi_deficiency_score"] is None
 
-    def test_metrics_with_poor_steps(self):
+    def test_metrics_with_poor_steps(self, client, auth_headers, settings):
+        client.headers.update(auth_headers)
+        actor = verify_token(settings, auth_headers["Authorization"].removeprefix("Bearer "))
         """步数低导致气虚评分提升"""
         # 同步低步数数据
         client.post("/api/v1/health-data/sync", json={
-            "user_id": "user_metrics_001",
+            "user_id": actor,
             "data_type": "steps",
             "value": 3000,
             "unit": "steps",
@@ -361,15 +403,17 @@ class TestTCMMetrics:
             "source": "apple_health",
         })
 
-        response = client.get("/api/v1/health-data/tcm-metrics/user_metrics_001")
+        response = client.get(f"/api/v1/health-data/tcm-metrics/{actor}")
         assert response.status_code == 200
         data = response.json()
-        assert data["data"]["qi_deficiency_score"] > 50
+        assert data["data"]["qi_deficiency_score"] is None
 
-    def test_metrics_with_poor_sleep(self):
+    def test_metrics_with_poor_sleep(self, client, auth_headers, settings):
+        client.headers.update(auth_headers)
+        actor = verify_token(settings, auth_headers["Authorization"].removeprefix("Bearer "))
         """睡眠不足导致心阴虚评分提升"""
         client.post("/api/v1/health-data/sync", json={
-            "user_id": "user_metrics_002",
+            "user_id": actor,
             "data_type": "sleep",
             "value": 5.0,
             "unit": "hours",
@@ -377,10 +421,10 @@ class TestTCMMetrics:
             "source": "google_fit",
         })
 
-        response = client.get("/api/v1/health-data/tcm-metrics/user_metrics_002")
+        response = client.get(f"/api/v1/health-data/tcm-metrics/{actor}")
         assert response.status_code == 200
         data = response.json()
-        assert data["data"]["heart_yin_deficiency_score"] > 50
+        assert data["data"]["heart_yin_deficiency_score"] is None
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -390,18 +434,22 @@ class TestTCMMetrics:
 class TestRecommendations:
     """GET /api/v1/health-data/recommendations/{user_id} 端点测试"""
 
-    def test_recommendations_no_data(self):
+    def test_recommendations_no_data(self, client, auth_headers, settings):
+        client.headers.update(auth_headers)
+        actor = verify_token(settings, auth_headers["Authorization"].removeprefix("Bearer "))
         """用户无数据时的建议"""
-        response = client.get("/api/v1/health-data/recommendations/user_rec_empty")
+        response = client.get(f"/api/v1/health-data/recommendations/{actor}")
         assert response.status_code == 200
         data = response.json()
         assert data["success"] is True
         assert "请先同步" in data["data"]["recommendations"][0]
 
-    def test_recommendations_with_low_steps(self):
+    def test_recommendations_with_low_steps(self, client, auth_headers, settings):
+        client.headers.update(auth_headers)
+        actor = verify_token(settings, auth_headers["Authorization"].removeprefix("Bearer "))
         """低步数触发运动建议"""
         client.post("/api/v1/health-data/sync", json={
-            "user_id": "user_rec_001",
+            "user_id": actor,
             "data_type": "steps",
             "value": 3000,
             "unit": "steps",
@@ -409,7 +457,7 @@ class TestRecommendations:
             "source": "apple_health",
         })
         client.post("/api/v1/health-data/sync", json={
-            "user_id": "user_rec_001",
+            "user_id": actor,
             "data_type": "steps",
             "value": 2800,
             "unit": "steps",
@@ -417,16 +465,18 @@ class TestRecommendations:
             "source": "apple_health",
         })
 
-        response = client.get("/api/v1/health-data/recommendations/user_rec_001")
+        response = client.get(f"/api/v1/health-data/recommendations/{actor}")
         assert response.status_code == 200
         data = response.json()
         recommendations_text = str(data["data"]["recommendations"])
         assert "运动" in recommendations_text or "步数" in recommendations_text
 
-    def test_recommendations_with_low_sleep(self):
+    def test_recommendations_with_low_sleep(self, client, auth_headers, settings):
+        client.headers.update(auth_headers)
+        actor = verify_token(settings, auth_headers["Authorization"].removeprefix("Bearer "))
         """低睡眠触发睡眠建议"""
         client.post("/api/v1/health-data/sync", json={
-            "user_id": "user_rec_002",
+            "user_id": actor,
             "data_type": "sleep",
             "value": 5.5,
             "unit": "hours",
@@ -434,7 +484,7 @@ class TestRecommendations:
             "source": "google_fit",
         })
         client.post("/api/v1/health-data/sync", json={
-            "user_id": "user_rec_002",
+            "user_id": actor,
             "data_type": "sleep",
             "value": 5.0,
             "unit": "hours",
@@ -442,16 +492,18 @@ class TestRecommendations:
             "source": "google_fit",
         })
 
-        response = client.get("/api/v1/health-data/recommendations/user_rec_002")
+        response = client.get(f"/api/v1/health-data/recommendations/{actor}")
         assert response.status_code == 200
         data = response.json()
         recommendations_text = str(data["data"]["recommendations"])
         assert "睡眠" in recommendations_text
 
-    def test_recommendations_with_low_hrv(self):
+    def test_recommendations_with_low_hrv(self, client, auth_headers, settings):
+        client.headers.update(auth_headers)
+        actor = verify_token(settings, auth_headers["Authorization"].removeprefix("Bearer "))
         """低 HRV 触发心理建议"""
         client.post("/api/v1/health-data/sync", json={
-            "user_id": "user_rec_003",
+            "user_id": actor,
             "data_type": "hrv",
             "value": 25,
             "unit": "ms",
@@ -459,16 +511,18 @@ class TestRecommendations:
             "source": "apple_health",
         })
 
-        response = client.get("/api/v1/health-data/recommendations/user_rec_003")
+        response = client.get(f"/api/v1/health-data/recommendations/{actor}")
         assert response.status_code == 200
         data = response.json()
         recommendations_text = str(data["data"]["recommendations"])
         assert "心" in recommendations_text or "肝" in recommendations_text
 
-    def test_recommendations_good_metrics(self):
+    def test_recommendations_good_metrics(self, client, auth_headers, settings):
+        client.headers.update(auth_headers)
+        actor = verify_token(settings, auth_headers["Authorization"].removeprefix("Bearer "))
         """良好指标返回保健建议"""
         client.post("/api/v1/health-data/sync", json={
-            "user_id": "user_rec_004",
+            "user_id": actor,
             "data_type": "steps",
             "value": 10000,
             "unit": "steps",
@@ -476,7 +530,7 @@ class TestRecommendations:
             "source": "apple_health",
         })
         client.post("/api/v1/health-data/sync", json={
-            "user_id": "user_rec_004",
+            "user_id": actor,
             "data_type": "sleep",
             "value": 7.5,
             "unit": "hours",
@@ -484,7 +538,7 @@ class TestRecommendations:
             "source": "google_fit",
         })
 
-        response = client.get("/api/v1/health-data/recommendations/user_rec_004")
+        response = client.get(f"/api/v1/health-data/recommendations/{actor}")
         assert response.status_code == 200
         data = response.json()
         assert data["success"] is True
@@ -497,14 +551,18 @@ class TestRecommendations:
 class TestDeleteUserData:
     """DELETE /api/v1/health-data/{user_id} 端点测试"""
 
-    def test_delete_nonexistent_user(self):
+    def test_delete_nonexistent_user(self, client, auth_headers, settings):
+        client.headers.update(auth_headers)
+        actor = verify_token(settings, auth_headers["Authorization"].removeprefix("Bearer "))
         """删除不存在用户的数据"""
-        response = client.delete("/api/v1/health-data/delete/nonexistent_user_delete")
+        response = client.delete(f"/api/v1/health-data/delete/{actor}")
         assert response.status_code == 404
 
-    def test_delete_existing_user(self):
+    def test_delete_existing_user(self, client, auth_headers, settings):
+        client.headers.update(auth_headers)
+        actor = verify_token(settings, auth_headers["Authorization"].removeprefix("Bearer "))
         """删除存在用户的数据"""
-        user_id = "user_delete_001"
+        user_id = actor
 
         # 先同步一些数据
         client.post("/api/v1/health-data/sync", json={
@@ -527,9 +585,11 @@ class TestDeleteUserData:
         summary_response = client.get(f"/api/v1/health-data/summary/{user_id}")
         assert summary_response.json()["data"]["summary"] == "暂无数据"
 
-    def test_delete_gdpr_compliance(self):
+    def test_delete_gdpr_compliance(self, client, auth_headers, settings):
+        client.headers.update(auth_headers)
+        actor = verify_token(settings, auth_headers["Authorization"].removeprefix("Bearer "))
         """验证删除操作返回 GDPR 合规信息"""
-        user_id = "user_delete_gdpr"
+        user_id = actor
 
         client.post("/api/v1/health-data/sync", json={
             "user_id": user_id,
@@ -543,7 +603,7 @@ class TestDeleteUserData:
         response = client.delete(f"/api/v1/health-data/delete/{user_id}")
         assert response.status_code == 200
         data = response.json()
-        assert "GDPR" in data["data"]["message"]
+        assert "本功能保存" in data["data"]["message"]
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -553,9 +613,11 @@ class TestDeleteUserData:
 class TestIntegration:
     """端点间的集成测试"""
 
-    def test_sync_analyze_recommend_flow(self):
-        """完整的数据同步 → 分析 → 建议流程"""
-        user_id = "user_integration_001"
+    def test_sync_analyze_recommend_flow(self, client, auth_headers, settings):
+        client.headers.update(auth_headers)
+        actor = verify_token(settings, auth_headers["Authorization"].removeprefix("Bearer "))
+        """完整的数据同步：只记录，不推导体质"""
+        user_id = actor
 
         # 1. 同步多个数据点
         client.post("/api/v1/health-data/sync", json={
@@ -588,4 +650,4 @@ class TestIntegration:
         # 4. 获取体质评分
         metrics = client.get(f"/api/v1/health-data/tcm-metrics/{user_id}")
         assert metrics.status_code == 200
-        assert metrics.json()["data"]["qi_deficiency_score"] > 50
+        assert metrics.json()["data"]["qi_deficiency_score"] is None
