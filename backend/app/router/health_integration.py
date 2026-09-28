@@ -3,11 +3,31 @@
 记录健康指标；不从可穿戴单项数值推导未经验证的诊断或体质评分。
 """
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field, model_validator
 from typing import Optional, List, Dict, Any
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from enum import Enum
+from zoneinfo import ZoneInfo
+from sqlalchemy import delete, select
+from sqlalchemy.orm import Session
+from app.deps import get_session
+from app.simple_models import HealthMeasurement
+
+
+def _recorded_time(value: str) -> datetime:
+    parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    # Legacy domestic clients omit the offset: interpret those as China time.
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=ZoneInfo("Asia/Shanghai"))
+    return parsed.astimezone(timezone.utc)
+
+
+def _serialize_record(row: HealthMeasurement) -> dict:
+    return {"data_type": row.data_type, "value": row.value, "unit": row.unit,
+            "source": row.source,
+            "recorded_at": datetime.fromtimestamp(row.recorded_at, timezone.utc).isoformat()}
+
 
 router = APIRouter(prefix="/api/v1/health-data", tags=["health_integration"])
 
@@ -47,7 +67,10 @@ class HealthDataSyncRequest(BaseModel):
             raise ValueError("该指标数值必须大于零")
         if self.data_type == DataTypeEnum.STEPS and not self.value.is_integer():
             raise ValueError("步数必须为整数")
-        datetime.fromisoformat(self.recorded_at.replace("Z", "+00:00"))
+        parsed = _recorded_time(self.recorded_at)
+        if parsed > datetime.now(timezone.utc):
+            raise ValueError("记录时间不能晚于当前时间")
+        self.recorded_at = parsed.isoformat()
         return self
 
 
@@ -57,17 +80,6 @@ class TCMAnalysisRequest(BaseModel):
     resting_hr: int = Field(default=0, ge=0, allow_inf_nan=False)
     hrv: int = Field(default=0, ge=0, allow_inf_nan=False)
 
-
-# ─────────────────────────────────────────────────────────────────────────────
-# 内存存储
-# ─────────────────────────────────────────────────────────────────────────────
-
-_health_data: Dict[str, List[Dict[str, Any]]] = {}
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# TCM 数据类型映射规则
-# ─────────────────────────────────────────────────────────────────────────────
 
 def _observation(label: str, value: float, unit: str) -> Dict[str, Any]:
     """A wearable reading is an observation, not a validated constitution test."""
@@ -102,26 +114,19 @@ def _analyze_weight(weight: float, user_id: str) -> Dict[str, Any]:
 
 
 @router.post("/sync", summary="同步健康数据")
-async def sync_health_data(request: HealthDataSyncRequest):
+async def sync_health_data(request: HealthDataSyncRequest, session: Session = Depends(get_session)):
     """
     接收来自 Apple Health / Google Fit 的健康数据同步，
     返回非诊断性记录说明。
     """
     user_id = request.user_id
 
-    if user_id not in _health_data:
-        _health_data[user_id] = []
-
-    record = {
-        "data_type": request.data_type.value,
-        "value": request.value,
-        "unit": request.unit,
-        "recorded_at": request.recorded_at,
-        "source": request.source.value,
-        "synced_at": datetime.now().isoformat(),
-    }
-
-    _health_data[user_id].append(record)
+    session.add(HealthMeasurement(
+        user_id=user_id, data_type=request.data_type.value, value=request.value,
+        unit=request.unit, source=request.source.value,
+        recorded_at=_recorded_time(request.recorded_at).timestamp(),
+    ))
+    session.commit()
 
     # 根据数据类型进行对应 TCM 分析
     tcm_result = None
@@ -144,18 +149,25 @@ async def sync_health_data(request: HealthDataSyncRequest):
             "value": request.value,
             "unit": request.unit,
             "source": request.source.value,
-            "timestamp": datetime.now().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "tcm_analysis": tcm_result,
         },
     }
 
 
 @router.get("/summary/{user_id}", summary="7天健康数据摘要")
-async def get_health_summary(user_id: str):
+async def get_health_summary(user_id: str, session: Session = Depends(get_session)):
     """
     返回用户最近7天的健康数据摘要，包括各指标最新值和趋势。
     """
-    if user_id not in _health_data or not _health_data[user_id]:
+    now = datetime.now(timezone.utc)
+    rows = session.scalars(select(HealthMeasurement).where(
+        HealthMeasurement.user_id == user_id,
+        HealthMeasurement.recorded_at >= (now - timedelta(days=7)).timestamp(),
+        HealthMeasurement.recorded_at <= now.timestamp(),
+    ).order_by(HealthMeasurement.recorded_at, HealthMeasurement.id)).all()
+    recent_records = [_serialize_record(row) for row in rows]
+    if not recent_records:
         return {
             "success": True,
             "data": {
@@ -165,10 +177,6 @@ async def get_health_summary(user_id: str):
                 "trend": "无趋势",
             },
         }
-
-    records = _health_data[user_id]
-    seven_days_ago = (datetime.now() - timedelta(days=7)).isoformat()
-    recent_records = [r for r in records if r["recorded_at"] >= seven_days_ago]
 
     latest_by_type = {}
     for r in recent_records:
@@ -192,7 +200,7 @@ async def get_health_summary(user_id: str):
             }
             for k, v in latest_by_type.items()
         },
-        "trend": "数据收集中" if len(recent_records) < 3 else "趋势分析中",
+        "trend": "仅展示记录，未进行趋势判断",
     }
 
     return {
@@ -258,11 +266,17 @@ async def get_tcm_metrics(user_id: str):
 
 
 @router.get("/recommendations/{user_id}", summary="个性化养护建议")
-async def get_recommendations(user_id: str):
+async def get_recommendations(user_id: str, session: Session = Depends(get_session)):
     """
     基于用户的健康数据历史生成个性化的 TCM 养护建议。
     """
-    if user_id not in _health_data or not _health_data[user_id]:
+    now = datetime.now(timezone.utc)
+    rows = session.scalars(select(HealthMeasurement).where(
+        HealthMeasurement.user_id == user_id,
+        HealthMeasurement.recorded_at >= (now - timedelta(days=7)).timestamp(),
+        HealthMeasurement.recorded_at <= now.timestamp(),
+    ).order_by(HealthMeasurement.recorded_at.desc(), HealthMeasurement.id.desc()).limit(5)).all()
+    if not rows:
         return {
             "success": True,
             "data": {
@@ -274,7 +288,7 @@ async def get_recommendations(user_id: str):
             },
         }
 
-    records = _health_data[user_id]
+    records = [_serialize_record(row) for row in rows]
     recommendations = []
 
     labels = {"steps": "步数", "sleep": "睡眠", "hrv": "心率变异度", "heart_rate": "心率", "weight": "体重"}
@@ -292,20 +306,20 @@ async def get_recommendations(user_id: str):
             "user_id": user_id,
             "total_recommendations": len(recommendations),
             "recommendations": recommendations,
-            "last_updated": datetime.now().isoformat(),
+            "last_updated": datetime.now(timezone.utc).isoformat(),
         },
     }
 
 
 @router.delete("/delete/{user_id}", summary="删除用户健康数据")
-async def delete_user_data(user_id: str):
+async def delete_user_data(user_id: str, session: Session = Depends(get_session)):
     """
-    根据 GDPR 等隐私法规，删除用户的所有健康数据。
+    删除本功能保存在数据库中的用户健康记录。
     """
-    if user_id not in _health_data:
+    result = session.execute(delete(HealthMeasurement).where(HealthMeasurement.user_id == user_id))
+    if result.rowcount == 0:
         raise HTTPException(status_code=404, detail="该用户暂无健康记录")
-
-    del _health_data[user_id]
+    session.commit()
 
     return {
         "success": True,
@@ -313,6 +327,6 @@ async def delete_user_data(user_id: str):
             "user_id": user_id,
             "deleted": True,
             "message": "本功能保存的健康记录已删除",
-            "timestamp": datetime.now().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
         },
     }

@@ -22,6 +22,7 @@ from ..simple_models import (
     AudioProgress,
     Entitlement,
     Feedback,
+    HealthMeasurement,
     Message,
     Reflection,
     SmsCode,
@@ -294,6 +295,13 @@ def _collect_user_data(session: Session, user_id: str) -> dict:
             if user
             else None
         ),
+        "health_measurements": [
+            {"id": row.id, "data_type": row.data_type, "value": row.value,
+             "unit": row.unit, "source": row.source,
+             "recorded_at": row.recorded_at, "synced_at": row.synced_at}
+            for row in session.scalars(select(HealthMeasurement).where(
+                HealthMeasurement.user_id == user_id).order_by(HealthMeasurement.recorded_at))
+        ],
         "settings": {row.key: json.loads(row.value) for row in settings_rows},
         "messages": [
             {"id": m.id, "role": m.role, "content": m.content, "created_at": m.created_at}
@@ -396,6 +404,7 @@ def delete_account(
         counts = {}
         for model, column in (
             (Message, Message.user_id),
+            (HealthMeasurement, HealthMeasurement.user_id),
             (UserSetting, UserSetting.user_id),
             (Reflection, Reflection.user_id),
             (Feedback, Feedback.user_id),

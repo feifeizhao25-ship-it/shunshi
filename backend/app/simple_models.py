@@ -6,7 +6,7 @@ import time
 import uuid
 from typing import Optional
 
-from sqlalchemy import Boolean, Integer, String, Text
+from sqlalchemy import Boolean, Float, Index, Integer, String, Text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -103,3 +103,17 @@ class Entitlement(Base):
     expires_at: Mapped[int] = mapped_column(Integer)
     original_transaction_id: Mapped[str] = mapped_column(String(128), unique=True)
     updated_at: Mapped[int] = mapped_column(Integer, default=now_ts)
+
+
+class HealthMeasurement(Base):
+    """Non-diagnostic measurements, stored in the configured account database."""
+    __tablename__ = "health_measurements"
+    __table_args__ = (Index("ix_health_measurements_user_recorded", "user_id", "recorded_at"),)
+    id: Mapped[str] = mapped_column(String(64), primary_key=True, default=new_id)
+    user_id: Mapped[str] = mapped_column(String(64))
+    data_type: Mapped[str] = mapped_column(String(32))
+    value: Mapped[float] = mapped_column(Float)
+    unit: Mapped[str] = mapped_column(String(16))
+    source: Mapped[str] = mapped_column(String(32))
+    recorded_at: Mapped[float] = mapped_column(Float)
+    synced_at: Mapped[int] = mapped_column(Integer, default=now_ts)
