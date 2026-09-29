@@ -1,0 +1,3 @@
+[Notifications] firebase-admin 未安装，远程推送不可用
+[DB] 数据库已就绪，现有 329 条内容记录
+PostgreSQL 17: two concurrent requests for the last family seat yield one success and one rejection; fresh-session count stays at four.

@@ -21,7 +21,9 @@
       },
       "export": {
         "data_export": true,
-        "formats": ["json"]
+        "formats": [
+          "json"
+        ]
       },
       "collaboration": {
         "family_members": 1,
@@ -51,7 +53,10 @@
       },
       "export": {
         "data_export": true,
-        "formats": ["json", "csv"]
+        "formats": [
+          "json",
+          "csv"
+        ]
       },
       "collaboration": {
         "family_members": 1,
@@ -81,10 +86,13 @@
       },
       "export": {
         "data_export": true,
-        "formats": ["json", "csv"]
+        "formats": [
+          "json",
+          "csv"
+        ]
       },
       "collaboration": {
-        "family_members": 6,
+        "family_members": 5,
         "shared_spaces": true
       },
       "service": {
@@ -111,7 +119,10 @@
       },
       "export": {
         "data_export": true,
-        "formats": ["json", "csv"]
+        "formats": [
+          "json",
+          "csv"
+        ]
       },
       "collaboration": {
         "family_members": -1,
@@ -136,6 +147,8 @@
     "yiyang_monthly": "pro",
     "yiyang_yearly": "pro",
     "family_monthly": "family",
-    "family_yearly": "family"
+    "family_yearly": "family",
+    "jiahe_monthly": "family",
+    "jiahe_yearly": "family"
   }
 }

@@ -23,6 +23,7 @@ from ..simple_models import (
     Entitlement,
     Feedback,
     HealthMeasurement,
+    FamilySeat,
     Message,
     Reflection,
     StorePurchase,
@@ -297,6 +298,11 @@ def _collect_user_data(session: Session, user_id: str) -> dict:
             if user
             else None
         ),
+        "family_seats": [
+            {"seat_id": row.id, "name": row.member_name, "member_user_id": row.member_user_id,
+             "bound_at": row.bound_at}
+            for row in session.scalars(select(FamilySeat).where(FamilySeat.user_id == user_id))
+        ],
         "store_purchases": [
             {"transaction_key": row.transaction_key, "store": row.store,
              "product_id": row.product_id, "expires_at": row.expires_at,
@@ -416,6 +422,7 @@ def delete_account(
         for model, column in (
             (Message, Message.user_id),
             (HealthMeasurement, HealthMeasurement.user_id),
+            (FamilySeat, FamilySeat.user_id),
             (UserSetting, UserSetting.user_id),
             (Reflection, Reflection.user_id),
             (Feedback, Feedback.user_id),

@@ -1643,7 +1643,8 @@ async def get_subscription_status(user_id: str = Depends(_payment_user), session
     hydrate_restore(session, user_id)
     """获取当前订阅状态"""
     sub = get_user_subscription(user_id)
-    seats_info = get_family_seats_info(user_id)
+    from app.services.family_seats import seats_info as read_seats
+    seats_info = read_seats(session, user_id)
 
     return {
         "success": True,
@@ -1690,34 +1691,32 @@ async def check_expired_api():
 # ---- 家庭席位 API ----
 
 @router.get("/family-seats", response_model=dict)
-async def get_family_seats_endpoint(user_id: str = Query("user-001")):
-    """获取家庭席位信息"""
-    return {
-        "success": True,
-        "data": get_family_seats_info(user_id),
-    }
+async def get_family_seats_endpoint(user_id: str = Depends(_payment_user), session: Session = Depends(get_session)):
+    from app.services.family_seats import seats_info
+    return {"success": True, "data": seats_info(session, user_id)}
 
 
 @router.post("/family-seats/bind", response_model=dict)
 async def bind_family_member_endpoint(
-    member_name: str = Query(..., description="成员姓名"),
-    member_user_id: Optional[str] = Query(None, description="成员用户 ID"),
-    user_id: str = Query("user-001"),
+    member_name: str = Query(..., min_length=1, max_length=64, pattern=r".*\S.*"),
+    member_user_id: Optional[str] = Query(None, min_length=1, max_length=64),
+    user_id: str = Depends(_payment_user),
+    session: Session = Depends(get_session),
 ):
-    """绑定家庭席位"""
-    info = bind_family_member(user_id, member_name, member_user_id)
-    return {"success": True, "data": info}
+    from app.services.family_seats import bind_seat
+    return {"success": True, "data": bind_seat(session, user_id, member_name, member_user_id)}
 
 
 @router.post("/family-seats/unbind", response_model=dict)
 async def unbind_family_member_endpoint(
-    member_user_id: Optional[str] = Query(None, description="成员用户 ID"),
-    member_index: Optional[int] = Query(None, description="成员索引"),
-    user_id: str = Query("user-001"),
+    member_user_id: Optional[str] = Query(None, min_length=1, max_length=64),
+    member_index: Optional[int] = Query(None, ge=0),
+    seat_id: Optional[str] = Query(None, min_length=1, max_length=64),
+    user_id: str = Depends(_payment_user),
+    session: Session = Depends(get_session),
 ):
-    """解绑家庭席位"""
-    info = unbind_family_member(user_id, member_user_id, member_index)
-    return {"success": True, "data": info}
+    from app.services.family_seats import unbind_seat
+    return {"success": True, "data": unbind_seat(session, user_id, member_user_id, member_index, seat_id)}
 
 
 # ============================================================

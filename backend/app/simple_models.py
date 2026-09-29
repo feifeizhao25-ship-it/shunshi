@@ -139,3 +139,12 @@ class StorePurchase(Base):
     auto_renew: Mapped[bool] = mapped_column(Boolean, default=False)
     receipt_hash: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     verified_at: Mapped[int] = mapped_column(Integer, default=now_ts)
+
+
+class FamilySeat(Base):
+    __tablename__ = "family_seats"
+    id: Mapped[str] = mapped_column(String(64), primary_key=True, default=new_id)
+    user_id: Mapped[str] = mapped_column(String(64), index=True)
+    member_name: Mapped[str] = mapped_column(String(64))
+    member_user_id: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+    bound_at: Mapped[int] = mapped_column(Integer, default=now_ts)

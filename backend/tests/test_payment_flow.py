@@ -744,6 +744,17 @@ class TestRestorePurchaseFlow:
 # ============================================================
 
 
+def _seed_family_entitlement(app, user_id):
+    """The state-machine payment fixture does not run the production projection."""
+    from app.simple_models import User, Entitlement
+    with app.state.session_factory() as session:
+        session.merge(User(id=user_id))
+        session.merge(Entitlement(user_id=user_id, product_id="jiahe_monthly", store="alipay",
+            expires_at=int((datetime.now(timezone.utc)+timedelta(days=30)).timestamp()),
+            original_transaction_id=f"family-fixture-{user_id}"))
+        session.commit()
+
+
 class TestTierPermissions:
     """各层级权限测试"""
 
@@ -790,10 +801,11 @@ class TestTierPermissions:
         assert features["family"] is False  # 颐养版没有家庭
 
     @pytest.mark.asyncio
-    async def test_jiahe_has_family_access(self, client):
+    async def test_jiahe_has_family_access(self, client, app):
         """家和版有家庭席位"""
         user_id = "user-jh-perm"
         await _create_and_pay_order(client, user_id, "jiahe_monthly")
+        _seed_family_entitlement(app, user_id)
 
         resp = await client.get(f"{API_BASE}/status", params={"user_id": user_id})
         data = resp.json()["data"]
@@ -804,10 +816,11 @@ class TestTierPermissions:
         assert data["family_seats"]["available"] == 4
 
     @pytest.mark.asyncio
-    async def test_jiahe_family_bind_and_unbind(self, client):
+    async def test_jiahe_family_bind_and_unbind(self, client, app):
         """家和版绑定/解绑家庭成员"""
         user_id = "user-jh-bind"
         await _create_and_pay_order(client, user_id, "jiahe_monthly")
+        _seed_family_entitlement(app, user_id)
 
         # 绑定成员
         resp_bind = await client.post(
@@ -1136,8 +1149,12 @@ class TestEdgeCases:
         assert "无法" in resp.json()["detail"] or "状态" in resp.json()["detail"]
 
     @pytest.mark.asyncio
-    async def test_bind_family_without_jiahe(self, client):
+    async def test_bind_family_without_jiahe(self, client, app):
         """非家和版用户不能绑定家庭"""
+        from app.simple_models import User
+        with app.state.session_factory() as session:
+            session.add(User(id="user-no-jiahe"))
+            session.commit()
         resp = await client.post(
             f"{API_BASE}/family-seats/bind",
             params={"user_id": "user-no-jiahe", "member_name": "张三"},
@@ -1145,10 +1162,11 @@ class TestEdgeCases:
         assert resp.status_code == 400
 
     @pytest.mark.asyncio
-    async def test_bind_family_exceed_limit(self, client):
+    async def test_bind_family_exceed_limit(self, client, app):
         """超额绑定家庭席位"""
         user_id = "user-family-full"
         await _create_and_pay_order(client, user_id, "jiahe_monthly")
+        _seed_family_entitlement(app, user_id)
 
         for i in range(4):
             resp = await client.post(
