@@ -13,7 +13,7 @@ from zoneinfo import ZoneInfo
 import httpx
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
-from sqlalchemy import delete, select, update
+from sqlalchemy import delete, select, update, func
 from sqlalchemy.orm import Session
 
 from ..config import Settings
@@ -25,6 +25,8 @@ from ..simple_models import (
     HealthMeasurement,
     Message,
     Reflection,
+    StorePurchase,
+    StorePurchaseOwner,
     SmsCode,
     SmsSendLog,
     User,
@@ -295,6 +297,12 @@ def _collect_user_data(session: Session, user_id: str) -> dict:
             if user
             else None
         ),
+        "store_purchases": [
+            {"transaction_key": row.transaction_key, "store": row.store,
+             "product_id": row.product_id, "expires_at": row.expires_at,
+             "verified_at": row.verified_at}
+            for row in session.scalars(select(StorePurchase).where(StorePurchase.user_id == user_id))
+        ],
         "health_measurements": [
             {"id": row.id, "data_type": row.data_type, "value": row.value,
              "unit": row.unit, "source": row.source,
@@ -397,7 +405,10 @@ def delete_account(
         # separate deployment requirements.
         tables = {row[0] for row in db.execute(
             "SELECT name FROM sqlite_master WHERE type='table'").fetchall()}
-        retained = {}
+        retained = {
+            model.__tablename__: session.scalar(select(func.count()).select_from(model).where(model.user_id == user_id))
+            for model in (StorePurchase, StorePurchaseOwner)
+        }
         for table in ('payment_orders', 'domestic_refund_requests'):
             retained[table] = (db.execute(f'SELECT count(*) FROM {table} WHERE user_id=?',
                 (user_id,)).fetchone()[0] if table in tables else 0)

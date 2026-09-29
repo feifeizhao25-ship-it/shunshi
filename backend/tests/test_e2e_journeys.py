@@ -353,7 +353,7 @@ def _create_test_app(db_conn):
 
 
 @pytest_asyncio.fixture(loop_scope="function")
-async def client(mock_db):
+async def client(mock_db, tmp_path):
     """创建异步测试客户端"""
     # 清理 thread-local 缓存的连接, 强制使用 mock 的 _get_connection
     from app.database import db as db_mod
@@ -361,10 +361,15 @@ async def client(mock_db):
         db_mod._local.connection = None
 
     test_app = _create_test_app(mock_db)
+    from app.db import make_engine, make_session_factory, init_db
+    store_engine = make_engine(f"sqlite:///{tmp_path}/entitlements.db")
+    init_db(store_engine)
+    test_app.state.session_factory = make_session_factory(store_engine)
 
     transport = ASGITransport(app=test_app)
     async with AsyncClient(transport=transport, base_url="http://testserver") as ac:
         yield ac
+    store_engine.dispose()
 
 
 @pytest_asyncio.fixture

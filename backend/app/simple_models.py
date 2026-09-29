@@ -117,3 +117,25 @@ class HealthMeasurement(Base):
     source: Mapped[str] = mapped_column(String(32))
     recorded_at: Mapped[float] = mapped_column(Float)
     synced_at: Mapped[int] = mapped_column(Integer, default=now_ts)
+
+
+class StorePurchaseOwner(Base):
+    """Permanent ownership of a verified store subscription chain."""
+    __tablename__ = "store_purchase_owners"
+    chain_key: Mapped[str] = mapped_column(String(64), primary_key=True)
+    user_id: Mapped[str] = mapped_column(String(64), index=True)
+    store: Mapped[str] = mapped_column(String(16))
+
+
+class StorePurchase(Base):
+    __tablename__ = "store_purchases"
+    transaction_key: Mapped[str] = mapped_column(String(64), primary_key=True)
+    chain_key: Mapped[str] = mapped_column(String(64), index=True)
+    user_id: Mapped[str] = mapped_column(String(64), index=True)
+    product_id: Mapped[str] = mapped_column(String(128))
+    plan: Mapped[str] = mapped_column(String(32))
+    store: Mapped[str] = mapped_column(String(16))
+    expires_at: Mapped[int] = mapped_column(Integer)
+    auto_renew: Mapped[bool] = mapped_column(Boolean, default=False)
+    receipt_hash: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+    verified_at: Mapped[int] = mapped_column(Integer, default=now_ts)

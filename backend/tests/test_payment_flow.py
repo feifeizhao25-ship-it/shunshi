@@ -103,7 +103,7 @@ def db():
 
 
 @pytest.fixture()
-def app(db, monkeypatch):
+def app(db, monkeypatch, tmp_path):
     """
     创建轻量 FastAPI app，仅注册 subscription 路由。
     清空模块级全局状态。
@@ -127,6 +127,15 @@ def app(db, monkeypatch):
     test_app = FastAPI(title="Test Subscription API")
     from app.config import Settings
     test_app.state.settings = Settings(env="test", jwt_secret="payment-fixture-secret-at-least-32-characters")
+    from app.db import make_engine, make_session_factory, init_db
+    from app.simple_models import User
+    store_engine = make_engine(f"sqlite:///{tmp_path}/iap.db")
+    init_db(store_engine)
+    test_app.state.session_factory = make_session_factory(store_engine)
+    with test_app.state.session_factory() as session:
+        for name in ["user-restore-001", "user-restore-exp", "user-restore-idem"]:
+            session.add(User(id=name))
+        session.commit()
     test_app.include_router(sub_mod.router)
     return test_app
 

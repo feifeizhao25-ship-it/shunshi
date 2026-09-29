@@ -38,7 +38,8 @@ def test_deleted_account_token_cannot_access_retained_billing_records(client, au
     deleted = client.delete('/api/v1/auth/account', headers=auth_headers)
     assert deleted.status_code == 200
     assert deleted.json()['retained_billing_records'] == {
-        'payment_orders': 1, 'domestic_refund_requests': 1}
+        'payment_orders': 1, 'domestic_refund_requests': 1,
+        'store_purchases': 0, 'store_purchase_owners': 0}
     assert '不表示退款已完成' in deleted.json()['billing_notice']
     for path in ('/api/v1/payments/alipay/refund', '/api/v1/payments/alipay/query-order'):
         assert client.get(path, headers=auth_headers,

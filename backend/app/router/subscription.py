@@ -13,7 +13,8 @@ import os
 import secrets
 
 from app.security import verify_token
-from app.deps import current_user
+from app.deps import current_user, get_session
+from sqlalchemy.orm import Session
 from decimal import Decimal, InvalidOperation
 
 logger = logging.getLogger(__name__)
@@ -1452,6 +1453,7 @@ def _product_id_to_plan(product_id: str) -> Optional[str]:
 async def restore_purchase(
     request: RestorePurchaseRequest,
     user_id: str = Depends(_payment_user),
+    session: Session = Depends(get_session),
 ):
     """
     恢复购买（增强版）
@@ -1483,8 +1485,8 @@ async def restore_purchase(
 
     if request.platform == "ios":
         if not request.receipt:
-            # 没有 receipt 时，回退到本地历史记录
-            logger.info(f"[Restore] iOS 恢复购买: 无 receipt，查找本地历史 user={effective_user_id}")
+            # 缺少凭证时不授予权益
+            logger.info(f"[Restore] iOS 恢复购买: 无 receipt，需要平台凭证 user={effective_user_id}")
         else:
             try:
                 from app.services.apple_receipt import verify_apple_receipt
@@ -1498,7 +1500,7 @@ async def restore_purchase(
 
     elif request.platform == "android":
         if not request.purchase_token:
-            logger.info(f"[Restore] Android 恢复购买: 无 purchase_token，查找本地历史 user={effective_user_id}")
+            logger.info(f"[Restore] Android 恢复购买: 无 purchase_token，需要平台凭证 user={effective_user_id}")
         else:
             try:
                 from app.services.google_purchase import verify_google_purchase
@@ -1556,26 +1558,6 @@ async def restore_purchase(
         return {"success": False, "code": "expired", "message": "订阅已过期，请重新订阅"}
     expires_at = expiry.isoformat()
 
-    # ── 幂等检查 ──
-    current_sub = _get_user_subscription_lazy(effective_user_id)
-    if (current_sub.get("plan") == plan_id and
-            current_sub.get("status") == "active" and
-            current_sub.get("restored") and
-            current_sub.get("transaction_id") == txn_id and
-            current_sub.get("expires_at") == expires_at):
-        # 已恢复过，返回当前状态
-        return {
-            "success": True,
-            "code": "already_restored",
-            "data": {
-                "plan": plan_id,
-                "plan_name": plan.get("name", plan_id),
-                "expires_at": current_sub.get("expires_at"),
-                "features": current_sub.get("features", plan["features"]),
-                "message": "订阅已恢复（无需重复操作）",
-            }
-        }
-
     # ── 激活订阅 ──
     auto_renew = True
     if verify_result and verify_result.get("valid"):
@@ -1586,6 +1568,12 @@ async def restore_purchase(
     if request.receipt:
         import hashlib
         receipt_hash = hashlib.sha256(request.receipt.encode()).hexdigest()[:32]
+
+    from app.services.store_restore import persist_restore
+    chain_id = (verify_result.get("original_transaction_id") or txn_id) if request.platform == "ios" else request.purchase_token
+    already_restored = persist_restore(session, user_id=effective_user_id, store=request.platform,
+        transaction_id=txn_id, chain_id=chain_id, product_id=product_id, plan=plan_id,
+        expires_at=expiry, auto_renew=auto_renew, receipt_hash=receipt_hash)
 
     subscriptions[effective_user_id] = {
         "plan": plan_id,
@@ -1602,11 +1590,14 @@ async def restore_purchase(
     }
 
     # 初始化家庭席位
-    _init_family_seats(effective_user_id, plan_id)
+    if plan_id != "jiahe" or effective_user_id not in family_seats:
+        _init_family_seats(effective_user_id, plan_id)
 
     # 记录购买历史
     if effective_user_id not in purchase_history:
         purchase_history[effective_user_id] = []
+    purchase_history[effective_user_id] = [item for item in purchase_history[effective_user_id]
+        if not (item.get("platform") == f"iap_{request.platform}" and item.get("transaction_id") == txn_id)]
     purchase_history[effective_user_id].append({
         "plan": plan_id,
         "platform": f"iap_{request.platform}",
@@ -1632,7 +1623,7 @@ async def restore_purchase(
 
     return {
         "success": True,
-        "code": "restored",
+        "code": "already_restored" if already_restored else "restored",
         "data": {
             "plan": plan_id,
             "plan_name": plan.get("name", plan_id),
@@ -1647,7 +1638,9 @@ async def restore_purchase(
 # ---- 当前订阅状态 ----
 
 @router.get("/status", response_model=dict)
-async def get_subscription_status(user_id: str = Depends(_payment_user)):
+async def get_subscription_status(user_id: str = Depends(_payment_user), session: Session = Depends(get_session)):
+    from app.services.store_restore import hydrate_restore
+    hydrate_restore(session, user_id)
     """获取当前订阅状态"""
     sub = get_user_subscription(user_id)
     seats_info = get_family_seats_info(user_id)
@@ -1732,7 +1725,9 @@ async def unbind_family_member_endpoint(
 # ============================================================
 
 @router.get("", response_model=dict)
-async def get_subscription(user_id: str = Query("user-001")):
+async def get_subscription(user_id: str = Query("user-001"), session: Session = Depends(get_session)):
+    from app.services.store_restore import hydrate_restore
+    hydrate_restore(session, user_id)
     """获取订阅状态"""
     sub = get_user_subscription(user_id)
 
@@ -1852,15 +1847,23 @@ async def cancel_subscription(user_id: str = Depends(_payment_user)):
 async def restore_purchase_v2(
     request: RestorePurchaseRequest,
     user_id: str = Depends(_payment_user),
+    session: Session = Depends(get_session),
 ):
     """旧路径复用正式平台验证，不允许仅凭本地历史延长权益。"""
-    return await restore_purchase(request, user_id=user_id)
+    return await restore_purchase(request, user_id=user_id, session=session)
 
 
 @router.get("/history", response_model=dict)
-async def get_purchase_history(user_id: str = Depends(_payment_user)):
+async def get_purchase_history(user_id: str = Depends(_payment_user), session: Session = Depends(get_session)):
     """获取购买历史"""
-    history = purchase_history.get(user_id, [])
+    from sqlalchemy import select
+    from app.simple_models import StorePurchase
+    history = [item for item in purchase_history.get(user_id, []) if item.get("platform") not in {"iap_ios", "iap_android"}]
+    history += [{"plan": row.plan, "platform": f"iap_{row.store}",
+                 "transaction_id": row.transaction_key, "source": "restore",
+                 "expires_at": datetime.fromtimestamp(row.expires_at, timezone.utc).isoformat(),
+                 "receipt_hash": row.receipt_hash}
+                for row in session.scalars(select(StorePurchase).where(StorePurchase.user_id == user_id).order_by(StorePurchase.verified_at))]
 
     return {
         "success": True,
@@ -1883,6 +1886,7 @@ async def verify_receipt(
 async def verify_receipt_v2(
     request: ReceiptVerifyBody,
     user_id: str = Depends(_payment_user),
+    session: Session = Depends(get_session),
 ):
     """验证应用内购收据；权益只取平台验证结果，不信任客户端计划或用户。"""
     if not request.receipt_data:
@@ -1896,7 +1900,7 @@ async def verify_receipt_v2(
         product_id=request.product_id,
         user_id=user_id,
     )
-    return await restore_purchase(restore_request, user_id=user_id)
+    return await restore_purchase(restore_request, user_id=user_id, session=session)
 
 
 # ---- 旧版发起支付（兼容） ----

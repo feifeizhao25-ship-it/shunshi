@@ -192,6 +192,7 @@ async def _verify_with_apple(
             "expires_at_ms": expires_at_ms,
             "product_id": product_id,
             "transaction_id": txn_id,
+            "original_transaction_id": transaction_info.get("original_transaction_id") or txn_id,
             "bundle_id": bundle_id,
             "environment": data.get("environment", "unknown"),
             "is_trial": is_trial,

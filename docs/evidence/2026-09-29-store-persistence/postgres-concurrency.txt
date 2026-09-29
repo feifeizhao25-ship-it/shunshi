@@ -1,0 +1,1 @@
+PostgreSQL 17: concurrent cross-account claim has one winner; losing transaction rolled back; concurrent renewals preserve longer expiry; persisted rows verified in fresh sessions.
