@@ -1,6 +1,8 @@
 """顺时 - 健康礼品测试"""
 import pytest
 
+pytestmark = pytest.mark.admin_signed_in
+
 
 class TestGiftingProducts:
     def test_products_returns_200(self, client):

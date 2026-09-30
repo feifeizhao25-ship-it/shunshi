@@ -1,6 +1,8 @@
 """顺时 - 食疗方案测试"""
 import pytest
 
+pytestmark = pytest.mark.signed_in
+
 
 class TestFoodTherapyList:
     def test_list_returns_200(self, client):

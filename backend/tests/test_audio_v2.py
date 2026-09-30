@@ -5,6 +5,8 @@ test_audio_v2.py
 
 import pytest
 
+pytestmark = pytest.mark.signed_in
+
 
 class TestAudioLibrary:
     """音频库端点测试"""

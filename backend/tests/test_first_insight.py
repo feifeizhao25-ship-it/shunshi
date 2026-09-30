@@ -5,6 +5,8 @@ test_first_insight.py
 
 import pytest
 
+pytestmark = pytest.mark.signed_in
+
 
 class TestFirstInsight:
     """首次洞察生成端点测试"""

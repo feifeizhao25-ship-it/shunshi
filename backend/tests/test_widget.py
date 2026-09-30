@@ -1,6 +1,8 @@
 """顺时 - 桌面小组件测试"""
 import pytest
 
+pytestmark = pytest.mark.signed_in
+
 
 class TestWidgetTypes:
     def test_types_returns_200(self, client):
@@ -59,9 +61,9 @@ class TestWidgetWaterTracker:
         data = client.get("/api/v1/widget/data/water-tracker?user_id=test_user").json()
         assert "progress_pct" in data["data"]
 
-    def test_water_tracker_requires_user_id(self, client):
-        response = client.get("/api/v1/widget/data/water-tracker")
-        assert response.status_code == 422
+    def test_water_tracker_requires_login(self, anonymous_client):
+        response = anonymous_client.get("/api/v1/widget/data/water-tracker")
+        assert response.status_code == 401
 
 
 class TestWidgetCheckinStreak:
@@ -74,6 +76,6 @@ class TestWidgetCheckinStreak:
         assert "streak_days" in data["data"]
         assert "badge" in data["data"]
 
-    def test_checkin_requires_user_id(self, client):
-        response = client.get("/api/v1/widget/data/checkin-streak")
-        assert response.status_code == 422
+    def test_checkin_requires_login(self, anonymous_client):
+        response = anonymous_client.get("/api/v1/widget/data/checkin-streak")
+        assert response.status_code == 401

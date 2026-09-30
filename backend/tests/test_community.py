@@ -1,6 +1,8 @@
 """顺时 - 社区测试"""
 import pytest
 
+pytestmark = pytest.mark.signed_in
+
 
 class TestCommunityPosts:
     def test_list_posts_returns_200(self, client):

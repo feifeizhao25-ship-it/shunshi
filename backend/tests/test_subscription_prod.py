@@ -6,6 +6,8 @@
 """
 
 import pytest
+
+pytestmark = pytest.mark.signed_in
 from unittest.mock import patch
 from datetime import datetime, timedelta
 
@@ -214,7 +216,7 @@ class TestRestorePurchase:
     """恢复购买重新激活"""
 
     def test_restore_ios_purchase(self, client):
-        """iOS 恢复购买应重新激活订阅"""
+        """伪造的 iOS 收据不得恢复订阅（必须经 Apple 验证；验证不过就失败关闭）"""
         # 先订阅
         client.post(
             "/api/v1/subscription/subscribe",
@@ -233,7 +235,8 @@ class TestRestorePurchase:
         )
         assert restore_resp.status_code == 200
         data = restore_resp.json()
-        assert data.get("success") is True, "恢复购买应成功"
+        assert data.get("success") is False, "没有通过平台验证的收据不能恢复权益"
+        assert data.get("code") == "verify_failed"
 
     def test_restore_no_purchase_history(self, client):
         """无购买历史时恢复应失败"""
@@ -255,8 +258,9 @@ class TestRestorePurchase:
 class TestSubscriptionExpired:
     """过期后降为 free"""
 
-    def test_check_expiry_endpoint(self, client):
-        """到期检查端点应返回过期列表"""
+    def test_check_expiry_endpoint(self, admin_client):
+        """到期检查端点应返回过期列表（仅管理员：它列的是所有用户）"""
+        client = admin_client
         response = client.get("/api/v1/subscription/check-expiry")
         assert response.status_code == 200
         data = response.json()

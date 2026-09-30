@@ -1,6 +1,8 @@
 """顺时 - 可穿戴设备测试"""
 import pytest
 
+pytestmark = pytest.mark.signed_in
+
 
 class TestWearableDevices:
     def test_devices_returns_200(self, client):

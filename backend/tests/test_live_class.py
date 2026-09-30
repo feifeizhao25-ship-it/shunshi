@@ -1,6 +1,8 @@
 """顺时 - 直播课测试"""
 import pytest
 
+pytestmark = pytest.mark.signed_in
+
 
 class TestLiveClassList:
     def test_list_returns_200(self, client):

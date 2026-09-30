@@ -11,7 +11,10 @@ def test_health_fail_closed_when_dependencies_unconfigured(client):
     components = body["components"]
     assert components["database"]["status"] == "up"  # 测试库可达
     assert components["redis"] == {"configured": False, "status": "down"}
-    assert components["model_gateway"] == {"configured": False, "status": "down"}
+    # 国内版直连国内模型厂商：没配任何厂商就是 down，并如实列出已配置的厂商（此处为空）。
+    assert components["model_gateway"] == {
+        "configured": False, "status": "down", "mode": "domestic-direct", "providers": [],
+    }
 
 
 def test_health_configured_but_unreachable_is_down(settings):

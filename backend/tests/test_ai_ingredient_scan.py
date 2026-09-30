@@ -1,6 +1,8 @@
 """顺时 - AI食材扫描测试"""
 import pytest
 
+pytestmark = pytest.mark.signed_in
+
 
 class TestIngredientScan:
     def test_scan_by_name_returns_200(self, client):

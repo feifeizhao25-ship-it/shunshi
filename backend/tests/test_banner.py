@@ -1,6 +1,8 @@
 """顺时 - 横幅公告测试"""
 import pytest
 
+pytestmark = pytest.mark.admin_signed_in
+
 
 class TestBannerActive:
     def test_active_returns_200(self, client):

@@ -1,6 +1,8 @@
 """顺时 - 夫妻养生测试"""
 import pytest
 
+pytestmark = pytest.mark.signed_in
+
 
 class TestCoupleTopics:
     def test_topics_returns_200(self, client):

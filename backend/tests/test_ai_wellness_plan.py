@@ -1,6 +1,8 @@
 """顺时 - AI健康计划测试"""
 import pytest
 
+pytestmark = pytest.mark.signed_in
+
 
 class TestAIWellnessPlanGenerate:
     def test_generate_returns_200(self, client):
@@ -20,10 +22,10 @@ class TestAIWellnessPlanGenerate:
         assert data["success"] is True
         assert "plan" in data["data"]
 
-    def test_generate_requires_user_id(self, client):
-        response = client.post("/api/v1/ai-wellness-plan/generate",
+    def test_generate_requires_login(self, anonymous_client):
+        response = anonymous_client.post("/api/v1/ai-wellness-plan/generate",
                                json={"constitution": "qi_deficiency"})
-        assert response.status_code == 422
+        assert response.status_code == 401
 
     def test_generate_requires_constitution(self, client):
         response = client.post("/api/v1/ai-wellness-plan/generate",

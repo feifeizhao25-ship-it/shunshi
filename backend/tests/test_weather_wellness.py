@@ -1,6 +1,8 @@
 """顺时 - 天气养生测试"""
 import pytest
 
+pytestmark = pytest.mark.signed_in
+
 
 class TestWeatherAdvice:
     def test_advice_returns_200(self, client):

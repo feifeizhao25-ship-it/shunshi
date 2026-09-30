@@ -5,6 +5,8 @@ test_emotion.py
 
 import pytest
 
+pytestmark = pytest.mark.signed_in
+
 
 class TestEmotionLog:
     """情绪记录端点测试"""
