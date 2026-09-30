@@ -21,6 +21,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
+from ..aigc import ai_disclosure
 from ..config import Settings
 from ..deps import current_user, get_session, get_settings
 from ..simple_models import Message, Entitlement
@@ -155,6 +156,7 @@ async def chat(
             "safety_flag": safety_result.flag or safety_result.level.value,
             "sources": [],
             "source_details": [],
+            **ai_disclosure(),
         }
     messages = [{"role": "system", "content": SYSTEM_PROMPT}]
     # Client-provided prompts and tiers are untrusted; never replace server policy.
@@ -223,4 +225,5 @@ async def chat(
         "safety_flag": output_safety.flag or "none",
         "sources": rag_sources,
         "source_details": rag_source_details,
+        **ai_disclosure(),
     }

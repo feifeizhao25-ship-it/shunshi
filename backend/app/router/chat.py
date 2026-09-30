@@ -10,6 +10,8 @@ import random
 import uuid
 import logging
 
+from app.aigc import ai_disclosure
+
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/v1/chat", tags=["聊天"])
@@ -316,7 +318,8 @@ async def chat(
     message_id = str(uuid.uuid4())
     conversations_db[conversation_id]["messages"].extend([
         {"id": str(uuid.uuid4()), "role": "user", "content": message, "created_at": datetime.now().isoformat()},
-        {"id": message_id, "role": "assistant", "content": result["text"], "created_at": datetime.now().isoformat()},
+        {"id": message_id, "role": "assistant", "content": result["text"], "created_at": datetime.now().isoformat(),
+         **ai_disclosure()},
     ])
     return {"success": True, "data": {**result, "message_id": message_id, "conversation_id": conversation_id}}
 
