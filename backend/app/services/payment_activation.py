@@ -116,6 +116,7 @@ def _restore_domestic_entitlement(request, db, user_id):
     """
     from app.router import subscription as sub
     from app.simple_models import Entitlement, User
+    from sqlalchemy import update
 
     session_factory = getattr(request.app.state, "session_factory", None)
     if session_factory is None:
@@ -137,7 +138,12 @@ def _restore_domestic_entitlement(request, db, user_id):
         paid_at = latest["paid_at"]
         paid_ts = int(datetime.fromisoformat(paid_at).timestamp())
         with session_factory() as session:
-            if session.get(User, user_id) is None:
+            # Share the account lock used by store restores and family seats.
+            # Lock before reading entitlement, including when no row exists yet:
+            # locking only Entitlement cannot serialize its first insertion.
+            locked = session.execute(update(User).where(User.id == user_id)
+                .values(nickname=User.nickname)).rowcount
+            if locked != 1:
                 raise HTTPException(status_code=410, detail="账号已不存在，不能恢复会员权益")
             entitlement = session.get(Entitlement, user_id)
             values = dict(product_id=latest["product_id"], store=latest["platform"],

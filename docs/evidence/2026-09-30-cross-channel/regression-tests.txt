@@ -1,0 +1,76 @@
+.......................F................................................ [ 46%]
+........................................................................ [ 92%]
+............                                                             [100%]
+=================================== FAILURES ===================================
+__________ test_production_lifespan_starts_and_drains_recovery_worker __________
+
+settings = Settings(env='test', database_url='sqlite:////private/var/folders/76/kgztbzps61vd_rnp4mc1q7980000gn/T/pytest-of-feifei...url='', sms_provider_url='', sms_provider_token='', payment_callback_secret='', content_source_url='', cors_origins='')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x1127ad4c0>
+
+    def test_production_lifespan_starts_and_drains_recovery_worker(settings, monkeypatch):
+        started, stopped = Event(), Event()
+        async def worker(app, stop):
+            started.set()
+            await stop.wait()
+            stopped.set()
+        monkeypatch.setattr(payment_recovery, 'payment_recovery_loop', worker)
+        production = settings.model_copy(update={
+            'env': 'production', 'cors_origins': 'https://example.cn'})
+>       with TestClient(create_app(production)):
+                        ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_domestic_payment_jobs.py:25: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+settings = Settings(env='production', database_url='sqlite:////private/var/folders/76/kgztbzps61vd_rnp4mc1q7980000gn/T/pytest-of-...er_url='', sms_provider_token='', payment_callback_secret='', content_source_url='', cors_origins='https://example.cn')
+
+    def create_app(settings: Settings | None = None) -> FastAPI:
+        settings = settings or Settings()
+    
+        if settings.env == "production" and (
+            len(settings.jwt_secret) < 32 or not settings.cors_origin_list()
+        ):
+            raise RuntimeError("生产环境必须配置至少 32 位 SHUNSHI_JWT_SECRET 和明确的 SHUNSHI_CORS_ORIGINS")
+    
+        # 生产环境不允许回落到 SQLite 缺省值。
+        #
+        # `Settings` 的 env_prefix 是 "SHUNSHI_"，而 docker-compose.yml 里写的是
+        # 不带前缀的 DATABASE_URL —— pydantic-settings 根本不读它。于是
+        # database_url 悄悄用了缺省值 sqlite:///./shunshi_dev.db，落在容器的
+        # WORKDIR /app 下，而 compose 只把 /app/data 和 /app/logs 做成了 volume。
+        #
+        # 结果：postgres 容器健康地跑着、一个字节都没写进去；用户数据全在
+        # 容器可写层里，**下一次 docker compose up --build 就清零**。
+        #
+        # JWT 与 CORS 都是 fail-closed 的，唯独"数据存在哪"不是——偏偏它是
+        # 唯一一个错了不会报错、只会在重新部署那天才暴露的配置。补上。
+        if settings.env == "production" and settings.database_url.startswith("sqlite"):
+>           raise RuntimeError(
+                "生产环境必须显式配置 SHUNSHI_DATABASE_URL（PostgreSQL DSN）。"
+                "当前回落到了 SQLite 缺省值，数据不会持久化。"
+                "注意变量名要带 SHUNSHI_ 前缀，不带前缀的 DATABASE_URL 不会被读取。"
+            )
+E           RuntimeError: 生产环境必须显式配置 SHUNSHI_DATABASE_URL（PostgreSQL DSN）。当前回落到了 SQLite 缺省值，数据不会持久化。注意变量名要带 SHUNSHI_ 前缀，不带前缀的 DATABASE_URL 不会被读取。
+
+app/main.py:90: RuntimeError
+=============================== warnings summary ===============================
+../../../../../../tmp/shunshi-verify-20260927/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /tmp/shunshi-verify-20260927/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+app/db/database.py:34
+  /Users/feifei00/Documents/CodexWorktrees/shunshi-production/backend/app/db/database.py:34: MovedIn20Warning: The ``declarative_base()`` function is now available as sqlalchemy.orm.declarative_base(). (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    Base = declarative_base()
+
+app/core/settings.py:9
+  /Users/feifei00/Documents/CodexWorktrees/shunshi-production/backend/app/core/settings.py:9: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class Settings(BaseSettings):
+
+app/router/ai_content.py:413
+  /Users/feifei00/Documents/CodexWorktrees/shunshi-production/backend/app/router/ai_content.py:413: FastAPIDeprecationWarning: `regex` has been deprecated, please use `pattern` instead
+    lang: str = Query("zh", regex="^(zh|en)$"),
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_domestic_payment_jobs.py::test_production_lifespan_starts_and_drains_recovery_worker
+1 failed, 155 passed, 4 warnings in 15.53s

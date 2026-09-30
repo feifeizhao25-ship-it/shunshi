@@ -117,3 +117,76 @@ def test_old_domestic_replay_does_not_overwrite_other_store(client, auth_headers
     assert error.value.status_code == 409
     with client.app.state.session_factory() as session:
         assert session.get(Entitlement, order['user_id']).store == 'apple'
+
+
+@pytest.mark.parametrize('existing_entitlement', [False, True])
+def test_domestic_projection_serializes_with_store_restore(client, auth_headers, existing_entitlement):
+    """Exercise independent DB sessions, including a missing entitlement row."""
+    import time
+    from datetime import timedelta, timezone
+    from threading import Event, local
+    from sqlalchemy import event, select, func
+    from app.services.store_restore import persist_restore
+    from app.simple_models import StorePurchase, StorePurchaseOwner
+
+    order, args = order_for(client, auth_headers)
+    factory = client.app.state.session_factory
+    with factory() as session:
+        engine = session.get_bind()
+        if existing_entitlement:
+            session.add(Entitlement(user_id=order['user_id'], product_id='yangxin_monthly',
+                store='alipay', expires_at=int(time.time()) - 60,
+                original_transaction_id='expired-domestic'))
+            session.commit()
+    projection_read = Event()
+    release_projection = Event()
+    restore_attempt = Event()
+    restore_done = Event()
+    role = local()
+
+    def before_execute(conn, cursor, statement, parameters, context, executemany):
+        sql = statement.lower()
+        if getattr(role, 'name', '') == 'domestic' and sql.startswith('select') and 'from entitlements' in sql:
+            projection_read.set()
+            assert release_projection.wait(5), 'test did not release domestic projection'
+        if getattr(role, 'name', '') == 'store' and sql.startswith('update users'):
+            restore_attempt.set()
+
+    def domestic():
+        role.name = 'domestic'
+        return activate_verified_domestic_payment(SimpleNamespace(app=client.app), **args)
+
+    def store():
+        role.name = 'store'
+        try:
+            with factory() as session:
+                persist_restore(session, user_id=order['user_id'], store='ios',
+                    transaction_id='concurrent-store', chain_id='concurrent-chain',
+                    product_id='com.shunshi.yiyang.yearly', plan='yiyang',
+                    expires_at=datetime.now(timezone.utc) + timedelta(days=365),
+                    auto_renew=False, receipt_hash='fixture-hash')
+            return 200
+        except HTTPException as exc:
+            return exc.status_code
+        finally:
+            restore_done.set()
+
+    event.listen(engine, 'before_cursor_execute', before_execute)
+    try:
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            payment = pool.submit(domestic)
+            try:
+                assert projection_read.wait(5)
+                restoration = pool.submit(store)
+                assert restore_attempt.wait(5)
+                assert not restore_done.wait(0.3), 'store bypassed domestic account lock'
+            finally:
+                release_projection.set()
+            assert payment.result(timeout=5)['status'] == 'paid'
+            assert restoration.result(timeout=5) == 409
+    finally:
+        event.remove(engine, 'before_cursor_execute', before_execute)
+    with factory() as session:
+        assert session.get(Entitlement, order['user_id']).store == 'alipay'
+        assert session.scalar(select(func.count()).select_from(StorePurchase)) == 0
+        assert session.scalar(select(func.count()).select_from(StorePurchaseOwner)) == 0
