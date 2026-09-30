@@ -24,6 +24,7 @@ from sqlalchemy.orm import Session
 from ..aigc import ai_disclosure
 from ..config import Settings
 from ..deps import current_user, get_session, get_settings
+from ..services.age_policy import policy_for
 from ..services.continuous_use import usage_reminder
 from ..simple_models import Message, Entitlement
 from ..entitlements import tier_for_product
@@ -62,7 +63,7 @@ def _recent_history(session: Session, user_id: str) -> list[dict[str, str]]:
 SYSTEM_PROMPT = (
     "你是顺时健康陪伴助手。只用简明中文，不诊断、不替代医生；"
     "涉及危险症状应建议立即就医。回答要可执行、易懂。"
-)
+)  # 面向所有人的身份规则（不是真人、不扮演亲密关系）与年龄相关规则由 age_policy 追加
 
 
 class ChatBody(BaseModel):
@@ -141,6 +142,8 @@ async def chat(
     message = body.text()
     # 先算再写：提醒依据的是「本轮之前」的使用记录。
     reminder = usage_reminder(session, user_id)
+    age = policy_for(session, user_id)  # 未满 14 周岁在这里直接 403，不会走到模型
+    extra = age.response_fields()
     from ..safety.guard import SafetyLevel, safety_guard
 
     safety_result = safety_guard.check_input(message, {"user_id": user_id, "lang": "cn"})
@@ -161,8 +164,9 @@ async def chat(
             "source_details": [],
             "usage_reminder": reminder,
             **ai_disclosure(),
+            **extra,
         }
-    messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+    messages = [{"role": "system", "content": SYSTEM_PROMPT + "".join(age.system_rules)}]
     # Client-provided prompts and tiers are untrusted; never replace server policy.
     if body.context:
         context_text = json.dumps(body.context, ensure_ascii=False)
@@ -234,4 +238,5 @@ async def chat(
         "source_details": rag_source_details,
         "usage_reminder": reminder,
         **ai_disclosure(),
+        **extra,
     }

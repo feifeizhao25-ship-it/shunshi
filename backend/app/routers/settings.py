@@ -9,7 +9,7 @@
 """
 
 import json
-from datetime import datetime
+from datetime import date, datetime
 
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
@@ -101,3 +101,31 @@ def check_quiet_hours(
         current = datetime.now().strftime("%H:%M")
         is_quiet = start <= current < end if start < end else current >= start or current < end
     return {**settings, "is_quiet": is_quiet}
+
+
+class AgeProfile(BaseModel):
+    birth_date: date
+
+
+@router.get("/settings/age-profile")
+def get_age_profile(
+    user_id: str = Depends(current_user), session: Session = Depends(get_session)
+):
+    """只返回年龄段，不回传出生日期。"""
+    from ..services.age_policy import read_group
+
+    group = read_group(session, user_id)
+    return {"declared": group != "unknown", "age_group": group}
+
+
+@router.post("/settings/age-profile")
+def set_age_profile(
+    body: AgeProfile,
+    user_id: str = Depends(current_user),
+    session: Session = Depends(get_session),
+):
+    """填写出生日期（自报）。用于未成年人保护与老年用户的健康使用提示。"""
+    from ..services.age_policy import declare_birth_date
+
+    group = declare_birth_date(session, user_id, body.birth_date)
+    return {"declared": True, "age_group": group}
