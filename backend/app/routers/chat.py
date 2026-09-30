@@ -24,6 +24,7 @@ from sqlalchemy.orm import Session
 from ..aigc import ai_disclosure
 from ..config import Settings
 from ..deps import current_user, get_session, get_settings
+from ..services.continuous_use import usage_reminder
 from ..simple_models import Message, Entitlement
 from ..entitlements import tier_for_product
 
@@ -138,6 +139,8 @@ async def chat(
     settings: Settings = Depends(get_settings),
 ):
     message = body.text()
+    # 先算再写：提醒依据的是「本轮之前」的使用记录。
+    reminder = usage_reminder(session, user_id)
     from ..safety.guard import SafetyLevel, safety_guard
 
     safety_result = safety_guard.check_input(message, {"user_id": user_id, "lang": "cn"})
@@ -156,6 +159,7 @@ async def chat(
             "safety_flag": safety_result.flag or safety_result.level.value,
             "sources": [],
             "source_details": [],
+            "usage_reminder": reminder,
             **ai_disclosure(),
         }
     messages = [{"role": "system", "content": SYSTEM_PROMPT}]
@@ -216,14 +220,18 @@ async def chat(
         answer = answer + output_safety.prefix
     session.add(Message(user_id=user_id, role="user", content=message))
     session.add(Message(user_id=user_id, role="assistant", content=answer))
+    # 提醒拼在回答末尾（不写进对话记录，也不会被当作历史再喂给模型）：
+    # 客户端不认 usage_reminder 字段时，用户照样能在对话里看到。
+    shown = answer + "\n\n" + reminder["text"] if reminder else answer
     return {
-        "content": answer,
-        "message": answer,
-        "text": answer,
+        "content": shown,
+        "message": shown,
+        "text": shown,
         "tone": "gentle",
         "care_status": "stable",
         "safety_flag": output_safety.flag or "none",
         "sources": rag_sources,
         "source_details": rag_source_details,
+        "usage_reminder": reminder,
         **ai_disclosure(),
     }
