@@ -66,6 +66,11 @@ SYSTEM_PROMPT = (
 )  # 面向所有人的身份规则（不是真人、不扮演亲密关系）与年龄相关规则由 age_policy 追加
 
 
+DISTRESS_HELP_SUFFIX = (
+    "\n\n如果这种难受的感觉一直没有缓解，可以拨打全国心理援助热线 12356，也可以和身边信任的人说说。"
+)
+
+
 class ChatBody(BaseModel):
     message: str | None = Field(default=None, min_length=1, max_length=4000)
     user_input: str | None = Field(default=None, min_length=1, max_length=4000)
@@ -144,7 +149,7 @@ async def chat(
     reminder = usage_reminder(session, user_id)
     age = policy_for(session, user_id)  # 未满 14 周岁在这里直接 403，不会走到模型
     extra = age.response_fields()
-    from ..safety.guard import SafetyLevel, safety_guard
+    from ..safety.guard import DEPENDENCY_SUFFIX_CN, SafetyLevel, safety_guard
 
     safety_result = safety_guard.check_input(message, {"user_id": user_id, "lang": "cn"})
     if safety_result.level == SafetyLevel.CRISIS or safety_result.should_block:
@@ -167,6 +172,12 @@ async def chat(
             **extra,
         }
     messages = [{"role": "system", "content": SYSTEM_PROMPT + "".join(age.system_rules)}]
+    # 情绪困扰 / 敏感：安全守卫给出的共情指令要真正交给模型（原来只在危机时才看守卫结果，
+    # 困扰等级的前缀被算出来又丢掉）。依赖倾向的后缀属于回答末尾，不属于给模型的指令。
+    if safety_result.prefix:
+        messages.append(
+            {"role": "system", "content": safety_result.prefix.replace(DEPENDENCY_SUFFIX_CN, "").strip()}
+        )
     # Client-provided prompts and tiers are untrusted; never replace server policy.
     if body.context:
         context_text = json.dumps(body.context, ensure_ascii=False)
@@ -222,6 +233,10 @@ async def chat(
         answer = output_safety.override_response or output_safety.prefix or "这份回答未通过安全检查，请换个问题或咨询专业人员。"
     elif output_safety.prefix:
         answer = answer + output_safety.prefix
+    if safety_result.level == SafetyLevel.EMOTIONAL_DISTRESS:
+        answer += DISTRESS_HELP_SUFFIX
+    elif any("dependency" in rule for rule in safety_result.detection_rules):
+        answer += DEPENDENCY_SUFFIX_CN
     session.add(Message(user_id=user_id, role="user", content=message))
     session.add(Message(user_id=user_id, role="assistant", content=answer))
     # 提醒拼在回答末尾（不写进对话记录，也不会被当作历史再喂给模型）：
@@ -233,7 +248,7 @@ async def chat(
         "text": shown,
         "tone": "gentle",
         "care_status": "stable",
-        "safety_flag": output_safety.flag or "none",
+        "safety_flag": output_safety.flag or safety_result.flag or "none",
         "sources": rag_sources,
         "source_details": rag_source_details,
         "usage_reminder": reminder,
