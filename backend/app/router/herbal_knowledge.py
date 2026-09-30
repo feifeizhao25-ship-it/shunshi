@@ -8,6 +8,9 @@ from typing import Optional, List
 
 router = APIRouter(prefix="/api/v1/herbal", tags=["herbal-knowledge"])
 
+# 顺时不做处方：不给出药材的用量与服法。用量因人、因病、因炮制而异，须由执业中医师/药师开具。
+USAGE_NOTICE = "中医药文化科普，不是处方或用药建议；用量、服法与是否适合你，请咨询执业中医师或药师。"
+
 HERBS = {
     "goji": {
         "id": "goji", "name_cn": "枸杞", "name_en": "Wolfberry",
@@ -15,7 +18,7 @@ HERBS = {
         "nature": "平", "flavor": "甘", "meridians": ["肝经", "肾经"],
         "functions": ["滋补肝肾", "益精明目", "润肺"],
         "indications": ["虚劳精亏", "腰膝酸痛", "眩晕耳鸣", "视力减退"],
-        "dosage": "6-12g，煎服或泡茶",
+        "usage_notice": USAGE_NOTICE,
         "contraindications": "外感实热、脾虚腹泻者不宜",
         "storage": "置阴凉干燥处，防潮防蛀",
         "common_pairs": ["菊花", "黑芝麻", "熟地黄"],
@@ -27,7 +30,7 @@ HERBS = {
         "nature": "微温", "flavor": "甘", "meridians": ["脾经", "肺经"],
         "functions": ["补气固表", "利水退肿", "托毒排脓", "生肌"],
         "indications": ["气虚乏力", "食少便溏", "中气下陷", "久泻脱肛"],
-        "dosage": "9-30g，煎服",
+        "usage_notice": USAGE_NOTICE,
         "contraindications": "表实邪盛、气滞湿阻、食积内停者不宜",
         "storage": "置通风干燥处，防潮防蛀",
         "common_pairs": ["党参", "白术", "当归"],
@@ -39,7 +42,7 @@ HERBS = {
         "nature": "微温", "flavor": "甘、微苦", "meridians": ["脾经", "肺经", "心经"],
         "functions": ["大补元气", "复脉固脱", "补脾益肺", "生津养血", "安神益智"],
         "indications": ["体虚欲脱", "肢冷脉微", "脾虚食少", "肺虚喘咳"],
-        "dosage": "3-9g，另煎兑服；研末吞服，每次2g",
+        "usage_notice": USAGE_NOTICE,
         "contraindications": "实证、热证慎用；不宜与藜芦、五灵脂、皂荚同用",
         "storage": "密封，置阴凉干燥处",
         "common_pairs": ["麦冬", "五味子", "白术"],
@@ -51,7 +54,7 @@ HERBS = {
         "nature": "温", "flavor": "甘、辛", "meridians": ["肝经", "心经", "脾经"],
         "functions": ["补血活血", "调经止痛", "润肠通便"],
         "indications": ["血虚萎黄", "月经不调", "闭经痛经", "肠燥便秘"],
-        "dosage": "6-12g，煎服",
+        "usage_notice": USAGE_NOTICE,
         "contraindications": "湿盛中满、大便泄泻者慎用；孕妇慎用",
         "storage": "置阴凉干燥处，防潮防霉",
         "common_pairs": ["黄芪", "白芍", "川芎"],
@@ -63,7 +66,7 @@ HERBS = {
         "nature": "温", "flavor": "甘", "meridians": ["脾经", "胃经"],
         "functions": ["补中益气", "养血安神", "缓和药性"],
         "indications": ["脾虚食少", "乏力便溏", "妇人脏躁"],
-        "dosage": "6-15g（3-10枚），煎服",
+        "usage_notice": USAGE_NOTICE,
         "contraindications": "湿盛脘腹胀满、食积、虫积者慎用",
         "storage": "置阴凉干燥处",
         "common_pairs": ["生姜", "甘草", "枸杞"],
@@ -75,7 +78,7 @@ HERBS = {
         "nature": "平", "flavor": "甘", "meridians": ["心经", "肺经", "脾经", "胃经"],
         "functions": ["补脾益气", "清热解毒", "祛痰止咳", "缓急止痛", "调和诸药"],
         "indications": ["脾胃虚弱", "倦怠乏力", "心悸气短", "咽喉肿痛"],
-        "dosage": "2-10g，煎服",
+        "usage_notice": USAGE_NOTICE,
         "contraindications": "湿盛胀满、浮肿者不宜用；不宜与海藻、京大戟、芫花、甘遂同用",
         "storage": "置通风干燥处",
         "common_pairs": ["茯苓", "白术", "党参"],
@@ -87,7 +90,7 @@ HERBS = {
         "nature": "微温", "flavor": "酸、甘", "meridians": ["脾经", "胃经", "肝经"],
         "functions": ["消食健胃", "行气散瘀", "降脂"],
         "indications": ["肉食积滞", "胃脘胀满", "泻痢腹痛", "血瘀经闭"],
-        "dosage": "9-12g，煎服",
+        "usage_notice": USAGE_NOTICE,
         "contraindications": "脾胃虚弱者慎用；孕妇慎用",
         "storage": "置通风干燥处",
         "common_pairs": ["麦芽", "神曲", "莱菔子"],

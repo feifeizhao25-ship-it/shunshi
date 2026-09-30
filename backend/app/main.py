@@ -35,6 +35,15 @@ INTERNATIONAL_ONLY_MODULES = frozenset(
 )
 
 
+# 暂不上线的模块：内容没有经过有资质的人审核，先不挂载，审核通过再从这里移出。
+# - tcm_medication：15 种中成药的「每次 6-9g、一日 2-3 次」「饭前/饭后」「配伍禁忌」是同一套
+#   模板文字，没有来源；给出剂量、服法与配伍结论属于用药指导，需要执业药师/中医师审核。
+#   应用自己的安全规则（app/safety/config.py）本来就不允许 AI 说出这类话，数据接口更不该有。
+PENDING_REVIEW_MODULES = {
+    "tcm_medication": "剂量、服法、配伍禁忌无来源，需执业药师/中医师审核后再上线",
+}
+
+
 def _include_product_routers(app: FastAPI) -> None:
     """Mount every production router under ``app.router``.
 
@@ -50,7 +59,7 @@ def _include_product_routers(app: FastAPI) -> None:
     for module_info in pkgutil.iter_modules(product_router_package.__path__):
         if module_info.name.startswith("_"):
             continue
-        if module_info.name in INTERNATIONAL_ONLY_MODULES:
+        if module_info.name in INTERNATIONAL_ONLY_MODULES or module_info.name in PENDING_REVIEW_MODULES:
             continue
         module = importlib.import_module(f"{product_router_package.__name__}.{module_info.name}")
         candidate = getattr(module, "router", None)
