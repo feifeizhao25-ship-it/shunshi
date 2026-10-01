@@ -147,6 +147,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         docs_url=None if settings.env == "production" else "/docs",
         lifespan=lifespan,
     )
+    from .errors import install_chinese_error_handlers
+
+    install_chinese_error_handlers(app)
     app.state.settings = settings
     app.state.engine = engine
     app.state.session_factory = make_session_factory(engine)
