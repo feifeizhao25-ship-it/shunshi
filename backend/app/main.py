@@ -18,6 +18,9 @@ from .routers import chat, content, feedback, health, memory, reflections, seaso
 
 # 国际版 SEASONS 专用的模块，国内版不挂载：
 # - stripe / seasons_subscription：境外支付与美元定价；
+# - audio_v2 / first_insight / localization / western_bridge / cultural_stories：国际版的英文内容。
+#   audio_v2 复用 seasons_audio 的英文音频库（标题英文、链接指向 audio.seasons.app）；first_insight 的
+#   "Welcome to SEASONS"；后三个自己的说明就写着「顺时国际版」，面向西方用户。
 # - seasons_chat：``POST /ai/chat`` 英文人设、不登录可用、user_id 由客户端自报（额度形同虚设）；
 # - seasons_api / seasons_home / seasons_family / seasons_audio：国际版的用户、家庭与内容接口，
 #   其中 ``/api/v1/seasons/user/{user_id}`` 的删除与导出不校验身份。
@@ -31,6 +34,11 @@ INTERNATIONAL_ONLY_MODULES = frozenset(
         "seasons_family",
         "seasons_home",
         "seasons_subscription",
+        "audio_v2",
+        "first_insight",
+        "localization",
+        "western_bridge",
+        "cultural_stories",
     }
 )
 

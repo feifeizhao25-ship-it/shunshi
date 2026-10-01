@@ -56,3 +56,33 @@ def test_every_stripe_or_seasons_module_is_on_the_exclusion_list():
     names = {m.name for m in pkgutil.iter_modules(product_router_package.__path__)}
     suspicious = {n for n in names if n.startswith(("stripe", "seasons_"))}
     assert suspicious <= INTERNATIONAL_ONLY_MODULES, sorted(suspicious - INTERNATIONAL_ONLY_MODULES)
+
+
+def test_modules_that_declare_themselves_international_are_excluded():
+    """模块自己的说明写着「国际版 / SEASONS Global」，却没进排除名单——这是 2026-09 查出的 5 个漏网之鱼
+    （英文内容、audio.seasons.app 链接、first-insight 的 "Welcome to SEASONS" 都暴露在国内版里）。
+    按文件说明扫，新增同类模块忘了登记会在这里变红。"""
+    import ast
+    import pathlib
+    import re
+
+    marker = re.compile(r"国际版|国际用户|SEASONS (Global|Audio)|SEASONS Global|Global Version|Western users", re.I)
+    router_dir = pathlib.Path(__file__).resolve().parent.parent / "app" / "router"
+    flagged = set()
+    for path in router_dir.glob("*.py"):
+        if path.stem.startswith("_"):
+            continue
+        doc = ast.get_docstring(ast.parse(path.read_text(encoding="utf-8"))) or ""
+        if marker.search(doc[:300]):
+            flagged.add(path.stem)
+    assert {"seasons_chat", "stripe"} & flagged or len(flagged) >= 5, "扫描没有命中任何模块，检查条件写错了"
+    assert flagged <= INTERNATIONAL_ONLY_MODULES, sorted(flagged - INTERNATIONAL_ONLY_MODULES)
+
+
+def test_english_only_content_is_not_served_by_the_domestic_app():
+    from fastapi.testclient import TestClient
+
+    client = TestClient(app)
+    for path in ("/api/v1/audio/library", "/api/v1/stories/", "/api/v1/localization/languages", "/api/v1/bridge/concepts"):
+        assert client.get(path).status_code == 404, path
+    assert client.post("/api/v1/ai/generate-first-insight", json={}).status_code == 404
