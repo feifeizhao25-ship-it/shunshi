@@ -21,3 +21,20 @@ def ai_disclosure() -> dict[str, Any]:
         "ai_label": AI_LABEL,
         "ai_notice": AI_IDENTITY_NOTICE,
     }
+
+
+# 音频没有可见的面，用响应头做隐式标识（可见的「AI 生成」由客户端在播放界面展示）。
+AI_HEADERS = {"X-AI-Generated": "true"}
+
+PROMPT_REFUSED = "这个内容无法生成，请换一个描述"
+
+
+def ensure_prompt_allowed(text: str, user_id: str = "anonymous") -> None:
+    """图片、视频、语音生成前的内容安全检查：命中禁止类内容（暴力、色情等）直接拒绝，不调用模型。"""
+    from fastapi import HTTPException
+
+    from .safety.guard import safety_guard
+
+    result = safety_guard.check_input(text, {"user_id": user_id})
+    if result.should_block and result.flag == "blocked":
+        raise HTTPException(status_code=400, detail=PROMPT_REFUSED)

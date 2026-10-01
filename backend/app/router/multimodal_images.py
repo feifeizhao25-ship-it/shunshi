@@ -12,6 +12,7 @@ from fastapi import APIRouter, HTTPException, BackgroundTasks
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
+from app.aigc import ai_disclosure, ensure_prompt_allowed
 from app.multimodal.image import generate_image
 
 logger = logging.getLogger(__name__)
@@ -57,6 +58,7 @@ MiniMax 图片生成接口，支持生成：
 )
 async def create_image(req: ImageGenerateRequest) -> JSONResponse:
     """生成图片"""
+    ensure_prompt_allowed(req.prompt)
     try:
         result = await generate_image(
             prompt=req.prompt,
@@ -64,7 +66,7 @@ async def create_image(req: ImageGenerateRequest) -> JSONResponse:
             model=req.model,
             n=req.n,
         )
-        return JSONResponse(content=result)
+        return JSONResponse(content={**result, **ai_disclosure()})
     except ValueError as e:
         logger.warning(f"[Multimodal Images] 参数错误: {e}")
         raise HTTPException(status_code=400, detail=str(e))

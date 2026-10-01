@@ -12,6 +12,7 @@ from fastapi.responses import JSONResponse
 from typing import Optional
 from pydantic import BaseModel, Field
 
+from app.aigc import ai_disclosure, ensure_prompt_allowed
 from app.multimodal.video import generate_video, query_video_status
 
 logger = logging.getLogger(__name__)
@@ -74,13 +75,14 @@ MiniMax 视频生成接口，支持生成：
 )
 async def create_video(req: VideoGenerateRequest) -> JSONResponse:
     """提交视频生成任务"""
+    ensure_prompt_allowed(req.prompt)
     try:
         result = await generate_video(
             prompt=req.prompt,
             subject_image_url=req.subject_image_url,
             model=req.model,
         )
-        return JSONResponse(content=result)
+        return JSONResponse(content={**result, **ai_disclosure()})
     except ValueError as e:
         logger.warning(f"[Multimodal Videos] 参数错误: {e}")
         raise HTTPException(status_code=400, detail=str(e))
@@ -102,7 +104,7 @@ async def get_video_status(task_id: str) -> JSONResponse:
     """查询视频生成状态"""
     try:
         result = await query_video_status(task_id=task_id)
-        return JSONResponse(content=result)
+        return JSONResponse(content={**result, **ai_disclosure()})
     except ValueError as e:
         logger.warning(f"[Multimodal Videos Status] 参数错误: {e}")
         raise HTTPException(status_code=400, detail=str(e))
