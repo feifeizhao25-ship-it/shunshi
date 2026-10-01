@@ -30,3 +30,46 @@ def test_myth_entries_have_no_dosage():
 
 def test_the_scan_can_fail():
     assert DOSE.search("6-12g，煎服") and DOSE.search("每日用量6-15g") and DOSE.search("一日 2-3 次")
+
+
+# ── 全部已挂载路由模块的内容数据：不得出现方剂式的处方语言 ───────────────────
+import pathlib
+import re
+
+from app.main import PENDING_REVIEW_MODULES
+
+ROUTER_DIR = pathlib.Path(__file__).resolve().parent.parent / "app" / "router"
+# 方剂配伍术语（君臣佐使）、中药服法（煎服/水煎/冲服/送服）、
+# 「某某汤/散是……处方，可长期服用」「需医嘱」式的用药指引、药材+克数的用量
+PRESCRIPTION_LANGUAGE = re.compile(
+    r"[君臣佐使]药|水煎|煎服|冲服|(?<!推)送服|经典的.{0,6}处方|处方.{0,6}可长期服用|可长期服用"
+    r"|(黄芪|当归|人参|党参|白术|川芎|熟地|附子|麻黄)\s*\d+\s*(g|克)"
+)
+
+
+def _mounted_router_files():
+    return [p for p in sorted(ROUTER_DIR.glob("*.py")) if p.stem not in PENDING_REVIEW_MODULES]
+
+
+def test_scan_sees_the_router_modules_and_can_fail():
+    assert len(_mounted_router_files()) > 100
+    assert PRESCRIPTION_LANGUAGE.search("君药，清肝明目") and PRESCRIPTION_LANGUAGE.search("水煎30分钟饮用")
+    assert PRESCRIPTION_LANGUAGE.search("是经典的补肺卫处方，可长期服用") and PRESCRIPTION_LANGUAGE.search("黄芪15g")
+
+
+def test_no_mounted_module_contains_prescription_language():
+    hits = []
+    for path in _mounted_router_files():
+        for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+            if line.lstrip().startswith("#"):
+                continue
+            if PRESCRIPTION_LANGUAGE.search(line):
+                hits.append(f"{path.name}:{number}: {line.strip()[:70]}")
+    assert not hits, "出现方剂/服法/用量式的处方语言：\n" + "\n".join(hits)
+
+
+def test_every_tea_formula_says_it_is_not_a_prescription():
+    from app.router import tea
+
+    assert len(tea.TEA_FORMULAS) >= 7
+    assert all(t.get("usage_notice") and "不是处方" in t["usage_notice"] for t in tea.TEA_FORMULAS)

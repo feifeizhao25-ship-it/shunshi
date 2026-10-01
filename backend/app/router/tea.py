@@ -18,8 +18,8 @@ TEA_FORMULAS = [
         "name": "菊花枸杞茶",
         "name_en": "Chrysanthemum & Goji Berry Tea",
         "ingredients": [
-            {"name": "菊花", "amount": "5g", "role": "君药，清肝明目"},
-            {"name": "枸杞", "amount": "10粒", "role": "臣药，滋补肝肾"},
+            {"name": "菊花", "amount": "5g", "role": "清肝明目"},
+            {"name": "枸杞", "amount": "10粒", "role": "滋补肝肾"},
         ],
         "benefits": ["清肝明目", "滋阴补肾", "缓解眼疲劳", "降虚火"],
         "constitution_types": ["yin_deficiency", "heat", "damp_heat"],
@@ -41,8 +41,8 @@ TEA_FORMULAS = [
         "name": "玫瑰山楂茶",
         "name_en": "Rose & Hawthorn Tea",
         "ingredients": [
-            {"name": "玫瑰花", "amount": "5朵", "role": "君药，疏肝理气"},
-            {"name": "山楂", "amount": "5片", "role": "臣药，消食化积"},
+            {"name": "玫瑰花", "amount": "5朵", "role": "疏肝理气"},
+            {"name": "山楂", "amount": "5片", "role": "消食化积"},
             {"name": "冰糖", "amount": "适量", "role": "调味，缓和酸性"},
         ],
         "benefits": ["疏肝解郁", "活血化瘀", "消食健胃", "调经止痛"],
@@ -65,9 +65,9 @@ TEA_FORMULAS = [
         "name": "黄芪红枣茶",
         "name_en": "Astragalus & Red Date Tea",
         "ingredients": [
-            {"name": "黄芪", "amount": "15g", "role": "君药，补气固表"},
-            {"name": "红枣", "amount": "5枚（去核）", "role": "臣药，补血养心"},
-            {"name": "枸杞", "amount": "10粒", "role": "佐药，滋补肝肾"},
+            {"name": "黄芪", "amount": "适量", "role": "补气固表"},
+            {"name": "红枣", "amount": "5枚（去核）", "role": "补血养心"},
+            {"name": "枸杞", "amount": "10粒", "role": "滋补肝肾"},
         ],
         "benefits": ["补气健脾", "益气固表", "补血养颜", "增强免疫"],
         "constitution_types": ["qi_deficiency", "blood_deficiency", "yang_deficiency"],
@@ -89,8 +89,8 @@ TEA_FORMULAS = [
         "name": "莲心甘草茶",
         "name_en": "Lotus Plumule & Licorice Tea",
         "ingredients": [
-            {"name": "莲子心", "amount": "2g", "role": "君药，清心泻火"},
-            {"name": "生甘草", "amount": "3g", "role": "臣药，调和诸药，解毒"},
+            {"name": "莲子心", "amount": "2g", "role": "清心泻火"},
+            {"name": "生甘草", "amount": "3g", "role": "调和诸药，解毒"},
         ],
         "benefits": ["清心降火", "宁心安神", "缓解口疮", "改善失眠"],
         "constitution_types": ["heat", "damp_heat", "yin_deficiency"],
@@ -112,9 +112,9 @@ TEA_FORMULAS = [
         "name": "姜糖暖茶",
         "name_en": "Ginger & Brown Sugar Warming Tea",
         "ingredients": [
-            {"name": "生姜", "amount": "3–5片", "role": "君药，温中散寒"},
-            {"name": "红糖", "amount": "适量", "role": "臣药，补血活血，调味"},
-            {"name": "大枣", "amount": "3枚", "role": "佐药，补气养血"},
+            {"name": "生姜", "amount": "3–5片", "role": "温中散寒"},
+            {"name": "红糖", "amount": "适量", "role": "补血活血，调味"},
+            {"name": "大枣", "amount": "3枚", "role": "补气养血"},
         ],
         "benefits": ["温中散寒", "驱寒暖胃", "活血调经", "缓解风寒感冒初期"],
         "constitution_types": ["yang_deficiency", "blood_stasis", "qi_deficiency"],
@@ -136,9 +136,9 @@ TEA_FORMULAS = [
         "name": "茯苓薏仁茶",
         "name_en": "Poria & Job's Tears Tea",
         "ingredients": [
-            {"name": "茯苓", "amount": "10g", "role": "君药，健脾渗湿"},
-            {"name": "薏苡仁", "amount": "15g", "role": "臣药，利水渗湿"},
-            {"name": "芡实", "amount": "10g", "role": "佐药，固肾健脾"},
+            {"name": "茯苓", "amount": "10g", "role": "健脾渗湿"},
+            {"name": "薏苡仁", "amount": "15g", "role": "利水渗湿"},
+            {"name": "芡实", "amount": "10g", "role": "固肾健脾"},
         ],
         "benefits": ["健脾祛湿", "利水消肿", "改善痰湿体质", "美白祛斑"],
         "constitution_types": ["damp", "damp_heat", "spleen_weakness"],
@@ -160,8 +160,8 @@ TEA_FORMULAS = [
         "name": "薄荷柠檬草茶",
         "name_en": "Mint & Lemon Balm Tea",
         "ingredients": [
-            {"name": "薄荷叶", "amount": "5g（新鲜或干燥）", "role": "君药，疏散风热，提神醒脑"},
-            {"name": "柠檬草", "amount": "3g", "role": "臣药，舒缓情绪，助消化"},
+            {"name": "薄荷叶", "amount": "5g（新鲜或干燥）", "role": "疏散风热，提神醒脑"},
+            {"name": "柠檬草", "amount": "3g", "role": "舒缓情绪，助消化"},
         ],
         "benefits": ["提神醒脑", "疏散风热", "缓解头痛", "助消化", "舒缓情绪"],
         "constitution_types": ["qi_stagnation", "heat", "balanced"],
@@ -183,8 +183,8 @@ TEA_FORMULAS = [
         "name": "玉竹桑叶茶",
         "name_en": "Solomon's Seal & Mulberry Leaf Tea",
         "ingredients": [
-            {"name": "玉竹", "amount": "10g", "role": "君药，滋阴润肺"},
-            {"name": "桑叶", "amount": "5g", "role": "臣药，清肺润燥"},
+            {"name": "玉竹", "amount": "10g", "role": "滋阴润肺"},
+            {"name": "桑叶", "amount": "5g", "role": "清肺润燥"},
             {"name": "冰糖", "amount": "少许", "role": "调味，增润肺之效"},
         ],
         "benefits": ["滋阴润肺", "缓解秋燥", "止咳化痰", "养颜润肤"],
@@ -203,6 +203,11 @@ TEA_FORMULAS = [
         "story": "秋属金，主肺，燥为秋之主气。玉竹甘平，为滋阴润肺之上品；桑叶清宣肺燥，又能清头目。二者合用，专为秋燥伤肺、皮肤干痒、咽干咳嗽而设。",
     },
 ]
+
+# 顺时不做处方：茶饮是日常养生参考，不使用「君臣佐使」等方剂配伍说法，药材类不给用量。
+TEA_USAGE_NOTICE = "日常养生茶饮参考，不是处方或用药建议；是否适合你、药材用量，请咨询执业中医师或药师。"
+for _tea in TEA_FORMULAS:
+    _tea.setdefault("usage_notice", TEA_USAGE_NOTICE)
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 辅助查找表

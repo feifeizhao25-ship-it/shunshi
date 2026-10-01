@@ -21,7 +21,7 @@ CHRONIC_CONDITIONS_DATA = [
         "description": "长期疲劳乏力，不因休息缓解",
         "food_therapy": {
             "recommended": ["黄芪", "红枣", "山药", "薏米", "鸡汤"],
-            "typical_recipe": "黄芪炖鸡汤（黄芪 30g、鸡 500g、红枣 5 颗）",
+            "typical_recipe": "黄芪炖鸡汤（药膳，是否适合你请先咨询医生）",
             "frequency": "每周 2-3 次"
         },
         "lifestyle_adjustments": [
@@ -100,7 +100,7 @@ CHRONIC_CONDITIONS_DATA = [
             "枕头高度应与肩宽相符"
         ],
         "acupoints": ["肩井（GB21）", "风池（GB20）", "曲池（LI11）"],
-        "herbal_notes": "活血通络类方剂（血府逐瘀汤、膈下逐瘀汤）可改善气血循环，但需医嘱",
+        "herbal_notes": "中医常从活血通络的思路调理，具体用药必须由执业中医师辨证后决定，请勿自行服药",
         "avoid_factors": ["长期低头", "坐姿不正", "过度颈部转向", "冷风吹颈"],
         "see_doctor_warning": "如出现双上肢无力、排尿排便困难、严重眩晕，需急诊影像学检查排除脊髓压迫",
         "severity_level": "medium"
@@ -112,7 +112,7 @@ CHRONIC_CONDITIONS_DATA = [
         "description": "鼻塞、流涕、嗅觉减退、反复感冒",
         "food_therapy": {
             "recommended": ["黄芪", "红枣", "薏米", "冬瓜", "黑芝麻", "生姜"],
-            "typical_recipe": "黄芪红枣粥（黄芪 20g、红枣 5 颗、粳米 50g）",
+            "typical_recipe": "黄芪红枣粥（药膳，是否适合你请先咨询医生）",
             "frequency": "每日 1 次"
         },
         "lifestyle_adjustments": [
@@ -123,7 +123,7 @@ CHRONIC_CONDITIONS_DATA = [
             "增强体质，适度运动"
         ],
         "acupoints": ["迎香（LI20）", "足三里（ST36）", "肺俞（BL13）"],
-        "herbal_notes": "玉屏风散（黄芪、白术、防风）是经典的补肺卫处方，可长期服用",
+        "herbal_notes": "中医常从补肺卫的思路调理，具体用药必须由执业中医师辨证后决定，请勿自行服药",
         "avoid_factors": ["过敏原接触", "冷空气", "烟雾", "过度疲劳", "饮食不当"],
         "see_doctor_warning": "如鼻涕伴血丝、鼻塞严重影响呼吸、持续化脓性分泌物，需耳鼻喉科检查",
         "severity_level": "low"
