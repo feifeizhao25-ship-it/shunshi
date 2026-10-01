@@ -168,7 +168,25 @@ class SkillOrchestrator:
         self.validator = schema_validator or SchemaValidator()
         self._registry = skill_registry
 
-    async def execute(
+    async def execute(self, *args, **kwargs) -> SkillExecutionResult:
+        """执行并对最终文字做输出检查（不给药物/中药的剂量、服法、配伍，不劝人停药）。"""
+        result = await self._execute_inner(*args, **kwargs)
+        from ..safety.guard import safety_guard
+
+        if (
+            isinstance(result, SkillExecutionResult)
+            and result.status != OrchestrationStatus.BLOCKED
+            and result.final_response
+        ):
+            check = safety_guard.check_output(result.final_response, {"user_id": "skills"})
+            if check.should_block or check.flag == "output_violation":
+                result.final_response = check.override_response or check.prefix or (
+                    "这份内容未通过安全检查，请换个问题或咨询专业人员。"
+                )
+                result.safety_flag = "medical"
+        return result
+
+    async def _execute_inner(
         self,
         user_message: str,
         user_context: Optional[Dict[str, Any]] = None,
@@ -273,6 +291,19 @@ class SkillOrchestrator:
         """
         # 危机优先；热线依据国家卫健委通知，2026-09-05 复核。
         # https://www.nhc.gov.cn/yzygj/c100068/202412/49a1a65386cd4be582d4702fd0926ee8.shtml
+        # 先走全站共用的安全守卫：这里原来只认下面 6 个危机词，对话链路补过的说法（一了百了、生无可恋…）
+        # 到了 Skills 就失效。
+        from ..safety.guard import SafetyLevel, safety_guard
+
+        shared = safety_guard.check_input(message, {"user_id": str(context.get("user_id", "anonymous"))})
+        if shared.level == SafetyLevel.CRISIS:
+            return {"response": shared.override_response, "flag": "crisis", "follow_up": None}
+        if shared.should_block and shared.flag in ("medical_boundary", "blocked"):
+            return {
+                "response": shared.override_response,
+                "flag": "medical" if shared.flag == "medical_boundary" else "blocked",
+                "follow_up": None,
+            }
         # 危机情绪检测
         crisis_keywords = ["自杀", "不想活", "活着没意思", "结束生命",
                           "伤害自己", "轻生"]

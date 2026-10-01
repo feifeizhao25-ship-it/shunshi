@@ -26,6 +26,8 @@ from ..skills.core_skills import (
 
 from ..skill_access import SkillAccess, get_skill_access
 
+from ..aigc import AI_IDENTITY_NOTICE, AI_LABEL
+
 router = APIRouter(prefix="/api/v1/core-skills", tags=["核心 Skills"])
 
 
@@ -54,6 +56,10 @@ class CoreSkillResponse(BaseModel):
     """核心 Skill 统一响应"""
     success: bool = True
     data: Dict[str, Any]
+    # AI 生成内容的显式标识：作为字段默认值，新增出口不会漏。
+    ai_generated: bool = True
+    ai_label: str = AI_LABEL
+    ai_notice: str = AI_IDENTITY_NOTICE
 
 
 class CoreSkillListItem(BaseModel):
