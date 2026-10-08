@@ -66,3 +66,27 @@ def get_registry() -> dict:
 def tier_for_product(product_id: str) -> str:
     """商品 id → tier；未登记的商品按 free 处理，绝不拔高权益。"""
     return str(get_registry().get("product_tier_map", {}).get(product_id, "free"))
+
+
+# ── 国内订阅档位（养心 / 颐养 / 家和）与注册表的对应 ───────────────────────────
+# 价格在 app/router/subscription.py 的 SUBSCRIPTION_PLANS（支付宝 / 微信 / Apple SKU 同价）；
+# 对话额度、家庭人数等权益只在本注册表里。其它地方需要展示这些数字时从这里取，不要自己再写一份。
+
+def registry_tier_for_plan(plan_id: str) -> str:
+    """国内档位 id（free/yangxin/yiyang/jiahe）→ 注册表 tier。"""
+    if plan_id == "free":
+        return "free"
+    return tier_for_product(f"{plan_id}_monthly")
+
+
+def daily_chat_limit_for_plan(plan_id: str) -> int:
+    """每天可用的 AI 对话条数；-1 表示不限。"""
+    tier = registry_tier_for_plan(plan_id)
+    return int(get_registry()["tiers"][tier]["quotas"]["ai_daily_messages"])
+
+
+def family_seats_for_plan(plan_id: str) -> int:
+    """可绑定的家人席位数。注册表的 family_members 含购买人自己（免费版是 1），所以席位 = 人数 - 1。"""
+    tier = registry_tier_for_plan(plan_id)
+    members = int(get_registry()["tiers"][tier]["collaboration"]["family_members"])
+    return -1 if members == -1 else max(0, members - 1)

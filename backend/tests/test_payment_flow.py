@@ -553,8 +553,8 @@ class TestSubscriptionStatus:
         resp_yx = await client.get(f"{API_BASE}/status", params={"user_id": user_yx})
         yx_features = resp_yx.json()["data"]["features"]
 
-        # 养心版应该比免费版多 unlimited_chat 和 today_plan
-        assert yx_features["unlimited_chat"] is True  # free 无此权限
+        # 养心版比免费版多 today_plan；对话额度以权益注册表为准（每天 200 条，不是「无限」）
+        assert yx_features["unlimited_chat"] is False
         assert yx_features["today_plan"] is True  # free 无此权限
         assert free_features["unlimited_chat"] is False
         assert free_features["today_plan"] is False
@@ -782,7 +782,7 @@ class TestTierPermissions:
         features = resp.json()["data"]["features"]
         assert features["basic_chat"] is True
         assert features["solar_terms"] is True
-        assert features["unlimited_chat"] is True
+        assert features["unlimited_chat"] is False  # 注册表 pro：每天 200 条
         assert features["today_plan"] is True
         # 养心版没有深度功能
         assert features["deep_suggestions"] is False
@@ -797,7 +797,7 @@ class TestTierPermissions:
 
         resp = await client.get(f"{API_BASE}/status", params={"user_id": user_id})
         features = resp.json()["data"]["features"]
-        assert features["unlimited_chat"] is True
+        assert features["unlimited_chat"] is False  # 注册表 pro：每天 200 条
         assert features["today_plan"] is True
         assert features["deep_suggestions"] is True
         assert features["weekly_summary"] is True
@@ -1114,7 +1114,7 @@ class TestBackwardCompatAPI:
         assert resp.status_code == 200
         data = resp.json()["data"]
         assert data["usage"]["chat_count"] == 5
-        assert data["limits"]["daily_chat"] == 10  # free 用户限制
+        assert data["limits"]["daily_chat"] == 20  # free 用户限制，取权益注册表（实际执行的也是 20）
 
 
 # ============================================================
