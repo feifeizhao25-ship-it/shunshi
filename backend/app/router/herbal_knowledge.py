@@ -58,7 +58,7 @@ HERBS = {
         "contraindications": "湿盛中满、大便泄泻者慎用；孕妇慎用",
         "storage": "置阴凉干燥处，防潮防霉",
         "common_pairs": ["黄芪", "白芍", "川芎"],
-        "popular_uses": ["当归炖鸡", "当归补血汤", "四物汤"]
+        "popular_uses": ["当归炖鸡"]
     },
     "jujube": {
         "id": "jujube", "name_cn": "大枣", "name_en": "Jujube",

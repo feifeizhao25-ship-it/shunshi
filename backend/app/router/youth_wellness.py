@@ -150,11 +150,12 @@ CONDITIONS = {
         "age_applicable": ["6-9", "10-13"],
         "prevention_strategy": "增强正气，固表卫气",
         "diet": [
-            {"ingredient": "黄芪", "benefit": "补气固表，增强免疫力", "usage": "黄芪粥或黄芪水，3克/天"},
+            {"ingredient": "山药", "benefit": "家常食材，健脾养胃", "usage": "山药粥或蒸山药，作为日常饮食的一部分"},
             {"ingredient": "红枣", "benefit": "补中益气，增强抵抗力", "usage": "红枣粥，3-5枚/天"},
             {"ingredient": "姜", "benefit": "温阳祛湿，预防感冒", "usage": "生姜红糖水，每周1-2次"}
         ],
-        "formula_recommend": "玉屏风散（黄芪+白术+防风）可长期调理，建议咨询医生",
+        "medication_notice": "如有不适请就医，用药请遵医嘱；不要自行给孩子服用中成药或偏方。",
+        "when_to_see_doctor": ["一年内感冒次数明显多于同龄人", "发热超过 3 天或高热不退", "咳嗽、气喘持续不好"],
         "lifestyle": [
             "增加户外活动，增强体质",
             "避免过度疲劳和压力",

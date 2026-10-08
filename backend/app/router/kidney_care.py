@@ -29,31 +29,52 @@ KIDNEY_TCM = {
     "flavor": "咸"
 }
 
+# 以前这里是「肾阴虚 / 肾阳虚 / 肾精不足」三种证型，按症状对号入座，再配六味地黄丸、金匮肾气丸、左归丸/右归丸
+# 和附子、肉桂。按症状给出证型结论属于辨证，配成药属于开方，顺时都不做。
+# 现在只按日常感受给作息、饮食、运动、情绪四方面的生活建议，不下证型结论、不给药名。
+# 接口路径和 id 保持不变，旧客户端不会 404。
+TYPE_NOTICE = "这里只按日常感受给生活方式建议，不判断你属于哪种证型，也不推荐任何药物。如有不适请就医，用药请遵医嘱。"
+
 KIDNEY_DEFICIENCY_TYPES = {
     "kidney_yin": {
-        "name": "肾阴虚",
-        "signs": ["腰膝酸软", "手足心热", "失眠多梦", "潮热盗汗", "头晕耳鸣"],
-        "diet": ["黑色食物", "枸杞", "桑椹", "黑芝麻", "核桃", "百合"],
-        "avoid": ["辛辣热性食物", "酒精", "熬夜"],
-        "herbs": ["六味地黄丸（代表方）", "枸杞", "山茱萸"],
-        "acupoints": ["肾俞穴", "太溪穴", "照海穴"]
+        "name": "容易口干、睡不踏实的时候",
+        "common_feelings": ["口干", "手脚心发热", "睡不踏实、多梦", "夜里出汗"],
+        "lifestyle": {
+            "作息": "晚上 11 点前睡，睡前 1 小时放下手机",
+            "饮食": "清淡少辣，多喝温水，可以吃百合、银耳、梨等润燥的食物",
+            "运动": "选择散步、太极等舒缓运动，避免大汗淋漓",
+            "情绪": "睡前做几分钟深呼吸或听轻音乐，让自己慢下来",
+        },
+        "diet": ["百合", "银耳", "梨", "黑芝麻", "桑椹"],
+        "avoid": ["辛辣燥热食物", "酒精", "熬夜"],
+        "see_doctor": ["夜间出汗持续两周以上", "伴有发热或体重下降", "失眠影响白天生活"],
     },
     "kidney_yang": {
-        "name": "肾阳虚",
-        "signs": ["畏寒肢冷", "腰膝酸冷", "小便清长", "精神萎靡", "面色㿠白"],
-        "diet": ["温热食物", "羊肉", "韭菜", "虾", "核桃", "栗子"],
-        "avoid": ["生冷食物", "苦寒药物", "过度劳累"],
-        "herbs": ["金匮肾气丸（代表方）", "附子", "肉桂"],
-        "acupoints": ["肾俞穴", "命门穴", "关元穴"]
+        "name": "怕冷、手脚凉的时候",
+        "common_feelings": ["怕冷", "手脚发凉", "腰背发凉", "容易没精神"],
+        "lifestyle": {
+            "作息": "早睡，冬季早上可以等太阳出来再出门活动",
+            "饮食": "少吃生冷，多吃温热熟食，可以喝点生姜红枣茶",
+            "运动": "每天快走或八段锦 20-30 分钟，让身体微微发热即可",
+            "情绪": "多晒太阳，多和家人朋友走动",
+        },
+        "diet": ["羊肉", "韭菜", "核桃", "栗子", "生姜"],
+        "avoid": ["生冷食物", "冷饮", "过度劳累"],
+        "see_doctor": ["怕冷伴明显乏力、体重变化", "手脚发凉伴麻木或疼痛", "夜尿突然增多"],
     },
     "kidney_jing": {
-        "name": "肾精不足",
-        "signs": ["早衰", "记忆力减退", "牙齿松动", "腰膝无力", "头发早白早脱"],
-        "diet": ["黑色食物", "核桃", "黑芝麻", "桑椹", "枸杞", "海参"],
-        "avoid": ["过度用脑", "房劳过度", "精神压力过大"],
-        "herbs": ["左归丸", "右归丸"],
-        "acupoints": ["肾俞穴", "太溪穴", "三阴交穴"]
-    }
+        "name": "容易累、记性变差的时候",
+        "common_feelings": ["容易疲劳", "记性变差", "腰膝无力", "头发变白变少"],
+        "lifestyle": {
+            "作息": "保证 7-8 小时睡眠，避免连续熬夜",
+            "饮食": "饮食多样，适量吃蛋、奶、豆类、坚果和深色蔬菜",
+            "运动": "规律运动，量力而行，逐步增加",
+            "情绪": "压力大时安排放松时间，多和人交流",
+        },
+        "diet": ["黑芝麻", "核桃", "黑豆", "鸡蛋", "牛奶"],
+        "avoid": ["长期熬夜", "过度劳累", "精神压力过大"],
+        "see_doctor": ["记忆力明显下降、影响生活", "持续疲劳休息后不缓解", "腰痛、水肿或排尿异常"],
+    },
 }
 
 KIDNEY_FOODS = [
@@ -80,29 +101,34 @@ async def get_tcm_functions():
     return {"success": True, "data": {**KIDNEY_TCM, "safety_notice": SAFETY_NOTICE}}
 
 
-@router.get("/deficiency-types", summary="肾虚类型辨识")
+@router.get("/deficiency-types", summary="按日常感受的生活建议")
 async def get_deficiency_types():
-    types = [{"id": k, "name": v["name"], "signs": v["signs"]} for k, v in KIDNEY_DEFICIENCY_TYPES.items()]
+    types = [
+        {"id": k, "name": v["name"], "common_feelings": v["common_feelings"]}
+        for k, v in KIDNEY_DEFICIENCY_TYPES.items()
+    ]
     return {
         "success": True,
         "data": {
             "types": types,
             "deficiency_types": types,
+            "notice": TYPE_NOTICE,
             "safety_notice": SAFETY_NOTICE,
         },
     }
 
 
-@router.get("/deficiency-types/{type_id}", summary="肾虚类型详细方案")
+@router.get("/deficiency-types/{type_id}", summary="生活方式建议")
 async def get_deficiency_type(type_id: str):
     if type_id not in KIDNEY_DEFICIENCY_TYPES:
         from fastapi import HTTPException
-        raise HTTPException(status_code=404, detail="肾虚类型不存在")
+        raise HTTPException(status_code=404, detail="没有这一项内容")
     return {
         "success": True,
         "data": {
+            "id": type_id,
             **KIDNEY_DEFICIENCY_TYPES[type_id],
-            "traditional_context": True,
+            "notice": TYPE_NOTICE,
             "safety_notice": SAFETY_NOTICE,
         },
     }
@@ -136,10 +162,10 @@ async def get_seasonal_care():
     return {
         "success": True,
         "data": {
-            "winter": "冬季是护肾的最佳季节，宜早睡晚起，温补肾阳",
+            "winter": "冬季宜早睡晚起，注意保暖，饮食以温热熟食为主",
             "spring": "春季顺应生发之气，适当活动但避免过度劳耗",
             "summer": "夏季注意补水护肾，避免大汗伤津",
-            "autumn": "秋季滋阴补肾，多食黑色滋补食物"
+            "autumn": "秋季干燥，多喝温水，饮食清润"
         },
         "safety_notice": SAFETY_NOTICE,
     }

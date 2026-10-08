@@ -1,5 +1,5 @@
 """
-顺时 — 食疗方剂 API
+顺时 — 食疗食谱 API
 提供体质食疗配方、节气美食、功效检索与烹饪指南。
 """
 
@@ -10,7 +10,7 @@ from datetime import datetime
 router = APIRouter(prefix="/api/v1/recipes", tags=["recipes"])
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 食疗方剂知识库
+# 食疗食谱知识库
 # ─────────────────────────────────────────────────────────────────────────────
 RECIPES = [
     {
@@ -33,10 +33,10 @@ RECIPES = [
             "调味可加少许冰糖或盐。",
         ],
         "benefits": ["健脾益气", "补中焦", "祛湿气", "改善疲劳"],
-        "tcm_principle": "脾为后天之本，气血生化之源。山药补脾，薏米祛湿，两者相合专治脾气虚弱、湿气困重。",
+        "tcm_principle": "山药、薏米都是常见的药食同源食材，传统上用来健脾、祛湿，家常煮粥即可。",
         "prep_time_minutes": 50,
         "difficulty": "easy",
-        "cultural_note": "四君子汤化粥，温和而有效，四季皆宜，尤宜脾虚食少者。",
+        "cultural_note": "家常粥品，四季皆宜；有慢性病或正在服药的人，饮食调整请先问医生。",
     },
     {
         "id": "jujube_longan_soup",
@@ -330,7 +330,7 @@ def _current_season(hemisphere: str = "north") -> str:
 # 端点
 # ─────────────────────────────────────────────────────────────────────────────
 
-@router.get("/", summary="食疗方剂列表")
+@router.get("/", summary="食疗食谱列表")
 async def list_recipes(
     season: Optional[str] = Query(None, description="季节: spring/summer/autumn/winter"),
     constitution: Optional[str] = Query(None, description="体质类型"),
@@ -338,7 +338,7 @@ async def list_recipes(
     difficulty: Optional[str] = Query(None, description="难度: easy/medium"),
     limit: int = Query(10, ge=1, le=20),
 ):
-    """返回食疗方剂列表，支持按季节、体质、分类、难度筛选。"""
+    """返回食疗食谱列表，支持按季节、体质、分类、难度筛选。"""
     results = RECIPES.copy()
 
     if season:
