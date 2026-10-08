@@ -174,3 +174,17 @@ def test_kidney_endpoint_does_not_conclude_a_syndrome_type(client):
         for word in ("肾阴虚", "肾阳虚", "肾精不足", "辨识", "证型：", "附子", "肉桂", "山茱萸"):
             assert word not in text, (path, word)
         assert "不判断" in text
+
+
+# ── 药材科普不能写「主治」病症 ────────────────────────────────────────────
+DISEASE_TERMS = ("月经不调", "闭经", "痛经", "便秘", "脱肛", "喘咳", "咽喉肿痛", "泻痢", "经闭", "便溏", "体虚欲脱", "脏躁")
+
+
+def test_herb_entries_use_plain_traditional_wording_not_indications():
+    for hid, herb in herbal_knowledge.HERBS.items():
+        assert "indications" not in herb, f"{hid} 仍返回主治（indications）"
+        assert "传统上" in herb["traditional_use"] and "科普" in herb["traditional_use"], hid
+        assert herb["plain_note"], hid
+        text = json.dumps(herb, ensure_ascii=False)
+        hits = [w for w in DISEASE_TERMS if w in text]
+        assert not hits, f"{hid} 出现疾病治疗用语：{hits}"
