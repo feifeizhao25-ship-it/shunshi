@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import '../../design_system/theme.dart';
+import '../../core/solar_term/solar_term_table.dart';
 
-/// 获取当前节气
+/// 获取当前节气：查天文计算的节气表（与后端同一份数据）；超出表的年份才回退到下面的旧近似
 String _getCurrentSolarTerm() {
+  final fromTable = currentSolarTermName();
+  if (fromTable != null) return fromTable;
   final month = DateTime.now().month;
   final day = DateTime.now().day;
   // Simplified solar term mapping
@@ -86,7 +89,18 @@ _SeasonInfo _getSeasonInfo(String term) {
       seasonIcon: Icons.grain,
     ),
   };
-  return seasons[term] ?? seasons['清明']!;
+  final known = seasons[term];
+  if (known != null) return known;
+  // 表里只写了 6 个春季节气：其它节气显示真实节气名 + 通用提示，不再冒充「清明」
+  final fallback = seasons['清明']!;
+  return _SeasonInfo(
+    term: term,
+    subtitle: '二十四节气',
+    description: '顺应节气，规律作息，饮食清淡，适度运动。',
+    gradientTop: fallback.gradientTop,
+    gradientBottom: fallback.gradientBottom,
+    seasonIcon: fallback.seasonIcon,
+  );
 }
 
 /// 季节 Hero 图片组件

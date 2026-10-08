@@ -714,25 +714,10 @@ class CoreSkillExecutor:
     }
 
     def _get_current_solar_term(self) -> str:
-        """根据当前日期推断节气"""
-        from datetime import datetime
-        month = datetime.now().month
-        day = datetime.now().day
-        
-        term_dates = [
-            (2, 4, "立春"), (2, 19, "雨水"), (3, 5, "惊蛰"), (3, 20, "春分"),
-            (4, 4, "清明"), (4, 20, "谷雨"), (5, 5, "立夏"), (5, 21, "小满"),
-            (6, 5, "芒种"), (6, 21, "夏至"), (7, 7, "小暑"), (7, 22, "大暑"),
-            (8, 7, "立秋"), (8, 23, "处暑"), (9, 7, "白露"), (9, 23, "秋分"),
-            (10, 8, "寒露"), (10, 23, "霜降"), (11, 7, "立冬"), (11, 22, "小雪"),
-            (12, 7, "大雪"), (12, 22, "冬至"), (1, 5, "小寒"), (1, 20, "大寒"),
-        ]
-        
-        current = "立春"
-        for m, d, term in term_dates:
-            if (month > m) or (month == m and day >= d):
-                current = term
-        return current
+        """当前节气：查天文计算的节气表（北京时间）。"""
+        from app.utils import solar_term_calendar
+
+        return solar_term_calendar.current_term()
 
     async def _execute_solar_term(self, inp: CoreSkillInput) -> CoreSkillOutput:
         """节气指南 - 使用预设数据，避免每次调用 LLM"""
