@@ -26,6 +26,7 @@ from ..config import Settings
 from ..deps import current_user, get_session, get_settings
 from ..services.age_policy import policy_for
 from ..services.continuous_use import usage_reminder
+from ..safety.config import CRISIS_HOTLINE_TEXT
 from ..simple_models import Message, Entitlement
 from ..entitlements import tier_for_product
 
@@ -67,7 +68,7 @@ SYSTEM_PROMPT = (
 
 
 DISTRESS_HELP_SUFFIX = (
-    "\n\n如果这种难受的感觉一直没有缓解，可以拨打全国心理援助热线 12356，也可以和身边信任的人说说。"
+    f"\n\n如果这种难受的感觉一直没有缓解，可以拨打{CRISIS_HOTLINE_TEXT}，也可以和身边信任的人说说。"
 )
 
 

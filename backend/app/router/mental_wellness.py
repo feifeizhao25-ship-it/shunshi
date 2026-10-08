@@ -10,6 +10,8 @@ from typing import Optional, List
 from datetime import datetime
 from enum import Enum
 
+from app.safety.config import CRISIS_EMERGENCY_NUMBERS, CRISIS_HOTLINE, CRISIS_HOTLINE_NAME
+
 router = APIRouter(prefix="/api/v1/mental", tags=["mental_wellness"])
 
 
@@ -308,20 +310,29 @@ MEDITATION_GUIDES = {
 }
 
 # 危机资源
+# 国内号码只从 app/safety/config.py 取（统一心理援助热线；紧急危险时 120 / 110）。
+# 以前这里把希望24热线标成「全国心理援助热线」，北京中心的号码在两个文件里还不一样，另有台湾号码。
 CRISIS_RESOURCES = [
     {
         "region": "中国",
-        "organization": "北京心理危机研究与干预中心",
-        "phone": "010-58951332",
-        "available": "24小时",
-        "service": "心理危机干预、心理援助",
+        "organization": CRISIS_HOTLINE_NAME,
+        "phone": CRISIS_HOTLINE,
+        "available": "各地开通时段不同，每天不少于 18 小时",
+        "service": "心理援助、情绪支持、心理危机干预",
     },
     {
         "region": "中国",
-        "organization": "全国心理援助热线",
-        "phone": "400-161-9995",
+        "organization": "医疗急救",
+        "phone": CRISIS_EMERGENCY_NUMBERS[0],
         "available": "24小时",
-        "service": "心理援助、情绪支持",
+        "service": "已经受伤或有生命危险时",
+    },
+    {
+        "region": "中国",
+        "organization": "报警",
+        "phone": CRISIS_EMERGENCY_NUMBERS[1],
+        "available": "24小时",
+        "service": "自己或他人正处于危险中时",
     },
     {
         "region": "国际",
@@ -329,13 +340,6 @@ CRISIS_RESOURCES = [
         "website": "https://www.iasp.info/resources/Crisis_Centres/",
         "available": "各地不同",
         "service": "多语言心理危机支持",
-    },
-    {
-        "region": "中国",
-        "organization": "生命热线（台湾）",
-        "phone": "1925",
-        "available": "24小时",
-        "service": "自杀防治和心理援助",
     },
 ]
 
@@ -513,10 +517,10 @@ async def get_crisis_resources():
         "success": True,
         "data": {
             "resources": CRISIS_RESOURCES,
-            "emergency_note": "如有自杀倾向或急性心理危机，请立即拨打当地紧急求助热线或前往医院。",
+            "emergency_note": "如有自杀倾向或急性心理危机，请立即拨打 120 或 110，或前往最近医院急诊科。",
             "crisis_hotlines": {
-                "china": "400-161-9995 (全国心理援助热线)",
-                "beijing": "010-58951332 (北京心理危机研究与干预中心)",
+                "china": f"{CRISIS_HOTLINE}（{CRISIS_HOTLINE_NAME}）",
+                "emergency": "120（医疗急救）、110（报警）",
                 "international": "https://www.iasp.info/resources/Crisis_Centres/",
             },
         },

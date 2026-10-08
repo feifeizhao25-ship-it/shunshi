@@ -273,7 +273,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
                     SuggestionCard(
                       type: 'crisis',
                       title: '紧急求助热线',
-                      subtitle: '400-161-9995 · 24小时心理援助',
+                      subtitle: '12356 · 全国统一心理援助热线',
                       icon: Icons.phone_in_talk,
                     ),
                   ]
@@ -599,8 +599,8 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
         ),
         content: const Text(
           '您提到的内容涉及健康安全风险。请您立即联系专业医疗机构或拨打：\n\n'
-          '• 24小时心理援助热线：400-161-9995\n'
-          '• 急救电话：120\n\n'
+          '• 全国统一心理援助热线：12356\n'
+          '• 急救电话：120，报警电话：110\n\n'
           '顺时AI不能替代专业医疗诊断。',
           style: TextStyle(
             fontSize: 15,

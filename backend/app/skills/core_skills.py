@@ -31,6 +31,24 @@ from __future__ import annotations
 from typing import Dict, List, Optional, Any
 from dataclasses import dataclass, field
 from enum import Enum
+
+from app.safety.config import CRISIS_EMERGENCY_TEXT, CRISIS_HOTLINE_TEXT
+
+
+def crisis_reply_text() -> str:
+    """情绪急救遇到危机说法时的回复：热线号码只从 app/safety/config.py 取。"""
+    return (
+        "我听到你说这些，我很担心你。你并不孤单，有人愿意倾听。"
+        f"请拨打{CRISIS_HOTLINE_TEXT}。{CRISIS_EMERGENCY_TEXT}"
+    )
+
+
+def crisis_card_steps() -> list[str]:
+    return [
+        f"拨打{CRISIS_HOTLINE_TEXT}",
+        "告诉身边信任的人你的感受",
+        "如果已经受伤或有立即的危险，拨打 120 或 110，或前往最近医院急诊科",
+    ]
 import hashlib
 import json
 import logging
@@ -643,7 +661,7 @@ class CoreSkillExecutor:
         
         text = result.final_response or "我理解你现在的感受，这很难受。"
         if is_crisis:
-            text = "我听到你说这些，我很担心你。你并不孤单，有人愿意倾听。请拨打心理援助热线：400-161-9995"
+            text = crisis_reply_text()
         
         return CoreSkillOutput(
             skill="MoodFirstAid",
@@ -657,11 +675,7 @@ class CoreSkillExecutor:
                     "停下来，深呼吸3次（吸气4秒-呼气6秒）",
                     "喝一杯温水，感受温度",
                     "如果愿意，写下此刻的感受",
-                ] if not is_crisis else [
-                    "拨打 24小时心理援助热线：400-161-9995",
-                    "告诉身边的信任的人你的感受",
-                    "前往最近医院急诊科",
-                ],
+                ] if not is_crisis else crisis_card_steps(),
             )],
             safety_flag=safety,
             presence_level=presence,

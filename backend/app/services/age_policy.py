@@ -19,6 +19,7 @@ from typing import Any
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
+from ..safety.config import CRISIS_HOTLINE_TEXT
 from ..simple_models import UserSetting
 
 AGE_KEY = "profile:age"
@@ -39,7 +40,7 @@ BASE_IDENTITY_RULES = (
 )
 MINOR_RULES = (
     "当前用户是未成年人：只聊日常健康、作息、运动与情绪调节；不建立、不模拟任何亲密关系（恋人、夫妻、亲属等），"
-    "不谈恋爱、不使用亲昵称呼；鼓励用户与家长、老师沟通；遇到情绪困扰建议联系家长或全国心理援助热线 12356。"
+    f"不谈恋爱、不使用亲昵称呼；鼓励用户与家长、老师沟通；遇到情绪困扰建议联系家长或{CRISIS_HOTLINE_TEXT}。"
 )
 SENIOR_RULES = (
     "当前用户是老年人：语句简短清楚；每次涉及身体不适、用药或慢性病，都要明确说明这里不能替代医生，"

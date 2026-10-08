@@ -293,6 +293,7 @@ class SkillOrchestrator:
         # https://www.nhc.gov.cn/yzygj/c100068/202412/49a1a65386cd4be582d4702fd0926ee8.shtml
         # 先走全站共用的安全守卫：这里原来只认下面 6 个危机词，对话链路补过的说法（一了百了、生无可恋…）
         # 到了 Skills 就失效。
+        from ..safety.config import CRISIS_HOTLINE_TEXT
         from ..safety.guard import SafetyLevel, safety_guard
 
         shared = safety_guard.check_input(message, {"user_id": str(context.get("user_id", "anonymous"))})
@@ -312,7 +313,7 @@ class SkillOrchestrator:
                 return {
                     "response": (
                         "听到您这样说，我很关心您的安全。如果您正在经历"
-                        "困难时刻，可以拨打全国统一心理援助热线 12356。\n\n"
+                        f"困难时刻，可以拨打{CRISIS_HOTLINE_TEXT}。\n\n"
                         "如果您已受伤或有立即伤害自己的危险，请拨打 120 或 110，"
                         "并请身边可信任的人陪伴您。\n\n"
                         "您并不孤单，专业的帮助就在身边。"

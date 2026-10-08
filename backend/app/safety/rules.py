@@ -154,7 +154,7 @@ def build_rules() -> List[SafetyRule]:
         response_template=(
             "我注意到您提到的内容涉及未成年人。\n"
             "如果您或身边的孩子需要帮助，请联系：\n"
-            "- 全国心理援助热线：12356\n"
+            f"- {SAFETY_CONFIG['crisis_hotline_cn']}（全国统一心理援助热线）\n"
             "- 紧急情况请拨打：110\n\n"
             "保护孩子是每个人的责任，请及时寻求帮助。"
         ),

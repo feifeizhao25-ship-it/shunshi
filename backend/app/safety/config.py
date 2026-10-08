@@ -3,6 +3,16 @@
 SafeGuard Configuration
 """
 
+# ── 危机热线：后端唯一来源 ──────────────────────────────────────────────
+# 所有面向用户的危机/求助文案都从这里取号码，不要在别处写死（tests/test_crisis_hotline_single_source.py 会检查）。
+# 依据：国家卫健委 2024-12-06 通知，2025-05-01 前全国开通统一心理援助热线 12356。
+# https://www.gov.cn/zhengce/zhengceku/202412/content_6994470.htm
+CRISIS_HOTLINE = "12356"
+CRISIS_HOTLINE_NAME = "全国统一心理援助热线"
+CRISIS_HOTLINE_TEXT = f"{CRISIS_HOTLINE_NAME} {CRISIS_HOTLINE}"
+CRISIS_EMERGENCY_NUMBERS = ("120", "110")  # 医疗急救、报警
+CRISIS_EMERGENCY_TEXT = "如果你或身边有人处于危险中，请立即拨打 120 或 110。"
+
 SAFETY_CONFIG = {
     # 开关
     "enable_input_check": True,
@@ -12,9 +22,9 @@ SAFETY_CONFIG = {
     # 国家卫健委统一号码，核验于 2026-09-06。
     # https://www.nhc.gov.cn/yzygj/c100068/202412/49a1a65386cd4be582d4702fd0926ee8.shtml
     # 危机热线
-    "crisis_hotline_cn": "12356",       # 全国心理援助热线
-    "crisis_emergency": "120",                   # 医疗急救
-    "crisis_police": "110",                      # 报警
+    "crisis_hotline_cn": CRISIS_HOTLINE,         # 全国统一心理援助热线
+    "crisis_emergency": CRISIS_EMERGENCY_NUMBERS[0],  # 医疗急救
+    "crisis_police": CRISIS_EMERGENCY_NUMBERS[1],     # 报警
 
     # 告警阈值
     "max_sensitive_streak": 5,    # 连续N次敏感输入触发告警
