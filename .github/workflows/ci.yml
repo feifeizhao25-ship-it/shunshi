@@ -45,6 +45,18 @@ jobs:
 
   backend:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: shunshi_ci
+          POSTGRES_PASSWORD: ci-fixture-only
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U shunshi_ci -d postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 10
     defaults:
       run:
         working-directory: backend
@@ -54,7 +66,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install deps
-        run: pip install -r requirements.txt
+        run: pip install -r requirements.txt PyYAML==6.0.3
       - name: Compile check
         run: python -m compileall -q app
       - name: Lint (ruff)
@@ -64,6 +76,8 @@ jobs:
           DATABASE_URL: sqlite:///test.db
           REDIS_URL: redis://localhost
           JWT_SECRET: ci-only-secret-with-at-least-32-characters
+          SHUNSHI_JWT_SECRET: ci-only-secret-with-at-least-32-characters
+          TEST_POSTGRES_ADMIN_URL: postgresql+psycopg://shunshi_ci:ci-fixture-only@127.0.0.1:5432/postgres
           ADMIN_JWT_SECRET: ci-admin-secret-with-at-least-32-characters
           ADMIN_PASSWORD_HASH: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
           APP_ENV: testing

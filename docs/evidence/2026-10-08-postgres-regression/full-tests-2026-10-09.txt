@@ -1,0 +1,3010 @@
+..........................................s...............s............. [  1%]
+........................................................................ [  3%]
+.........................FFFFFF...FFF................................... [  5%]
+............................FFFFF.FFFF.................................. [  7%]
+........................................................................ [  9%]
+....FFFFFFF....FFFF.................................................FFF. [ 11%]
+......FFFFFF..........................................................FF [ 13%]
+FFFFFFF...............F.FFFFFFF...FFF.FFF..................FF.........FF [ 15%]
+FFFFF..FFFF...FF.FF.FF...FFF...F........................................ [ 17%]
+...........FFFFFFFFFF................................................... [ 19%]
+........................................................................ [ 20%]
+...............................FFFFFFF.................................. [ 22%]
+....................................................................FFF. [ 24%]
+F............FFFFFFFssssssFF.FsFF.....ss........s..s.....s.............. [ 26%]
+........................................................FFFFFFFFFFFF.... [ 28%]
+........................................FFF........FF................... [ 30%]
+....................................FFF.FFFF.FFFFFFF.....FFFFFFF........ [ 32%]
+..F..................................................................... [ 34%]
+........................................................................ [ 36%]
+......................FFFF.............................................. [ 38%]
+........................................................................ [ 40%]
+........................................................................ [ 41%]
+..................................................................FFFFFF [ 43%]
+FFF...............................................................FFFFFF [ 45%]
+FF...................................................................... [ 47%]
+....................................................sss........FFFF....F [ 49%]
+........................................................................ [ 51%]
+........................................................................ [ 53%]
+........................................................................ [ 55%]
+........................................................................ [ 57%]
+........................................................................ [ 59%]
+.....................................................FFFFFFFFF.......... [ 60%]
+.....F.................................................................. [ 62%]
+........................................................................ [ 64%]
+........................................................................ [ 66%]
+..................................FFF..FF.FF..........FFFF.............. [ 68%]
+........................................................................ [ 70%]
+.......................................FFFFFFFFFFF..................FFF. [ 72%]
+FF.F.................................................................... [ 74%]
+.............................................F.FF.FFFFF.F............... [ 76%]
+.................................................................FFFFFFF [ 78%]
+FFFFF.........FFFFF................................FFFFFFFFFFFF..FFF.... [ 80%]
+...............FFFFFFFFFF....................................FFFFFFFFF.. [ 81%]
+............F..FF.FFFFFFFFFFFF.F.FFFFF.................................. [ 83%]
+......................................................FFFFFFFFFFF....... [ 85%]
+........................................................................ [ 87%]
+........................................................................ [ 89%]
+..............FFF...........................................FFFFFFFFF..F [ 91%]
+.........FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF...FFFFFFFFFFFFF............... [ 93%]
+..................FFFFFFFF.................FFFFFF....................... [ 95%]
+.......................................FFFFFF........................... [ 97%]
+............................................FFFFFFFFFF.................. [ 99%]
+..................FFFFFFFFFFF.......                                     [100%]
+=================================== FAILURES ===================================
+_______________ TestIngredientScan.test_scan_by_name_returns_200 _______________
+tests/test_ai_ingredient_scan.py:9: in test_scan_by_name_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+____________ TestIngredientScan.test_scan_found_ingredient_has_info ____________
+tests/test_ai_ingredient_scan.py:14: in test_scan_found_ingredient_has_info
+    assert data["success"] is True
+           ^^^^^^^^^^^^^^^
+E   KeyError: 'success'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+__________________ TestIngredientScan.test_scan_by_image_url ___________________
+tests/test_ai_ingredient_scan.py:26: in test_scan_by_image_url
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_____ TestIngredientScan.test_scan_by_image_fails_without_ai_configuration _____
+tests/test_ai_ingredient_scan.py:35: in test_scan_by_image_fails_without_ai_configuration
+    assert response.status_code == 503
+E   assert 401 == 503
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+______________ TestIngredientScan.test_scan_no_input_returns_400 _______________
+tests/test_ai_ingredient_scan.py:39: in test_scan_no_input_returns_400
+    assert response.status_code == 400
+E   assert 401 == 400
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_______________ TestIngredientScan.test_scan_unknown_ingredient ________________
+tests/test_ai_ingredient_scan.py:44: in test_scan_unknown_ingredient
+    assert data["success"] is True
+           ^^^^^^^^^^^^^^^
+E   KeyError: 'success'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+________ TestIngredientCombination.test_analyze_combination_returns_200 ________
+tests/test_ai_ingredient_scan.py:66: in test_analyze_combination_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+___________ TestIngredientCombination.test_combination_has_analysis ____________
+tests/test_ai_ingredient_scan.py:71: in test_combination_has_analysis
+    assert "analysis" in data["data"]
+                         ^^^^^^^^^^^^
+E   KeyError: 'data'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+____ TestIngredientCombination.test_combination_requires_min_2_ingredients _____
+tests/test_ai_ingredient_scan.py:76: in test_combination_requires_min_2_ingredients
+    assert response.status_code == 422
+E   assert 401 == 422
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_____________ TestAIWellnessPlanGenerate.test_generate_returns_200 _____________
+tests/test_ai_wellness_plan.py:15: in test_generate_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+______________ TestAIWellnessPlanGenerate.test_generate_has_plan _______________
+tests/test_ai_wellness_plan.py:20: in test_generate_has_plan
+    assert data["success"] is True
+           ^^^^^^^^^^^^^^^
+E   KeyError: 'success'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+__________ TestAIWellnessPlanGenerate.test_generate_requires_user_id ___________
+tests/test_ai_wellness_plan.py:26: in test_generate_requires_user_id
+    assert response.status_code == 422
+E   assert 401 == 422
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+________ TestAIWellnessPlanGenerate.test_generate_requires_constitution ________
+tests/test_ai_wellness_plan.py:31: in test_generate_requires_constitution
+    assert response.status_code == 422
+E   assert 401 == 422
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_______________ TestAIWellnessPlanGet.test_get_plan_returns_200 ________________
+tests/test_ai_wellness_plan.py:38: in test_get_plan_returns_200
+    plan_id = create_data["data"]["plan"]["plan_id"]
+              ^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'data'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_____ TestAIWellnessPlanLatest.test_latest_plan_returns_200_after_generate _____
+tests/test_ai_wellness_plan.py:51: in test_latest_plan_returns_200_after_generate
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+___________ TestAIWellnessPlanLatest.test_latest_no_plan_returns_404 ___________
+tests/test_ai_wellness_plan.py:55: in test_latest_no_plan_returns_404
+    assert response.status_code == 404
+E   assert 401 == 404
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_____________ TestAIWellnessPlanFeedback.test_feedback_returns_200 _____________
+tests/test_ai_wellness_plan.py:62: in test_feedback_returns_200
+    plan_id = create_data["data"]["plan"]["plan_id"]
+              ^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'data'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+__________ TestAIWellnessPlanFeedback.test_feedback_nonexistent_plan ___________
+tests/test_ai_wellness_plan.py:69: in test_feedback_nonexistent_plan
+    assert client.post("/api/v1/ai-wellness-plan/feedback", json=payload).status_code == 404
+E   AssertionError: assert 401 == 404
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+E    +    where <Response [401 Unauthorized]> = post('/api/v1/ai-wellness-plan/feedback', json={'plan_id': 'nonexistent', 'rating': 3, 'user_id': 'test_user'})
+E    +      where post = <starlette.testclient.TestClient object at 0x12d08f6e0>.post
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_________ TestAudioRecommended.test_audio_recommended_without_user_id __________
+tests/test_audio_v2.py:61: in test_audio_recommended_without_user_id
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+___________ TestAudioRecommended.test_audio_recommended_with_user_id ___________
+tests/test_audio_v2.py:68: in test_audio_recommended_with_user_id
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_________ TestAudioRecommended.test_audio_recommended_with_time_of_day _________
+tests/test_audio_v2.py:82: in test_audio_recommended_with_time_of_day
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_______ TestAudioRecommended.test_audio_recommended_with_duration_filter _______
+tests/test_audio_v2.py:91: in test_audio_recommended_with_duration_filter
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_________ TestAudioRecommended.test_audio_recommended_with_categories __________
+tests/test_audio_v2.py:100: in test_audio_recommended_with_categories
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+____________ TestAudioRecommended.test_audio_recommended_with_limit ____________
+tests/test_audio_v2.py:109: in test_audio_recommended_with_limit
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+______ TestAudioRecommended.test_audio_recommended_response_has_metadata _______
+tests/test_audio_v2.py:116: in test_audio_recommended_response_has_metadata
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_________________ TestAudioPlays.test_audio_plays_post_success _________________
+tests/test_audio_v2.py:180: in test_audio_plays_post_success
+    assert response.status_code in [200, 201]
+E   assert 401 in [200, 201]
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_________________ TestAudioPlays.test_audio_plays_post_minimal _________________
+tests/test_audio_v2.py:195: in test_audio_plays_post_minimal
+    assert response.status_code in [200, 201]
+E   assert 401 in [200, 201]
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+________________ TestAudioPlays.test_audio_plays_post_completed ________________
+tests/test_audio_v2.py:209: in test_audio_plays_post_completed
+    assert response.status_code in [200, 201]
+E   assert 401 in [200, 201]
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+___________ TestAudioPlays.test_audio_plays_post_partially_completed ___________
+tests/test_audio_v2.py:224: in test_audio_plays_post_partially_completed
+    assert response.status_code in [200, 201]
+E   assert 401 in [200, 201]
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_______________ TestBannerCreate.test_create_banner_returns_200 ________________
+tests/test_banner.py:39: in test_create_banner_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+__________________ TestBannerCreate.test_create_banner_has_id __________________
+tests/test_banner.py:44: in test_create_banner_has_id
+    assert data["success"] is True
+           ^^^^^^^^^^^^^^^
+E   KeyError: 'success'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_________________ TestBannerDetail.test_get_banner_returns_200 _________________
+tests/test_banner.py:52: in test_get_banner_returns_200
+    banner_id = create_data["data"]["banner_id"]
+                ^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'data'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+___________________ TestCalorieLog.test_log_meal_returns_200 ___________________
+tests/test_calorie_tracker.py:32: in test_log_meal_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_____________________ TestCalorieLog.test_log_meal_success _____________________
+tests/test_calorie_tracker.py:41: in test_log_meal_success
+    assert data["success"] is True
+           ^^^^^^^^^^^^^^^
+E   KeyError: 'success'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+___________________ TestCalorieLog.test_log_requires_user_id ___________________
+tests/test_calorie_tracker.py:46: in test_log_requires_user_id
+    assert response.status_code == 422
+E   assert 401 == 422
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+___________________ TestCalorieToday.test_today_returns_200 ____________________
+tests/test_calorie_tracker.py:52: in test_today_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+____________________ TestCalorieToday.test_today_has_totals ____________________
+tests/test_calorie_tracker.py:56: in test_today_has_totals
+    assert "data" in data
+E   AssertionError: assert 'data' in {'detail': '请先登录'}
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+__________________ TestCalorieGoal.test_set_goal_returns_200 ___________________
+tests/test_calorie_tracker.py:63: in test_set_goal_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+______________ TestSymptomCheck.test_symptom_check_single_symptom ______________
+tests/test_chronic_care.py:223: in test_symptom_check_single_symptom
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+____________ TestSymptomCheck.test_symptom_check_multiple_symptoms _____________
+tests/test_chronic_care.py:234: in test_symptom_check_multiple_symptoms
+    matched = data["data"]["matched_conditions"]
+              ^^^^^^^^^^^^
+E   KeyError: 'data'
+________________ TestSymptomCheck.test_symptom_check_no_matches ________________
+tests/test_chronic_care.py:243: in test_symptom_check_no_matches
+    assert data["success"] is True
+           ^^^^^^^^^^^^^^^
+E   KeyError: 'success'
+_____ TestSymptomCheck.test_symptom_check_fatigue_maps_to_chronic_fatigue ______
+tests/test_chronic_care.py:252: in test_symptom_check_fatigue_maps_to_chronic_fatigue
+    matched = data["data"]["matched_conditions"]
+              ^^^^^^^^^^^^
+E   KeyError: 'data'
+________ TestSymptomCheck.test_symptom_check_insomnia_maps_to_insomnia _________
+tests/test_chronic_care.py:261: in test_symptom_check_insomnia_maps_to_insomnia
+    matched = data["data"]["matched_conditions"]
+              ^^^^^^^^^^^^
+E   KeyError: 'data'
+_____________ TestSymptomCheck.test_symptom_check_high_blood_sugar _____________
+tests/test_chronic_care.py:270: in test_symptom_check_high_blood_sugar
+    matched = data["data"]["matched_conditions"]
+              ^^^^^^^^^^^^
+E   KeyError: 'data'
+_________ TestSymptomCheck.test_symptom_check_contains_recommendations _________
+tests/test_chronic_care.py:279: in test_symptom_check_contains_recommendations
+    assert "recommendations" in data["data"]
+                                ^^^^^^^^^^^^
+E   KeyError: 'data'
+___________ TestSymptomCheck.test_symptom_check_contains_disclaimer ____________
+tests/test_chronic_care.py:287: in test_symptom_check_contains_disclaimer
+    assert "disclaimer" in data["data"]
+                           ^^^^^^^^^^^^
+E   KeyError: 'data'
+________ TestSymptomCheck.test_symptom_check_multiple_conditions_mapped ________
+tests/test_chronic_care.py:294: in test_symptom_check_multiple_conditions_mapped
+    matched = data["data"]["matched_conditions"]
+              ^^^^^^^^^^^^
+E   KeyError: 'data'
+_____ TestChronicCareIntegration.test_symptom_check_matches_are_reasonable _____
+tests/test_chronic_care.py:468: in test_symptom_check_matches_are_reasonable
+    matched = data["data"]["matched_conditions"]
+              ^^^^^^^^^^^^
+E   KeyError: 'data'
+________________ TestMetricsBatch.test_metrics_batch_empty_list ________________
+tests/test_client_metrics.py:18: in test_metrics_batch_empty_list
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_______________ TestMetricsBatch.test_metrics_batch_single_event _______________
+tests/test_client_metrics.py:39: in test_metrics_batch_single_event
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_____________ TestMetricsBatch.test_metrics_batch_multiple_events ______________
+tests/test_client_metrics.py:75: in test_metrics_batch_multiple_events
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_______________ TestMetricsBatch.test_metrics_batch_invalid_body _______________
+tests/test_client_metrics.py:89: in test_metrics_batch_invalid_body
+    assert response.status_code in [200, 422]
+E   assert 401 in [200, 422]
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_______________ TestMetricsBatch.test_metrics_batch_large_batch ________________
+tests/test_client_metrics.py:110: in test_metrics_batch_large_batch
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+___________ TestMetricsBatch.test_metrics_batch_with_optional_fields ___________
+tests/test_client_metrics.py:130: in test_metrics_batch_with_optional_fields
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_________ TestMetricsBatch.test_metrics_batch_with_complex_properties __________
+tests/test_client_metrics.py:160: in test_metrics_batch_with_complex_properties
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_____________ TestCommunityCreatePost.test_create_post_returns_200 _____________
+tests/test_community.py:25: in test_create_post_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_______________ TestCommunityCreatePost.test_create_post_has_id ________________
+tests/test_community.py:30: in test_create_post_has_id
+    assert data["success"] is True
+           ^^^^^^^^^^^^^^^
+E   KeyError: 'success'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_____________ TestCommunityPostDetail.test_post_detail_returns_200 _____________
+tests/test_community.py:39: in test_post_detail_returns_200
+    post_id = create_data["data"]["post_id"]
+              ^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'data'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_______________ TestCommunityLikePost.test_like_post_returns_200 _______________
+tests/test_community.py:51: in test_like_post_returns_200
+    post_id = create_data["data"]["post_id"]
+              ^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'data'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_____________ TestCommunityComments.test_get_comments_returns_200 ______________
+tests/test_community.py:61: in test_get_comments_returns_200
+    post_id = create_data["data"]["post_id"]
+              ^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'data'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+______________ TestCommunityComments.test_add_comment_returns_200 ______________
+tests/test_community.py:68: in test_add_comment_returns_200
+    post_id = create_data["data"]["post_id"]
+              ^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'data'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_______________ TestConstitutionAssess.test_assess_with_answers ________________
+tests/test_constitution.py:159: in test_assess_with_answers
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_______________ TestConstitutionAssess.test_assess_empty_answers _______________
+tests/test_constitution.py:169: in test_assess_empty_answers
+    assert response.status_code in [200, 400]
+E   assert 401 in [200, 400]
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+________________ TestContentList.test_list_content_returns_200 _________________
+tests/test_content_cms.py:20: in test_list_content_returns_200
+    assert response.status_code in [200, 404]  # 路由可能不同
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   assert 401 in [200, 404]
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+______________________ TestContentList.test_list_by_type _______________________
+tests/test_content_cms.py:25: in test_list_by_type
+    assert response.status_code in [200, 404]
+E   assert 401 in [200, 404]
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_____________________ TestContentList.test_list_by_status ______________________
+tests/test_content_cms.py:30: in test_list_by_status
+    assert response.status_code in [200, 404]
+E   assert 401 in [200, 404]
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+__________________ TestContentList.test_list_with_pagination ___________________
+tests/test_content_cms.py:35: in test_list_with_pagination
+    assert response.status_code in [200, 404]
+E   assert 401 in [200, 404]
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+___________ TestContentCreate.test_create_content_returns_201_or_200 ___________
+tests/test_content_cms.py:50: in test_create_content_returns_201_or_200
+    assert response.status_code in [200, 201, 404]
+E   assert 401 in [200, 201, 404]
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_______________ TestContentCreate.test_create_content_with_tags ________________
+tests/test_content_cms.py:60: in test_create_content_with_tags
+    assert response.status_code in [200, 201, 404]
+E   assert 401 in [200, 201, 404]
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_____________ TestContentCreate.test_create_content_requires_title _____________
+tests/test_content_cms.py:69: in test_create_content_requires_title
+    assert response.status_code in [400, 422, 404]
+E   assert 401 in [400, 422, 404]
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+______________ TestContentUpdate.test_update_content_returns_200 _______________
+tests/test_content_cms.py:96: in test_update_content_returns_200
+    assert response.status_code in [200, 404]
+E   assert 401 in [200, 404]
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+____________________ TestContentUpdate.test_partial_update _____________________
+tests/test_content_cms.py:104: in test_partial_update
+    assert response.status_code in [200, 404]
+E   assert 401 in [200, 404]
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+______________ TestContentDelete.test_delete_content_returns_200 _______________
+tests/test_content_cms.py:113: in test_delete_content_returns_200
+    assert response.status_code in [200, 404]
+E   assert 401 in [200, 404]
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+________________ TestContentDelete.test_delete_nonexistent_404 _________________
+tests/test_content_cms.py:118: in test_delete_nonexistent_404
+    assert response.status_code in [404, 200]
+E   assert 401 in [404, 200]
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+____________________ TestContentReview.test_publish_content ____________________
+tests/test_content_cms.py:142: in test_publish_content
+    assert response.status_code in [200, 404]
+E   assert 401 in [200, 404]
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+___________________ TestContentArchive.test_archive_content ____________________
+tests/test_content_cms.py:151: in test_archive_content
+    assert response.status_code in [200, 404]
+E   assert 401 in [200, 404]
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+__________________ TestContentMedia.test_add_media_to_content __________________
+tests/test_content_cms.py:170: in test_add_media_to_content
+    assert response.status_code in [200, 201, 404]
+E   assert 401 in [200, 201, 404]
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+___________________ TestContentMedia.test_list_content_media ___________________
+tests/test_content_cms.py:175: in test_list_content_media
+    assert response.status_code in [200, 404]
+E   assert 401 in [200, 404]
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+________________________ TestContentTags.test_list_tags ________________________
+tests/test_content_cms.py:189: in test_list_tags
+    assert response.status_code in [200, 404]
+E   assert 401 in [200, 404]
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_______________________ TestContentTags.test_create_tag ________________________
+tests/test_content_cms.py:199: in test_create_tag
+    assert response.status_code == 200, response.text
+E   AssertionError: {"detail":"需要管理员登录"}
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+___________________ TestContentStats.test_get_content_stats ____________________
+tests/test_content_cms.py:227: in test_get_content_stats
+    assert response.status_code in [200, 404]
+E   assert 401 in [200, 404]
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_________________ TestContentStats.test_content_by_type_stats __________________
+tests/test_content_cms.py:232: in test_content_by_type_stats
+    assert response.status_code in [200, 404]
+E   assert 401 in [200, 404]
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+________________ TestContentStats.test_content_by_status_stats _________________
+tests/test_content_cms.py:237: in test_content_by_status_stats
+    assert response.status_code in [200, 404]
+E   assert 401 in [200, 404]
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_____________________ TestContentBatch.test_batch_publish ______________________
+tests/test_content_cms.py:268: in test_batch_publish
+    assert response.status_code in [200, 404]
+E   assert 401 in [200, 404]
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+____________ TestCoupleGeneratePlan.test_generate_plan_returns_200 _____________
+tests/test_couple_wellness.py:39: in test_generate_plan_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+___________ TestCoupleGeneratePlan.test_generate_plan_has_activities ___________
+tests/test_couple_wellness.py:44: in test_generate_plan_has_activities
+    assert data["success"] is True
+           ^^^^^^^^^^^^^^^
+E   KeyError: 'success'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_________________ TestCoupleGetPlan.test_get_plan_returns_200 __________________
+tests/test_couple_wellness.py:53: in test_get_plan_returns_200
+    assert response.status_code == 200
+E   assert 404 == 200
+E    +  where 404 = <Response [404 Not Found]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+____________________ TestCouponIssue.test_issue_returns_200 ____________________
+tests/test_coupon.py:9: in test_issue_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+__________________ TestCouponIssue.test_issue_has_coupon_code __________________
+tests/test_coupon.py:14: in test_issue_has_coupon_code
+    assert data["success"] is True
+           ^^^^^^^^^^^^^^^
+E   KeyError: 'success'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+___________________ TestCouponMy.test_my_coupons_returns_200 ___________________
+tests/test_coupon.py:21: in test_my_coupons_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+____________________ TestCouponMy.test_my_coupons_has_list _____________________
+tests/test_coupon.py:25: in test_my_coupons_has_list
+    assert "coupons" in data["data"]
+                        ^^^^^^^^^^^^
+E   KeyError: 'data'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+__________________ TestCouponRedeem.test_redeem_valid_coupon ___________________
+tests/test_coupon.py:33: in test_redeem_valid_coupon
+    code = issue_data["data"]["coupon_code"]
+           ^^^^^^^^^^^^^^^^^^
+E   KeyError: 'data'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+__________________ TestCouponRedeem.test_redeem_invalid_code ___________________
+tests/test_coupon.py:42: in test_redeem_invalid_code
+    assert response.status_code in [400, 404]
+E   assert 401 in [400, 404]
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_________________ TestCouponValidate.test_validate_returns_200 _________________
+tests/test_coupon.py:50: in test_validate_returns_200
+    code = issue_data["data"]["coupon_code"]
+           ^^^^^^^^^^^^^^^^^^
+E   KeyError: 'data'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+___________________ TestEmotionLog.test_log_calm_returns_200 ___________________
+tests/test_emotion.py:20: in test_log_calm_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_____________________ TestEmotionLog.test_log_has_guidance _____________________
+tests/test_emotion.py:30: in test_log_has_guidance
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_______________________ TestEmotionLog.test_log_anxious ________________________
+tests/test_emotion.py:43: in test_log_anxious
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_________________ TestEmotionLog.test_log_invalid_emotion_422 __________________
+tests/test_emotion.py:55: in test_log_invalid_emotion_422
+    assert response.status_code == 422
+E   assert 401 == 422
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+________________ TestEmotionLog.test_log_intensity_too_high_422 ________________
+tests/test_emotion.py:65: in test_log_intensity_too_high_422
+    assert response.status_code == 422
+E   assert 401 == 422
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+________________ TestEmotionLog.test_log_intensity_too_low_422 _________________
+tests/test_emotion.py:75: in test_log_intensity_too_low_422
+    assert response.status_code == 422
+E   assert 401 == 422
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_____________ TestEmotionLog.test_log_message_varies_by_intensity ______________
+tests/test_emotion.py:85: in test_log_message_varies_by_intensity
+    msg1 = response1.json()["data"]["message"]
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'data'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_____________ TestExpertQuestions.test_submit_question_returns_200 _____________
+tests/test_expert_qa.py:34: in test_submit_question_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_______________ TestExpertQuestions.test_submit_question_has_id ________________
+tests/test_expert_qa.py:39: in test_submit_question_has_id
+    assert data["success"] is True
+           ^^^^^^^^^^^^^^^
+E   KeyError: 'success'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+__________ TestExpertQuestionDetail.test_question_detail_returns_200 ___________
+tests/test_expert_qa.py:47: in test_question_detail_returns_200
+    q_id = create_data["data"]["question_id"]
+           ^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'data'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+______________ TestExpertAnswer.test_answer_question_returns_200 _______________
+tests/test_expert_qa.py:59: in test_answer_question_returns_200
+    q_id = create_data["data"]["question_id"]
+           ^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'data'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_____________________ TestInviteFamily.test_invite_family ______________________
+tests/test_family.py:26: in test_invite_family
+    assert response.status_code == 200, "生成邀请码应返回 200"
+E   AssertionError: 生成邀请码应返回 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+___________________ TestInviteFamily.test_invite_has_expiry ____________________
+tests/test_family.py:38: in test_invite_has_expiry
+    assert "expires_at" in data, "邀请响应应包含过期时间"
+E   AssertionError: 邀请响应应包含过期时间
+E   assert 'expires_at' in {'detail': '请先登录'}
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+______________ TestInviteFamily.test_invite_reuses_existing_code _______________
+tests/test_family.py:46: in test_invite_reuses_existing_code
+    code1 = resp1.json()["code"]
+            ^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'code'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+____________________ TestBindFamily.test_add_family_member _____________________
+tests/test_family.py:68: in test_add_family_member
+    assert response.status_code == 200, "添加家庭成员应返回 200"
+E   AssertionError: 添加家庭成员应返回 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+__________________ TestBindFamily.test_join_family_with_code ___________________
+tests/test_family.py:81: in test_join_family_with_code
+    code = invite_resp.json()["code"]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'code'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+____________________ TestBindFamily.test_join_invalid_code _____________________
+tests/test_family.py:99: in test_join_invalid_code
+    assert join_resp.status_code == 404, "无效邀请码应返回 404"
+E   AssertionError: 无效邀请码应返回 404
+E   assert 401 == 404
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+______________________ TestBindFamily.test_join_used_code ______________________
+tests/test_family.py:107: in test_join_used_code
+    code = invite_resp.json()["code"]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'code'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_____________________ TestUnbindFamily.test_remove_member ______________________
+tests/test_family.py:278: in test_remove_member
+    member_id = add_resp.json()["id"]
+                ^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'id'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+______________________ TestUnbindFamily.test_leave_family ______________________
+tests/test_family.py:294: in test_leave_family
+    assert response.status_code == 200, "离开家庭应成功"
+E   AssertionError: 离开家庭应成功
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_______________ TestMaxFamilyMembers.test_over_limit_returns_400 _______________
+tests/test_family.py:343: in test_over_limit_returns_400
+    assert resp.status_code == 400, "超出成员上限应返回 400"
+E   AssertionError: 超出成员上限应返回 400
+E   assert 401 == 400
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_________ TestFamilyCareReminder.test_care_reminder_nonexistent_member _________
+tests/test_family.py:400: in test_care_reminder_nonexistent_member
+    assert resp.status_code == 404, "不存在的成员应返回 404"
+E   AssertionError: 不存在的成员应返回 404
+E   assert 401 == 404
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_______________ TestFamilyCareReminder.test_family_settings_read _______________
+tests/test_family.py:405: in test_family_settings_read
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_______________ TestFirstInsight.test_first_insight_spring_calm ________________
+tests/test_first_insight.py:23: in test_first_insight_spring_calm
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+______________ TestFirstInsight.test_first_insight_autumn_anxious ______________
+tests/test_first_insight.py:47: in test_first_insight_autumn_anxious
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_____________ TestFirstInsight.test_first_insight_south_hemisphere _____________
+tests/test_first_insight.py:67: in test_first_insight_south_hemisphere
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+____________ TestFirstInsight.test_first_insight_missing_hemisphere ____________
+tests/test_first_insight.py:86: in test_first_insight_missing_hemisphere
+    assert response.status_code in [200, 422]
+E   assert 401 in [200, 422]
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_______ TestFirstInsight.test_first_insight_response_has_required_fields _______
+tests/test_first_insight.py:103: in test_first_insight_response_has_required_fields
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+____________ TestFirstInsight.test_first_insight_different_feelings ____________
+tests/test_first_insight.py:139: in test_first_insight_different_feelings
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_____________ TestFirstInsight.test_first_insight_different_goals ______________
+tests/test_first_insight.py:157: in test_first_insight_different_goals
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_____________ TestFirstInsight.test_first_insight_different_styles _____________
+tests/test_first_insight.py:174: in test_first_insight_different_styles
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_______________ TestFirstInsight.test_first_insight_with_user_id _______________
+tests/test_first_insight.py:192: in test_first_insight_with_user_id
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_________ TestFirstInsight.test_first_insight_without_optional_fields __________
+tests/test_first_insight.py:205: in test_first_insight_without_optional_fields
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+________ TestFirstInsight.test_first_insight_empty_strings_use_defaults ________
+tests/test_first_insight.py:224: in test_first_insight_empty_strings_use_defaults
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+___ TestFirstInsight.test_first_insight_response_generated_at_is_iso_format ____
+tests/test_first_insight.py:239: in test_first_insight_response_generated_at_is_iso_format
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+___________ TestFoodCompatibilityCheck.test_check_incompatible_pair ____________
+tests/test_food_compatibility.py:20: in test_check_incompatible_pair
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+___________ TestFoodCompatibilityCheck.test_check_has_is_compatible ____________
+tests/test_food_compatibility.py:25: in test_check_has_is_compatible
+    assert "is_compatible" in data["data"]
+                              ^^^^^^^^^^^^
+E   KeyError: 'data'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+__________ TestFoodCompatibilityCheck.test_check_requires_both_foods ___________
+tests/test_food_compatibility.py:29: in test_check_requires_both_foods
+    assert response.status_code == 422
+E   assert 401 == 422
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_____________ TestFoodTherapyRecommend.test_recommend_returns_200 ______________
+tests/test_food_therapy.py:33: in test_recommend_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_____________ TestFoodTherapyRecommend.test_recommend_has_recipes ______________
+tests/test_food_therapy.py:38: in test_recommend_has_recipes
+    assert "recipes" in data["data"]
+                        ^^^^^^^^^^^^
+E   KeyError: 'data'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_______________ TestGiftingOrders.test_create_order_returns_200 ________________
+tests/test_gifting.py:34: in test_create_order_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+__________________ TestGiftingOrders.test_create_order_has_id __________________
+tests/test_gifting.py:39: in test_create_order_has_id
+    assert data["success"] is True
+           ^^^^^^^^^^^^^^^
+E   KeyError: 'success'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_____________ TestGiftingOrderDetail.test_order_detail_returns_200 _____________
+tests/test_gifting.py:47: in test_order_detail_returns_200
+    order_id = create_data["data"]["order_id"]
+               ^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'data'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_______________ TestGiftCards.test_create_gift_card_returns_200 ________________
+tests/test_gifting.py:59: in test_create_gift_card_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_________________ TestGiftCards.test_create_gift_card_has_code _________________
+tests/test_gifting.py:64: in test_create_gift_card_has_code
+    assert data["success"] is True
+           ^^^^^^^^^^^^^^^
+E   KeyError: 'success'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+__________________ TestGiftCardRedeem.test_redeem_valid_card ___________________
+tests/test_gifting.py:72: in test_redeem_valid_card
+    code = create_data["data"]["card_code"]
+           ^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'data'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+___________ TestGiftCardRedeem.test_redeem_invalid_card_returns_404 ____________
+tests/test_gifting.py:80: in test_redeem_invalid_card_returns_404
+    assert response.status_code == 404
+E   assert 401 == 404
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+____________________ TestGratitudeLog.test_log_returns_200 _____________________
+tests/test_gratitude.py:14: in test_log_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+______________________ TestGratitudeLog.test_log_success _______________________
+tests/test_gratitude.py:19: in test_log_success
+    assert data["success"] is True
+           ^^^^^^^^^^^^^^^
+E   KeyError: 'success'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+__________________ TestGratitudeLog.test_log_requires_user_id __________________
+tests/test_gratitude.py:23: in test_log_requires_user_id
+    assert response.status_code == 422
+E   assert 401 == 422
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+________________ TestGratitudeHistory.test_history_returns_200 _________________
+tests/test_gratitude.py:29: in test_history_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+________________ TestGratitudeHistory.test_history_has_entries _________________
+tests/test_gratitude.py:33: in test_history_has_entries
+    assert "entries" in data["data"]
+                        ^^^^^^^^^^^^
+E   KeyError: 'data'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_________________ TestGratitudeStreak.test_streak_returns_200 __________________
+tests/test_gratitude.py:39: in test_streak_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+__________________ TestGratitudeStreak.test_streak_has_count ___________________
+tests/test_gratitude.py:43: in test_streak_has_count
+    assert "streak_days" in data["data"]
+                            ^^^^^^^^^^^^
+E   KeyError: 'data'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+________________ TestHabitCreate.test_create_habit_returns_200 _________________
+tests/test_habit_builder.py:26: in test_create_habit_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+___________________ TestHabitCreate.test_create_habit_has_id ___________________
+tests/test_habit_builder.py:31: in test_create_habit_has_id
+    assert data["success"] is True
+           ^^^^^^^^^^^^^^^
+E   KeyError: 'success'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+________________ TestHabitUserList.test_user_habits_returns_200 ________________
+tests/test_habit_builder.py:38: in test_user_habits_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_________________ TestHabitUserList.test_user_habits_has_list __________________
+tests/test_habit_builder.py:42: in test_user_habits_has_list
+    assert "habits" in data["data"]
+                       ^^^^^^^^^^^^
+E   KeyError: 'data'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+__________________ TestHabitCheckin.test_checkin_returns_200 ___________________
+tests/test_habit_builder.py:50: in test_checkin_returns_200
+    habit_id = create_data["data"]["habit_id"]
+               ^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'data'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_________________ TestHabitCheckin.test_checkin_updates_streak _________________
+tests/test_habit_builder.py:58: in test_checkin_updates_streak
+    habit_id = create_data["data"]["habit_id"]
+               ^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'data'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_________________ TestHabitProgress.test_progress_returns_200 __________________
+tests/test_habit_builder.py:68: in test_progress_returns_200
+    habit_id = create_data["data"]["habit_id"]
+               ^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'data'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+____________ test_health_fail_closed_when_dependencies_unconfigured ____________
+tests/test_health.py:14: in test_health_fail_closed_when_dependencies_unconfigured
+    assert components["model_gateway"] == {"configured": False, "status": "down"}
+E   AssertionError: assert {'configured'...atus': 'down'} == {'configured'...atus': 'down'}
+E     
+E     Omitting 2 identical items, use -vv to show
+E     Left contains 2 more items:
+E     {'mode': 'domestic-direct', 'providers': []}
+E     Use -v to get more diff
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+________________ TestLiveClassBook.test_book_class_returns_200 _________________
+tests/test_live_class.py:33: in test_book_class_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+__________________ TestLiveClassBook.test_book_class_success ___________________
+tests/test_live_class.py:38: in test_book_class_success
+    assert data["success"] is True
+           ^^^^^^^^^^^^^^^
+E   KeyError: 'success'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+______________ TestLiveClassBookings.test_my_bookings_returns_200 ______________
+tests/test_live_class.py:44: in test_my_bookings_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_________________ TestLiveClassBookings.test_bookings_has_list _________________
+tests/test_live_class.py:48: in test_bookings_has_list
+    assert "bookings" in data["data"]
+                         ^^^^^^^^^^^^
+E   KeyError: 'data'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+____________ TestPersonalizedAdvice.test_personalized_advice_basic _____________
+tests/test_maternity.py:424: in test_personalized_advice_basic
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_________ TestPersonalizedAdvice.test_personalized_advice_with_nausea __________
+tests/test_maternity.py:439: in test_personalized_advice_with_nausea
+    recommendations = data["data"]["personalized_recommendations"]
+                      ^^^^^^^^^^^^
+E   KeyError: 'data'
+_________ TestPersonalizedAdvice.test_personalized_advice_with_fatigue _________
+tests/test_maternity.py:451: in test_personalized_advice_with_fatigue
+    recommendations = data["data"]["personalized_recommendations"]
+                      ^^^^^^^^^^^^
+E   KeyError: 'data'
+______ TestPersonalizedAdvice.test_personalized_advice_multiple_symptoms _______
+tests/test_maternity.py:463: in test_personalized_advice_multiple_symptoms
+    assert len(data["data"]["personalized_recommendations"]) >= 3
+               ^^^^^^^^^^^^
+E   KeyError: 'data'
+________ TestPersonalizedAdvice.test_personalized_advice_invalid_month _________
+tests/test_maternity.py:473: in test_personalized_advice_invalid_month
+    assert response.status_code == 400
+E   assert 401 == 400
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+___________ TestPersonalizedAdvice.test_personalized_advice_month_0 ____________
+tests/test_maternity.py:483: in test_personalized_advice_month_0
+    assert response.status_code == 400
+E   assert 401 == 400
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+______ TestPersonalizedAdvice.test_personalized_advice_with_constipation _______
+tests/test_maternity.py:494: in test_personalized_advice_with_constipation
+    recommendations = data["data"]["personalized_recommendations"]
+                      ^^^^^^^^^^^^
+E   KeyError: 'data'
+______ TestPersonalizedAdvice.test_personalized_advice_contains_base_plan ______
+tests/test_maternity.py:506: in test_personalized_advice_contains_base_plan
+    assert "base_plan" in data["data"]
+                          ^^^^^^^^^^^^
+E   KeyError: 'data'
+_____ TestPersonalizedAdvice.test_personalized_advice_contains_disclaimer ______
+tests/test_maternity.py:518: in test_personalized_advice_contains_disclaimer
+    assert "disclaimer" in data["data"]
+                           ^^^^^^^^^^^^
+E   KeyError: 'data'
+_______________ TestMenstrualCycleLog.test_log_cycle_returns_200 _______________
+tests/test_menstrual.py:9: in test_log_cycle_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+________________ TestMenstrualCycleLog.test_log_returns_success ________________
+tests/test_menstrual.py:14: in test_log_returns_success
+    assert data["success"] is True
+           ^^^^^^^^^^^^^^^
+E   KeyError: 'success'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_______________ TestMenstrualCycleLog.test_log_requires_user_id ________________
+tests/test_menstrual.py:18: in test_log_requires_user_id
+    assert response.status_code == 422
+E   assert 401 == 422
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+________________ TestMenstrualHistory.test_history_returns_200 _________________
+tests/test_menstrual.py:24: in test_history_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+__________________ TestMenstrualHistory.test_history_has_data __________________
+tests/test_menstrual.py:28: in test_history_has_data
+    assert "data" in data
+E   AssertionError: assert 'data' in {'detail': '请先登录'}
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_______________ TestMenstrualSettings.test_settings_returns_200 ________________
+tests/test_menstrual.py:35: in test_settings_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+________________ TestMenstrualPredict.test_predict_returns_200 _________________
+tests/test_menstrual.py:41: in test_predict_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+______________ TestMenstrualPhaseCare.test_phase_care_returns_200 ______________
+tests/test_menstrual.py:47: in test_phase_care_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_______________ TestOnboardingProgress.test_progress_returns_200 _______________
+tests/test_onboarding.py:19: in test_progress_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_______________ TestOnboardingProgress.test_progress_has_status ________________
+tests/test_onboarding.py:23: in test_progress_has_status
+    assert "data" in data
+E   AssertionError: assert 'data' in {'detail': '请先登录'}
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+________ TestOnboardingUpdateProgress.test_update_progress_returns_200 _________
+tests/test_onboarding.py:30: in test_update_progress_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+__________ TestOnboardingUpdateProgress.test_update_progress_success ___________
+tests/test_onboarding.py:35: in test_update_progress_success
+    assert data["success"] is True
+           ^^^^^^^^^^^^^^^
+E   KeyError: 'success'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+____________ TestOnboardingQuizSubmit.test_submit_quiz_returns_200 _____________
+tests/test_onboarding.py:62: in test_submit_quiz_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_____ TestRecommendationsDaily.test_get_daily_recommendations_returns_200 ______
+tests/test_recommendations.py:19: in test_get_daily_recommendations_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_________ TestRecommendationsDaily.test_daily_recommendations_has_data _________
+tests/test_recommendations.py:24: in test_daily_recommendations_has_data
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_____ TestRecommendationsDaily.test_daily_recommendations_requires_user_id _____
+tests/test_recommendations.py:31: in test_daily_recommendations_requires_user_id
+    assert response.status_code == 422
+E   assert 401 == 422
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+______ TestRecommendationsDaily.test_daily_recommendations_respects_limit ______
+tests/test_recommendations.py:36: in test_daily_recommendations_respects_limit
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_______ TestRecommendationsDaily.test_daily_recommendations_limit_max_10 _______
+tests/test_recommendations.py:47: in test_daily_recommendations_limit_max_10
+    assert response.status_code in [200, 422]
+E   assert 401 in [200, 422]
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+____ TestRecommendationsDaily.test_daily_recommendations_with_locale_zh_cn _____
+tests/test_recommendations.py:52: in test_daily_recommendations_with_locale_zh_cn
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+____ TestRecommendationsDaily.test_daily_recommendations_with_locale_en_us _____
+tests/test_recommendations.py:57: in test_daily_recommendations_with_locale_en_us
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_____ TestRecommendationsDaily.test_daily_recommendations_default_limit_3 ______
+tests/test_recommendations.py:62: in test_daily_recommendations_default_limit_3
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_ TestRecommendationsDaily.test_daily_different_users_different_recommendations _
+tests/test_recommendations.py:68: in test_daily_different_users_different_recommendations
+    assert response1.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+____________ TestRecommendationsResponse.test_response_success_key _____________
+tests/test_recommendations.py:173: in test_response_success_key
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+______________ TestFamilyPrivacy.test_family_api_status_endpoint _______________
+tests/test_safety_prod.py:186: in test_family_api_status_endpoint
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+____________ TestFamilyPrivacy.test_family_settings_default_privacy ____________
+tests/test_safety_prod.py:204: in test_family_settings_default_privacy
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_____________________ TestDataExport.test_export_settings ______________________
+tests/test_safety_prod.py:220: in test_export_settings
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_____________________ TestDataDelete.test_clear_all_memory _____________________
+tests/test_safety_prod.py:278: in test_clear_all_memory
+    assert response.status_code == 200, "清空记忆应成功"
+E   AssertionError: 清空记忆应成功
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+______________ TestDataDelete.test_memory_delete_requires_confirm ______________
+tests/test_safety_prod.py:288: in test_memory_delete_requires_confirm
+    assert response.status_code == 400, "未提供正确 confirm 应返回 400"
+E   AssertionError: 未提供正确 confirm 应返回 400
+E   assert 401 == 400
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+____________________ TestMemoryReset.test_re_enable_memory _____________________
+tests/test_safety_prod.py:329: in test_re_enable_memory
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_____________________ TestMemoryReset.test_disable_memory ______________________
+tests/test_safety_prod.py:339: in test_disable_memory
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+__________________ test_legacy_entitlement_grants_are_retired __________________
+tests/test_seasons_subscription_truth.py:14: in test_legacy_entitlement_grants_are_retired
+    assert client.post("/api/v1/seasons/subscription/trial?user_id=u1", json={"product_id": "serenity"}).status_code == 410
+E   AssertionError: assert 404 == 410
+E    +  where 404 = <Response [404 Not Found]>.status_code
+E    +    where <Response [404 Not Found]> = post('/api/v1/seasons/subscription/trial?user_id=u1', json={'product_id': 'serenity'})
+E    +      where post = <starlette.testclient.TestClient object at 0x11ebd3770>.post
+_______________ test_checkout_fails_closed_without_configuration _______________
+tests/test_seasons_subscription_truth.py:25: in test_checkout_fails_closed_without_configuration
+    assert response.status_code == 503
+E   assert 404 == 503
+E    +  where 404 = <Response [404 Not Found]>.status_code
+____________________ test_checkout_uses_real_stripe_session ____________________
+tests/test_seasons_subscription_truth.py:42: in test_checkout_uses_real_stripe_session
+    assert response.status_code == 200
+E   assert 404 == 200
+E    +  where 404 = <Response [404 Not Found]>.status_code
+____________________ test_webhook_rejects_unsigned_payload _____________________
+tests/test_seasons_subscription_truth.py:49: in test_webhook_rejects_unsigned_payload
+    assert client.post("/api/v1/seasons/subscription/webhook/stripe", json={"type": "invoice.paid"}).status_code == 400
+E   AssertionError: assert 404 == 400
+E    +  where 404 = <Response [404 Not Found]>.status_code
+E    +    where <Response [404 Not Found]> = post('/api/v1/seasons/subscription/webhook/stripe', json={'type': 'invoice.paid'})
+E    +      where post = <starlette.testclient.TestClient object at 0x11ebd3770>.post
+___________________ TestHealthCheck.test_health_check_basic ____________________
+tests/test_senior_wellness.py:406: in test_health_check_basic
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_______________ TestHealthCheck.test_health_check_with_insomnia ________________
+tests/test_senior_wellness.py:420: in test_health_check_with_insomnia
+    recommendations = data["data"]["tcm_recommendations"]
+                      ^^^^^^^^^^^^
+E   KeyError: 'data'
+____________ TestHealthCheck.test_health_check_with_memory_decline _____________
+tests/test_senior_wellness.py:432: in test_health_check_with_memory_decline
+    recommendations = data["data"]["tcm_recommendations"]
+                      ^^^^^^^^^^^^
+E   KeyError: 'data'
+________ TestHealthCheck.test_health_check_with_hypertension_condition _________
+tests/test_senior_wellness.py:444: in test_health_check_with_hypertension_condition
+    alerts = data["data"]["medical_alerts"]
+             ^^^^^^^^^^^^
+E   KeyError: 'data'
+__________ TestHealthCheck.test_health_check_with_diabetes_condition ___________
+tests/test_senior_wellness.py:456: in test_health_check_with_diabetes_condition
+    alerts = data["data"]["medical_alerts"]
+             ^^^^^^^^^^^^
+E   KeyError: 'data'
+_____________ TestHealthCheck.test_health_check_multiple_symptoms ______________
+tests/test_senior_wellness.py:468: in test_health_check_multiple_symptoms
+    recommendations = data["data"]["tcm_recommendations"]
+                      ^^^^^^^^^^^^
+E   KeyError: 'data'
+____________ TestHealthCheck.test_health_check_multiple_conditions _____________
+tests/test_senior_wellness.py:480: in test_health_check_multiple_conditions
+    alerts = data["data"]["medical_alerts"]
+             ^^^^^^^^^^^^
+E   KeyError: 'data'
+_______________ TestHealthCheck.test_health_check_age_too_young ________________
+tests/test_senior_wellness.py:491: in test_health_check_age_too_young
+    assert response.status_code == 400
+E   assert 401 == 400
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+______________ TestHealthCheck.test_health_check_age_boundary_50 _______________
+tests/test_senior_wellness.py:501: in test_health_check_age_boundary_50
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_________ TestHealthCheck.test_health_check_no_symptoms_no_conditions __________
+tests/test_senior_wellness.py:512: in test_health_check_no_symptoms_no_conditions
+    recommendations = data["data"]["tcm_recommendations"]
+                      ^^^^^^^^^^^^
+E   KeyError: 'data'
+________ TestHealthCheck.test_health_check_returns_suggested_exercises _________
+tests/test_senior_wellness.py:526: in test_health_check_returns_suggested_exercises
+    assert "suggested_exercises" in data["data"]
+                                    ^^^^^^^^^^^^
+E   KeyError: 'data'
+__________________ TestShareCard.test_create_card_returns_200 __________________
+tests/test_share.py:9: in test_create_card_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_________________ TestShareCard.test_create_card_has_share_id __________________
+tests/test_share.py:14: in test_create_card_has_share_id
+    assert data["success"] is True
+           ^^^^^^^^^^^^^^^
+E   KeyError: 'success'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_________________ TestShareCardGet.test_get_card_after_create __________________
+tests/test_share.py:22: in test_get_card_after_create
+    share_id = create_data["data"]["card"]["share_id"]
+               ^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'data'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+___________________ TestShareInvite.test_invite_returns_200 ____________________
+tests/test_share.py:34: in test_invite_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_____________________ TestShareInvite.test_invite_has_link _____________________
+tests/test_share.py:39: in test_invite_has_link
+    assert "invite_url" in data["data"]
+                           ^^^^^^^^^^^^
+E   KeyError: 'data'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+____________________ TestShareStats.test_stats_returns_200 _____________________
+tests/test_share.py:51: in test_stats_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_______________ TestSkillExecute.test_execute_skill_returns_200 ________________
+tests/test_skills.py:244: in test_execute_skill_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+__________________ TestSkillExecute.test_execute_with_context __________________
+tests/test_skills.py:268: in test_execute_with_context
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+__________ TestSkillExecute.test_execute_requires_user_id_and_message __________
+tests/test_skills.py:274: in test_execute_requires_user_id_and_message
+    assert response.status_code == 422
+E   assert 401 == 422
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+______________ TestDailyPlan.test_generate_daily_plan_returns_200 ______________
+tests/test_skills.py:298: in test_generate_daily_plan_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+___________________ TestDailyPlan.test_daily_plan_light_type ___________________
+tests/test_skills.py:307: in test_daily_plan_light_type
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+___________________ TestDailyPlan.test_daily_plan_deep_type ____________________
+tests/test_skills.py:316: in test_daily_plan_deep_type
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+__________________ TestDailyPlan.test_daily_plan_emotion_type __________________
+tests/test_skills.py:325: in test_daily_plan_emotion_type
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+__________________ TestDailyPlan.test_daily_plan_with_context __________________
+tests/test_skills.py:335: in test_daily_plan_with_context
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_____________________ TestDailyPlan.test_invalid_plan_type _____________________
+tests/test_skills.py:356: in test_invalid_plan_type
+    assert response.status_code == 400  # 不得把用户选错的类型悄悄替换为另一份计划
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   assert 401 == 400
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+____________________ TestTextToSpeech.test_tts_returns_200 _____________________
+tests/test_speech.py:22: in test_tts_returns_200
+    assert response.status_code in [200, 400, 500]  # 可能依赖外部服务
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   assert 401 in [200, 400, 500]
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+___________________ TestTextToSpeech.test_tts_requires_text ____________________
+tests/test_speech.py:28: in test_tts_requires_text
+    assert response.status_code == 422
+E   assert 401 == 422
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_____________________ TestTextToSpeech.test_tts_with_model _____________________
+tests/test_speech.py:37: in test_tts_with_model
+    assert response.status_code in [200, 400, 500]
+E   assert 401 in [200, 400, 500]
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_____________________ TestTextToSpeech.test_tts_with_voice _____________________
+tests/test_speech.py:46: in test_tts_with_voice
+    assert response.status_code in [200, 400, 500]
+E   assert 401 in [200, 400, 500]
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+____________________ TestTextToSpeech.test_tts_with_format _____________________
+tests/test_speech.py:55: in test_tts_with_format
+    assert response.status_code in [200, 400, 500]
+E   assert 401 in [200, 400, 500]
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_____________________ TestTextToSpeech.test_tts_with_speed _____________________
+tests/test_speech.py:64: in test_tts_with_speed
+    assert response.status_code in [200, 400, 500]
+E   assert 401 in [200, 400, 500]
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+____________________ TestTextToSpeech.test_tts_speed_range _____________________
+tests/test_speech.py:73: in test_tts_speed_range
+    assert response.status_code in [200, 400, 422, 500]
+E   assert 401 in [200, 400, 422, 500]
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+__________________ TestTextToSpeech.test_tts_text_max_length ___________________
+tests/test_speech.py:81: in test_tts_text_max_length
+    assert response.status_code in [400, 422, 500]
+E   assert 401 in [400, 422, 500]
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+________________ TestTextToSpeech.test_tts_with_all_parameters _________________
+tests/test_speech.py:93: in test_tts_with_all_parameters
+    assert response.status_code in [200, 400, 500]
+E   assert 401 in [200, 400, 500]
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+___________________ TestSpeechToText.test_asr_requires_file ____________________
+tests/test_speech.py:102: in test_asr_requires_file
+    assert response.status_code in [422, 400]
+E   assert 401 in [422, 400]
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_____________________ TestSpeechToText.test_asr_with_model _____________________
+tests/test_speech.py:114: in test_asr_with_model
+    assert response.status_code in [200, 400, 500]
+E   assert 401 in [200, 400, 500]
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+___________________ TestSpeechToText.test_asr_with_language ____________________
+tests/test_speech.py:125: in test_asr_with_language
+    assert response.status_code in [200, 400, 500]
+E   assert 401 in [200, 400, 500]
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_________________ TestChatVoice.test_chat_voice_requires_file __________________
+tests/test_speech.py:206: in test_chat_voice_requires_file
+    assert response.status_code in [422, 400]
+E   assert 401 in [422, 400]
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+___________________ TestChatVoice.test_chat_voice_with_file ____________________
+tests/test_speech.py:216: in test_chat_voice_with_file
+    assert response.status_code in [200, 400, 500]
+E   assert 401 in [200, 400, 500]
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+___________________ TestChatVoice.test_chat_voice_with_model ___________________
+tests/test_speech.py:227: in test_chat_voice_with_model
+    assert response.status_code in [200, 400, 500]
+E   assert 401 in [200, 400, 500]
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_________________ TestChatVoice.test_chat_voice_with_tts_model _________________
+tests/test_speech.py:238: in test_chat_voice_with_tts_model
+    assert response.status_code in [200, 400, 500]
+E   assert 401 in [200, 400, 500]
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+___________________ TestChatVoice.test_chat_voice_with_voice ___________________
+tests/test_speech.py:249: in test_chat_voice_with_voice
+    assert response.status_code in [200, 400, 500]
+E   assert 401 in [200, 400, 500]
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+___________ TestPostWorkout.test_post_workout_strength_training_high ___________
+tests/test_sports_recovery.py:329: in test_post_workout_strength_training_high
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+______________ TestPostWorkout.test_post_workout_running_extreme _______________
+tests/test_sports_recovery.py:344: in test_post_workout_running_extreme
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+______________ TestPostWorkout.test_post_workout_swimming_medium _______________
+tests/test_sports_recovery.py:357: in test_post_workout_swimming_medium
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_________________ TestPostWorkout.test_post_workout_hiit_high __________________
+tests/test_sports_recovery.py:369: in test_post_workout_hiit_high
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+__________________ TestPostWorkout.test_post_workout_yoga_low __________________
+tests/test_sports_recovery.py:380: in test_post_workout_yoga_low
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_______________ TestPostWorkout.test_post_workout_invalid_sport ________________
+tests/test_sports_recovery.py:392: in test_post_workout_invalid_sport
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_____________ TestPostWorkout.test_post_workout_invalid_intensity ______________
+tests/test_sports_recovery.py:403: in test_post_workout_invalid_intensity
+    assert response.status_code == 422
+E   assert 401 == 422
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_______________ TestPostWorkout.test_post_workout_zero_duration ________________
+tests/test_sports_recovery.py:412: in test_post_workout_zero_duration
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+__________ TestPostWorkout.test_post_workout_energy_cost_calculation ___________
+tests/test_sports_recovery.py:425: in test_post_workout_energy_cost_calculation
+    assert data["data"]["energy_cost_score"] == 120
+           ^^^^^^^^^^^^
+E   KeyError: 'data'
+_____________ TestPostWorkout.test_post_workout_recovery_priority ______________
+tests/test_sports_recovery.py:436: in test_post_workout_recovery_priority
+    assert "recovery_priority" in data["data"]
+                                  ^^^^^^^^^^^^
+E   KeyError: 'data'
+_________________ TestPostWorkout.test_post_workout_structure __________________
+tests/test_sports_recovery.py:446: in test_post_workout_structure
+    result = data["data"]
+             ^^^^^^^^^^^^
+E   KeyError: 'data'
+_______________ TestPostWorkout.test_post_workout_includes_diet ________________
+tests/test_sports_recovery.py:462: in test_post_workout_includes_diet
+    assert "recommended_diet" in data["data"]
+                                 ^^^^^^^^^^^^
+E   KeyError: 'data'
+______________ TestIntegration.test_all_intensity_levels_accepted ______________
+tests/test_sports_recovery.py:506: in test_all_intensity_levels_accepted
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+__________________ TestIntegration.test_energy_cost_gradient ___________________
+tests/test_sports_recovery.py:521: in test_energy_cost_gradient
+    assert data["data"]["energy_cost_score"] == int(duration * 1.5)
+           ^^^^^^^^^^^^
+E   KeyError: 'data'
+_________________ TestIntegration.test_post_workout_all_sports _________________
+tests/test_sports_recovery.py:538: in test_post_workout_all_sports
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+______________________ test_plans_are_public_and_complete ______________________
+tests/test_stripe.py:15: in test_plans_are_public_and_complete
+    assert response.status_code == 200
+E   assert 404 == 200
+E    +  where 404 = <Response [404 Not Found]>.status_code
+_______________ test_config_fails_closed_without_publishable_key _______________
+tests/test_stripe.py:24: in test_config_fails_closed_without_publishable_key
+    assert response.status_code == 503
+E   assert 404 == 503
+E    +  where 404 = <Response [404 Not Found]>.status_code
+___________________ test_config_returns_real_configured_key ____________________
+tests/test_stripe.py:30: in test_config_returns_real_configured_key
+    assert response.status_code == 200
+E   assert 404 == 200
+E    +  where 404 = <Response [404 Not Found]>.status_code
+__________________ test_checkout_fails_closed_without_stripe ___________________
+tests/test_stripe.py:37: in test_checkout_fails_closed_without_stripe
+    assert response.status_code == 503
+E   assert 404 == 503
+E    +  where 404 = <Response [404 Not Found]>.status_code
+______________ test_checkout_uses_stripe_session_when_configured _______________
+tests/test_stripe.py:46: in test_checkout_uses_stripe_session_when_configured
+    assert response.status_code == 200
+E   assert 404 == 200
+E    +  where 404 = <Response [404 Not Found]>.status_code
+_________________ test_checkout_rejects_free_and_unknown_plans _________________
+tests/test_stripe.py:51: in test_checkout_rejects_free_and_unknown_plans
+    assert client.post("/api/v1/stripe/create-checkout-session", json={"plan_id": "free"}).status_code == 400
+E   AssertionError: assert 404 == 400
+E    +  where 404 = <Response [404 Not Found]>.status_code
+E    +    where <Response [404 Not Found]> = post('/api/v1/stripe/create-checkout-session', json={'plan_id': 'free'})
+E    +      where post = <starlette.testclient.TestClient object at 0x11ee3ca70>.post
+___________________ test_portal_fails_closed_without_stripe ____________________
+tests/test_stripe.py:57: in test_portal_fails_closed_without_stripe
+    assert client.post("/api/v1/stripe/create-portal-session?user_id=user-001").status_code == 503
+E   AssertionError: assert 404 == 503
+E    +  where 404 = <Response [404 Not Found]>.status_code
+E    +    where <Response [404 Not Found]> = post('/api/v1/stripe/create-portal-session?user_id=user-001')
+E    +      where post = <starlette.testclient.TestClient object at 0x11ee3ca70>.post
+_______________ test_webhook_fails_closed_without_configuration ________________
+tests/test_stripe.py:63: in test_webhook_fails_closed_without_configuration
+    assert client.post("/api/v1/stripe/webhook", json={"type": "anything"}).status_code == 503
+E   AssertionError: assert 404 == 503
+E    +  where 404 = <Response [404 Not Found]>.status_code
+E    +    where <Response [404 Not Found]> = post('/api/v1/stripe/webhook', json={'type': 'anything'})
+E    +      where post = <starlette.testclient.TestClient object at 0x11ee3ca70>.post
+_______________ test_webhook_requires_signature_when_configured ________________
+tests/test_stripe.py:69: in test_webhook_requires_signature_when_configured
+    assert client.post("/api/v1/stripe/webhook", json={"type": "anything"}).status_code == 400
+E   AssertionError: assert 404 == 400
+E    +  where 404 = <Response [404 Not Found]>.status_code
+E    +    where <Response [404 Not Found]> = post('/api/v1/stripe/webhook', json={'type': 'anything'})
+E    +      where post = <starlette.testclient.TestClient object at 0x11ee3ca70>.post
+________________ test_verified_unknown_webhook_is_acknowledged _________________
+tests/test_stripe.py:77: in test_verified_unknown_webhook_is_acknowledged
+    assert response.status_code == 200
+E   assert 404 == 200
+E    +  where 404 = <Response [404 Not Found]>.status_code
+_____________ TestPriceCalculation.test_calculate_basic_usd_1month _____________
+tests/test_subscription_local.py:276: in test_calculate_basic_usd_1month
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_____________ TestPriceCalculation.test_calculate_basic_eur_1month _____________
+tests/test_subscription_local.py:294: in test_calculate_basic_eur_1month
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+___________ TestPriceCalculation.test_calculate_premium_gbp_3months ____________
+tests/test_subscription_local.py:309: in test_calculate_premium_gbp_3months
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+___________ TestPriceCalculation.test_calculate_family_aud_12months ____________
+tests/test_subscription_local.py:327: in test_calculate_family_aud_12months
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_________ TestPriceCalculation.test_calculate_vat_rates_vary_by_region _________
+tests/test_subscription_local.py:349: in test_calculate_vat_rates_vary_by_region
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_______________ TestPriceCalculation.test_calculate_invalid_tier _______________
+tests/test_subscription_local.py:361: in test_calculate_invalid_tier
+    assert response.status_code == 422
+E   assert 401 == 422
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+___________ TestPriceCalculation.test_calculate_unsupported_currency ___________
+tests/test_subscription_local.py:371: in test_calculate_unsupported_currency
+    assert response.status_code == 404
+E   assert 401 == 404
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+______________ TestPriceCalculation.test_calculate_invalid_region ______________
+tests/test_subscription_local.py:381: in test_calculate_invalid_region
+    assert response.status_code == 404
+E   assert 401 == 404
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+__________ TestPriceCalculation.test_calculate_case_insensitive_tier ___________
+tests/test_subscription_local.py:397: in test_calculate_case_insensitive_tier
+    assert response_upper.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_____________ TestIntegration.test_currency_price_calculation_flow _____________
+tests/test_subscription_local.py:546: in test_currency_price_calculation_flow
+    calc_data = calculation.json()["data"]
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'data'
+_______________ TestProductList.test_product_list_returns_plans ________________
+tests/test_subscription_prod.py:21: in test_product_list_returns_plans
+    assert response.status_code == 200, "获取计划列表应返回 200"
+E   AssertionError: 获取计划列表应返回 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_______________ TestProductList.test_product_list_has_free_plan ________________
+tests/test_subscription_prod.py:33: in test_product_list_has_free_plan
+    assert "free" in plan_ids, "产品列表应包含 free 计划"
+E   AssertionError: 产品列表应包含 free 计划
+E   assert 'free' in []
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_____________ TestProductList.test_product_list_has_premium_plans ______________
+tests/test_subscription_prod.py:55: in test_product_list_has_premium_plans
+    assert len(plan_ids) >= 3, "应至少有 3 个计划（free + 付费）"
+E   AssertionError: 应至少有 3 个计划（free + 付费）
+E   assert 0 >= 3
+E    +  where 0 = len([])
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+___________________ TestCreateOrder.test_create_alipay_order ___________________
+tests/test_subscription_prod.py:69: in test_create_alipay_order
+    assert response.status_code == 200, "创建订单应返回 200"
+E   AssertionError: 创建订单应返回 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_________________ TestCreateOrder.test_create_free_plan_order __________________
+tests/test_subscription_prod.py:87: in test_create_free_plan_order
+    assert response.status_code == 400
+E   assert 401 == 400
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_________________ TestCreateOrder.test_create_stripe_checkout __________________
+tests/test_subscription_prod.py:97: in test_create_stripe_checkout
+    assert response.status_code == 410
+E   assert 401 == 410
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+__________________ TestVerifyPayment.test_verify_alipay_order __________________
+tests/test_subscription_prod.py:112: in test_verify_alipay_order
+    order_id = create_resp.json()["data"]["order_id"]
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'data'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_______________ TestVerifyPayment.test_verify_already_paid_order _______________
+tests/test_subscription_prod.py:129: in test_verify_already_paid_order
+    order_id = create_resp.json()["data"]["order_id"]
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'data'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+__________________ TestVerifyPayment.test_query_order_status ___________________
+tests/test_subscription_prod.py:152: in test_query_order_status
+    order_id = create_resp.json()["data"]["order_id"]
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'data'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_____ TestSubscriptionActivation.test_subscription_activated_after_payment _____
+tests/test_subscription_prod.py:172: in test_subscription_activated_after_payment
+    order_id = create_resp.json()["data"]["order_id"]
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'data'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+____ TestSubscriptionActivation.test_stripe_webhook_activates_subscription _____
+tests/test_subscription_prod.py:203: in test_stripe_webhook_activates_subscription
+    assert webhook_resp.status_code == 410
+E   assert 401 == 410
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+________________ TestRestorePurchase.test_restore_ios_purchase _________________
+tests/test_subscription_prod.py:234: in test_restore_ios_purchase
+    assert restore_resp.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_____________ TestRestorePurchase.test_restore_no_purchase_history _____________
+tests/test_subscription_prod.py:248: in test_restore_no_purchase_history
+    assert restore_resp.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+______________ TestSubscriptionExpired.test_check_expiry_endpoint ______________
+tests/test_subscription_prod.py:261: in test_check_expiry_endpoint
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_____ TestUpgradeSubscription.test_paid_upgrade_requires_verified_payment ______
+tests/test_subscription_prod.py:307: in test_paid_upgrade_requires_verified_payment
+    assert upgrade_resp.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+____________ TestConcurrentPurchase.test_duplicate_order_same_user _____________
+tests/test_subscription_prod.py:355: in test_duplicate_order_same_user
+    order_id_1 = order1.json()["data"]["order_id"]
+                 ^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'data'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+______________ TestConcurrentPurchase.test_invalid_plan_rejected _______________
+tests/test_subscription_prod.py:386: in test_invalid_plan_rejected
+    assert response.status_code == 400, "无效计划应返回 400"
+E   AssertionError: 无效计划应返回 400
+E   assert 401 == 400
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_____________________ TestRefund.test_cancel_subscription ______________________
+tests/test_subscription_prod.py:408: in test_cancel_subscription
+    assert cancel_resp.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+____________________ TestRefund.test_stripe_webhook_cancel _____________________
+tests/test_subscription_prod.py:442: in test_stripe_webhook_cancel
+    assert cancel_webhook.status_code == 410
+E   assert 401 == 410
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+____________________ TestRefund.test_usage_stats_available _____________________
+tests/test_subscription_prod.py:447: in test_usage_stats_available
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_____ TestCheckCompatibility.test_check_spinach_tofu_debunks_pairing_myth ______
+tests/test_tcm_food_safety.py:205: in test_check_spinach_tofu_debunks_pairing_myth
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+____ TestCheckCompatibility.test_check_crab_persimmon_debunks_pairing_myth _____
+tests/test_tcm_food_safety.py:216: in test_check_crab_persimmon_debunks_pairing_myth
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_________________ TestCheckCompatibility.test_check_by_food_id _________________
+tests/test_tcm_food_safety.py:227: in test_check_by_food_id
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_______ TestCheckCompatibility.test_check_safe_combination_ginger_honey ________
+tests/test_tcm_food_safety.py:236: in test_check_safe_combination_ginger_honey
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+________ TestCheckCompatibility.test_check_safe_combination_egg_tomato _________
+tests/test_tcm_food_safety.py:245: in test_check_safe_combination_egg_tomato
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_______________ TestCheckCompatibility.test_check_reverse_order ________________
+tests/test_tcm_food_safety.py:255: in test_check_reverse_order
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_______________ TestCheckCompatibility.test_check_missing_food1 ________________
+tests/test_tcm_food_safety.py:263: in test_check_missing_food1
+    assert response.status_code == 422
+E   assert 401 == 422
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_______________ TestCheckCompatibility.test_check_missing_food2 ________________
+tests/test_tcm_food_safety.py:270: in test_check_missing_food2
+    assert response.status_code == 422
+E   assert 401 == 422
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+________________ TestCheckCompatibility.test_check_invalid_food ________________
+tests/test_tcm_food_safety.py:278: in test_check_invalid_food
+    assert response.status_code == 404
+E   assert 401 == 404
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_____________ TestCheckCompatibility.test_check_both_foods_invalid _____________
+tests/test_tcm_food_safety.py:286: in test_check_both_foods_invalid
+    assert response.status_code == 404
+E   assert 401 == 404
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+______________ TestCheckCompatibility.test_check_response_format _______________
+tests/test_tcm_food_safety.py:294: in test_check_response_format
+    data = response.json()["data"]
+           ^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'data'
+_______________ TestThemeSettings.test_set_settings_returns_200 ________________
+tests/test_theme.py:29: in test_set_settings_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_____________ TestThemeSettings.test_set_settings_has_confirmation _____________
+tests/test_theme.py:34: in test_set_settings_has_confirmation
+    assert data["success"] is True
+           ^^^^^^^^^^^^^^^
+E   KeyError: 'success'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+______________ TestThemeGetSettings.test_get_settings_returns_200 ______________
+tests/test_theme.py:40: in test_get_settings_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+__________ TestPersonalizedSchedule.test_personalized_schedule_basic ___________
+tests/test_timezone_wellness.py:390: in test_personalized_schedule_basic
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+____ TestPersonalizedSchedule.test_personalized_schedule_with_constitution _____
+tests/test_timezone_wellness.py:405: in test_personalized_schedule_with_constitution
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+______ TestPersonalizedSchedule.test_personalized_schedule_yin_deficiency ______
+tests/test_timezone_wellness.py:417: in test_personalized_schedule_yin_deficiency
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+________ TestPersonalizedSchedule.test_personalized_schedule_damp_heat _________
+tests/test_timezone_wellness.py:429: in test_personalized_schedule_damp_heat
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_____ TestPersonalizedSchedule.test_personalized_schedule_schedule_length ______
+tests/test_timezone_wellness.py:441: in test_personalized_schedule_schedule_length
+    assert len(data["data"]["personalized_schedule"]) >= 6
+               ^^^^^^^^^^^^
+E   KeyError: 'data'
+_ TestPersonalizedSchedule.test_personalized_schedule_contains_key_activities __
+tests/test_timezone_wellness.py:451: in test_personalized_schedule_contains_key_activities
+    activities = [item["activity"] for item in data["data"]["personalized_schedule"]]
+                                               ^^^^^^^^^^^^
+E   KeyError: 'data'
+____ TestPersonalizedSchedule.test_personalized_schedule_invalid_wake_time _____
+tests/test_timezone_wellness.py:464: in test_personalized_schedule_invalid_wake_time
+    assert response.status_code == 422
+E   assert 401 == 422
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+____ TestPersonalizedSchedule.test_personalized_schedule_invalid_sleep_time ____
+tests/test_timezone_wellness.py:473: in test_personalized_schedule_invalid_sleep_time
+    assert response.status_code == 422
+E   assert 401 == 422
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+________ TestPersonalizedSchedule.test_personalized_schedule_invalid_tz ________
+tests/test_timezone_wellness.py:483: in test_personalized_schedule_invalid_tz
+    assert response.status_code == 422
+E   assert 401 == 422
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+________________ TestIntegration.test_jet_lag_and_schedule_flow ________________
+tests/test_timezone_wellness.py:530: in test_jet_lag_and_schedule_flow
+    assert schedule.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+____________ TestDeleteUser.test_delete_user_requires_confirmation _____________
+tests/test_users.py:19: in test_delete_user_requires_confirmation
+    assert response.status_code == 400
+E   assert 401 == 400
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+______________ TestDeleteUser.test_delete_user_with_confirmation _______________
+tests/test_users.py:24: in test_delete_user_with_confirmation
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_______________ TestDeleteUser.test_delete_user_success_response _______________
+tests/test_users.py:29: in test_delete_user_success_response
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+________________ TestDeleteUser.test_delete_user_has_deleted_at ________________
+tests/test_users.py:37: in test_delete_user_has_deleted_at
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_____________ TestDeleteUser.test_delete_user_has_deleted_records ______________
+tests/test_users.py:44: in test_delete_user_has_deleted_records
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+________________ TestDeleteUser.test_delete_user_cascade_delete ________________
+tests/test_users.py:52: in test_delete_user_cascade_delete
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+____________ TestDeleteUser.test_delete_user_without_confirm_query _____________
+tests/test_users.py:61: in test_delete_user_without_confirm_query
+    assert response.status_code == 400
+E   assert 401 == 400
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+____________ TestDeleteUser.test_delete_user_invalid_confirm_value _____________
+tests/test_users.py:66: in test_delete_user_invalid_confirm_value
+    assert response.status_code in [400, 422]
+E   assert 401 in [400, 422]
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+______ TestDeleteUser.test_delete_user_response_has_total_records_deleted ______
+tests/test_users.py:71: in test_delete_user_response_has_total_records_deleted
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_________________ TestDeleteUser.test_delete_nonexistent_user __________________
+tests/test_users.py:78: in test_delete_nonexistent_user
+    assert response.status_code in [200, 404]
+E   assert 401 in [200, 404]
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_____________ TestExportUserData.test_export_user_data_returns_200 _____________
+tests/test_users.py:87: in test_export_user_data_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+__________________ TestExportUserData.test_export_has_user_id __________________
+tests/test_users.py:92: in test_export_has_user_id
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+________________ TestExportUserData.test_export_has_exported_at ________________
+tests/test_users.py:100: in test_export_has_exported_at
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+__________________ TestExportUserData.test_export_has_profile __________________
+tests/test_users.py:107: in test_export_has_profile
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_______________ TestExportUserData.test_export_has_subscriptions _______________
+tests/test_users.py:115: in test_export_has_subscriptions
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_________________ TestExportUserData.test_export_has_memories __________________
+tests/test_users.py:123: in test_export_has_memories
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_______________ TestExportUserData.test_export_has_conversations _______________
+tests/test_users.py:131: in test_export_has_conversations
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_______________ TestExportUserData.test_export_nonexistent_user ________________
+tests/test_users.py:139: in test_export_nonexistent_user
+    assert response.status_code in [200, 404]
+E   assert 401 in [200, 404]
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+________________ TestExportUserData.test_export_data_structure _________________
+tests/test_users.py:144: in test_export_data_structure
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+________________ TestExportUserData.test_export_different_users ________________
+tests/test_users.py:155: in test_export_different_users
+    assert response1.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+________ TestUserManagementIntegration.test_export_then_delete_workflow ________
+tests/test_users.py:169: in test_export_then_delete_workflow
+    assert export_response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_______ TestUserManagementIntegration.test_export_returns_complete_data ________
+tests/test_users.py:182: in test_export_returns_complete_data
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+__________ TestUserManagementIntegration.test_delete_returns_summary ___________
+tests/test_users.py:191: in test_delete_returns_summary
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+__________ TestUserManagementIntegration.test_path_parameter_user_id ___________
+tests/test_users.py:200: in test_path_parameter_user_id
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+___________________ TestWaterTrackerLog.test_log_returns_200 ___________________
+tests/test_water_tracker.py:9: in test_log_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_________________ TestWaterTrackerLog.test_log_returns_success _________________
+tests/test_water_tracker.py:14: in test_log_returns_success
+    assert data["success"] is True
+           ^^^^^^^^^^^^^^^
+E   KeyError: 'success'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+________________ TestWaterTrackerLog.test_log_requires_user_id _________________
+tests/test_water_tracker.py:18: in test_log_requires_user_id
+    assert response.status_code == 422
+E   assert 401 == 422
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_________________ TestWaterTrackerToday.test_today_returns_200 _________________
+tests/test_water_tracker.py:24: in test_today_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+__________________ TestWaterTrackerToday.test_today_has_total __________________
+tests/test_water_tracker.py:28: in test_today_has_total
+    assert "data" in data
+E   AssertionError: assert 'data' in {'detail': '请先登录'}
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+________________ TestWaterTrackerGoal.test_set_goal_returns_200 ________________
+tests/test_water_tracker.py:35: in test_set_goal_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_____________ TestWaterTrackerRecommend.test_recommend_returns_200 _____________
+tests/test_water_tracker.py:41: in test_recommend_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_____________ TestWaterTrackerRecommend.test_recommend_has_advice ______________
+tests/test_water_tracker.py:45: in test_recommend_has_advice
+    assert "data" in data
+E   AssertionError: assert 'data' in {'detail': '请先登录'}
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+________________ TestWearableConnect.test_connect_valid_device _________________
+tests/test_wearable.py:25: in test_connect_valid_device
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+______________ TestWearableConnect.test_connect_has_confirmation _______________
+tests/test_wearable.py:30: in test_connect_has_confirmation
+    assert data["success"] is True
+           ^^^^^^^^^^^^^^^
+E   KeyError: 'success'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_________ TestWearableConnect.test_connect_invalid_device_returns_404 __________
+tests/test_wearable.py:34: in test_connect_invalid_device_returns_404
+    assert client.post("/api/v1/wearable/connect", json=payload).status_code == 404
+E   AssertionError: assert 401 == 404
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+E    +    where <Response [401 Unauthorized]> = post('/api/v1/wearable/connect', json={'device_id': 'nonexistent_device', 'user_id': 'test_user'})
+E    +      where post = <starlette.testclient.TestClient object at 0x13fe5e4b0>.post
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+____________ TestWearableConnectedDevice.test_connected_returns_200 ____________
+tests/test_wearable.py:43: in test_connected_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_________ TestWearableConnectedDevice.test_connected_has_is_connected __________
+tests/test_wearable.py:47: in test_connected_has_is_connected
+    assert "is_connected" in data["data"]
+                             ^^^^^^^^^^^^
+E   KeyError: 'data'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_________________ TestWearableSync.test_sync_data_returns_200 __________________
+tests/test_wearable.py:63: in test_sync_data_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_________________ TestWearableSync.test_sync_has_tcm_insights __________________
+tests/test_wearable.py:73: in test_sync_has_tcm_insights
+    assert "tcm_insights" in data["data"]
+                             ^^^^^^^^^^^^
+E   KeyError: 'data'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_________________ TestWearableHistory.test_history_returns_200 _________________
+tests/test_wearable.py:79: in test_history_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+__________________ TestWearableHistory.test_history_has_list ___________________
+tests/test_wearable.py:83: in test_history_has_list
+    assert "history" in data["data"]
+                        ^^^^^^^^^^^^
+E   KeyError: 'data'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+___________ TestWearableTodaySummary.test_today_summary_returns_200 ____________
+tests/test_wearable.py:89: in test_today_summary_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+__________________ TestWeatherAdvice.test_advice_returns_200 ___________________
+tests/test_weather_wellness.py:9: in test_advice_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+___ TestWeatherAdvice.test_advice_requires_observed_temperature_and_humidity ___
+tests/test_weather_wellness.py:14: in test_advice_requires_observed_temperature_and_humidity
+    assert response.status_code == 422
+E   assert 401 == 422
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_____________ TestWeatherAdvice.test_advice_requires_weather_type ______________
+tests/test_weather_wellness.py:18: in test_advice_requires_weather_type
+    assert response.status_code == 422
+E   assert 401 == 422
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+____________ TestGenerateMonthlyReport.test_generate_monthly_report ____________
+tests/test_wechat_social.py:231: in test_generate_monthly_report
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_______ TestGenerateMonthlyReport.test_generate_monthly_report_december ________
+tests/test_wechat_social.py:248: in test_generate_monthly_report_december
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+__________ TestGenerateMonthlyReport.test_generate_monthly_report_jan __________
+tests/test_wechat_social.py:262: in test_generate_monthly_report_jan
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+________ TestGenerateMonthlyReport.test_report_contains_required_fields ________
+tests/test_wechat_social.py:275: in test_report_contains_required_fields
+    data = response.json()["data"]
+           ^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'data'
+_______ TestGenerateMonthlyReport.test_report_content_includes_user_name _______
+tests/test_wechat_social.py:291: in test_report_content_includes_user_name
+    content = response.json()["data"]["report_content"]
+              ^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'data'
+_____ TestGenerateMonthlyReport.test_report_content_includes_checkin_days ______
+tests/test_wechat_social.py:303: in test_report_content_includes_checkin_days
+    content = response.json()["data"]["report_content"]
+              ^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'data'
+_______ TestGenerateMonthlyReport.test_report_with_minimal_checkin_days ________
+tests/test_wechat_social.py:315: in test_report_with_minimal_checkin_days
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_____________ TestGenerateMonthlyReport.test_report_emoji_present ______________
+tests/test_wechat_social.py:327: in test_report_emoji_present
+    data = response.json()["data"]
+           ^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'data'
+______________________ TestWeightLog.test_log_returns_200 ______________________
+tests/test_weight_manage.py:9: in test_log_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+________________________ TestWeightLog.test_log_success ________________________
+tests/test_weight_manage.py:14: in test_log_success
+    assert data["success"] is True
+           ^^^^^^^^^^^^^^^
+E   KeyError: 'success'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+___________________ TestWeightLog.test_log_requires_user_id ____________________
+tests/test_weight_manage.py:18: in test_log_requires_user_id
+    assert response.status_code == 422
+E   assert 401 == 422
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+__________________ TestWeightHistory.test_history_returns_200 __________________
+tests/test_weight_manage.py:24: in test_history_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+__________________ TestWeightHistory.test_history_has_records __________________
+tests/test_weight_manage.py:28: in test_history_has_records
+    assert "data" in data
+E   AssertionError: assert 'data' in {'detail': '请先登录'}
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+___________________ TestWeightGoal.test_set_goal_returns_200 ___________________
+tests/test_weight_manage.py:35: in test_set_goal_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+____________ TestWidgetWaterTracker.test_water_tracker_returns_200 _____________
+tests/test_widget.py:56: in test_water_tracker_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+____________ TestWidgetWaterTracker.test_water_tracker_has_progress ____________
+tests/test_widget.py:60: in test_water_tracker_has_progress
+    assert "progress_pct" in data["data"]
+                             ^^^^^^^^^^^^
+E   KeyError: 'data'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+__________ TestWidgetWaterTracker.test_water_tracker_requires_user_id __________
+tests/test_widget.py:64: in test_water_tracker_requires_user_id
+    assert response.status_code == 422
+E   assert 401 == 422
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+___________ TestWidgetCheckinStreak.test_checkin_streak_returns_200 ____________
+tests/test_widget.py:70: in test_checkin_streak_returns_200
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_____________ TestWidgetCheckinStreak.test_checkin_streak_has_days _____________
+tests/test_widget.py:74: in test_checkin_streak_has_days
+    assert "streak_days" in data["data"]
+                            ^^^^^^^^^^^^
+E   KeyError: 'data'
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+____________ TestWidgetCheckinStreak.test_checkin_requires_user_id _____________
+tests/test_widget.py:79: in test_checkin_requires_user_id
+    assert response.status_code == 422
+E   assert 401 == 422
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stdout setup -----------------------------
+[DB] 数据库已就绪，现有 329 条内容记录
+_____________ TestSymptomRelief.test_symptom_relief_neck_shoulder ______________
+tests/test_workplace_wellness.py:342: in test_symptom_relief_neck_shoulder
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+______________ TestSymptomRelief.test_symptom_relief_eye_fatigue _______________
+tests/test_workplace_wellness.py:353: in test_symptom_relief_eye_fatigue
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_______________ TestSymptomRelief.test_symptom_relief_drowsiness _______________
+tests/test_workplace_wellness.py:362: in test_symptom_relief_drowsiness
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+______________ TestSymptomRelief.test_symptom_relief_stomach_pain ______________
+tests/test_workplace_wellness.py:372: in test_symptom_relief_stomach_pain
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+________________ TestSymptomRelief.test_symptom_relief_headache ________________
+tests/test_workplace_wellness.py:381: in test_symptom_relief_headache
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+________________ TestSymptomRelief.test_symptom_relief_anxiety _________________
+tests/test_workplace_wellness.py:390: in test_symptom_relief_anxiety
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+____________ TestSymptomRelief.test_symptom_relief_unknown_symptom _____________
+tests/test_workplace_wellness.py:399: in test_symptom_relief_unknown_symptom
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+___________ TestSymptomRelief.test_symptom_relief_solution_structure ___________
+tests/test_workplace_wellness.py:408: in test_symptom_relief_solution_structure
+    solution = data["data"]["quick_solutions"][0]
+               ^^^^^^^^^^^^
+E   KeyError: 'data'
+_________ TestSymptomRelief.test_symptom_relief_all_symptoms_supported _________
+tests/test_workplace_wellness.py:419: in test_symptom_relief_all_symptoms_supported
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_____________ TestSymptomRelief.test_symptom_relief_empty_symptom ______________
+tests/test_workplace_wellness.py:426: in test_symptom_relief_empty_symptom
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+___________________ TestPersonalizedAdvice.test_advice_age_7 ___________________
+tests/test_youth_wellness.py:341: in test_advice_age_7
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+__________________ TestPersonalizedAdvice.test_advice_age_12 ___________________
+tests/test_youth_wellness.py:350: in test_advice_age_12
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+__________________ TestPersonalizedAdvice.test_advice_age_16 ___________________
+tests/test_youth_wellness.py:358: in test_advice_age_16
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_____________ TestPersonalizedAdvice.test_advice_multiple_symptoms _____________
+tests/test_youth_wellness.py:369: in test_advice_multiple_symptoms
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+________________ TestPersonalizedAdvice.test_advice_with_season ________________
+tests/test_youth_wellness.py:381: in test_advice_with_season
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+___________ TestPersonalizedAdvice.test_advice_invalid_age_too_young ___________
+tests/test_youth_wellness.py:389: in test_advice_invalid_age_too_young
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+____________ TestPersonalizedAdvice.test_advice_invalid_age_too_old ____________
+tests/test_youth_wellness.py:396: in test_advice_invalid_age_too_old
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_________________ TestPersonalizedAdvice.test_advice_structure _________________
+tests/test_youth_wellness.py:408: in test_advice_structure
+    assert "age" in data["data"]
+                    ^^^^^^^^^^^^
+E   KeyError: 'data'
+_____________ TestPersonalizedAdvice.test_advice_age_guide_summary _____________
+tests/test_youth_wellness.py:418: in test_advice_age_guide_summary
+    summary = data["data"]["age_guide_summary"]
+              ^^^^^^^^^^^^
+E   KeyError: 'data'
+______________ TestPersonalizedAdvice.test_advice_empty_symptoms _______________
+tests/test_youth_wellness.py:427: in test_advice_empty_symptoms
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+______________ TestPersonalizedAdvice.test_advice_all_valid_ages _______________
+tests/test_youth_wellness.py:435: in test_advice_all_valid_ages
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+=============================== warnings summary ===============================
+../../../../../../tmp/shunshi-verify-20261008/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /tmp/shunshi-verify-20261008/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+app/db/database.py:34
+  /Users/feifei00/Documents/CodexWorktrees/shunshi-production/backend/app/db/database.py:34: MovedIn20Warning: The ``declarative_base()`` function is now available as sqlalchemy.orm.declarative_base(). (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    Base = declarative_base()
+
+app/core/settings.py:9
+  /Users/feifei00/Documents/CodexWorktrees/shunshi-production/backend/app/core/settings.py:9: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class Settings(BaseSettings):
+
+app/router/ai_content.py:413
+  /Users/feifei00/Documents/CodexWorktrees/shunshi-production/backend/app/router/ai_content.py:413: FastAPIDeprecationWarning: `regex` has been deprecated, please use `pattern` instead
+    lang: str = Query("zh", regex="^(zh|en)$"),
+
+tests/automated_test.py:145
+  /Users/feifei00/Documents/CodexWorktrees/shunshi-production/backend/tests/automated_test.py:145: PytestCollectionWarning: cannot collect test class 'TestResult' because it has a __init__ constructor (from: tests/automated_test.py)
+    @dataclass
+
+tests/test_account_lifecycle.py: 25 warnings
+  /tmp/shunshi-verify-20261008/lib/python3.12/site-packages/jwt/api_jwt.py:149: InsecureKeyLengthWarning: The HMAC key is 27 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+    return self._jws.encode(
+
+tests/test_account_lifecycle.py: 21 warnings
+  /tmp/shunshi-verify-20261008/lib/python3.12/site-packages/jwt/api_jwt.py:370: InsecureKeyLengthWarning: The HMAC key is 27 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+    decoded = self.decode_complete(
+
+tests/test_audio_v2.py::TestAudioLibrary::test_audio_library_returns_200
+tests/test_audio_v2.py::TestAudioLibrary::test_audio_library_response_structure
+tests/test_audio_v2.py::TestAudioLibrary::test_audio_library_with_hemisphere_param
+tests/test_audio_v2.py::TestAudioContents::test_audio_contents_basic
+tests/test_audio_v2.py::TestAudioContents::test_audio_contents_with_duration_filter
+tests/test_audio_v2.py::TestAudioContents::test_audio_contents_with_hemisphere
+tests/test_audio_v2.py::TestAudioContents::test_audio_contents_with_limit
+  /Users/feifei00/Documents/CodexWorktrees/shunshi-production/backend/app/router/audio_v2.py:30: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    month = datetime.utcnow().month
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_ai_ingredient_scan.py::TestIngredientScan::test_scan_by_name_returns_200
+FAILED tests/test_ai_ingredient_scan.py::TestIngredientScan::test_scan_found_ingredient_has_info
+FAILED tests/test_ai_ingredient_scan.py::TestIngredientScan::test_scan_by_image_url
+FAILED tests/test_ai_ingredient_scan.py::TestIngredientScan::test_scan_by_image_fails_without_ai_configuration
+FAILED tests/test_ai_ingredient_scan.py::TestIngredientScan::test_scan_no_input_returns_400
+FAILED tests/test_ai_ingredient_scan.py::TestIngredientScan::test_scan_unknown_ingredient
+FAILED tests/test_ai_ingredient_scan.py::TestIngredientCombination::test_analyze_combination_returns_200
+FAILED tests/test_ai_ingredient_scan.py::TestIngredientCombination::test_combination_has_analysis
+FAILED tests/test_ai_ingredient_scan.py::TestIngredientCombination::test_combination_requires_min_2_ingredients
+FAILED tests/test_ai_wellness_plan.py::TestAIWellnessPlanGenerate::test_generate_returns_200
+FAILED tests/test_ai_wellness_plan.py::TestAIWellnessPlanGenerate::test_generate_has_plan
+FAILED tests/test_ai_wellness_plan.py::TestAIWellnessPlanGenerate::test_generate_requires_user_id
+FAILED tests/test_ai_wellness_plan.py::TestAIWellnessPlanGenerate::test_generate_requires_constitution
+FAILED tests/test_ai_wellness_plan.py::TestAIWellnessPlanGet::test_get_plan_returns_200
+FAILED tests/test_ai_wellness_plan.py::TestAIWellnessPlanLatest::test_latest_plan_returns_200_after_generate
+FAILED tests/test_ai_wellness_plan.py::TestAIWellnessPlanLatest::test_latest_no_plan_returns_404
+FAILED tests/test_ai_wellness_plan.py::TestAIWellnessPlanFeedback::test_feedback_returns_200
+FAILED tests/test_ai_wellness_plan.py::TestAIWellnessPlanFeedback::test_feedback_nonexistent_plan
+FAILED tests/test_audio_v2.py::TestAudioRecommended::test_audio_recommended_without_user_id
+FAILED tests/test_audio_v2.py::TestAudioRecommended::test_audio_recommended_with_user_id
+FAILED tests/test_audio_v2.py::TestAudioRecommended::test_audio_recommended_with_time_of_day
+FAILED tests/test_audio_v2.py::TestAudioRecommended::test_audio_recommended_with_duration_filter
+FAILED tests/test_audio_v2.py::TestAudioRecommended::test_audio_recommended_with_categories
+FAILED tests/test_audio_v2.py::TestAudioRecommended::test_audio_recommended_with_limit
+FAILED tests/test_audio_v2.py::TestAudioRecommended::test_audio_recommended_response_has_metadata
+FAILED tests/test_audio_v2.py::TestAudioPlays::test_audio_plays_post_success
+FAILED tests/test_audio_v2.py::TestAudioPlays::test_audio_plays_post_minimal
+FAILED tests/test_audio_v2.py::TestAudioPlays::test_audio_plays_post_completed
+FAILED tests/test_audio_v2.py::TestAudioPlays::test_audio_plays_post_partially_completed
+FAILED tests/test_banner.py::TestBannerCreate::test_create_banner_returns_200
+FAILED tests/test_banner.py::TestBannerCreate::test_create_banner_has_id - Ke...
+FAILED tests/test_banner.py::TestBannerDetail::test_get_banner_returns_200 - ...
+FAILED tests/test_calorie_tracker.py::TestCalorieLog::test_log_meal_returns_200
+FAILED tests/test_calorie_tracker.py::TestCalorieLog::test_log_meal_success
+FAILED tests/test_calorie_tracker.py::TestCalorieLog::test_log_requires_user_id
+FAILED tests/test_calorie_tracker.py::TestCalorieToday::test_today_returns_200
+FAILED tests/test_calorie_tracker.py::TestCalorieToday::test_today_has_totals
+FAILED tests/test_calorie_tracker.py::TestCalorieGoal::test_set_goal_returns_200
+FAILED tests/test_chronic_care.py::TestSymptomCheck::test_symptom_check_single_symptom
+FAILED tests/test_chronic_care.py::TestSymptomCheck::test_symptom_check_multiple_symptoms
+FAILED tests/test_chronic_care.py::TestSymptomCheck::test_symptom_check_no_matches
+FAILED tests/test_chronic_care.py::TestSymptomCheck::test_symptom_check_fatigue_maps_to_chronic_fatigue
+FAILED tests/test_chronic_care.py::TestSymptomCheck::test_symptom_check_insomnia_maps_to_insomnia
+FAILED tests/test_chronic_care.py::TestSymptomCheck::test_symptom_check_high_blood_sugar
+FAILED tests/test_chronic_care.py::TestSymptomCheck::test_symptom_check_contains_recommendations
+FAILED tests/test_chronic_care.py::TestSymptomCheck::test_symptom_check_contains_disclaimer
+FAILED tests/test_chronic_care.py::TestSymptomCheck::test_symptom_check_multiple_conditions_mapped
+FAILED tests/test_chronic_care.py::TestChronicCareIntegration::test_symptom_check_matches_are_reasonable
+FAILED tests/test_client_metrics.py::TestMetricsBatch::test_metrics_batch_empty_list
+FAILED tests/test_client_metrics.py::TestMetricsBatch::test_metrics_batch_single_event
+FAILED tests/test_client_metrics.py::TestMetricsBatch::test_metrics_batch_multiple_events
+FAILED tests/test_client_metrics.py::TestMetricsBatch::test_metrics_batch_invalid_body
+FAILED tests/test_client_metrics.py::TestMetricsBatch::test_metrics_batch_large_batch
+FAILED tests/test_client_metrics.py::TestMetricsBatch::test_metrics_batch_with_optional_fields
+FAILED tests/test_client_metrics.py::TestMetricsBatch::test_metrics_batch_with_complex_properties
+FAILED tests/test_community.py::TestCommunityCreatePost::test_create_post_returns_200
+FAILED tests/test_community.py::TestCommunityCreatePost::test_create_post_has_id
+FAILED tests/test_community.py::TestCommunityPostDetail::test_post_detail_returns_200
+FAILED tests/test_community.py::TestCommunityLikePost::test_like_post_returns_200
+FAILED tests/test_community.py::TestCommunityComments::test_get_comments_returns_200
+FAILED tests/test_community.py::TestCommunityComments::test_add_comment_returns_200
+FAILED tests/test_constitution.py::TestConstitutionAssess::test_assess_with_answers
+FAILED tests/test_constitution.py::TestConstitutionAssess::test_assess_empty_answers
+FAILED tests/test_content_cms.py::TestContentList::test_list_content_returns_200
+FAILED tests/test_content_cms.py::TestContentList::test_list_by_type - assert...
+FAILED tests/test_content_cms.py::TestContentList::test_list_by_status - asse...
+FAILED tests/test_content_cms.py::TestContentList::test_list_with_pagination
+FAILED tests/test_content_cms.py::TestContentCreate::test_create_content_returns_201_or_200
+FAILED tests/test_content_cms.py::TestContentCreate::test_create_content_with_tags
+FAILED tests/test_content_cms.py::TestContentCreate::test_create_content_requires_title
+FAILED tests/test_content_cms.py::TestContentUpdate::test_update_content_returns_200
+FAILED tests/test_content_cms.py::TestContentUpdate::test_partial_update - as...
+FAILED tests/test_content_cms.py::TestContentDelete::test_delete_content_returns_200
+FAILED tests/test_content_cms.py::TestContentDelete::test_delete_nonexistent_404
+FAILED tests/test_content_cms.py::TestContentReview::test_publish_content - a...
+FAILED tests/test_content_cms.py::TestContentArchive::test_archive_content - ...
+FAILED tests/test_content_cms.py::TestContentMedia::test_add_media_to_content
+FAILED tests/test_content_cms.py::TestContentMedia::test_list_content_media
+FAILED tests/test_content_cms.py::TestContentTags::test_list_tags - assert 40...
+FAILED tests/test_content_cms.py::TestContentTags::test_create_tag - Assertio...
+FAILED tests/test_content_cms.py::TestContentStats::test_get_content_stats - ...
+FAILED tests/test_content_cms.py::TestContentStats::test_content_by_type_stats
+FAILED tests/test_content_cms.py::TestContentStats::test_content_by_status_stats
+FAILED tests/test_content_cms.py::TestContentBatch::test_batch_publish - asse...
+FAILED tests/test_couple_wellness.py::TestCoupleGeneratePlan::test_generate_plan_returns_200
+FAILED tests/test_couple_wellness.py::TestCoupleGeneratePlan::test_generate_plan_has_activities
+FAILED tests/test_couple_wellness.py::TestCoupleGetPlan::test_get_plan_returns_200
+FAILED tests/test_coupon.py::TestCouponIssue::test_issue_returns_200 - assert...
+FAILED tests/test_coupon.py::TestCouponIssue::test_issue_has_coupon_code - Ke...
+FAILED tests/test_coupon.py::TestCouponMy::test_my_coupons_returns_200 - asse...
+FAILED tests/test_coupon.py::TestCouponMy::test_my_coupons_has_list - KeyErro...
+FAILED tests/test_coupon.py::TestCouponRedeem::test_redeem_valid_coupon - Key...
+FAILED tests/test_coupon.py::TestCouponRedeem::test_redeem_invalid_code - ass...
+FAILED tests/test_coupon.py::TestCouponValidate::test_validate_returns_200 - ...
+FAILED tests/test_emotion.py::TestEmotionLog::test_log_calm_returns_200 - ass...
+FAILED tests/test_emotion.py::TestEmotionLog::test_log_has_guidance - assert ...
+FAILED tests/test_emotion.py::TestEmotionLog::test_log_anxious - assert 401 =...
+FAILED tests/test_emotion.py::TestEmotionLog::test_log_invalid_emotion_422 - ...
+FAILED tests/test_emotion.py::TestEmotionLog::test_log_intensity_too_high_422
+FAILED tests/test_emotion.py::TestEmotionLog::test_log_intensity_too_low_422
+FAILED tests/test_emotion.py::TestEmotionLog::test_log_message_varies_by_intensity
+FAILED tests/test_expert_qa.py::TestExpertQuestions::test_submit_question_returns_200
+FAILED tests/test_expert_qa.py::TestExpertQuestions::test_submit_question_has_id
+FAILED tests/test_expert_qa.py::TestExpertQuestionDetail::test_question_detail_returns_200
+FAILED tests/test_expert_qa.py::TestExpertAnswer::test_answer_question_returns_200
+FAILED tests/test_family.py::TestInviteFamily::test_invite_family - Assertion...
+FAILED tests/test_family.py::TestInviteFamily::test_invite_has_expiry - Asser...
+FAILED tests/test_family.py::TestInviteFamily::test_invite_reuses_existing_code
+FAILED tests/test_family.py::TestBindFamily::test_add_family_member - Asserti...
+FAILED tests/test_family.py::TestBindFamily::test_join_family_with_code - Key...
+FAILED tests/test_family.py::TestBindFamily::test_join_invalid_code - Asserti...
+FAILED tests/test_family.py::TestBindFamily::test_join_used_code - KeyError: ...
+FAILED tests/test_family.py::TestUnbindFamily::test_remove_member - KeyError:...
+FAILED tests/test_family.py::TestUnbindFamily::test_leave_family - AssertionE...
+FAILED tests/test_family.py::TestMaxFamilyMembers::test_over_limit_returns_400
+FAILED tests/test_family.py::TestFamilyCareReminder::test_care_reminder_nonexistent_member
+FAILED tests/test_family.py::TestFamilyCareReminder::test_family_settings_read
+FAILED tests/test_first_insight.py::TestFirstInsight::test_first_insight_spring_calm
+FAILED tests/test_first_insight.py::TestFirstInsight::test_first_insight_autumn_anxious
+FAILED tests/test_first_insight.py::TestFirstInsight::test_first_insight_south_hemisphere
+FAILED tests/test_first_insight.py::TestFirstInsight::test_first_insight_missing_hemisphere
+FAILED tests/test_first_insight.py::TestFirstInsight::test_first_insight_response_has_required_fields
+FAILED tests/test_first_insight.py::TestFirstInsight::test_first_insight_different_feelings
+FAILED tests/test_first_insight.py::TestFirstInsight::test_first_insight_different_goals
+FAILED tests/test_first_insight.py::TestFirstInsight::test_first_insight_different_styles
+FAILED tests/test_first_insight.py::TestFirstInsight::test_first_insight_with_user_id
+FAILED tests/test_first_insight.py::TestFirstInsight::test_first_insight_without_optional_fields
+FAILED tests/test_first_insight.py::TestFirstInsight::test_first_insight_empty_strings_use_defaults
+FAILED tests/test_first_insight.py::TestFirstInsight::test_first_insight_response_generated_at_is_iso_format
+FAILED tests/test_food_compatibility.py::TestFoodCompatibilityCheck::test_check_incompatible_pair
+FAILED tests/test_food_compatibility.py::TestFoodCompatibilityCheck::test_check_has_is_compatible
+FAILED tests/test_food_compatibility.py::TestFoodCompatibilityCheck::test_check_requires_both_foods
+FAILED tests/test_food_therapy.py::TestFoodTherapyRecommend::test_recommend_returns_200
+FAILED tests/test_food_therapy.py::TestFoodTherapyRecommend::test_recommend_has_recipes
+FAILED tests/test_gifting.py::TestGiftingOrders::test_create_order_returns_200
+FAILED tests/test_gifting.py::TestGiftingOrders::test_create_order_has_id - K...
+FAILED tests/test_gifting.py::TestGiftingOrderDetail::test_order_detail_returns_200
+FAILED tests/test_gifting.py::TestGiftCards::test_create_gift_card_returns_200
+FAILED tests/test_gifting.py::TestGiftCards::test_create_gift_card_has_code
+FAILED tests/test_gifting.py::TestGiftCardRedeem::test_redeem_valid_card - Ke...
+FAILED tests/test_gifting.py::TestGiftCardRedeem::test_redeem_invalid_card_returns_404
+FAILED tests/test_gratitude.py::TestGratitudeLog::test_log_returns_200 - asse...
+FAILED tests/test_gratitude.py::TestGratitudeLog::test_log_success - KeyError...
+FAILED tests/test_gratitude.py::TestGratitudeLog::test_log_requires_user_id
+FAILED tests/test_gratitude.py::TestGratitudeHistory::test_history_returns_200
+FAILED tests/test_gratitude.py::TestGratitudeHistory::test_history_has_entries
+FAILED tests/test_gratitude.py::TestGratitudeStreak::test_streak_returns_200
+FAILED tests/test_gratitude.py::TestGratitudeStreak::test_streak_has_count - ...
+FAILED tests/test_habit_builder.py::TestHabitCreate::test_create_habit_returns_200
+FAILED tests/test_habit_builder.py::TestHabitCreate::test_create_habit_has_id
+FAILED tests/test_habit_builder.py::TestHabitUserList::test_user_habits_returns_200
+FAILED tests/test_habit_builder.py::TestHabitUserList::test_user_habits_has_list
+FAILED tests/test_habit_builder.py::TestHabitCheckin::test_checkin_returns_200
+FAILED tests/test_habit_builder.py::TestHabitCheckin::test_checkin_updates_streak
+FAILED tests/test_habit_builder.py::TestHabitProgress::test_progress_returns_200
+FAILED tests/test_health.py::test_health_fail_closed_when_dependencies_unconfigured
+FAILED tests/test_live_class.py::TestLiveClassBook::test_book_class_returns_200
+FAILED tests/test_live_class.py::TestLiveClassBook::test_book_class_success
+FAILED tests/test_live_class.py::TestLiveClassBookings::test_my_bookings_returns_200
+FAILED tests/test_live_class.py::TestLiveClassBookings::test_bookings_has_list
+FAILED tests/test_maternity.py::TestPersonalizedAdvice::test_personalized_advice_basic
+FAILED tests/test_maternity.py::TestPersonalizedAdvice::test_personalized_advice_with_nausea
+FAILED tests/test_maternity.py::TestPersonalizedAdvice::test_personalized_advice_with_fatigue
+FAILED tests/test_maternity.py::TestPersonalizedAdvice::test_personalized_advice_multiple_symptoms
+FAILED tests/test_maternity.py::TestPersonalizedAdvice::test_personalized_advice_invalid_month
+FAILED tests/test_maternity.py::TestPersonalizedAdvice::test_personalized_advice_month_0
+FAILED tests/test_maternity.py::TestPersonalizedAdvice::test_personalized_advice_with_constipation
+FAILED tests/test_maternity.py::TestPersonalizedAdvice::test_personalized_advice_contains_base_plan
+FAILED tests/test_maternity.py::TestPersonalizedAdvice::test_personalized_advice_contains_disclaimer
+FAILED tests/test_menstrual.py::TestMenstrualCycleLog::test_log_cycle_returns_200
+FAILED tests/test_menstrual.py::TestMenstrualCycleLog::test_log_returns_success
+FAILED tests/test_menstrual.py::TestMenstrualCycleLog::test_log_requires_user_id
+FAILED tests/test_menstrual.py::TestMenstrualHistory::test_history_returns_200
+FAILED tests/test_menstrual.py::TestMenstrualHistory::test_history_has_data
+FAILED tests/test_menstrual.py::TestMenstrualSettings::test_settings_returns_200
+FAILED tests/test_menstrual.py::TestMenstrualPredict::test_predict_returns_200
+FAILED tests/test_menstrual.py::TestMenstrualPhaseCare::test_phase_care_returns_200
+FAILED tests/test_onboarding.py::TestOnboardingProgress::test_progress_returns_200
+FAILED tests/test_onboarding.py::TestOnboardingProgress::test_progress_has_status
+FAILED tests/test_onboarding.py::TestOnboardingUpdateProgress::test_update_progress_returns_200
+FAILED tests/test_onboarding.py::TestOnboardingUpdateProgress::test_update_progress_success
+FAILED tests/test_onboarding.py::TestOnboardingQuizSubmit::test_submit_quiz_returns_200
+FAILED tests/test_recommendations.py::TestRecommendationsDaily::test_get_daily_recommendations_returns_200
+FAILED tests/test_recommendations.py::TestRecommendationsDaily::test_daily_recommendations_has_data
+FAILED tests/test_recommendations.py::TestRecommendationsDaily::test_daily_recommendations_requires_user_id
+FAILED tests/test_recommendations.py::TestRecommendationsDaily::test_daily_recommendations_respects_limit
+FAILED tests/test_recommendations.py::TestRecommendationsDaily::test_daily_recommendations_limit_max_10
+FAILED tests/test_recommendations.py::TestRecommendationsDaily::test_daily_recommendations_with_locale_zh_cn
+FAILED tests/test_recommendations.py::TestRecommendationsDaily::test_daily_recommendations_with_locale_en_us
+FAILED tests/test_recommendations.py::TestRecommendationsDaily::test_daily_recommendations_default_limit_3
+FAILED tests/test_recommendations.py::TestRecommendationsDaily::test_daily_different_users_different_recommendations
+FAILED tests/test_recommendations.py::TestRecommendationsResponse::test_response_success_key
+FAILED tests/test_safety_prod.py::TestFamilyPrivacy::test_family_api_status_endpoint
+FAILED tests/test_safety_prod.py::TestFamilyPrivacy::test_family_settings_default_privacy
+FAILED tests/test_safety_prod.py::TestDataExport::test_export_settings - asse...
+FAILED tests/test_safety_prod.py::TestDataDelete::test_clear_all_memory - Ass...
+FAILED tests/test_safety_prod.py::TestDataDelete::test_memory_delete_requires_confirm
+FAILED tests/test_safety_prod.py::TestMemoryReset::test_re_enable_memory - as...
+FAILED tests/test_safety_prod.py::TestMemoryReset::test_disable_memory - asse...
+FAILED tests/test_seasons_subscription_truth.py::test_legacy_entitlement_grants_are_retired
+FAILED tests/test_seasons_subscription_truth.py::test_checkout_fails_closed_without_configuration
+FAILED tests/test_seasons_subscription_truth.py::test_checkout_uses_real_stripe_session
+FAILED tests/test_seasons_subscription_truth.py::test_webhook_rejects_unsigned_payload
+FAILED tests/test_senior_wellness.py::TestHealthCheck::test_health_check_basic
+FAILED tests/test_senior_wellness.py::TestHealthCheck::test_health_check_with_insomnia
+FAILED tests/test_senior_wellness.py::TestHealthCheck::test_health_check_with_memory_decline
+FAILED tests/test_senior_wellness.py::TestHealthCheck::test_health_check_with_hypertension_condition
+FAILED tests/test_senior_wellness.py::TestHealthCheck::test_health_check_with_diabetes_condition
+FAILED tests/test_senior_wellness.py::TestHealthCheck::test_health_check_multiple_symptoms
+FAILED tests/test_senior_wellness.py::TestHealthCheck::test_health_check_multiple_conditions
+FAILED tests/test_senior_wellness.py::TestHealthCheck::test_health_check_age_too_young
+FAILED tests/test_senior_wellness.py::TestHealthCheck::test_health_check_age_boundary_50
+FAILED tests/test_senior_wellness.py::TestHealthCheck::test_health_check_no_symptoms_no_conditions
+FAILED tests/test_senior_wellness.py::TestHealthCheck::test_health_check_returns_suggested_exercises
+FAILED tests/test_share.py::TestShareCard::test_create_card_returns_200 - ass...
+FAILED tests/test_share.py::TestShareCard::test_create_card_has_share_id - Ke...
+FAILED tests/test_share.py::TestShareCardGet::test_get_card_after_create - Ke...
+FAILED tests/test_share.py::TestShareInvite::test_invite_returns_200 - assert...
+FAILED tests/test_share.py::TestShareInvite::test_invite_has_link - KeyError:...
+FAILED tests/test_share.py::TestShareStats::test_stats_returns_200 - assert 4...
+FAILED tests/test_skills.py::TestSkillExecute::test_execute_skill_returns_200
+FAILED tests/test_skills.py::TestSkillExecute::test_execute_with_context - as...
+FAILED tests/test_skills.py::TestSkillExecute::test_execute_requires_user_id_and_message
+FAILED tests/test_skills.py::TestDailyPlan::test_generate_daily_plan_returns_200
+FAILED tests/test_skills.py::TestDailyPlan::test_daily_plan_light_type - asse...
+FAILED tests/test_skills.py::TestDailyPlan::test_daily_plan_deep_type - asser...
+FAILED tests/test_skills.py::TestDailyPlan::test_daily_plan_emotion_type - as...
+FAILED tests/test_skills.py::TestDailyPlan::test_daily_plan_with_context - as...
+FAILED tests/test_skills.py::TestDailyPlan::test_invalid_plan_type - assert 4...
+FAILED tests/test_speech.py::TestTextToSpeech::test_tts_returns_200 - assert ...
+FAILED tests/test_speech.py::TestTextToSpeech::test_tts_requires_text - asser...
+FAILED tests/test_speech.py::TestTextToSpeech::test_tts_with_model - assert 4...
+FAILED tests/test_speech.py::TestTextToSpeech::test_tts_with_voice - assert 4...
+FAILED tests/test_speech.py::TestTextToSpeech::test_tts_with_format - assert ...
+FAILED tests/test_speech.py::TestTextToSpeech::test_tts_with_speed - assert 4...
+FAILED tests/test_speech.py::TestTextToSpeech::test_tts_speed_range - assert ...
+FAILED tests/test_speech.py::TestTextToSpeech::test_tts_text_max_length - ass...
+FAILED tests/test_speech.py::TestTextToSpeech::test_tts_with_all_parameters
+FAILED tests/test_speech.py::TestSpeechToText::test_asr_requires_file - asser...
+FAILED tests/test_speech.py::TestSpeechToText::test_asr_with_model - assert 4...
+FAILED tests/test_speech.py::TestSpeechToText::test_asr_with_language - asser...
+FAILED tests/test_speech.py::TestChatVoice::test_chat_voice_requires_file - a...
+FAILED tests/test_speech.py::TestChatVoice::test_chat_voice_with_file - asser...
+FAILED tests/test_speech.py::TestChatVoice::test_chat_voice_with_model - asse...
+FAILED tests/test_speech.py::TestChatVoice::test_chat_voice_with_tts_model - ...
+FAILED tests/test_speech.py::TestChatVoice::test_chat_voice_with_voice - asse...
+FAILED tests/test_sports_recovery.py::TestPostWorkout::test_post_workout_strength_training_high
+FAILED tests/test_sports_recovery.py::TestPostWorkout::test_post_workout_running_extreme
+FAILED tests/test_sports_recovery.py::TestPostWorkout::test_post_workout_swimming_medium
+FAILED tests/test_sports_recovery.py::TestPostWorkout::test_post_workout_hiit_high
+FAILED tests/test_sports_recovery.py::TestPostWorkout::test_post_workout_yoga_low
+FAILED tests/test_sports_recovery.py::TestPostWorkout::test_post_workout_invalid_sport
+FAILED tests/test_sports_recovery.py::TestPostWorkout::test_post_workout_invalid_intensity
+FAILED tests/test_sports_recovery.py::TestPostWorkout::test_post_workout_zero_duration
+FAILED tests/test_sports_recovery.py::TestPostWorkout::test_post_workout_energy_cost_calculation
+FAILED tests/test_sports_recovery.py::TestPostWorkout::test_post_workout_recovery_priority
+FAILED tests/test_sports_recovery.py::TestPostWorkout::test_post_workout_structure
+FAILED tests/test_sports_recovery.py::TestPostWorkout::test_post_workout_includes_diet
+FAILED tests/test_sports_recovery.py::TestIntegration::test_all_intensity_levels_accepted
+FAILED tests/test_sports_recovery.py::TestIntegration::test_energy_cost_gradient
+FAILED tests/test_sports_recovery.py::TestIntegration::test_post_workout_all_sports
+FAILED tests/test_stripe.py::test_plans_are_public_and_complete - assert 404 ...
+FAILED tests/test_stripe.py::test_config_fails_closed_without_publishable_key
+FAILED tests/test_stripe.py::test_config_returns_real_configured_key - assert...
+FAILED tests/test_stripe.py::test_checkout_fails_closed_without_stripe - asse...
+FAILED tests/test_stripe.py::test_checkout_uses_stripe_session_when_configured
+FAILED tests/test_stripe.py::test_checkout_rejects_free_and_unknown_plans - A...
+FAILED tests/test_stripe.py::test_portal_fails_closed_without_stripe - Assert...
+FAILED tests/test_stripe.py::test_webhook_fails_closed_without_configuration
+FAILED tests/test_stripe.py::test_webhook_requires_signature_when_configured
+FAILED tests/test_stripe.py::test_verified_unknown_webhook_is_acknowledged - ...
+FAILED tests/test_subscription_local.py::TestPriceCalculation::test_calculate_basic_usd_1month
+FAILED tests/test_subscription_local.py::TestPriceCalculation::test_calculate_basic_eur_1month
+FAILED tests/test_subscription_local.py::TestPriceCalculation::test_calculate_premium_gbp_3months
+FAILED tests/test_subscription_local.py::TestPriceCalculation::test_calculate_family_aud_12months
+FAILED tests/test_subscription_local.py::TestPriceCalculation::test_calculate_vat_rates_vary_by_region
+FAILED tests/test_subscription_local.py::TestPriceCalculation::test_calculate_invalid_tier
+FAILED tests/test_subscription_local.py::TestPriceCalculation::test_calculate_unsupported_currency
+FAILED tests/test_subscription_local.py::TestPriceCalculation::test_calculate_invalid_region
+FAILED tests/test_subscription_local.py::TestPriceCalculation::test_calculate_case_insensitive_tier
+FAILED tests/test_subscription_local.py::TestIntegration::test_currency_price_calculation_flow
+FAILED tests/test_subscription_prod.py::TestProductList::test_product_list_returns_plans
+FAILED tests/test_subscription_prod.py::TestProductList::test_product_list_has_free_plan
+FAILED tests/test_subscription_prod.py::TestProductList::test_product_list_has_premium_plans
+FAILED tests/test_subscription_prod.py::TestCreateOrder::test_create_alipay_order
+FAILED tests/test_subscription_prod.py::TestCreateOrder::test_create_free_plan_order
+FAILED tests/test_subscription_prod.py::TestCreateOrder::test_create_stripe_checkout
+FAILED tests/test_subscription_prod.py::TestVerifyPayment::test_verify_alipay_order
+FAILED tests/test_subscription_prod.py::TestVerifyPayment::test_verify_already_paid_order
+FAILED tests/test_subscription_prod.py::TestVerifyPayment::test_query_order_status
+FAILED tests/test_subscription_prod.py::TestSubscriptionActivation::test_subscription_activated_after_payment
+FAILED tests/test_subscription_prod.py::TestSubscriptionActivation::test_stripe_webhook_activates_subscription
+FAILED tests/test_subscription_prod.py::TestRestorePurchase::test_restore_ios_purchase
+FAILED tests/test_subscription_prod.py::TestRestorePurchase::test_restore_no_purchase_history
+FAILED tests/test_subscription_prod.py::TestSubscriptionExpired::test_check_expiry_endpoint
+FAILED tests/test_subscription_prod.py::TestUpgradeSubscription::test_paid_upgrade_requires_verified_payment
+FAILED tests/test_subscription_prod.py::TestConcurrentPurchase::test_duplicate_order_same_user
+FAILED tests/test_subscription_prod.py::TestConcurrentPurchase::test_invalid_plan_rejected
+FAILED tests/test_subscription_prod.py::TestRefund::test_cancel_subscription
+FAILED tests/test_subscription_prod.py::TestRefund::test_stripe_webhook_cancel
+FAILED tests/test_subscription_prod.py::TestRefund::test_usage_stats_available
+FAILED tests/test_tcm_food_safety.py::TestCheckCompatibility::test_check_spinach_tofu_debunks_pairing_myth
+FAILED tests/test_tcm_food_safety.py::TestCheckCompatibility::test_check_crab_persimmon_debunks_pairing_myth
+FAILED tests/test_tcm_food_safety.py::TestCheckCompatibility::test_check_by_food_id
+FAILED tests/test_tcm_food_safety.py::TestCheckCompatibility::test_check_safe_combination_ginger_honey
+FAILED tests/test_tcm_food_safety.py::TestCheckCompatibility::test_check_safe_combination_egg_tomato
+FAILED tests/test_tcm_food_safety.py::TestCheckCompatibility::test_check_reverse_order
+FAILED tests/test_tcm_food_safety.py::TestCheckCompatibility::test_check_missing_food1
+FAILED tests/test_tcm_food_safety.py::TestCheckCompatibility::test_check_missing_food2
+FAILED tests/test_tcm_food_safety.py::TestCheckCompatibility::test_check_invalid_food
+FAILED tests/test_tcm_food_safety.py::TestCheckCompatibility::test_check_both_foods_invalid
+FAILED tests/test_tcm_food_safety.py::TestCheckCompatibility::test_check_response_format
+FAILED tests/test_theme.py::TestThemeSettings::test_set_settings_returns_200
+FAILED tests/test_theme.py::TestThemeSettings::test_set_settings_has_confirmation
+FAILED tests/test_theme.py::TestThemeGetSettings::test_get_settings_returns_200
+FAILED tests/test_timezone_wellness.py::TestPersonalizedSchedule::test_personalized_schedule_basic
+FAILED tests/test_timezone_wellness.py::TestPersonalizedSchedule::test_personalized_schedule_with_constitution
+FAILED tests/test_timezone_wellness.py::TestPersonalizedSchedule::test_personalized_schedule_yin_deficiency
+FAILED tests/test_timezone_wellness.py::TestPersonalizedSchedule::test_personalized_schedule_damp_heat
+FAILED tests/test_timezone_wellness.py::TestPersonalizedSchedule::test_personalized_schedule_schedule_length
+FAILED tests/test_timezone_wellness.py::TestPersonalizedSchedule::test_personalized_schedule_contains_key_activities
+FAILED tests/test_timezone_wellness.py::TestPersonalizedSchedule::test_personalized_schedule_invalid_wake_time
+FAILED tests/test_timezone_wellness.py::TestPersonalizedSchedule::test_personalized_schedule_invalid_sleep_time
+FAILED tests/test_timezone_wellness.py::TestPersonalizedSchedule::test_personalized_schedule_invalid_tz
+FAILED tests/test_timezone_wellness.py::TestIntegration::test_jet_lag_and_schedule_flow
+FAILED tests/test_users.py::TestDeleteUser::test_delete_user_requires_confirmation
+FAILED tests/test_users.py::TestDeleteUser::test_delete_user_with_confirmation
+FAILED tests/test_users.py::TestDeleteUser::test_delete_user_success_response
+FAILED tests/test_users.py::TestDeleteUser::test_delete_user_has_deleted_at
+FAILED tests/test_users.py::TestDeleteUser::test_delete_user_has_deleted_records
+FAILED tests/test_users.py::TestDeleteUser::test_delete_user_cascade_delete
+FAILED tests/test_users.py::TestDeleteUser::test_delete_user_without_confirm_query
+FAILED tests/test_users.py::TestDeleteUser::test_delete_user_invalid_confirm_value
+FAILED tests/test_users.py::TestDeleteUser::test_delete_user_response_has_total_records_deleted
+FAILED tests/test_users.py::TestDeleteUser::test_delete_nonexistent_user - as...
+FAILED tests/test_users.py::TestExportUserData::test_export_user_data_returns_200
+FAILED tests/test_users.py::TestExportUserData::test_export_has_user_id - ass...
+FAILED tests/test_users.py::TestExportUserData::test_export_has_exported_at
+FAILED tests/test_users.py::TestExportUserData::test_export_has_profile - ass...
+FAILED tests/test_users.py::TestExportUserData::test_export_has_subscriptions
+FAILED tests/test_users.py::TestExportUserData::test_export_has_memories - as...
+FAILED tests/test_users.py::TestExportUserData::test_export_has_conversations
+FAILED tests/test_users.py::TestExportUserData::test_export_nonexistent_user
+FAILED tests/test_users.py::TestExportUserData::test_export_data_structure - ...
+FAILED tests/test_users.py::TestExportUserData::test_export_different_users
+FAILED tests/test_users.py::TestUserManagementIntegration::test_export_then_delete_workflow
+FAILED tests/test_users.py::TestUserManagementIntegration::test_export_returns_complete_data
+FAILED tests/test_users.py::TestUserManagementIntegration::test_delete_returns_summary
+FAILED tests/test_users.py::TestUserManagementIntegration::test_path_parameter_user_id
+FAILED tests/test_water_tracker.py::TestWaterTrackerLog::test_log_returns_200
+FAILED tests/test_water_tracker.py::TestWaterTrackerLog::test_log_returns_success
+FAILED tests/test_water_tracker.py::TestWaterTrackerLog::test_log_requires_user_id
+FAILED tests/test_water_tracker.py::TestWaterTrackerToday::test_today_returns_200
+FAILED tests/test_water_tracker.py::TestWaterTrackerToday::test_today_has_total
+FAILED tests/test_water_tracker.py::TestWaterTrackerGoal::test_set_goal_returns_200
+FAILED tests/test_water_tracker.py::TestWaterTrackerRecommend::test_recommend_returns_200
+FAILED tests/test_water_tracker.py::TestWaterTrackerRecommend::test_recommend_has_advice
+FAILED tests/test_wearable.py::TestWearableConnect::test_connect_valid_device
+FAILED tests/test_wearable.py::TestWearableConnect::test_connect_has_confirmation
+FAILED tests/test_wearable.py::TestWearableConnect::test_connect_invalid_device_returns_404
+FAILED tests/test_wearable.py::TestWearableConnectedDevice::test_connected_returns_200
+FAILED tests/test_wearable.py::TestWearableConnectedDevice::test_connected_has_is_connected
+FAILED tests/test_wearable.py::TestWearableSync::test_sync_data_returns_200
+FAILED tests/test_wearable.py::TestWearableSync::test_sync_has_tcm_insights
+FAILED tests/test_wearable.py::TestWearableHistory::test_history_returns_200
+FAILED tests/test_wearable.py::TestWearableHistory::test_history_has_list - K...
+FAILED tests/test_wearable.py::TestWearableTodaySummary::test_today_summary_returns_200
+FAILED tests/test_weather_wellness.py::TestWeatherAdvice::test_advice_returns_200
+FAILED tests/test_weather_wellness.py::TestWeatherAdvice::test_advice_requires_observed_temperature_and_humidity
+FAILED tests/test_weather_wellness.py::TestWeatherAdvice::test_advice_requires_weather_type
+FAILED tests/test_wechat_social.py::TestGenerateMonthlyReport::test_generate_monthly_report
+FAILED tests/test_wechat_social.py::TestGenerateMonthlyReport::test_generate_monthly_report_december
+FAILED tests/test_wechat_social.py::TestGenerateMonthlyReport::test_generate_monthly_report_jan
+FAILED tests/test_wechat_social.py::TestGenerateMonthlyReport::test_report_contains_required_fields
+FAILED tests/test_wechat_social.py::TestGenerateMonthlyReport::test_report_content_includes_user_name
+FAILED tests/test_wechat_social.py::TestGenerateMonthlyReport::test_report_content_includes_checkin_days
+FAILED tests/test_wechat_social.py::TestGenerateMonthlyReport::test_report_with_minimal_checkin_days
+FAILED tests/test_wechat_social.py::TestGenerateMonthlyReport::test_report_emoji_present
+FAILED tests/test_weight_manage.py::TestWeightLog::test_log_returns_200 - ass...
+FAILED tests/test_weight_manage.py::TestWeightLog::test_log_success - KeyErro...
+FAILED tests/test_weight_manage.py::TestWeightLog::test_log_requires_user_id
+FAILED tests/test_weight_manage.py::TestWeightHistory::test_history_returns_200
+FAILED tests/test_weight_manage.py::TestWeightHistory::test_history_has_records
+FAILED tests/test_weight_manage.py::TestWeightGoal::test_set_goal_returns_200
+FAILED tests/test_widget.py::TestWidgetWaterTracker::test_water_tracker_returns_200
+FAILED tests/test_widget.py::TestWidgetWaterTracker::test_water_tracker_has_progress
+FAILED tests/test_widget.py::TestWidgetWaterTracker::test_water_tracker_requires_user_id
+FAILED tests/test_widget.py::TestWidgetCheckinStreak::test_checkin_streak_returns_200
+FAILED tests/test_widget.py::TestWidgetCheckinStreak::test_checkin_streak_has_days
+FAILED tests/test_widget.py::TestWidgetCheckinStreak::test_checkin_requires_user_id
+FAILED tests/test_workplace_wellness.py::TestSymptomRelief::test_symptom_relief_neck_shoulder
+FAILED tests/test_workplace_wellness.py::TestSymptomRelief::test_symptom_relief_eye_fatigue
+FAILED tests/test_workplace_wellness.py::TestSymptomRelief::test_symptom_relief_drowsiness
+FAILED tests/test_workplace_wellness.py::TestSymptomRelief::test_symptom_relief_stomach_pain
+FAILED tests/test_workplace_wellness.py::TestSymptomRelief::test_symptom_relief_headache
+FAILED tests/test_workplace_wellness.py::TestSymptomRelief::test_symptom_relief_anxiety
+FAILED tests/test_workplace_wellness.py::TestSymptomRelief::test_symptom_relief_unknown_symptom
+FAILED tests/test_workplace_wellness.py::TestSymptomRelief::test_symptom_relief_solution_structure
+FAILED tests/test_workplace_wellness.py::TestSymptomRelief::test_symptom_relief_all_symptoms_supported
+FAILED tests/test_workplace_wellness.py::TestSymptomRelief::test_symptom_relief_empty_symptom
+FAILED tests/test_youth_wellness.py::TestPersonalizedAdvice::test_advice_age_7
+FAILED tests/test_youth_wellness.py::TestPersonalizedAdvice::test_advice_age_12
+FAILED tests/test_youth_wellness.py::TestPersonalizedAdvice::test_advice_age_16
+FAILED tests/test_youth_wellness.py::TestPersonalizedAdvice::test_advice_multiple_symptoms
+FAILED tests/test_youth_wellness.py::TestPersonalizedAdvice::test_advice_with_season
+FAILED tests/test_youth_wellness.py::TestPersonalizedAdvice::test_advice_invalid_age_too_young
+FAILED tests/test_youth_wellness.py::TestPersonalizedAdvice::test_advice_invalid_age_too_old
+FAILED tests/test_youth_wellness.py::TestPersonalizedAdvice::test_advice_structure
+FAILED tests/test_youth_wellness.py::TestPersonalizedAdvice::test_advice_age_guide_summary
+FAILED tests/test_youth_wellness.py::TestPersonalizedAdvice::test_advice_empty_symptoms
+FAILED tests/test_youth_wellness.py::TestPersonalizedAdvice::test_advice_all_valid_ages
+411 failed, 3352 passed, 17 skipped, 58 warnings in 165.13s (0:02:45)

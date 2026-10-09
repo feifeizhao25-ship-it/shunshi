@@ -14,8 +14,8 @@
 
 另外：即使手工让两套模型连同一个 PostgreSQL，它们都有 ``users`` 表且列不同，
 产品模型建外键时 ``DatatypeMismatch``。修复后产品模型进独立 schema
-``shunshi_product``；这一点在真实 PostgreSQL 16 上验证过（设置
-``SHUNSHI_TEST_POSTGRES_URL`` 可在本地复跑最后一条用例）。
+``shunshi_product``；测试使用独立 PostgreSQL 数据库，可通过
+``TEST_POSTGRES_ADMIN_URL`` 指定测试服务器，或从 PATH 启动本地 PostgreSQL。
 """
 from __future__ import annotations
 
@@ -203,10 +203,9 @@ def test_compose_uses_psycopg3_and_mounts_the_knowledge_base():
     assert any(str(v).endswith(":/app/knowledge:ro") for v in backend["volumes"])
 
 
-# ── 五、真实 PostgreSQL（有环境时才跑）────────────────────────
+# ── 五、真实 PostgreSQL（每次运行独立测试数据库）────────────────
 
-@pytest.mark.skipif(not os.environ.get("SHUNSHI_TEST_POSTGRES_URL"), reason="需要 SHUNSHI_TEST_POSTGRES_URL")
-def test_boots_on_postgres_with_documented_variables_only(tmp_path):
+def test_boots_on_postgres_with_documented_variables_only(tmp_path, postgres_database_url):
     image = tmp_path / "image"
     shutil.copytree(BACKEND / "app", image / "app", ignore=shutil.ignore_patterns("__pycache__"))
     kb = tmp_path / "knowledge"
@@ -220,7 +219,7 @@ def test_boots_on_postgres_with_documented_variables_only(tmp_path):
         """,
         {
             "SHUNSHI_ENV": "production",
-            "SHUNSHI_DATABASE_URL": os.environ["SHUNSHI_TEST_POSTGRES_URL"],
+            "SHUNSHI_DATABASE_URL": postgres_database_url,
             "SHUNSHI_KNOWLEDGE_DIR": str(kb),
             "SHUNSHI_JWT_SECRET": SECRET,
             "SHUNSHI_CORS_ORIGINS": "https://shunshi.example",

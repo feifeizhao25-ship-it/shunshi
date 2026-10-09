@@ -136,3 +136,69 @@ def chat_redis_url(tmp_path_factory):
         client.close()
         process.terminate()
         process.wait(timeout=5)
+
+
+@pytest.fixture(scope="session")
+def postgres_admin_url():
+    """Use an explicit CI test server or start a private local PostgreSQL."""
+    import shutil
+    import socket
+    import subprocess
+    import tempfile
+    from sqlalchemy.engine import make_url
+
+    configured = os.environ.get("TEST_POSTGRES_ADMIN_URL")
+    if configured:
+        url = make_url(configured)
+        if url.get_backend_name() != "postgresql" or url.database != "postgres":
+            pytest.fail("TEST_POSTGRES_ADMIN_URL must identify the postgres maintenance database of a disposable test server")
+        yield configured
+        return
+
+    pg_config = shutil.which("pg_config")
+    if not pg_config:
+        pytest.fail("PostgreSQL tests require pg_config on PATH or TEST_POSTGRES_ADMIN_URL")
+    bindir = Path(subprocess.check_output([pg_config, "--bindir"], text=True).strip())
+    initdb, pg_ctl = bindir / "initdb", bindir / "pg_ctl"
+    if not initdb.is_file() or not pg_ctl.is_file():
+        pytest.fail("PostgreSQL server binaries are required; pg_config alone is insufficient")
+    root = Path(tempfile.mkdtemp(prefix="shunshi-test-postgres-"))
+    data = root / "data"
+    started = False
+    try:
+        with socket.socket() as listener:
+            listener.bind(("127.0.0.1", 0))
+            port = listener.getsockname()[1]
+        subprocess.run([str(initdb), "-D", str(data), "-U", "shunshi_test", "-A", "trust"],
+                       check=True, capture_output=True, text=True, timeout=30)
+        subprocess.run([str(pg_ctl), "-D", str(data), "-l", str(root / "server.log"),
+                        "-o", f"-h 127.0.0.1 -p {port} -c unix_socket_directories=''", "-w", "start"],
+                       check=True, capture_output=True, text=True, timeout=30)
+        started = True
+        yield f"postgresql+psycopg://shunshi_test@127.0.0.1:{port}/postgres"
+    finally:
+        if started or (data / "postmaster.pid").exists():
+            subprocess.run([str(pg_ctl), "-D", str(data), "-m", "fast", "-w", "stop"],
+                           check=True, capture_output=True, text=True, timeout=30)
+        shutil.rmtree(root)
+
+
+@pytest.fixture()
+def postgres_database_url(postgres_admin_url):
+    """Create/drop only this test's unique database; never clear shared tables."""
+    from sqlalchemy import create_engine, text
+    from sqlalchemy.engine import make_url
+
+    database = "shunshi_test_" + uuid.uuid4().hex
+    admin = create_engine(postgres_admin_url, isolation_level="AUTOCOMMIT")
+    created = False
+    try:
+        with admin.connect() as connection:
+            connection.execute(text(f'CREATE DATABASE "{database}"'))
+        created = True
+        yield make_url(postgres_admin_url).set(database=database).render_as_string(hide_password=False)
+    finally:
+        if created:
+            with admin.connect() as connection:
+                connection.execute(text(f'DROP DATABASE "{database}" WITH (FORCE)'))
+        admin.dispose()

@@ -13,7 +13,7 @@ from app.main import create_app
 from .test_domestic_payment_recovery import order_for
 
 
-def test_production_lifespan_starts_and_drains_recovery_worker(settings, monkeypatch):
+def test_production_lifespan_starts_and_drains_recovery_worker(settings, monkeypatch, postgres_database_url):
     started, stopped = Event(), Event()
     async def worker(app, stop):
         started.set()
@@ -21,10 +21,16 @@ def test_production_lifespan_starts_and_drains_recovery_worker(settings, monkeyp
         stopped.set()
     monkeypatch.setattr(payment_recovery, 'payment_recovery_loop', worker)
     production = settings.model_copy(update={
-        'env': 'production', 'cors_origins': 'https://example.cn'})
-    with TestClient(create_app(production)):
+        'env': 'production', 'cors_origins': 'https://example.cn',
+        'database_url': postgres_database_url})
+    with TestClient(create_app(production)) as client:
         assert started.wait(timeout=2)
         assert not stopped.is_set()
+        # Startup must really create tables in PostgreSQL, not a mocked engine.
+        from sqlalchemy import text
+        with client.app.state.session_factory() as session:
+            assert session.execute(text('SELECT version()')).scalar().startswith('PostgreSQL')
+            assert session.execute(text("SELECT to_regclass('entitlements')")).scalar() == 'entitlements'
     assert stopped.is_set()
 
 
