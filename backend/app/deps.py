@@ -26,9 +26,13 @@ def get_session(request: Request) -> Iterator[Session]:
 
 
 def current_user(
+    request: Request,
     authorization: str | None = Header(default=None),
     settings: Settings = Depends(get_settings),
 ) -> str:
     if not authorization or not authorization.startswith("Bearer "):
         raise HTTPException(status_code=401, detail="请先登录")
-    return verify_token(settings, authorization[7:])
+    user_id = verify_token(settings, authorization[7:])
+    from .services.erasure_recovery import reject_erased_account
+    reject_erased_account(request, user_id)
+    return user_id

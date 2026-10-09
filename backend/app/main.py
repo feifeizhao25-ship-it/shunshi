@@ -113,15 +113,20 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         load_knowledge_bases()
         recovery_stop = asyncio.Event()
         recovery_task = None
+        erasure_task = None
         if settings.env == "production":
             from .services.payment_recovery import payment_recovery_loop
             recovery_task = asyncio.create_task(payment_recovery_loop(app, recovery_stop))
+            from .services.erasure_recovery import erasure_recovery_loop
+            erasure_task = asyncio.create_task(erasure_recovery_loop(app, recovery_stop))
         try:
             yield
         finally:
             recovery_stop.set()
             if recovery_task is not None:
                 await recovery_task
+            if erasure_task is not None:
+                await erasure_task
             close_all_test_connections()
             engine.dispose()
 

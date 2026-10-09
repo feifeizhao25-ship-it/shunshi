@@ -140,6 +140,8 @@ def _current_user_id(request: Request) -> str:
     if not token:
         raise HTTPException(status_code=401, detail="请先登录")
     user_id = verify_token(request.app.state.settings, token)
+    from .services.erasure_recovery import reject_erased_account
+    reject_erased_account(request, user_id)
     _reject_deleted(user_id)
     return user_id
 

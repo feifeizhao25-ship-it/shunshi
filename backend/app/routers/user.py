@@ -19,6 +19,7 @@ from sqlalchemy.orm import Session
 from ..config import Settings
 from ..deps import current_user, get_session, get_settings
 from ..simple_models import (
+    AccountErasureJob,
     AudioProgress,
     Entitlement,
     Feedback,
@@ -406,6 +407,14 @@ def delete_account(
         # Coordinate deletion with domestic recovery before taking SQLAlchemy
         # write locks, using the same lock order as the recovery worker.
         db.execute("BEGIN IMMEDIATE")
+        locked = session.execute(update(User).where(User.id == user_id)
+            .values(nickname=User.nickname)).rowcount
+        if locked != 1:
+            # Email/password accounts historically live only in the record
+            # store. Its writer lock above protects this existence check.
+            legacy = db.execute('SELECT status FROM users WHERE id=?', (user_id,)).fetchone()
+            if legacy is None or dict(legacy).get('status') == 'deleted':
+                raise HTTPException(401, "账号不存在或已注销")
         # Financial evidence is not silently destroyed by account deletion.
         # Report it explicitly; retention policy and refund settlement remain
         # separate deployment requirements.
@@ -431,26 +440,25 @@ def delete_account(
         ):
             result = session.execute(delete(model).where(column == user_id))
             counts[model.__tablename__] = result.rowcount
+        # The durable intent survives any later record/product store failure.
+        session.add(AccountErasureJob(user_id=user_id))
         result = session.execute(delete(User).where(User.id == user_id))
         counts["users"] = result.rowcount
         session.commit()
-        db.execute("DELETE FROM domestic_payment_recovery WHERE user_id=?", (user_id,))
-        # 记录库与产品库里的个人数据（家庭成员、饮水、日记、情绪……）原来注销后原样留着。
-        from ..services.account_erasure import erase_product_store, erase_record_store
-
-        record_deleted, record_retained = erase_record_store(db, user_id)
         db.commit()
-        product_deleted, product_retained, leftovers = erase_product_store(user_id)
-        for table, count in {**record_retained, **product_retained}.items():
+        from ..services.erasure_recovery import cleanup_account
+        cleanup = cleanup_account(request.app, user_id)
+        for table, count in cleanup["retained_billing_records"].items():
             retained.setdefault(table, count)
         # 这把 token 立即作废（否则 1 小时内还能写入新数据）。
         header = request.headers.get("authorization") or ""
         if header.lower().startswith("bearer "):
             revoke_token(settings, header[7:].strip())
         return {"deleted": True, "user_id": user_id, "deleted_rows": counts,
-            "deleted_record_rows": record_deleted,
-            "deleted_product_rows": product_deleted,
-            "erasure_incomplete_tables": leftovers,
+            "deleted_record_rows": cleanup["deleted_record_rows"],
+            "deleted_product_rows": cleanup["deleted_product_rows"],
+            "erasure_incomplete_tables": cleanup["erasure_incomplete_tables"],
+            "erasure_status": "pending" if cleanup["erasure_incomplete_tables"] else "done",
             "retained_billing_records": retained,
             "billing_notice": "支付与退款申请记录仍保留，注销不表示退款已完成"}
     except Exception:

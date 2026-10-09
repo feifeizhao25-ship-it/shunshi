@@ -1,6 +1,6 @@
 # 认证 API 路由
 # 生产级升级: Token轮换 · 多设备管理 · 游客模式 · 账号安全 · 密码预留
-from fastapi import APIRouter, HTTPException, Query, Depends, Header
+from fastapi import APIRouter, HTTPException, Query, Depends, Header, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel, Field, model_validator
 from typing import Optional, List
@@ -509,6 +509,7 @@ def _verify_sms_code(phone: str, code: str) -> bool:
 async def get_current_user(
     credentials: Optional[HTTPAuthorizationCredentials] = Depends(_bearer_scheme),
     settings: Settings = Depends(get_settings),
+    http_request: Request = None,
 ) -> dict:
     """
     FastAPI 依赖注入：必须带有效登录态，否则 401。
@@ -526,7 +527,7 @@ async def get_current_user(
     现在与严格模式共用同一套解析（核心签发 → 产品签发 → 旧式数据库 token），
     都不认时 401。
     """
-    return _get_current_user_from_request(credentials, settings)
+    return _get_current_user_from_request(credentials, settings, http_request)
 
 
 def get_user_from_token(token: str) -> Optional[dict]:
@@ -553,6 +554,7 @@ def get_user_from_token(token: str) -> Optional[dict]:
 def _get_current_user_from_request(
     credentials: Optional[HTTPAuthorizationCredentials] = Depends(_bearer_scheme),
     settings: Settings = Depends(get_settings),
+    http_request: Request = None,
 ) -> dict:
     """
     FastAPI 依赖注入（严格模式）: 必须提供有效 token，否则返回401
@@ -560,6 +562,11 @@ def _get_current_user_from_request(
     """
     if not credentials:
         raise HTTPException(status_code=401, detail="未提供认证信息")
+
+    def active_user(user):
+        from app.services.erasure_recovery import reject_erased_account
+        reject_erased_account(http_request, user['id'])
+        return user
     
     token = credentials.credentials
     payload = None
@@ -571,7 +578,7 @@ def _get_current_user_from_request(
             user = dict(row)
             if user.get("status") == "deleted":
                 raise HTTPException(status_code=403, detail="账号已注销")
-            return user
+            return active_user(user)
     except HTTPException as exc:
         if exc.status_code == 403:
             raise
@@ -586,7 +593,7 @@ def _get_current_user_from_request(
             user = dict(row)
             if user.get("status") == "deleted":
                 raise HTTPException(status_code=403, detail="账号已注销")
-            return user
+            return active_user(user)
     
     # 回退
     db = get_db()
@@ -595,7 +602,7 @@ def _get_current_user_from_request(
         (token,)
     ).fetchone()
     if row:
-        return dict(row)
+        return active_user(dict(row))
     
     raise HTTPException(status_code=401, detail="Token 无效或已过期")
 
@@ -717,7 +724,7 @@ async def register(request: RegisterRequest, settings: Settings = Depends(get_se
     return response
 
 @router.post("/login", response_model=dict, summary="用户登录", description="邮箱密码登录，返回JWT access_token和refresh_token")
-async def login(request: LoginRequest, settings: Settings = Depends(get_settings)):
+async def login(request: LoginRequest, settings: Settings = Depends(get_settings), http_request: Request = None):
     """用户登录"""
     db = get_db()
     
@@ -745,6 +752,9 @@ async def login(request: LoginRequest, settings: Settings = Depends(get_settings
     # 错误提示与「账号不存在」一致，避免被用来探测哪些邮箱注册过。
     if not pw_hash or not verify_password(request.password, pw_hash):
         raise HTTPException(status_code=401, detail="账号或密码错误")
+
+    from app.services.erasure_recovery import reject_erased_account
+    reject_erased_account(http_request, user_id)
     
     # 生成 JWT token
     access_token = issue_core_token(settings, user_id)["access_token"]
@@ -784,7 +794,7 @@ async def login(request: LoginRequest, settings: Settings = Depends(get_settings
 # ============ Token 轮换 ============
 
 @router.post("/refresh", response_model=dict, summary="刷新Token", description="使用refresh_token换取新的access_token和refresh_token，旧refresh_token立即失效")
-async def refresh_token(request: RefreshRequest, settings: Settings = Depends(get_settings)):
+async def refresh_token(request: RefreshRequest, settings: Settings = Depends(get_settings), http_request: Request = None):
     """
     刷新 access token (Token 轮换)
     - 验证 refresh_token
@@ -800,6 +810,8 @@ async def refresh_token(request: RefreshRequest, settings: Settings = Depends(ge
     
     user_id = payload["sub"]
     device_id = payload.get("device_id")
+    from app.services.erasure_recovery import reject_erased_account
+    reject_erased_account(http_request, user_id)
     
     # 查找用户
     db = get_db()
@@ -849,6 +861,7 @@ async def refresh_token(request: RefreshRequest, settings: Settings = Depends(ge
 async def get_me(
     authorization: str = Header(None),
     settings: Settings = Depends(get_settings),
+    http_request: Request = None,
 ):
     """获取当前用户信息"""
     token = None
@@ -866,6 +879,9 @@ async def get_me(
     
     if not user:
         raise HTTPException(status_code=401, detail="未登录或令牌无效")
+
+    from app.services.erasure_recovery import reject_erased_account
+    reject_erased_account(http_request, user['id'])
     
     return {
         "success": True,

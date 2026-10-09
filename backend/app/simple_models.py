@@ -148,3 +148,15 @@ class FamilySeat(Base):
     member_name: Mapped[str] = mapped_column(String(64))
     member_user_id: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     bound_at: Mapped[int] = mapped_column(Integer, default=now_ts)
+
+
+class AccountErasureJob(Base):
+    """Durable erasure intent and tombstone; no profile or credential content."""
+    __tablename__ = "account_erasure_jobs"
+    user_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    status: Mapped[str] = mapped_column(String(16), default="pending", index=True)
+    attempts: Mapped[int] = mapped_column(Integer, default=0)
+    next_attempt_at: Mapped[int] = mapped_column(Integer, default=0)
+    last_error: Mapped[Optional[str]] = mapped_column(String(32), nullable=True)
+    created_at: Mapped[int] = mapped_column(Integer, default=now_ts)
+    completed_at: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
