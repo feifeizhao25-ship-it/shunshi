@@ -1,202 +1,94 @@
-"""
-顺时 - 用户管理 API 路由测试
-test_users.py
-"""
-
+"""Legacy account paths must act on authenticated owners and real data."""
 import pytest
-from fastapi.testclient import TestClient
-from app.main import app
+from sqlalchemy import select, func
+from app.security import verify_token
+from app.simple_models import User, UserSetting
+from app.database.db import get_db, close_test_connection
 
-client = TestClient(app)
+@pytest.fixture()
+def actor(auth_headers, settings):
+    return verify_token(settings, auth_headers['Authorization'].removeprefix('Bearer '))
 
+@pytest.mark.parametrize('method,suffix', [('get','/export'), ('delete','?confirm=true')])
+def test_anonymous_and_cross_account_denied(client, auth_headers, actor, method, suffix):
+    request = getattr(client, method)
+    assert request(f'/api/v1/users/{actor}{suffix}').status_code == 401
+    other = client.post('/api/v1/auth/guest-login', json={}).json()['access_token']
+    assert request(f'/api/v1/users/{actor}{suffix}', headers={'Authorization':f'Bearer {other}'}).status_code == 403
+    with client.app.state.session_factory() as session:
+        assert session.get(User, actor) is not None
 
-class TestDeleteUser:
-    """用户删除端点测试（GDPR合规）"""
+@pytest.mark.parametrize('query,status', [('',400), ('?confirm=false',400), ('?confirm=invalid',422)])
+def test_confirmation_required_without_deleting(client, auth_headers, actor, query, status):
+    assert client.delete(f'/api/v1/users/{actor}{query}', headers=auth_headers).status_code == status
+    with client.app.state.session_factory() as session:
+        assert session.get(User, actor) is not None
 
-    def test_delete_user_requires_confirmation(self):
-        """DELETE /api/v1/users/{user_id} 不确认返回 400"""
-        response = client.delete("/api/v1/users/user-001?confirm=false")
-        assert response.status_code == 400
+def test_export_includes_core_data_and_isolates_owners(client, auth_headers, actor, settings):
+    other_token = client.post('/api/v1/auth/guest-login', json={}).json()['access_token']
+    other_id = verify_token(settings, other_token)
+    with client.app.state.session_factory() as session:
+        session.add(UserSetting(user_id=actor, key='private_note', value='"本人记录"'))
+        session.add(UserSetting(user_id=other_id, key='private_note', value='"其他人的秘密"'))
+        session.commit()
+    response = client.get(f'/api/v1/users/{actor}/export', headers=auth_headers)
+    assert response.status_code == 200, response.text
+    data = response.json()
+    assert data['user_id'] == data['user']['id'] == actor
+    from datetime import datetime
+    assert datetime.fromisoformat(data['exported_at']).tzinfo is not None
+    assert data['settings']['private_note'] == '本人记录'
+    assert '其他人的秘密' not in response.text
+    assert all(key in data for key in ('health_measurements','family_seats','store_purchases','domestic_billing'))
+    assert all(isinstance(data[key], list) for key in ('profile','subscriptions','memories','conversations'))
+    assert '全部产品' in data['export_scope']
+    other_export = client.get(f'/api/v1/users/{other_id}/export', headers={'Authorization':f'Bearer {other_token}'})
+    assert other_export.status_code == 200
+    assert other_export.json()['settings']['private_note'] == '其他人的秘密'
+    assert '本人记录' not in other_export.text
 
-    def test_delete_user_with_confirmation(self):
-        """DELETE /api/v1/users/{user_id}?confirm=true 确认删除"""
-        response = client.delete("/api/v1/users/test-delete-user?confirm=true")
-        assert response.status_code == 200
+def test_export_then_delete_removes_core_and_record_data(client, auth_headers, actor):
+    with client.app.state.session_factory() as session:
+        session.add(UserSetting(user_id=actor, key='note', value='"remove-me"'))
+        session.commit()
+    assert client.post('/api/v1/family/members', headers=auth_headers,
+        json={'name':'外婆','relation':'grandma','age':78}).status_code == 200
+    assert client.get(f'/api/v1/users/{actor}/export', headers=auth_headers).status_code == 200
+    response = client.delete(f'/api/v1/users/{actor}?confirm=true', headers=auth_headers)
+    assert response.status_code == 200, response.text
+    data = response.json()
+    assert data['success'] is True and data['deleted'] is True
+    assert data['deleted_records']['core.users'] == 1
+    assert data['deleted_records']['core.user_settings'] >= 1
+    assert data['total_records_deleted'] == sum(data['deleted_records'].values())
+    assert 'retained_billing_records' in data and data['deleted_at']
+    with client.app.state.session_factory() as session:
+        assert session.get(User, actor) is None
+        assert session.scalar(select(func.count()).select_from(UserSetting).where(UserSetting.user_id==actor)) == 0
+    db = get_db()
+    try:
+        assert db.execute('SELECT count(*) FROM family_relations WHERE user_id=?',(actor,)).fetchone()[0] == 0
+    finally:
+        close_test_connection(db)
+    assert client.get('/api/v1/auth/data/export', headers=auth_headers).status_code == 401
+    assert client.get(f'/api/v1/users/{actor}/export', headers=auth_headers).status_code == 401
 
-    def test_delete_user_success_response(self):
-        """删除成功返回成功消息"""
-        response = client.delete("/api/v1/users/test-delete-user-2?confirm=true")
-        assert response.status_code == 200
-        data = response.json()
-        assert "success" in data
-        assert "message" in data
+def test_incomplete_erasure_is_not_reported_as_complete(client, auth_headers, actor, monkeypatch):
+    from app.services import account_erasure
+    monkeypatch.setattr(account_erasure, 'erase_product_store', lambda _: ({}, {}, ['unhandled_table']))
+    response = client.delete(f'/api/v1/users/{actor}?confirm=true', headers=auth_headers)
+    assert response.status_code == 200
+    assert response.json()['success'] is False
+    assert response.json()['erasure_incomplete_tables'] == ['unhandled_table']
+    assert '尚未完成' in response.json()['message']
 
-    def test_delete_user_has_deleted_at(self):
-        """删除响应包含 deleted_at 时间戳"""
-        response = client.delete("/api/v1/users/test-delete-user-3?confirm=true")
-        assert response.status_code == 200
-        data = response.json()
-        assert "deleted_at" in data
-
-    def test_delete_user_has_deleted_records(self):
-        """删除响应包含已删除的记录数"""
-        response = client.delete("/api/v1/users/test-delete-user-4?confirm=true")
-        assert response.status_code == 200
-        data = response.json()
-        assert "deleted_records" in data
-        assert isinstance(data["deleted_records"], dict)
-
-    def test_delete_user_cascade_delete(self):
-        """级联删除用户关联数据"""
-        response = client.delete("/api/v1/users/test-cascade-delete?confirm=true")
-        assert response.status_code == 200
-        data = response.json()
-        deleted_records = data.get("deleted_records", {})
-        # 应该尝试删除多个表的数据
-        assert isinstance(deleted_records, dict)
-
-    def test_delete_user_without_confirm_query(self):
-        """缺少 confirm 参数返回 400"""
-        response = client.delete("/api/v1/users/user-001")
-        assert response.status_code == 400
-
-    def test_delete_user_invalid_confirm_value(self):
-        """confirm=invalid 返回 400"""
-        response = client.delete("/api/v1/users/user-001?confirm=invalid")
-        assert response.status_code in [400, 422]
-
-    def test_delete_user_response_has_total_records_deleted(self):
-        """响应包含 total_records_deleted"""
-        response = client.delete("/api/v1/users/test-total-records?confirm=true")
-        assert response.status_code == 200
-        data = response.json()
-        assert "total_records_deleted" in data
-
-    def test_delete_nonexistent_user(self):
-        """删除不存在的用户应该返回 200（或 404）"""
-        response = client.delete("/api/v1/users/nonexistent-user-xyz?confirm=true")
-        assert response.status_code in [200, 404]
-
-
-class TestExportUserData:
-    """用户数据导出端点测试（GDPR合规）"""
-
-    def test_export_user_data_returns_200(self):
-        """GET /api/v1/users/{user_id}/export 返回 200"""
-        response = client.get("/api/v1/users/user-001/export")
-        assert response.status_code == 200
-
-    def test_export_has_user_id(self):
-        """导出数据包含 user_id"""
-        response = client.get("/api/v1/users/user-001/export")
-        assert response.status_code == 200
-        data = response.json()
-        assert "user_id" in data
-        assert data["user_id"] == "user-001"
-
-    def test_export_has_exported_at(self):
-        """导出数据包含导出时间戳"""
-        response = client.get("/api/v1/users/user-001/export")
-        assert response.status_code == 200
-        data = response.json()
-        assert "exported_at" in data
-
-    def test_export_has_profile(self):
-        """导出数据包含用户档案"""
-        response = client.get("/api/v1/users/user-001/export")
-        assert response.status_code == 200
-        data = response.json()
-        assert "profile" in data
-        assert isinstance(data["profile"], list)
-
-    def test_export_has_subscriptions(self):
-        """导出数据包含订阅信息"""
-        response = client.get("/api/v1/users/user-001/export")
-        assert response.status_code == 200
-        data = response.json()
-        assert "subscriptions" in data
-        assert isinstance(data["subscriptions"], list)
-
-    def test_export_has_memories(self):
-        """导出数据包含记忆"""
-        response = client.get("/api/v1/users/user-001/export")
-        assert response.status_code == 200
-        data = response.json()
-        assert "memories" in data
-        assert isinstance(data["memories"], list)
-
-    def test_export_has_conversations(self):
-        """导出数据包含对话记录"""
-        response = client.get("/api/v1/users/user-001/export")
-        assert response.status_code == 200
-        data = response.json()
-        assert "conversations" in data
-        assert isinstance(data["conversations"], list)
-
-    def test_export_nonexistent_user(self):
-        """导出不存在的用户应该返回 200（空数据）或 404"""
-        response = client.get("/api/v1/users/nonexistent-user-xyz/export")
-        assert response.status_code in [200, 404]
-
-    def test_export_data_structure(self):
-        """导出数据包含预期的结构"""
-        response = client.get("/api/v1/users/user-001/export")
-        assert response.status_code == 200
-        data = response.json()
-        # 应该有用户数据的不同部分
-        keys = set(data.keys())
-        expected_keys = {"user_id", "exported_at"}
-        assert expected_keys.issubset(keys)
-
-    def test_export_different_users(self):
-        """不同用户导出不同数据"""
-        response1 = client.get("/api/v1/users/user-001/export")
-        response2 = client.get("/api/v1/users/user-002/export")
-        assert response1.status_code == 200
-        assert response2.status_code == 200
-        data1 = response1.json()
-        data2 = response2.json()
-        assert data1["user_id"] != data2["user_id"]
-
-
-class TestUserManagementIntegration:
-    """用户管理整体集成测试"""
-
-    def test_export_then_delete_workflow(self):
-        """GDPR 工作流：先导出后删除"""
-        # Step 1: 导出用户数据
-        export_response = client.get("/api/v1/users/test-gdpr-user/export")
-        assert export_response.status_code == 200
-        export_data = export_response.json()
-        assert "user_id" in export_data
-
-        # Step 2: 删除用户
-        delete_response = client.delete("/api/v1/users/test-gdpr-user?confirm=true")
-        assert delete_response.status_code == 200
-        delete_data = delete_response.json()
-        assert delete_data["success"] is True
-
-    def test_export_returns_complete_data(self):
-        """导出应该返回完整用户数据"""
-        response = client.get("/api/v1/users/complete-user-test/export")
-        assert response.status_code == 200
-        data = response.json()
-        # 检查关键字段
-        assert isinstance(data, dict)
-        assert "user_id" in data
-
-    def test_delete_returns_summary(self):
-        """删除应该返回删除摘要"""
-        response = client.delete("/api/v1/users/delete-summary-test?confirm=true")
-        assert response.status_code == 200
-        data = response.json()
-        if "deleted_records" in data:
-            assert isinstance(data["deleted_records"], dict)
-
-    def test_path_parameter_user_id(self):
-        """路径参数 user_id 应该正确传递"""
-        user_id = "path-param-test-123"
-        response = client.get(f"/api/v1/users/{user_id}/export")
-        assert response.status_code == 200
-        data = response.json()
-        assert data["user_id"] == user_id
+def test_deletion_failure_is_not_reported_as_success(client, auth_headers, actor, monkeypatch):
+    from fastapi import HTTPException
+    from app.router import users
+    def fail(**kwargs):
+        raise HTTPException(503, '注销存储暂不可用')
+    monkeypatch.setattr(users, 'delete_account', fail)
+    response = client.delete(f'/api/v1/users/{actor}?confirm=true', headers=auth_headers)
+    assert response.status_code == 503
+    with client.app.state.session_factory() as session:
+        assert session.get(User, actor) is not None

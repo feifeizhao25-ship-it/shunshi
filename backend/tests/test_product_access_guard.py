@@ -37,6 +37,11 @@ def ctx(tmp_path_factory):
     app = create_app(settings)
 
     def bearer(user_id: str) -> dict:
+        from app.simple_models import User
+        with app.state.session_factory() as session:
+            if session.get(User, user_id) is None:
+                session.add(User(id=user_id, nickname="门禁测试用户"))
+                session.commit()
         from app.database.db import get_db
         db = get_db()
         db.execute("INSERT OR IGNORE INTO users (id, name, life_stage, created_at, updated_at) VALUES (?, ?, 'exploration', datetime('now'), datetime('now'))", (user_id, "门禁测试用户"))
@@ -64,7 +69,9 @@ def test_export_of_any_user_requires_login_and_ownership(ctx):
     alice, bob = _ids()
     assert client.get(f"/api/v1/users/{bob}/export").status_code == 401
     assert client.get(f"/api/v1/users/{bob}/export", headers=bearer(alice)).status_code == 403
-    assert client.get(f"/api/v1/users/{alice}/export", headers=bearer(alice)).status_code not in (401, 403)
+    response = client.get(f"/api/v1/users/{alice}/export", headers=bearer(alice))
+    assert response.status_code == 200
+    assert response.json()['user']['id'] == alice
 
 
 def test_delete_of_another_user_is_refused(ctx):
