@@ -23,20 +23,29 @@ def cleanup_account(app, user_id):
     from app.database.db import get_db, close_test_connection
     from . import account_erasure
     result = dict(deleted_record_rows={}, deleted_product_rows={},
-                  retained_billing_records={}, erasure_incomplete_tables=[])
+                  retained_billing_records={}, erasure_incomplete_tables=[], attempted=False)
     db = None
+    previous_attempts = None
     try:
         db = get_db()
         # Same lock order as payment projection and account deletion.
         db.execute('BEGIN IMMEDIATE')
         with app.state.session_factory() as session:
             changed = session.execute(update(AccountErasureJob).where(
-                AccountErasureJob.user_id == user_id, AccountErasureJob.status == 'pending'
+                AccountErasureJob.user_id == user_id, AccountErasureJob.status == 'pending',
+                AccountErasureJob.next_attempt_at <= int(time.time())
             ).values(attempts=AccountErasureJob.attempts + 1)).rowcount
             if changed != 1:
+                job = session.get(AccountErasureJob, user_id)
+                if job is None:
+                    result['erasure_incomplete_tables'] = ['cleanup_job_missing']
+                elif job.status != 'done':
+                    result['erasure_incomplete_tables'] = ['cleanup_pending']
                 db.rollback()
                 return result
             job = session.get(AccountErasureJob, user_id)
+            previous_attempts = job.attempts - 1
+            result['attempted'] = True
             if session.get(User, user_id) is not None:
                 raise RuntimeError('core_account_still_exists')
             if db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='domestic_payment_recovery'").fetchone():
@@ -63,11 +72,16 @@ def cleanup_account(app, user_id):
         # No raw exception text, SQL parameters, or profile data in the job.
         # A competing worker may have finished after this attempt failed.
         with app.state.session_factory() as session:
-            session.execute(update(AccountErasureJob).where(
-                AccountErasureJob.user_id == user_id, AccountErasureJob.status == 'pending'
+            conditions = [AccountErasureJob.user_id == user_id, AccountErasureJob.status == 'pending',
+                          AccountErasureJob.next_attempt_at <= int(time.time())]
+            if previous_attempts is not None:
+                conditions.append(AccountErasureJob.attempts == previous_attempts)
+            changed = session.execute(update(AccountErasureJob).where(*conditions
             ).values(attempts=AccountErasureJob.attempts + 1,
-                     next_attempt_at=int(time.time()) + 60, last_error='cleanup_failed'))
+                     next_attempt_at=int(time.time()) + min(3600, 60 * 2 ** min(previous_attempts or 0, 6)),
+                     last_error='cleanup_failed')).rowcount
             session.commit()
+            result['attempted'] = bool(changed)
         result['erasure_incomplete_tables'] = ['record_store', 'product_store']
         logger.warning('账号数据清理未完成，已保留恢复任务')
         return result
@@ -84,6 +98,8 @@ def recover_pending_erasures(app, limit=25):
     result = {'completed': 0, 'retry': 0}
     for user_id in ids:
         status = cleanup_account(app, user_id)
+        if not status['attempted']:
+            continue
         result['retry' if status['erasure_incomplete_tables'] else 'completed'] += 1
     return result
 
