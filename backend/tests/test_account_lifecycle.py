@@ -176,7 +176,7 @@ def db():
 
 
 @pytest.fixture()
-def app(db, monkeypatch):
+def app(db, monkeypatch, tmp_path):
     """
     创建轻量 FastAPI app，仅注册 auth 路由。
     将 get_db 替换为返回测试内存 DB。
@@ -200,9 +200,17 @@ def app(db, monkeypatch):
     test_app = FastAPI(title="Test Auth API")
     from app.config import Settings
     test_app.state.settings = Settings(env="test", jwt_secret=JWT_SECRET)
+    # Supply the real core session contract required by identity projection.
+    from sqlalchemy import create_engine
+    from sqlalchemy.orm import sessionmaker
+    from app.simple_models import Base
+    engine = create_engine(f"sqlite:///{tmp_path}/auth-core.db")
+    Base.metadata.create_all(engine)
+    test_app.state.session_factory = sessionmaker(bind=engine)
     test_app.include_router(auth_mod.router)
 
-    return test_app
+    yield test_app
+    engine.dispose()
 
 
 @pytest_asyncio.fixture(loop_scope="function")

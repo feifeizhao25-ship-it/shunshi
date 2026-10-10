@@ -152,7 +152,9 @@ def test_legacy_only_account_cleanup_is_durable(client, settings, monkeypatch):
     from .test_login_and_user_data_identity import _login_token
     token, user_id = _login_token(client)
     with client.app.state.session_factory() as session:
-        assert session.get(User, user_id) is None
+        # Simulate an account created before core identity projection existed.
+        session.delete(session.get(User, user_id))
+        session.commit()
     monkeypatch.setattr(account_erasure, 'erase_product_store', lambda _: ({},{},['retry_table']))
     response = client.delete('/api/v1/auth/account', headers={'Authorization':'Bearer '+token})
     assert response.status_code == 200, response.text

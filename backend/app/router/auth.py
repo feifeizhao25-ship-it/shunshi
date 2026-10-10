@@ -672,7 +672,7 @@ def _get_or_create_device(db, user_id: str, device_id: str, platform: str = "unk
 # ============ API Endpoints (原有，保持签名不变) ============
 
 @router.post("/register", response_model=dict, summary="用户注册", description="使用邮箱和密码注册新用户，返回JWT access_token和refresh_token")
-async def register(request: RegisterRequest, settings: Settings = Depends(get_settings)):
+async def register(request: RegisterRequest, settings: Settings = Depends(get_settings), http_request: Request = None):
     """用户注册"""
     db = get_db()
     
@@ -695,6 +695,12 @@ async def register(request: RegisterRequest, settings: Settings = Depends(get_se
         VALUES (?, ?, ?, ?, ?, 'exploration', ?, ?)
     """, (user_id, request.email, request.phone, request.name or "用户", hash_password(request.password), now, now))
     
+    # Persist credentials first; if the core store is unavailable, login retries
+    # the projection with the same stable identity instead of creating a new one.
+    db.commit()
+    from app.services.account_identity import ensure_core_identity
+    ensure_core_identity(http_request, user_id)
+
     # 生成 JWT token
     access_token = issue_core_token(settings, user_id)["access_token"]
     refresh_token = create_refresh_token(user_id)
@@ -755,6 +761,8 @@ async def login(request: LoginRequest, settings: Settings = Depends(get_settings
 
     from app.services.erasure_recovery import reject_erased_account
     reject_erased_account(http_request, user_id)
+    from app.services.account_identity import ensure_core_identity
+    ensure_core_identity(http_request, user_id)
     
     # 生成 JWT token
     access_token = issue_core_token(settings, user_id)["access_token"]
