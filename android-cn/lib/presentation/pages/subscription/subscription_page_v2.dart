@@ -9,9 +9,17 @@ import '../../../data/models/subscription.dart';
 import '../../../data/services/wechat_pay_client.dart';
 
 class SubscriptionPageV2 extends StatefulWidget {
-  const SubscriptionPageV2({super.key, this.loadPlans, this.loadStatus});
+  const SubscriptionPageV2({
+    super.key,
+    this.loadPlans,
+    this.loadStatus,
+    this.choosePaymentMethod,
+    this.createOrder,
+  });
   final Future<List<SubscriptionPlan>> Function()? loadPlans;
   final Future<UserSubscriptionStatus> Function()? loadStatus;
+  final Future<String?> Function()? choosePaymentMethod;
+  final Future<SubscriptionOrder?> Function(String, String)? createOrder;
 
   @override
   State<SubscriptionPageV2> createState() => _SubscriptionPageV2State();
@@ -56,30 +64,35 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
           _loading = false;
           _currentStatus = null;
           _plans = [];
-          _loadError = '会员状态暂时无法查询，请检查网络后重试';
+          _loadError = '会员或套餐信息暂时无法查询，请检查网络后重试';
         });
       }
     }
   }
 
   Future<void> _purchase(SubscriptionPlan plan) async {
+    if (_purchasingPlanId != null || _loading || _loadError != null) return;
     if (plan.priceCents == 0) {
       _showToast('当前已是${plan.name}');
       return;
     }
-    final paymentMethod = await _choosePaymentMethod();
-    if (paymentMethod == null || !mounted) return;
     setState(() {
       _purchasingPlanId = plan.id;
       _orderMessage = null;
     });
-
     try {
-      final order = await SubscriptionService.createOrder(
-        plan.id,
-        platform: paymentMethod,
-        paymentScene: paymentMethod == 'wechat' && !kIsWeb ? 'app' : 'native',
-      );
+      final paymentMethod =
+          await (widget.choosePaymentMethod ?? _choosePaymentMethod)();
+      if (paymentMethod == null || !mounted) return;
+      final order = widget.createOrder != null
+          ? await widget.createOrder!(plan.id, paymentMethod)
+          : await SubscriptionService.createOrder(
+              plan.id,
+              platform: paymentMethod,
+              paymentScene: paymentMethod == 'wechat' && !kIsWeb
+                  ? 'app'
+                  : 'native',
+            );
       if (order == null) {
         if (mounted) {
           setState(() => _purchasingPlanId = null);
@@ -91,9 +104,8 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
       // 扫码支付场景：展示支付信息
       if (mounted) {
         setState(() {
-          _purchasingPlanId = null;
           _orderMessage =
-              '订单已创建：¥${(order.amountCents / 100).toStringAsFixed(0)}\n请完成支付后刷新页面';
+              '订单已创建：¥${(order.amountCents / 100).toStringAsFixed(2)}\n请完成支付后刷新页面';
         });
         if (paymentMethod == 'wechat' && order.appPayParams != null) {
           final launched = await WechatPayClient.pay(order.appPayParams!);
@@ -125,7 +137,7 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
           final active =
               _loadError == null &&
               _currentStatus?.isActive == true &&
-              _currentStatus?.planId == plan.id;
+              _currentStatus?.planId == (plan.tier ?? plan.id);
           _showToast(active ? '支付已确认，当前会员权益已生效' : '支付已确认，会员权益仍待核实，请稍后刷新');
         } else if (mounted) {
           _showToast('尚未收到支付确认，可稍后在会员中心刷新');
@@ -134,8 +146,10 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
     } catch (e) {
       if (mounted) {
         setState(() => _purchasingPlanId = null);
-        _showToast('购买失败：${e.toString()}');
+        _showToast('购买请求失败，请稍后重试');
       }
+    } finally {
+      if (mounted) setState(() => _purchasingPlanId = null);
     }
   }
 
@@ -513,7 +527,7 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: const Text(
-                        'RECOMMENDED',
+                        '推荐方案',
                         style: TextStyle(
                           fontSize: 10,
                           color: Colors.white,
@@ -532,7 +546,7 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
-                        '年度特惠',
+                        '支付前确认',
                         style: TextStyle(
                           fontSize: 10,
                           color: ShunShiColors.primary,
@@ -552,7 +566,7 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
                   ),
                 ),
                 Text(
-                  '${recommended.periodName ?? ""} · 每日约 ¥${((recommended.priceYearlyCents ?? 0) / 36500).toStringAsFixed(2)}',
+                  '购买周期：${recommended.periodName ?? "以订单为准"}',
                   style: TextStyle(
                     fontSize: 12,
                     color: ShunShiColors.textTertiary,
@@ -563,7 +577,7 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      '¥${(recommended.priceYearlyCents ?? 0) ~/ 100}',
+                      recommended.priceDisplay,
                       style: TextStyle(
                         fontSize: 34,
                         fontWeight: FontWeight.bold,
@@ -574,7 +588,7 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
                     Padding(
                       padding: const EdgeInsets.only(bottom: 6),
                       child: Text(
-                        '/年',
+                        '/${recommended.periodName ?? "期"}',
                         style: TextStyle(
                           fontSize: 13,
                           color: ShunShiColors.textTertiary,
@@ -591,27 +605,22 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
         ),
         const SizedBox(height: 12),
 
-        // Monthly plans row
-        Row(
-          children: [
-            for (final plan in plans.where((p) => p.id != recommended.id))
-              Expanded(
-                child: Padding(
-                  padding: EdgeInsets.only(right: plan == plans.last ? 0 : 8),
-                  child: _buildPlanCard(plan),
-                ),
-              ),
-          ],
-        ),
+        // Stack all returned SKUs so a larger catalog remains readable on phones.
+        for (final plan in plans.where((p) => p.id != recommended.id))
+          Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: _buildPlanCard(plan),
+          ),
       ],
     );
   }
 
   Widget _buildPlanCard(SubscriptionPlan plan) {
-    final isSelected = _currentStatus?.planId == plan.id;
+    final isSelected = _currentStatus?.planId == (plan.tier ?? plan.id);
     return GestureDetector(
-      onTap: () => _purchase(plan),
+      onTap: _purchasingPlanId != null ? null : () => _purchase(plan),
       child: Container(
+        width: double.infinity,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: ShunShiColors.surface,
@@ -636,7 +645,7 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
             const SizedBox(height: 6),
             Text(
               plan.priceCents > 0
-                  ? '¥${plan.priceCents ~/ 100}/${plan.periodName ?? "月"}'
+                  ? '${plan.priceDisplay}/${plan.periodName ?? "期"}'
                   : '免费',
               style: TextStyle(
                 fontSize: 20,
@@ -655,7 +664,7 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
-            const Spacer(),
+            const SizedBox(height: 14),
             _buildPurchaseButton(plan),
           ],
         ),
@@ -666,7 +675,8 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
   Widget _buildPurchaseButton(SubscriptionPlan plan) {
     final isPurchasing = _purchasingPlanId == plan.id;
     final isCurrent =
-        _currentStatus?.planId == plan.id && _currentStatus?.isActive == true;
+        _currentStatus?.planId == (plan.tier ?? plan.id) &&
+        _currentStatus?.isActive == true;
 
     if (isCurrent) {
       return Container(
@@ -692,7 +702,7 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
       );
     }
     return GestureDetector(
-      onTap: () => _purchase(plan),
+      onTap: _purchasingPlanId != null ? null : () => _purchase(plan),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(

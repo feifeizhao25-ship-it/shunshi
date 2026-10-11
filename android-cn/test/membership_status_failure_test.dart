@@ -93,7 +93,7 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    expect(find.text('会员状态暂时无法查询，请检查网络后重试'), findsOneWidget);
+    expect(find.text('会员或套餐信息暂时无法查询，请检查网络后重试'), findsOneWidget);
     expect(find.text('免费版'), findsNothing);
     fail = false;
     await tester.tap(find.text('重新查询'));

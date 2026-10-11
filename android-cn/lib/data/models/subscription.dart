@@ -38,6 +38,7 @@ class Subscription {
 /// 订阅计划（从前端固定写入，对应后端4个层级）
 class SubscriptionPlan {
   final String id;
+  final String? tier;
   final String name;
   final int priceCents;
   final int? priceYearlyCents;
@@ -51,6 +52,7 @@ class SubscriptionPlan {
 
   SubscriptionPlan({
     required this.id,
+    this.tier,
     required this.name,
     required this.priceCents,
     this.priceYearlyCents,
@@ -65,12 +67,12 @@ class SubscriptionPlan {
 
   String get priceDisplay {
     if (priceCents == 0) return '免费';
-    return '¥${(priceCents / 100).toStringAsFixed(0)}';
+    return '¥${(priceCents / 100).toStringAsFixed(priceCents % 100 == 0 ? 0 : 2)}';
   }
 
   String get priceYearlyDisplay {
     if (priceYearlyCents == null) return '';
-    return '¥${(priceYearlyCents! / 100).toStringAsFixed(0)}';
+    return '¥${(priceYearlyCents! / 100).toStringAsFixed(priceYearlyCents! % 100 == 0 ? 0 : 2)}';
   }
 
   factory SubscriptionPlan.fromJson(
@@ -114,10 +116,19 @@ class SubscriptionPlan {
     return SubscriptionPlan(
       id: json['id'] ?? json['product_id'] ?? 'free',
       name: json['name'] ?? '',
+      tier: json['tier'],
       priceCents: priceCents,
       priceYearlyCents: json['price_yearly_cents'],
-      period: json['period'] ?? (level == 1 ? 'month' : 'year'),
-      periodName: json['period_name'] ?? (level == 1 ? '月' : '年'),
+      period:
+          json['period'] ??
+          (json['duration_days'] != null
+              ? 'day'
+              : (level == 1 ? 'month' : 'year')),
+      periodName:
+          json['period_name'] ??
+          (json['duration_days'] != null
+              ? '${json['duration_days']}天'
+              : (level == 1 ? '月' : '年')),
       description: json['description'] ?? descMap[level] ?? '',
       features: Map<String, bool>.from(
         json['features'] ?? featMap[level] ?? {},
@@ -209,7 +220,10 @@ DateTime? _parseMembershipExpiry(dynamic value) {
   if (value is num && value.isFinite) {
     final milliseconds = value * 1000;
     if (milliseconds.abs() > 8640000000000000) return null;
-    return DateTime.fromMillisecondsSinceEpoch(milliseconds.toInt(), isUtc: true);
+    return DateTime.fromMillisecondsSinceEpoch(
+      milliseconds.toInt(),
+      isUtc: true,
+    );
   }
   return value is String ? DateTime.tryParse(value) : null;
 }

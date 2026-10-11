@@ -17,24 +17,52 @@ class SubscriptionService {
   /// 获取订阅计划列表
   static Future<List<SubscriptionPlan>> getPlans({
     String platform = 'alipay',
+  }) => fetchPlans(_dio, platform: platform);
+
+  static Future<List<SubscriptionPlan>> fetchPlans(
+    Dio client, {
+    String platform = 'alipay',
   }) async {
-    try {
-      final userId = await _getUserId();
-      final res = await _dio.get(
-        '/api/v1/subscription/products',
-        queryParameters: {'platform': platform, 'user_id': userId},
-      );
-      if (res.data?['success'] == true) {
-        final List data = res.data['data']['products'];
-        // 标记 recommended plan（yiyang 颐养版）
-        return data.map((p) {
-          return SubscriptionPlan.fromJson(p, recommended: p['id'] == 'yiyang');
-        }).toList();
-      }
-    } catch (_) {
-      // fallback to hardcoded plans
+    final response = await client.get(
+      '/api/v1/subscription/products',
+      queryParameters: {'platform': platform},
+    );
+    final body = response.data;
+    if (body is! Map ||
+        body['success'] != true ||
+        body['data'] is! Map ||
+        body['data']['products'] is! List) {
+      throw StateError('套餐价格暂时无法查询');
     }
-    return _fallbackPlans;
+    final plans = <SubscriptionPlan>[];
+    final ids = <String>{};
+    for (final raw in body['data']['products']) {
+      if (raw is! Map) throw StateError('套餐信息无效');
+      final item = Map<String, dynamic>.from(raw);
+      final id = item['id'] ?? item['product_id'];
+      final price = item.containsKey('price_cents')
+          ? item['price_cents']
+          : item['price'];
+      if (id is! String ||
+          id.isEmpty ||
+          !ids.add(id) ||
+          item['name'] is! String ||
+          price is! num ||
+          !price.isFinite ||
+          price < 0 ||
+          (item.containsKey('price_cents') && price != price.round()) ||
+          (id != 'free' && price == 0)) {
+        throw StateError('套餐价格信息无效');
+      }
+      if (item.containsKey('price_cents')) item['price_cents'] = price.toInt();
+      plans.add(
+        SubscriptionPlan.fromJson(
+          item,
+          recommended: (item['tier'] ?? id) == 'yiyang',
+        ),
+      );
+    }
+    return plans;
   }
 
   /// 获取用户当前订阅状态
@@ -142,75 +170,4 @@ class SubscriptionService {
     }
     return uid;
   }
-
-  /// 支付功能尚未上线，创建订单时返回 null
-  /// 上线后对接真实支付 SDK
-
-  /// 后端不可用时的硬编码 plan fallback
-  static final List<SubscriptionPlan> _fallbackPlans = [
-    SubscriptionPlan(
-      id: 'free',
-      name: '免费版',
-      priceCents: 0,
-      description: '基础功能，满足日常养生需求',
-      features: {
-        'basic_chat': true,
-        'solar_terms': true,
-        'unlimited_chat': false,
-      },
-      isCurrent: true,
-    ),
-    SubscriptionPlan(
-      id: 'yangxin',
-      name: '养心版',
-      priceCents: 2900,
-      priceYearlyCents: 19900,
-      period: 'month',
-      periodName: '月',
-      description: '无限聊天+今日计划，适合养生爱好者',
-      features: {
-        'basic_chat': true,
-        'solar_terms': true,
-        'unlimited_chat': true,
-        'today_plan': true,
-      },
-    ),
-    SubscriptionPlan(
-      id: 'yiyang',
-      name: '颐养版',
-      priceCents: 5900,
-      priceYearlyCents: 39900,
-      period: 'month',
-      periodName: '月',
-      description: '深度建议+周总结，适合养生达人',
-      isRecommended: true,
-      features: {
-        'basic_chat': true,
-        'solar_terms': true,
-        'unlimited_chat': true,
-        'today_plan': true,
-        'deep_suggestions': true,
-        'weekly_summary': true,
-      },
-    ),
-    SubscriptionPlan(
-      id: 'jiahe',
-      name: '家和版',
-      priceCents: 9900,
-      priceYearlyCents: 69900,
-      period: 'month',
-      periodName: '月',
-      description: '家庭共享（4席位），适合全家使用',
-      familySeats: 4,
-      features: {
-        'basic_chat': true,
-        'solar_terms': true,
-        'unlimited_chat': true,
-        'today_plan': true,
-        'deep_suggestions': true,
-        'weekly_summary': true,
-        'family': true,
-      },
-    ),
-  ];
 }

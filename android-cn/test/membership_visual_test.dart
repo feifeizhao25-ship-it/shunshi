@@ -21,7 +21,10 @@ void main() {
             ).readAsBytes().then((bytes) => ByteData.sublistView(bytes)),
           );
         await font.load();
-        await (FontLoader('NotoSerifSC')..addFont(rootBundle.load('assets/fonts/NotoSerifCJKsc-Regular.otf'))).load();
+        await (FontLoader('NotoSerifSC')..addFont(
+              rootBundle.load('assets/fonts/NotoSerifCJKsc-Regular.otf'),
+            ))
+            .load();
         await (FontLoader(
           'MaterialIcons',
         )..addFont(rootBundle.load('fonts/MaterialIcons-Regular.otf'))).load();
@@ -53,7 +56,27 @@ void main() {
                   features: {},
                 );
               },
-              loadPlans: () async => [],
+              loadPlans: () async => [
+                SubscriptionPlan(
+                  id: 'yiyang_monthly',
+                  tier: 'yiyang',
+                  name: '颐养版月付',
+                  priceCents: 5888,
+                  periodName: '30天',
+                  description: '测试套餐',
+                  features: {},
+                  isRecommended: true,
+                ),
+                SubscriptionPlan(
+                  id: 'jiahe_yearly',
+                  tier: 'jiahe',
+                  name: '家和版年付',
+                  priceCents: 68899,
+                  periodName: '365天',
+                  description: '测试套餐',
+                  features: {},
+                ),
+              ],
             ),
           ),
         ),
