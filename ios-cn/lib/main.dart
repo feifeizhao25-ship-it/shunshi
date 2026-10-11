@@ -7,22 +7,21 @@ import 'data/services/notification_service.dart';
 import 'data/services/store_service.dart';
 import 'design_system/theme.dart';
 import 'presentation/widgets/error_boundary.dart';
+import 'presentation/widgets/startup_gate.dart';
 
-void main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
   AppErrorHandler.init();
 
-  await Future.wait([
-    StorageManager.init(),
-    NotificationService().init(),
-    StoreService().initialize(),
-  ]).catchError((Object e) {
-    debugPrint('Init error: $e');
-    return <void>[];
-  });
-
-  runApp(const ProviderScope(child: ShunshiApp()));
+  runApp(
+    StartupGate(
+      initializeStorage: StorageManager.init,
+      initializeNotifications: () => NotificationService().init(),
+      initializeStore: () => StoreService().initialize(),
+      readyBuilder: (_) => const ProviderScope(child: ShunshiApp()),
+    ),
+  );
 }
 
 class ShunshiApp extends StatefulWidget {
