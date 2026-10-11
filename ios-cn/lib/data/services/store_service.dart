@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'purchase_update_processor.dart';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import '../network/api_client.dart';
@@ -70,42 +71,23 @@ class StoreService {
 
   // ==================== 购买流程 ====================
 
-  void _handlePurchaseUpdate(List<PurchaseDetails> purchaseDetailsList) async {
-    for (final purchaseDetails in purchaseDetailsList) {
-      debugPrint('[StoreService] 购买状态: ${purchaseDetails.status}');
-      var platformVerified = true;
+  late final PurchaseUpdateProcessor _processor = PurchaseUpdateProcessor(
+    verifyPurchase: _handleSuccessfulPurchase,
+    verifyRestore: _handleRestoredPurchase,
+    completePurchase: _iap.completePurchase,
+    onTerminal: (purchase) => _onRestoreComplete?.call(
+      RestoreResult(
+        success: false,
+        message: purchase.status == PurchaseStatus.canceled
+            ? '购买已取消'
+            : '购买未完成，请稍后重试',
+      ),
+    ),
+    onError: () => debugPrint('[StoreService] 交易处理未完成，等待后续重试'),
+  );
 
-      switch (purchaseDetails.status) {
-        case PurchaseStatus.pending:
-          break;
-        case PurchaseStatus.purchased:
-          platformVerified = await _handleSuccessfulPurchase(purchaseDetails);
-          break;
-        case PurchaseStatus.restored:
-          _handleRestoredPurchase(purchaseDetails);
-          break;
-        case PurchaseStatus.error:
-          debugPrint('[StoreService] 购买错误: ${purchaseDetails.error}');
-          _onRestoreComplete?.call(
-            RestoreResult(
-              success: false,
-              message: '购买错误: ${purchaseDetails.error?.message}',
-            ),
-          );
-          break;
-        case PurchaseStatus.canceled:
-          debugPrint('[StoreService] 购买取消');
-          _onRestoreComplete?.call(
-            const RestoreResult(success: false, message: '购买已取消'),
-          );
-          break;
-      }
-
-      if (purchaseDetails.pendingCompletePurchase && platformVerified) {
-        await _iap.completePurchase(purchaseDetails);
-      }
-    }
-  }
+  Future<void> _handlePurchaseUpdate(List<PurchaseDetails> purchases) =>
+      _processor.handle(purchases);
 
   Future<bool> _handleSuccessfulPurchase(
     PurchaseDetails purchaseDetails,
@@ -127,14 +109,14 @@ class StoreService {
   }
 
   /// 处理恢复购买的交易
-  Future<void> _handleRestoredPurchase(PurchaseDetails purchaseDetails) async {
+  Future<bool> _handleRestoredPurchase(PurchaseDetails purchaseDetails) async {
     try {
       final planId = _productToPlan[purchaseDetails.productID];
       if (planId == null) {
         _onRestoreComplete?.call(
           const RestoreResult(success: false, message: '无法识别的产品'),
         );
-        return;
+        return false;
       }
 
       final platform = Platform.isIOS ? 'ios' : 'android';
@@ -149,11 +131,13 @@ class StoreService {
       );
 
       _onRestoreComplete?.call(result);
+      return result.success;
     } catch (e) {
       debugPrint('[StoreService] 处理恢复购买异常: $e');
       _onRestoreComplete?.call(
         RestoreResult(success: false, message: '恢复购买失败: $e'),
       );
+      return false;
     }
   }
 
@@ -171,6 +155,7 @@ class StoreService {
         BaseOptions(
           baseUrl: baseUrl,
           connectTimeout: const Duration(seconds: 10),
+          receiveTimeout: const Duration(seconds: 30),
           headers: {
             'Content-Type': 'application/json',
             'ngrok-skip-browser-warning': 'true',
@@ -214,6 +199,7 @@ class StoreService {
         BaseOptions(
           baseUrl: baseUrl,
           connectTimeout: const Duration(seconds: 15),
+          receiveTimeout: const Duration(seconds: 30),
           headers: {
             'Content-Type': 'application/json',
             'ngrok-skip-browser-warning': 'true',
