@@ -1,4 +1,5 @@
 import 'store_connection.dart';
+import 'restore_attempt.dart';
 import 'purchase_update_processor.dart';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
@@ -25,8 +26,19 @@ class StoreService {
   bool get _available => _connection.available;
   List<ProductDetails> get _products => _connection.products;
 
-  // 恢复购买回调
-  RestoreResultCallback? _onRestoreComplete;
+  final _restoreAttempt = RestoreAttempt<RestoreResult>(
+    isSuccess: (result) => result.success,
+    pendingResult: const RestoreResult(
+      success: false,
+      code: 'pending',
+      message: '暂未收到可确认的恢复结果，请刷新会员状态或稍后重试',
+    ),
+    failedResult: const RestoreResult(
+      success: false,
+      code: 'request_failed',
+      message: '恢复购买请求失败，请稍后重试',
+    ),
+  );
 
   // 国内版产品ID映射
   static const Map<String, String> productIds = {
@@ -59,14 +71,8 @@ class StoreService {
     verifyPurchase: _handleSuccessfulPurchase,
     verifyRestore: _handleRestoredPurchase,
     completePurchase: _iap.completePurchase,
-    onTerminal: (purchase) => _onRestoreComplete?.call(
-      RestoreResult(
-        success: false,
-        message: purchase.status == PurchaseStatus.canceled
-            ? '购买已取消'
-            : '购买未完成，请稍后重试',
-      ),
-    ),
+    onTerminal:
+        (_) {}, // Purchase cancellation is not proof that restoration failed.
     onError: () => debugPrint('[StoreService] 交易处理未完成，等待后续重试'),
   );
 
@@ -94,12 +100,10 @@ class StoreService {
 
   /// 处理恢复购买的交易
   Future<bool> _handleRestoredPurchase(PurchaseDetails purchaseDetails) async {
+    final attemptId = _restoreAttempt.activeId;
     try {
       final planId = _productToPlan[purchaseDetails.productID];
       if (planId == null) {
-        _onRestoreComplete?.call(
-          const RestoreResult(success: false, message: '无法识别的产品'),
-        );
         return false;
       }
 
@@ -114,13 +118,10 @@ class StoreService {
         planId: planId,
       );
 
-      _onRestoreComplete?.call(result);
+      _restoreAttempt.report(attemptId, result);
       return result.success;
     } catch (e) {
       debugPrint('[StoreService] 处理恢复购买异常: $e');
-      _onRestoreComplete?.call(
-        RestoreResult(success: false, message: '恢复购买失败: $e'),
-      );
       return false;
     }
   }
@@ -264,33 +265,22 @@ class StoreService {
 
   // ==================== 恢复购买 ====================
 
-  /// 恢复购买
-  ///
-  /// 流程:
-  /// 1. 调用平台 SDK 恢复购买 (restorePurchases)
-  /// 2. SDK 返回已购交易 → purchaseStream 接收 PurchaseStatus.restored
-  /// 3. _handleRestoredPurchase → 发送到后端验证
-  /// 4. 通过 [onRestoreComplete] 回调通知结果
-  ///
-  /// [onResult] 恢复完成回调，返回 RestoreResult
-  Future<void> restorePurchases({RestoreResultCallback? onResult}) async {
+  /// Await verified success or an explicitly uncertain, bounded result.
+  Future<RestoreResult> restorePurchases({
+    RestoreResultCallback? onResult,
+  }) async {
+    final RestoreResult result;
     if (!_available) {
-      onResult?.call(
-        const RestoreResult(success: false, message: '当前设备不支持应用内购'),
+      result = const RestoreResult(
+        success: false,
+        code: 'unavailable',
+        message: '当前设备的商店暂不可用，请刷新后重试',
       );
-      return;
+    } else {
+      result = await _restoreAttempt.run(_iap.restorePurchases);
     }
-
-    _onRestoreComplete = onResult;
-
-    try {
-      await _iap.restorePurchases();
-      // 结果通过 purchaseStream 的 PurchaseStatus.restored 异步返回
-      // 调用方通过 onResult 回调获取结果
-    } catch (e) {
-      debugPrint('[StoreService] 恢复购买异常: $e');
-      onResult?.call(RestoreResult(success: false, message: '恢复购买失败: $e'));
-    }
+    onResult?.call(result);
+    return result;
   }
 
   // ==================== 购买 ====================
@@ -335,7 +325,7 @@ class StoreService {
   }
 
   Future<void> dispose() {
-    _onRestoreComplete = null;
+    _restoreAttempt.cancel();
     return _connection.dispose();
   }
 

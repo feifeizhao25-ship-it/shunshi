@@ -14,7 +14,7 @@ class SubscriptionPageV2 extends StatefulWidget {
   final Future<UserSubscriptionStatus> Function()? loadStatus;
   final Future<Map<String, String>> Function()? loadPrices;
   final Future<bool> Function(String)? purchase;
-  final Future<void> Function()? restore;
+  final Future<RestoreResult> Function()? restore;
   @override
   State<SubscriptionPageV2> createState() => _SubscriptionPageV2State();
 }
@@ -129,23 +129,10 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2>
       _notice = '已请求恢复购买。请等待商店返回记录，再刷新会员状态。';
     });
     try {
-      if (widget.restore != null) {
-        await widget.restore!();
-      } else {
-        final store = StoreService();
-        if (!store.isAvailable) throw StateError('商店不可用');
-        await store.restorePurchases(
-          onResult: (result) {
-            if (!mounted) return;
-            setState(
-              () => _notice = result.success
-                  ? '购买记录已核验，正在刷新会员状态。'
-                  : '暂未恢复会员，请稍后重试或核对购买所用的账号。',
-            );
-            _reload();
-          },
-        );
-      }
+      final result =
+          await (widget.restore ?? StoreService().restorePurchases)();
+      if (!mounted) return;
+      setState(() => _notice = result.message);
       if (mounted) await _reload();
     } catch (_) {
       if (mounted) setState(() => _notice = '恢复购买请求失败，请稍后重试。');

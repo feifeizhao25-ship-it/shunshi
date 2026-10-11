@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shunshi/data/services/store_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shunshi/data/models/subscription.dart';
 import 'package:shunshi/presentation/pages/subscription/subscription_page_v2.dart';
@@ -118,6 +119,7 @@ void main() {
         loadPrices: () async => prices,
         restore: () async {
           paid = true;
+          return const RestoreResult(success: true, message: '已核验');
         },
       ),
     );
@@ -150,5 +152,35 @@ void main() {
     await tester.drag(find.byType(ListView), const Offset(0, -550));
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
+  });
+  testWidgets('uncertain restore ends busy state without granting membership', (
+    tester,
+  ) async {
+    await show(
+      tester,
+      SubscriptionPageV2(
+        loadStatus: () async => status(),
+        loadPrices: () async => prices,
+        restore: () async => const RestoreResult(
+          success: false,
+          code: 'pending',
+          message: '暂未确认，请稍后刷新',
+        ),
+      ),
+    );
+    await tester.ensureVisible(find.text('恢复购买'));
+    await tester.tap(find.text('恢复购买'));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('暂未确认，请稍后刷新'));
+    expect(find.text('暂未确认，请稍后刷新'), findsOneWidget);
+    expect(
+      tester
+          .widget<OutlinedButton>(find.widgetWithText(OutlinedButton, '恢复购买'))
+          .onPressed,
+      isNotNull,
+    );
+    await tester.scrollUntilVisible(find.text('免费版'), -300);
+    expect(find.text('免费版'), findsOneWidget);
+    expect(find.text('家和版'), findsNothing);
   });
 }

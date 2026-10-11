@@ -746,53 +746,28 @@ class _ProfilePageState extends State<ProfilePage> {
 
   // ==================== 恢复购买 ====================
 
+  bool _restoringPurchases = false;
+
   Future<void> _handleRestorePurchase(BuildContext context) async {
-    final store = StoreService();
-    if (!store.isAvailable) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('当前设备不支持应用内购'),
-            backgroundColor: _textSecondary(context),
-          ),
-        );
-      }
-      return;
-    }
-
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => Center(
-            child: CircularProgressIndicator(
-              color: _primary(context),
-              strokeWidth: 2,
-            ),
-          ),
-    );
-
+    if (_restoringPurchases) return;
+    _restoringPurchases = true;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('正在核对购买记录，请稍候…')));
     try {
-      await store.restorePurchases();
-      if (mounted) {
-        Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('正在恢复购买，请稍候...'),
-            duration: Duration(seconds: 3),
-            backgroundColor: ShunshiColors.primary,
-          ),
-        );
+      final result = await StoreService().restorePurchases();
+      if (!mounted || !context.mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(result.message)));
+    } catch (_) {
+      if (mounted && context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('恢复购买请求失败，请稍后重试')));
       }
-    } catch (e) {
-      if (mounted) {
-        Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('恢复购买失败: $e'),
-            backgroundColor: ShunshiColors.error,
-          ),
-        );
-      }
+    } finally {
+      _restoringPurchases = false;
     }
   }
 }
