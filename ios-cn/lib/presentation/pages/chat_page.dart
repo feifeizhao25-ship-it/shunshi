@@ -11,6 +11,7 @@ import '../widgets/feedback_sheet.dart';
 import '../widgets/membership_widgets.dart';
 import 'chat/chat_models.dart';
 import 'chat/chat_widgets.dart';
+import '../../core/solar_term/solar_term_table.dart';
 
 const _baseUrl = 'https://api.shunshi.app';
 
@@ -86,7 +87,8 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
 
   String _userName = '';
   String _token = '';
-  final String _currentSolarTerm = '清明';
+  // 以前写死「清明」，全年对话开场都说「清明时节」；改为查节气表（与后端同一份数据）
+  final String _currentSolarTerm = currentSolarTermName() ?? '清明';
   final String _solarTermDesc = '春意渐深，万物清洁而明净。适合踏青、放风筝，心情也该舒展。';
   String? _conversationId;
 

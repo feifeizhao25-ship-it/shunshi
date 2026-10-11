@@ -12,6 +12,7 @@ import '../../../core/config/app_config.dart';
 import '../widgets/membership_widgets.dart';
 import 'chat/chat_models.dart';
 import 'chat/chat_widgets.dart';
+import '../../core/solar_term/solar_term_table.dart';
 
 final String _baseUrl = AppConfig.apiBaseUrl.replaceAll('/api/v1', '');
 
@@ -87,7 +88,8 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
 
   String _userName = '';
   String _token = '';
-  String _currentSolarTerm = '立夏';
+  // 先用节气表（与后端同一份数据）给出当前节气，接口返回后再以接口为准
+  String _currentSolarTerm = currentSolarTermName() ?? '立夏';
   String _solarTermDesc = '夏之始，养心安神。清淡饮食，适当午睡，防暑防晒。';
   String? _conversationId;
 

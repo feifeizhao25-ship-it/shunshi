@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
 import 'package:go_router/go_router.dart';
 import 'widgets/home_skeleton.dart';
+import '../../../core/solar_term/solar_term_table.dart';
 import '../../../data/services/offline_cache.dart';
 
 // ═══════════════════════════════════════════════════════════════
@@ -225,6 +226,17 @@ String _getCurrentSolarTermInfo() {
     if (month < t.$1 || (month == t.$1 && day < t.$2)) break;
     termName = t.$3;
     season = t.$4;
+  }
+  // 节气以天文计算的节气表为准（与后端同一份数据）；上面的固定月日只在超出表的年份时兜底。
+  // 固定月日会差一天（如 2026 惊蛰 3-5、春分 3-20），1 月 1-5 日还会落到「清明」。
+  final fromTable = currentSolarTermName();
+  if (fromTable != null) {
+    for (final t in terms) {
+      if (t.$3 == fromTable) {
+        termName = t.$3;
+        season = t.$4;
+      }
+    }
   }
   return '$termName · $season之节';
 }
