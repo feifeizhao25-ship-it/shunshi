@@ -9,7 +9,9 @@ import '../../../data/models/subscription.dart';
 import '../../../data/services/wechat_pay_client.dart';
 
 class SubscriptionPageV2 extends StatefulWidget {
-  const SubscriptionPageV2({super.key});
+  const SubscriptionPageV2({super.key, this.loadPlans, this.loadStatus});
+  final Future<List<SubscriptionPlan>> Function()? loadPlans;
+  final Future<UserSubscriptionStatus> Function()? loadStatus;
 
   @override
   State<SubscriptionPageV2> createState() => _SubscriptionPageV2State();
@@ -21,6 +23,8 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
   bool _loading = true;
   String? _purchasingPlanId;
   String? _orderMessage;
+  String? _loadError;
+  int _loadGeneration = 0;
 
   @override
   void initState() {
@@ -29,13 +33,17 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
   }
 
   Future<void> _loadData() async {
-    setState(() => _loading = true);
+    final generation = ++_loadGeneration;
+    setState(() {
+      _loading = true;
+      _loadError = null;
+    });
     try {
       final results = await Future.wait([
-        SubscriptionService.getPlans(),
-        SubscriptionService.getCurrentStatus(),
+        (widget.loadPlans ?? SubscriptionService.getPlans)(),
+        (widget.loadStatus ?? SubscriptionService.getCurrentStatus)(),
       ]);
-      if (mounted) {
+      if (mounted && generation == _loadGeneration) {
         setState(() {
           _plans = results[0] as List<SubscriptionPlan>;
           _currentStatus = results[1] as UserSubscriptionStatus;
@@ -43,7 +51,14 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
         });
       }
     } catch (e) {
-      if (mounted) setState(() => _loading = false);
+      if (mounted && generation == _loadGeneration) {
+        setState(() {
+          _loading = false;
+          _currentStatus = null;
+          _plans = [];
+          _loadError = '会员状态暂时无法查询，请检查网络后重试';
+        });
+      }
     }
   }
 
@@ -106,7 +121,12 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
         final status = await SubscriptionService.pollOrderStatus(order.orderId);
         if (status == 'paid' && mounted) {
           await _loadData();
-          _showToast('支付已确认，会员权益已生效');
+          if (!mounted) return;
+          final active =
+              _loadError == null &&
+              _currentStatus?.isActive == true &&
+              _currentStatus?.planId == plan.id;
+          _showToast(active ? '支付已确认，当前会员权益已生效' : '支付已确认，会员权益仍待核实，请稍后刷新');
         } else if (mounted) {
           _showToast('尚未收到支付确认，可稍后在会员中心刷新');
         }
@@ -183,18 +203,10 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
     );
   }
 
-  Future<void> _restorePurchases() async {
-    setState(() => _purchasingPlanId = 'restoring');
-    final ok = await SubscriptionService.restorePurchases();
-    if (mounted) {
-      setState(() => _purchasingPlanId = null);
-      if (ok) {
-        await _loadData();
-        _showToast('恢复购买成功');
-      } else {
-        _showToast('未找到可恢复的购买');
-      }
-    }
+  Future<void> _refreshMembership() async {
+    await _loadData();
+    if (!mounted) return;
+    _showToast(_loadError != null ? '会员状态尚未确认，请稍后重试' : '已从服务端更新会员状态');
   }
 
   void _showToast(String msg) {
@@ -228,9 +240,9 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
         ),
         actions: [
           TextButton(
-            onPressed: _restorePurchases,
+            onPressed: _loading ? null : _refreshMembership,
             child: Text(
-              '恢复购买',
+              '刷新会员',
               style: TextStyle(
                 fontSize: 13,
                 color: ShunShiColors.textSecondary,
@@ -242,6 +254,25 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
       body: _loading
           ? const Center(
               child: CircularProgressIndicator(color: ShunShiColors.primary),
+            )
+          : _loadError != null
+          ? Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.cloud_off, size: 40),
+                    const SizedBox(height: 16),
+                    Text(_loadError!, textAlign: TextAlign.center),
+                    const SizedBox(height: 16),
+                    OutlinedButton(
+                      onPressed: _loadData,
+                      child: const Text('重新查询'),
+                    ),
+                  ],
+                ),
+              ),
             )
           : RefreshIndicator(
               onRefresh: _loadData,
@@ -345,7 +376,7 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
-                  isActive ? 'ACTIVE' : 'FREE',
+                  isActive && planId != 'free' ? '会员有效' : '免费版',
                   style: const TextStyle(
                     fontSize: 11,
                     color: Colors.white,
@@ -429,6 +460,9 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
 
   Widget _buildPlans() {
     final plans = _plans.where((p) => p.id != 'free').toList();
+    if (plans.isEmpty) {
+      return const Text('暂无可购买套餐，请稍后刷新');
+    }
     final recommended = plans.firstWhere(
       (p) => p.isRecommended,
       orElse: () => plans.first,

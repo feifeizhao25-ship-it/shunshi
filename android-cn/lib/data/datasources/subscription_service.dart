@@ -38,24 +38,29 @@ class SubscriptionService {
   }
 
   /// 获取用户当前订阅状态
-  static Future<UserSubscriptionStatus> getCurrentStatus() async {
-    try {
-      final res = await _dio.get(
-        '/api/v1/subscription/status',
-        options: Options(headers: _authHeaders()),
-      );
-      if (res.data?['success'] == true) {
-        return UserSubscriptionStatus.fromJson(res.data['data']);
-      }
-    } catch (_) {
-      // fallback
-    }
-    return UserSubscriptionStatus(
-      planId: 'free',
-      planName: '免费版',
-      isActive: true,
-      features: {'basic_chat': true, 'solar_terms': true},
+  static Future<UserSubscriptionStatus> getCurrentStatus() =>
+      fetchCurrentStatus(_dio, headers: _authHeaders());
+
+  /// Errors must remain distinguishable from a verified free account.
+  static Future<UserSubscriptionStatus> fetchCurrentStatus(
+    Dio client, {
+    required Map<String, String> headers,
+  }) async {
+    final response = await client.get(
+      '/api/v1/subscription/status',
+      options: Options(headers: headers),
     );
+    final body = response.data;
+    if (body is! Map || body['success'] != true || body['data'] is! Map) {
+      throw StateError('会员状态响应无效');
+    }
+    final data = Map<String, dynamic>.from(body['data']);
+    if (data['plan'] is! String ||
+        data['plan_name'] is! String ||
+        data['is_active'] is! bool) {
+      throw StateError('会员状态不完整');
+    }
+    return UserSubscriptionStatus.fromJson(data);
   }
 
   /// 创建订单（获取支付链接）
