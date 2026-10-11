@@ -1,397 +1,276 @@
-/// 会员订阅中心 — 参考UI _11
-library;
-
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import '../../../design_system/theme.dart';
+import '../../../data/network/api_client.dart';
+import '../../../data/models/subscription.dart';
 import '../../../data/services/store_service.dart';
 
 class SubscriptionPageV2 extends StatefulWidget {
-  const SubscriptionPageV2({super.key});
-
+  const SubscriptionPageV2({
+    super.key,
+    this.loadStatus,
+    this.loadPrices,
+    this.purchase,
+    this.restore,
+  });
+  final Future<UserSubscriptionStatus> Function()? loadStatus;
+  final Future<Map<String, String>> Function()? loadPrices;
+  final Future<bool> Function(String)? purchase;
+  final Future<void> Function()? restore;
   @override
   State<SubscriptionPageV2> createState() => _SubscriptionPageV2State();
 }
 
-class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
-  bool _purchasing = false;
+class _SubscriptionPageV2State extends State<SubscriptionPageV2>
+    with WidgetsBindingObserver {
+  static const _plans = {
+    'yiyang_monthly': '颐养版月付',
+    'yiyang_yearly': '颐养版年付',
+    'family_yearly': '家和版年付',
+  };
+  UserSubscriptionStatus? _status;
+  Map<String, String> _prices = {};
+  bool _loading = true, _busy = false;
+  String? _error, _notice;
+  String _selected = 'yiyang_yearly';
+  int _generation = 0;
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _reload();
+  }
 
-  Future<void> _purchaseAnnual() async {
-    setState(() => _purchasing = true);
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) _reload();
+  }
+
+  Future<UserSubscriptionStatus> _fetchStatus() async {
+    final body = (await ApiClient().get('/api/v1/subscription/status')).data;
+    if (body is! Map || body['success'] != true || body['data'] is! Map) {
+      throw StateError('会员状态响应无效');
+    }
+    return UserSubscriptionStatus.fromJson(
+      Map<String, dynamic>.from(body['data']),
+    );
+  }
+
+  Future<Map<String, String>> _fetchPrices() async {
+    final store = StoreService();
+    return {
+      for (final id in _plans.keys)
+        if (store.getProductDetails(id) != null)
+          id: store.getProductDetails(id)!.price,
+    };
+  }
+
+  Future<void> _reload() async {
+    final generation = ++_generation;
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
     try {
-      final store = StoreService();
-      if (!store.isAvailable) throw Exception('当前设备暂不支持 App Store 内购');
-      final launched = await store.purchase('yiyang_yearly');
-      if (!launched) throw Exception('未能发起 App Store 购买');
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('购买请求已提交，服务端验证收据后会员权益将自动生效')),
-      );
-    } catch (error) {
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('购买失败：$error')));
+      final status = await (widget.loadStatus ?? _fetchStatus)();
+      Map<String, String> prices;
+      try {
+        prices = await (widget.loadPrices ?? _fetchPrices)();
+      } catch (_) {
+        prices = {};
       }
+      if (!mounted || generation != _generation) return;
+      setState(() {
+        _status = status;
+        _prices = prices;
+        _loading = false;
+      });
+    } catch (_) {
+      if (!mounted || generation != _generation) return;
+      setState(() {
+        _status = null;
+        _prices = {};
+        _loading = false;
+        _error = '会员状态暂时无法查询，请检查网络后重试';
+      });
+    }
+  }
+
+  Future<void> _purchase() async {
+    setState(() {
+      _busy = true;
+      _notice = null;
+    });
+    try {
+      final launched = await (widget.purchase ?? StoreService().purchase)(
+        _selected,
+      );
+      if (!mounted) return;
+      setState(
+        () => _notice = launched
+            ? '购买请求已提交。完成支付后请刷新状态，以服务端核验结果为准。'
+            : '未能发起购买，请稍后重试。',
+      );
+    } catch (_) {
+      if (mounted) setState(() => _notice = '购买请求失败，请稍后重试。');
     } finally {
-      if (mounted) setState(() => _purchasing = false);
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<void> _restore() async {
+    setState(() {
+      _busy = true;
+      _notice = '已请求恢复购买。请等待商店返回记录，再刷新会员状态。';
+    });
+    try {
+      if (widget.restore != null) {
+        await widget.restore!();
+      } else {
+        final store = StoreService();
+        if (!store.isAvailable) throw StateError('商店不可用');
+        await store.restorePurchases(
+          onResult: (result) {
+            if (!mounted) return;
+            setState(
+              () => _notice = result.success
+                  ? '购买记录已核验，正在刷新会员状态。'
+                  : '暂未恢复会员，请稍后重试或核对购买所用的账号。',
+            );
+            _reload();
+          },
+        );
+      }
+      if (mounted) await _reload();
+    } catch (_) {
+      if (mounted) setState(() => _notice = '恢复购买请求失败，请稍后重试。');
+    } finally {
+      if (mounted) setState(() => _busy = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final paid = _status?.isActive == true && _status?.planId != 'free';
+    final expiry = _status?.expiresAt?.toLocal();
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: const Color(0xFFF5F7F3),
       appBar: AppBar(
-        backgroundColor: ShunShiColors.background,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
-        ),
-        title: Text(
-          '会员中心',
-          style: TextStyle(
-            fontFamily: ShunShiTypography.serifFamily,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+        title: const Text('会员中心'),
         actions: [
-          IconButton(icon: const Icon(Icons.help_outline), onPressed: () {}),
+          IconButton(
+            tooltip: '刷新会员状态',
+            onPressed: _loading ? null : _reload,
+            icon: const Icon(Icons.refresh),
+          ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // SVIP Header
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF144227), Color(0xFF2D7A4A)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'SVIP 尊享',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: ShunShiColors.surface,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '开启您的智能养生之旅',
-                    style: TextStyle(fontSize: 14, color: Colors.white70),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    '权益以订单确认页和当前已上线功能为准',
-                    style: TextStyle(fontSize: 12, color: Color(0xFFE4C285)),
-                  ),
-                ],
-              ),
+      body: ListView(
+        padding: const EdgeInsets.all(20),
+        children: [
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: const Color(0xFF205C44),
+              borderRadius: BorderRadius.circular(20),
             ),
-            const SizedBox(height: 20),
-
-            // 年度会员 - Recommended
-            GestureDetector(
-              child: Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: ShunShiColors.surface,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: ShunShiColors.primary, width: 2),
-                  boxShadow: [
-                    BoxShadow(
-                      color: ShunShiColors.primary.withValues(alpha: 0.1),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 3,
-                          ),
-                          decoration: BoxDecoration(
-                            color: ShunShiColors.primary,
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            'RECOMMENDED',
-                            style: TextStyle(
-                              fontSize: 10,
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      '年度会员',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: ShunShiColors.textPrimary,
-                      ),
-                    ),
-                    Text(
-                      '颐养版年付 · 每日约 ¥1.09',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: ShunShiColors.textTertiary,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          '¥399/年',
-                          style: TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
-                            color: ShunShiColors.primary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-
-            // 月度卡 + 家庭卡
-            Row(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: _buildPlanCard('颐养月付', '¥59', '按月购买 · 支付前确认', false),
+                const Text('当前会员状态', style: TextStyle(color: Colors.white70)),
+                const SizedBox(height: 10),
+                Text(
+                  _loading
+                      ? '正在查询…'
+                      : _error != null
+                      ? '暂时无法查询'
+                      : paid
+                      ? _status!.planName
+                      : '免费版',
+                  style: const TextStyle(
+                    fontSize: 26,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _buildPlanCard('家和年付', '¥699', '最多4个家庭席位', false),
+                const SizedBox(height: 8),
+                Text(
+                  paid && !_loading && _error == null && expiry != null
+                      ? '有效期至 ${expiry.year}年${expiry.month}月${expiry.day}日'
+                      : '会员权益以服务端确认结果为准',
+                  style: const TextStyle(color: Colors.white70),
                 ),
               ],
             ),
-            const SizedBox(height: 24),
-
-            // 会员权益
-            Text(
-              '会员尊享权益',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: ShunShiColors.textPrimary,
-              ),
+          ),
+          if (_loading) const LinearProgressIndicator(),
+          if (_error != null) ...[
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              child: Text(_error!),
             ),
-            const SizedBox(height: 12),
-            _buildBenefit(
-              Icons.auto_awesome,
-              'AI私人订制方案',
-              '基于二十四节气与体质实时调整的个性化调理建议。',
-            ),
-            _buildBenefit(
-              Icons.restaurant_menu,
-              '完整内容库',
-              '解锁当前已上架并持续更新的食养、作息与节气内容。',
-            ),
-            _buildBenefit(Icons.headphones, '会员音频', '按实际上架范围收听冥想导引与养生音频。'),
-            _buildBenefit(
-              Icons.family_restroom,
-              '家庭成员关怀',
-              '家和版最多提供4个家庭席位，并由成员自行控制共享范围。',
-            ),
-            _buildBenefit(
-              Icons.insights,
-              '长期趋势与周度报告',
-              '在数据充足时生成趋势视图和周度深度报告，并明确数据范围。',
-            ),
-            const SizedBox(height: 8),
-            Text(
-              '当前支付宝年付为单次购买，不自动续费；支付前会再次展示金额与订单信息。',
-              style: TextStyle(
-                fontSize: 12,
-                color: ShunShiColors.textTertiary,
-                height: 1.5,
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            // FAQ
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: ShunShiColors.surfaceContainerLow,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.help_outline,
-                    color: ShunShiColors.textTertiary,
-                    size: 18,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    '如何取消自动续费？',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: ShunShiColors.textSecondary,
-                    ),
-                  ),
-                  const Spacer(),
-                  Icon(
-                    Icons.chevron_right,
-                    color: ShunShiColors.textTertiary,
-                    size: 18,
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 40),
+            OutlinedButton(onPressed: _reload, child: const Text('重新查询')),
           ],
-        ),
-      ),
-      bottomNavigationBar: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
-          child: SizedBox(
-            width: double.infinity,
-            height: 52,
-            child: ElevatedButton(
-              onPressed: _purchasing ? null : _purchaseAnnual,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: ShunShiColors.primary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
+          const SizedBox(height: 24),
+          const Text(
+            '选择适合您的套餐',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 8),
+          for (final plan in _plans.entries)
+            Card(
+              child: ListTile(
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
                 ),
-              ),
-              child: Text(
-                _purchasing ? '等待支付确认…' : '立即开通',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
+                title: Text(plan.value),
+                subtitle: Text(_prices[plan.key] ?? '商店价格暂不可用'),
+                trailing: Icon(
+                  _selected == plan.key
+                      ? Icons.radio_button_checked
+                      : Icons.radio_button_off,
                 ),
+                onTap: _busy || _loading || !_prices.containsKey(plan.key)
+                    ? null
+                    : () => setState(() => _selected = plan.key),
               ),
             ),
+          const SizedBox(height: 12),
+          const Text(
+            '价格由苹果商店提供，金额、订阅周期及续订条件请在购买确认页核对。您可在苹果账户的订阅设置中管理订阅。',
+            style: TextStyle(height: 1.6, color: Color(0xFF58645D)),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPlanCard(
-    String title,
-    String price,
-    String subtitle,
-    bool isSelected,
-  ) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: ShunShiColors.surface,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: isSelected ? ShunShiColors.primary : ShunShiColors.borderGhost,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w600,
-              color: ShunShiColors.textPrimary,
+          const SizedBox(height: 16),
+          FilledButton(
+            onPressed:
+                _busy ||
+                    _loading ||
+                    _error != null ||
+                    !_prices.containsKey(_selected)
+                ? null
+                : _purchase,
+            child: Text(_busy ? '正在处理…' : '前往商店确认购买'),
+          ),
+          OutlinedButton(
+            onPressed: _busy || _loading ? null : _restore,
+            child: const Text('恢复购买'),
+          ),
+          if (_notice != null)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              child: Text(_notice!, style: const TextStyle(height: 1.6)),
             ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            price,
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: ShunShiColors.primary,
-            ),
-          ),
-          Text(
-            subtitle,
-            style: TextStyle(fontSize: 11, color: ShunShiColors.textTertiary),
+          const SizedBox(height: 12),
+          const Text(
+            '更换设备后，请使用原购买所用的苹果账户恢复购买。未完成核验的订单不会在本页显示为已开通。',
+            style: TextStyle(height: 1.6, color: Color(0xFF58645D)),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildBenefit(IconData icon, String title, String desc) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: ShunShiColors.surface,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                color: ShunShiColors.primary.withValues(alpha: 0.08),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(icon, color: ShunShiColors.primary, size: 18),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: ShunShiColors.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    desc,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: ShunShiColors.textTertiary,
-                      height: 1.5,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
