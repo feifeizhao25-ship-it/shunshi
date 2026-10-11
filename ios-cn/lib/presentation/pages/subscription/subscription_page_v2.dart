@@ -62,6 +62,7 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2>
 
   Future<Map<String, String>> _fetchPrices() async {
     final store = StoreService();
+    await store.refreshProducts();
     return {
       for (final id in _plans.keys)
         if (store.getProductDetails(id) != null)

@@ -1,4 +1,4 @@
-import 'dart:async';
+import 'store_connection.dart';
 import 'purchase_update_processor.dart';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
@@ -15,9 +15,15 @@ class StoreService {
   StoreService._();
 
   final InAppPurchase _iap = InAppPurchase.instance;
-  bool _available = false;
-  List<ProductDetails> _products = [];
-  StreamSubscription<List<PurchaseDetails>>? _subscription;
+  late final StoreConnection _connection = StoreConnection(
+    checkAvailable: _iap.isAvailable,
+    purchaseStream: () => _iap.purchaseStream,
+    queryProducts: () => _iap.queryProductDetails(productIds.values.toSet()),
+    onPurchase: _handlePurchaseUpdate,
+    onStreamError: () => debugPrint('[StoreService] 商店事件读取失败'),
+  );
+  bool get _available => _connection.available;
+  List<ProductDetails> get _products => _connection.products;
 
   // 恢复购买回调
   RestoreResultCallback? _onRestoreComplete;
@@ -43,31 +49,9 @@ class StoreService {
 
   // ==================== 初始化 ====================
 
-  Future<void> initialize() async {
-    _available = await _iap.isAvailable();
-    if (!_available) {
-      debugPrint('[StoreService] 内购不可用');
-      return;
-    }
+  Future<void> initialize() => _connection.refresh();
 
-    _subscription = _iap.purchaseStream.listen(
-      _handlePurchaseUpdate,
-      onDone: () => _subscription?.cancel(),
-      onError: (error) => debugPrint('[StoreService] 购买流错误: $error'),
-    );
-
-    await _loadProducts();
-    debugPrint('[StoreService] 初始化完成, ${_products.length} 个产品');
-  }
-
-  Future<void> _loadProducts() async {
-    final ids = productIds.values.toSet();
-    final response = await _iap.queryProductDetails(ids);
-    if (response.notFoundIDs.isNotEmpty) {
-      debugPrint('[StoreService] 未找到产品: ${response.notFoundIDs}');
-    }
-    _products = response.productDetails;
-  }
+  Future<void> refreshProducts() => _connection.refresh();
 
   // ==================== 购买流程 ====================
 
@@ -350,8 +334,9 @@ class StoreService {
     return _products.where((p) => p.id == storeProductId).firstOrNull;
   }
 
-  void dispose() {
-    _subscription?.cancel();
+  Future<void> dispose() {
+    _onRestoreComplete = null;
+    return _connection.dispose();
   }
 
   bool get isAvailable => _available;
