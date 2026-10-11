@@ -76,17 +76,31 @@ class StoreService {
     onError: () => debugPrint('[StoreService] 交易处理未完成，等待后续重试'),
   );
 
-  Future<void> _handlePurchaseUpdate(List<PurchaseDetails> purchases) =>
-      _processor.handle(purchases);
+  Future<void> _handlePurchaseUpdate(List<PurchaseDetails> purchases) {
+    // Capture at delivery, before this batch waits behind other transactions.
+    final token = StorageManager.user.getToken();
+    return _processor.handle(
+      purchases,
+      canVerify: () => _isCurrentToken(token),
+    );
+  }
+
+  bool _isCurrentToken(String? token) =>
+      token != null &&
+      token.trim().isNotEmpty &&
+      StorageManager.user.getToken() == token;
 
   Future<bool> _handleSuccessfulPurchase(
     PurchaseDetails purchaseDetails,
   ) async {
+    final token = StorageManager.user.getToken();
+    if (!_isCurrentToken(token)) return false;
     try {
       final planId = _productToPlan[purchaseDetails.productID];
       if (planId == null) return false;
 
       return await _verifyReceipt(
+        token: token!,
         platform: Platform.isIOS ? 'ios' : 'android',
         receiptData: purchaseDetails.verificationData.serverVerificationData,
         productId: purchaseDetails.productID,
@@ -101,6 +115,8 @@ class StoreService {
   /// 处理恢复购买的交易
   Future<bool> _handleRestoredPurchase(PurchaseDetails purchaseDetails) async {
     final attemptId = _restoreAttempt.activeId;
+    final token = StorageManager.user.getToken();
+    if (!_isCurrentToken(token)) return false;
     try {
       final planId = _productToPlan[purchaseDetails.productID];
       if (planId == null) {
@@ -112,12 +128,14 @@ class StoreService {
           purchaseDetails.verificationData.serverVerificationData;
 
       final result = await _restoreToServer(
+        token: token!,
         platform: platform,
         receiptData: receiptData,
         productId: purchaseDetails.productID,
         planId: planId,
       );
 
+      if (!_isCurrentToken(token)) return false;
       _restoreAttempt.report(attemptId, result);
       return result.success;
     } catch (e) {
@@ -129,6 +147,7 @@ class StoreService {
   // ==================== 收据验证 ====================
 
   Future<bool> _verifyReceipt({
+    required String token,
     required String platform,
     required String receiptData,
     required String productId,
@@ -148,11 +167,9 @@ class StoreService {
         ),
       );
 
-      // 添加 Token
-      final token = StorageManager.user.getToken();
-      if (token != null) {
-        dio.options.headers['Authorization'] = 'Bearer $token';
-      }
+      // Use the captured credential; never substitute a newly logged-in account.
+      if (!_isCurrentToken(token)) throw StateError('Account changed');
+      dio.options.headers['Authorization'] = 'Bearer $token';
 
       final response = await dio.post(
         '/api/v1/subscription/verify-receipt-v2',
@@ -164,7 +181,7 @@ class StoreService {
         },
       );
 
-      return response.data['success'] == true;
+      return _isCurrentToken(token) && response.data['success'] == true;
     } catch (e) {
       debugPrint('[StoreService] 收据验证请求失败: $e');
       return false;
@@ -173,6 +190,7 @@ class StoreService {
 
   /// 发送恢复购买请求到后端
   Future<RestoreResult> _restoreToServer({
+    required String token,
     required String platform,
     required String receiptData,
     required String productId,
@@ -192,11 +210,9 @@ class StoreService {
         ),
       );
 
-      // 添加 Token
-      final token = StorageManager.user.getToken();
-      if (token != null) {
-        dio.options.headers['Authorization'] = 'Bearer $token';
-      }
+      // Use the captured credential; never substitute a newly logged-in account.
+      if (!_isCurrentToken(token)) throw StateError('Account changed');
+      dio.options.headers['Authorization'] = 'Bearer $token';
 
       final Map<String, dynamic> body;
 
@@ -218,6 +234,7 @@ class StoreService {
         '/api/v1/subscription/restore',
         data: body,
       );
+      if (!_isCurrentToken(token)) return _accountChanged;
       final data = response.data;
 
       if (data['success'] == true) {
@@ -241,7 +258,7 @@ class StoreService {
       return RestoreResult(success: false, message: '网络连接失败，请检查网络后重试');
     } catch (e) {
       debugPrint('[StoreService] 恢复购买异常: $e');
-      return RestoreResult(success: false, message: '恢复购买失败: $e');
+      return const RestoreResult(success: false, message: '恢复购买未完成，请稍后重试');
     }
   }
 
@@ -269,8 +286,15 @@ class StoreService {
   Future<RestoreResult> restorePurchases({
     RestoreResultCallback? onResult,
   }) async {
-    final RestoreResult result;
-    if (!_available) {
+    final token = StorageManager.user.getToken();
+    RestoreResult result;
+    if (!_isCurrentToken(token)) {
+      result = const RestoreResult(
+        success: false,
+        code: 'login_required',
+        message: '请先登录，再恢复购买',
+      );
+    } else if (!_available) {
       result = const RestoreResult(
         success: false,
         code: 'unavailable',
@@ -279,14 +303,23 @@ class StoreService {
     } else {
       result = await _restoreAttempt.run(_iap.restorePurchases);
     }
+    if (token != null && !_isCurrentToken(token)) result = _accountChanged;
     onResult?.call(result);
     return result;
   }
 
+  static const _accountChanged = RestoreResult(
+    success: false,
+    code: 'account_changed',
+    message: '登录状态已变化，请确认当前账号后重新恢复购买',
+  );
+
   // ==================== 购买 ====================
 
   Future<bool> purchase(String productId) async {
-    if (!_available) return false;
+    if (!_available || !_isCurrentToken(StorageManager.user.getToken())) {
+      return false;
+    }
 
     final storeProductId = productIds[productId];
     if (storeProductId == null) return false;

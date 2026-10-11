@@ -20,6 +20,102 @@ PurchaseDetails transaction(
 )..pendingCompletePurchase = pending;
 
 void main() {
+  for (final status in [PurchaseStatus.purchased, PurchaseStatus.restored]) {
+    test(
+      '$status queued under old account is not verified for new account',
+      () async {
+        var token = 'account-a';
+        final barrier = Completer<bool>();
+        final verified = <String?>[], completed = <String?>[];
+        Future<bool> verify(PurchaseDetails purchase) async {
+          verified.add(purchase.purchaseID);
+          return purchase.purchaseID == 'blocking' ? barrier.future : true;
+        }
+
+        final processor = PurchaseUpdateProcessor(
+          verifyPurchase: verify,
+          verifyRestore: verify,
+          completePurchase: (p) async {
+            completed.add(p.purchaseID);
+          },
+          onTerminal: (_) {},
+          onError: () {
+            fail('unexpected error');
+          },
+        );
+        final captured = token;
+        final first = processor.handle([
+          transaction('blocking', status),
+        ], canVerify: () => token == captured);
+        final second = processor.handle([
+          transaction('queued', status),
+        ], canVerify: () => token == captured);
+        await Future<void>.delayed(Duration.zero);
+        token = 'account-b';
+        barrier.complete(true);
+        await Future.wait([first, second]);
+        expect(verified, ['blocking']);
+        expect(completed, isEmpty);
+        // A subsequent delivery in the current session can still be processed.
+        final newCaptured = token;
+        await processor.handle([
+          transaction('new-event', status),
+        ], canVerify: () => token == newCaptured);
+        expect(completed, ['new-event']);
+      },
+    );
+
+    test('$status checks session again between items in one batch', () async {
+      var signedIn = true;
+      final verified = <String?>[], completed = <String?>[];
+      Future<bool> verify(PurchaseDetails p) async {
+        verified.add(p.purchaseID);
+        signedIn = false;
+        return true;
+      }
+
+      final processor = PurchaseUpdateProcessor(
+        verifyPurchase: verify,
+        verifyRestore: verify,
+        completePurchase: (p) async {
+          completed.add(p.purchaseID);
+        },
+        onTerminal: (_) {},
+        onError: () {},
+      );
+      await processor.handle([
+        transaction('first', status),
+        transaction('second', status),
+      ], canVerify: () => signedIn);
+      expect(verified, ['first']);
+      expect(completed, isEmpty);
+    });
+  }
+
+  test(
+    'signed out leaves receipts pending but permits terminal SDK cleanup',
+    () async {
+      final completed = <String?>[];
+      final processor = PurchaseUpdateProcessor(
+        verifyPurchase: (_) async => throw StateError('must not verify'),
+        verifyRestore: (_) async => throw StateError('must not verify'),
+        completePurchase: (p) async {
+          completed.add(p.purchaseID);
+        },
+        onTerminal: (_) {},
+        onError: () {
+          fail('must not invoke verification');
+        },
+      );
+      await processor.handle([
+        transaction('purchase', PurchaseStatus.purchased),
+        transaction('restore', PurchaseStatus.restored),
+        transaction('cancel', PurchaseStatus.canceled),
+      ], canVerify: () => false);
+      expect(completed, ['cancel']);
+    },
+  );
+
   test(
     'restored transaction waits for successful server verification',
     () async {

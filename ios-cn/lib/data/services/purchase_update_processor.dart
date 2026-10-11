@@ -16,7 +16,10 @@ class PurchaseUpdateProcessor {
   final void Function() onError;
   Future<void> _queue = Future<void>.value();
 
-  Future<void> handle(List<PurchaseDetails> purchases) {
+  Future<void> handle(
+    List<PurchaseDetails> purchases, {
+    bool Function()? canVerify,
+  }) {
     final batch = List<PurchaseDetails>.of(purchases);
     _queue = _queue.then((_) async {
       for (final purchase in batch) {
@@ -24,10 +27,18 @@ class PurchaseUpdateProcessor {
           var readyToComplete = false;
           switch (purchase.status) {
             case PurchaseStatus.purchased:
-              readyToComplete = await verifyPurchase(purchase);
+              if (canVerify?.call() ?? true) {
+                readyToComplete = await verifyPurchase(purchase);
+                readyToComplete =
+                    readyToComplete && (canVerify?.call() ?? true);
+              }
               break;
             case PurchaseStatus.restored:
-              readyToComplete = await verifyRestore(purchase);
+              if (canVerify?.call() ?? true) {
+                readyToComplete = await verifyRestore(purchase);
+                readyToComplete =
+                    readyToComplete && (canVerify?.call() ?? true);
+              }
               break;
             case PurchaseStatus.error:
             case PurchaseStatus.canceled:
