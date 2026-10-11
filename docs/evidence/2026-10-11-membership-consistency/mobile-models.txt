@@ -1,0 +1,3 @@
+Domestic membership model checks passed (16 cases)
+Analyzing verify_membership_models.dart, subscription.dart, subscription.dart...
+No issues found!

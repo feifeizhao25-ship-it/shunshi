@@ -745,8 +745,6 @@ async def login(request: LoginRequest, settings: Settings = Depends(get_settings
     user_id = row["id"]
     name = row["name"]
     life_stage = row["life_stage"]
-    is_premium = row["is_premium"]
-    subscription_plan = row["subscription_plan"]
     pw_hash = row["password_hash"]
     
     # 没有设置过密码的账号（Apple / Google / 微信 / 游客 / 演示账号）不能走口令登录。
@@ -763,6 +761,8 @@ async def login(request: LoginRequest, settings: Settings = Depends(get_settings
     reject_erased_account(http_request, user_id)
     from app.services.account_identity import ensure_core_identity
     ensure_core_identity(http_request, user_id)
+    from app.services.membership_status import account_membership
+    membership = account_membership(http_request, user_id)
     
     # 生成 JWT token
     access_token = issue_core_token(settings, user_id)["access_token"]
@@ -787,8 +787,7 @@ async def login(request: LoginRequest, settings: Settings = Depends(get_settings
                 "phone": request.phone,
                 "name": name,
                 "life_stage": life_stage,
-                "is_premium": bool(is_premium),
-                "subscription_plan": subscription_plan
+                **membership
             },
             "token": access_token,
             "refresh_token": refresh_token,
@@ -890,6 +889,8 @@ async def get_me(
 
     from app.services.erasure_recovery import reject_erased_account
     reject_erased_account(http_request, user['id'])
+    from app.services.membership_status import account_membership
+    membership = account_membership(http_request, user['id'])
     
     return {
         "success": True,
@@ -899,8 +900,7 @@ async def get_me(
             "phone": user.get("phone"),
             "name": user["name"],
             "life_stage": user["life_stage"],
-            "is_premium": bool(user.get("is_premium", 0)),
-            "subscription_plan": user.get("subscription_plan", "free")
+            **membership
         }
     }
 

@@ -189,11 +189,19 @@ class UserSubscriptionStatus {
       planId: json['plan_id'] ?? json['plan'] ?? 'free',
       planName: json['plan_name'] ?? '免费版',
       isActive: json['is_active'] ?? false,
-      expiresAt: json['expires_at'] != null
-          ? DateTime.parse(json['expires_at'])
-          : null,
+      expiresAt: _parseMembershipExpiry(json['expires_at']),
       dayRemaining: json['day_remaining'] ?? 0,
       features: Map<String, bool>.from(json['features'] ?? {}),
     );
   }
+}
+
+// The status API uses Unix seconds; older responses used ISO dates.
+DateTime? _parseMembershipExpiry(dynamic value) {
+  if (value is num && value.isFinite) {
+    final milliseconds = value * 1000;
+    if (milliseconds.abs() > 8640000000000000) return null;
+    return DateTime.fromMillisecondsSinceEpoch(milliseconds.toInt(), isUtc: true);
+  }
+  return value is String ? DateTime.tryParse(value) : null;
 }
