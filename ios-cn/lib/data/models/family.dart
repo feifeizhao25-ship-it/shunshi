@@ -33,7 +33,7 @@ class FamilyMember {
   final String name;
   final FamilyRelation relation;
   final MemberStatus status;
-  final int age;
+  final int? age;
   final DateTime? lastActiveAt;
   final Map<String, dynamic>? healthData;
   final DateTime addedAt;

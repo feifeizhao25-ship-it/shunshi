@@ -1,205 +1,321 @@
-/// 家庭养生页 V3 — 接 API
-/// GET /api/v1/family/, POST /members, GET /status, POST /invite
-library;
-
-import 'package:dio/dio.dart';
-import '../../widgets/state_view.dart';
 import 'package:flutter/material.dart';
-import '../../../design_system/theme.dart';
+import '../../../data/services/family_api.dart';
+
+const _relations = {
+  'parent': '父母',
+  'father': '父亲',
+  'mother': '母亲',
+  'spouse': '配偶',
+  'child': '子女',
+  'grandparent': '祖父母',
+  'sibling': '兄弟姐妹',
+  'other': '其他',
+};
 
 class FamilyPageV2 extends StatefulWidget {
-  const FamilyPageV2({super.key});
-
+  const FamilyPageV2({super.key, this.api});
+  final FamilyApi? api;
   @override
   State<FamilyPageV2> createState() => _FamilyPageV2State();
 }
 
 class _FamilyPageV2State extends State<FamilyPageV2> {
-  static const _baseUrl = 'https://api.shunshi.app';
-  final _dio = Dio(BaseOptions(baseUrl: _baseUrl, connectTimeout: const Duration(seconds: 8)));
-  
-  String _familyName = '我的家庭';
-  List<Map<String, dynamic>> _members = [];
-  bool _loading = true;
-  String? _token;
-
+  late final FamilyApi _api = widget.api ?? FamilyApi();
+  Map<String, dynamic>? _family;
+  String? _error;
+  bool _loading = true, _saving = false;
+  int _generation = 0;
   @override
   void initState() {
     super.initState();
-    _init();
+    _load();
   }
 
-  Future<void> _init() async {
-    await _getToken();
-    await _fetchFamily();
+  @override
+  void dispose() {
+    if (widget.api == null) _api.dispose();
+    super.dispose();
   }
 
-  Future<void> _getToken() async {
+  Future<void> _load() async {
+    final generation = ++_generation;
+    setState(() {
+      _loading = true;
+      _error = null;
+      _family = null;
+    });
     try {
-      final res = await _dio.post('/api/v1/auth/guest-login', data: {});
-      _token = res.data['data']['token'];
-    } catch (_) {}
-  }
-
-  Map<String, dynamic> get _authHeaders => {'Authorization': 'Bearer $_token'};
-
-  Future<void> _fetchFamily() async {
-    if (_token == null) { setState(() => _loading = false); return; }
-    try {
-      final res = await _dio.get('/api/v1/family/', options: Options(headers: _authHeaders));
-      final data = res.data;
-      if (data is Map && data['data'] is Map) {
-        final d = data['data'] as Map<String, dynamic>;
-        _familyName = d['family_name']?.toString() ?? '我的家庭';
-        _members = (d['members'] as List?)?.cast<Map<String, dynamic>>() ?? [];
-      }
-    } catch (_) {}
-    setState(() => _loading = false);
-  }
-
-  Future<void> _addMember(String name, String relation) async {
-    if (_token == null) return;
-    try {
-      await _dio.post('/api/v1/family/members',
-        data: {'name': name, 'relationship': relation, 'age_group': 'adult'},
-        options: Options(headers: _authHeaders));
-      _fetchFamily();
+      final family = await _api.load();
+      if (!mounted || generation != _generation) return;
+      setState(() {
+        _family = family;
+        _loading = false;
+      });
     } catch (_) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('添加失败')));
+      if (!mounted || generation != _generation) return;
+      setState(() {
+        _loading = false;
+        _error = '家庭信息暂时无法读取，请确认已登录后重试';
+      });
     }
   }
 
-  Future<void> _removeMember(String memberId) async {
-    if (_token == null) return;
+  Future<void> _change(Future<void> Function() action) async {
+    if (_saving) return;
+    setState(() => _saving = true);
     try {
-      await _dio.delete('/api/v1/family/members/$memberId', options: Options(headers: _authHeaders));
-      _fetchFamily();
-    } catch (_) {}
+      await action();
+      if (!mounted) return;
+      await _load();
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('操作未完成，请检查登录状态、网络或家庭人数后重试')));
+      await _load();
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
   }
 
-  void _showAddMemberDialog() {
-    final nameCtrl = TextEditingController();
-    String relation = '父母';
-    final relations = ['父母', '配偶', '子女', '祖父母', '其他'];
-    
-    showDialog(context: context, builder: (ctx) => AlertDialog(
-      title: Text('添加家庭成员', style: TextStyle(fontWeight: FontWeight.w600)),
-      content: Column(mainAxisSize: MainAxisSize.min, children: [
-        TextField(controller: nameCtrl, decoration: InputDecoration(labelText: '姓名', border: OutlineInputBorder())),
-        const SizedBox(height: 12),
-        DropdownButtonFormField<String>(
-          initialValue: relation,
-          items: relations.map((r) => DropdownMenuItem(value: r, child: Text(r))).toList(),
-          onChanged: (v) => relation = v ?? '父母',
-          decoration: InputDecoration(labelText: '关系', border: OutlineInputBorder()),
-        ),
-      ]),
-      actions: [
-        TextButton(onPressed: () => Navigator.pop(ctx), child: Text('取消')),
-        ElevatedButton(
-          onPressed: () { Navigator.pop(ctx); _addMember(nameCtrl.text.trim(), relation); },
-          style: ElevatedButton.styleFrom(backgroundColor: ShunShiColors.primary),
-          child: Text('添加', style: TextStyle(color: Colors.white)),
-        ),
-      ],
-    ));
+  Future<void> _add() async {
+    final values = await showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (_) => const _AddMemberDialog(),
+    );
+    if (values != null && mounted) await _change(() => _api.add(values));
+  }
+
+  Future<void> _remove(Map member) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('移除家庭成员'),
+        content: Text('确定移除“${member['name']}”吗？'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('取消'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('确认移除'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true && mounted) {
+      await _change(() => _api.remove(member['id'] as String));
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_loading) return Scaffold(backgroundColor: ShunShiColors.background, body: const LoadingSkeleton());
-
+    final members = (_family?['members'] as List?) ?? [];
+    final enabled = !_loading && !_saving && _family != null;
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
-      body: RefreshIndicator(
-        color: ShunShiColors.primary,
-        onRefresh: _fetchFamily,
-        child: CustomScrollView(
-          physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-          slivers: [
-            // Header
-            SliverToBoxAdapter(child: SafeArea(child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
-              child: Row(children: [
-                Text('家庭养生', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 22, fontWeight: FontWeight.bold, color: ShunShiColors.textPrimary)),
-                const Spacer(),
-                IconButton(icon: Icon(Icons.person_add, color: ShunShiColors.primary), onPressed: _showAddMemberDialog),
-              ]),
-            ))),
-
-            // Family name card
-            SliverToBoxAdapter(child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
-              child: Container(
+      backgroundColor: const Color(0xFFF5F7F3),
+      appBar: AppBar(
+        title: const Text('家庭关怀'),
+        actions: [
+          IconButton(
+            tooltip: '刷新家庭信息',
+            onPressed: _loading || _saving ? null : _load,
+            icon: const Icon(Icons.refresh),
+          ),
+        ],
+      ),
+      body: _loading
+          ? const Center(child: CircularProgressIndicator())
+          : RefreshIndicator(
+              onRefresh: _saving ? () async {} : _load,
+              child: ListView(
                 padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(colors: [Color(0xFF144227), Color(0xFF2D7A4A)]),
-                  borderRadius: BorderRadius.circular(16)),
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Row(children: [
-                    Icon(Icons.home, color: Color(0xFFE4C285), size: 20),
-                    const SizedBox(width: 8),
-                    Text(_familyName, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.white)),
-                  ]),
-                  const SizedBox(height: 8),
-                  Text('${_members.length} 位家庭成员', style: TextStyle(fontSize: 13, color: Colors.white70)),
-                  const SizedBox(height: 4),
-                  Text('根据每人不同体质提供差异化养生方案', style: TextStyle(fontSize: 12, color: Colors.white54)),
-                ]),
+                physics: const AlwaysScrollableScrollPhysics(),
+                children: [
+                  if (_error != null) ...[
+                    const Icon(Icons.cloud_off, size: 44),
+                    const SizedBox(height: 16),
+                    Text(_error!, textAlign: TextAlign.center),
+                    TextButton(onPressed: _load, child: const Text('重新读取')),
+                  ] else ...[
+                    Container(
+                      padding: const EdgeInsets.all(22),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF205C44),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            _family?['family_name'] as String? ?? '我的家庭',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            '已记录 ${members.length} 位成员',
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                          const SizedBox(height: 6),
+                          const Text(
+                            '记录家人的基本信息，留意日常关怀。',
+                            style: TextStyle(color: Color(0xFFD6E6DB)),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    if (members.isEmpty)
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 24),
+                        child: Text(
+                          '还没有家庭成员，可以先添加一位家人。',
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    for (final member in members)
+                      Card(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Row(
+                            children: [
+                              const CircleAvatar(
+                                child: Icon(Icons.person_outline),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      (member['name'] as String).isEmpty
+                                          ? '未填写姓名'
+                                          : member['name'],
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      '${_relations[member['relation']] ?? '家人'} · ${member['age'] == null ? '年龄未填写' : '${member['age']} 岁'}',
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              IconButton(
+                                tooltip: '移除成员',
+                                onPressed: enabled
+                                    ? () => _remove(member)
+                                    : null,
+                                icon: const Icon(Icons.person_remove_outlined),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    const SizedBox(height: 12),
+                    FilledButton.icon(
+                      onPressed: enabled ? _add : null,
+                      icon: const Icon(Icons.person_add_outlined),
+                      label: Text(_saving ? '正在保存…' : '添加家庭成员'),
+                    ),
+                    const SizedBox(height: 14),
+                    const Text(
+                      '年龄可以暂不填写。家庭记录不等同于付费会员席位。',
+                      style: TextStyle(color: Color(0xFF617166)),
+                    ),
+                  ],
+                ],
               ),
-            )),
+            ),
+    );
+  }
+}
 
-            // Members list
-            if (_members.isEmpty) ...[
-              SliverToBoxAdapter(child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 40, 20, 0),
-                child: Column(children: [
-                  Icon(Icons.family_restroom, size: 48, color: ShunShiColors.textTertiary),
-                  const SizedBox(height: 12),
-                  Text('还没有家庭成员', style: TextStyle(fontSize: 16, color: ShunShiColors.textTertiary)),
-                  const SizedBox(height: 8),
-                  Text('添加家人，获取个性化养生方案', style: TextStyle(fontSize: 13, color: ShunShiColors.textTertiary)),
-                  const SizedBox(height: 16),
-                  ElevatedButton.icon(
-                    onPressed: _showAddMemberDialog,
-                    icon: Icon(Icons.add, size: 18),
-                    label: Text('添加家庭成员'),
-                    style: ElevatedButton.styleFrom(backgroundColor: ShunShiColors.primary, foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-                  ),
-                ]),
-              )),
-            ] else ...[
-              SliverToBoxAdapter(child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
-                child: Text('家庭成员', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
-              )),
-              SliverList(delegate: SliverChildBuilderDelegate((ctx, i) {
-                final m = _members[i];
-                return Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
-                  child: Container(
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(12)),
-                    child: Row(children: [
-                      CircleAvatar(radius: 20, backgroundColor: ShunShiColors.primary.withOpacity(0.1),
-                        child: Text(m['name']?.toString().substring(0, 1) ?? '?', style: TextStyle(color: ShunShiColors.primary, fontWeight: FontWeight.w600))),
-                      const SizedBox(width: 12),
-                      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Text(m['name']?.toString() ?? '', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: ShunShiColors.textPrimary)),
-                        Text(m['relationship']?.toString() ?? '', style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
-                      ])),
-                      IconButton(icon: Icon(Icons.delete_outline, size: 18, color: ShunShiColors.textTertiary),
-                        onPressed: () => _removeMember(m['id']?.toString() ?? '')),
-                    ]),
-                  ),
-                );
-              }, childCount: _members.length)),
-            ],
+class _AddMemberDialog extends StatefulWidget {
+  const _AddMemberDialog();
+  @override
+  State<_AddMemberDialog> createState() => _AddMemberDialogState();
+}
 
-            const SliverPadding(padding: EdgeInsets.only(bottom: 40)),
+class _AddMemberDialogState extends State<_AddMemberDialog> {
+  final _form = GlobalKey<FormState>();
+  final _name = TextEditingController(), _age = TextEditingController();
+  String _relation = 'parent';
+  @override
+  void dispose() {
+    _name.dispose();
+    _age.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => AlertDialog(
+    title: const Text('添加家庭成员'),
+    content: SingleChildScrollView(
+      child: Form(
+        key: _form,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextFormField(
+              controller: _name,
+              maxLength: 80,
+              decoration: const InputDecoration(labelText: '姓名'),
+              validator: (v) => v == null || v.trim().isEmpty ? '请填写姓名' : null,
+            ),
+            DropdownButtonFormField<String>(
+              initialValue: _relation,
+              decoration: const InputDecoration(labelText: '关系'),
+              items: _relations.entries
+                  .map(
+                    (e) => DropdownMenuItem(value: e.key, child: Text(e.value)),
+                  )
+                  .toList(),
+              onChanged: (v) => _relation = v ?? 'parent',
+            ),
+            TextFormField(
+              controller: _age,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(labelText: '年龄（选填）'),
+              validator: (v) {
+                if (v == null || v.trim().isEmpty) return null;
+                final age = int.tryParse(v.trim());
+                return age == null || age < 0 || age > 120
+                    ? '请输入 0 至 120 的整数'
+                    : null;
+              },
+            ),
           ],
         ),
       ),
-    );
-  }
+    ),
+    actions: [
+      TextButton(
+        onPressed: () => Navigator.pop(context),
+        child: const Text('取消'),
+      ),
+      FilledButton(
+        onPressed: () {
+          if (_form.currentState!.validate()) {
+            Navigator.pop(context, <String, dynamic>{
+              'name': _name.text.trim(),
+              'relation': _relation,
+              'age': _age.text.trim().isEmpty
+                  ? null
+                  : int.parse(_age.text.trim()),
+            });
+          }
+        },
+        child: const Text('保存'),
+      ),
+    ],
+  );
 }

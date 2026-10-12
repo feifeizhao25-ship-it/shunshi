@@ -1,6 +1,6 @@
 # 家庭系统 API 路由
 from fastapi import APIRouter, HTTPException, Depends, Query
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, field_validator
 from typing import List, Literal, Optional
 from datetime import datetime, timedelta
 import secrets
@@ -25,7 +25,7 @@ class FamilyMember(BaseModel):
     id: str
     name: str
     relation: str
-    age: int
+    age: Optional[int] = None
     status: str = "normal"
     last_active_at: Optional[str] = None
     health_data: Optional[dict] = None
@@ -38,9 +38,14 @@ class FamilyInfo(BaseModel):
     invite_expires_at: Optional[str] = None
 
 class AddMemberRequest(BaseModel):
-    name: str
-    relation: str
-    age: int
+    name: str = Field(min_length=1, max_length=80)
+    relation: str = Field(min_length=1, max_length=30)
+    age: Optional[int] = Field(default=None, ge=0, le=120, strict=True)
+
+    @field_validator("name", "relation", mode="before")
+    @classmethod
+    def trim_text(cls, value):
+        return value.strip() if isinstance(value, str) else value
 
 class GenerateInviteRequest(BaseModel):
     relation: str
@@ -91,7 +96,7 @@ async def get_family(user_id: str = "user-001"):
             "id": d["id"],
             "name": d["member_name"],
             "relation": d["relation"],
-            "age": d["age"] or 0,
+            "age": d["age"],
             "status": d["status"],
             "last_active_at": d.get("last_active_at"),
             "health_data": d["health_data"]
@@ -315,7 +320,7 @@ async def get_family_members(user_id: str = "user-001"):
             "id": d["id"],
             "name": d["member_name"],
             "relation": d["relation"],
-            "age": d["age"] or 0,
+            "age": d["age"],
             "status": d["status"],
             "last_active_at": d.get("last_active_at"),
             "trend": _get_member_trend(d["status"]),
