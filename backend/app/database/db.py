@@ -401,6 +401,14 @@ CREATE TABLE IF NOT EXISTS purchase_history (
     subscribed_at TEXT DEFAULT (datetime('now'))
 );
 
+CREATE TABLE IF NOT EXISTS family_settings (
+    user_id TEXT PRIMARY KEY,
+    show_trend_only INTEGER NOT NULL DEFAULT 1 CHECK (show_trend_only = 1),
+    reminder_enabled INTEGER NOT NULL DEFAULT 1 CHECK (reminder_enabled IN (0, 1)),
+    reminder_frequency TEXT NOT NULL DEFAULT 'daily' CHECK (reminder_frequency IN ('daily', 'weekly', 'manual')),
+    updated_at TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS notification_settings (
     user_id TEXT PRIMARY KEY,
     enabled INTEGER DEFAULT 1,

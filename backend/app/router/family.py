@@ -338,101 +338,120 @@ class ReminderRequest(BaseModel):
 async def send_care_reminder(request: ReminderRequest, user_id: str = "user-001"):
     """发送关怀提醒"""
     db = get_db()
-    
-    # 验证目标成员存在且属于同一家庭
-    target = db.execute(
-        "SELECT * FROM family_relations WHERE id = ? AND user_id = ?",
-        (request.target_member_id, user_id)
-    ).fetchone()
-    
-    if not target:
-        raise HTTPException(status_code=404, detail="成员不存在")
 
-    if not db.execute("SELECT id FROM users WHERE id = ?", (user_id,)).fetchone():
-        raise HTTPException(status_code=404, detail="用户不存在")
-    
-    now = datetime.now().isoformat()
-    
-    # 记录关怀提醒到notifications表
-    notif_id = f"care_{now.replace(':', '').replace('.', '').replace('-', '')}"
-    
-    messages = {
-        "health_reminder": f"来自家庭的健康提醒：请关注{target['member_name']}的健康状况。",
-        "care": f"来自家庭的关怀：向{target['member_name']}发送了一份关怀提醒。",
-        "medication": f"来自家庭的提醒：请提醒{target['member_name']}按时服药。",
-    }
-    
-    body = request.message or messages.get(request.type, f"向{target['member_name']}发送了关怀提醒。")
-    
-    db.execute("""
-        INSERT INTO notifications (id, user_id, type, title, body, data, sent_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-    """, (
-        notif_id,
-        user_id,
-        request.type,
-        "家庭关怀",
-        body,
-        json.dumps({"source": "family", "target_member": target["member_name"]}, ensure_ascii=False),
-        now,
-    ))
-    db.commit()
-    
-    return {
-        "success": True,
-        "notification_id": notif_id,
-        "message": f"已向{target['member_name']}发送{request.type}",
-    }
+    try:
+        # Serialize the preference check with both settings changes and the insert.
+        db.execute("BEGIN IMMEDIATE")
+        # 验证目标成员存在且属于同一家庭
+        target = db.execute(
+            "SELECT * FROM family_relations WHERE id = ? AND user_id = ?",
+            (request.target_member_id, user_id)
+        ).fetchone()
+
+        if not target:
+            raise HTTPException(status_code=404, detail="成员不存在")
+
+        if not db.execute("SELECT id FROM users WHERE id = ?", (user_id,)).fetchone():
+            raise HTTPException(status_code=404, detail="用户不存在")
+
+        if not _read_family_settings(db, user_id).reminder_enabled:
+            raise HTTPException(status_code=409, detail="家庭关怀提醒已关闭，请先在家庭设置中开启")
+
+        now = datetime.now().isoformat()
+
+        # 记录关怀提醒到notifications表
+        notif_id = f"care_{now.replace(':', '').replace('.', '').replace('-', '')}"
+
+        messages = {
+            "health_reminder": f"关怀提醒：请关注{target['member_name']}的健康状况。",
+            "care": f"关怀提醒：记得关心{target['member_name']}。",
+            "medication": f"关怀提醒：请提醒{target['member_name']}按时服药。",
+        }
+
+        body = request.message or messages.get(request.type, f"向{target['member_name']}发送了关怀提醒。")
+
+        db.execute("""
+            INSERT INTO notifications (id, user_id, type, title, body, data, sent_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, (
+            notif_id,
+            user_id,
+            request.type,
+            "家庭关怀",
+            body,
+            json.dumps({"source": "family", "target_member": target["member_name"]}, ensure_ascii=False),
+            now,
+        ))
+        db.commit()
+
+        return {
+            "success": True,
+            "notification_id": notif_id,
+            "delivery": "self_inbox",
+            "message": "已保存到自己的通知列表",
+        }
+    except Exception:
+        db.rollback()
+        raise
+    finally:
+        close_test_connection(db)
+
 
 
 class FamilySettings(BaseModel):
-    show_trend_only: bool = True  # 只显示趋势，不显示隐私数据
-    reminder_enabled: bool = True  # 启用关怀提醒
-    reminder_frequency: str = "daily"  # daily / weekly / manual
+    # Detailed health sharing has no consent workflow; do not pretend to enable it.
+    show_trend_only: Literal[True] = True
+    reminder_enabled: bool = True
+    reminder_frequency: Literal["daily", "weekly", "manual"] = "daily"
+
+
+def _read_family_settings(db, user_id: str) -> FamilySettings:
+    row = db.execute(
+        "SELECT show_trend_only, reminder_enabled, reminder_frequency FROM family_settings WHERE user_id = ?",
+        (user_id,),
+    ).fetchone()
+    return FamilySettings(**dict(row)) if row else FamilySettings()
+
 
 @router.get("/settings")
 async def get_family_settings(user_id: str = "user-001"):
-    """获取家庭设置"""
-    # Settings stored in user_settings as JSON metadata
+    """读取当前账号的家庭设置。"""
     db = get_db()
     try:
-        row = db.execute("SELECT * FROM user_settings WHERE user_id = ?", (user_id,)).fetchone()
-        if row:
-            import json
-            d = dict(row)
-            # Check for family settings in metadata (if any)
-            return {
-                "success": True,
-                "data": {
-                    "show_trend_only": True,
-                    "reminder_enabled": True,
-                    "reminder_frequency": "daily",
-                }
-            }
-    except Exception:
-        pass
-    
-    return {
-        "success": True,
-        "data": {
-            "show_trend_only": True,
-            "reminder_enabled": True,
-            "reminder_frequency": "daily",
-        }
-    }
+        return {"success": True, "data": _read_family_settings(db, user_id).model_dump(),
+                "reminder_schedule_active": False}
+    finally:
+        close_test_connection(db)
+
 
 @router.put("/settings")
 async def update_family_settings(settings: FamilySettings, user_id: str = "user-001"):
-    """更新家庭设置（隐私控制）"""
-    # In a real implementation, save to user_settings or a family_settings table
-    return {
-        "success": True,
-        "data": {
-            "show_trend_only": settings.show_trend_only,
-            "reminder_enabled": settings.reminder_enabled,
-            "reminder_frequency": settings.reminder_frequency,
-        }
-    }
+    """持久化设置；只更新本次明确提交的字段。"""
+    db = get_db()
+    try:
+        db.execute("BEGIN IMMEDIATE")
+        values = _read_family_settings(db, user_id).model_dump()
+        values.update(settings.model_dump(exclude_unset=True))
+        db.execute(
+            """INSERT INTO family_settings
+            (user_id, show_trend_only, reminder_enabled, reminder_frequency, updated_at)
+            VALUES (?, ?, ?, ?, ?)
+            ON CONFLICT(user_id) DO UPDATE SET
+                show_trend_only=excluded.show_trend_only,
+                reminder_enabled=excluded.reminder_enabled,
+                reminder_frequency=excluded.reminder_frequency,
+                updated_at=excluded.updated_at""",
+            (user_id, int(values["show_trend_only"]), int(values["reminder_enabled"]),
+             values["reminder_frequency"], datetime.now().isoformat()),
+        )
+        db.commit()
+        return {"success": True, "data": values, "reminder_schedule_active": False,
+                "message": "设置已保存；自动定时提醒尚未启用"}
+    except Exception:
+        db.rollback()
+        raise
+    finally:
+        close_test_connection(db)
 
 
 def _get_member_trend(status: str) -> str:
