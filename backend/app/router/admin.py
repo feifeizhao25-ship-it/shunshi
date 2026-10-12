@@ -178,3 +178,42 @@ async def get_subscription_stats(
         stats["total_revenue"] = 0
 
     return {"success": True, "data": stats}
+
+
+@router.get("/families", response_model=dict)
+async def list_family_records(
+    page: int = Query(1, ge=1),
+    page_size: int = Query(20, ge=1, le=100),
+):
+    """管理员家庭记录汇总；认证由统一 product_access_guard 执行。
+
+    关系记录不是已注册成员或付费席位，不返回健康资料和邀请凭证。
+    """
+    from app.database.db import get_db as get_records, close_test_connection
+
+    records = get_records()
+    try:
+        records.execute("BEGIN")
+        total = records.execute(
+            "SELECT COUNT(DISTINCT family_id) FROM family_relations"
+        ).fetchone()[0]
+        rows = records.execute(
+            """SELECT family_id AS id, MIN(family_name) AS name,
+                      COUNT(*) AS record_count,
+                      COUNT(DISTINCT user_id) AS account_count,
+                      MAX(updated_at) AS updated_at
+               FROM family_relations GROUP BY family_id
+               ORDER BY MAX(updated_at) DESC, family_id ASC
+               LIMIT ? OFFSET ?""",
+            (page_size, (page - 1) * page_size),
+        ).fetchall()
+        records.commit()
+        return {
+            "success": True, "data": [dict(row) for row in rows],
+            "total": total, "page": page, "page_size": page_size,
+        }
+    except Exception:
+        records.rollback()
+        raise
+    finally:
+        close_test_connection(records)

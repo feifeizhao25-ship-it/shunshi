@@ -22,7 +22,9 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
   );
 
   useEffect(() => {
-    if (!isLogin && !loggedIn) {
+    // Hydration starts with the server's signed-out snapshot. Check the
+    // browser token before redirecting a returning authenticated user.
+    if (!isLogin && !isLoggedIn()) {
       router.replace('/login');
     }
   }, [isLogin, loggedIn, router]);
