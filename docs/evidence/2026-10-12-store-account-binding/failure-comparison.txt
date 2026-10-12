@@ -1,0 +1,3 @@
+387 failed, 3432 passed, 17 skipped, 58 warnings in 186.05s (0:03:06)
+New failures: 0
+Resolved failures: 0

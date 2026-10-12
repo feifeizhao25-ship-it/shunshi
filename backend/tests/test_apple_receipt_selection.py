@@ -41,3 +41,12 @@ async def test_original_identifier_selects_latest_platform_transaction(monkeypat
 @pytest.mark.parametrize('records', [[], [txn('new', 200, cancellation_date_ms='150')], [txn('new', 200, expires_date_ms=None)]])
 async def test_missing_or_revoked_receipt_is_not_valid(monkeypatch, records):
     assert (await verify(monkeypatch, records))['valid'] is False
+
+
+@pytest.mark.asyncio
+async def test_account_token_comes_from_selected_verified_transaction(monkeypatch):
+    result = await verify(monkeypatch, [txn('old', 100, app_account_token='old-account'),
+                                       txn('new', 200, app_account_token='new-account')])
+    assert result['app_account_token'] == 'new-account'
+    legacy = await verify(monkeypatch, [txn('legacy', 200)])
+    assert legacy['app_account_token'] is None

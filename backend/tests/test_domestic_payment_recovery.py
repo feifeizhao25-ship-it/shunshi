@@ -126,7 +126,7 @@ def test_domestic_projection_serializes_with_store_restore(client, auth_headers,
     from datetime import timedelta, timezone
     from threading import Event, local
     from sqlalchemy import event, select, func
-    from app.services.store_restore import persist_restore
+    from app.services.store_restore import persist_restore, ios_account_token
     from app.simple_models import StorePurchase, StorePurchaseOwner
 
     order, args = order_for(client, auth_headers)
@@ -164,7 +164,8 @@ def test_domestic_projection_serializes_with_store_restore(client, auth_headers,
                     transaction_id='concurrent-store', chain_id='concurrent-chain',
                     product_id='com.shunshi.yiyang.yearly', plan='yiyang',
                     expires_at=datetime.now(timezone.utc) + timedelta(days=365),
-                    auto_renew=False, receipt_hash='fixture-hash')
+                    auto_renew=False, receipt_hash='fixture-hash',
+                    verified_account_token=ios_account_token(order['user_id']))
             return 200
         except HTTPException as exc:
             return exc.status_code

@@ -3,7 +3,7 @@
 支持 Production + Sandbox 自动回退
 
 生产环境: 需配置 APPLE_SHARED_SECRET 环境变量
-开发环境: 自动 mock 有效订阅
+测试环境: 仅显式测试前缀可使用 mock；不授予缺少到期时间的权益
 """
 import hashlib
 import logging
@@ -193,6 +193,7 @@ async def _verify_with_apple(
             "product_id": product_id,
             "transaction_id": txn_id,
             "original_transaction_id": transaction_info.get("original_transaction_id") or txn_id,
+            "app_account_token": transaction_info.get("app_account_token"),
             "bundle_id": bundle_id,
             "environment": data.get("environment", "unknown"),
             "is_trial": is_trial,

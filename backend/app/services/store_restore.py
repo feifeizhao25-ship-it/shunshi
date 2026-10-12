@@ -1,6 +1,7 @@
 """Commit verified store ownership and entitlement together; never store receipts."""
 import hashlib
 import time
+from uuid import UUID, NAMESPACE_URL, uuid5
 from datetime import datetime, timezone
 
 from fastapi import HTTPException
@@ -10,12 +11,17 @@ from sqlalchemy.exc import IntegrityError
 from app.simple_models import Entitlement, StorePurchase, StorePurchaseOwner, User
 
 
+def ios_account_token(user_id: str) -> str:
+    # Stable pseudonymous UUID. Changing this namespace would orphan existing purchases.
+    return str(uuid5(NAMESPACE_URL, f'https://api.shunshi.app/store-account/ios/{user_id}'))
+
+
 def _key(store, identifier):
     return hashlib.sha256(f'{store}:{identifier}'.encode()).hexdigest()
 
 
 def persist_restore(session, *, user_id, store, transaction_id, chain_id,
-                    product_id, plan, expires_at, auto_renew, receipt_hash):
+                    product_id, plan, expires_at, auto_renew, receipt_hash, verified_account_token=None):
     transaction_key = _key(store, transaction_id)
     chain_key = _key(store, chain_id)
     expiry = int(expires_at.timestamp())
@@ -27,6 +33,17 @@ def persist_restore(session, *, user_id, store, transaction_id, chain_id,
         owner = session.get(StorePurchaseOwner, chain_key)
         if owner and owner.user_id != user_id:
             raise HTTPException(409, '此购买凭证已关联其他账号')
+        if store == 'ios':
+            if verified_account_token is not None:
+                try:
+                    matches = str(UUID(verified_account_token)) == ios_account_token(user_id)
+                except (ValueError, TypeError, AttributeError):
+                    matches = False
+                if not matches:
+                    raise HTTPException(409, '平台交易关联的账号不匹配，请使用购买时的账号')
+            elif owner is None:
+                # Legacy receipts can restore only an already established owner.
+                raise HTTPException(409, '购买凭证缺少账号关联信息，请联系支持核对购买归属')
         purchase = session.get(StorePurchase, transaction_key)
         if purchase and (purchase.user_id != user_id or purchase.chain_key != chain_key or purchase.product_id != product_id):
             raise HTTPException(409, '平台交易归属或商品冲突')

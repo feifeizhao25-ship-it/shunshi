@@ -1,4 +1,8 @@
 import 'store_connection.dart';
+import 'account_bound_purchase.dart';
+import 'apple_verification_receipt.dart';
+import 'package:in_app_purchase_storekit/in_app_purchase_storekit.dart';
+import 'package:in_app_purchase_storekit/store_kit_wrappers.dart';
 import 'restore_attempt.dart';
 import 'purchase_update_processor.dart';
 import 'dart:io';
@@ -99,10 +103,13 @@ class StoreService {
       final planId = _productToPlan[purchaseDetails.productID];
       if (planId == null) return false;
 
+      final receipt = await _receiptFor(purchaseDetails);
+      if (!_isCurrentToken(token)) return false;
       return await _verifyReceipt(
+        transactionId: purchaseDetails.purchaseID,
         token: token!,
         platform: Platform.isIOS ? 'ios' : 'android',
-        receiptData: purchaseDetails.verificationData.serverVerificationData,
+        receiptData: receipt,
         productId: purchaseDetails.productID,
         planId: planId,
       );
@@ -124,10 +131,11 @@ class StoreService {
       }
 
       final platform = Platform.isIOS ? 'ios' : 'android';
-      final receiptData =
-          purchaseDetails.verificationData.serverVerificationData;
+      final receiptData = await _receiptFor(purchaseDetails);
+      if (!_isCurrentToken(token)) return false;
 
       final result = await _restoreToServer(
+        transactionId: purchaseDetails.purchaseID,
         token: token!,
         platform: platform,
         receiptData: receiptData,
@@ -144,9 +152,17 @@ class StoreService {
     }
   }
 
+  Future<String> _receiptFor(PurchaseDetails purchase) =>
+      appleVerificationReceipt(
+        storeKit2: Platform.isIOS && purchase is SK2PurchaseDetails,
+        eventData: purchase.verificationData.serverVerificationData,
+        readAppReceipt: SKReceiptManager.retrieveReceiptData,
+      );
+
   // ==================== 收据验证 ====================
 
   Future<bool> _verifyReceipt({
+    required String? transactionId,
     required String token,
     required String platform,
     required String receiptData,
@@ -176,6 +192,7 @@ class StoreService {
         data: {
           'platform': platform,
           'receipt_data': receiptData,
+          'transaction_id': transactionId,
           'product_id': productId,
           'plan': planId,
         },
@@ -190,6 +207,7 @@ class StoreService {
 
   /// 发送恢复购买请求到后端
   Future<RestoreResult> _restoreToServer({
+    required String? transactionId,
     required String token,
     required String platform,
     required String receiptData,
@@ -220,6 +238,7 @@ class StoreService {
         body = {
           'platform': 'ios',
           'receipt': receiptData,
+          'transaction_id': transactionId,
           'product_id': productId,
         };
       } else {
@@ -327,13 +346,47 @@ class StoreService {
     final details = _products.where((p) => p.id == storeProductId).firstOrNull;
     if (details == null) return false;
 
-    final purchaseParam = PurchaseParam(productDetails: details);
-
+    if (Platform.isIOS) {
+      return launchAccountBoundPurchase(
+        readToken: StorageManager.user.getToken,
+        loadAccountToken: (token) async {
+          final dio = Dio(
+            BaseOptions(
+              baseUrl: ApiClient.baseUrl,
+              connectTimeout: const Duration(seconds: 10),
+              receiveTimeout: const Duration(seconds: 15),
+              headers: {'Authorization': 'Bearer $token'},
+            ),
+          );
+          try {
+            final response = await dio.get(
+              '/api/v1/subscription/store-account',
+            );
+            final body = response.data;
+            if (body is! Map ||
+                body['success'] != true ||
+                body['data'] is! Map) {
+              return null;
+            }
+            final value = body['data']['app_account_token'];
+            return value is String ? value : null;
+          } finally {
+            dio.close();
+          }
+        },
+        buy: (accountToken) => _iap.buyNonConsumable(
+          purchaseParam: PurchaseParam(
+            productDetails: details,
+            applicationUserName: accountToken,
+          ),
+        ),
+      );
+    }
     try {
-      if (Platform.isIOS) {
-        return await _iap.buyNonConsumable(purchaseParam: purchaseParam);
-      } else if (Platform.isAndroid) {
-        return await _iap.buyNonConsumable(purchaseParam: purchaseParam);
+      if (Platform.isAndroid) {
+        return await _iap.buyNonConsumable(
+          purchaseParam: PurchaseParam(productDetails: details),
+        );
       }
       return false;
     } catch (e) {

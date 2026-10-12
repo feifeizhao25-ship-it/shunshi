@@ -18,6 +18,8 @@ def result(platform, expiry):
 
 
 def restore(client, headers, monkeypatch, platform, verified):
+    if platform == 'ios':
+        verified['app_account_token'] = client.get('/api/v1/subscription/store-account', headers=headers).json()['data']['app_account_token']
     target = 'app.services.apple_receipt.verify_apple_receipt' if platform == 'ios' else 'app.services.google_purchase.verify_google_purchase'
     monkeypatch.setattr(target, AsyncMock(return_value=verified))
     return client.post('/api/v1/subscription/restore', headers=headers, json={

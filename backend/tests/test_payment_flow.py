@@ -17,6 +17,7 @@
 """
 
 from app.router import subscription as live_subscription
+from app.services.store_restore import ios_account_token
 import os
 import sys
 import re
@@ -699,6 +700,7 @@ class TestRestorePurchaseFlow:
         monkeypatch.setattr("app.services.apple_receipt.verify_apple_receipt", AsyncMock(return_value={
             "valid": True, "product_id": "com.shunshi.yiyang.yearly",
             "transaction_id": "verified-flow", "expires_at_ms": expiry,
+            "app_account_token": ios_account_token("user-restore-001"),
         }))
         resp = await client.post(f"{API_BASE}/restore", json={"platform": "ios", "receipt": "fixture"}, params={"user_id": "user-restore-001"})
         assert resp.status_code == 200
@@ -730,6 +732,7 @@ class TestRestorePurchaseFlow:
         monkeypatch.setattr("app.services.apple_receipt.verify_apple_receipt", AsyncMock(return_value={
             "valid": True, "product_id": "com.shunshi.yiyang.yearly",
             "transaction_id": "idempotent-flow", "expires_at_ms": expiry,
+            "app_account_token": ios_account_token("user-restore-idem"),
         }))
         args = {"json": {"platform": "ios", "receipt": "fixture"}, "params": {"user_id": "user-restore-idem"}}
         first = await client.post(f"{API_BASE}/restore", **args)

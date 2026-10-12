@@ -17,6 +17,7 @@
 
 import pytest
 from app.security import verify_token
+from app.services.store_restore import ios_account_token
 import asyncio
 from unittest.mock import AsyncMock, patch, MagicMock
 from datetime import datetime, timedelta
@@ -47,6 +48,7 @@ class TestIOSRestorePurchase:
             "expires_at_ms": int((time.time() + 86400) * 1000),
             "product_id": "com.shunshi.yiyang.yearly",
             "transaction_id": "IOS_TXN_RESTORE_001",
+            "app_account_token": ios_account_token(actor),
             "bundle_id": "com.shunshi.app",
             "environment": "Production",
             "is_trial": False,
@@ -296,6 +298,7 @@ class TestRestoreEdgeCases:
             "valid": True,
             "product_id": "com.shunshi.yiyang.yearly",
             "transaction_id": "TXN_IDEMPOTENT",
+            "app_account_token": ios_account_token(actor),
             "expires_at_ms": int((time.time() + 86400) * 1000),
             "auto_renew": True,
             "error": None,
@@ -349,6 +352,7 @@ class TestRestoreEdgeCases:
             "valid": True,
             "product_id": "com.shunshi.yiyang.yearly",
             "transaction_id": "TXN_HASH_TEST",
+            "app_account_token": ios_account_token(actor),
             "expires_at_ms": int((time.time() + 86400) * 1000),
             "auto_renew": True,
             "error": None,

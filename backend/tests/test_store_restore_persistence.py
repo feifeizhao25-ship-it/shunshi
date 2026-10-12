@@ -11,10 +11,11 @@ from app.simple_models import Entitlement, StorePurchase, StorePurchaseOwner
 from app.security import verify_token
 
 
-def setup_verifier(monkeypatch, tx='transaction-1', chain='chain-1', expiry=None):
+def setup_verifier(monkeypatch, client, auth_headers, tx='transaction-1', chain='chain-1', expiry=None):
     result = {'valid': True, 'product_id': 'com.shunshi.yiyang.yearly',
               'transaction_id': tx, 'original_transaction_id': chain,
-              'expires_at_ms': expiry or int((time.time()+86400)*1000)}
+              'expires_at_ms': expiry or int((time.time()+86400)*1000),
+              'app_account_token': client.get('/api/v1/subscription/store-account', headers=auth_headers).json()['data']['app_account_token']}
     monkeypatch.setattr('app.services.apple_receipt.verify_apple_receipt', AsyncMock(return_value=result))
     return result
 
@@ -29,7 +30,7 @@ def other_account(client):
 
 
 def test_restart_keeps_entitlements_and_history(client, auth_headers, settings, monkeypatch):
-    setup_verifier(monkeypatch)
+    setup_verifier(monkeypatch, client, auth_headers)
     assert restore(client, auth_headers).status_code == 200
     subscription.subscriptions.clear()
     subscription.purchase_history.clear()
@@ -46,10 +47,10 @@ def test_restart_keeps_entitlements_and_history(client, auth_headers, settings, 
 
 
 def test_receipt_chain_cannot_move_to_another_account(client, auth_headers, monkeypatch):
-    setup_verifier(monkeypatch)
+    setup_verifier(monkeypatch, client, auth_headers)
     assert restore(client, auth_headers).status_code == 200
     other = other_account(client)
-    setup_verifier(monkeypatch, tx='renewal-2')
+    setup_verifier(monkeypatch, client, auth_headers, tx='renewal-2')
     assert restore(client, other).status_code == 409
     with client.app.state.session_factory() as session:
         assert session.scalar(select(func.count()).select_from(StorePurchase)) == 1
@@ -57,9 +58,9 @@ def test_receipt_chain_cannot_move_to_another_account(client, auth_headers, monk
 
 
 def test_same_transaction_cannot_be_reassigned_under_another_chain(client, auth_headers, monkeypatch):
-    setup_verifier(monkeypatch)
+    setup_verifier(monkeypatch, client, auth_headers)
     assert restore(client, auth_headers).status_code == 200
-    setup_verifier(monkeypatch, chain='forged-chain')
+    setup_verifier(monkeypatch, client, auth_headers, chain='forged-chain')
     assert restore(client, other_account(client)).status_code == 409
     with client.app.state.session_factory() as session:
         assert session.scalar(select(func.count()).select_from(StorePurchaseOwner)) == 1
@@ -67,9 +68,9 @@ def test_same_transaction_cannot_be_reassigned_under_another_chain(client, auth_
 
 def test_old_receipt_does_not_shorten_membership(client, auth_headers, monkeypatch):
     expiry = int((time.time()+10*86400)*1000)
-    setup_verifier(monkeypatch, expiry=expiry)
+    setup_verifier(monkeypatch, client, auth_headers, expiry=expiry)
     assert restore(client, auth_headers).status_code == 200
-    setup_verifier(monkeypatch, tx='older-tx', expiry=expiry-86400000)
+    setup_verifier(monkeypatch, client, auth_headers, tx='older-tx', expiry=expiry-86400000)
     assert restore(client, auth_headers).status_code == 409
     with client.app.state.session_factory() as session:
         assert session.scalar(select(Entitlement)).expires_at == expiry // 1000
@@ -81,7 +82,7 @@ def test_existing_domestic_entitlement_is_not_overwritten(client, auth_headers, 
     with client.app.state.session_factory() as session:
         session.add(Entitlement(user_id=actor, product_id='yiyang_yearly', store='alipay', expires_at=int(time.time()+86400), original_transaction_id='alipay-verified'))
         session.commit()
-    setup_verifier(monkeypatch)
+    setup_verifier(monkeypatch, client, auth_headers)
     assert restore(client, auth_headers).status_code == 409
     with client.app.state.session_factory() as session:
         assert session.get(Entitlement, actor).store == 'alipay'
@@ -89,7 +90,7 @@ def test_existing_domestic_entitlement_is_not_overwritten(client, auth_headers, 
 
 
 def test_account_deletion_retains_ownership_and_reports_it(client, auth_headers, monkeypatch):
-    setup_verifier(monkeypatch)
+    setup_verifier(monkeypatch, client, auth_headers)
     assert restore(client, auth_headers).status_code == 200
     exported = client.get('/api/v1/auth/data/export', headers=auth_headers)
     assert len(exported.json()['store_purchases']) == 1
@@ -100,7 +101,7 @@ def test_account_deletion_retains_ownership_and_reports_it(client, auth_headers,
 
 
 def test_restore_alias_uses_same_persistent_transaction(client, auth_headers, monkeypatch):
-    setup_verifier(monkeypatch)
+    setup_verifier(monkeypatch, client, auth_headers)
     assert restore(client, auth_headers, '/restore-purchase').json()['code'] == 'restored'
     response = client.post('/api/v1/subscription/verify-receipt-v2', headers=auth_headers, json={'platform': 'ios', 'receipt_data': 'private-receipt'})
     assert response.status_code == 200, response.text
@@ -108,7 +109,7 @@ def test_restore_alias_uses_same_persistent_transaction(client, auth_headers, mo
 
 
 def test_failed_commit_leaves_no_ownership_or_entitlement(client, auth_headers, settings, monkeypatch):
-    from app.services.store_restore import persist_restore
+    from app.services.store_restore import persist_restore, ios_account_token
     actor = verify_token(settings, auth_headers['Authorization'].removeprefix('Bearer '))
     with client.app.state.session_factory() as session:
         def fail():
@@ -117,7 +118,7 @@ def test_failed_commit_leaves_no_ownership_or_entitlement(client, auth_headers, 
         monkeypatch.setattr(session, 'commit', fail)
         import pytest
         with pytest.raises(RuntimeError):
-            persist_restore(session, user_id=actor, store='ios', transaction_id='fail-tx', chain_id='fail-chain', product_id='com.shunshi.yiyang.yearly', plan='yiyang', expires_at=datetime.now(timezone.utc)+timedelta(days=1), auto_renew=False, receipt_hash=None)
+            persist_restore(session, user_id=actor, store='ios', transaction_id='fail-tx', chain_id='fail-chain', product_id='com.shunshi.yiyang.yearly', plan='yiyang', expires_at=datetime.now(timezone.utc)+timedelta(days=1), auto_renew=False, receipt_hash=None, verified_account_token=ios_account_token(actor))
     with client.app.state.session_factory() as session:
         for model in (StorePurchase, StorePurchaseOwner, Entitlement):
             assert session.scalar(select(func.count()).select_from(model)) == 0

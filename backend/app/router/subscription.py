@@ -407,6 +407,7 @@ class RestorePurchaseRequest(BaseModel):
 class ReceiptVerifyBody(BaseModel):
     platform: str = "ios"
     receipt_data: str = ""
+    transaction_id: Optional[str] = None
     product_id: Optional[str] = None
     plan: Optional[str] = None
     user_id: Optional[str] = "user-001"
@@ -1447,6 +1448,13 @@ def _product_id_to_plan(product_id: str) -> Optional[str]:
     return None
 
 
+@router.get("/store-account", response_model=dict)
+async def store_account(user_id: str = Depends(current_user)):
+    """Return the authenticated account's opaque iOS purchase association UUID."""
+    from app.services.store_restore import ios_account_token
+    return {"success": True, "data": {"app_account_token": ios_account_token(user_id)}}
+
+
 # ---- 恢复购买 ----
 
 @router.post("/restore", response_model=dict)
@@ -1573,7 +1581,8 @@ async def restore_purchase(
     chain_id = (verify_result.get("original_transaction_id") or txn_id) if request.platform == "ios" else request.purchase_token
     already_restored = persist_restore(session, user_id=effective_user_id, store=request.platform,
         transaction_id=txn_id, chain_id=chain_id, product_id=product_id, plan=plan_id,
-        expires_at=expiry, auto_renew=auto_renew, receipt_hash=receipt_hash)
+        expires_at=expiry, auto_renew=auto_renew, receipt_hash=receipt_hash,
+        verified_account_token=verify_result.get("app_account_token") if request.platform == "ios" else None)
 
     subscriptions[effective_user_id] = {
         "plan": plan_id,
@@ -1897,6 +1906,7 @@ async def verify_receipt_v2(
         receipt=request.receipt_data if request.platform == "ios" else None,
         purchase_token=request.receipt_data if request.platform == "android" else None,
         product_id=request.product_id,
+        transaction_id=request.transaction_id,
         user_id=user_id,
     )
     return await restore_purchase(restore_request, user_id=user_id, session=session)
