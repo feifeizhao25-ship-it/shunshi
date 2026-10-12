@@ -8,7 +8,7 @@ import string
 import json
 from sqlalchemy import text
 
-from app.database.db import get_db
+from app.database.db import get_db, close_test_connection
 
 router = APIRouter(prefix="/api/v1/family", tags=["家庭"])
 
@@ -155,34 +155,49 @@ async def remove_member(
     """移除家庭成员"""
     db = get_db()
     
-    db.execute("DELETE FROM family_relations WHERE id = ? AND user_id = ?", (member_id, user_id))
-    db.commit()
-    
-    return {"success": True, "message": "成员已移除"}
+    try:
+        removed = db.execute(
+            "DELETE FROM family_relations WHERE id = ? AND user_id = ?",
+            (member_id, user_id),
+        ).rowcount
+        if removed != 1:
+            raise HTTPException(status_code=404, detail="成员不存在")
+        db.commit()
+        return {"success": True, "message": "成员已移除"}
+    except Exception:
+        db.rollback()
+        raise
+    finally:
+        close_test_connection(db)
 
 
 @router.patch("/members/{member_id}/status")
 async def update_member_status(
     member_id: str,
-    status: str,
+    status: Literal["normal", "attention", "warning", "inactive"],
     user_id: str = "user-001"
 ):
     """更新成员状态"""
     db = get_db()
     
-    db.execute(
-        "UPDATE family_relations SET status = ?, updated_at = ? WHERE id = ? AND user_id = ?",
-        (status, datetime.now().isoformat(), member_id, user_id)
-    )
-    row = db.execute(
-        "SELECT * FROM family_relations WHERE id = ? AND user_id = ?",
-        (member_id, user_id)
-    ).fetchone()
-    
-    if not row:
-        raise HTTPException(status_code=404, detail="成员不存在")
-    
-    return {"success": True, "member": dict(row)}
+    try:
+        changed = db.execute(
+            "UPDATE family_relations SET status = ?, updated_at = ? WHERE id = ? AND user_id = ?",
+            (status, datetime.now().isoformat(), member_id, user_id),
+        ).rowcount
+        if changed != 1:
+            raise HTTPException(status_code=404, detail="成员不存在")
+        row = db.execute(
+            "SELECT * FROM family_relations WHERE id = ? AND user_id = ?",
+            (member_id, user_id),
+        ).fetchone()
+        db.commit()
+        return {"success": True, "member": dict(row)}
+    except Exception:
+        db.rollback()
+        raise
+    finally:
+        close_test_connection(db)
 
 
 @router.post("/invite", response_model=dict)
