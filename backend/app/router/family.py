@@ -3,10 +3,15 @@ from fastapi import APIRouter, HTTPException, Depends, Query
 from pydantic import BaseModel
 from typing import List, Literal, Optional
 from datetime import datetime, timedelta
-import random
+import secrets
+import sqlite3
+import uuid
 import string
 import json
 from sqlalchemy import text
+from sqlalchemy.orm import Session
+from app.deps import get_session
+from app.simple_models import User
 
 from app.database.db import get_db, close_test_connection
 
@@ -44,7 +49,7 @@ class GenerateInviteRequest(BaseModel):
 
 def generate_code(length=6):
     chars = string.ascii_uppercase + string.digits
-    return ''.join(random.choices(chars, k=length))
+    return ''.join(secrets.choice(chars) for _ in range(length))
 
 
 def get_user_family(db, user_id: str) -> tuple:
@@ -95,9 +100,9 @@ async def get_family(user_id: str = "user-001"):
     # 查找有效的邀请码
     invite_row = db.execute("""
         SELECT code, expires_at FROM family_invites 
-        WHERE family_id = ? AND used = 0 AND expires_at > ?
+        WHERE family_id = ? AND created_by = ? AND used = 0 AND expires_at > ?
         ORDER BY created_at DESC LIMIT 1
-    """, (family_id, datetime.now().isoformat())).fetchone()
+    """, (family_id, user_id, datetime.now().isoformat())).fetchone()
     
     return FamilyInfo(
         family_id=family_id,
@@ -116,35 +121,42 @@ async def add_member(
     """添加家庭成员"""
     db = get_db()
     
-    family_id, family_name = get_user_family(db, user_id)
-    
-    # 检查成员数量限制
-    count = db.execute(
-        "SELECT COUNT(*) FROM family_relations WHERE family_id = ? AND user_id = ?",
-        (family_id, user_id)
-    ).fetchone()[0]
-    
-    if count >= 4:
-        raise HTTPException(status_code=400, detail="家庭成员数量已达上限(4人)")
-    
-    member_id = f"member_{datetime.now().strftime('%Y%m%d%H%M%S')}_{random.randint(1000,9999)}"
-    now = datetime.now().isoformat()
-    
-    db.execute("""
-        INSERT INTO family_relations (id, user_id, family_id, family_name, member_name, relation, age, status, last_active_at, created_at, updated_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, 'normal', ?, ?, ?)
-    """, (member_id, user_id, family_id, family_name, request.name, request.relation, request.age, now, now, now))
-    db.commit()
-    
-    return FamilyMember(
-        id=member_id,
-        name=request.name,
-        relation=request.relation,
-        age=request.age,
-        status="normal",
-        last_active_at=now,
-        health_data={}
-    )
+    try:
+        db.execute("BEGIN IMMEDIATE")
+        family_id, family_name = get_user_family(db, user_id)
+
+        # 检查成员数量限制
+        count = db.execute(
+            "SELECT COUNT(*) FROM family_relations WHERE family_id = ?",
+            (family_id,)
+        ).fetchone()[0]
+
+        if count >= 4:
+            raise HTTPException(status_code=400, detail="家庭成员数量已达上限(4人)")
+
+        member_id = f"member_{uuid.uuid4().hex}"
+        now = datetime.now().isoformat()
+
+        db.execute("""
+            INSERT INTO family_relations (id, user_id, family_id, family_name, member_name, relation, age, status, last_active_at, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'normal', ?, ?, ?)
+        """, (member_id, user_id, family_id, family_name, request.name, request.relation, request.age, now, now, now))
+        db.commit()
+
+        return FamilyMember(
+            id=member_id,
+            name=request.name,
+            relation=request.relation,
+            age=request.age,
+            status="normal",
+            last_active_at=now,
+            health_data={}
+        )
+    except Exception:
+        db.rollback()
+        raise
+    finally:
+        close_test_connection(db)
 
 
 @router.delete("/members/{member_id}")
@@ -201,69 +213,87 @@ async def update_member_status(
 
 
 @router.post("/invite", response_model=dict)
-async def generate_invite(
-    request: GenerateInviteRequest,
-    user_id: str = "user-001"
-):
-    """生成邀请码"""
+async def generate_invite(request: GenerateInviteRequest, user_id: str = "user-001"):
+    """生成或复用当前邀请人、关系对应的邀请码。"""
     db = get_db()
-    
-    family_id, _ = get_user_family(db, user_id)
-    
-    # 检查是否已有有效邀请码
-    existing = db.execute("""
-        SELECT code, expires_at FROM family_invites 
-        WHERE family_id = ? AND used = 0 AND expires_at > ?
-    """, (family_id, datetime.now().isoformat())).fetchone()
-    
-    if existing:
-        return {"code": existing["code"], "expires_at": existing["expires_at"]}
-    
-    code = generate_code()
-    expires_at = (datetime.now() + timedelta(days=7)).isoformat()
-    now = datetime.now().isoformat()
-    
-    db.execute("""
-        INSERT INTO family_invites (id, family_id, code, relation, created_by, expires_at, created_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-    """, (f"inv_{now}", family_id, code, request.relation, user_id, expires_at, now))
-    db.commit()
-    
-    return {"code": code, "expires_at": expires_at}
+    try:
+        db.execute("BEGIN IMMEDIATE")
+        family_id, _ = get_user_family(db, user_id)
+        now = datetime.now().isoformat()
+        existing = db.execute(
+            """SELECT code, expires_at FROM family_invites
+            WHERE family_id = ? AND created_by = ? AND relation = ?
+            AND used = 0 AND expires_at > ? ORDER BY created_at DESC LIMIT 1""",
+            (family_id, user_id, request.relation, now),
+        ).fetchone()
+        if existing:
+            db.commit()
+            return dict(existing)
+        expires_at = (datetime.now() + timedelta(days=7)).isoformat()
+        for _ in range(5):
+            code = generate_code()
+            try:
+                db.execute(
+                    """INSERT INTO family_invites
+                    (id, family_id, code, relation, created_by, expires_at, created_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)""",
+                    (f"inv_{uuid.uuid4().hex}", family_id, code, request.relation, user_id, expires_at, now),
+                )
+                db.commit()
+                return {"code": code, "expires_at": expires_at}
+            except sqlite3.IntegrityError:
+                # A code collision must not expose another family's invitation.
+                continue
+        raise HTTPException(status_code=503, detail="邀请码生成繁忙，请稍后重试")
+    except Exception:
+        db.rollback()
+        raise
+    finally:
+        close_test_connection(db)
 
 
 @router.post("/join")
-async def join_family(code: str, user_id: str = "user-001"):
-    """使用邀请码加入家庭"""
+async def join_family(code: str, user_id: str = "user-001", session: Session = Depends(get_session)):
+    """一次性消费邀请码；失败时不消耗邀请码、不留下部分加入记录。"""
     db = get_db()
-    
-    invite = db.execute("SELECT * FROM family_invites WHERE code = ?", (code,)).fetchone()
-    if not invite:
-        raise HTTPException(status_code=404, detail="邀请码不存在")
-    
-    if invite["used"]:
-        raise HTTPException(status_code=400, detail="邀请码已使用")
-    
-    if invite["expires_at"] < datetime.now().isoformat():
-        raise HTTPException(status_code=400, detail="邀请码已过期")
-    
-    now = datetime.now().isoformat()
-    family_id = invite["family_id"]
-    
-    # 标记已使用
-    db.execute("""
-        UPDATE family_invites SET used = 1, used_by = ?, used_at = ? WHERE code = ?
-    """, (user_id, now, code))
-    
-    # 添加用户到目标家庭
-    db.execute("""
-        INSERT OR IGNORE INTO family_relations (id, user_id, family_id, family_name, member_name, relation, age, status, last_active_at, user_id_member, created_at, updated_at)
-        VALUES (?, ?, ?, '已加入的家庭', '新成员', ?, 30, 'normal', ?, ?, ?, ?)
-    """, (f"member_{now}", user_id, family_id, invite["relation"], now, user_id, now, now))
-    
-    db.commit()
-    
-    return {"success": True, "message": "成功加入家庭"}
+    try:
+        db.execute("BEGIN IMMEDIATE")
+        invite = db.execute("SELECT * FROM family_invites WHERE code = ?", (code,)).fetchone()
+        if not invite:
+            raise HTTPException(status_code=404, detail="邀请码不存在")
+        if invite["used"]:
+            raise HTTPException(status_code=400, detail="邀请码已使用")
+        now = datetime.now().isoformat()
+        if invite["expires_at"] <= now:
+            raise HTTPException(status_code=400, detail="邀请码已过期")
+        if invite["created_by"] == user_id:
+            raise HTTPException(status_code=400, detail="不能使用自己生成的邀请码")
+        if session.get(User, invite["created_by"]) is None:
+            raise HTTPException(status_code=410, detail="邀请账号已不存在，请重新获取邀请")
+        if db.execute("SELECT 1 FROM family_relations WHERE user_id = ? LIMIT 1", (user_id,)).fetchone():
+            raise HTTPException(status_code=409, detail="当前已有家庭关系，请先退出或移除现有关系")
+        family_id = invite["family_id"]
+        count = db.execute("SELECT count(*) FROM family_relations WHERE family_id = ?", (family_id,)).fetchone()[0]
+        if count >= 4:
+            raise HTTPException(status_code=400, detail="家庭成员数量已达上限(4人)")
+        db.execute(
+            "UPDATE family_invites SET used = 1, used_by = ?, used_at = ? WHERE code = ? AND used = 0",
+            (user_id, now, code),
+        )
+        db.execute(
+            """INSERT INTO family_relations
+            (id, user_id, family_id, family_name, member_name, relation, age, status,
+             last_active_at, user_id_member, created_at, updated_at)
+            VALUES (?, ?, ?, '已加入的家庭', '新成员', ?, NULL, 'normal', ?, ?, ?, ?)""",
+            (f"member_{uuid.uuid4().hex}", user_id, family_id, invite["relation"], now, user_id, now, now),
+        )
+        db.commit()
+        return {"success": True, "message": "成功加入家庭"}
+    except Exception:
+        db.rollback()
+        raise
+    finally:
+        close_test_connection(db)
 
 
 @router.get("/members")
@@ -470,10 +500,17 @@ async def leave_family(user_id: str = "user-001"):
     """离开家庭"""
     db = get_db()
     
-    db.execute("DELETE FROM family_relations WHERE user_id_member = ?", (user_id,))
-    db.commit()
-    
-    return {"success": True, "message": "已离开家庭"}
+    try:
+        db.execute("BEGIN IMMEDIATE")
+        db.execute("DELETE FROM family_relations WHERE user_id_member = ?", (user_id,))
+        db.execute("DELETE FROM family_invites WHERE created_by = ? AND used = 0", (user_id,))
+        db.commit()
+        return {"success": True, "message": "已离开家庭"}
+    except Exception:
+        db.rollback()
+        raise
+    finally:
+        close_test_connection(db)
 
 
 def _parse_json(s):
