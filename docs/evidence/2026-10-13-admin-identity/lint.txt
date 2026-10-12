@@ -1,0 +1,5 @@
+
+> admin@0.1.0 test
+> node scripts/test-production-contracts.mjs
+
+Admin production contracts passed

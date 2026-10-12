@@ -1,0 +1,1 @@
+Admin security browser checks passed: mismatch/no request, failure/no success, retry, confirmed logout, mobile layout; controlled API.

@@ -1,10 +1,18 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { setAdminToken, fetchAPI } from '@/lib/api';
 
+function PasswordChangedNotice() {
+  const params = useSearchParams();
+  return params.get('passwordChanged') === '1'
+    ? <p role="status" className="text-green-800 text-center">密码已修改，请使用新密码登录。</p>
+    : null;
+}
+
 export default function LoginPage() {
+  const [username, setUsername] = useState('admin');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -29,7 +37,7 @@ export default function LoginPage() {
     try {
       const res = await fetchAPI('/api/v1/admin/auth/login', {
         method: 'POST',
-        body: JSON.stringify({ username: 'admin', password }),
+        body: JSON.stringify({ username, password }),
       });
 
       if (res?.success && res.token) {
@@ -56,7 +64,14 @@ export default function LoginPage() {
             管理后台登录
           </p>
         </div>
+        <Suspense fallback={null}><PasswordChangedNotice /></Suspense>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          <div>
+            <label htmlFor="username" className="block mb-2">管理员账号</label>
+            <input id="username" name="username" autoComplete="username" required maxLength={100}
+              value={username} onChange={event => setUsername(event.target.value)}
+              className="w-full border rounded px-3 py-2" />
+          </div>
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
               <label htmlFor="password" className="sr-only">
@@ -65,6 +80,8 @@ export default function LoginPage() {
               <input
                 id="password"
                 name="password"
+                autoComplete="current-password"
+                maxLength={1024}
                 type="password"
                 required
                 className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"

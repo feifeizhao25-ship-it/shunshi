@@ -1,16 +1,22 @@
-from datetime import datetime, timedelta
-
 import pytest
 
 
+@pytest.fixture(autouse=True)
+def isolated_family_records(client, tmp_path, monkeypatch):
+    import sqlite3
+    from app.database import db as records
+    path = tmp_path / "family-records.db"
+    with sqlite3.connect(path) as db:
+        db.executescript(records.SCHEMA_SQL)
+    monkeypatch.setattr(records, "DB_PATH", path)
+
+
 @pytest.fixture
-def admin_headers(monkeypatch):
-    from app.router import admin_auth
-    token = "test-family-admin"
-    monkeypatch.setitem(admin_auth._active_tokens, token, {
-        "username": "test", "expires_at": datetime.now() + timedelta(hours=1),
-    })
-    return {"X-Admin-Token": token}
+def admin_headers():
+    from tests.admin_support import create_admin_session, remove_admin_session
+    token = create_admin_session()
+    yield {"X-Admin-Token": token}
+    remove_admin_session(token)
 
 
 def test_family_admin_rejects_anonymous_and_regular_user(client, auth_headers):

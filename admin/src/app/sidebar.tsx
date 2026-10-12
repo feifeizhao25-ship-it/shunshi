@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { clearAdminToken, fetchAPI } from '@/lib/api';
 
 const navItems = [
+  { href: '/account', label: '登录安全', icon: '🔐' },
   { href: '/', label: '仪表盘', icon: '📊' },
   { href: '/users', label: '用户管理', icon: '👥' },
   { href: '/content', label: '内容管理', icon: '📝' },

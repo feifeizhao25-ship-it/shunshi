@@ -91,10 +91,10 @@ def _bearer(request: Request) -> str:
 
 
 def _is_admin(request: Request) -> bool:
-    from .router.admin_auth import _verify_token
+    from .router.admin_auth import _verify_token, _token
 
-    candidates = [request.headers.get("x-admin-token") or "", _bearer(request)]
-    return any(token and _verify_token(token) for token in candidates)
+    token = _token(request.headers.get("x-admin-token"), request.headers.get("authorization"))
+    return bool(token and _verify_token(token))
 
 
 def _body_model_fields(route: Any) -> set[str]:

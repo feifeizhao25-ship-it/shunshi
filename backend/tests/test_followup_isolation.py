@@ -58,11 +58,10 @@ def test_deleted_account_token_cannot_read_task(client, auth_headers):
 
 
 def test_operator_can_run_scheduler_with_no_real_delivery(client, monkeypatch):
-    from app.router import admin_auth, followup
-    import uuid
-    token = 'test-operator-' + uuid.uuid4().hex
+    from app.router import followup
+    from tests.admin_support import create_admin_session
+    token = create_admin_session()
     calls = []
-    monkeypatch.setitem(admin_auth._active_tokens, token, {'username': 'ops', 'expires_at': None})
     def run():
         calls.append(True)
         return []

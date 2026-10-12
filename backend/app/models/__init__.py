@@ -30,3 +30,5 @@ __all__ = [
     "Reminder", "ReminderLog",
     "ContentItem", "ContentMedia", "ContentTag", "ContentTagRelation",
 ]
+
+from app.models.admin_identity import AdminCredential, AdminSession

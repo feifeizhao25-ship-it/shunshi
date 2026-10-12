@@ -37,7 +37,7 @@ from app.db.url import PRODUCT_SCHEMA, normalize_database_url, resolve_product_d
 SECRET = "s" * 48
 # 在进程内拉起 create_app() 的用例需要它（router/auth.py 在导入时读取）。
 os.environ.setdefault("SHUNSHI_JWT_SECRET", SECRET)
-os.environ.setdefault("ADMIN_PASSWORD_HASH", "x")
+os.environ.setdefault("ADMIN_PASSWORD_HASH", "a" * 64)
 os.environ.setdefault("ADMIN_JWT_SECRET", SECRET)
 
 
@@ -223,7 +223,7 @@ def test_boots_on_postgres_with_documented_variables_only(tmp_path, postgres_dat
             "SHUNSHI_KNOWLEDGE_DIR": str(kb),
             "SHUNSHI_JWT_SECRET": SECRET,
             "SHUNSHI_CORS_ORIGINS": "https://shunshi.example",
-            "ADMIN_PASSWORD_HASH": "x",
+            "ADMIN_PASSWORD_HASH": "a" * 64,
             "ADMIN_JWT_SECRET": SECRET,
         },
         cwd=image,

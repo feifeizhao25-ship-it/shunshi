@@ -60,5 +60,5 @@ def init_db():
     from app.models import exercise, chat, journal, article, audio, membership, reminder
     from app.models import content, conversation, diary, family, followup
     from app.models import gamification, notification, onboarding, subscription
-    from app.models import wearable, wellness_tracking, audit
+    from app.models import wearable, wellness_tracking, audit, admin_identity
     Base.metadata.create_all(bind=engine)

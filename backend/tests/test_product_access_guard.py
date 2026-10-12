@@ -48,13 +48,12 @@ def ctx(tmp_path_factory):
         db.commit()
         return {"Authorization": "Bearer " + issue_token(settings, user_id)["access_token"]}
 
-    from app.router import admin_auth
+    from tests.admin_support import create_admin_session, remove_admin_session
 
-    admin_token = "adm-" + uuid.uuid4().hex
-    admin_auth._active_tokens[admin_token] = {"username": "ops", "expires_at": None}
+    admin_token = create_admin_session()
     with TestClient(app, raise_server_exceptions=False) as client:
         yield client, bearer, {"X-Admin-Token": admin_token}
-    admin_auth._active_tokens.pop(admin_token, None)
+    remove_admin_session(admin_token)
 
 
 def _ids():
