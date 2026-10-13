@@ -1,0 +1,33 @@
+........................................................................ [ 69%]
+................................                                         [100%]
+=============================== warnings summary ===============================
+../../../../../../tmp/shunshi-verify-20261008/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /tmp/shunshi-verify-20261008/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+app/db/database.py:34
+  /Users/feifei00/Documents/CodexWorktrees/shunshi-production/backend/app/db/database.py:34: MovedIn20Warning: The ``declarative_base()`` function is now available as sqlalchemy.orm.declarative_base(). (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    Base = declarative_base()
+
+app/core/settings.py:9
+  /Users/feifei00/Documents/CodexWorktrees/shunshi-production/backend/app/core/settings.py:9: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class Settings(BaseSettings):
+
+app/router/ai_content.py:413
+  /Users/feifei00/Documents/CodexWorktrees/shunshi-production/backend/app/router/ai_content.py:413: FastAPIDeprecationWarning: `regex` has been deprecated, please use `pattern` instead
+    lang: str = Query("zh", regex="^(zh|en)$"),
+
+tests/test_admin_flags_persistence.py::test_update_persists_and_other_worker_reads_it
+tests/test_admin_flags_persistence.py::test_read_through_does_not_keep_stale_enabled_state
+tests/test_admin_flags_persistence.py::test_read_through_does_not_keep_stale_enabled_state
+tests/test_admin_flags_persistence.py::test_unverified_binding_and_invalid_body_rejected
+tests/test_admin_flags_persistence.py::test_whitelist_not_exposed_and_disable_not_misleading
+tests/test_admin_flags_persistence.py::test_anonymous_cannot_bypass_partial_rollout
+tests/test_admin_flags_persistence.py::test_anonymous_cannot_bypass_partial_rollout
+tests/test_admin_flags_persistence.py::test_parallel_update_only_one_wins
+tests/test_admin_flags_persistence.py::test_failed_commit_rolls_back
+  /Users/feifei00/Documents/CodexWorktrees/shunshi-production/backend/app/feature_flags/store.py:220: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    now = datetime.utcnow().isoformat()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+104 passed, 13 warnings in 8.96s

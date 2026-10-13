@@ -31,26 +31,10 @@ router = APIRouter(tags=["feature-flags"])
 
 # ==================== Admin 鉴权 ====================
 
-# 从环境变量读取 admin token，默认开发用
-ADMIN_TOKEN = os.environ.get("ADMIN_TOKEN", "dev-admin-token")
-
-
 def _verify_admin(authorization: Optional[str] = None):
-    """校验 admin token（兼容旧环境变量和新 Admin Auth 系统）"""
-    if not authorization:
-        raise HTTPException(status_code=401, detail="缺少 Authorization header")
-    token = authorization.replace("Bearer ", "") if authorization.startswith("Bearer ") else authorization
-
-    # 1. 优先检查新的 Admin Auth token
-    from app.router.admin_auth import _verify_token
-    if _verify_token(token):
-        return
-
-    # 2. 向后兼容：检查旧的 ADMIN_TOKEN 环境变量
-    if token == ADMIN_TOKEN:
-        return
-
-    raise HTTPException(status_code=403, detail="无效的 admin token")
+    """Legacy router also requires a durable administrator session."""
+    from app.router.admin_auth import get_current_admin
+    get_current_admin(token=None, authorization=authorization)
 
 
 # ==================== Pydantic Models ====================

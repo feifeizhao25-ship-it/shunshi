@@ -1,88 +1,101 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Sidebar from '../sidebar';
-import { fetchAPI, putAPI } from '../../lib/api';
+import { fetchAPI } from '../../lib/api';
 
 interface Flag {
   key: string;
-  name: string;
   description: string;
-  enabled: boolean;
-  target_users?: string;
-  rollout_pct?: number;
+  value_type: string;
+  value_default: unknown;
+  rollout_pct: number;
+  whitelist_count: number;
   updated_at: string;
+  editable: boolean;
+  binding: string;
 }
 
 export default function FlagsPage() {
   const [flags, setFlags] = useState<Flag[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [attempt, setAttempt] = useState(0);
+  const [message, setMessage] = useState('');
 
-  useEffect(() => { loadFlags(); }, []);
+  useEffect(() => {
+    const controller = new AbortController();
+    async function load() {
+      setLoading(true);
+      setError('');
+      setFlags([]);
+      try {
+        const result = await fetchAPI<{ success?: boolean; data?: Flag[]; error?: unknown }>(
+          '/api/v1/admin/flags', { signal: controller.signal },
+        );
+        if (controller.signal.aborted) return;
+        if (result.success !== true || result.error || !Array.isArray(result.data)) throw new Error();
+        setFlags(result.data);
+      } catch {
+        if (!controller.signal.aborted) setError('读取失败，请检查管理员登录状态和网络后重试');
+      } finally {
+        if (!controller.signal.aborted) setLoading(false);
+      }
+    }
+    void load();
+    return () => controller.abort();
+  }, [attempt]);
 
-  async function loadFlags() {
-    setLoading(true);
+  async function toggle(flag: Flag) {
+    if (saving || loading) return;
+    setSaving(true);
+    setMessage('');
     try {
-      const res = await fetchAPI<{ data: Flag[] }>('/api/v1/flags');
-      if (res?.data) setFlags(Array.isArray(res.data) ? res.data : []);
-    } catch { /* empty */ }
-    setLoading(false);
+      const value = flag.value_default !== true;
+      const result = await fetchAPI<{ success?: boolean; value?: boolean; error?: unknown }>(
+        '/api/v1/admin/flags/' + encodeURIComponent(flag.key),
+        { method: 'PATCH', body: JSON.stringify({ value, expected_updated_at: flag.updated_at }) },
+      );
+      setMessage(result.success === true && !result.error && result.value === value
+        ? '配置已保存。实际使用仍取决于灰度比例、白名单和可用提示词版本。'
+        : '修改未确认，可能存在配置冲突或白名单限制，请刷新核对。');
+    } catch {
+      setMessage('修改结果未确认，请刷新核对。');
+    } finally {
+      setSaving(false);
+      setAttempt(value => value + 1);
+    }
   }
-
-  async function toggleFlag(key: string, current: boolean) {
-    try {
-      await putAPI(`/api/v1/flags/${key}`, { enabled: !current });
-      loadFlags();
-    } catch { alert('操作失败'); }
-  }
-
-  const defaultFlags: Flag[] = [
-    { key: 'ai_companion_v2', name: 'AI伴侣V2', description: '新版AI对话界面和模型', enabled: true, rollout_pct: 100, updated_at: '2026-04-15' },
-    { key: 'new_onboarding', name: '新用户引导', description: '改进的注册引导流程', enabled: true, rollout_pct: 50, updated_at: '2026-04-10' },
-    { key: 'family_sharing', name: '家庭共享', description: '家庭成员内容共享功能', enabled: true, rollout_pct: 100, updated_at: '2026-04-08' },
-    { key: 'dark_mode', name: '深色模式', description: '应用深色主题', enabled: false, rollout_pct: 0, updated_at: '2026-04-12' },
-    { key: 'social_share', name: '社交分享', description: '微信/微博分享养生内容', enabled: false, rollout_pct: 0, updated_at: '2026-04-05' },
-    { key: 'premium_content', name: '付费内容', description: '高级会员专属内容', enabled: true, rollout_pct: 100, updated_at: '2026-04-01' },
-    { key: 'apple_health', name: 'Apple健康', description: 'HealthKit数据集成', enabled: false, rollout_pct: 0, updated_at: '2026-04-14' },
-    { key: 'push_ai_summary', name: 'AI推送摘要', description: '智能推送养生摘要通知', enabled: true, rollout_pct: 30, updated_at: '2026-04-16' },
-  ];
-
-  const displayFlags = flags.length > 0 ? flags : defaultFlags;
 
   return (
     <div className="flex">
       <Sidebar active="/flags" />
-      <main className="flex-1 p-8">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">Feature Flags</h2>
-        <div className="space-y-3">
-          {loading ? (
-            <div className="bg-white rounded-xl border p-12 text-center text-gray-400">加载中...</div>
-          ) : (
-            displayFlags.map((flag) => (
-              <div key={flag.key} className="bg-white rounded-xl border border-gray-200 p-5 flex items-center justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-1">
-                    <span className="font-medium text-gray-800">{flag.name}</span>
-                    <code className="text-xs bg-gray-100 px-2 py-0.5 rounded text-gray-500">{flag.key}</code>
-                  </div>
-                  <p className="text-sm text-gray-500">{flag.description}</p>
-                  {flag.rollout_pct !== undefined && flag.rollout_pct > 0 && flag.rollout_pct < 100 && (
-                    <div className="mt-2 flex items-center gap-2">
-                      <div className="flex-1 max-w-32 bg-gray-100 rounded-full h-2">
-                        <div className="bg-blue-500 h-full rounded-full" style={{ width: `${flag.rollout_pct}%` }} />
-                      </div>
-                      <span className="text-xs text-gray-400">{flag.rollout_pct}% 灰度</span>
-                    </div>
-                  )}
-                </div>
-                <button onClick={() => toggleFlag(flag.key, flag.enabled)}
-                  className={`relative w-12 h-6 rounded-full transition-colors ${flag.enabled ? 'bg-blue-600' : 'bg-gray-300'}`}>
-                  <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${flag.enabled ? 'left-6' : 'left-0.5'}`} />
+      <main className="flex-1 min-w-0 p-4 md:p-8">
+        <h2 className="text-2xl font-bold mb-4">功能开关</h2>
+        <p className="text-gray-600 mb-4">仅展示已保存配置。当前只支持提示词灰度开关；保存配置不等于新功能已经上线。</p>
+        <button disabled={loading || saving} onClick={() => setAttempt(value => value + 1)}
+          className="border rounded px-4 py-2 mb-4 disabled:opacity-50">刷新配置</button>
+        {message && <p role="status" className="mb-4">{message}</p>}
+        {loading ? <p>正在读取…</p> : error ? <p role="alert">{error}</p>
+          : flags.length === 0 ? <p>暂无已保存的功能配置</p>
+          : <div className="space-y-4">{flags.map(flag => (
+            <article key={flag.key} className="bg-white border rounded-xl p-5">
+              <h3 className="font-bold">{flag.description || '未填写说明的配置'}</h3>
+              <p className="text-sm break-all text-gray-600 mt-2">{flag.key}</p>
+              <p className="text-sm mt-2">{flag.binding}</p>
+              <p className="text-sm mt-2">覆盖比例：{flag.rollout_pct}% · 白名单：{flag.whitelist_count} 人</p>
+              <p className="text-sm break-all mt-2">更新时间：{flag.updated_at || '暂无记录'}</p>
+              {flag.value_type === 'boolean' ? (
+                <button disabled={!flag.editable || saving || loading}
+                  aria-label={`修改${flag.description || flag.key}`}
+                  aria-pressed={flag.value_default === true}
+                  onClick={() => toggle(flag)} className="border rounded px-4 py-2 mt-4 disabled:opacity-50">
+                  默认配置：{flag.value_default === true ? '开启' : '关闭'}
                 </button>
-              </div>
-            ))
-          )}
-        </div>
+              ) : <p className="mt-4">此类型配置仅供查看</p>}
+            </article>
+          ))}</div>}
       </main>
     </div>
   );

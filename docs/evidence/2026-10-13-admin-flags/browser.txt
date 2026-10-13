@@ -1,0 +1,1 @@
+Flags browser checks passed: true empty, error, retry, readonly binding, PATCH save, conflict preserves state, mobile layout; controlled API.

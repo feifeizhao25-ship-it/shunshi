@@ -15,7 +15,7 @@ from typing import Dict, List, Any, Optional
 from dataclasses import dataclass, field, asdict
 from datetime import datetime
 
-from app.database.db import get_db
+from app.database.db import get_db, close_test_connection
 
 # ==================== 数据模型 ====================
 
@@ -78,7 +78,8 @@ class FlagStore:
     - 用户白名单强制启用
     """
 
-    def __init__(self):
+    def __init__(self, read_through=False):
+        self._read_through = read_through
         self._cache: Dict[str, FlagValue] = {}
         self._lock = threading.Lock()
 
@@ -113,7 +114,10 @@ class FlagStore:
     def _load_cache(self):
         """从数据库加载所有 flags 到内存缓存"""
         conn = get_db()
-        rows = conn.execute("SELECT * FROM feature_flags ORDER BY key").fetchall()
+        try:
+            rows = conn.execute("SELECT * FROM feature_flags ORDER BY key").fetchall()
+        finally:
+            close_test_connection(conn)
         cache = {}
         for row in rows:
             cache[row["key"]] = FlagValue(
@@ -136,6 +140,8 @@ class FlagStore:
 
     def _get_from_cache(self, key: str) -> Optional[FlagValue]:
         """线程安全地读取缓存"""
+        if self._read_through:
+            self._load_cache()
         with self._lock:
             return self._cache.get(key)
 
@@ -173,7 +179,7 @@ class FlagStore:
             # 否则用百分比灰度
             if user_id:
                 return self._hash_user(key, user_id) < flag.rollout_pct
-            return bool(value)
+            return False
         else:
             # 非布尔类型的 flag，非空即视为启用
             if value is None or value == "" or value == "false" or value is False:
@@ -182,7 +188,7 @@ class FlagStore:
                 return True
             if user_id:
                 return self._hash_user(key, user_id) < flag.rollout_pct
-            return bool(value)
+            return False
 
     def get_variant(self, key: str, user_id: str = None, variants: List[str] = None) -> str:
         """
@@ -257,6 +263,8 @@ class FlagStore:
 
     def list_flags(self, category: str = None) -> list[FlagValue]:
         """列出所有 flags，可按 category 过滤"""
+        if self._read_through:
+            self._load_cache()
         with self._lock:
             flags = list(self._cache.values())
         if category:
@@ -374,7 +382,8 @@ class FlagStore:
                 ON flag_evaluations(evaluated_at);
         """)
         conn.commit()
+        close_test_connection(conn)
 
 
 # 全局单例
-flag_store = FlagStore()
+flag_store = FlagStore(read_through=True)

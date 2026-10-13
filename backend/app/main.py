@@ -108,6 +108,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         init_product_db()
         product_model_base.metadata.create_all(product_engine)
         init_record_store()
+        from .feature_flags.store import flag_store
+        flag_store.ensure_tables()
         from .rag.knowledge_base import load_knowledge_bases
 
         load_knowledge_bases()
