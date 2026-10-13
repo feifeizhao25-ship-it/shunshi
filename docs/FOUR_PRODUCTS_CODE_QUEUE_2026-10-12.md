@@ -22,3 +22,5 @@
 
 ## 见己后续验收（2026-10-13）
 原生登录已修复实际 access_token/user_id 响应不匹配（0c49180）。本轮会员等级 GET/PUT 改为 users 表持久化，数据库失败不报成功、不使用缓存替代；Python 3.11 用户服务全量 347 项及 PostgreSQL 专项 15 项通过，详见见己 TIER_PERSISTENCE_2026-10-13.md。仍待修复资料创建/更新失败回退内存、原生退出/注销与资料补全，仍非全部完成。
+
+见己资料创建/更新提交前返回成功的问题已于 5f47a9e 修复：全量 355 项、PostgreSQL 专项 8 项通过，详见 PROFILE_TRANSACTIONS_2026-10-13.md。下一步统一账户 schema/gender 迁移、核对认证建档与资料完善；GET 缓存回退和 DELETE 非事务仍待处理。
