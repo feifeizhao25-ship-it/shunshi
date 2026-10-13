@@ -117,7 +117,7 @@ class SkillExecutor:
             SkillName.DAILY_RHYTHM_PLAN: {
                 "name": "daily_rhythm_plan",
                 "description": "每日养生计划",
-                "model": "deepseek-chat",
+                "model": "deepseek-flash",
                 "input_schema": {
                     "user_stage": "youth|adult|middle_age|elder",
                     "season": "spring|summer|autumn|winter",
@@ -241,7 +241,7 @@ class SkillExecutor:
             SkillName.OFFICE_MICRO_BREAK: {
                 "name": "office_micro_break",
                 "description": "办公室微运动",
-                "model": "deepseek-chat",
+                "model": "deepseek-flash",
                 "input_schema": {
                     "work_type": "office_type",
                     "duration_minutes": "时长",

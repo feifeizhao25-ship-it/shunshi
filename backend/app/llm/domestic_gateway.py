@@ -44,7 +44,7 @@ PROVIDERS: tuple[Provider, ...] = (
         "deepseek",
         ("SHUNSHI_DEEPSEEK_API_KEY", "DEEPSEEK_API_KEY"),
         "https://api.deepseek.com/chat/completions",
-        "deepseek-chat",
+        "deepseek-flash",  # 官方 2026-07-24 停用 deepseek-chat，见 app/llm/deepseek.py
     ),
     Provider(
         "siliconflow",
