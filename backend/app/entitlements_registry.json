@@ -1,6 +1,6 @@
 {
   "product": "shunshi",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "tiers": {
     "free": {
       "quotas": {
@@ -31,6 +31,39 @@
       },
       "service": {
         "support": "community",
+        "api_access": false
+      }
+    },
+    "plus": {
+      "quotas": {
+        "ai_daily_messages": 100,
+        "reflections_per_day": -1,
+        "audio_daily_minutes": -1
+      },
+      "knowledge": {
+        "daily_insight": true,
+        "wellness_library": "full",
+        "long_term_trends": true,
+        "weekly_deep_report": true
+      },
+      "personalization": {
+        "onboarding_profile": true,
+        "adaptive_suggestions": true,
+        "ai_memory": true
+      },
+      "export": {
+        "data_export": true,
+        "formats": [
+          "json",
+          "csv"
+        ]
+      },
+      "collaboration": {
+        "family_members": 1,
+        "shared_spaces": false
+      },
+      "service": {
+        "support": "priority",
         "api_access": false
       }
     },
@@ -135,15 +168,15 @@
     }
   },
   "product_tier_map": {
-    "shunshi_yangxin_monthly": "pro",
-    "shunshi_yangxin_yearly": "pro",
-    "shunshi_healing_monthly": "pro",
+    "shunshi_yangxin_monthly": "plus",
+    "shunshi_yangxin_yearly": "plus",
+    "shunshi_healing_monthly": "plus",
     "shunshi_yiyang_monthly": "pro",
     "shunshi_yiyang_yearly": "pro",
     "shunshi_family_monthly": "family",
     "shunshi_family_yearly": "family",
-    "yangxin_monthly": "pro",
-    "yangxin_yearly": "pro",
+    "yangxin_monthly": "plus",
+    "yangxin_yearly": "plus",
     "yiyang_monthly": "pro",
     "yiyang_yearly": "pro",
     "family_monthly": "family",

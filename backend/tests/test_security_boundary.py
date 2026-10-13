@@ -432,9 +432,9 @@ class TestAuthorization:
             "免费用户不应有 deep_suggestions 功能"
         assert free_features.get("weekly_summary") is False, \
             "免费用户不应有 weekly_summary 功能"
-        # 颐养版应有这些功能
-        assert yiyang_features.get("deep_suggestions") is True
-        assert yiyang_features.get("weekly_summary") is True
+        # 颐养版高于养心版的是每天对话次数（200 vs 100）；「深度建议、周总结」没有执行点，不再宣传
+        assert SUBSCRIPTION_PLANS["yiyang"]["daily_chat_limit"] > SUBSCRIPTION_PLANS["yangxin"]["daily_chat_limit"] > SUBSCRIPTION_PLANS["free"]["daily_chat_limit"]
+        assert yiyang_features.get("deep_suggestions") is False
 
     def test_free_user_premium_content_blocked_by_middleware(self):
         """权益中间件应拦截免费用户访问高级功能"""

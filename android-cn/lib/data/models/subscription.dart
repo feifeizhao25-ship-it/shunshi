@@ -98,18 +98,16 @@ class SubscriptionPlan {
     };
     final featMap = {
       0: {'basic_chat': true},
-      1: {'basic_chat': true, 'unlimited_chat': true, 'today_plan': true},
+      1: {'basic_chat': true, 'unlimited_chat': false, 'today_plan': true},
       2: {
         'basic_chat': true,
-        'unlimited_chat': true,
+        'unlimited_chat': false,
         'today_plan': true,
-        'deep_suggestions': true,
       },
       3: {
         'basic_chat': true,
-        'unlimited_chat': true,
+        'unlimited_chat': false,
         'today_plan': true,
-        'deep_suggestions': true,
         'family': true,
       },
     };

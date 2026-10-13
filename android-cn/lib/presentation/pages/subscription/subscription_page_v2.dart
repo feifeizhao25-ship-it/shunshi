@@ -425,7 +425,7 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
           ),
           if (planId != 'free' && isActive) ...[
             const SizedBox(height: 10),
-            _buildFeatureRow('unlimited_chat', '无限聊天'),
+            _buildFeatureRow('basic_chat', '每日 AI 对话（次数见套餐说明）'),
             _buildFeatureRow('today_plan', '今日计划'),
           ],
         ],
@@ -462,9 +462,9 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
       case 'free':
         return '基础功能，满足日常养生需求';
       case 'yangxin':
-        return '无限聊天 + 今日计划';
+        return '每天 100 次对话 + 今日计划';
       case 'yiyang':
-        return '深度建议 + 周总结';
+        return '每天 200 次对话 + 今日计划';
       case 'jiahe':
         return '家庭共享（4席位）';
       default:

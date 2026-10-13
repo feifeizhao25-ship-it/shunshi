@@ -140,8 +140,8 @@ SUBSCRIPTION_PLANS = {
             "solar_terms": True,
             "unlimited_chat": True,
             "today_plan": True,
-            "deep_suggestions": True,
-            "weekly_summary": True,
+            "deep_suggestions": False,
+            "weekly_summary": False,
             "family": False
         }
     },
@@ -160,8 +160,8 @@ SUBSCRIPTION_PLANS = {
             "solar_terms": True,
             "unlimited_chat": True,
             "today_plan": True,
-            "deep_suggestions": True,
-            "weekly_summary": True,
+            "deep_suggestions": False,
+            "weekly_summary": False,
             "family": True
         }
     },
@@ -1796,7 +1796,7 @@ def _get_plan_description(plan_id: str) -> str:
     descriptions = {
         "free": f"基础功能，{chats('free')}，满足日常养生需求",
         "yangxin": f"{chats('yangxin')}+今日计划，适合养生爱好者",
-        "yiyang": f"{chats('yiyang')}+深度建议+周总结，适合养生达人",
+        "yiyang": f"{chats('yiyang')}+今日计划，对话次数是养心版的两倍",
         "jiahe": f"家庭共享（{SUBSCRIPTION_PLANS['jiahe']['family_seats']} 个家人席位），适合全家使用",
     }
     return descriptions.get(plan_id, "")

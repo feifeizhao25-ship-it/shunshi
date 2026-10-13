@@ -299,7 +299,7 @@ def test_activate_yangxin_has_registry_quota():
         },
     )
     data = response.json()["data"]
-    assert data["features"]["ai_questions_per_day"] == 200
+    assert data["features"]["ai_questions_per_day"] == 100  # 养心版：注册表 plus 档每天 100 次（2026-10-13 起）
 
 
 def test_activate_family_members_count():

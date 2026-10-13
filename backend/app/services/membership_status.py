@@ -2,7 +2,7 @@
 import time
 from datetime import datetime, timezone
 from fastapi import HTTPException
-from app.entitlements import tier_for_product
+from app.entitlements import daily_chat_limit_for_plan, tier_for_product
 from app.simple_models import Entitlement
 
 _DOMESTIC_PLAN_NAMES = {
@@ -13,10 +13,14 @@ _DOMESTIC_PLAN_NAMES = {
 }
 _DOMESTIC_FEATURES = {
     "free": {"basic_chat": True, "solar_terms": True},
-    "yangxin": {"basic_chat": True, "solar_terms": True, "unlimited_chat": True, "today_plan": True},
-    "yiyang": {"basic_chat": True, "solar_terms": True, "unlimited_chat": True, "today_plan": True, "deep_suggestions": True, "weekly_summary": True},
-    "jiahe": {"basic_chat": True, "solar_terms": True, "unlimited_chat": True, "today_plan": True, "deep_suggestions": True, "weekly_summary": True, "family": True},
+    "yangxin": {"basic_chat": True, "solar_terms": True, "today_plan": True},
+    "yiyang": {"basic_chat": True, "solar_terms": True, "today_plan": True},
+    "jiahe": {"basic_chat": True, "solar_terms": True, "today_plan": True, "family": True},
 }
+# 对话额度以权益注册表为准（养心每天 100 条、颐养 / 家和每天 200 条）；不再宣称没有执行点的「深度建议、周总结」。
+for _plan_id, _features in _DOMESTIC_FEATURES.items():
+    _features["daily_chat_limit"] = daily_chat_limit_for_plan(_plan_id)
+    _features["unlimited_chat"] = _features["daily_chat_limit"] == -1
 
 
 # Exact known SKU aliases only. Unknown products never acquire paid display.

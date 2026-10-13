@@ -524,8 +524,9 @@ class TestSubscriptionStatus:
         assert data["plan"] == "yiyang"
         assert data["status"] == "active"
         assert data["expires_at"] is not None
-        assert data["features"]["deep_suggestions"] is True
-        assert data["features"]["weekly_summary"] is True
+        # 「深度建议、周总结」没有执行点，2026-10-13 起不再作为颐养版权益宣传
+        assert data["features"]["deep_suggestions"] is False
+        assert data["features"]["weekly_summary"] is False
 
     @pytest.mark.asyncio
     async def test_subscription_end_date(self, client):
@@ -799,9 +800,13 @@ class TestTierPermissions:
         features = resp.json()["data"]["features"]
         assert features["unlimited_chat"] is False  # 注册表 pro：每天 200 条
         assert features["today_plan"] is True
-        assert features["deep_suggestions"] is True
-        assert features["weekly_summary"] is True
+        assert features["deep_suggestions"] is False  # 没有执行点，不再宣传
+        assert features["weekly_summary"] is False
         assert features["family"] is False  # 颐养版没有家庭
+        from app.router.subscription import SUBSCRIPTION_PLANS
+        # 颐养版比养心版多的是对话次数：每天 200 vs 100（权益注册表 pro / plus）
+        assert SUBSCRIPTION_PLANS["yiyang"]["daily_chat_limit"] == 200
+        assert SUBSCRIPTION_PLANS["yangxin"]["daily_chat_limit"] == 100
 
     @pytest.mark.asyncio
     async def test_jiahe_has_family_access(self, client, app):
@@ -942,9 +947,7 @@ class TestEndToEndFlow:
 
         # 3. 验证升级后状态
         resp = await client.get(f"{API_BASE}/status", params={"user_id": user_id})
-        features = resp.json()["data"]["features"]
-        assert features["deep_suggestions"] is True
-        assert features["weekly_summary"] is True
+        assert resp.json()["data"]["plan"] == "yiyang"
 
     @pytest.mark.asyncio
     async def test_cancel_order_flow(self, client):
