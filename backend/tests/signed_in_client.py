@@ -27,18 +27,24 @@ class SignedInClient(TestClient):
 
     def __init__(self, *args, admin: bool = False, **kwargs):
         super().__init__(*args, **kwargs)
-        self.admin_token = self._register_admin_token() if admin else None
+        self._admin = admin
+        self._admin_token = None
+        # 模块级的全局 app 不进 lifespan，核心库不会建表；而 current_user 现在要查注销任务表
+        # （Codex 66abea2d：已注销身份在各登录路径都要拒绝），这里按 lifespan 的做法先建核心表。
+        from app.db import init_db
+
+        init_db(self.app.state.engine)
         self.default_user_id = f"signed-in-{uuid.uuid4().hex[:12]}"
         self._known_users: set[str] = set()
 
-    @staticmethod
-    def _register_admin_token() -> str:
-        """与 test_product_access_guard 相同：往管理后台的活动令牌表里登记一个。"""
-        from app.router import admin_auth
+    @property
+    def admin_token(self):
+        """管理员会话已改为存数据库（admin_identity）：第一次发请求时才建会话，避免模块导入时库还没就绪。"""
+        if self._admin and self._admin_token is None:
+            from tests.admin_support import create_admin_session
 
-        token = "adm-" + uuid.uuid4().hex
-        admin_auth._active_tokens[token] = {"username": "ops", "expires_at": None}
-        return token
+            self._admin_token = create_admin_session()
+        return self._admin_token
 
     def _path_templates(self):
         """从 OpenAPI 取出所有带 {user_id}/{userId} 的路径模板，转成正则（FastAPI 新版的嵌套路由不好直接遍历）。"""
@@ -89,6 +95,13 @@ class SignedInClient(TestClient):
             (user_id, "测试用户"),
         )
         db.commit()
+        # 核心库（app.simple_models.User）也要有这个人：Codex 之后的家庭邀请等接口会核对邀请人账号仍存在。
+        from app.simple_models import User
+
+        with self.app.state.session_factory() as session:
+            if session.get(User, user_id) is None:
+                session.add(User(id=user_id, nickname="测试用户"))
+                session.commit()
         self._known_users.add(user_id)
 
     def request(self, method, url, **kwargs):
