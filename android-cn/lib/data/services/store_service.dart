@@ -21,17 +21,17 @@ class StoreService {
   // 恢复购买回调
   RestoreResultCallback? _onRestoreComplete;
 
-  // 国内版产品ID映射
+  // 国内版在售产品ID（0S3：年付唯一，内容订阅 ¥399、会员 ¥888）。
+  // 旧的养心 / 颐养 / 家和月付年付已停售：不再拉取、不再展示，但下面的映射保留，
+  // 老用户「恢复购买」时仍能识别。
   static const Map<String, String> productIds = {
-    'yangxin_monthly': 'com.shunshi.yangxin.monthly',
-    'yangxin_yearly': 'com.shunshi.yangxin.yearly',
-    'yiyang_monthly': 'com.shunshi.yiyang.monthly',
-    'yiyang_yearly': 'com.shunshi.yiyang.yearly',
-    'family_monthly': 'com.shunshi.family.monthly',
-    'family_yearly': 'com.shunshi.family.yearly',
+    'content_yearly': 'com.shunshi.content.yearly',
+    'member_yearly': 'com.shunshi.member.yearly',
   };
 
   static const Map<String, String> _productToPlan = {
+    'com.shunshi.content.yearly': 'yangxin',
+    'com.shunshi.member.yearly': 'yiyang',
     'com.shunshi.yangxin.monthly': 'yangxin',
     'com.shunshi.yangxin.yearly': 'yangxin',
     'com.shunshi.yiyang.monthly': 'yiyang',

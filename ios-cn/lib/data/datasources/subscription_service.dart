@@ -146,11 +146,11 @@ class SubscriptionService {
     ),
     SubscriptionPlan(
       id: 'yangxin',
-      name: '养心版',
-      priceCents: 2900,
-      priceYearlyCents: 19900,
-      period: 'month',
-      periodName: '月',
+      name: '内容订阅',
+      priceCents: 39900,
+      priceYearlyCents: 39900,
+      period: 'year',
+      periodName: '年',
       description: '每天 100 次对话+今日计划，适合养生爱好者',
       features: {
         'basic_chat': true,
@@ -161,11 +161,11 @@ class SubscriptionService {
     ),
     SubscriptionPlan(
       id: 'yiyang',
-      name: '颐养版',
-      priceCents: 5900,
-      priceYearlyCents: 39900,
-      period: 'month',
-      periodName: '月',
+      name: '会员',
+      priceCents: 88800,
+      priceYearlyCents: 88800,
+      period: 'year',
+      periodName: '年',
       description: '每天 200 次对话+今日计划，适合养生达人',
       isRecommended: true,
       features: {
@@ -175,22 +175,6 @@ class SubscriptionService {
         'today_plan': true,
       },
     ),
-    SubscriptionPlan(
-      id: 'jiahe',
-      name: '家和版',
-      priceCents: 9900,
-      priceYearlyCents: 69900,
-      period: 'month',
-      periodName: '月',
-      description: '家庭共享（4席位），适合全家使用',
-      familySeats: 4,
-      features: {
-        'basic_chat': true,
-        'solar_terms': true,
-        'unlimited_chat': false,
-        'today_plan': true,
-        'family': true,
-      },
-    ),
+    // 家和版 0S3 停售，不再出现在兜底列表
   ];
 }

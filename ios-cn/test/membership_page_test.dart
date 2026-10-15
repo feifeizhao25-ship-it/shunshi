@@ -12,9 +12,8 @@ UserSubscriptionStatus status({bool paid = false}) => UserSubscriptionStatus(
   features: {},
 );
 const prices = {
-  'yiyang_yearly': '¥388.00',
-  'yiyang_monthly': '¥58.00',
-  'family_yearly': '¥688.00',
+  'content_yearly': '¥399.00',
+  'member_yearly': '¥888.00',
 };
 
 void main() {
@@ -38,7 +37,7 @@ void main() {
       ),
     );
     expect(find.text('家和版'), findsOneWidget);
-    expect(find.text('¥388.00'), findsOneWidget);
+    expect(find.text('¥888.00'), findsOneWidget);
     expect(find.text('SVIP 尊享'), findsNothing);
     expect(find.text('RECOMMENDED'), findsNothing);
     expect(tester.takeException(), isNull);
@@ -79,12 +78,12 @@ void main() {
           },
         ),
       );
-      await tester.tap(find.text('家和版年付'));
+      await tester.tap(find.text('内容订阅·年付'));
       await tester.pump();
       await tester.ensureVisible(find.text('前往商店确认购买'));
       await tester.tap(find.text('前往商店确认购买'));
       await tester.pumpAndSettle();
-      expect(selected, 'family_yearly');
+      expect(selected, 'content_yearly');
       await tester.scrollUntilVisible(find.text('免费版'), -300);
       expect(find.text('免费版'), findsOneWidget);
       expect(find.text('家和版'), findsNothing);
@@ -100,7 +99,7 @@ void main() {
           loadPrices: () async => {},
         ),
       );
-      expect(find.text('商店价格暂不可用'), findsNWidgets(3));
+      expect(find.text('商店价格暂不可用'), findsNWidgets(2));  // 0S3 在售 2 个年付 SKU
       await tester.ensureVisible(find.byType(FilledButton));
       expect(
         tester.widget<FilledButton>(find.byType(FilledButton)).onPressed,
