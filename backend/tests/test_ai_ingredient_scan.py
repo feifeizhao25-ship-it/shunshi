@@ -27,6 +27,13 @@ class TestIngredientScan:
         response = client.post("/api/v1/ingredient-scan/scan", json=payload)
         assert response.status_code == 200
         assert response.json()["data"]["recognition_model"] == "verified-test-model"
+        # 图片识别结果来自模型：带显式「AI 生成」标识
+        assert response.json()["ai_generated"] is True
+        assert response.json()["ai_label"] == "AI 生成"
+
+    def test_scan_by_name_is_not_labelled_ai(self, client):
+        data = client.post("/api/v1/ingredient-scan/scan", json={"ingredient_name": "枸杞"}).json()
+        assert "ai_generated" not in data
 
     def test_scan_by_image_fails_without_ai_configuration(self, client, monkeypatch):
         monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)

@@ -157,7 +157,14 @@ class _SkillsPageState extends State<SkillsPage> {
                     ? '部分内容未能完成'
                     : _result!['status'] == 'failed'
                     ? '本次未能完成'
-                    : '人工智能生成，请结合自身情况参考',
+                    : '请结合自身情况参考',
+              ),
+              const SizedBox(height: 8),
+              // 显式标识：不论本次状态如何，只要展示了模型输出就带「AI 生成」。
+              Text(
+                (_result!['ai_label'] as String?) ?? 'AI 生成',
+                key: const Key('skill-ai-label'),
+                style: const TextStyle(fontSize: 12, color: Colors.grey),
               ),
               const SizedBox(height: 20),
               MarkdownBody(
