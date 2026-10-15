@@ -172,7 +172,7 @@ def test_activate_basic_tier_1_month():
     data = response.json()["data"]
     assert data["tier"] == "yangxin"
     assert data["duration_months"] == 1
-    assert data["total_price"] == 29  # 养心月付
+    assert data["total_price"] == 33.25  # 0S3 只卖年付：内容订阅 399/12 折算（仅开发环境接口）
 
 
 def test_activate_rejects_3_months():
@@ -365,7 +365,7 @@ def test_get_benefits_basic_tier():
     assert response.status_code == 200
     data = response.json()["data"]
     assert data["tier"] == "yangxin"
-    assert data["price_monthly"] == 29
+    assert data["price_monthly"] is None  # 0S3 只卖年付
 
 
 def test_get_benefits_premium_tier():
@@ -653,7 +653,7 @@ def test_unicode_user_id():
 
 
 def test_pricing_calculations_accuracy():
-    """价格与收费 SKU 一致：养心月付 29、年付 199"""
+    """价格与收费 SKU 一致：0S3 内容订阅只卖年付 399"""
     monthly = client.post(
         "/api/v1/membership/activate",
         json={"user_id": "user1", "tier": "yangxin", "duration_months": 1},
@@ -662,8 +662,8 @@ def test_pricing_calculations_accuracy():
         "/api/v1/membership/activate",
         json={"user_id": "user2", "tier": "yangxin", "duration_months": 12},
     ).json()["data"]
-    assert monthly["total_price"] == 29
-    assert yearly["total_price"] == 199
+    assert monthly["total_price"] == 33.25
+    assert yearly["total_price"] == 399
 
 
 def test_all_duration_options_supported():

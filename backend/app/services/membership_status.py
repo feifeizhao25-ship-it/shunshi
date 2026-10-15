@@ -7,8 +7,8 @@ from app.simple_models import Entitlement
 
 _DOMESTIC_PLAN_NAMES = {
     "free": "免费版",
-    "yangxin": "养心版",
-    "yiyang": "颐养版",
+    "yangxin": "内容订阅",
+    "yiyang": "会员",
     "jiahe": "家和版",
 }
 _DOMESTIC_FEATURES = {
@@ -26,9 +26,11 @@ for _plan_id, _features in _DOMESTIC_FEATURES.items():
 # Exact known SKU aliases only. Unknown products never acquire paid display.
 _PRODUCT_PLANS = {
     **{sku: 'yangxin' for sku in ('shunshi_yangxin_monthly', 'shunshi_yangxin_yearly',
-        'shunshi_healing_monthly', 'yangxin_monthly', 'yangxin_yearly')},
+        'shunshi_healing_monthly', 'yangxin_monthly', 'yangxin_yearly',
+        'shunshi_content_yearly', 'content_yearly', 'content_apple_yearly', 'com.shunshi.content.yearly')},
     **{sku: 'yiyang' for sku in ('shunshi_yiyang_monthly', 'shunshi_yiyang_yearly',
-        'yiyang_monthly', 'yiyang_yearly')},
+        'yiyang_monthly', 'yiyang_yearly',
+        'shunshi_member_yearly', 'member_yearly', 'member_apple_yearly', 'com.shunshi.member.yearly')},
     **{sku: 'jiahe' for sku in ('shunshi_family_monthly', 'shunshi_family_yearly',
         'family_monthly', 'family_yearly', 'jiahe_monthly', 'jiahe_yearly')},
 }

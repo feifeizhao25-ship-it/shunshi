@@ -43,6 +43,26 @@ ALIPAY_GATEWAY = {
 # ==================== 产品定义 ====================
 
 ALIPAY_PRODUCTS: dict[str, dict] = {
+    # 0S3 在售（年付唯一）
+    "content_yearly": {
+        "product_id": "shunshi_content_yearly",
+        "name": "内容订阅·年付",
+        "tier": "yangxin",
+        "price": Decimal("399.00"),
+        "currency": "CNY",
+        "duration_days": 365,
+        "max_family_seats": 0,
+    },
+    "member_yearly": {
+        "product_id": "shunshi_member_yearly",
+        "name": "会员·年付",
+        "tier": "yiyang",
+        "price": Decimal("888.00"),
+        "currency": "CNY",
+        "duration_days": 365,
+        "max_family_seats": 0,
+    },
+    # 以下为停售旧 SKU：订阅接口已拒绝下单，仅保留以便旧订单回调 / 对账识别金额
     "yangxin_monthly": {
         "product_id": "shunshi_yangxin_monthly",
         "name": "养心·月付",

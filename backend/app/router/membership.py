@@ -213,12 +213,13 @@ async def activate_membership(request: MembershipActivateRequest, db: Session = 
         )
 
     tier_data = MEMBERSHIP_TIERS[request.tier]
-    base_price = tier_data["price_monthly"]
+    # 0S3：付费档只卖年付；本接口仅开发 / 测试环境可用，非 12 个月按年价折算
+    base_price = tier_data["price_monthly"] if tier_data["price_monthly"] is not None else round(tier_data["price_yearly"] / 12, 2)
     if request.duration_months == 12 and tier_data.get("price_yearly") is not None:
         total_price = tier_data["price_yearly"]
     else:
         total_price = base_price * request.duration_months
-    full_price = base_price * request.duration_months
+    full_price = total_price if tier_data["price_monthly"] is None else base_price * request.duration_months
     discount = (total_price / full_price) if full_price else 1.0
 
     now = datetime.now()
@@ -342,7 +343,10 @@ async def compare_tiers():
                 else f"每日{features['audio_minutes_per_day']}分钟"
             ),
             "family_members": f"{features['family_members']}人",
-            "price": f"¥{tier_data['price_monthly']} 元/月" if tier_data["price_monthly"] > 0 else "免费",
+            "price": (
+                f"¥{tier_data['price_yearly']} 元/年" if tier_data["price_monthly"] is None
+                else f"¥{tier_data['price_monthly']} 元/月" if tier_data["price_monthly"] > 0 else "免费"
+            ),
         })
 
     return {

@@ -236,3 +236,12 @@ def pytest_configure(config):
         "markers",
         "admin_signed_in: 用带管理员令牌的客户端跑（测后台接口的功能用例）",
     )
+
+
+def sell_legacy_sku_for_existing_purchaser(monkeypatch, product_id):
+    """模拟「停售前已购」的老用户：0S3 后旧 SKU（如家和）不再售卖，
+    但已购用户的权益与家庭席位逻辑仍需覆盖，测试里临时把该 SKU 置回可下单。"""
+    from app.router import subscription as sub_mod
+    for product in sub_mod.SUBSCRIPTION_PRODUCTS:
+        if product["product_id"] == product_id:
+            monkeypatch.setitem(product, "status", "active")

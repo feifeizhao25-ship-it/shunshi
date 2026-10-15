@@ -77,7 +77,7 @@ class TestCreateOrder:
         assert order_data.get("status") == "pending", (
             f"新建订单状态应为 pending，实际: {order_data.get('status')}"
         )
-        assert order_data.get("amount_cents") == 19900
+        assert order_data.get("amount_cents") == 39900  # 0S3 内容订阅年付
         assert order_data.get("pay_url", "").startswith("https://")
 
     def test_create_free_plan_order(self, client):

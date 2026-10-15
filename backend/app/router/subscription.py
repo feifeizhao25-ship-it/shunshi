@@ -109,13 +109,14 @@ SUBSCRIPTION_PLANS = {
     },
     "yangxin": {
         "id": "yangxin",
-        "name": "养心版",
-        "price": 29,           # 月付价格（CNY）
-        "price_yearly": 199,   # 年付价格（CNY）
-        "price_cents": 2900,   # 月付（分）
-        "price_yearly_cents": 19900,
-        "period": "month",
-        "period_name": "月",
+        "name": "内容订阅",
+        "price": None,         # 0S3：只卖年付，无月付
+        "price_yearly": 399,   # 年付价格（CNY）
+        "price_cents": None,
+        "price_yearly_cents": 39900,
+        "period": "year",
+        "period_name": "年",
+        "on_sale": True,
         "features": {
             "basic_chat": True,
             "solar_terms": True,
@@ -128,13 +129,14 @@ SUBSCRIPTION_PLANS = {
     },
     "yiyang": {
         "id": "yiyang",
-        "name": "颐养版",
-        "price": 59,
-        "price_yearly": 399,
-        "price_cents": 5900,
-        "price_yearly_cents": 39900,
-        "period": "month",
-        "period_name": "月",
+        "name": "会员",
+        "price": None,
+        "price_yearly": 888,
+        "price_cents": None,
+        "price_yearly_cents": 88800,
+        "period": "year",
+        "period_name": "年",
+        "on_sale": True,
         "features": {
             "basic_chat": True,
             "solar_terms": True,
@@ -147,7 +149,8 @@ SUBSCRIPTION_PLANS = {
     },
     "jiahe": {
         "id": "jiahe",
-        "name": "家和版",
+        "name": "家和版（已停售）",
+        "on_sale": False,      # 0S3 不再售卖；只为已购用户保留权益
         "price": 99,
         "price_yearly": 699,
         "price_cents": 9900,
@@ -323,6 +326,29 @@ SUBSCRIPTION_PRODUCTS = [
         "status": "active",
     },
 ]
+
+# 0S3 定价（2026-10-15）：只卖年付「内容订阅 ¥399」「会员 ¥888」；陪伴档不在售。
+# 上面的养心 / 颐养 / 家和旧 SKU 全部停售（status=legacy）：不再列出、不能下单，
+# 但已购用户的权益映射（注册表 product_tier_map、_product_id_to_plan）保留不变。
+for _legacy in SUBSCRIPTION_PRODUCTS:
+    _legacy["status"] = "legacy"
+
+for _pid, _tier, _name, _cents in (
+    ("content_yearly", "yangxin", "内容订阅·年付", 39900),
+    ("member_yearly", "yiyang", "会员·年付", 88800),
+):
+    for _platform, _id in (("alipay", _pid), ("apple", _pid.replace("_yearly", "_apple_yearly"))):
+        SUBSCRIPTION_PRODUCTS.append({
+            "product_id": _id,
+            "name": _name,
+            "tier": _tier,
+            "price_cents": _cents,
+            "currency": "CNY",
+            "duration_days": 365,
+            "platform": _platform,
+            "features": SUBSCRIPTION_PLANS[_tier]["features"],
+            "status": "active",
+        })
 
 SUBSCRIPTION_PRODUCTS.extend(
     [{**product, "platform": "wechat"} for product in list(SUBSCRIPTION_PRODUCTS)
@@ -1184,6 +1210,8 @@ async def create_order(
     )
     if product is None:
         raise HTTPException(status_code=400, detail="商品与支付平台不匹配")
+    if product.get("status") != "active":
+        raise HTTPException(status_code=410, detail="该商品已停售，请选择内容订阅或会员年付")
 
     current_sub = get_user_subscription(user_id)
     new_tier = product["tier"]
@@ -1446,7 +1474,8 @@ def _product_id_to_plan(product_id: str) -> Optional[str]:
 
     aliases = {
         f"com.shunshi.{name}.{period}": tier
-        for name, tier in (("yangxin", "yangxin"), ("yiyang", "yiyang"), ("jiahe", "jiahe"), ("family", "jiahe"))
+        for name, tier in (("yangxin", "yangxin"), ("yiyang", "yiyang"), ("jiahe", "jiahe"), ("family", "jiahe"),
+                           ("content", "yangxin"), ("member", "yiyang"))
         for period in ("monthly", "yearly")
     }
     if product_id in aliases:
@@ -1964,7 +1993,10 @@ async def alipay_create_order(
     if request.plan == "free":
         raise HTTPException(status_code=400, detail="免费方案无需创建支付订单")
     return await create_order(
-        CreateOrderRequest(product_id=f"{request.plan}_yearly", platform="alipay"),
+        CreateOrderRequest(
+            product_id={"yangxin": "content_yearly", "yiyang": "member_yearly"}.get(request.plan, f"{request.plan}_yearly"),
+            platform="alipay",
+        ),
         user_id,
     )
 

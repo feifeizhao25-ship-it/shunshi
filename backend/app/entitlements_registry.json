@@ -1,6 +1,6 @@
 {
   "product": "shunshi",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "tiers": {
     "free": {
       "quotas": {
@@ -182,6 +182,14 @@
     "family_monthly": "family",
     "family_yearly": "family",
     "jiahe_monthly": "family",
-    "jiahe_yearly": "family"
+    "jiahe_yearly": "family",
+    "shunshi_content_yearly": "plus",
+    "content_yearly": "plus",
+    "content_apple_yearly": "plus",
+    "com.shunshi.content.yearly": "plus",
+    "shunshi_member_yearly": "pro",
+    "member_yearly": "pro",
+    "member_apple_yearly": "pro",
+    "com.shunshi.member.yearly": "pro"
   }
 }

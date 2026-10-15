@@ -38,6 +38,8 @@ def test_subscription_plans_do_not_claim_more_than_registry():
 
 def test_every_sku_price_matches_its_plan():
     for sku in SUBSCRIPTION_PRODUCTS:
+        if sku["status"] != "active":
+            continue  # 停售旧 SKU 保留下单时的原价，仅供旧订单对账
         plan = SUBSCRIPTION_PLANS[sku["tier"]]
         yearly = sku["duration_days"] >= 365
         expected = plan["price_yearly_cents"] if yearly else plan["price_cents"]
@@ -48,6 +50,9 @@ def test_every_sku_price_matches_its_plan():
 
 def test_alipay_products_match_plans_and_registry():
     for key, product in ALIPAY_PRODUCTS.items():
+        assert tier_for_product(product["product_id"]) == registry_tier_for_plan(product["tier"]), key
+        if key not in {"content_yearly", "member_yearly"}:
+            continue  # 停售旧 SKU：价格保留原样，仅供旧订单对账
         plan = SUBSCRIPTION_PLANS[product["tier"]]
         yearly = product["duration_days"] >= 365
         expected = plan["price_yearly"] if yearly else plan["price"]

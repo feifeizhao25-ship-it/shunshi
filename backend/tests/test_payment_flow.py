@@ -258,8 +258,8 @@ class TestProductQuery:
         body = resp.json()
         assert body["success"] is True
         products = body["data"]["products"]
-        # 18 个 SKU: 3 tiers × 2 durations × 支付宝/微信/Apple
-        assert len(products) == 18
+        # 0S3 在售 6 个 SKU：内容订阅 / 会员 × 年付 × 支付宝/微信/Apple
+        assert len(products) == 6
 
     @pytest.mark.asyncio
     async def test_products_have_valid_pricing(self, client):
@@ -278,14 +278,14 @@ class TestProductQuery:
         # 仅 alipay
         resp = await client.get(f"{API_BASE}/products", params={"platform": "alipay"})
         products = resp.json()["data"]["products"]
-        assert len(products) == 6  # 3 tiers × 2 durations
+        assert len(products) == 2  # 内容订阅 / 会员 年付
         for p in products:
             assert p["platform"] == "alipay"
 
         # 仅 apple
         resp = await client.get(f"{API_BASE}/products", params={"platform": "apple"})
         products = resp.json()["data"]["products"]
-        assert len(products) == 6
+        assert len(products) == 2
         for p in products:
             assert p["platform"] == "apple"
 
@@ -295,9 +295,9 @@ class TestProductQuery:
         data = resp.json()["data"]
         # tiers 应该包含4个层级
         assert data["tiers"] == ["free", "yangxin", "yiyang", "jiahe"]
-        # 产品中应该覆盖所有付费层级
+        # 在售商品只覆盖内容订阅与会员（家和 0S3 停售）
         tiers_in_products = {p["tier"] for p in data["products"]}
-        assert tiers_in_products == {"yangxin", "yiyang", "jiahe"}
+        assert tiers_in_products == {"yangxin", "yiyang"}
         # 所有产品都应有 features
         for p in data["products"]:
             assert "features" in p
@@ -316,14 +316,14 @@ class TestOrderCreation:
     async def test_create_order_success(self, client):
         resp = await client.post(
             f"{API_BASE}/create-order",
-            json={"product_id": "yangxin_monthly", "platform": "alipay"},
+            json={"product_id": "content_yearly", "platform": "alipay"},
             params={"user_id": "user-create-001"},
         )
         assert resp.status_code == 200
         data = resp.json()["data"]
         assert data["status"] == "pending"
-        assert data["amount_cents"] == 2900
-        assert data["amount_display"] == "¥29.00"
+        assert data["amount_cents"] == 39900
+        assert data["amount_display"] == "¥399.00"
         assert data["currency"] == "CNY"
         assert data["expires_in"] == 1800
 
@@ -340,7 +340,7 @@ class TestOrderCreation:
     async def test_create_order_generates_order_id(self, client):
         resp = await client.post(
             f"{API_BASE}/create-order",
-            json={"product_id": "yiyang_apple_yearly", "platform": "apple"},
+            json={"product_id": "member_apple_yearly", "platform": "apple"},
             params={"user_id": "user-order-id-001"},
         )
         data = resp.json()["data"]
@@ -351,7 +351,7 @@ class TestOrderCreation:
 
     @pytest.mark.asyncio
     @pytest.mark.parametrize("platform,product_id", [
-        ("alipay", "yangxin_monthly"), ("apple", "yangxin_apple_monthly"),
+        ("alipay", "content_yearly"), ("apple", "content_apple_yearly"),
     ])
     async def test_create_duplicate_order_same_product(self, client, monkeypatch, platform, product_id):
         """国内同档可创建待付款续费订单，应用商店保留原购买规则。"""
@@ -390,7 +390,7 @@ class TestPaymentVerification:
     @pytest.mark.asyncio
     async def test_verify_payment_activates_subscription(self, client, monkeypatch):
         user_id = "user-verify-001"
-        _, resp = await _create_and_pay_order(client, user_id, "yangxin_monthly")
+        _, resp = await _create_and_pay_order(client, user_id, "content_yearly")
         assert resp["success"] is True
         assert resp["data"]["status"] == "paid"
         assert resp["data"]["plan"] == "yangxin"
@@ -402,6 +402,8 @@ class TestPaymentVerification:
 
     @pytest.mark.asyncio
     async def test_verify_payment_updates_user_tier(self, client, monkeypatch):
+        from tests.conftest import sell_legacy_sku_for_existing_purchaser
+        sell_legacy_sku_for_existing_purchaser(monkeypatch, "jiahe_monthly")
         user_id = "user-tier-001"
         _, resp = await _create_and_pay_order(client, user_id, "jiahe_monthly")
         assert resp["data"]["plan"] == "jiahe"
@@ -413,7 +415,7 @@ class TestPaymentVerification:
     async def test_verify_payment_rejects_missing_signature(self, client):
         create = await client.post(
             f"{API_BASE}/create-order",
-            json={"product_id": "yangxin_monthly", "platform": "alipay"},
+            json={"product_id": "content_yearly", "platform": "alipay"},
             params={"user_id": "user-missing-signature"},
         )
         order_id = create.json()["data"]["order_id"]
@@ -428,7 +430,7 @@ class TestPaymentVerification:
     async def test_verify_payment_rejects_tampered_transaction(self, client):
         create = await client.post(
             f"{API_BASE}/create-order",
-            json={"product_id": "yangxin_monthly", "platform": "alipay"},
+            json={"product_id": "content_yearly", "platform": "alipay"},
             params={"user_id": "user-tampered-signature"},
         )
         order_id = create.json()["data"]["order_id"]
@@ -450,7 +452,7 @@ class TestPaymentVerification:
         # 创建订单后，模拟已支付状态再验证（非pending不能支付）
         resp_create = await client.post(
             f"{API_BASE}/create-order",
-            json={"product_id": "yangxin_monthly", "platform": "alipay"},
+            json={"product_id": "content_yearly", "platform": "alipay"},
         )
         order_id = resp_create.json()["data"]["order_id"]
 
@@ -471,7 +473,7 @@ class TestPaymentVerification:
     async def test_verify_duplicate_payment(self, client):
         """重复支付同一订单返回 already_paid"""
         user_id = "user-dup-pay-001"
-        order_id, resp = await _create_and_pay_order(client, user_id, "yiyang_yearly")
+        order_id, resp = await _create_and_pay_order(client, user_id, "member_yearly")
         assert resp["data"]["status"] == "paid"
 
         # 再次支付同一订单
@@ -488,7 +490,7 @@ class TestPaymentVerification:
         from app.router import subscription as sub_mod
         assert len(sub_mod.audit_log) == 0
 
-        await _create_and_pay_order(client, user_id, "yangxin_monthly")
+        await _create_and_pay_order(client, user_id, "content_yearly")
 
         # 应该有创建订单和支付验证两条审计日志
         actions = [e["action"] for e in sub_mod.audit_log]
@@ -517,7 +519,7 @@ class TestSubscriptionStatus:
     @pytest.mark.asyncio
     async def test_paid_user_status(self, client):
         user_id = "user-paid-status"
-        await _create_and_pay_order(client, user_id, "yiyang_yearly")
+        await _create_and_pay_order(client, user_id, "member_yearly")
 
         resp = await client.get(f"{API_BASE}/status", params={"user_id": user_id})
         data = resp.json()["data"]
@@ -532,12 +534,12 @@ class TestSubscriptionStatus:
     async def test_subscription_end_date(self, client):
         user_id = "user-end-date"
         # 月付 → 30天
-        order_id, resp = await _create_and_pay_order(client, user_id, "yangxin_monthly")
+        order_id, resp = await _create_and_pay_order(client, user_id, "content_yearly")
         expires_at_str = resp["data"]["subscription"]["expires_at"]
         expires_at = datetime.fromisoformat(expires_at_str)
 
-        # 过期时间应在约30天后 (±1s 容差)
-        expected = datetime.now(timezone.utc) + timedelta(days=30)
+        # 0S3 只卖年付：过期时间应在约365天后 (±1s 容差)
+        expected = datetime.now(timezone.utc) + timedelta(days=365)
         diff = abs((expires_at - expected).total_seconds())
         assert diff < 2, f"过期时间偏差: {diff}s"
 
@@ -550,7 +552,7 @@ class TestSubscriptionStatus:
 
         # Yangxin
         user_yx = "user-perm-yx"
-        await _create_and_pay_order(client, user_yx, "yangxin_monthly")
+        await _create_and_pay_order(client, user_yx, "content_yearly")
         resp_yx = await client.get(f"{API_BASE}/status", params={"user_id": user_yx})
         yx_features = resp_yx.json()["data"]["features"]
 
@@ -777,7 +779,7 @@ class TestTierPermissions:
     async def test_yangxin_can_access_basic_premium(self, client):
         """养心版有基础高级功能"""
         user_id = "user-yx-perm"
-        await _create_and_pay_order(client, user_id, "yangxin_monthly")
+        await _create_and_pay_order(client, user_id, "content_yearly")
 
         resp = await client.get(f"{API_BASE}/status", params={"user_id": user_id})
         features = resp.json()["data"]["features"]
@@ -794,7 +796,7 @@ class TestTierPermissions:
     async def test_yiyang_has_higher_limits(self, client):
         """颐养版有深度建议和周总结"""
         user_id = "user-yy-perm"
-        await _create_and_pay_order(client, user_id, "yiyang_yearly")
+        await _create_and_pay_order(client, user_id, "member_yearly")
 
         resp = await client.get(f"{API_BASE}/status", params={"user_id": user_id})
         features = resp.json()["data"]["features"]
@@ -809,8 +811,10 @@ class TestTierPermissions:
         assert SUBSCRIPTION_PLANS["yangxin"]["daily_chat_limit"] == 100
 
     @pytest.mark.asyncio
-    async def test_jiahe_has_family_access(self, client, app):
+    async def test_jiahe_has_family_access(self, client, app, monkeypatch):
         """家和版有家庭席位"""
+        from tests.conftest import sell_legacy_sku_for_existing_purchaser
+        sell_legacy_sku_for_existing_purchaser(monkeypatch, "jiahe_monthly")
         user_id = "user-jh-perm"
         await _create_and_pay_order(client, user_id, "jiahe_monthly")
         _seed_family_entitlement(app, user_id)
@@ -824,8 +828,10 @@ class TestTierPermissions:
         assert data["family_seats"]["available"] == 4
 
     @pytest.mark.asyncio
-    async def test_jiahe_family_bind_and_unbind(self, client, app):
+    async def test_jiahe_family_bind_and_unbind(self, client, app, monkeypatch):
         """家和版绑定/解绑家庭成员"""
+        from tests.conftest import sell_legacy_sku_for_existing_purchaser
+        sell_legacy_sku_for_existing_purchaser(monkeypatch, "jiahe_monthly")
         user_id = "user-jh-bind"
         await _create_and_pay_order(client, user_id, "jiahe_monthly")
         _seed_family_entitlement(app, user_id)
@@ -871,7 +877,7 @@ class TestEndToEndFlow:
         # 2. 创建订单
         resp_order = await client.post(
             f"{API_BASE}/create-order",
-            json={"product_id": "yangxin_yearly", "platform": "alipay"},
+            json={"product_id": "content_yearly", "platform": "alipay"},
             params={"user_id": user_id},
         )
         assert resp_order.status_code == 200
@@ -924,7 +930,7 @@ class TestEndToEndFlow:
         user_id = "user-upgrade"
 
         # 1. 购买 yangxin
-        await _create_and_pay_order(client, user_id, "yangxin_monthly")
+        await _create_and_pay_order(client, user_id, "content_yearly")
         resp = await client.get(f"{API_BASE}/status", params={"user_id": user_id})
         assert resp.json()["data"]["plan"] == "yangxin"
 
@@ -933,7 +939,7 @@ class TestEndToEndFlow:
         # 当前代码: TIER_ORDER[yiyang] > TIER_ORDER[yangxin] 所以不会触发 "无需重复购买"
         resp_order = await client.post(
             f"{API_BASE}/create-order",
-            json={"product_id": "yiyang_yearly", "platform": "alipay"},
+            json={"product_id": "member_yearly", "platform": "alipay"},
             params={"user_id": user_id},
         )
         assert resp_order.status_code == 200  # 升级订单创建成功
@@ -955,7 +961,7 @@ class TestEndToEndFlow:
         # 1. 创建订单
         resp = await client.post(
             f"{API_BASE}/create-order",
-            json={"product_id": "yangxin_monthly", "platform": "alipay"},
+            json={"product_id": "content_yearly", "platform": "alipay"},
         )
         order_id = resp.json()["data"]["order_id"]
 
@@ -976,7 +982,7 @@ class TestEndToEndFlow:
         # pending → cancelled
         resp1 = await client.post(
             f"{API_BASE}/create-order",
-            json={"product_id": "yiyang_monthly", "platform": "alipay"},
+            json={"product_id": "member_yearly", "platform": "alipay"},
             params={"user_id": "user-trans-001"},
         )
         oid1 = resp1.json()["data"]["order_id"]
@@ -986,7 +992,7 @@ class TestEndToEndFlow:
         # pending → paid
         resp2 = await client.post(
             f"{API_BASE}/create-order",
-            json={"product_id": "yiyang_monthly", "platform": "alipay"},
+            json={"product_id": "member_yearly", "platform": "alipay"},
             params={"user_id": "user-trans-002"},
         )
         oid2 = resp2.json()["data"]["order_id"]
@@ -1049,7 +1055,7 @@ class TestBackwardCompatAPI:
             json={
                 "platform": "ios",
                 "receipt_data": "mock_ios_receipt_data_long_enough",
-                "product_id": "yangxin_monthly",
+                "product_id": "content_yearly",
                 "plan": "yangxin",
                 "user_id": "user-receipt-v2",
             },
@@ -1146,7 +1152,7 @@ class TestEdgeCases:
     async def test_cancel_paid_order(self, client):
         """已支付订单不能取消"""
         user_id = "user-cancel-paid"
-        order_id, _ = await _create_and_pay_order(client, user_id, "yangxin_monthly")
+        order_id, _ = await _create_and_pay_order(client, user_id, "content_yearly")
 
         resp = await client.post(
             f"{API_BASE}/cancel-order", headers=_order_auth(order_id), json={"order_id": order_id},
@@ -1168,8 +1174,10 @@ class TestEdgeCases:
         assert resp.status_code == 400
 
     @pytest.mark.asyncio
-    async def test_bind_family_exceed_limit(self, client, app):
+    async def test_bind_family_exceed_limit(self, client, app, monkeypatch):
         """超额绑定家庭席位"""
+        from tests.conftest import sell_legacy_sku_for_existing_purchaser
+        sell_legacy_sku_for_existing_purchaser(monkeypatch, "jiahe_monthly")
         user_id = "user-family-full"
         await _create_and_pay_order(client, user_id, "jiahe_monthly")
         _seed_family_entitlement(app, user_id)
@@ -1204,9 +1212,8 @@ class TestEdgeCases:
     async def test_create_order_with_all_platforms(self, client):
         """所有平台都能创建订单"""
         products = [
-            ("yangxin_apple_monthly", "apple"),
-            ("yiyang_monthly", "alipay"),
-            ("jiahe_yearly", "alipay"),
+            ("content_apple_yearly", "apple"),
+            ("member_yearly", "alipay"),
         ]
         for product_id, platform in products:
             resp = await client.post(
@@ -1215,6 +1222,10 @@ class TestEdgeCases:
             )
             assert resp.status_code == 200, f"Failed for {product_id}: {resp.text}"
             assert resp.json()["data"]["status"] == "pending"
+        # 停售 SKU（家和、旧月付）不能再下单
+        for product_id in ("jiahe_yearly", "yangxin_monthly"):
+            resp = await client.post(f"{API_BASE}/create-order", json={"product_id": product_id, "platform": "alipay"})
+            assert resp.status_code == 410
 
     @pytest.mark.asyncio
     async def test_products_response_structure(self, client):
@@ -1250,7 +1261,7 @@ if __name__ == "__main__":
     ("transaction_id", ""), ("platform", "google"),
 ])
 async def test_signed_invalid_transaction_cannot_mutate_order(client, field, value):
-    created = await client.post(f"{API_BASE}/create-order", json={"product_id": "yangxin_monthly", "platform": "alipay"})
+    created = await client.post(f"{API_BASE}/create-order", json={"product_id": "content_yearly", "platform": "alipay"})
     order_id = created.json()["data"]["order_id"]
     callback = _test_alipay_callback(order_id, "TXN_VALID")
     callback[field] = value
@@ -1269,7 +1280,7 @@ async def test_signed_invalid_transaction_cannot_mutate_order(client, field, val
 async def test_cancel_requires_owner_even_in_testing_environment(client):
     from app.config import Settings
     from app.security import issue_token
-    created = await client.post(f"{API_BASE}/create-order", params={"user_id": "owner-fixture"}, json={"product_id": "yangxin_monthly", "platform": "alipay"})
+    created = await client.post(f"{API_BASE}/create-order", params={"user_id": "owner-fixture"}, json={"product_id": "content_yearly", "platform": "alipay"})
     order_id = created.json()["data"]["order_id"]
     assert (await client.post(f"{API_BASE}/cancel-order", json={"order_id": order_id})).status_code == 401
     token = issue_token(Settings(env="test", jwt_secret="payment-fixture-secret-at-least-32-characters"), "another-user")
@@ -1292,7 +1303,7 @@ async def test_development_flag_and_long_google_token_are_not_payment_proof(monk
 
 @pytest.mark.asyncio
 async def test_paid_order_replay_still_requires_matching_signed_transaction(client):
-    order_id, _ = await _create_and_pay_order(client, "replay-fixture", "yangxin_monthly")
+    order_id, _ = await _create_and_pay_order(client, "replay-fixture", "content_yearly")
     assert (await client.post(f"{API_BASE}/verify-payment", json={"order_id": order_id})).status_code == 400
     assert (await client.post(f"{API_BASE}/verify-payment", json=_test_alipay_callback(order_id, "different-transaction"))).status_code == 409
     assert live_subscription.payment_orders[order_id]["status"] == "paid"
@@ -1300,9 +1311,9 @@ async def test_paid_order_replay_still_requires_matching_signed_transaction(clie
 
 @pytest.mark.asyncio
 async def test_transaction_reuse_cannot_pay_another_order(client):
-    first, _ = await _create_and_pay_order(client, "first-owner", "yangxin_monthly")
+    first, _ = await _create_and_pay_order(client, "first-owner", "content_yearly")
     transaction = live_subscription.payment_orders[first]["transaction_id"]
-    created = await client.post(f"{API_BASE}/create-order", json={"product_id": "yangxin_monthly", "platform": "alipay"})
+    created = await client.post(f"{API_BASE}/create-order", json={"product_id": "content_yearly", "platform": "alipay"})
     second = created.json()["data"]["order_id"]
     response = await client.post(f"{API_BASE}/verify-payment", json=_test_alipay_callback(second, transaction))
     assert response.status_code == 409
@@ -1311,7 +1322,7 @@ async def test_transaction_reuse_cannot_pay_another_order(client):
 
 @pytest.mark.asyncio
 async def test_stale_cache_cannot_cancel_paid_order(client, db):
-    created = await client.post(f"{API_BASE}/create-order", json={"product_id": "yangxin_monthly", "platform": "alipay"})
+    created = await client.post(f"{API_BASE}/create-order", json={"product_id": "content_yearly", "platform": "alipay"})
     order_id = created.json()["data"]["order_id"]
     db.execute("UPDATE payment_orders SET status='paid', transaction_id='external-paid' WHERE id=?", (order_id,))
     db.commit()
