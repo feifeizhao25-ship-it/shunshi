@@ -88,10 +88,10 @@ async def create_video(req: VideoGenerateRequest) -> JSONResponse:
         raise HTTPException(status_code=400, detail=str(e))
     except RuntimeError as e:
         logger.error(f"[Multimodal Videos] 提交失败: {e}")
-        raise HTTPException(status_code=502, detail=str(e))
+        raise HTTPException(status_code=502, detail="视频服务暂时不可用，请稍后再试")
     except Exception as e:
         logger.exception(f"[Multimodal Videos] 未知错误: {e}")
-        raise HTTPException(status_code=500, detail=f"内部错误: {e}")
+        raise HTTPException(status_code=500, detail="服务暂时不可用，请稍后再试")
 
 
 @router.get(
@@ -110,7 +110,7 @@ async def get_video_status(task_id: str) -> JSONResponse:
         raise HTTPException(status_code=400, detail=str(e))
     except RuntimeError as e:
         logger.error(f"[Multimodal Videos Status] 查询失败: {e}")
-        raise HTTPException(status_code=502, detail=str(e))
+        raise HTTPException(status_code=502, detail="视频服务暂时不可用，请稍后再试")
     except Exception as e:
         logger.exception(f"[Multimodal Videos Status] 未知错误: {e}")
-        raise HTTPException(status_code=500, detail=f"内部错误: {e}")
+        raise HTTPException(status_code=500, detail="服务暂时不可用，请稍后再试")

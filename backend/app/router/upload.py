@@ -42,7 +42,7 @@ async def upload_image_endpoint(
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         logger.exception(f"[Upload] 上传失败: {e}")
-        raise HTTPException(status_code=500, detail=f"上传失败: {e}")
+        raise HTTPException(status_code=500, detail="上传失败，请稍后重试")
 
 
 @router.post(

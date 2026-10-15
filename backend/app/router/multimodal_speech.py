@@ -86,7 +86,7 @@ async def create_speech(req: SpeechGenerateRequest) -> Response:
         raise HTTPException(status_code=400, detail=str(e))
     except RuntimeError as e:
         logger.error(f"[Multimodal Speech] 生成失败: {e}")
-        raise HTTPException(status_code=502, detail=str(e))
+        raise HTTPException(status_code=502, detail="语音服务暂时不可用，请稍后再试")
     except Exception as e:
         logger.exception(f"[Multimodal Speech] 未知错误: {e}")
-        raise HTTPException(status_code=500, detail=f"内部错误: {e}")
+        raise HTTPException(status_code=500, detail="服务暂时不可用，请稍后再试")
