@@ -180,15 +180,29 @@ class UserSubscriptionStatus {
   });
 
   factory UserSubscriptionStatus.fromJson(Map<String, dynamic> json) {
+    // 后端 /api/v1/subscription/status 返回 plan / plan_name（中文）/ expires_at（秒级时间戳）；
+    // 原实现只认 plan_id 并对数字 DateTime.parse，一解析就抛异常，付费用户被显示成 Free。
+    final id = (json['plan_id'] ?? json['plan'] ?? 'free').toString();
+    const enNames = {'free': 'Free', 'yangxin': 'Wellness', 'yiyang': 'Premium', 'jiahe': 'Family'};
+    final rawExp = json['expires_at'];
+    DateTime? exp;
+    if (rawExp is num) {
+      exp = DateTime.fromMillisecondsSinceEpoch((rawExp * 1000).round());
+    } else if (rawExp is String && rawExp.isNotEmpty) {
+      exp = DateTime.tryParse(rawExp);
+    }
+    final rawFeatures = json['features'];
     return UserSubscriptionStatus(
-      planId: json['plan_id'] ?? 'free',
-      planName: json['plan_name'] ?? 'Free',
+      planId: id,
+      planName: enNames[id] ?? 'Free',
       isActive: json['is_active'] ?? false,
-      expiresAt: json['expires_at'] != null
-          ? DateTime.parse(json['expires_at'])
-          : null,
+      expiresAt: exp,
       dayRemaining: json['day_remaining'] ?? 0,
-      features: Map<String, bool>.from(json['features'] ?? {}),
+      features: rawFeatures is Map
+          ? Map<String, bool>.fromEntries(rawFeatures.entries
+              .where((e) => e.value is bool)
+              .map((e) => MapEntry(e.key.toString(), e.value as bool)))
+          : <String, bool>{},
     );
   }
 }

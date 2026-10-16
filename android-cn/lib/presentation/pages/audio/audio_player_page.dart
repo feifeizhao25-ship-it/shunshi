@@ -40,6 +40,7 @@ class AudioPlayerPage extends StatefulWidget {
 class _AudioPlayerPageState extends State<AudioPlayerPage>
     with TickerProviderStateMixin {
   late AudioPlayer _player;
+  bool _usingBundled = false;
   bool _isPlaying = false;
   bool _isPremium = false;
   bool _isLoading = true;
@@ -107,7 +108,9 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
     } else if (widget.audioId != null && widget.audioId!.isNotEmpty) {
       _loadAudioFromId();
     } else {
-      // 无数据，回退到静态 UI
+      // 未指定音频：使用随包内置的呼吸引导音频（assets/audio），点击开始即可播放
+      _usingBundled = true;
+      _player.setSource(AssetSource('audio/audio_breathe_1.mp3'));
       setState(() => _isLoading = false);
     }
   }
@@ -186,6 +189,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
       _reportProgress();
     } else {
       await _player.resume();
+      if (_usingBundled && mounted) setState(() => _isPlaying = true);
     }
   }
 

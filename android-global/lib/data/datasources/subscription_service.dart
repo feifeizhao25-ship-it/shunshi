@@ -2,14 +2,28 @@ import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/subscription.dart';
 import '../../core/config/app_config.dart';
+import '../storage/storage_manager.dart';
 
 /// 订阅服务 - 对接后端 API
 class SubscriptionService {
-  static final _dio = Dio(BaseOptions(
+  // 订阅/套餐接口都要求登录：此前这个 Dio 没带 Authorization，已登录用户也拿到 401，
+  // 页面因此显示“查询失败”（国内）或回退成假的“Free · ACTIVE”（国际）。
+  static final Dio _dio = _withAuth(Dio(BaseOptions(
     baseUrl: AppConfig.baseUrl,
     connectTimeout: const Duration(seconds: 8),
     receiveTimeout: const Duration(seconds: 10),
-  ));
+  )));
+
+  static Dio _withAuth(Dio dio) {
+    dio.interceptors.add(InterceptorsWrapper(onRequest: (options, handler) {
+      final token = StorageManager.user.getToken();
+      if (token != null && token.isNotEmpty) {
+        options.headers['Authorization'] = 'Bearer $token';
+      }
+      handler.next(options);
+    }));
+    return dio;
+  }
 
   /// 获取订阅计划列表
   static Future<List<SubscriptionPlan>> getPlans() async {
@@ -32,7 +46,7 @@ class SubscriptionService {
   static Future<UserSubscriptionStatus> getCurrentStatus() async {
     final userId = await _getUserId();
     try {
-      final res = await _dio.get('/api/v1/subscription/status$userId');
+      final res = await _dio.get('/api/v1/subscription/status');
       if (res.data?['success'] == true) {
         return UserSubscriptionStatus.fromJson(res.data['data']);
       }
