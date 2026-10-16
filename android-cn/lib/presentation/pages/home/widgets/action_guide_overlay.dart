@@ -144,7 +144,7 @@ class ActionGuideOverlay extends StatelessWidget {
         if (h >= 14 && h < 18) {
           return _GuideData(
             icon: Icons.water_drop_outlined,
-            title: '申时膀胱经当令，多喝水排毒',
+            title: '下午记得多喝温水',
             subtitle: '记录饮水 →',
             color: const Color(0xFF29B6F6),
             stepNum: 2,

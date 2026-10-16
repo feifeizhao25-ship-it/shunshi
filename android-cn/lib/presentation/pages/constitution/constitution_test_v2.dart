@@ -312,7 +312,7 @@ class _ConstitutionTestV2State extends State<ConstitutionTestV2> {
       ],
       '特禀质': [
         {'title': '饮食调养', 'desc': '清淡饮食，避免已知过敏原。增强脾胃功能。', 'icon': Icons.restaurant, 'color': Color(0xFF607D8B)},
-        {'title': '运动调养', 'desc': '适度运动增强免疫力，换季时注意防护。', 'icon': Icons.self_improvement, 'color': Color(0xFF2196F3)},
+        {'title': '运动调养', 'desc': '保持适度运动，换季时注意增减衣物。', 'icon': Icons.self_improvement, 'color': Color(0xFF2196F3)},
       ],
     };
     return adviceMap[typeName] ?? adviceMap['平和质']!;

@@ -22,7 +22,7 @@ class _SeasonalIngredientsPageState extends State<SeasonalIngredientsPage> {
   static const _filters = ['All Items', 'Vegetables', 'Fruits', 'Herbs'];
 
   static const _ingredients = [
-    _Ingredient('芦笋', 'Vegetables', '富含叶酸和铬，支持排毒和血糖调节。', ['Vata Cooling', 'Kapha Light']),
+    _Ingredient('芦笋', 'Vegetables', '富含叶酸和膳食纤维，口感清爽。', ['Vata Cooling', 'Kapha Light']),
     _Ingredient('大黄', 'Fruits', '高纤维和抗氧化，促进消化健康。', ['Pitta Cooling']),
     _Ingredient('Mint', 'Herbs', '舒缓消化，具有清凉特性。', ['Pitta Cooling', 'Kapha Light']),
     _Ingredient('豌豆', 'Vegetables', '富含蛋白质的春季食材，帮助肌肉恢复。', ['Vata Grounding', 'Kapha Light']),
