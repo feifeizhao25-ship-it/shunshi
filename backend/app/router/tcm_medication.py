@@ -166,7 +166,7 @@ MEDICINES = {
         "drug_interactions_warning": [],
         "dosage_note": "每次 6-9g，一日 2-3 次，温开水送服",
         "duration_typical": "2-4 周见效，可长期服用",
-        "tcm_function": "补气固表，增强免疫",
+        "tcm_function": "补气固表，日常保养",
         "caution": "容易感冒者适用；可预防性长期服用",
     },
     "med_012": {
@@ -224,7 +224,7 @@ MEDICINES = {
         ],
         "dosage_note": "每次 6-9g，一日 2-3 次，温开水送服",
         "duration_typical": "1-2 周见效",
-        "tcm_function": "清热解毒，增强免疫",
+        "tcm_function": "清热解毒，日常保养",
         "caution": "脾阳虚弱者禁用；长期使用需医嘱指导",
     },
 }

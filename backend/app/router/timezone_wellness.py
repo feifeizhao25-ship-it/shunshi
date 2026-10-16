@@ -54,7 +54,7 @@ SHICHEN_MAP = {
         "organ_pair": "肺",
         "optimal_activity": "排便，晨间呼吸功法",
         "avoid": "憋尿，进食油腻",
-        "tcm_principle": "大肠经当令，是排毒的最佳时间，晨起排便很重要",
+        "tcm_principle": "大肠经当令，适合规律如厕，晨起排便很重要",
         "circadian_science": "皮质醇上升，体温回升，肠道蠕动增强",
     },
     "辰": {

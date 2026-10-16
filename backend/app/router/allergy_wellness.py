@@ -112,7 +112,7 @@ ALLERGY_TYPES = {
             {"name": "黄芪炖鸡", "description": "增强肺卫功能，预防花粉入侵"},
             {"name": "蜂蜜柚子茶", "description": "润肺化痰，增强呼吸道抵抗力"},
             {"name": "薏米红豆粥", "description": "祛湿健脾，改善体质"},
-            {"name": "冬虫夏草炖瘦肉", "description": "补肺气，增强免疫功能"},
+            {"name": "冬虫夏草炖瘦肉", "description": "补肺气，日常保养"},
         ],
         "acupoints": [
             {"point": "迎香穴(LI20)", "effect": "通鼻窍，缓解鼻痒"},
@@ -135,7 +135,7 @@ ALLERGY_TYPES = {
         ],
         "acupoints": [
             {"point": "脾俞穴(BL20)", "effect": "健脾利湿，增强脾功能"},
-            {"point": "足三里(ST36)", "effect": "补气健脾，增强免疫力"},
+            {"point": "足三里(ST36)", "effect": "补气健脾，日常保养"},
             {"point": "三阴交(SP6)", "effect": "调理脾胃，改善湿气"},
         ],
         "lifestyle": "保持室内干燥，定期清洁床品，使用除湿机。",
@@ -233,7 +233,7 @@ ACUTE_RELIEF = {
             "point": "合谷穴(LI4)",
             "location": "虎口中央，拇指和食指骨交点",
             "technique": "深按1-2分钟，每天3-4次",
-            "effect": "疏风解毒，增强免疫功能",
+            "effect": "疏风解毒，日常保养",
         },
         {
             "point": "印堂穴(EX-HN3)",

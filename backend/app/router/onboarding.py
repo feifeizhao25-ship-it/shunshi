@@ -63,7 +63,7 @@ HEALTH_GOALS = [
     {"id": "boost_energy", "label": "提升精力", "icon": "lightning"},
     {"id": "weight_management", "label": "体重管理", "icon": "scale"},
     {"id": "stress_relief", "label": "减压放松", "icon": "leaf"},
-    {"id": "immune_boost", "label": "增强免疫", "icon": "shield"},
+    {"id": "immune_boost", "label": "日常保养", "icon": "shield"},
     {"id": "digestive_health", "label": "肠胃健康", "icon": "stomach"},
     {"id": "skin_care", "label": "皮肤改善", "icon": "sparkle"},
     {"id": "chronic_management", "label": "慢性病管理", "icon": "heart"},

@@ -186,7 +186,7 @@ CONDITIONS = {
         "treatment_approach": "清热解毒，调理肠胃",
         "diet": [
             {"ingredient": "绿豆", "benefit": "清热解毒，清除皮肤热毒", "usage": "绿豆粥或绿豆水，每周2-3次"},
-            {"ingredient": "冬瓜", "benefit": "清热利尿，避免热气囤积", "usage": "冬瓜汤，每周2次"},
+            {"ingredient": "冬瓜", "benefit": "清爽解暑，避免热气囤积", "usage": "冬瓜汤，每周2次"},
             {"ingredient": "薏米", "benefit": "清热祛湿", "usage": "薏米粥，每周2次"}
         ],
         "avoid_foods": ["煎炸食物", "辛辣刺激食物", "高糖高脂肪食物", "巧克力", "浓茶咖啡"],
@@ -248,7 +248,7 @@ CONDITIONS = {
         "name": "运动损伤",
         "tcm_cause": "活动过度，气血瘀滞；或动作不当导致肌肉拉伤",
         "age_applicable": ["10-13", "14-18"],
-        "treatment_approach": "活血化瘀，消肿止痛",
+        "treatment_approach": "放松舒缓",
         "immediate_care": [
             {
                 "phase": "急性期（24小时内）",
@@ -260,7 +260,7 @@ CONDITIONS = {
             }
         ],
         "diet": [
-            {"ingredient": "山楂", "benefit": "活血化瘀，消肿", "usage": "山楂茶，每周2-3次"},
+            {"ingredient": "山楂", "benefit": "放松舒缓", "usage": "山楂茶，每周2-3次"},
             {"ingredient": "黑木耳", "benefit": "活血化瘀", "usage": "黑木耳粥，每周2次"},
             {"ingredient": "红花油", "benefit": "外用活血", "usage": "适量涂抹伤部，每天2-3次"}
         ],
@@ -273,9 +273,9 @@ CONDITIONS = {
         "age_applicable": ["6-9", "10-13", "14-18"],
         "treatment_approach": "健脾祛湿，调理代谢",
         "diet": [
-            {"ingredient": "薏米", "benefit": "健脾祛湿，利尿", "usage": "薏米粥，每周3次"},
-            {"ingredient": "红豆", "benefit": "利尿祛湿，健脾", "usage": "红豆粥或红豆薏米粥，每周2-3次"},
-            {"ingredient": "冬瓜", "benefit": "清热利尿，减肥", "usage": "冬瓜汤，每周2次"}
+            {"ingredient": "薏米", "benefit": "健脾祛湿，清爽", "usage": "薏米粥，每周3次"},
+            {"ingredient": "红豆", "benefit": "清爽，健脾", "usage": "红豆粥或红豆薏米粥，每周2-3次"},
+            {"ingredient": "冬瓜", "benefit": "清爽解暑，减肥", "usage": "冬瓜汤，每周2次"}
         ],
         "lifestyle": [
             "增加运动时间（每天60-120分钟）",
@@ -317,7 +317,7 @@ SEASONAL_CARE = {
         ],
         "recommended_diet": [
             {"food": "绿豆粥", "benefit": "清热祛湿，清心火"},
-            {"food": "冬瓜", "benefit": "清热利尿，避免热气囤积"},
+            {"food": "冬瓜", "benefit": "清爽解暑，避免热气囤积"},
             {"food": "薏米粥", "benefit": "健脾祛湿"},
             {"food": "百合", "benefit": "润肺安神，适合夏季"}
         ],
@@ -379,14 +379,14 @@ MASSAGE_GUIDE = {
             "technique": "用拇指指腹按住穴位，旋转按摩，力度适中至酸胀感",
             "duration_minutes": 2,
             "benefit": "激发穴位功效，调理相关脏腑",
-            "when_to_use": "提神、缓解疲劳、增强免疫力"
+            "when_to_use": "提神、缓解疲劳、日常保养"
         },
         {
             "name": "摩腹法",
             "body_part": "腹部（脐周）",
             "technique": "用掌根顺时针摩腹，力度轻柔，每周期30秒",
             "duration_minutes": 5,
-            "benefit": "健脾和胃，促进消化，增强免疫力",
+            "benefit": "健脾和胃，促进消化，日常保养",
             "when_to_use": "厌食、腹胀、消化不良"
         },
         {
@@ -394,7 +394,7 @@ MASSAGE_GUIDE = {
             "body_part": "背部（肺俞、脾俞区域）",
             "technique": "用手掌或五指轻轻拍打，力度温和，避免伤害",
             "duration_minutes": 3,
-            "benefit": "激活背部经络，增强免疫力，预防感冒",
+            "benefit": "激活背部经络，日常保养，预防感冒",
             "when_to_use": "预防感冒、增强体质、疲劳"
         },
         {
