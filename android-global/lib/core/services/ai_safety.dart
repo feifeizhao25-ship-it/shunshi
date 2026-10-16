@@ -159,7 +159,7 @@ class AISafetyService {
   static String _getCrisisResponseCn(RiskLevel level) {
     switch (level) {
       case RiskLevel.crisis:
-        return '⚠️ We are very concerned about what you mentioned. Please reach out for help now：\n\n'
+        return '⚠️ We are very concerned about what you mentioned. Please reach out for help now:\n\n'
             '• 24hr Crisis Hotline: 988 (Suicide & Crisis Lifeline)\n'
             '• Crisis Text Line: Text HOME to 741741\n'
             '• Emergency: 911\n\n'
@@ -168,7 +168,7 @@ class AISafetyService {
         return '⚠️ The health concern you mentioned requires professional care. Please consult a doctor for a thorough examination.\n\n'
             'SEASONS AI Wellness Tips are for reference only and cannot replace medical diagnosis. If you feel unwell, please see a doctor.';
       case RiskLevel.medium:
-        return '📌 温馨提示：The following suggestions are based on traditional wellness theory and are for reference only. If symptoms persist, consult a doctor.';
+        return '📌 Note: The following suggestions are based on traditional wellness theory and are for reference only. If symptoms persist, consult a doctor.';
       case RiskLevel.low:
         return '';
     }

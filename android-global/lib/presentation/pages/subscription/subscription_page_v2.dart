@@ -70,7 +70,7 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
       if (mounted) {
         setState(() {
           _purchasingPlanId = null;
-          _orderMessage = 'Order created：¥${(order.amountCents / 100).toStringAsFixed(0)}\nPlease complete payment and refresh';
+          _orderMessage = 'Order created.\nPlease complete payment and refresh';
         });
         // 模拟支付成功（开发模式）
         await _simulatePaymentSuccess(plan);
@@ -78,7 +78,7 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
     } catch (e) {
       if (mounted) {
         setState(() => _purchasingPlanId = null);
-        _showToast('Purchase failed：${e.toString()}');
+        _showToast('Purchase failed. Please try again.');
       }
     }
   }
@@ -312,10 +312,10 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
                 ]),
                 const SizedBox(height: 12),
                 Text(recommended.name, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
-                Text('${recommended.periodName ?? ""} · Only ¥${(recommended.priceYearlyCents ?? 0) ~/ 36500}', style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
+                Text('${recommended.periodName ?? ""}', style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
                 const SizedBox(height: 8),
                 Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                  Text('¥${(recommended.priceYearlyCents ?? 0) ~/ 100}', style: TextStyle(fontSize: 34, fontWeight: FontWeight.bold, color: ShunShiColors.primary)),
+                  Text(recommended.priceYearlyDisplay, style: TextStyle(fontSize: 34, fontWeight: FontWeight.bold, color: ShunShiColors.primary)),
                   const SizedBox(width: 6),
                   Padding(padding: const EdgeInsets.only(bottom: 6), child: Text(AppLocalizations.of(context).get('subscription_per_year'), style: TextStyle(fontSize: 13, color: ShunShiColors.textTertiary))),
                   const Spacer(),
@@ -356,7 +356,7 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
           Text(plan.name, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
           const SizedBox(height: 6),
           Text(
-            plan.priceCents > 0 ? '¥${plan.priceCents ~/ 100}/${plan.periodName ?? "mo"}' : 'Free',
+            plan.priceCents > 0 ? (plan.priceDisplay == SubscriptionPlan.pricePending ? plan.priceDisplay : '${plan.priceDisplay}/${plan.periodName ?? "mo"}') : 'Free',
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: ShunShiColors.primary),
           ),
           const SizedBox(height: 4),

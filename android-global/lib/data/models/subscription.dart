@@ -48,6 +48,9 @@ class SubscriptionPlan {
   final bool isCurrent;
   final int familySeats;
   final bool isRecommended;
+  /// ISO 4217 code from the API (e.g. USD). When the API gives none we show no amount
+  /// rather than guess (the shared backend currently returns domestic CNY amounts).
+  final String? currency;
 
   SubscriptionPlan({
     required this.id,
@@ -61,16 +64,28 @@ class SubscriptionPlan {
     this.isCurrent = false,
     this.familySeats = 0,
     this.isRecommended = false,
+    this.currency,
   });
+
+  static const pricePending = 'Price shown at checkout';
+
+  static String formatMoney(int cents, String? currency) {
+    if (currency == null || currency.isEmpty || currency.toUpperCase() == 'CNY') return pricePending;
+    const symbols = {'USD': '\$', 'EUR': '€', 'GBP': '£', 'AUD': 'A\$', 'CAD': 'C\$', 'JPY': '¥'};
+    final code = currency.toUpperCase();
+    final amount = (cents / 100).toStringAsFixed(code == 'JPY' ? 0 : 2).replaceAll(RegExp(r'\.00$'), '');
+    final sym = symbols[code];
+    return sym != null ? '$sym$amount' : '$code $amount';
+  }
 
   String get priceDisplay {
     if (priceCents == 0) return 'Free';
-    return '¥${(priceCents / 100).toStringAsFixed(0)}';
+    return formatMoney(priceCents, currency);
   }
 
   String get priceYearlyDisplay {
     if (priceYearlyCents == null) return '';
-    return '¥${(priceYearlyCents! / 100).toStringAsFixed(0)}';
+    return formatMoney(priceYearlyCents!, currency);
   }
 
   factory SubscriptionPlan.fromJson(Map<String, dynamic> json, {bool recommended = false}) {
@@ -104,6 +119,7 @@ class SubscriptionPlan {
       isCurrent: json['is_current'] ?? false,
       familySeats: level == 3 ? 4 : 0,
       isRecommended: recommended || level == 2,
+      currency: (json['currency'] as String?)?.toUpperCase(),
     );
   }
 }
