@@ -64,6 +64,9 @@ def _include_product_routers(app: FastAPI) -> None:
     from .product_access import product_access_guard
 
     mounted = {id(route) for route in app.router.routes}
+    # 已由核心路由提供的 (方法, 路径) 不再重复挂载：Starlette 按注册顺序只会命中第一个，
+    # 后挂的同名接口永远不可达，还会产生 Duplicate Operation ID（例如 /api/v1/auth/guest-login）。
+    taken = {(m, getattr(r, "path", None)) for r in app.router.routes for m in (getattr(r, "methods", None) or ())}
     for module_info in pkgutil.iter_modules(product_router_package.__path__):
         if module_info.name.startswith("_"):
             continue
@@ -76,9 +79,17 @@ def _include_product_routers(app: FastAPI) -> None:
                 getattr(route, "path", None) == "" for route in candidate.routes
             )
             prefix = f"/api/v1/{module_info.name.replace('_', '-')}" if needs_prefix else ""
+            fresh = APIRouter()
+            for route in candidate.routes:
+                full = prefix + getattr(route, "path", "")
+                methods = getattr(route, "methods", None) or ()
+                if methods and all((m, full) in taken for m in methods):
+                    continue
+                fresh.routes.append(route)
+            candidate_routes = fresh
             # 默认关着：见 app/product_access.py。
             app.include_router(
-                candidate, prefix=prefix, dependencies=[Depends(product_access_guard)]
+                candidate_routes, prefix=prefix, dependencies=[Depends(product_access_guard)]
             )
             mounted.add(id(candidate))
 
@@ -161,6 +172,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.settings = settings
     app.state.engine = engine
     app.state.session_factory = make_session_factory(engine)
+    from .services.membership_status import bind_session_factory
+    bind_session_factory(app.state.session_factory)
 
     app.add_middleware(
         CORSMiddleware,
