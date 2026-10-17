@@ -1,0 +1,41 @@
+..........F                                                              [100%]
+=================================== FAILURES ===================================
+_______________ test_content_change_reopens_closed_evidence_task _______________
+
+tmp_path = PosixPath('/private/var/folders/76/kgztbzps61vd_rnp4mc1q7980000gn/T/pytest-of-feifei00/pytest-182/test_content_change_reopens_cl0')
+
+    def test_content_change_reopens_closed_evidence_task(tmp_path):
+     import shutil
+     from datetime import date
+     import backlog
+     config=json.loads((e.ROOT/'config.json').read_text())
+     backend=tmp_path/'后端'
+     module=backend/'app/services/rag_sources.py'
+     module.parent.mkdir(parents=True)
+     shutil.copy2(Path(config['projects']['energy']['root'])/'后端/app/services/rag_sources.py',module)
+     (backend/'data').mkdir()
+     source_row=dict(source_id='cn',type='policy',lang='cn',title='fixture',content='original evidence',year=2026,last_verified_at=date.today().isoformat(),source_url='https://example.org/cn',source_org='fixture',license_note='fixture',verify_interval_days=30)
+     registry=backend/'data/rag_sources.json'
+     def tasks():
+      registry.write_text(json.dumps({'sources':[source_row,dict(source_row,source_id='en',lang='en',evidence_review={'status':'approved'})]}))
+      report=e.audit_energy_evidence(tmp_path)
+      assert report['audit_ok'],report['errors']
+      return e.maintenance_queue({'projects':{'energy':{'frozen':False}}},[],{'projects':[],'energy_evidence':report},{'registry_sha256':e.digest([])})['tasks']
+     original=tasks()
+     state=backlog.merge({'schema_version':1,'items':{}},original,'first')
+     ident=original[0]['id']; fingerprint=state['items'][ident]['fingerprint']
+     state=backlog.close(state,ident,fingerprint,'Reviewed fixture evidence','close')
+     assert backlog.merge(state,tasks(),'unchanged')['items'][ident]['status']=='closed'
+     source_row['content']='materially changed evidence'
+     updated=tasks()
+     reopened=backlog.merge(state,updated,'second')['items'][ident]
+>    assert reopened['status']=='open'
+E    AssertionError: assert 'closed' == 'open'
+E      
+E      - open
+E      + closed
+
+运营资料-OpenClaw/automation/domestic_research/test_evaluate.py:127: AssertionError
+=========================== short test summary info ============================
+FAILED 运营资料-OpenClaw/automation/domestic_research/test_evaluate.py::test_content_change_reopens_closed_evidence_task
+1 failed, 10 passed in 0.84s

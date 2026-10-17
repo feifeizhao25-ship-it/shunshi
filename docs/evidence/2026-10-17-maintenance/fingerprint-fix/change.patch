@@ -1,0 +1,48 @@
+--- a/automation/domestic_research/evaluate.py
++++ b/automation/domestic_research/evaluate.py
+@@ -103,6 +103,7 @@
+             if not reasons: continue
+             entries.append({'source_id':source['source_id'], 'reasons':reasons,
+                             'evidence_status':status, 'source_url':source.get('source_url'),
++                            'source_sha256':digest(source),
+                             'retrieval_allowed_by_review':module.evidence_usable(source)})
+         return {'audit_ok':not problems, 'errors':problems, 'total':len(registry.sources),
+                 'review_queue':entries, 'production_modified':False}
+--- a/automation/domestic_research/test_evaluate.py
++++ b/automation/domestic_research/test_evaluate.py
+@@ -97,3 +97,35 @@
+  assert e.ranking_metrics([],['a'])['recall_at_5']==0
+  assert e.ranking_metrics(['a'],['a','b'])['recall_at_5']==0.5
+  with pytest.raises(ValueError):e.ranking_metrics(['a','a'],['a'])
++
++
++def test_content_change_reopens_closed_evidence_task(tmp_path):
++ import shutil
++ from datetime import date
++ import backlog
++ config=json.loads((e.ROOT/'config.json').read_text())
++ backend=tmp_path/'后端'
++ module=backend/'app/services/rag_sources.py'
++ module.parent.mkdir(parents=True)
++ shutil.copy2(Path(config['projects']['energy']['root'])/'后端/app/services/rag_sources.py',module)
++ (backend/'data').mkdir()
++ source_row=dict(source_id='cn',type='policy',lang='cn',title='fixture',content='original evidence',year=2026,last_verified_at=date.today().isoformat(),source_url='https://example.org/cn',source_org='fixture',license_note='fixture',verify_interval_days=30)
++ registry=backend/'data/rag_sources.json'
++ def tasks():
++  registry.write_text(json.dumps({'sources':[source_row,dict(source_row,source_id='en',lang='en',evidence_review={'status':'approved'})]}))
++  report=e.audit_energy_evidence(tmp_path)
++  assert report['audit_ok'],report['errors']
++  return e.maintenance_queue({'projects':{'energy':{'frozen':False}}},[],{'projects':[],'energy_evidence':report},{'registry_sha256':e.digest([])})['tasks']
++ original=tasks()
++ state=backlog.merge({'schema_version':1,'items':{}},original,'first')
++ ident=original[0]['id']; fingerprint=state['items'][ident]['fingerprint']
++ state=backlog.close(state,ident,fingerprint,'Reviewed fixture evidence','close')
++ assert backlog.merge(state,tasks(),'unchanged')['items'][ident]['status']=='closed'
++ source_row['content']='materially changed evidence'
++ updated=tasks()
++ reopened=backlog.merge(state,updated,'second')['items'][ident]
++ assert reopened['status']=='open'
++ assert reopened['fingerprint']!=fingerprint
++ assert reopened['history'][-1]['event']=='evidence_changed'
++ with pytest.raises(ValueError):
++  backlog.close(backlog.merge(state,updated,'second'),ident,fingerprint,'old evidence','close')
