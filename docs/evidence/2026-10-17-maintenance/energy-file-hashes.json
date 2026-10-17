@@ -1,0 +1,15 @@
+{
+  "scripts/run_rag_integration.py": "787b113e53730d5c031f9b22274b54c766a91c2af5b364589f8d7879e4a94e35",
+  "requirements.txt": "e8f4206283751ceda96a5ec7e283f59e0196e5846d4c65efc484ea9c56ffdb6a",
+  "data/rag_sources.json": "af9e98b6ef1e63220dedd06a2f43536520681b59e16c9ad02ca8a17021ab7c58",
+  "app/api/v1/ai_assistant.py": "3ea26c6f4792a9cc471a58a6d9014b52b2aa9abc9b2e301737d03a81078d2d73",
+  "app/services/rag_refresh.py": "6e567c3f7bd94bfb5d6391c58fe86ac8f3e37c468e73c0499ee30a8a5728df60",
+  "app/services/rag_service.py": "346644f05de724bab59619884ac404355ee9e37926be9e82a2239dbeda2d2d90",
+  "app/services/rag_sources.py": "5066cd332966a3a95ba0d5bfd97c1f13bfa8d016389b94622c5a0ef8d72d3377",
+  "tests/test_rag_api_freshness.py": "1d991136c1677c000f809cdf882b05b14b412e6b42f3e178df00962960b30ed6",
+  "tests/test_rag_evidence_review.py": "828eafceaa2256d4cad43941b05d92f712cd5cf2de298fcc24790fbe4e6e31eb",
+  "tests/test_rag_freshness_language.py": "ca2e7b32d7e4e3ec2029287a32caed716b933d1eb7339d8bfef61b1ce63fcbd9",
+  "tests/test_rag_geography.py": "1b1af940346ec378a366ad3e3cea33d27a856671ab68474441893666a9aecad7",
+  "tests/test_rag_relevance.py": "52b3295c12fbd67ea24dc2cc38d35020cb906f8b981d07d0444439f709569274",
+  "tests/test_rag_sources.py": "09f569be26c9d254ed33b299d4b7fd701a6811c8fce11e924f9da57c1343289b"
+}
