@@ -50,6 +50,7 @@ import '../../presentation/pages/diary/diary_report_page.dart';
 import '../../presentation/pages/diary/sleep_report_page.dart';
 import '../../presentation/pages/journal/journal_reflection_page.dart';
 import '../../presentation/pages/sleep/sleep_sanctuary_page.dart';
+import '../../presentation/pages/audio/audio_player_page.dart';
 import '../../presentation/pages/home/seasons_home_page.dart';
 import '../../presentation/pages/welcome/welcome_to_seasons_page.dart';
 import '../../presentation/pages/subscription/stripe_checkout_page.dart';
@@ -91,6 +92,8 @@ class AppRouter {
       GoRoute(path: '/welcome-seasons', builder: (context, state) => const WelcomeToSeasonsPage()),
       GoRoute(path: '/seasons-home', builder: (context, state) => const SeasonsHomePage()),
       GoRoute(path: '/sleep-sanctuary', builder: (context, state) => const SleepSanctuaryPage()),
+      // Real audio player (English, bundled breathing guide); Sleep Sanctuary remains a showcase page.
+      GoRoute(path: '/audio-player', builder: (context, state) => const AudioPlayerPage()),
       GoRoute(path: '/journal-reflection', builder: (context, state) => const JournalReflectionPage()),
       GoRoute(path: '/content/:id', builder: (context, state) {
         return ContentDetailPage(contentId: state.pathParameters['id']!);

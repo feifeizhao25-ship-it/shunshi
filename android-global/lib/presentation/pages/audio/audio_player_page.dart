@@ -112,7 +112,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
     } else {
       // No track given: fall back to the bundled breathing guide (assets/audio)
       _usingBundled = true;
-      _player.setAsset('assets/audio/audio_breathe_1.mp3');
+      _player.setAsset('assets/audio/audio_breathe_2.mp3');
       setState(() => _isLoading = false);
     }
   }
