@@ -36,6 +36,27 @@ _PRODUCT_PLANS = {
 }
 
 
+# 会员唯一事实来源：Entitlement 表（由签名支付回调/商店恢复写入）。
+# 旧版 router/subscription.py 的内存 dict 只作兜底，所有读会员档位的地方都先问这里。
+_SESSION_FACTORY = None
+
+
+def bind_session_factory(factory):
+    global _SESSION_FACTORY
+    _SESSION_FACTORY = factory
+
+
+def entitlement_plan(user_id):
+    """返回 (plan, expires_at) ；未绑定数据库或无有效权益时返回 None。"""
+    if _SESSION_FACTORY is None or not user_id:
+        return None
+    with _SESSION_FACTORY() as session:
+        state = membership_status(session, user_id)
+    if not state['active']:
+        return None
+    return state['plan'], state['expires_at']
+
+
 def membership_status(session, user_id):
     row = session.get(Entitlement, user_id)
     tier = tier_for_product(row.product_id) if row and row.expires_at > time.time() else 'free'

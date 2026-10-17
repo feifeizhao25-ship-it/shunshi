@@ -683,8 +683,12 @@ async def require_tier(
 
 def _get_user_subscription_lazy(user_id: str) -> dict:
     """
-    获取用户订阅状态（带过期回退的 lazy check）
+    获取用户订阅状态（带过期回退的 lazy check）——先读 Entitlement 唯一事实来源
     """
+    ent = _entitled(user_id)
+    if ent:
+        return {"plan": ent[0], "status": "active",
+                "expires_at": datetime.fromtimestamp(ent[1], timezone.utc).isoformat() if ent[1] else None}
     if user_id not in subscriptions:
         return {"plan": "free", "status": "active", "expires_at": None}
 
@@ -755,8 +759,24 @@ def _notify_subscription_expired(user_id: str, old_plan: str):
 
 # ============ Helper Functions ============
 
+def _entitled(user_id: str):
+    try:
+        from app.services.membership_status import entitlement_plan
+        return entitlement_plan(user_id)
+    except Exception:
+        return None
+
+
 def get_user_subscription(user_id: str) -> SubscriptionStatus:
-    """获取用户订阅状态（兼容原有接口）"""
+    """获取用户订阅状态（兼容原有接口）——先读 Entitlement 唯一事实来源"""
+    ent = _entitled(user_id)
+    if ent and ent[0] in SUBSCRIPTION_PLANS:
+        plan, exp = ent
+        return SubscriptionStatus(
+            plan=plan, status="active",
+            expires_at=datetime.fromtimestamp(exp, timezone.utc).isoformat() if exp else None,
+            features=SUBSCRIPTION_PLANS[plan]["features"], auto_renew=False,
+        )
     if user_id not in subscriptions:
         return SubscriptionStatus(
             plan="free",

@@ -209,7 +209,14 @@ class UserSubscriptionStatus {
       isActive: json['is_active'] ?? false,
       expiresAt: _parseMembershipExpiry(json['expires_at']),
       dayRemaining: json['day_remaining'] ?? 0,
-      features: Map<String, bool>.from(json['features'] ?? {}),
+      // features 里混有 daily_chat_limit 等数字项，强转 bool 会抛错并让整页显示“查询失败”
+      features: json['features'] is Map
+          ? Map<String, bool>.fromEntries(
+              (json['features'] as Map).entries
+                  .where((e) => e.value is bool)
+                  .map((e) => MapEntry(e.key.toString(), e.value as bool)),
+            )
+          : const <String, bool>{},
     );
   }
 }
