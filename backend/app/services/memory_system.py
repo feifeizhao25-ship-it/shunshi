@@ -459,4 +459,57 @@ class MemorySystem:
 
 
 # 全局实例
+
+    # ── 批3补齐: 单条更新 / 搜索 / 保留期 ──────────────────────────────
+    def update_memory_content(self, memory_id: str, user_id: str, content: str, confidence: float = None) -> bool:
+        """更新单条记忆内容 (仅本人); 返回是否更新成功。"""
+        self._ensure_table()
+        conn = get_db()
+        cur = conn.execute(
+            "UPDATE user_memory SET content = ?, updated_at = datetime('now') WHERE id = ? AND user_id = ?",
+            (content, memory_id, user_id),
+        )
+        conn.commit()
+        return (cur.rowcount or 0) > 0
+
+    def search_memories(self, user_id: str, query: str, limit: int = 50):
+        """按关键词搜索本人记忆 (内容包含)。"""
+        self._ensure_table()
+        conn = get_db()
+        rows = conn.execute(
+            "SELECT * FROM user_memory WHERE user_id = ? AND content LIKE ? ORDER BY created_at DESC LIMIT ?",
+            (user_id, f"%{query}%", limit),
+        ).fetchall()
+        return [dict(r) for r in rows]
+
+    def _ensure_retention_table(self):
+        conn = get_db()
+        conn.execute("CREATE TABLE IF NOT EXISTS memory_retention_settings (user_id TEXT PRIMARY KEY, retention_days INTEGER NOT NULL, updated_at TEXT)")
+        conn.commit()
+
+    def get_retention_days(self, user_id: str):
+        self._ensure_retention_table()
+        conn = get_db()
+        row = conn.execute("SELECT retention_days FROM memory_retention_settings WHERE user_id = ?", (user_id,)).fetchone()
+        return int(row["retention_days"]) if row else None
+
+    def set_retention_days(self, user_id: str, retention_days: int) -> int:
+        """设置保留期并立即清理过期记忆; 返回清理条数。retention_days<=0 表示不限期。"""
+        self._ensure_retention_table()
+        conn = get_db()
+        conn.execute(
+            "INSERT INTO memory_retention_settings (user_id, retention_days, updated_at) VALUES (?, ?, datetime('now')) "
+            "ON CONFLICT(user_id) DO UPDATE SET retention_days=excluded.retention_days, updated_at=datetime('now')",
+            (user_id, int(retention_days)),
+        )
+        deleted = 0
+        if retention_days and retention_days > 0:
+            cur = conn.execute(
+                "DELETE FROM user_memory WHERE user_id = ? AND date(created_at) < date('now', ?)",
+                (user_id, f"-{int(retention_days)} days"),
+            )
+            deleted = cur.rowcount or 0
+        conn.commit()
+        return deleted
+
 memory_system = MemorySystem()
