@@ -750,11 +750,6 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
           '家庭成员关怀',
           '家和版最多提供4个家庭席位，并由成员自行控制共享范围。',
         ),
-        _buildBenefit(
-          Icons.insights,
-          '长期趋势与周度报告',
-          '在数据充足时生成趋势视图和周度深度报告，并明确数据范围。',
-        ),
         const SizedBox(height: 8),
         Text(
           '当前支付宝方案为单次购买，不自动续费；支付前会再次展示金额与订单信息。',

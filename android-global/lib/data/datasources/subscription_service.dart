@@ -160,9 +160,9 @@ class SubscriptionService {
       priceYearlyCents: 39900,
       period: 'month',
       periodName: 'month',
-      description: 'Deep suggestions + weekly summary for wellness pros',
+      description: 'Daily plans and full content library for wellness enthusiasts',
       isRecommended: true,
-      features: {'basic_chat': true, 'solar_terms': true, 'unlimited_chat': true, 'today_plan': true, 'deep_suggestions': true, 'weekly_summary': true},
+      features: {'basic_chat': true, 'solar_terms': true, 'unlimited_chat': true, 'today_plan': true, 'deep_suggestions': false, 'weekly_summary': false},
     ),
     SubscriptionPlan(
       id: 'jiahe',
@@ -173,7 +173,7 @@ class SubscriptionService {
       periodName: 'month',
       description: 'Family sharing (4 seats) for the whole household',
       familySeats: 4,
-      features: {'basic_chat': true, 'solar_terms': true, 'unlimited_chat': true, 'today_plan': true, 'deep_suggestions': true, 'weekly_summary': true, 'family': true},
+      features: {'basic_chat': true, 'solar_terms': true, 'unlimited_chat': true, 'today_plan': true, 'deep_suggestions': false, 'weekly_summary': false, 'family': true},
     ),
   ];
 }
