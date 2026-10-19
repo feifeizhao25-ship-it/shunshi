@@ -1,0 +1,207 @@
+{
+  "status": "partial",
+  "checked_at": "2026-10-19T01:01:45.884781+00:00",
+  "checked": 22,
+  "changes": [
+    {
+      "source_id": "R004",
+      "kind": "changed",
+      "before": {
+        "id": "pgvector/pgvector",
+        "updated": "2026-10-15T23:08:40Z",
+        "license": "NOASSERTION",
+        "archived": false,
+        "default_branch": "master"
+      },
+      "after": {
+        "id": "pgvector/pgvector",
+        "updated": "2026-10-18T12:20:41Z",
+        "license": "NOASSERTION",
+        "archived": false,
+        "default_branch": "master"
+      },
+      "action": "review_candidate",
+      "production_approved": false
+    },
+    {
+      "source_id": "R008",
+      "kind": "changed",
+      "before": {
+        "id": "docling-project/docling",
+        "updated": "2026-10-16T15:44:42Z",
+        "license": "MIT",
+        "archived": false,
+        "default_branch": "main"
+      },
+      "after": {
+        "id": "docling-project/docling",
+        "updated": "2026-10-18T07:20:32Z",
+        "license": "MIT",
+        "archived": false,
+        "default_branch": "main"
+      },
+      "action": "review_candidate",
+      "production_approved": false
+    },
+    {
+      "source_id": "R011",
+      "kind": "changed",
+      "before": {
+        "id": "infiniflow/ragflow",
+        "updated": "2026-10-17T00:23:13Z",
+        "license": "Apache-2.0",
+        "archived": false,
+        "default_branch": "main"
+      },
+      "after": {
+        "id": "infiniflow/ragflow",
+        "updated": "2026-10-17T13:11:26Z",
+        "license": "Apache-2.0",
+        "archived": false,
+        "default_branch": "main"
+      },
+      "action": "review_candidate",
+      "production_approved": false
+    },
+    {
+      "source_id": "R016",
+      "kind": "changed",
+      "before": {
+        "id": "mem0ai/mem0",
+        "updated": "2026-10-16T20:26:26Z",
+        "license": "Apache-2.0",
+        "archived": false,
+        "default_branch": "main"
+      },
+      "after": {
+        "id": "mem0ai/mem0",
+        "updated": "2026-10-17T21:06:52Z",
+        "license": "Apache-2.0",
+        "archived": false,
+        "default_branch": "main"
+      },
+      "action": "review_candidate",
+      "production_approved": false
+    },
+    {
+      "source_id": "R032",
+      "kind": "changed",
+      "before": {
+        "id": "gitroomhq/postiz-app",
+        "updated": "2026-10-16T07:58:54Z",
+        "license": "AGPL-3.0",
+        "archived": false,
+        "default_branch": "main"
+      },
+      "after": {
+        "id": "gitroomhq/postiz-app",
+        "updated": "2026-10-18T19:43:50Z",
+        "license": "AGPL-3.0",
+        "archived": false,
+        "default_branch": "main"
+      },
+      "action": "review_candidate",
+      "production_approved": false
+    },
+    {
+      "source_id": "R036",
+      "kind": "changed",
+      "before": {
+        "id": "pvlib/pvlib-python",
+        "updated": "2026-10-15T11:30:13Z",
+        "license": "BSD-3-Clause",
+        "archived": false,
+        "default_branch": "main"
+      },
+      "after": {
+        "id": "pvlib/pvlib-python",
+        "updated": "2026-10-18T15:42:46Z",
+        "license": "BSD-3-Clause",
+        "archived": false,
+        "default_branch": "main"
+      },
+      "action": "review_candidate",
+      "production_approved": false
+    },
+    {
+      "source_id": "R037",
+      "kind": "changed",
+      "before": {
+        "id": "PyPSA/PyPSA",
+        "updated": "2026-10-16T08:07:23Z",
+        "license": "MIT",
+        "archived": false,
+        "default_branch": "master"
+      },
+      "after": {
+        "id": "PyPSA/PyPSA",
+        "updated": "2026-10-18T08:00:11Z",
+        "license": "MIT",
+        "archived": false,
+        "default_branch": "master"
+      },
+      "action": "review_candidate",
+      "production_approved": false
+    },
+    {
+      "source_id": "R054",
+      "kind": "changed",
+      "before": {
+        "id": "embeddings-benchmark/mteb",
+        "updated": "2026-10-16T19:34:53Z",
+        "license": "Apache-2.0",
+        "archived": false,
+        "default_branch": "main"
+      },
+      "after": {
+        "id": "embeddings-benchmark/mteb",
+        "updated": "2026-10-18T20:21:39Z",
+        "license": "Apache-2.0",
+        "archived": false,
+        "default_branch": "main"
+      },
+      "action": "review_candidate",
+      "production_approved": false
+    },
+    {
+      "source_id": "R057",
+      "kind": "changed",
+      "before": {
+        "id": "openclaw/openclaw",
+        "updated": "2026-10-17T01:17:35Z",
+        "license": "MIT",
+        "archived": false,
+        "default_branch": "main"
+      },
+      "after": {
+        "id": "openclaw/openclaw",
+        "updated": "2026-10-19T01:01:53Z",
+        "license": "MIT",
+        "archived": false,
+        "default_branch": "main"
+      },
+      "action": "review_candidate",
+      "production_approved": false
+    }
+  ],
+  "failures": [
+    {
+      "source_id": "R006",
+      "error": "URLError",
+      "reason_type": "SSLEOFError"
+    },
+    {
+      "source_id": "R015",
+      "error": "URLError",
+      "reason_type": "SSLEOFError"
+    },
+    {
+      "source_id": "R061",
+      "error": "HTTPError",
+      "http_status": 403
+    }
+  ],
+  "production_modified": false,
+  "local_day": "2026-10-19",
+  "registry_sha256": "29298266d158ab0929e6d21470e99cd27174b4d25724d786efc7020f8c909a06"
+}
