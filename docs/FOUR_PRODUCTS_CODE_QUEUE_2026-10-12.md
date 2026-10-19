@@ -48,3 +48,5 @@
 2026-10-18 下午：分发侠70b138f拆分refund_channel_order_no，退款完成不再覆盖payment_channel_order_no；历史refunded迁移复制已有退款值，但无法恢复已丢失原支付流水，需渠道账单核对。支付模块118项、TypeScript及独立PostgreSQL最小表迁移断言通过（非整链迁移/商户验收），发布前需应用新增迁移。详见分发侠REFUND_REFERENCE_2026-10-18.md。发现见己a89cfb3国际接口及新能源新计费规则提交，未覆盖，待审查；其余RAG未提交工作保留。本日下午未重复今日来源抓取。
 
 2026-10-19：新能源runtime/backend计费规则f410a5c修复时区混用、NaN/无穷/异常金额和全额退款格式；15函数测试通过，非HTTP验收。旧后端已明确LEGACY，历史83项RAG不可当现行runtime验收。周一多渠道研究复核完成，选择0项无收益证明的研究变更；刷新22成功3失败，研究18/18通过，台账115开放2关闭。详见WEEKLY_REVIEW_2026-10-19.md及检索日志。
+
+2026-10-19 下午：新能源9456fcc修复到期付费用户续费报价误读有效free权益导致400，改读持久化购买档位且不激活权益。现行runtime完整app下29项规则/真实JWT HTTP/独立SQLite/到期回归通过，见runtime/docs/billing-http-20261019.md及可复用verify_billing_rules.py。降级意图已验证落库，但apply_scheduled_downgrade仅定义无调用任务，仍须接通执行，不能宣称全流程完成。其他三产品未改、见己冻结、他人RAG修改保留。下午未重复研究抓取。
