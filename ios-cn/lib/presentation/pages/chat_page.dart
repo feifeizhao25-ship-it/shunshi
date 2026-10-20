@@ -11,13 +11,15 @@ import '../widgets/feedback_sheet.dart';
 import '../widgets/membership_widgets.dart';
 import 'chat/chat_models.dart';
 import 'chat/chat_history_codec.dart';
+import 'chat/chat_membership.dart';
 import 'chat/chat_widgets.dart';
 
 const _baseUrl = 'https://api.shunshi.app';
 
 class ChatPage extends StatefulWidget {
   final String? conversationId;
-  const ChatPage({super.key, this.conversationId});
+  final Dio? client;
+  const ChatPage({super.key, this.conversationId, this.client});
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -78,11 +80,11 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
   final _scrollController = ScrollController();
   final _focusNode = FocusNode();
   final List<ChatMessage> _messages = [];
-  final _dio = Dio(BaseOptions(baseUrl: _baseUrl));
+  late final _dio = widget.client ?? Dio(BaseOptions(baseUrl: _baseUrl, connectTimeout: const Duration(seconds: 10)));
   bool _isLoading = false;
   bool _isRecording = false;
-  int _quotaRemaining = 10;
-  int _quotaLimit = 10;
+  bool _membershipKnown = false;
+  bool _membershipLoading = false;
   bool _isVip = false;
 
   String _userName = '';
@@ -148,22 +150,31 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
         );
       });
     }
-    _loadQuota();
+    _loadMembership();
   }
 
-  Future<void> _loadQuota() async {
+  Future<void> _loadMembership() async {
+    if (_membershipLoading || !mounted) return;
+    setState(() => _membershipLoading = true);
     try {
       _dio.options.headers['Authorization'] = 'Bearer $_token';
-      final res = await _dio.get('/api/v1/subscription/status');
-      if (res.data != null && res.data['data'] != null) {
-        final data = res.data['data'];
-        setState(() {
-          _quotaLimit = data['limit'] ?? 10;
-          _quotaRemaining = data['remaining'] ?? (data['limit'] ?? 10);
-          _isVip = data['tier'] != 'free';
-        });
-      }
-    } catch (_) {}
+      final res = await _dio.get('/api/v1/subscription/status',
+          options: Options(receiveTimeout: const Duration(seconds: 10)));
+      final paid = parseChatMembership(res.data);
+      if (!mounted) return;
+      setState(() {
+        _isVip = paid;
+        _membershipKnown = true;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _isVip = false;
+        _membershipKnown = false;
+      });
+    } finally {
+      if (mounted) setState(() => _membershipLoading = false);
+    }
   }
 
   // ── 对话持久化 ──
@@ -202,10 +213,6 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
   Future<void> _sendMessage() async {
     final text = _controller.text.trim();
     if (text.isEmpty || _isLoading) return;
-    if (!_isVip && _quotaRemaining <= 0) {
-      _showUpgradePrompt();
-      return;
-    }
     _controller.clear();
 
     // Prompt Injection 防护
@@ -317,7 +324,6 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
           ),
         );
         _isLoading = false;
-        if (!_isVip) _quotaRemaining--;
         _incrementChatCount();
       });
       _saveConversation();
@@ -491,7 +497,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
             ),
             const SizedBox(height: 16),
             const Text(
-              '今日免费消息已用完',
+              '查看会员权益',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
@@ -500,7 +506,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
             ),
             const SizedBox(height: 8),
             Text(
-              '升级会员，每天 $_quotaLimit 条专属AI养生建议\n解锁全部体质测试 + 家庭成员管理',
+              '查看各档会员的对话、养生建议与家庭功能\n具体权益以套餐页面为准',
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 14,
@@ -761,15 +767,12 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
       ),
       child: Column(
         children: [
-          if (!_isVip)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: TokenBalanceBar(
-                remaining: _quotaRemaining,
-                limit: _quotaLimit,
-                isVip: _isVip,
-                onTapUpgrade: _showUpgradePrompt,
-              ),
+          if (!_membershipKnown)
+            TextButton(
+              onPressed: _membershipLoading ? null : _loadMembership,
+              child: Text(_membershipLoading
+                  ? '正在查询会员状态'
+                  : '会员状态暂未查到，点击重试'),
             ),
           Row(
             children: [
@@ -837,21 +840,21 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
                       ),
                     ] else ...[
                       Icon(
-                        _quotaRemaining > 3
+                        _membershipKnown
                             ? Icons.chat_bubble_outline_rounded
                             : Icons.chat_bubble_rounded,
                         size: 13,
-                        color: _quotaRemaining > 3
+                        color: _membershipKnown
                             ? ShunShiColors.primary
                             : Colors.orange,
                       ),
                       const SizedBox(width: 3),
                       Text(
-                        '$_quotaRemaining/$_quotaLimit',
+                        _membershipKnown ? '免费版' : '状态待查询',
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w500,
-                          color: _quotaRemaining > 3
+                          color: _membershipKnown
                               ? ShunShiColors.primary
                               : Colors.orange,
                         ),
@@ -885,7 +888,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
   }
 
   Widget _buildList() {
-    final showUpgradeNudge = _aiMessageCount >= 5 && !_isVip;
+    final showUpgradeNudge = _aiMessageCount >= 5 && _membershipKnown && !_isVip;
     if (_messages.isEmpty && _isLoading) {
       return ListView(
         children: [
