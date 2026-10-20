@@ -3,13 +3,14 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../core/services/ai_safety.dart';
-import '../../../data/services/voice_service.dart';
-import '../../../design_system/theme.dart';
-import '../../../design_system/theme_helper.dart';
+import '../../core/services/ai_safety.dart';
+import '../../data/services/voice_service.dart';
+import '../../design_system/theme.dart';
+import '../../design_system/theme_helper.dart';
 import '../widgets/feedback_sheet.dart';
 import '../widgets/membership_widgets.dart';
 import 'chat/chat_models.dart';
+import 'chat/chat_history_codec.dart';
 import 'chat/chat_widgets.dart';
 
 const _baseUrl = 'https://api.shunshi.app';
@@ -169,33 +170,19 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
 
   Future<void> _saveConversation() async {
     final prefs = await SharedPreferences.getInstance();
-    final msgs = _messages.map((m) => '${m.role}|${m.text}').join('\n');
+    final msgs = encodeChatHistory(_messages);
     await prefs.setString('chat_history', msgs);
     await prefs.setString('conversation_id', _conversationId ?? '');
   }
 
   Future<void> _loadConversation(SharedPreferences prefs) async {
     final saved = prefs.getString('chat_history');
-    _conversationId =
-        prefs.getString('conversation_id') ?? widget.conversationId;
-    if (saved != null && saved.isNotEmpty) {
-      final lines = saved.split('\n');
-      final recent = lines.length > 10
-          ? lines.sublist(lines.length - 10)
-          : lines;
-      for (final line in recent) {
-        final sepIdx = line.indexOf('|');
-        if (sepIdx > 0) {
-          _messages.add(
-            ChatMessage(
-              role: line.substring(0, sepIdx),
-              text: line.substring(sepIdx + 1),
-              time: _fmt(DateTime.now()),
-            ),
-          );
-        }
-      }
-    }
+    if (!mounted) return;
+    setState(() {
+      _conversationId =
+          prefs.getString('conversation_id') ?? widget.conversationId;
+      _messages.addAll(decodeChatHistory(saved));
+    });
   }
 
   void _scrollToBottom() {

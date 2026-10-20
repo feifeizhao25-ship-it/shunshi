@@ -1,0 +1,18 @@
+
+00:00 +0: loading /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_history_codec_test.dart
+00:01 +0: loading /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_history_codec_test.dart
+00:01 +0: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_history_codec_test.dart: round trips 25 multiline messages without truncation
+00:01 +1: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_history_codec_test.dart: round trips 25 multiline messages without truncation
+00:01 +1: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_history_codec_test.dart: preserves sources and complete cards
+00:01 +2: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_history_codec_test.dart: preserves sources and complete cards
+00:01 +2: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_history_codec_test.dart: migrates legacy multiline messages beyond ten rows
+00:01 +3: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_history_codec_test.dart: migrates legacy multiline messages beyond ten rows
+00:01 +3: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_history_codec_test.dart: damaged data does not crash
+00:01 +4: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_history_codec_test.dart: damaged data does not crash
+00:01 +4: loading /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_history_bubble_test.dart
+00:01 +4: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_history_bubble_test.dart: restored full reply and cards render at width 390.0
+00:02 +4: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_history_bubble_test.dart: restored full reply and cards render at width 390.0
+00:02 +5: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_history_page_test.dart: history renders even when membership and solar term HTTP requests fail
+00:02 +6: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_history_page_test.dart: history renders even when membership and solar term HTTP requests fail
+00:02 +7: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_history_page_test.dart: history renders even when membership and solar term HTTP requests fail
+00:02 +7: All tests passed!
