@@ -10,7 +10,7 @@ import '../../design_system/theme_helper.dart';
 import '../widgets/feedback_sheet.dart';
 import '../widgets/membership_widgets.dart';
 import 'chat/chat_models.dart';
-import 'chat/chat_history_codec.dart';
+import 'chat/chat_history_store.dart';
 import 'chat/chat_membership.dart';
 import 'chat/chat_widgets.dart';
 
@@ -180,19 +180,30 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
   // ── 对话持久化 ──
 
   Future<void> _saveConversation() async {
-    final prefs = await SharedPreferences.getInstance();
-    final msgs = encodeChatHistory(_messages);
-    await prefs.setString('chat_history', msgs);
-    await prefs.setString('conversation_id', _conversationId ?? '');
+    final token = _token;
+    final messages = List<ChatMessage>.of(_messages);
+    final conversation = _conversationId;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await ChatHistoryStore(prefs, token).save(messages, conversation);
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('聊天记录未能保存，请先复制重要内容再重试')),
+        );
+      }
+    }
   }
 
   Future<void> _loadConversation(SharedPreferences prefs) async {
-    final saved = prefs.getString('chat_history');
+    final stored = ChatHistoryStore(prefs, _token)
+        .load(conversationId: widget.conversationId);
     if (!mounted) return;
     setState(() {
-      _conversationId =
-          prefs.getString('conversation_id') ?? widget.conversationId;
-      _messages.addAll(decodeChatHistory(saved));
+      _conversationId = stored.conversationId;
+      _messages
+        ..clear()
+        ..addAll(stored.messages);
     });
   }
 
@@ -869,11 +880,11 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
                   size: 22,
                   color: ShunShiColors.textTertiary,
                 ),
-                onSelected: (v) {
+                onSelected: (v) async {
                   if (v == 'clear') {
                     setState(() => _messages.clear());
-                    _saveConversation();
-                    _initChat();
+                    await _saveConversation();
+                    if (mounted) await _initChat();
                   }
                 },
                 itemBuilder: (_) => [

@@ -85,6 +85,11 @@ class UserStorage {
     await _prefs.remove(_keySubscription);
     await _prefs.remove('refresh_token');
     await _prefs.remove('device_id');
+    // Remove unowned legacy and account-scoped conversation caches on logout.
+    for (final key in _prefs.getKeys().where((key) =>
+        key.startsWith('chat_v2_') || key == 'chat_history' || key == 'conversation_id').toList()) {
+      await _prefs.remove(key);
+    }
     return true;
   }
 

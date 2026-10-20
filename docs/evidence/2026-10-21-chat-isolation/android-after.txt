@@ -1,0 +1,31 @@
+
+00:00 +0: loading /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_history_store_test.dart
+00:01 +0: loading /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_history_store_test.dart
+00:02 +0: loading /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_history_store_test.dart
+00:02 +0: loading /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_membership_test.dart
+00:03 +0: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_membership_test.dart: actual membership contract handles free and all paid plans without data.tier
+00:03 +1: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_membership_test.dart: actual membership contract handles free and all paid plans without data.tier
+00:03 +1: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_membership_test.dart: missing, unknown and contradictory fields never grant membership
+00:03 +2: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_membership_test.dart: missing, unknown and contradictory fields never grant membership
+00:03 +2: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_membership_test.dart: free badge follows server fields without fabricated quota
+00:03 +3: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_membership_test.dart: free badge follows server fields without fabricated quota
+00:03 +4: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_membership_test.dart: free badge follows server fields without fabricated quota
+00:03 +5: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_membership_test.dart: free badge follows server fields without fabricated quota
+00:03 +6: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_membership_test.dart: free badge follows server fields without fabricated quota
+00:03 +7: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_membership_test.dart: free badge follows server fields without fabricated quota
+00:03 +8: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_membership_test.dart: free badge follows server fields without fabricated quota
+00:03 +9: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_membership_test.dart: free badge follows server fields without fabricated quota
+00:03 +10: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_membership_test.dart: free badge follows server fields without fabricated quota
+00:03 +11: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_membership_test.dart: free badge follows server fields without fabricated quota
+00:03 +12: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_membership_test.dart: free badge follows server fields without fabricated quota
+00:03 +13: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_membership_test.dart: free badge follows server fields without fabricated quota
+00:03 +14: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_membership_test.dart: free badge follows server fields without fabricated quota
+00:03 +15: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_history_page_test.dart: history renders even when membership and solar term HTTP requests fail
+00:03 +16: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_history_page_test.dart: history renders even when membership and solar term HTTP requests fail
+00:03 +17: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_history_page_test.dart: history renders even when membership and solar term HTTP requests fail
+00:03 +18: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_membership_test.dart: jiahe badge follows server fields without fabricated quota
+00:03 +19: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_history_page_test.dart: unowned legacy content is not displayed to a signed in user
+00:03 +20: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_membership_test.dart: failed lookup is unknown and retry restores verified state
+00:03 +21: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_membership_test.dart: failed lookup is unknown and retry restores verified state
+00:03 +22: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_membership_test.dart: failed lookup is unknown and retry restores verified state
+00:04 +22: All tests passed!
