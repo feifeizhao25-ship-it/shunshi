@@ -1,0 +1,207 @@
+{
+  "refresh": {
+    "status": "partial",
+    "checked_at": "2026-10-20T01:02:11.429826+00:00",
+    "checked": 22,
+    "changes": [
+      {
+        "source_id": "R006",
+        "kind": "changed",
+        "before": {
+          "id": "stanfordnlp/dspy",
+          "updated": "2026-10-16T19:33:56Z",
+          "license": "MIT",
+          "archived": false,
+          "default_branch": "main"
+        },
+        "after": {
+          "id": "stanfordnlp/dspy",
+          "updated": "2026-10-19T23:15:11Z",
+          "license": "MIT",
+          "archived": false,
+          "default_branch": "main"
+        },
+        "action": "review_candidate",
+        "production_approved": false
+      },
+      {
+        "source_id": "R008",
+        "kind": "changed",
+        "before": {
+          "id": "docling-project/docling",
+          "updated": "2026-10-18T07:20:32Z",
+          "license": "MIT",
+          "archived": false,
+          "default_branch": "main"
+        },
+        "after": {
+          "id": "docling-project/docling",
+          "updated": "2026-10-19T15:59:04Z",
+          "license": "MIT",
+          "archived": false,
+          "default_branch": "main"
+        },
+        "action": "review_candidate",
+        "production_approved": false
+      },
+      {
+        "source_id": "R011",
+        "kind": "changed",
+        "before": {
+          "id": "infiniflow/ragflow",
+          "updated": "2026-10-17T13:11:26Z",
+          "license": "Apache-2.0",
+          "archived": false,
+          "default_branch": "main"
+        },
+        "after": {
+          "id": "infiniflow/ragflow",
+          "updated": "2026-10-19T13:17:31Z",
+          "license": "Apache-2.0",
+          "archived": false,
+          "default_branch": "main"
+        },
+        "action": "review_candidate",
+        "production_approved": false
+      },
+      {
+        "source_id": "R016",
+        "kind": "changed",
+        "before": {
+          "id": "mem0ai/mem0",
+          "updated": "2026-10-17T21:06:52Z",
+          "license": "Apache-2.0",
+          "archived": false,
+          "default_branch": "main"
+        },
+        "after": {
+          "id": "mem0ai/mem0",
+          "updated": "2026-10-19T19:20:40Z",
+          "license": "Apache-2.0",
+          "archived": false,
+          "default_branch": "main"
+        },
+        "action": "review_candidate",
+        "production_approved": false
+      },
+      {
+        "source_id": "R032",
+        "kind": "changed",
+        "before": {
+          "id": "gitroomhq/postiz-app",
+          "updated": "2026-10-18T19:43:50Z",
+          "license": "AGPL-3.0",
+          "archived": false,
+          "default_branch": "main"
+        },
+        "after": {
+          "id": "gitroomhq/postiz-app",
+          "updated": "2026-10-19T20:27:06Z",
+          "license": "AGPL-3.0",
+          "archived": false,
+          "default_branch": "main"
+        },
+        "action": "review_candidate",
+        "production_approved": false
+      },
+      {
+        "source_id": "R054",
+        "kind": "changed",
+        "before": {
+          "id": "embeddings-benchmark/mteb",
+          "updated": "2026-10-18T20:21:39Z",
+          "license": "Apache-2.0",
+          "archived": false,
+          "default_branch": "main"
+        },
+        "after": {
+          "id": "embeddings-benchmark/mteb",
+          "updated": "2026-10-19T16:18:42Z",
+          "license": "Apache-2.0",
+          "archived": false,
+          "default_branch": "main"
+        },
+        "action": "review_candidate",
+        "production_approved": false
+      },
+      {
+        "source_id": "R057",
+        "kind": "changed",
+        "before": {
+          "id": "openclaw/openclaw",
+          "updated": "2026-10-19T01:01:53Z",
+          "license": "MIT",
+          "archived": false,
+          "default_branch": "main"
+        },
+        "after": {
+          "id": "openclaw/openclaw",
+          "updated": "2026-10-20T01:01:53Z",
+          "license": "MIT",
+          "archived": false,
+          "default_branch": "main"
+        },
+        "action": "review_candidate",
+        "production_approved": false
+      },
+      {
+        "source_id": "R061",
+        "kind": "changed",
+        "before": {
+          "id": "langchain-ai/langgraph",
+          "updated": "2026-10-16T22:11:27Z",
+          "license": "MIT",
+          "archived": false,
+          "default_branch": "main"
+        },
+        "after": {
+          "id": "langchain-ai/langgraph",
+          "updated": "2026-10-19T14:06:21Z",
+          "license": "MIT",
+          "archived": false,
+          "default_branch": "main"
+        },
+        "action": "review_candidate",
+        "production_approved": false
+      }
+    ],
+    "failures": [
+      {
+        "source_id": "R036",
+        "error": "URLError",
+        "reason_type": "SSLEOFError"
+      },
+      {
+        "source_id": "R042",
+        "error": "URLError",
+        "reason_type": "SSLEOFError"
+      },
+      {
+        "source_id": "R055",
+        "error": "URLError",
+        "reason_type": "SSLEOFError"
+      }
+    ],
+    "production_modified": false,
+    "local_day": "2026-10-20",
+    "registry_sha256": "29298266d158ab0929e6d21470e99cd27174b4d25724d786efc7020f8c909a06"
+  },
+  "evaluation": {
+    "scope": "research_keyword_retrieval_only",
+    "cases": 18,
+    "passed": 18,
+    "ranking_metrics_known_gold_only": {
+      "recall_at_5": 1.0,
+      "mrr_at_5": 0.9583333333333334,
+      "ndcg_at_5": 0.9692441461309548,
+      "empty_query_correct": 1.0
+    },
+    "maintenance_ledger": {
+      "path": "/Users/feifei00/Documents/运营资料-OpenClaw/automation/output/domestic-research/maintenance-ledger.json",
+      "open": 117,
+      "closed": 2,
+      "production_modified": false
+    },
+    "checked_at": "2026-10-20T04:40:19.651492+00:00"
+  }
+}
