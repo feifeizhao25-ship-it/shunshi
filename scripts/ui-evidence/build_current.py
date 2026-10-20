@@ -5,7 +5,7 @@ e=html.escape
 css='body{font:16px/1.8 system-ui;background:#f1f5f7;color:#18323a;margin:0}main{max-width:1250px;margin:auto;padding:24px}article,header{background:white;padding:24px;border-radius:14px;margin-bottom:20px}img{width:100%;height:auto}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#edf3f5;padding:16px}a{color:#086a60}h1{font-size:32px}nav{display:flex;gap:20px;flex-wrap:wrap}'
 def page(t,b):return '<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+e(t)+'</title><style>'+css+'</style><main>'+b+'</main></html>'
 allrows=[];groups=[]
-for name in ['contentflow-output','after-energy-cn','membership-energy-cn','after-membership-boundaries','after-energy-global','before-membership-boundaries','current-energy-cn','current-energy-global']:
+for name in ['contentflow-cn-full-after','contentflow-cn-full-before','contentflow-output','after-energy-cn','membership-energy-cn','after-membership-boundaries','after-energy-global','before-membership-boundaries','current-energy-cn','current-energy-global']:
  folder=OUT/name
  if not (folder/'manifest.json').exists():continue
  rows=json.loads((folder/'manifest.json').read_text());groups.append((name,rows))
