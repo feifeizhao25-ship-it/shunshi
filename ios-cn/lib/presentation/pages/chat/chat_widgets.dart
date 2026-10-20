@@ -8,7 +8,8 @@ import 'chat_models.dart';
 class AIBubble extends StatelessWidget {
   final ChatMessage message;
   final VoidCallback? onFeedback;
-  const AIBubble({super.key, required this.message, this.onFeedback});
+  final VoidCallback? onSpeak;
+  const AIBubble({super.key, required this.message, this.onFeedback, this.onSpeak});
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +26,7 @@ class AIBubble extends StatelessWidget {
         Row(children: [
           Text(message.time, style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 11, color: ShunShiColors.textTertiary)),
           const SizedBox(width: 8),
-          GestureDetector(onTap: () { ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('正在播报...'), duration: Duration(seconds: 2))); }, child: Icon(Icons.volume_up, size: 16, color: ShunShiColors.textTertiary)),
+          IconButton(tooltip: onSpeak == null ? '语音播报尚未接通' : '朗读回复', onPressed: onSpeak, icon: const Icon(Icons.volume_up, size: 16)),
           const SizedBox(width: 8),
           if (onFeedback != null) GestureDetector(onTap: onFeedback, child: Icon(Icons.thumb_up_outlined, size: 16, color: ShunShiColors.textTertiary)),
         ]),

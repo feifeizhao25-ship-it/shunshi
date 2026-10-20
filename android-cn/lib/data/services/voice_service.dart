@@ -11,7 +11,14 @@ import 'package:dio/dio.dart';
 import '../../core/config/app_config.dart';
 
 /// 语音输入服务
-class VoiceService {
+abstract class VoiceInput {
+  String get errorMsg;
+  Future<bool> startRecording();
+  Future<String?> stopAndRecognize();
+  Future<void> cancel();
+}
+
+class VoiceService implements VoiceInput {
   static final VoiceService _instance = VoiceService._();
   factory VoiceService() => _instance;
   VoiceService._();
@@ -52,6 +59,7 @@ class VoiceService {
   Future<bool> startRecording() async {
     try {
       if (await _recorder.isRecording()) return true;
+      if (!await _checkPermission()) return false;
 
       final dir = await getTemporaryDirectory();
       _recordPath = '${dir.path}/voice_${DateTime.now().millisecondsSinceEpoch}.aac';
@@ -65,7 +73,7 @@ class VoiceService {
       _errorMsg = '';
       return true;
     } catch (e) {
-      _errorMsg = '录音启动失败: $e';
+      _errorMsg = '录音启动失败，请检查麦克风权限后重试';
       debugPrint('[VoiceService] startRecording error: $e');
       return false;
     }
@@ -76,7 +84,10 @@ class VoiceService {
   Future<String?> stopAndRecognize() async {
     try {
       _isListening = false;
-      if (!(await _recorder.isRecording())) return null;
+      if (!(await _recorder.isRecording())) {
+        _errorMsg = '录音已停止，请重新录音';
+        return null;
+      }
 
       final path = await _recorder.stop();
       if (path == null || path.isEmpty) {
@@ -92,9 +103,16 @@ class VoiceService {
 
       return await _recognizeFile(file);
     } catch (e) {
-      _errorMsg = '语音识别失败: $e';
+      _errorMsg = '语音识别失败，请重新录音或输入文字';
       debugPrint('[VoiceService] stopAndRecognize error: $e');
       return null;
+    } finally {
+      try {
+        if (_recordPath.isNotEmpty) {
+          final file = File(_recordPath);
+          if (await file.exists()) await file.delete();
+        }
+      } catch (_) {}
     }
   }
 
@@ -139,7 +157,7 @@ class VoiceService {
       debugPrint('[VoiceService] _recognizeFile error: ${e.message}');
       return null;
     } catch (e) {
-      _errorMsg = '识别失败: $e';
+      _errorMsg = '语音识别失败，请重新录音或输入文字';
       debugPrint('[VoiceService] _recognizeFile error: $e');
       return null;
     } finally {

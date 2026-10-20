@@ -46,6 +46,9 @@ void main() {
       await tester.ensureVisible(find.text('来源一'));
       await tester.pumpAndSettle();
       expect(find.text('来源一').hitTestable(), findsOneWidget);
+      final playback = tester.widget<IconButton>(find.byWidgetPredicate((w) => w is IconButton && w.tooltip == '语音播报尚未接通'));
+      expect(playback.onPressed, isNull);
+      expect(find.text('正在播报...'), findsNothing);
       expect(tester.takeException(), isNull);
     });
   }

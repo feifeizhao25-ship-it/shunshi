@@ -20,7 +20,8 @@ const _baseUrl = 'https://api.shunshi.app';
 class ChatPage extends StatefulWidget {
   final String? conversationId;
   final Dio? client;
-  const ChatPage({super.key, this.conversationId, this.client});
+  final VoiceInput? voiceInput;
+  const ChatPage({super.key, this.conversationId, this.client, this.voiceInput});
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -85,6 +86,8 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
   bool _isLoading = false;
   String? _chatError;
   bool _isRecording = false;
+  bool _voiceBusy = false;
+  VoiceInput? _voice;
   bool _membershipKnown = false;
   bool _membershipLoading = false;
   bool _isVip = false;
@@ -104,6 +107,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
 
   @override
   void dispose() {
+    _voice?.cancel().catchError((Object _) {});
     _controller.dispose();
     _scrollController.dispose();
     _focusNode.dispose();
@@ -528,47 +532,44 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
   // ── 语音 ──
 
   void _showVoiceInput() async {
-    if (_isRecording) {
-      setState(() => _isRecording = false);
-      try {
-        final voice = VoiceService();
-        final text = await voice.stopAndRecognize();
-        if (text != null && text.isNotEmpty && mounted) {
-          setState(() => _controller.text = text);
-        }
-      } catch (e) {
-        if (mounted)
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('语音识别失败: $e'),
-              duration: const Duration(seconds: 2),
-            ),
-          );
-      }
-      return;
-    }
+    if (_voiceBusy) return;
+    final voice = _voice ??= widget.voiceInput ?? VoiceService();
+    setState(() {
+      _voiceBusy = true;
+      _chatError = null;
+    });
     try {
-      final voice = VoiceService();
-      final started = await voice.startRecording();
-      if (!started) {
-        if (mounted)
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('录音启动失败，请检查麦克风权限'),
-              duration: Duration(seconds: 2),
-            ),
-          );
-        return;
+      if (_isRecording) {
+        setState(() => _isRecording = false);
+        final text = await voice.stopAndRecognize();
+        if (!mounted) return;
+        if (text == null || text.trim().isEmpty) {
+          setState(() => _chatError = voice.errorMsg.isEmpty
+              ? '未识别到语音，请重新录音或输入文字。' : voice.errorMsg);
+        } else {
+          // Never overwrite words typed while recognition was in flight.
+          setState(() => _controller.text = _controller.text.isEmpty
+              ? text : '${_controller.text}\n$text');
+        }
+      } else {
+        final started = await voice.startRecording();
+        if (!mounted) {
+          await voice.cancel();
+          return;
+        }
+        setState(() {
+          _isRecording = started;
+          if (!started) _chatError = voice.errorMsg.isEmpty
+              ? '录音启动失败，请检查麦克风权限。' : voice.errorMsg;
+        });
       }
-      setState(() => _isRecording = true);
-    } catch (e) {
-      if (mounted)
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('录音失败: $e'),
-            duration: const Duration(seconds: 2),
-          ),
-        );
+    } catch (_) {
+      if (mounted) setState(() {
+        _isRecording = false;
+        _chatError = '语音服务暂不可用，请重新录音或输入文字。';
+      });
+    } finally {
+      if (mounted) setState(() => _voiceBusy = false);
     }
   }
 
