@@ -1,0 +1,27 @@
+{
+  "status": "partial",
+  "checked_at": "2026-10-22T01:02:15.081010+00:00",
+  "checked": 23,
+  "changes": 9,
+  "failures": [
+    {
+      "source_id": "R042",
+      "error": "URLError",
+      "reason_type": "SSLEOFError"
+    },
+    {
+      "source_id": "R055",
+      "error": "URLError",
+      "reason_type": "SSLEOFError"
+    }
+  ],
+  "evaluation_passed": 18,
+  "ranking_metrics_known_gold_only": {
+    "recall_at_5": 1.0,
+    "mrr_at_5": 0.9583333333333334,
+    "ndcg_at_5": 0.9692441461309548,
+    "empty_query_correct": 1.0
+  },
+  "scope": "research index only; no product knowledge approval",
+  "production_modified": false
+}
