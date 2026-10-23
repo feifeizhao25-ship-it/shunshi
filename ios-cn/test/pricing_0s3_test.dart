@@ -15,6 +15,21 @@ void main() {
     expect(plan.priceDisplay, '¥888');
   });
 
+  test('365 天商品按年展示，不回退成月付文案', () {
+    final plan = SubscriptionPlan.fromJson({
+      'product_id': 'content_yearly',
+      'name': '内容订阅·年付',
+      'price_cents': 39900,
+      'duration_days': 365,
+      'description': '每天 100 次对话+今日计划，适合养生爱好者',
+      'features': {'basic_chat': true, 'today_plan': true},
+    });
+    expect(plan.periodName, '年');
+    expect(plan.period, 'year');
+    expect(plan.description, contains('100'));
+    expect(plan.description, isNot(contains('月度')));
+  });
+
   test('商店只拉取两个在售年付商品', () {
     expect(StoreService.productIds.values.toSet(),
         {'com.shunshi.content.yearly', 'com.shunshi.member.yearly'});

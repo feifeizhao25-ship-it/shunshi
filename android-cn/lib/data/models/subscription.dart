@@ -84,8 +84,10 @@ class SubscriptionPlan {
     if (json.containsKey('price_cents')) {
       // 0S3 付费档只卖年付：月价为空时用年价，避免把付费档显示成「免费」
       priceCents = json['price_cents'] ?? json['price_yearly_cents'] ?? 0;
-    } else if (json.containsKey('price')) {
+    } else if (json['price'] is num) {
       priceCents = ((json['price'] as num) * 100).round();
+    } else if (json['price_yearly'] is num) {
+      priceCents = ((json['price_yearly'] as num) * 100).round();
     } else {
       priceCents = 0;
     }
@@ -93,9 +95,8 @@ class SubscriptionPlan {
     final level = json['level'] as int? ?? 0;
     final descMap = {
       0: '基础功能',
-      1: '月度会员，畅享全部功能',
-      2: '年度会员，超值优惠',
-      3: '家庭共享，最多4人使用',
+      1: '年付内容订阅',
+      2: '年付会员',
     };
     final featMap = {
       0: {'basic_chat': true},
@@ -120,15 +121,20 @@ class SubscriptionPlan {
       priceYearlyCents: json['price_yearly_cents'],
       period:
           json['period'] ??
-          (json['duration_days'] != null
-              ? 'day'
-              : (level == 1 ? 'month' : 'year')),
+          ((json['duration_days'] is num && (json['duration_days'] as num) >= 365)
+              ? 'year'
+              : (json['duration_days'] != null
+                  ? 'day'
+                  : 'year')),
       periodName:
           json['period_name'] ??
-          (json['duration_days'] != null
-              ? '${json['duration_days']}天'
-              : (level == 1 ? '月' : '年')),
-      description: json['description'] ?? descMap[level] ?? '',
+          ((json['duration_days'] is num && (json['duration_days'] as num) >= 365)
+              ? '年'
+              : (json['duration_days'] != null
+                  ? '${json['duration_days']}天'
+                  : '年')),
+      description: json['description'] ??
+          (priceCents > 0 ? '年付，次数以订单页说明为准' : (descMap[level] ?? '')),
       features: Map<String, bool>.from(
         json['features'] ?? featMap[level] ?? {},
       ),

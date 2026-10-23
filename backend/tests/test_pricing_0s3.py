@@ -48,3 +48,50 @@ def test_legacy_sku_cannot_be_ordered(client, auth_headers):
     r = client.post("/api/v1/subscription/create-order", headers=auth_headers,
                     json={"product_id": "yangxin_monthly", "platform": "alipay"})
     assert r.status_code == 410 and "停售" in r.json()["detail"]
+
+
+def test_alipay_public_catalogue_lists_only_yearly_on_sale(client):
+    response = client.get("/api/v1/payments/alipay/products")
+    assert response.status_code == 200
+    rows = response.json()["data"]
+    assert {(row["sku"], row["price"], row["period"]) for row in rows} == {
+        ("content_yearly", "399.00", "year"),
+        ("member_yearly", "888.00", "year"),
+    }
+    assert all(row["on_sale"] is True and row["max_family_seats"] == 0 for row in rows)
+
+
+def test_discontinued_alipay_sku_cannot_open_a_new_order():
+    from decimal import Decimal
+    import pytest
+    from app.services.alipay_service import purchasable_alipay_product
+    for sku in ("yangxin_monthly", "family_monthly", "family_yearly", "jiahe"):
+        with pytest.raises(ValueError, match="停售"):
+            purchasable_alipay_product(sku)
+    assert purchasable_alipay_product("content_yearly")["price"] == Decimal("399.00")
+
+
+def test_subscription_products_are_yearly_and_do_not_offer_jiahe(client, auth_headers):
+    response = client.get("/api/v1/subscription/products", headers=auth_headers, params={"platform": "alipay"})
+    assert response.status_code == 200
+    body = response.json()["data"]
+    assert body["tiers"] == ["free", "yangxin", "yiyang"]
+    products = body["products"]
+    assert {item["product_id"] for item in products} == {"content_yearly", "member_yearly"}
+    by_id = {item["product_id"]: item for item in products}
+    assert by_id["content_yearly"]["price_cents"] == 39900
+    assert by_id["member_yearly"]["price_cents"] == 88800
+    for item in products:
+        assert item["period_name"] == "年" and item["on_sale"] is True
+        assert "无限" not in item["description"]
+        assert "家庭" not in item["description"]
+        assert "深度" not in item["description"]
+
+
+def test_plan_list_marks_jiahe_off_sale(client, auth_headers):
+    response = client.get("/api/v1/subscription/plans", headers=auth_headers)
+    assert response.status_code == 200
+    plans = {item["id"]: item for item in response.json()["data"]}
+    assert plans["jiahe"]["on_sale"] is False
+    assert plans["yangxin"]["on_sale"] is True and plans["yangxin"]["price_yearly"] == 399
+    assert plans["yiyang"]["price_yearly"] == 888

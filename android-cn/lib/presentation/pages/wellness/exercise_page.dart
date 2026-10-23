@@ -5,7 +5,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../data/network/api_client.dart';
 import '../../../design_system/theme.dart';
 import '../../widgets/exercise_demo.dart';
-import '../../widgets/paywall_banner.dart';
 import '../../widgets/skeleton_loading.dart';
 
 /// 运动功法页面
@@ -121,7 +120,6 @@ class _ExercisePageState extends State<ExercisePage> {
               ),
             ],
           ),
-          const PaywallBanner(message: '升级会员解锁专属运动方案与八段锦跟练', icon: Icons.fitness_center),
           Container(
             padding: const EdgeInsets.all(16),
             color: Colors.orange[50],

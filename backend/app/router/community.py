@@ -60,7 +60,7 @@ def list_posts(
     category: Optional[str] = Query(None),
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=50),
-    sort: str = Query("latest", enum=["latest", "popular"]),
+    sort: str = Query("latest", pattern="^(latest|popular)$"),
     db: Session = Depends(get_db),
 ):
     q = db.query(CommunityPost).filter(CommunityPost.is_active == True)  # noqa: E712

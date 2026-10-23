@@ -5,6 +5,8 @@
 import logging
 from typing import Optional
 
+from app.safety.efficacy import redact_efficacy_claims
+
 from .knowledge_base import cn_kb, gl_kb, KnowledgeChunk
 from .embedder import get_embedder
 
@@ -84,7 +86,7 @@ def retrieve(
     return [
         {
             "chunk_id": kb.chunks[idx].chunk_id,
-            "content": kb.chunks[idx].content,
+            "content": redact_efficacy_claims(kb.chunks[idx].content),
             "heading_path": kb.chunks[idx].heading_path,
             "metadata": kb.chunks[idx].metadata,
             "score": round(score, 4),

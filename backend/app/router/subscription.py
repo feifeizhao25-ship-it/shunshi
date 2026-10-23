@@ -1172,11 +1172,16 @@ async def get_products(
         if platform and p["platform"] != platform:
             continue
 
+        yearly = p.get("duration_days", 0) >= 365
         products.append({
             "product_id": p["product_id"],
             "name": p["name"],
             "tier": p["tier"],
             "tier_name": SUBSCRIPTION_PLANS[p["tier"]]["name"],
+            "period": "year" if yearly else "day",
+            "period_name": "年" if yearly else f"{p.get('duration_days', 0)}天",
+            "description": _get_plan_description(p["tier"]),
+            "on_sale": True,
             "price_cents": p["price_cents"],
             "price_display": f"¥{p['price_cents'] / 100:.2f}",
             "currency": p["currency"],
@@ -1192,7 +1197,7 @@ async def get_products(
         "success": True,
         "data": {
             "current_tier": current_sub.plan,
-            "tiers": ["free", "yangxin", "yiyang", "jiahe"],
+            "tiers": [plan_id for plan_id, plan in SUBSCRIPTION_PLANS.items() if plan.get("on_sale", plan_id == "free")],
             "products": products,
         }
     }
@@ -1822,16 +1827,17 @@ async def get_plans(user_id: str = Query("user-001")):
         plans.append({
             "id": plan["id"],
             "name": plan["name"],
-            "price": plan.get("price", 0),
+            "price": plan.get("price"),
             "price_yearly": plan.get("price_yearly"),
-            "price_cents": plan.get("price_cents", 0),
-            "price_yearly_cents": plan.get("price_yearly_cents", 0),
+            "price_cents": plan.get("price_cents"),
+            "price_yearly_cents": plan.get("price_yearly_cents"),
             "period": plan.get("period"),
             "period_name": plan.get("period_name"),
             "features": plan["features"],
             "is_current": plan["id"] == current_sub.plan,
             "description": _get_plan_description(plan["id"]),
             "family_seats": plan.get("family_seats", 0),
+            "on_sale": plan.get("on_sale", plan["id"] == "free"),
         })
 
     return {"success": True, "data": plans}

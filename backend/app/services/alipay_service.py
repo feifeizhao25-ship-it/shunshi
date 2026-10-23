@@ -52,6 +52,7 @@ ALIPAY_PRODUCTS: dict[str, dict] = {
         "currency": "CNY",
         "duration_days": 365,
         "max_family_seats": 0,
+        "on_sale": True,
     },
     "member_yearly": {
         "product_id": "shunshi_member_yearly",
@@ -61,6 +62,7 @@ ALIPAY_PRODUCTS: dict[str, dict] = {
         "currency": "CNY",
         "duration_days": 365,
         "max_family_seats": 0,
+        "on_sale": True,
     },
     # 以下为停售旧 SKU：订阅接口已拒绝下单，仅保留以便旧订单回调 / 对账识别金额
     "yangxin_monthly": {
@@ -71,6 +73,7 @@ ALIPAY_PRODUCTS: dict[str, dict] = {
         "currency": "CNY",
         "duration_days": 30,
         "max_family_seats": 0,
+        "on_sale": False,
     },
     "yangxin_yearly": {
         "product_id": "shunshi_yangxin_yearly",
@@ -80,6 +83,7 @@ ALIPAY_PRODUCTS: dict[str, dict] = {
         "currency": "CNY",
         "duration_days": 365,
         "max_family_seats": 0,
+        "on_sale": False,
     },
     "yiyang_monthly": {
         "product_id": "shunshi_yiyang_monthly",
@@ -89,6 +93,7 @@ ALIPAY_PRODUCTS: dict[str, dict] = {
         "currency": "CNY",
         "duration_days": 30,
         "max_family_seats": 0,
+        "on_sale": False,
     },
     "yiyang_yearly": {
         "product_id": "shunshi_yiyang_yearly",
@@ -98,6 +103,7 @@ ALIPAY_PRODUCTS: dict[str, dict] = {
         "currency": "CNY",
         "duration_days": 365,
         "max_family_seats": 0,
+        "on_sale": False,
     },
     "family_monthly": {
         "product_id": "shunshi_family_monthly",
@@ -107,6 +113,7 @@ ALIPAY_PRODUCTS: dict[str, dict] = {
         "currency": "CNY",
         "duration_days": 30,
         "max_family_seats": 4,
+        "on_sale": False,
     },
     "family_yearly": {
         "product_id": "shunshi_family_yearly",
@@ -116,8 +123,17 @@ ALIPAY_PRODUCTS: dict[str, dict] = {
         "currency": "CNY",
         "duration_days": 365,
         "max_family_seats": 4,
+        "on_sale": False,
     },
 }
+
+
+def purchasable_alipay_product(product_sku: str) -> dict:
+    """新订单只能使用在售年付。停售 SKU 仍留在目录里给旧回调对账。"""
+    product = ALIPAY_PRODUCTS.get(product_sku)
+    if not product or not product.get("on_sale"):
+        raise ValueError("该商品已停售，请选择内容订阅或会员年付")
+    return product
 
 
 # ==================== 数据模型 ====================
@@ -220,9 +236,7 @@ class AlipayService:
         Returns:
             AlipayOrderResult
         """
-        product = ALIPAY_PRODUCTS.get(product_sku)
-        if not product:
-            raise ValueError(f"未知产品 SKU: {product_sku}")
+        product = purchasable_alipay_product(product_sku)
 
         order_no = f"AP{datetime.now().strftime('%Y%m%d%H%M%S')}{uuid.uuid4().hex[:8]}"
         total_amount = str(product["price"])
@@ -340,7 +354,12 @@ class AlipayGateway:
         """创建支付订单"""
         from .payment_gateway import PaymentResult
         try:
-            sku = (metadata or {}).get("sku", "yangxin_monthly")
+            sku = (metadata or {}).get("sku")
+            if not isinstance(sku, str) or not sku:
+                return PaymentResult(
+                    success=False, order_id="", amount=amount, currency=currency,
+                    message="缺少在售商品",
+                )
             result = self._svc.create_order(product_sku=sku, user_id=user_id)
             return PaymentResult(
                 success=True,

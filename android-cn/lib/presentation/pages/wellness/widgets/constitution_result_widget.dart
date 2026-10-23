@@ -260,7 +260,7 @@ class ConstitutionResultWidget extends StatelessWidget {
                 const Text('👑', style: TextStyle(fontSize: 20)),
                 const SizedBox(width: 10),
                 const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text('解锁完整体质报告',
+                  Text('查看调理建议',
                       style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF92400E))),
                   SizedBox(height: 2),
                   Text('饮食·茶饮·运动·穴位·四季调理方案',
@@ -274,7 +274,7 @@ class ConstitutionResultWidget extends StatelessWidget {
                 child: ElevatedButton.icon(
                   onPressed: onUnlock,
                   icon: const Icon(Icons.lock_open, size: 18),
-                  label: const Text('解锁报告',
+                  label: const Text('查看建议',
                       style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFE5A84B),

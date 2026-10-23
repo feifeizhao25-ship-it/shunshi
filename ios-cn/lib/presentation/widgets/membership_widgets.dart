@@ -80,10 +80,9 @@ class _MembershipCardState extends State<MembershipCard> {
 
           // 权益列表
           ...[
-            ('💬', '无限AI对话'),
-            ('📊', '深度养生建议'),
-            ('👨‍👩‍👧‍👦', '家庭共享'),
-            ('📅', '专属节气报告'),
+            ('💬', '更多每日对话次数'),
+            ('📅', '今日计划'),
+            ('🌿', '年付：内容订阅 ¥399 / 会员 ¥888'),
           ].map((item) => Padding(
             padding: const EdgeInsets.only(bottom: 8),
             child: Row(
