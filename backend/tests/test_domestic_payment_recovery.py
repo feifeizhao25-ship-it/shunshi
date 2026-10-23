@@ -14,7 +14,7 @@ from app.services.payment_activation import activate_verified_domestic_payment
 from app.simple_models import Entitlement
 
 
-def order_for(client, headers, product="yangxin_monthly"):
+def order_for(client, headers, product="content_yearly"):
     response = client.post('/api/v1/subscription/create-order', headers=headers,
         json={"product_id": product, "platform": "alipay"})
     assert response.status_code == 200, response.text
@@ -72,7 +72,9 @@ def test_paid_ledger_survives_projection_failure_and_retry_does_not_add_days(
         close_test_connection(db)
 
 
-def test_old_callback_recovers_latest_renewal_without_resetting_family_members(client, auth_headers):
+def test_old_callback_recovers_latest_renewal_without_resetting_family_members(client, auth_headers, monkeypatch):
+    from tests.conftest import sell_legacy_sku_for_existing_purchaser
+    sell_legacy_sku_for_existing_purchaser(monkeypatch, 'jiahe_monthly')
     request = SimpleNamespace(app=client.app)
     first, first_args = order_for(client, auth_headers, 'jiahe_monthly')
     activate_verified_domestic_payment(request, **first_args)

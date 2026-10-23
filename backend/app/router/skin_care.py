@@ -95,8 +95,8 @@ SKIN_BRIGHTENING_RECIPES = [
     },
     {
         "name": "红枣枸杞内调汤",
-        "ingredients": ["红枣5颗", "枸杞15g", "当归5g"],
-        "method": "水煎30分钟饮用",
+        "ingredients": ["红枣", "枸杞"],
+        "method": "加水煮 20 分钟，温热饮用",
         "benefit": "补血养颜，从内改善面色",
         "frequency": "每日1次"
     }

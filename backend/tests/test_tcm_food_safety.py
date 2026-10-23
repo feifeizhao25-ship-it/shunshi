@@ -5,14 +5,17 @@
 
 import pytest
 from fastapi.testclient import TestClient
+from tests.signed_in_client import SignedInClient
 from datetime import datetime
+
+pytestmark = pytest.mark.signed_in
 
 
 @pytest.fixture
 def client():
     """创建FastAPI测试客户端"""
     from app.main import app
-    return TestClient(app)
+    return SignedInClient(app)
 
 
 class TestListFoods:

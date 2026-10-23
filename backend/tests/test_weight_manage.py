@@ -1,6 +1,8 @@
 """顺时 - 体重管理测试"""
 import pytest
 
+pytestmark = pytest.mark.signed_in
+
 
 class TestWeightLog:
     def test_log_returns_200(self, client):
@@ -13,9 +15,9 @@ class TestWeightLog:
         data = client.post("/api/v1/weight-manage/log", json=payload).json()
         assert data["success"] is True
 
-    def test_log_requires_user_id(self, client):
-        response = client.post("/api/v1/weight-manage/log", json={"weight_kg": 65.0})
-        assert response.status_code == 422
+    def test_log_requires_login(self, anonymous_client):
+        response = anonymous_client.post("/api/v1/weight-manage/log", json={"weight_kg": 65.0})
+        assert response.status_code == 401
 
 
 class TestWeightHistory:

@@ -61,7 +61,7 @@ class _MembershipCardState extends State<MembershipCard> {
               const SizedBox(width: 12),
               const Expanded(
                 child: Text(
-                  '养心版会员',
+                  '内容订阅会员',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
@@ -180,7 +180,7 @@ class TokenBalanceBar extends StatelessWidget {
             Expanded(
               child: Text(
                 isLow
-                    ? '升级养心版，无限对话'
+                    ? '升级会员，每天更多对话'
                     : '今日对话剩余 $remaining 次',
                 style: TextStyle(
                   fontSize: 12,

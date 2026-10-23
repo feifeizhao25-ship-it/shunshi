@@ -389,7 +389,7 @@ SEASONAL_ADJUSTMENTS: Dict[str, Dict[str, List[Dict[str, Any]]]] = {
                 {"suggestion": "减少空调使用", "type": "care"},
             ],
             "stable": [
-                {"suggestion": "沙参麦冬汤养阴润肺", "type": "diet"},
+                {"suggestion": "银耳百合羹润燥", "type": "diet"},
                 {"suggestion": "尺泽穴清肺热", "type": "acupoint"},
             ],
             "mature": [

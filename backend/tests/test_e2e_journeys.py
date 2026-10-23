@@ -611,7 +611,7 @@ class TestSubscriptionJourney:
         resp = await client.post(
             "/api/v1/subscription/create-order",
             json={
-                "product_id": "yiyang_monthly",
+                "product_id": "member_yearly",
                 "platform": "alipay",
             },
             params={"user_id": "user-e2e-sub"},
@@ -620,7 +620,7 @@ class TestSubscriptionJourney:
         data = resp.json()["data"]
         assert "order_id" in data, "缺少 order_id"
         assert data["status"] == "pending", f"订单状态应为 pending: {data['status']}"
-        assert data["amount_cents"] == 5900, f"颐养版月付应为 5900 分: {data['amount_cents']}"
+        assert data["amount_cents"] == 88800, f"会员年付应为 88800 分: {data['amount_cents']}"
 
         # 保存 order_id
         TestSubscriptionJourney._order_id = data["order_id"]
@@ -632,13 +632,13 @@ class TestSubscriptionJourney:
         from cryptography.hazmat.primitives import hashes, serialization
         from cryptography.hazmat.primitives.asymmetric import padding, rsa
 
-        created = await client.post("/api/v1/subscription/create-order", params={"user_id": "user-e2e-sub"}, json={"product_id": "yiyang_monthly", "platform": "alipay"})
+        created = await client.post("/api/v1/subscription/create-order", params={"user_id": "user-e2e-sub"}, json={"product_id": "member_yearly", "platform": "alipay"})
         assert created.status_code == 200
         order_id = created.json()["data"]["order_id"]
         key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
         public = key.public_key().public_bytes(serialization.Encoding.PEM, serialization.PublicFormat.SubjectPublicKeyInfo).decode()
         monkeypatch.setenv("ALIPAY_PUBLIC_KEY", public)
-        payload = {"order_id": order_id, "transaction_id": "MOCK_TXN_001", "trade_status": "TRADE_SUCCESS", "total_amount": "59.00"}
+        payload = {"order_id": order_id, "transaction_id": "MOCK_TXN_001", "trade_status": "TRADE_SUCCESS", "total_amount": "888.00"}
         signed = "&".join(f"{name}={value}" for name, value in sorted(payload.items()))
         payload["sign"] = base64.b64encode(key.sign(signed.encode(), padding.PKCS1v15(), hashes.SHA256())).decode()
         payload["platform"] = "alipay"

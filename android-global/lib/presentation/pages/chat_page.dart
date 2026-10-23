@@ -15,6 +15,7 @@ import 'chat/chat_widgets.dart';
 import '../../../core/theme/app_localizations.dart';
 import '../../../core/network/api_singleton.dart';
 import '../../core/config/app_config.dart';
+import '../../core/solar_term/solar_term_en.dart';
 class ChatPage extends StatefulWidget {
   final String? conversationId;
   const ChatPage({super.key, this.conversationId});
@@ -52,8 +53,8 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
 
   String _userName = '';
   String _token = '';
-  String _currentSolarTerm = 'Lixia';
-  String _solarTermDesc = 'The beginning of summer. Nourish the heart, eat lightly, rest properly.';
+  String _currentSolarTerm = currentSolarTermEn()?.$1 ?? 'this season';
+  String _solarTermDesc = currentSolarTermEn()?.$2 ?? 'Seasonal guidance is loading.';
   String? _conversationId;
 
   @override
@@ -70,7 +71,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
       if (res.data is Map && res.data['success'] == true) {
         final data = res.data['data'] as Map<String, dynamic>;
         if (mounted) setState(() {
-          _currentSolarTerm = data['name']?.toString() ?? 'Lixia';
+          _currentSolarTerm = data['name']?.toString() ?? _currentSolarTerm;
           _solarTermDesc = data['description']?.toString() ?? _solarTermDesc;
         });
       }

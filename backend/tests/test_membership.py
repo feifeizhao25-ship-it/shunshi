@@ -9,7 +9,7 @@ from app.router.membership import (
     router,
     _memberships,
     MEMBERSHIP_TIERS,
-    DURATION_DISCOUNTS,
+    SUPPORTED_DURATIONS,
     _get_default_free_membership,
     _ensure_membership,
     _is_membership_active,
@@ -44,9 +44,10 @@ def test_list_tiers_returns_all_tiers():
     assert len(data["tiers"]) == 4
     tier_names = [t["tier"] for t in data["tiers"]]
     assert "free" in tier_names
-    assert "basic" in tier_names
-    assert "premium" in tier_names
-    assert "family" in tier_names
+    # 档位与收费 SKU 一致：养心 / 颐养 / 家和（以前是另一套 basic/premium/family）
+    assert "yangxin" in tier_names
+    assert "yiyang" in tier_names
+    assert "jiahe" in tier_names
 
 
 def test_tiers_have_required_fields():
@@ -67,9 +68,11 @@ def test_tier_pricing():
     data = response.json()["data"]
     tier_dict = {t["tier"]: t for t in data["tiers"]}
     assert tier_dict["free"]["price_monthly"] == 0
-    assert tier_dict["basic"]["price_monthly"] == 18
-    assert tier_dict["premium"]["price_monthly"] == 38
-    assert tier_dict["family"]["price_monthly"] == 58
+    # 价格只有一份：SUBSCRIPTION_PLANS（支付宝/微信/Apple 实际收费）。以前这里是 18/38/58，与收费的 29/59/99 矛盾
+    from app.router.subscription import SUBSCRIPTION_PLANS
+    for plan_id, plan in SUBSCRIPTION_PLANS.items():
+        assert tier_dict[plan_id]["price_monthly"] == plan["price"]
+        assert tier_dict[plan_id]["price_yearly"] == plan.get("price_yearly")
 
 
 def test_free_tier_basic_features():
@@ -78,28 +81,29 @@ def test_free_tier_basic_features():
     data = response.json()["data"]
     free_tier = next(t for t in data["tiers"] if t["tier"] == "free")
     features = free_tier["features"]
-    assert features["ai_questions_per_day"] == 3
-    assert features["audio_per_day"] == 0
-    assert features["companion"] == False
+    # 额度取权益注册表（chat_quota 实际执行的数字）；以前写每天 3 次
+    assert features["ai_questions_per_day"] == 20
+    assert features["audio_minutes_per_day"] == 30
+    assert "companion" not in features
 
 
-def test_premium_tier_unlimited_features():
-    """高级版包含无限功能"""
+def test_paid_tier_features_follow_registry():
+    """付费档权益取权益注册表：每天 200 次对话（不是「无限」）、音频不限时长；不卖「AI 伴侣」"""
     response = client.get("/api/v1/membership/tiers")
     data = response.json()["data"]
-    premium_tier = next(t for t in data["tiers"] if t["tier"] == "premium")
-    features = premium_tier["features"]
-    # JSON 不支持 Infinity；使用显式字符串保证跨端序列化一致。
-    assert features["ai_questions_per_day"] == "unlimited"
-    assert features["audio_per_day"] == "unlimited"
-    assert features["companion"] == True
+    tier = next(t for t in data["tiers"] if t["tier"] == "yiyang")
+    features = tier["features"]
+    # JSON 不支持 Infinity；不限时用显式字符串保证跨端序列化一致。
+    assert features["ai_questions_per_day"] == 200
+    assert features["audio_minutes_per_day"] == "unlimited"
+    assert "companion" not in features
 
 
 def test_family_tier_5_members():
     """家庭版支持5个成员"""
     response = client.get("/api/v1/membership/tiers")
     data = response.json()["data"]
-    family_tier = next(t for t in data["tiers"] if t["tier"] == "family")
+    family_tier = next(t for t in data["tiers"] if t["tier"] == "jiahe")
     assert family_tier["features"]["family_members"] == 5
 
 
@@ -160,60 +164,56 @@ def test_activate_basic_tier_1_month():
         "/api/v1/membership/activate",
         json={
             "user_id": "user1",
-            "tier": "basic",
+            "tier": "yangxin",
             "duration_months": 1,
         },
     )
     assert response.status_code == 200
     data = response.json()["data"]
-    assert data["tier"] == "basic"
+    assert data["tier"] == "yangxin"
     assert data["duration_months"] == 1
-    assert data["total_price"] == 18  # 18 * 1 * 1.0
+    assert data["total_price"] == 33.25  # 0S3 只卖年付：内容订阅 399/12 折算（仅开发环境接口）
 
 
-def test_activate_applies_discount_3_months():
-    """激活3个月应用5%折扣"""
+def test_activate_rejects_3_months():
+    """只卖月付和年付：3 个月没有对应 SKU（以前按 5% 折扣算出一个不存在的价格）"""
     response = client.post(
         "/api/v1/membership/activate",
         json={
             "user_id": "user1",
-            "tier": "basic",
+            "tier": "yangxin",
             "duration_months": 3,
         },
     )
-    data = response.json()["data"]
-    assert data["discount_applied"] == 5
-    assert data["total_price"] == pytest.approx(18 * 3 * 0.95)
+    assert response.status_code == 422
 
 
-def test_activate_applies_discount_6_months():
-    """激活6个月应用10%折扣"""
+def test_activate_rejects_6_months():
+    """只卖月付和年付：6 个月没有对应 SKU"""
     response = client.post(
         "/api/v1/membership/activate",
         json={
             "user_id": "user1",
-            "tier": "premium",
+            "tier": "yiyang",
             "duration_months": 6,
         },
     )
-    data = response.json()["data"]
-    assert data["discount_applied"] == 10
-    assert data["total_price"] == pytest.approx(38 * 6 * 0.90)
+    assert response.status_code == 422
 
 
-def test_activate_applies_discount_12_months():
-    """激活12个月应用15%折扣"""
+def test_activate_12_months_uses_yearly_price():
+    """年付按年付 SKU 价格（家和 699 元）"""
     response = client.post(
         "/api/v1/membership/activate",
         json={
             "user_id": "user1",
-            "tier": "family",
+            "tier": "jiahe",
             "duration_months": 12,
         },
     )
     data = response.json()["data"]
-    assert data["discount_applied"] == 15
-    assert data["total_price"] == pytest.approx(58 * 12 * 0.85)
+    assert data["total_price"] == 699
+    assert data["discount_applied"] == round((1 - 699 / (99 * 12)) * 100)
 
 
 def test_activate_sets_expiration():
@@ -222,7 +222,7 @@ def test_activate_sets_expiration():
         "/api/v1/membership/activate",
         json={
             "user_id": "user1",
-            "tier": "basic",
+            "tier": "yangxin",
             "duration_months": 1,
         },
     )
@@ -267,39 +267,39 @@ def test_activate_invalid_duration():
         "/api/v1/membership/activate",
         json={
             "user_id": "user1",
-            "tier": "basic",
+            "tier": "yangxin",
             "duration_months": 2,
         },
     )
     assert response.status_code == 422
 
 
-def test_activate_premium_includes_companion():
-    """高级版包含AI伴侣"""
+def test_activate_paid_tier_sells_no_ai_companion():
+    """付费档不再写「专属 AI 伴侣」：注册表里没有这项权益，拟人化办法也不鼓励把陪伴关系当卖点"""
     response = client.post(
         "/api/v1/membership/activate",
         json={
             "user_id": "user1",
-            "tier": "premium",
+            "tier": "yiyang",
             "duration_months": 1,
         },
     )
     data = response.json()["data"]
-    assert data["features"]["companion"] == True
+    assert "companion" not in data["features"]
 
 
-def test_activate_basic_no_companion():
-    """基础版不包含AI伴侣"""
+def test_activate_yangxin_has_registry_quota():
+    """养心版对话额度取注册表"""
     response = client.post(
         "/api/v1/membership/activate",
         json={
             "user_id": "user1",
-            "tier": "basic",
+            "tier": "yangxin",
             "duration_months": 1,
         },
     )
     data = response.json()["data"]
-    assert data["features"]["companion"] == False
+    assert data["features"]["ai_questions_per_day"] == 100  # 养心版：注册表 plus 档每天 100 次（2026-10-13 起）
 
 
 def test_activate_family_members_count():
@@ -308,7 +308,7 @@ def test_activate_family_members_count():
         "/api/v1/membership/activate",
         json={
             "user_id": "user1",
-            "tier": "family",
+            "tier": "jiahe",
             "duration_months": 1,
         },
     )
@@ -322,12 +322,12 @@ def test_activate_updates_membership_in_store():
         "/api/v1/membership/activate",
         json={
             "user_id": "user1",
-            "tier": "premium",
+            "tier": "yiyang",
             "duration_months": 1,
         },
     )
     assert "user1" in _memberships
-    assert _memberships["user1"]["tier"] == "premium"
+    assert _memberships["user1"]["tier"] == "yiyang"
 
 
 def test_activate_returns_success_message():
@@ -336,8 +336,8 @@ def test_activate_returns_success_message():
         "/api/v1/membership/activate",
         json={
             "user_id": "user1",
-            "tier": "basic",
-            "duration_months": 3,
+            "tier": "yangxin",
+            "duration_months": 1,
         },
     )
     data = response.json()["data"]
@@ -361,20 +361,20 @@ def test_get_benefits_free_tier():
 
 def test_get_benefits_basic_tier():
     """获取基础版权益"""
-    response = client.get("/api/v1/membership/benefits/basic")
+    response = client.get("/api/v1/membership/benefits/yangxin")
     assert response.status_code == 200
     data = response.json()["data"]
-    assert data["tier"] == "basic"
-    assert data["price_monthly"] == 18
+    assert data["tier"] == "yangxin"
+    assert data["price_monthly"] is None  # 0S3 只卖年付
 
 
 def test_get_benefits_premium_tier():
     """获取高级版权益"""
-    response = client.get("/api/v1/membership/benefits/premium")
+    response = client.get("/api/v1/membership/benefits/yiyang")
     assert response.status_code == 200
     data = response.json()["data"]
-    assert data["tier"] == "premium"
-    assert "无限" in str(data["benefits"])
+    assert data["tier"] == "yiyang"
+    assert "每日200次AI问答" in data["benefits"]
 
 
 def test_get_benefits_invalid_tier():
@@ -385,18 +385,18 @@ def test_get_benefits_invalid_tier():
 
 def test_get_benefits_case_insensitive():
     """等级名称不区分大小写"""
-    response = client.get("/api/v1/membership/benefits/PREMIUM")
+    response = client.get("/api/v1/membership/benefits/YIYANG")
     assert response.status_code == 200
     data = response.json()["data"]
-    assert data["tier"] == "premium"
+    assert data["tier"] == "yiyang"
 
 
-def test_get_benefits_includes_companion_info():
-    """权益详情包含AI伴侣信息"""
-    response = client.get("/api/v1/membership/benefits/premium")
+def test_get_benefits_has_no_ai_companion():
+    """权益详情不再宣传「专属 AI 伴侣」"""
+    response = client.get("/api/v1/membership/benefits/yiyang")
     data = response.json()["data"]
     benefits_text = str(data["benefits"])
-    assert "伴侣" in benefits_text or "companion" in benefits_text.lower()
+    assert "伴侣" not in benefits_text and "companion" not in benefits_text.lower()
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -435,12 +435,12 @@ def test_compare_includes_pricing():
         assert "price" in tier
 
 
-def test_compare_premium_shows_unlimited():
-    """高级版对比显示无限"""
+def test_compare_paid_tier_shows_registry_quota():
+    """对比表的付费档对话额度取注册表（每日 200 次），不写「无限」"""
     response = client.get("/api/v1/membership/compare")
     data = response.json()["data"]
-    premium = next(t for t in data["tiers"] if t["tier"] == "premium")
-    assert "无限" in premium["ai_questions"]
+    paid = next(t for t in data["tiers"] if t["tier"] == "yiyang")
+    assert paid["ai_questions"] == "每日200次"
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -460,7 +460,7 @@ def test_days_remaining_for_active_paid():
         "/api/v1/membership/activate",
         json={
             "user_id": "user1",
-            "tier": "basic",
+            "tier": "yangxin",
             "duration_months": 1,
         },
     )
@@ -476,24 +476,24 @@ def test_days_remaining_calculates_correctly():
         "/api/v1/membership/activate",
         json={
             "user_id": "user1",
-            "tier": "premium",
-            "duration_months": 3,
+            "tier": "yiyang",
+            "duration_months": 12,
         },
     )
     response = client.get("/api/v1/membership/user/user1")
     data = response.json()["data"]
-    # 3个月 ≈ 90天
-    assert 85 <= data["days_remaining"] <= 92
+    # 年付 SKU 是 365 天（只卖月付/年付，原来测的 3 个月没有对应 SKU）
+    assert 363 <= data["days_remaining"] <= 365
 
 
 def test_expired_membership_shows_0_days():
     """过期的会员显示0天剩余"""
     # 手动设置过期的会员
     _memberships["user1"] = {
-        "tier": "basic",
+        "tier": "yangxin",
         "activated_at": datetime.now().isoformat(),
         "expires_at": (datetime.now() - timedelta(days=1)).isoformat(),
-        "features": MEMBERSHIP_TIERS["basic"]["features"].copy(),
+        "features": MEMBERSHIP_TIERS["yangxin"]["features"].copy(),
     }
     response = client.get("/api/v1/membership/user/user1")
     data = response.json()["data"]
@@ -503,10 +503,10 @@ def test_expired_membership_shows_0_days():
 def test_expired_membership_not_active():
     """过期会员状态为不活跃"""
     _memberships["user1"] = {
-        "tier": "basic",
+        "tier": "yangxin",
         "activated_at": datetime.now().isoformat(),
         "expires_at": (datetime.now() - timedelta(days=1)).isoformat(),
-        "features": MEMBERSHIP_TIERS["basic"]["features"].copy(),
+        "features": MEMBERSHIP_TIERS["yangxin"]["features"].copy(),
     }
     response = client.get("/api/v1/membership/user/user1")
     data = response.json()["data"]
@@ -521,31 +521,31 @@ def test_different_users_different_tiers():
     """不同用户可有不同的会员等级"""
     client.post(
         "/api/v1/membership/activate",
-        json={"user_id": "user1", "tier": "basic", "duration_months": 1},
+        json={"user_id": "user1", "tier": "yangxin", "duration_months": 1},
     )
     client.post(
         "/api/v1/membership/activate",
-        json={"user_id": "user2", "tier": "premium", "duration_months": 1},
+        json={"user_id": "user2", "tier": "yiyang", "duration_months": 1},
     )
     response1 = client.get("/api/v1/membership/user/user1")
     response2 = client.get("/api/v1/membership/user/user2")
-    assert response1.json()["data"]["tier"] == "basic"
-    assert response2.json()["data"]["tier"] == "premium"
+    assert response1.json()["data"]["tier"] == "yangxin"
+    assert response2.json()["data"]["tier"] == "yiyang"
 
 
 def test_user_upgrade_changes_tier():
     """用户可以升级会员等级"""
     client.post(
         "/api/v1/membership/activate",
-        json={"user_id": "user1", "tier": "basic", "duration_months": 1},
+        json={"user_id": "user1", "tier": "yangxin", "duration_months": 1},
     )
-    assert _memberships["user1"]["tier"] == "basic"
+    assert _memberships["user1"]["tier"] == "yangxin"
 
     client.post(
         "/api/v1/membership/activate",
-        json={"user_id": "user1", "tier": "premium", "duration_months": 1},
+        json={"user_id": "user1", "tier": "yiyang", "duration_months": 1},
     )
-    assert _memberships["user1"]["tier"] == "premium"
+    assert _memberships["user1"]["tier"] == "yiyang"
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -557,7 +557,7 @@ def test_get_default_free_membership():
     membership = _get_default_free_membership()
     assert membership["tier"] == "free"
     assert membership["expires_at"] is None
-    assert membership["features"]["ai_questions_per_day"] == 3
+    assert membership["features"]["ai_questions_per_day"] == 20  # 权益注册表 free 档
 
 
 def test_ensure_membership_creates_default():
@@ -576,7 +576,7 @@ def test_is_membership_active_free():
 def test_is_membership_active_future():
     """未来过期日期的会员为活跃"""
     membership = {
-        "tier": "basic",
+        "tier": "yangxin",
         "activated_at": datetime.now().isoformat(),
         "expires_at": (datetime.now() + timedelta(days=30)).isoformat(),
         "features": {},
@@ -587,7 +587,7 @@ def test_is_membership_active_future():
 def test_is_membership_active_past():
     """过去过期日期的会员为不活跃"""
     membership = {
-        "tier": "basic",
+        "tier": "yangxin",
         "activated_at": datetime.now().isoformat(),
         "expires_at": (datetime.now() - timedelta(days=1)).isoformat(),
         "features": {},
@@ -604,7 +604,7 @@ def test_get_days_remaining_free():
 def test_get_days_remaining_positive():
     """有效期未来显示正数天数"""
     membership = {
-        "tier": "basic",
+        "tier": "yangxin",
         "activated_at": datetime.now().isoformat(),
         "expires_at": (datetime.now() + timedelta(days=30)).isoformat(),
         "features": {},
@@ -632,7 +632,7 @@ def test_special_characters_user_id():
         "/api/v1/membership/activate",
         json={
             "user_id": "user-123_abc@test",
-            "tier": "basic",
+            "tier": "yangxin",
             "duration_months": 1,
         },
     )
@@ -645,7 +645,7 @@ def test_unicode_user_id():
         "/api/v1/membership/activate",
         json={
             "user_id": "用户123",
-            "tier": "basic",
+            "tier": "yangxin",
             "duration_months": 1,
         },
     )
@@ -653,29 +653,28 @@ def test_unicode_user_id():
 
 
 def test_pricing_calculations_accuracy():
-    """价格计算精确"""
-    # 基础18元，6个月，10%折扣
-    # 18 * 6 * 0.9 = 97.2
-    response = client.post(
+    """价格与收费 SKU 一致：0S3 内容订阅只卖年付 399"""
+    monthly = client.post(
         "/api/v1/membership/activate",
-        json={
-            "user_id": "user1",
-            "tier": "basic",
-            "duration_months": 6,
-        },
-    )
-    data = response.json()["data"]
-    assert data["total_price"] == pytest.approx(18 * 6 * 0.9)
+        json={"user_id": "user1", "tier": "yangxin", "duration_months": 1},
+    ).json()["data"]
+    yearly = client.post(
+        "/api/v1/membership/activate",
+        json={"user_id": "user2", "tier": "yangxin", "duration_months": 12},
+    ).json()["data"]
+    assert monthly["total_price"] == 33.25
+    assert yearly["total_price"] == 399
 
 
 def test_all_duration_options_supported():
-    """支持所有时长选项"""
-    for duration in [1, 3, 6, 12]:
+    """支持的时长就是月付和年付两种 SKU"""
+    assert SUPPORTED_DURATIONS == (1, 12)
+    for duration in SUPPORTED_DURATIONS:
         response = client.post(
             "/api/v1/membership/activate",
             json={
                 "user_id": f"user_{duration}",
-                "tier": "basic",
+                "tier": "yangxin",
                 "duration_months": duration,
             },
         )

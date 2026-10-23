@@ -79,14 +79,14 @@ def test_verified_callback_activates_and_is_idempotent(client, auth_headers, mon
         return WeChatOrderResult(order_no, "app", app_pay_params={"prepayid": "wx-prepay"})
     monkeypatch.setattr(wm.wechat_pay_service, "create_order", create_order)
     created = client.post("/api/v1/subscription/create-order",
-        json={"product_id": "yiyang_yearly", "platform": "wechat", "payment_scene": "app"},
+        json={"product_id": "member_yearly", "platform": "wechat", "payment_scene": "app"},
         headers=auth_headers)
     assert created.status_code == 200, created.text
     order = created.json()["data"]
-    assert order["amount_cents"] == 39900 and order["app_pay_params"]["prepayid"] == "wx-prepay"
+    assert order["amount_cents"] == 88800 and order["app_pay_params"]["prepayid"] == "wx-prepay"
     tx = {"mchid": values["WECHAT_PAY_MCH_ID"], "appid": values["WECHAT_PAY_APP_ID"],
           "out_trade_no": order_no, "transaction_id": f"TX{uuid.uuid4().hex}",
-          "trade_state": "SUCCESS", "amount": {"total": 39900, "currency": "CNY"}}
+          "trade_state": "SUCCESS", "amount": {"total": 88800, "currency": "CNY"}}
     raw, headers = _notify(platform, values, tx)
     assert client.post("/api/v1/payments/wechat/notify", content=raw, headers=headers).status_code == 200
     assert client.post("/api/v1/payments/wechat/notify", content=raw, headers=headers).status_code == 200

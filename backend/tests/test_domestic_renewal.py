@@ -29,11 +29,11 @@ def test_same_plan_renewal_preserves_remaining_time_and_replay_is_idempotent(
 
     def buy():
         response = client.post('/api/v1/subscription/create-order',
-            headers=auth_headers, json={"product_id": "yangxin_monthly", "platform": "alipay"})
+            headers=auth_headers, json={"product_id": "content_yearly", "platform": "alipay"})
         assert response.status_code == 200
         order = sub.payment_orders[response.json()['data']['order_id']]
         args = dict(order_no=order['order_no'], transaction_id='trade-' + order['id'],
-                    amount_cents=2900, provider='alipay')
+                    amount_cents=39900, provider='alipay')
         payment_activation.activate_verified_domestic_payment(request, **args)
         return order, args
 
@@ -49,7 +49,7 @@ def test_same_plan_renewal_preserves_remaining_time_and_replay_is_idempotent(
             session.commit()
         second, args = buy()
         base = max(now, expiry) if previous_platform in ('alipay', 'wechat') else now
-        expected = base + timedelta(days=30)
+        expected = base + timedelta(days=365)  # 0S3 只卖年付
         for _ in range(2):
             payment_activation.activate_verified_domestic_payment(request, **args)
             with client.app.state.session_factory() as session:
@@ -61,17 +61,17 @@ def test_same_plan_renewal_preserves_remaining_time_and_replay_is_idempotent(
         third, _ = buy()
         with client.app.state.session_factory() as session:
             assert session.get(Entitlement, first['user_id']).expires_at == int(
-                (expected + timedelta(days=30)).timestamp())
+                (expected + timedelta(days=365)).timestamp())
         record = db.execute('SELECT expires_at FROM subscriptions WHERE id=?',
             ('sub_alipay_' + third['order_no'],)).fetchone()
-        assert datetime.fromisoformat(record['expires_at']) == expected + timedelta(days=30)
+        assert datetime.fromisoformat(record['expires_at']) == expected + timedelta(days=365)
     finally:
         close_test_connection(db)
 
 
 def test_invalid_existing_expiry_rolls_back_payment_claim(client, auth_headers):
     response = client.post('/api/v1/subscription/create-order', headers=auth_headers,
-        json={"product_id": "yangxin_monthly", "platform": "alipay"})
+        json={"product_id": "content_yearly", "platform": "alipay"})
     assert response.status_code == 200
     order = sub.payment_orders[response.json()['data']['order_id']]
     db = get_db()
@@ -86,7 +86,7 @@ def test_invalid_existing_expiry_rolls_back_payment_claim(client, auth_headers):
         with pytest.raises(HTTPException) as error:
             payment_activation.activate_verified_domestic_payment(
                 SimpleNamespace(app=client.app), order_no=order['order_no'],
-                transaction_id='trade-' + order['id'], amount_cents=2900, provider='alipay')
+                transaction_id='trade-' + order['id'], amount_cents=39900, provider='alipay')
         assert error.value.status_code == 409
         row = db.execute('SELECT status,transaction_id FROM payment_orders WHERE id=?',
             (order['id'],)).fetchone()

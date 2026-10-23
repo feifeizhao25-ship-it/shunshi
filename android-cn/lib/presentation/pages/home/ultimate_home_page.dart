@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
 import 'package:go_router/go_router.dart';
 import 'widgets/home_skeleton.dart';
+import '../../../core/solar_term/solar_term_table.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/cache/cache_service.dart';
 import '../../../data/storage/storage_manager.dart';
@@ -83,7 +84,7 @@ const _shiChenList = <ShiChenData>[
     icon: Icons.night_shelter,
     actions: [
       BentoAction(icon: Icons.bedtime, title: '深度睡眠', description: '丑时肝经当令，深度睡眠养肝血。'),
-      BentoAction(icon: Icons.local_florist, title: '养肝护肝', description: '避免熬夜，让肝脏充分休息排毒。'),
+      BentoAction(icon: Icons.local_florist, title: '养肝护肝', description: '今晚尽量别熬夜，早点休息。'),
     ],
   ),
   ShiChenData(
@@ -101,10 +102,10 @@ const _shiChenList = <ShiChenData>[
     name: '卯时', timeRange: '5-7', meridian: '大肠经',
     principle: '天明排便', principleShort: '通肠腑',
     wellnessPrinciple: '润肠通便，清理积滞',
-    aiQuote: '卯时大肠经当令，是排便的最佳时机。晨起喝一杯温水，配合轻度活动，帮助身体排毒焕新。',
+    aiQuote: '清晨起床后喝一杯温水，做几分钟舒展，给新的一天一个轻松的开始。',
     icon: Icons.light_mode,
     actions: [
-      BentoAction(icon: Icons.water_drop, title: '晨起温水', description: '一杯温水唤醒肠胃，促进排便排毒。'),
+      BentoAction(icon: Icons.water_drop, title: '晨起温水', description: '起床后先喝一杯温水。'),
       BentoAction(icon: Icons.directions_walk, title: '晨起活动', description: '轻度活动促进肠蠕动，通调腑气。'),
     ],
   ),
@@ -149,18 +150,18 @@ const _shiChenList = <ShiChenData>[
     icon: Icons.filter_alt,
     actions: [
       BentoAction(icon: Icons.directions_walk, title: '午后散步', description: '轻度活动帮助消化吸收，促进运化。'),
-      BentoAction(icon: Icons.water_drop, title: '补充水分', description: '未时宜多喝水促进代谢排毒。'),
+      BentoAction(icon: Icons.water_drop, title: '补充水分', description: '午后记得小口多喝水。'),
     ],
   ),
   ShiChenData(
     name: '申时', timeRange: '15-17', meridian: '膀胱经',
-    principle: '排毒利水', principleShort: '泻火气',
+    principle: '多喝温水', principleShort: '起身走动',
     wellnessPrinciple: '通利水道，清热解毒',
-    aiQuote: '申时膀胱经最活跃，是排毒的好时机。多喝水、适度运动出汗，帮助身体排出代谢废物，神清气爽。',
+    aiQuote: '下午容易犯困，起身活动几分钟、喝点温水，精神会好一些。',
     icon: Icons.wb_cloudy,
     actions: [
-      BentoAction(icon: Icons.directions_run, title: '适度运动', description: '申时体能较好，适合运动排汗排毒。'),
-      BentoAction(icon: Icons.water_drop, title: '多饮温水', description: '促进膀胱经排毒，利尿消肿。'),
+      BentoAction(icon: Icons.directions_run, title: '适度运动', description: '下午适合安排一次轻松的运动。'),
+      BentoAction(icon: Icons.water_drop, title: '多饮温水', description: '多喝温水，少吃咸。'),
     ],
   ),
   ShiChenData(
@@ -170,7 +171,7 @@ const _shiChenList = <ShiChenData>[
     aiQuote: '酉时肾经当令，是储藏精华的时刻。最宜收敛心神，让身体在安静中完成一次深度的自我修复。',
     icon: Icons.auto_awesome,
     actions: [
-      BentoAction(icon: Icons.water_drop, title: '补充水分', description: '酉时肾脏排毒最为旺盛，适量饮用温水辅助代谢。'),
+      BentoAction(icon: Icons.water_drop, title: '补充水分', description: '傍晚适量喝点温水，晚饭清淡些。'),
       BentoAction(icon: Icons.accessibility_new, title: '轻拍足跟', description: '足少阴肾经起于足底，轻拍足跟激发肾经经气。'),
     ],
   ),
@@ -226,6 +227,17 @@ String _getCurrentSolarTermInfo() {
     if (month < t.$1 || (month == t.$1 && day < t.$2)) break;
     termName = t.$3;
     season = t.$4;
+  }
+  // 节气以天文计算的节气表为准（与后端同一份数据）；上面的固定月日只在超出表的年份时兜底。
+  // 固定月日会差一天（如 2026 惊蛰 3-5、春分 3-20），1 月 1-5 日还会落到「清明」。
+  final fromTable = currentSolarTermName();
+  if (fromTable != null) {
+    for (final t in terms) {
+      if (t.$3 == fromTable) {
+        termName = t.$3;
+        season = t.$4;
+      }
+    }
   }
   return '$termName · $season之节';
 }

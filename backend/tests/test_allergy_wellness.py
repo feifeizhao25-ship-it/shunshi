@@ -242,7 +242,9 @@ def test_prevention_plan_stage_one():
 
     stage_1 = stages[0]
     assert "增强体表防御" in stage_1["objective"]
-    assert "玉屏风散" in stage_1["core_formula"]
+    # 顺时不推荐中成药/方剂：原来断言「玉屏风散」在 core_formula 里，现在改为生活方式要点
+    assert "core_formula" not in stage_1
+    assert "作息" in stage_1["core_focus"]
 
 
 def test_prevention_plan_stage_two():

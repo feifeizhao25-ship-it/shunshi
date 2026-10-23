@@ -121,35 +121,15 @@ TASKS_BY_SLOT = {
 # ============ Helper Functions ============
 
 def get_current_solar_term():
-    """获取当前节气（2026年精确日期）"""
-    month = datetime.now().month
-    day = datetime.now().day
-    md = (month, day)
+    """获取当前节气：查天文计算的节气表（北京时间），见 app/utils/solar_term_calendar.py。"""
+    from app.utils import solar_term_calendar
 
-    TERMS = [
-        ((1, 5), "小寒", "🥶"), ((1, 20), "大寒", "🥶"),
-        ((2, 4), "立春", "🌱"), ((2, 19), "雨水", "💧"),
-        ((3, 5), "惊蛰", "⚡"), ((3, 20), "春分", "🌸"),
-        ((4, 5), "清明", "🌿"), ((4, 20), "谷雨", "🌧️"),
-        ((5, 6), "立夏", "☀️"), ((5, 21), "小满", "🌾"),
-        ((6, 6), "芒种", "🌾"), ((6, 21), "夏至", "🌞"),
-        ((7, 7), "小暑", "🔥"), ((7, 23), "大暑", "🌡️"),
-        ((8, 7), "立秋", "🍂"), ((8, 23), "处暑", "🍃"),
-        ((9, 7), "白露", "💧"), ((9, 23), "秋分", "🍁"),
-        ((10, 8), "寒露", "🍂"), ((10, 23), "霜降", "❄️"),
-        ((11, 7), "立冬", "❄️"), ((11, 22), "小雪", "🌨️"),
-        ((12, 7), "大雪", "⛄"), ((12, 22), "冬至", "☀️"),
-    ]
-
-    current_name, current_emoji = "春分", "🌸"
-    current_desc = "阴阳平衡，宜调理气血"
-    for (m, d), name, emoji in TERMS:
-        if md >= (m, d):
-            current_name, current_emoji = name, emoji
-    # 查描述
+    today = solar_term_calendar.beijing_today()
+    current_name = solar_term_calendar.term_on(today)
+    current_emoji, current_desc = "🍃", ""
     for t in SOLAR_TERMS:
         if t["name"] == current_name:
-            current_desc = t["description"]
+            current_emoji, current_desc = t["emoji"], t["description"]
             break
 
     return {
@@ -157,8 +137,10 @@ def get_current_solar_term():
         "emoji": current_emoji,
         "description": current_desc,
         "suggestions": ["适当运动", "注意休息", "调理饮食"],
-        "date": datetime.now().strftime("%Y-%m-%d"),
+        "date": today.isoformat(),
     }
+
+
 
 def generate_insights():
     """生成今日洞察"""
@@ -195,11 +177,14 @@ def generate_tasks():
 
 def generate_recommendations():
     """生成内容推荐"""
+    from app.utils import solar_term_calendar
+
+    season = solar_term_calendar.season_of(solar_term_calendar.current_term())
     recommendations = [
         {
             "id": "rec_1",
-            "title": "春季养生食谱",
-            "description": "适合春季的养生美食",
+            "title": f"{season}季养生食谱",
+            "description": f"适合{season}季的家常饮食",
             "type": "recipe",
         },
         {

@@ -1,6 +1,8 @@
 """顺时 - 卡路里追踪测试"""
 import pytest
 
+pytestmark = pytest.mark.signed_in
+
 
 class TestCalorieFoodSearch:
     def test_search_returns_200(self, client):
@@ -40,10 +42,10 @@ class TestCalorieLog:
         data = client.post("/api/v1/calorie-tracker/log", json=payload).json()
         assert data["success"] is True
 
-    def test_log_requires_user_id(self, client):
-        response = client.post("/api/v1/calorie-tracker/log",
+    def test_log_requires_login(self, anonymous_client):
+        response = anonymous_client.post("/api/v1/calorie-tracker/log",
                                json={"meal_type": "breakfast", "foods": []})
-        assert response.status_code == 422
+        assert response.status_code == 401
 
 
 class TestCalorieToday:

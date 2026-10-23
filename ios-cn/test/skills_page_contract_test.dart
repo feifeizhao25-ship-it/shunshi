@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shunshi/presentation/pages/skills/skills_page.dart';
 
 void main() {
-  Dio client(List<RequestOptions> calls, {bool forbidden = false}) {
+  Dio client(List<RequestOptions> calls, {bool forbidden = false, String status = 'success'}) {
     final dio = Dio(BaseOptions(baseUrl: 'https://test.invalid'));
     dio.interceptors.add(
       InterceptorsWrapper(
@@ -35,7 +35,7 @@ void main() {
             handler.resolve(
               Response(
                 requestOptions: request,
-                data: {'status': 'success', 'final_response': '今晚先减少睡前屏幕使用。'},
+                data: {'status': status, 'final_response': '今晚先减少睡前屏幕使用。'},
               ),
             );
           }
@@ -64,6 +64,24 @@ void main() {
     expect(calls.last.data['message'], '请提供睡前放松的日常建议');
     expect(find.textContaining('今晚先减少睡前屏幕使用。'), findsOneWidget);
     expect(find.text('中'), findsNothing);
+    expect(find.text('AI 生成'), findsOneWidget);
+  });
+
+  testWidgets('部分完成时展示的模型输出也带「AI 生成」标识', (tester) async {
+    final calls = <RequestOptions>[];
+    await tester.pumpWidget(
+      MaterialApp(
+        home: SkillsPage(
+          client: client(calls, status: 'partial'),
+          accessToken: () async => 'test-token',
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('睡前放松'));
+    await tester.pumpAndSettle();
+    expect(find.text('部分内容未能完成'), findsOneWidget);
+    expect(find.text('AI 生成'), findsOneWidget);
   });
 
   testWidgets('未登录不会发送生成请求', (tester) async {

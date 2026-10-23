@@ -83,47 +83,39 @@ class TestProductList4Tiers:
         assert TIER_ORDER["yiyang"] < TIER_ORDER["jiahe"]
 
     def test_plans_have_correct_prices(self):
-        """各计划价格正确"""
+        """0S3 定价：免费 / 内容订阅 ¥399 / 会员 ¥888，只卖年付；家和停售保留旧价供已购用户"""
         assert SUBSCRIPTION_PLANS["free"]["price"] == 0
-        assert SUBSCRIPTION_PLANS["yangxin"]["price"] == 29
-        assert SUBSCRIPTION_PLANS["yangxin"]["price_yearly"] == 199
-        assert SUBSCRIPTION_PLANS["yiyang"]["price"] == 59
-        assert SUBSCRIPTION_PLANS["yiyang"]["price_yearly"] == 399
-        assert SUBSCRIPTION_PLANS["jiahe"]["price"] == 99
-        assert SUBSCRIPTION_PLANS["jiahe"]["price_yearly"] == 699
+        assert SUBSCRIPTION_PLANS["yangxin"]["price"] is None
+        assert SUBSCRIPTION_PLANS["yangxin"]["price_yearly"] == 399
+        assert SUBSCRIPTION_PLANS["yiyang"]["price"] is None
+        assert SUBSCRIPTION_PLANS["yiyang"]["price_yearly"] == 888
+        assert SUBSCRIPTION_PLANS["jiahe"]["on_sale"] is False
 
     def test_prices_stored_in_cents(self):
         """价格用分存储"""
-        assert SUBSCRIPTION_PLANS["yangxin"]["price_cents"] == 2900
-        assert SUBSCRIPTION_PLANS["yangxin"]["price_yearly_cents"] == 19900
-        assert SUBSCRIPTION_PLANS["yiyang"]["price_cents"] == 5900
-        assert SUBSCRIPTION_PLANS["yiyang"]["price_yearly_cents"] == 39900
-        assert SUBSCRIPTION_PLANS["jiahe"]["price_cents"] == 9900
-        assert SUBSCRIPTION_PLANS["jiahe"]["price_yearly_cents"] == 69900
+        assert SUBSCRIPTION_PLANS["yangxin"]["price_yearly_cents"] == 39900
+        assert SUBSCRIPTION_PLANS["yiyang"]["price_yearly_cents"] == 88800
 
     def test_products_cover_all_tiers(self):
-        """商品列表覆盖所有付费层级"""
-        tiers_in_products = {p["tier"] for p in SUBSCRIPTION_PRODUCTS}
-        assert tiers_in_products == {"yangxin", "yiyang", "jiahe"}
+        """在售商品只覆盖内容订阅与会员；旧 SKU（含家和）全部停售"""
+        on_sale = {p["tier"] for p in SUBSCRIPTION_PRODUCTS if p["status"] == "active"}
+        assert on_sale == {"yangxin", "yiyang"}
+        assert {p["tier"] for p in SUBSCRIPTION_PRODUCTS} == {"yangxin", "yiyang", "jiahe"}
 
     def test_products_have_monthly_and_yearly(self):
-        """每个层级都有月付和年付"""
-        for tier in ["yangxin", "yiyang", "jiahe"]:
-            products_for_tier = [p for p in SUBSCRIPTION_PRODUCTS if p["tier"] == tier]
-            durations = {p["duration_days"] for p in products_for_tier}
-            assert 30 in durations, f"{tier} 缺少月付产品"
-            assert 365 in durations, f"{tier} 缺少年付产品"
+        """0S3：在售商品只有年付"""
+        for p in SUBSCRIPTION_PRODUCTS:
+            if p["status"] == "active":
+                assert p["duration_days"] == 365, p["product_id"]
 
     def test_products_have_alipay_and_apple(self):
-        """每个 SKU 都有 alipay 和 apple 两个平台"""
-        for tier in ["yangxin", "yiyang", "jiahe"]:
-            for dur in [30, 365]:
-                for platform in ["alipay", "apple"]:
-                    found = any(
-                        p["tier"] == tier and p["duration_days"] == dur and p["platform"] == platform
-                        for p in SUBSCRIPTION_PRODUCTS
-                    )
-                    assert found, f"{tier} {dur}d {platform} 缺少产品"
+        """在售档位都有 alipay、wechat 和 apple 三个平台"""
+        for tier in ["yangxin", "yiyang"]:
+            for platform in ["alipay", "wechat", "apple"]:
+                assert any(
+                    p["tier"] == tier and p["platform"] == platform and p["status"] == "active"
+                    for p in SUBSCRIPTION_PRODUCTS
+                ), f"{tier} {platform} 缺少在售产品"
 
     def test_jiahe_has_family_seats(self):
         """家和版有家庭席位"""
@@ -139,9 +131,9 @@ class TestProductList4Tiers:
         assert "family_seats" not in SUBSCRIPTION_PLANS["yiyang"]
 
     def test_all_products_active(self):
-        """所有产品状态为 active"""
+        """产品状态只有 active（在售）或 legacy（停售，仅为旧订单保留）"""
         for p in SUBSCRIPTION_PRODUCTS:
-            assert p["status"] == "active"
+            assert p["status"] in {"active", "legacy"}
 
     def test_all_amounts_in_cents(self):
         """所有商品金额用分存储"""
@@ -279,7 +271,7 @@ class TestVerifyPayment:
             "id": order_id,
             "order_no": "SHUNSHI-20260318-TEST001",
             "user_id": "user-test",
-            "product_id": "yangxin_yearly",
+            "product_id": "content_yearly",
             "tier": "yangxin",
             "platform": "alipay",
             "amount_cents": 19900,
@@ -328,7 +320,7 @@ class TestVerifyPayment:
             "id": "order-hist-001",
             "order_no": "SHUNSHI-20260318-HIST001",
             "user_id": user_id,
-            "product_id": "yiyang_yearly",
+            "product_id": "member_yearly",
             "tier": "yiyang",
             "platform": "alipay",
             "amount_cents": 39900,
@@ -386,7 +378,7 @@ class TestVerifyPayment:
             "id": order_id,
             "order_no": "SHUNSHI-20260318-DUP001",
             "user_id": "user-dup",
-            "product_id": "yangxin_yearly",
+            "product_id": "content_yearly",
             "tier": "yangxin",
             "platform": "alipay",
             "amount_cents": 19900,

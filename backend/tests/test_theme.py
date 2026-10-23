@@ -1,6 +1,8 @@
 """顺时 - 主题定制测试"""
 import pytest
 
+pytestmark = pytest.mark.signed_in
+
 
 class TestThemeList:
     def test_list_returns_200(self, client):

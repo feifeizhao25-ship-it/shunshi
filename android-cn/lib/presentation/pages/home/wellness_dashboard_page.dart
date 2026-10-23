@@ -311,7 +311,7 @@ class WellnessDashboardPage extends StatelessWidget {
                                         color: ShunShiColors.textPrimary,
                                       )),
                                       const SizedBox(height: 4),
-                                      const Text('清淡温润的一餐，旨在为冬日后的身体进行轻盈排毒。', style: TextStyle(
+                                      const Text('清淡温润的一餐，让换季后的胃口轻松一些。', style: TextStyle(
                                         fontSize: 13, color: ShunShiColors.textTertiary, height: 1.5,
                                       )),
                                     ],

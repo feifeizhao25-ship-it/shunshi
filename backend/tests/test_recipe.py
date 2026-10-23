@@ -469,11 +469,11 @@ class TestConstitutionRecipes:
         assert response.status_code == 404
 
     def test_constitution_invalid_error_message(self):
-        """404 错误消息包含有效体质列表"""
+        """404 错误消息是中文（原来是带英文「Valid types: [...]」的原文，用户直接看到）"""
         response = client.get("/api/v1/recipes/constitution/invalid_constitution")
+        assert response.status_code == 404
         data = response.json()
-        assert "detail" in data
-        assert "Valid types" in data["detail"]
+        assert data["detail"] == "没有找到相关内容"
 
     def test_constitution_has_schedule(self):
         """体质方案包含食用周期"""

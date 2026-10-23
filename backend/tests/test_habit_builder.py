@@ -1,6 +1,8 @@
 """顺时 - 习惯养成测试"""
 import pytest
 
+pytestmark = pytest.mark.signed_in
+
 
 class TestHabitTemplates:
     def test_templates_returns_200(self, client):

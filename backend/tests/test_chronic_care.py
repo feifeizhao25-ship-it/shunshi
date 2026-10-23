@@ -5,10 +5,13 @@
 
 import pytest
 from fastapi.testclient import TestClient
+from tests.signed_in_client import SignedInClient
 from app.main import app
 
+pytestmark = pytest.mark.signed_in
 
-client = TestClient(app)
+
+client = SignedInClient(app)
 
 
 # ─────────────────────────────────────────────────────────────────────────────

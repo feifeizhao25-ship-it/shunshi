@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../design_system/theme.dart';
 import '../../widgets/membership_widgets.dart';
 import '../../../core/network/api_singleton.dart';
+import '../../../core/solar_term/solar_term_en.dart';
 /// Chat Page — AI Wellness Assistant
 /// Stripe-inspired messaging with purple accent
 class ChatPage extends StatefulWidget {
@@ -44,7 +45,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
   bool _isVip = false;
   String _userName = '';
   String _token = '';
-  String _currentSolarTerm = 'Lixia';
+  String _currentSolarTerm = currentSolarTermEn()?.$1 ?? 'this season';
   final String _solarTermDesc = 'The beginning of summer. Nourish the heart, eat lightly, rest properly.';
   String? _conversationId;
 
@@ -77,7 +78,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
       setState(() {
         _messages.add(_ChatMessage(
           role: 'ai',
-          text: 'The ${_currentSolarTerm}n season is here, and the energy of the earth is shifting. How have you been feeling lately?',
+          text: 'The $_currentSolarTerm season is here, and the energy of the earth is shifting. How have you been feeling lately?',
           cards: [_SuggestionCard(type: 'greeting', title: 'Current: $_currentSolarTerm', subtitle: _solarTermDesc)],
           time: _fmt(DateTime.now()),
         ));

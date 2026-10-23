@@ -45,8 +45,9 @@ SOLAR_TERMS_2026 = [
     {"name": "大寒", "name_en": "Major Cold", "month": 1, "day": 20, "emoji": "🥶", "season": "winter"},
 ]
 
-# 按日历顺序排列
+# 按日历顺序排列（month/day 只是典型日期，用于展示；「今天是什么节气」一律查 app/utils/solar_term_calendar.py）
 SOLAR_TERMS_ORDERED = sorted(SOLAR_TERMS_2026, key=lambda x: (x["month"], x["day"]))
+_TERM_BY_NAME = {t["name"]: t for t in SOLAR_TERMS_2026}
 
 
 class SolarTermEnhancedService:
@@ -56,35 +57,15 @@ class SolarTermEnhancedService:
         pass
 
     def get_current_term(self) -> Dict[str, Any]:
-        """获取当前节气（含倒计时）"""
-        today = date.today()
-        current = None
-        next_term = None
-        days_in_current = 0
-        countdown = 0
+        """获取当前节气（含倒计时）；日期查天文计算的节气表（北京时间），不再写死 2026 年。"""
+        from app.utils import solar_term_calendar
 
-        for i, term in enumerate(SOLAR_TERMS_ORDERED):
-            term_date = date(2026, term["month"], term["day"])
-            next_date = date(2026, SOLAR_TERMS_ORDERED[(i + 1) % 24]["month"], SOLAR_TERMS_ORDERED[(i + 1) % 24]["day"])
-
-            if term_date <= today < next_date:
-                current = term
-                days_in_current = (next_date - today).days
-                # 下一个节气
-                next_term = SOLAR_TERMS_ORDERED[(i + 1) % 24]
-                next_term_date = date(2026, next_term["month"], next_term["day"])
-                countdown = (next_term_date - today).days
-                break
-
-        if not current:
-            # 兜底: 找最近的
-            min_delta = float('inf')
-            for term in SOLAR_TERMS_ORDERED:
-                td = date(2026, term["month"], term["day"])
-                delta = abs((td - today).days)
-                if delta < min_delta:
-                    min_delta = delta
-                    current = term
+        today = solar_term_calendar.beijing_today()
+        current = _TERM_BY_NAME[solar_term_calendar.term_on(today)]
+        start = solar_term_calendar.term_start(today)
+        next_name, next_date = solar_term_calendar.next_term(today)
+        next_term = _TERM_BY_NAME[next_name]
+        countdown = (next_date - today).days
 
         return {
             "current": {
@@ -92,16 +73,16 @@ class SolarTermEnhancedService:
                 "name_en": current["name_en"],
                 "emoji": current["emoji"],
                 "season": current["season"],
-                "date": f"2026-{current['month']:02d}-{current['day']:02d}",
-                "days_remaining": days_in_current,
+                "date": start.isoformat(),
+                "days_remaining": countdown,
             },
             "next": {
-                "name": next_term["name"] if next_term else "",
-                "name_en": next_term["name_en"] if next_term else "",
-                "emoji": next_term["emoji"] if next_term else "",
+                "name": next_term["name"],
+                "name_en": next_term["name_en"],
+                "emoji": next_term["emoji"],
                 "countdown_days": countdown,
-                "date": f"2026-{next_term['month']:02d}-{next_term['day']:02d}" if next_term else "",
-            } if next_term else None,
+                "date": next_date.isoformat(),
+            },
         }
 
     def get_term_detail(
@@ -234,16 +215,18 @@ class SolarTermEnhancedService:
         }
 
     def get_all_terms_with_status(self, locale: str = "zh-CN") -> List[Dict[str, Any]]:
-        """获取所有节气（含当前/过去/未来状态）"""
-        today = date.today()
+        """获取今年所有节气（含当前/过去/未来状态）；日期查节气表（北京时间）。"""
+        from app.utils import solar_term_calendar
+
+        today = solar_term_calendar.beijing_today()
+        current_start = solar_term_calendar.term_start(today)
+        rows = solar_term_calendar.term_dates(today.year)
         result = []
 
-        for i, term in enumerate(SOLAR_TERMS_ORDERED):
-            term_date = date(2026, term["month"], term["day"])
-            next_idx = (i + 1) % 24
-            next_date = date(2026, SOLAR_TERMS_ORDERED[next_idx]["month"], SOLAR_TERMS_ORDERED[next_idx]["day"])
-
-            if term_date <= today < next_date:
+        for i, row in enumerate(rows):
+            term = _TERM_BY_NAME[row["name"]]
+            term_date = date.fromisoformat(row["date"])
+            if term_date == current_start:
                 status = "current"
             elif term_date < today:
                 status = "past"
@@ -259,7 +242,7 @@ class SolarTermEnhancedService:
                 "display_name": name,
                 "emoji": term["emoji"],
                 "season": term["season"],
-                "date": f"2026-{term['month']:02d}-{term['day']:02d}",
+                "date": row["date"],
                 "status": status,
                 "days_until": (term_date - today).days if status == "upcoming" else 0,
                 "is_highlighted": status == "current",

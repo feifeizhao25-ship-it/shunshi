@@ -84,15 +84,12 @@ echo ""
 echo "[5/5] 健康检查..."
 sleep 5
 
-HEALTH=$(curl -s --max-time 10 "http://$ECS_HOST:4000/health" 2>/dev/null || echo '{"status":"unreachable"}')
+HEALTH=$(curl -s --max-time 10 "http://$ECS_HOST:4000/healthz" 2>/dev/null || echo '{"status":"unreachable"}')
 echo "健康检查结果: $HEALTH"
 
-if echo "$HEALTH" | grep -q '"status":"healthy"'; then
+if echo "$HEALTH" | grep -q '"status":"ok"'; then
     echo ""
     echo "🎉 部署成功！"
-elif echo "$HEALTH" | grep -q '"status":"degraded"'; then
-    echo ""
-    echo "⚠️  部署完成但服务降级（检查 Redis/DB 配置）"
 else
     echo ""
     echo "❌ 部署可能失败，请检查日志:"
@@ -102,6 +99,5 @@ fi
 echo ""
 echo "==================== 部署完成 ===================="
 echo "API: http://$ECS_HOST:4000"
-echo "健康: http://$ECS_HOST:4000/health"
-echo "文档: http://$ECS_HOST:4000/docs"
+echo "存活探针: http://$ECS_HOST:4000/healthz"
 echo "======================================================"

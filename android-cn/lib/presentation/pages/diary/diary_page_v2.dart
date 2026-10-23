@@ -7,6 +7,7 @@ import '../../../core/config/app_config.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
+import '../../../core/solar_term/solar_term_table.dart';
 
 class DiaryPageV2 extends StatefulWidget {
   const DiaryPageV2({super.key});
@@ -105,7 +106,9 @@ class _DiaryPageV2State extends State<DiaryPageV2> {
 
     final now = DateTime.now();
     final solarTerms = ['小寒','大寒','立春','雨水','惊蛰','春分','清明','谷雨','立夏','小满','芒种','夏至','小暑','大暑','立秋','处暑','白露','秋分','寒露','霜降','立冬','小雪','大雪','冬至'];
-    final termIdx = ((now.month - 1) * 2 + (now.day >= 6 ? 1 : 0)) % 24;
+    final approxIdx = ((now.month - 1) * 2 + (now.day >= 6 ? 1 : 0)) % 24;
+    // 节气查天文计算的节气表（与后端同一份数据）；超出表的年份才回退到近似
+    final termName = currentSolarTermName() ?? solarTerms[approxIdx];
     
     return Scaffold(
   appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
@@ -127,7 +130,7 @@ class _DiaryPageV2State extends State<DiaryPageV2> {
                       fontSize: 22, fontWeight: FontWeight.bold, color: ShunShiColors.textPrimary,
                     )),
                     const Spacer(),
-                    Text('${now.month}月${now.day}日 · ${solarTerms[termIdx]}',
+                    Text('${now.month}月${now.day}日 · $termName',
                       style: TextStyle(fontSize: 13, color: ShunShiColors.textTertiary)),
                   ]),
                 ),

@@ -5,9 +5,12 @@ test_speech.py
 
 import pytest
 from fastapi.testclient import TestClient
+from tests.signed_in_client import SignedInClient
 from app.main import app
 
-client = TestClient(app)
+pytestmark = pytest.mark.signed_in
+
+client = SignedInClient(app)
 
 
 class TestTextToSpeech:

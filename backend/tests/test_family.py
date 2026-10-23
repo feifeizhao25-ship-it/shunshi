@@ -12,6 +12,8 @@ import pytest
 import uuid
 from datetime import datetime, timedelta
 
+pytestmark = pytest.mark.signed_in
+
 
 # ==================== 发起邀请 ====================
 

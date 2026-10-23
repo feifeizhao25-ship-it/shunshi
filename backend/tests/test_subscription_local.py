@@ -5,12 +5,15 @@
 
 import pytest
 from fastapi.testclient import TestClient
+from tests.signed_in_client import SignedInClient
 
 
 # 假设 FastAPI app 已正确导入
 from app.main import app
 
-client = TestClient(app)
+pytestmark = pytest.mark.signed_in
+
+client = SignedInClient(app)
 
 
 # ─────────────────────────────────────────────────────────────────────────────

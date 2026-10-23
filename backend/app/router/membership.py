@@ -1,6 +1,9 @@
 """
-顺时 — 会员权益管理 (Membership Management)
-提供会员等级查询、激活和权益对比。包括免费版、基础、高级和家庭会员。
+顺时 — 会员权益查询 (Membership)
+会员档位、价格、权益对比。只做展示，不自己定义档位和价格：
+- 档位与价格：app/router/subscription.py 的 SUBSCRIPTION_PLANS（与支付宝 / 微信 / Apple 实际收费的 SKU 同价）；
+- 对话额度、音频时长、家庭人数：app/entitlements_registry.json（chat_quota 等实际执行的就是它）。
+以前这里另有一套「基础 18 / 高级 38 / 家庭 58 元」和「每天 3 次 / 无限 AI 问答、专属 AI 伴侣」，与收费和执行都对不上。
 """
 
 from fastapi import APIRouter, HTTPException, Depends
@@ -10,7 +13,9 @@ from datetime import datetime, timedelta
 import os
 from sqlalchemy.orm import Session
 from app.db.database import get_db
+from app.entitlements import get_registry, registry_tier_for_plan
 from app.models.membership import UserMembership, MembershipPlan
+from app.router.subscription import SUBSCRIPTION_PLANS
 
 router = APIRouter(prefix="/api/v1/membership", tags=["membership"])
 
@@ -21,75 +26,55 @@ router = APIRouter(prefix="/api/v1/membership", tags=["membership"])
 
 class MembershipActivateRequest(BaseModel):
     user_id: str
-    tier: str = Field(..., description="会员等级: free/basic/premium/family")
-    duration_months: int = Field(..., ge=1, le=12, description="订阅期限: 1/3/6/12 个月")
+    tier: str = Field(..., description="会员档位: free/yangxin/yiyang/jiahe")
+    duration_months: int = Field(..., ge=1, le=12, description="1（月付）或 12（年付）")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 会员等级定义和价格（静态配置，不需DB）
+# 会员档位：由 SUBSCRIPTION_PLANS + 权益注册表推导，不在这里另写数字
 # ─────────────────────────────────────────────────────────────────────────────
 
 # 内存存储 — 仅用于测试 (生产使用数据库)
 _memberships: dict = {}
 
-MEMBERSHIP_TIERS = {
-    "free": {
-        "name": "免费版",
-        "price_monthly": 0,
-        "features": {
-            "ai_questions_per_day": 3,
-            "content_access": "基础节气内容",
-            "audio_per_day": 0,
-            "companion": False,
-            "family_members": 1,
-        },
-        "description": "体验基础养生功能，每天3次AI问答，了解节气知识。",
-    },
-    "basic": {
-        "name": "基础会员",
-        "price_monthly": 18,
-        "features": {
-            "ai_questions_per_day": 20,
-            "content_access": "全部节气内容",
-            "audio_per_day": 5,
-            "companion": False,
-            "family_members": 1,
-        },
-        "description": "获得更多AI问答机会和音频内容，全面了解24节气养护。",
-    },
-    "premium": {
-        "name": "高级会员",
-        "price_monthly": 38,
-        "features": {
-            "ai_questions_per_day": "unlimited",
-            "content_access": "全部内容（包括专属课程）",
-            "audio_per_day": "unlimited",
-            "companion": True,
-            "family_members": 2,
-        },
-        "description": "无限AI问答，专属AI伴侣，家庭计划支持2人。享受完整功能。",
-    },
-    "family": {
-        "name": "家庭会员",
-        "price_monthly": 58,
-        "features": {
-            "ai_questions_per_day": "unlimited",
-            "content_access": "全部内容（包括专属课程）",
-            "audio_per_day": "unlimited",
-            "companion": True,
-            "family_members": 5,
-        },
-        "description": "无限AI问答，专属AI伴侣，家庭计划支持5人。全家养生。",
-    },
-}
+SUPPORTED_DURATIONS = (1, 12)  # 只有月付和年付两种 SKU
 
-# 订阅时长折扣（越长折扣越大）
-DURATION_DISCOUNTS = {
-    1: 1.0,      # 0% 折扣
-    3: 0.95,     # 5% 折扣
-    6: 0.90,     # 10% 折扣
-    12: 0.85,    # 15% 折扣
-}
+
+def _registry_features(plan_id: str) -> dict:
+    tier = get_registry()["tiers"][registry_tier_for_plan(plan_id)]
+    chats = tier["quotas"]["ai_daily_messages"]
+    audio = tier["quotas"]["audio_daily_minutes"]
+    return {
+        "ai_questions_per_day": "unlimited" if chats == -1 else chats,
+        "audio_minutes_per_day": "unlimited" if audio == -1 else audio,
+        "content_access": "全部养生内容" if tier["knowledge"]["wellness_library"] == "full" else "基础养生内容",
+        "family_members": tier["collaboration"]["family_members"],
+    }
+
+
+def _describe(features: dict) -> str:
+    chats = features["ai_questions_per_day"]
+    parts = ["不限次数AI问答" if chats == "unlimited" else f"每天{chats}次AI问答", features["content_access"]]
+    if isinstance(features["family_members"], int) and features["family_members"] > 1:
+        parts.append(f"最多{features['family_members']}人（含你自己）一起使用")
+    return "，".join(parts) + "。"
+
+
+def _build_tiers() -> dict:
+    tiers = {}
+    for plan_id, plan in SUBSCRIPTION_PLANS.items():
+        features = _registry_features(plan_id)
+        tiers[plan_id] = {
+            "name": plan["name"],
+            "price_monthly": plan.get("price", 0),
+            "price_yearly": plan.get("price_yearly"),
+            "features": features,
+            "description": _describe(features),
+        }
+    return tiers
+
+
+MEMBERSHIP_TIERS = _build_tiers()
 
 
 def _get_default_free_membership() -> dict:
@@ -150,6 +135,7 @@ async def list_tiers():
             "tier": tier_key,
             "name": tier_data["name"],
             "price_monthly": tier_data["price_monthly"],
+            "price_yearly": tier_data["price_yearly"],
             "description": tier_data["description"],
             "features": tier_data["features"],
         })
@@ -211,28 +197,34 @@ async def activate_membership(request: MembershipActivateRequest, db: Session = 
     if os.getenv("APP_ENV") not in {"development", "testing"}:
         raise HTTPException(
             status_code=403,
-            detail="Direct membership activation is disabled. Use the verified payment callback.",
+            detail="不能直接开通会员，请通过已验证的支付完成购买",
         )
 
     if request.tier not in MEMBERSHIP_TIERS:
         raise HTTPException(
             status_code=422,
-            detail=f"Unknown tier '{request.tier}'. Valid: {list(MEMBERSHIP_TIERS.keys())}",
+            detail=f"没有这个会员档位，可选：{'、'.join(MEMBERSHIP_TIERS)}",
         )
 
-    if request.duration_months not in DURATION_DISCOUNTS:
+    if request.duration_months not in SUPPORTED_DURATIONS:
         raise HTTPException(
             status_code=422,
-            detail=f"Invalid duration. Supported: {list(DURATION_DISCOUNTS.keys())}",
+            detail="只支持月付（1 个月）或年付（12 个月）",
         )
 
     tier_data = MEMBERSHIP_TIERS[request.tier]
-    base_price = tier_data["price_monthly"]
-    discount = DURATION_DISCOUNTS[request.duration_months]
-    total_price = base_price * request.duration_months * discount
+    # 0S3：付费档只卖年付；本接口仅开发 / 测试环境可用，非 12 个月按年价折算
+    base_price = tier_data["price_monthly"] if tier_data["price_monthly"] is not None else round(tier_data["price_yearly"] / 12, 2)
+    if request.duration_months == 12 and tier_data.get("price_yearly") is not None:
+        total_price = tier_data["price_yearly"]
+    else:
+        total_price = base_price * request.duration_months
+    full_price = total_price if tier_data["price_monthly"] is None else base_price * request.duration_months
+    discount = (total_price / full_price) if full_price else 1.0
 
     now = datetime.now()
-    expires_at = now + timedelta(days=request.duration_months * 30)
+    # 与 SKU 的 duration_days 一致：月付 30 天、年付 365 天
+    expires_at = now + timedelta(days=365 if request.duration_months == 12 else 30)
     if request.tier == "free":
         expires_at = None
 
@@ -275,7 +267,7 @@ async def activate_membership(request: MembershipActivateRequest, db: Session = 
             "activated_at": now.isoformat(),
             "expires_at": expires_at.isoformat() if expires_at else None,
             "features": tier_data["features"],
-            "message": f"成功激活{tier_data['name']}{request.duration_months}个月，总价¥{round(total_price, 2)}（已享受{round((1 - discount) * 100)}%折扣）",
+            "message": f"成功激活{tier_data['name']}{request.duration_months}个月，总价¥{round(total_price, 2)}",
         },
     }
 
@@ -287,7 +279,7 @@ async def get_tier_benefits(tier: str):
     if tier not in MEMBERSHIP_TIERS:
         raise HTTPException(
             status_code=404,
-            detail=f"Tier '{tier}' not found. Valid: {list(MEMBERSHIP_TIERS.keys())}",
+            detail=f"没有这个会员档位，可选：{'、'.join(MEMBERSHIP_TIERS)}",
         )
 
     tier_data = MEMBERSHIP_TIERS[tier]
@@ -296,21 +288,18 @@ async def get_tier_benefits(tier: str):
     features = tier_data["features"]
 
     if features["ai_questions_per_day"] == "unlimited":
-        benefits.append("无限次数AI问答（每天）")
+        benefits.append("不限次数AI问答（每天）")
     else:
         benefits.append(f"每日{features['ai_questions_per_day']}次AI问答")
 
     benefits.append(f"权益范围：{features['content_access']}")
 
-    if features["audio_per_day"] == "unlimited":
-        benefits.append("无限音频内容")
+    if features["audio_minutes_per_day"] == "unlimited":
+        benefits.append("音频内容不限时长")
     else:
-        benefits.append(f"每日{features['audio_per_day']}个音频")
+        benefits.append(f"每日{features['audio_minutes_per_day']}分钟音频")
 
-    if features["companion"]:
-        benefits.append("专属AI伴侣 - 个性化问候和养护建议")
-
-    benefits.append(f"家庭成员数：{features['family_members']}人")
+    benefits.append(f"家庭成员数：{features['family_members']}人（含你自己）")
 
     return {
         "success": True,
@@ -333,8 +322,7 @@ async def compare_tiers():
         "feature_categories": [
             "AI问答次数",
             "内容权限",
-            "音频权限",
-            "AI伴侣",
+            "音频时长",
             "家庭成员",
             "月度价格",
         ],
@@ -346,17 +334,19 @@ async def compare_tiers():
             "tier": tier_key,
             "name": tier_data["name"],
             "ai_questions": (
-                "无限" if features["ai_questions_per_day"] == "unlimited"
+                "不限" if features["ai_questions_per_day"] == "unlimited"
                 else f"每日{features['ai_questions_per_day']}次"
             ),
             "content": features["content_access"],
             "audio": (
-                "无限" if features["audio_per_day"] == "unlimited"
-                else f"每日{features['audio_per_day']}个"
+                "不限" if features["audio_minutes_per_day"] == "unlimited"
+                else f"每日{features['audio_minutes_per_day']}分钟"
             ),
-            "companion": "✓ 有" if features["companion"] else "✗ 无",
             "family_members": f"{features['family_members']}人",
-            "price": f"¥{tier_data['price_monthly']} 元/月" if tier_data["price_monthly"] > 0 else "免费",
+            "price": (
+                f"¥{tier_data['price_yearly']} 元/年" if tier_data["price_monthly"] is None
+                else f"¥{tier_data['price_monthly']} 元/月" if tier_data["price_monthly"] > 0 else "免费"
+            ),
         })
 
     return {

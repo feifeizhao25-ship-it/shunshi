@@ -12,6 +12,7 @@ import 'widgets/premium_teaser.dart';
 import 'widgets/action_guide_overlay.dart';
 import 'widgets/home_bottom_nav.dart';
 import 'widgets/home_skeleton.dart';
+import '../../../core/solar_term/solar_term_table.dart';
 
 /// 顺时首页 V3 — 复刻"懂生活的人在帮你安排一天"
 ///
@@ -38,7 +39,7 @@ class _HomePageState extends State<HomePage> {
 
   bool _isLoading = true;
   String _userName = '';
-  String _currentTerm = '立夏';
+  String _currentTerm = currentSolarTermName() ?? '';
   String _shiChen = '';
   String _shiChenOrgan = '';
   String _constitution = '';
@@ -104,7 +105,7 @@ class _HomePageState extends State<HomePage> {
     try {
       final res = await _dio.get('/api/v1/solar-terms/current');
       if (res.data?['data'] != null) {
-        _currentTerm = res.data['data']['name'] ?? '清明';
+        _currentTerm = res.data['data']['name'] ?? currentSolarTermName() ?? _currentTerm;
       }
     } catch (_) {}
 
@@ -150,7 +151,7 @@ class _HomePageState extends State<HomePage> {
     final h = DateTime.now().hour;
     if (h < 9) return '卯时大肠经旺，温水助排便。辰时胃经旺，适合吃早餐。';
     if (h < 14) return '午时心经当令，心血最旺。小憩可养心安神。';
-    if (h < 18) return '申时膀胱经旺，身体排毒高峰，多喝水帮助代谢。';
+    if (h < 18) return '下午时段，记得起身走动、小口多喝温水。';
     if (h < 22) return '戌时心包经旺，放松心情，释放一天的压力。';
     return '亥时三焦经旺，身体进入修复模式，早睡养阴。';
   }

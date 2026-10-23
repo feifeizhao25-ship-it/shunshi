@@ -29,7 +29,7 @@ class Settings(BaseSettings):
     SILICONFLOW_API_KEY: str = ""
     OPENAI_API_KEY: str = ""
     DEEPSEEK_API_KEY: str = ""
-    DEFAULT_LLM_MODEL: str = "deepseek-chat"
+    DEFAULT_LLM_MODEL: str = "deepseek-flash"
 
     # === LLM配额 ===
     LLM_DAILY_FREE_LIMIT: int = 10

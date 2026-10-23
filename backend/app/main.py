@@ -18,6 +18,9 @@ from .routers import chat, content, feedback, health, memory, reflections, seaso
 
 # 国际版 SEASONS 专用的模块，国内版不挂载：
 # - stripe / seasons_subscription：境外支付与美元定价；
+# - audio_v2 / first_insight / localization / western_bridge / cultural_stories：国际版的英文内容。
+#   audio_v2 复用 seasons_audio 的英文音频库（标题英文、链接指向 audio.seasons.app）；first_insight 的
+#   "Welcome to SEASONS"；后三个自己的说明就写着「顺时国际版」，面向西方用户。
 # - seasons_chat：``POST /ai/chat`` 英文人设、不登录可用、user_id 由客户端自报（额度形同虚设）；
 # - seasons_api / seasons_home / seasons_family / seasons_audio：国际版的用户、家庭与内容接口，
 #   其中 ``/api/v1/seasons/user/{user_id}`` 的删除与导出不校验身份。
@@ -31,8 +34,22 @@ INTERNATIONAL_ONLY_MODULES = frozenset(
         "seasons_family",
         "seasons_home",
         "seasons_subscription",
+        "audio_v2",
+        "first_insight",
+        "localization",
+        "western_bridge",
+        "cultural_stories",
     }
 )
+
+
+# 暂不上线的模块：内容没有经过有资质的人审核，先不挂载，审核通过再从这里移出。
+# - tcm_medication：15 种中成药的「每次 6-9g、一日 2-3 次」「饭前/饭后」「配伍禁忌」是同一套
+#   模板文字，没有来源；给出剂量、服法与配伍结论属于用药指导，需要执业药师/中医师审核。
+#   应用自己的安全规则（app/safety/config.py）本来就不允许 AI 说出这类话，数据接口更不该有。
+PENDING_REVIEW_MODULES = {
+    "tcm_medication": "剂量、服法、配伍禁忌无来源，需执业药师/中医师审核后再上线",
+}
 
 
 def _include_product_routers(app: FastAPI) -> None:
@@ -47,10 +64,13 @@ def _include_product_routers(app: FastAPI) -> None:
     from .product_access import product_access_guard
 
     mounted = {id(route) for route in app.router.routes}
+    # 已由核心路由提供的 (方法, 路径) 不再重复挂载：Starlette 按注册顺序只会命中第一个，
+    # 后挂的同名接口永远不可达，还会产生 Duplicate Operation ID（例如 /api/v1/auth/guest-login）。
+    taken = {(m, getattr(r, "path", None)) for r in app.router.routes for m in (getattr(r, "methods", None) or ())}
     for module_info in pkgutil.iter_modules(product_router_package.__path__):
         if module_info.name.startswith("_"):
             continue
-        if module_info.name in INTERNATIONAL_ONLY_MODULES:
+        if module_info.name in INTERNATIONAL_ONLY_MODULES or module_info.name in PENDING_REVIEW_MODULES:
             continue
         module = importlib.import_module(f"{product_router_package.__name__}.{module_info.name}")
         candidate = getattr(module, "router", None)
@@ -59,9 +79,17 @@ def _include_product_routers(app: FastAPI) -> None:
                 getattr(route, "path", None) == "" for route in candidate.routes
             )
             prefix = f"/api/v1/{module_info.name.replace('_', '-')}" if needs_prefix else ""
+            fresh = APIRouter()
+            for route in candidate.routes:
+                full = prefix + getattr(route, "path", "")
+                methods = getattr(route, "methods", None) or ()
+                if methods and all((m, full) in taken for m in methods):
+                    continue
+                fresh.routes.append(route)
+            candidate_routes = fresh
             # 默认关着：见 app/product_access.py。
             app.include_router(
-                candidate, prefix=prefix, dependencies=[Depends(product_access_guard)]
+                candidate_routes, prefix=prefix, dependencies=[Depends(product_access_guard)]
             )
             mounted.add(id(candidate))
 
@@ -138,9 +166,14 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         docs_url=None if settings.env == "production" else "/docs",
         lifespan=lifespan,
     )
+    from .errors import install_chinese_error_handlers
+
+    install_chinese_error_handlers(app)
     app.state.settings = settings
     app.state.engine = engine
     app.state.session_factory = make_session_factory(engine)
+    from .services.membership_status import bind_session_factory
+    bind_session_factory(app.state.session_factory)
 
     app.add_middleware(
         CORSMiddleware,

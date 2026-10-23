@@ -15,6 +15,7 @@ import 'chat/chat_history_store.dart';
 import 'chat/chat_membership.dart';
 import 'chat/chat_api.dart';
 import 'chat/chat_widgets.dart';
+import '../../core/solar_term/solar_term_table.dart';
 
 final String _baseUrl = AppConfig.apiBaseUrl.replaceAll('/api/v1', '');
 
@@ -95,7 +96,8 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
 
   String _userName = '';
   String _token = '';
-  String _currentSolarTerm = '立夏';
+  // 先用节气表（与后端同一份数据）给出当前节气，接口返回后再以接口为准
+  String _currentSolarTerm = currentSolarTermName() ?? '立夏';
   String _solarTermDesc = '夏之始，养心安神。清淡饮食，适当午睡，防暑防晒。';
   String? _conversationId;
 
@@ -293,7 +295,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
                     SuggestionCard(
                       type: 'crisis',
                       title: '紧急求助热线',
-                      subtitle: '400-161-9995 · 24小时心理援助',
+                      subtitle: '12356 · 全国统一心理援助热线',
                       icon: Icons.phone_in_talk,
                     ),
                   ]
@@ -520,8 +522,8 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
         ),
         content: const Text(
           '您提到的内容涉及健康安全风险。请您立即联系专业医疗机构或拨打：\n\n'
-          '• 24小时心理援助热线：400-161-9995\n'
-          '• 急救电话：120\n\n'
+          '• 全国统一心理援助热线：12356\n'
+          '• 急救电话：120，报警电话：110\n\n'
           '顺时AI不能替代专业医疗诊断。',
           style: TextStyle(
             fontSize: 15,

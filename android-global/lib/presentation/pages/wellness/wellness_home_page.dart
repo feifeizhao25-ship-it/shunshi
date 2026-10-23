@@ -91,7 +91,7 @@ class WellnessHomePage extends StatelessWidget {
                       _gridIcon(Icons.emoji_food_beverage, 'Wellness Teas', () => context.push('/wellness-category/tea')),
                       _gridIcon(Icons.architecture, 'Acupoints', () => context.push('/wellness-category/acupoint')),
                       _gridIcon(Icons.self_improvement, 'Traditional Qigong', () => context.push('/wellness-category/exercise')),
-                      _gridIcon(Icons.graphic_eq, 'Sleep Audio', () => context.push('/sleep-sanctuary')),
+                      _gridIcon(Icons.graphic_eq, 'Sleep Audio', () => context.push('/audio-player')),
                     ],
                   ),
                   const SizedBox(height: 48),

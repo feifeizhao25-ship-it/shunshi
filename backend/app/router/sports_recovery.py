@@ -113,7 +113,7 @@ SPORTS_RECOVERY = {
         ],
         "diet_recommendations": [
             {"food": "绿豆粥", "benefit": "清热，降肝火", "timing": "运动后6小时", "usage": "每周2-3次"},
-            {"food": "冬瓜汤", "benefit": "清热利尿，避免热气囤积", "timing": "运动后2小时", "usage": "清汤"},
+            {"food": "冬瓜汤", "benefit": "清爽解暑，避免热气囤积", "timing": "运动后2小时", "usage": "清汤"},
             {"food": "百合莲子粥", "benefit": "滋阴安神，平复心神", "timing": "运动后2-3小时", "usage": "每周2次"},
             {"food": "黑芝麻", "benefit": "滋阴补肾，恢复阴液", "timing": "恢复期", "usage": "黑芝麻糊，每周3次"}
         ],
@@ -145,7 +145,7 @@ INJURY_CARE = {
     "sprain": {
         "injury_type": "sprain",
         "name": "扭伤",
-        "tcm_cause": "经络受损，气血瘀滞，需要活血化瘀、消肿止痛",
+        "tcm_cause": "经络受损，气血瘀滞，需要放松舒缓",
         "phases": [
             {
                 "phase": "急性期（0-24小时）",
@@ -366,7 +366,7 @@ OVERTRAINING_SIGNS = {
         {
             "sign": "频繁感冒（1个月内≥2次）",
             "tcm_interpretation": "肺卫不固，正气虚，免疫功能下降",
-            "action": "黄芪玉屏风散调理，加强休息"
+            "action": "减少训练量，保证睡眠和营养；1 个月内反复感冒请就医检查"
         },
         {
             "sign": "口腔溃疡反复出现",

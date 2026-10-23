@@ -28,7 +28,6 @@ import '../../presentation/pages/wellness/constitution_page.dart';
 import '../../presentation/pages/wellness/boundaries_page.dart';
 import '../../presentation/pages/records/records_page_v2.dart';
 import '../../presentation/pages/subscription/subscription_page_v2.dart';
-import '../../presentation/pages/subscription/membership_center_page.dart';
 import '../../presentation/pages/reflection/reflection_page.dart';
 import '../../presentation/pages/community/community_page_v2.dart';
 import '../../presentation/pages/achievement/achievement_page_v2.dart';
@@ -77,7 +76,7 @@ class AppRouter {
       // 全屏子页面
       GoRoute(path: '/reflection', builder: (context, state) => const ReflectionPage()),
       GoRoute(path: '/subscription', builder: (context, state) => const SubscriptionPageV2()),
-      GoRoute(path: '/membership', builder: (context, state) => const MembershipCenterPage()),
+      GoRoute(path: '/membership', builder: (context, state) => const SubscriptionPageV2()),  // 原会员中心页是写死价格（¥199/¥25/¥299 与虚构「首年特惠」）的样板页，统一到真实订阅页
       GoRoute(path: '/content/:id', builder: (context, state) {
         return ContentDetailPage(contentId: state.pathParameters['id']!);
       }),

@@ -28,7 +28,7 @@ class CurrentTermCard extends StatelessWidget {
             Row(children: [
               Text(term.emoji, style: const TextStyle(fontSize: 28)),
               const SizedBox(width: 12),
-              Text('Today：${term.name}', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: Colors.white, height: 1.3)),
+              Text('Today: ${term.name}', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: Colors.white, height: 1.3)),
             ]),
             const SizedBox(height: 12),
             Text('「${term.poem}」', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400, color: Colors.white.withValues(alpha: 0.9), height: 1.5)),

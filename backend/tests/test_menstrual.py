@@ -1,6 +1,8 @@
 """顺时 - 月经期养护测试"""
 import pytest
 
+pytestmark = pytest.mark.signed_in
+
 
 class TestMenstrualCycleLog:
     def test_log_cycle_returns_200(self, client):
@@ -13,9 +15,9 @@ class TestMenstrualCycleLog:
         data = client.post("/api/v1/menstrual/cycle/log", json=payload).json()
         assert data["success"] is True
 
-    def test_log_requires_user_id(self, client):
-        response = client.post("/api/v1/menstrual/cycle/log", json={"start_date": "2024-01-01"})
-        assert response.status_code == 422
+    def test_log_requires_login(self, anonymous_client):
+        response = anonymous_client.post("/api/v1/menstrual/cycle/log", json={"start_date": "2024-01-01"})
+        assert response.status_code == 401
 
 
 class TestMenstrualHistory:

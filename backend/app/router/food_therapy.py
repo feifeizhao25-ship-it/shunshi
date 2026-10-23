@@ -31,7 +31,7 @@ FOOD_THERAPY_RECIPES = {
         "season": ["spring", "summer", "long_summer"],
         "ingredients": [
             {"name": "山药", "amount": "100g", "function": "健脾益胃，补肺固肾"},
-            {"name": "薏米", "amount": "50g", "function": "健脾利湿，清热排毒"},
+            {"name": "薏米", "amount": "50g", "function": "健脾利湿，清淡饮食"},
             {"name": "大米", "amount": "100g", "function": "养胃和中"},
         ],
         "preparation": "薏米提前浸泡2小时，山药去皮切块，与大米同煮成粥，小火慢熬40分钟。",

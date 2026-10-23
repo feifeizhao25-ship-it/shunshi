@@ -284,7 +284,7 @@ class TodayPlanService {
         const FollowUpTask(
           id: '1',
           title: '喝一杯温水',
-          description: '帮助身体排毒',
+          description: '清淡饮食，多喝温水',
           status: TaskStatus.pending,
           priority: TaskPriority.normal,
           category: 'health',

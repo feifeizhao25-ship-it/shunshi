@@ -21,7 +21,7 @@ CHRONIC_CONDITIONS_DATA = [
         "description": "长期疲劳乏力，不因休息缓解",
         "food_therapy": {
             "recommended": ["黄芪", "红枣", "山药", "薏米", "鸡汤"],
-            "typical_recipe": "黄芪炖鸡汤（黄芪 30g、鸡 500g、红枣 5 颗）",
+            "typical_recipe": "黄芪炖鸡汤（药膳，是否适合你请先咨询医生）",
             "frequency": "每周 2-3 次"
         },
         "lifestyle_adjustments": [
@@ -31,7 +31,7 @@ CHRONIC_CONDITIONS_DATA = [
             "调节工作节奏，避免长期高压"
         ],
         "acupoints": ["足三里（ST36）", "脾俞（BL20）", "气海（CV6）"],
-        "herbal_notes": "四君子汤（人参/黄芪、白术、茯苓、甘草）可长期温和补气",
+        "herbal_notes": "具体用药必须由医生面诊后决定，请勿自行服用中成药或方剂；如有不适请就医，用药请遵医嘱",
         "avoid_factors": ["过度劳累", "过度思虑", "饮食不规律", "长期熬夜"],
         "see_doctor_warning": "如疲劳持续恶化或伴随其他症状（发热、体重下降），需医学评估排除器质性病变",
         "severity_level": "medium"
@@ -54,7 +54,7 @@ CHRONIC_CONDITIONS_DATA = [
             "避免过度思虑和情绪波动"
         ],
         "acupoints": ["神门（HT7）", "三阴交（SP6）", "安眠穴（耳后）"],
-        "herbal_notes": "酸枣仁汤（酸枣仁、茯神、知母、黄芪、川芎）可改善睡眠质量",
+        "herbal_notes": "具体用药必须由医生面诊后决定，请勿自行服用中成药或方剂；如有不适请就医，用药请遵医嘱",
         "avoid_factors": ["咖啡因", "烟酒", "睡前进食", "室温过高或过低"],
         "see_doctor_warning": "若失眠伴随明显情绪障碍或持续超过 3 个月，需精神心理评估",
         "severity_level": "medium"
@@ -77,7 +77,7 @@ CHRONIC_CONDITIONS_DATA = [
             "保持心态舒畅，避免过度思虑"
         ],
         "acupoints": ["足三里（ST36）", "脾俞（BL20）", "胃俞（BL21）"],
-        "herbal_notes": "理中丸（人参、白术、干姜、甘草）可温阳健脾；若湿热明显需六君子汤",
+        "herbal_notes": "具体用药必须由医生面诊后决定，请勿自行服用中成药或方剂；如有不适请就医，用药请遵医嘱",
         "avoid_factors": ["生冷硬食物", "油腻厚腻", "过酸过辣", "烟酒", "过冷饮料"],
         "see_doctor_warning": "如出现持续黑便、呕血、剧烈腹痛，需急诊检查排除消化道溃疡或出血",
         "severity_level": "medium"
@@ -100,7 +100,7 @@ CHRONIC_CONDITIONS_DATA = [
             "枕头高度应与肩宽相符"
         ],
         "acupoints": ["肩井（GB21）", "风池（GB20）", "曲池（LI11）"],
-        "herbal_notes": "活血通络类方剂（血府逐瘀汤、膈下逐瘀汤）可改善气血循环，但需医嘱",
+        "herbal_notes": "具体用药必须由医生面诊后决定，请勿自行服用中成药或方剂；如有不适请就医，用药请遵医嘱",
         "avoid_factors": ["长期低头", "坐姿不正", "过度颈部转向", "冷风吹颈"],
         "see_doctor_warning": "如出现双上肢无力、排尿排便困难、严重眩晕，需急诊影像学检查排除脊髓压迫",
         "severity_level": "medium"
@@ -112,7 +112,7 @@ CHRONIC_CONDITIONS_DATA = [
         "description": "鼻塞、流涕、嗅觉减退、反复感冒",
         "food_therapy": {
             "recommended": ["黄芪", "红枣", "薏米", "冬瓜", "黑芝麻", "生姜"],
-            "typical_recipe": "黄芪红枣粥（黄芪 20g、红枣 5 颗、粳米 50g）",
+            "typical_recipe": "黄芪红枣粥（药膳，是否适合你请先咨询医生）",
             "frequency": "每日 1 次"
         },
         "lifestyle_adjustments": [
@@ -123,7 +123,7 @@ CHRONIC_CONDITIONS_DATA = [
             "增强体质，适度运动"
         ],
         "acupoints": ["迎香（LI20）", "足三里（ST36）", "肺俞（BL13）"],
-        "herbal_notes": "玉屏风散（黄芪、白术、防风）是经典的补肺卫处方，可长期服用",
+        "herbal_notes": "具体用药必须由医生面诊后决定，请勿自行服用中成药或方剂；如有不适请就医，用药请遵医嘱",
         "avoid_factors": ["过敏原接触", "冷空气", "烟雾", "过度疲劳", "饮食不当"],
         "see_doctor_warning": "如鼻涕伴血丝、鼻塞严重影响呼吸、持续化脓性分泌物，需耳鼻喉科检查",
         "severity_level": "low"
@@ -146,7 +146,7 @@ CHRONIC_CONDITIONS_DATA = [
             "必要时寻求专业心理咨询"
         ],
         "acupoints": ["太冲（LV3）", "膈俞（BL17）", "心俞（BL15）"],
-        "herbal_notes": "逍遥散（柴胡、薄荷、白芍、白术、茯苓、甘草）可疏肝解郁，但需在医生指导下使用",
+        "herbal_notes": "具体用药必须由医生面诊后决定，请勿自行服用中成药或方剂；如有不适请就医，用药请遵医嘱",
         "avoid_factors": ["过度思虑", "社交隔离", "长期压力", "缺乏运动"],
         "see_doctor_warning": "如出现严重抑郁、自伤念头、持续失眠，需立即就医并寻求精神心理专科评估",
         "severity_level": "high"
@@ -169,7 +169,7 @@ CHRONIC_CONDITIONS_DATA = [
             "定期检测血糖，监测进展"
         ],
         "acupoints": ["足三里（ST36）", "脾俞（BL20）", "三阴交（SP6）"],
-        "herbal_notes": "六君子汤或补中益气汤可强健脾胃，但需定期复查血糖调整方案",
+        "herbal_notes": "具体用药必须由医生面诊后决定，请勿自行服用中成药或方剂；如有不适请就医，用药请遵医嘱；需定期复查血糖",
         "avoid_factors": ["高糖食物", "精白米面", "油腻厚腻", "过度劳累", "长期压力"],
         "see_doctor_warning": "需定期复查血糖和 HbA1c（每 3-6 个月），密切监测是否进展为糖尿病",
         "severity_level": "high"
@@ -193,7 +193,7 @@ CHRONIC_CONDITIONS_DATA = [
             "定期监测血压"
         ],
         "acupoints": ["太冲（LV3）", "曲池（LI11）", "三阴交（SP6）"],
-        "herbal_notes": "天麻钩藤饮（天麻、钩藤、石决明、黄芩、栀子等）可平肝潜阳，但需医嘱",
+        "herbal_notes": "具体用药必须由医生面诊后决定，请勿自行服用中成药或方剂；如有不适请就医，用药请遵医嘱",
         "avoid_factors": ["高盐饮食", "烟酒", "过度劳累", "长期情绪激动", "缺乏运动"],
         "see_doctor_warning": "需定期复查血压（每 3-6 个月），若升至 140/90 需启动药物治疗",
         "severity_level": "high"

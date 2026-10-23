@@ -120,22 +120,10 @@ def _get_season() -> str:
 
 
 def _get_solar_term() -> str:
-    """获取当前节气关键词"""
-    month = datetime.now().month
-    day = datetime.now().day
-    terms = [
-        (1, 6, "小寒"), (1, 20, "大寒"), (2, 4, "立春"), (2, 19, "雨水"),
-        (3, 6, "惊蛰"), (3, 21, "春分"), (4, 5, "清明"), (4, 20, "谷雨"),
-        (5, 6, "立夏"), (5, 21, "小满"), (6, 6, "芒种"), (6, 21, "夏至"),
-        (7, 7, "小暑"), (7, 23, "大暑"), (8, 7, "立秋"), (8, 23, "处暑"),
-        (9, 8, "白露"), (9, 23, "秋分"), (10, 8, "寒露"), (10, 23, "霜降"),
-        (11, 7, "立冬"), (11, 22, "小雪"), (12, 7, "大雪"), (12, 22, "冬至"),
-    ]
-    current = terms[0][2]
-    for m, d, name in terms:
-        if (month > m) or (month == m and day >= d):
-            current = name
-    return current
+    """获取当前节气关键词：查天文计算的节气表（北京时间）。"""
+    from app.utils import solar_term_calendar
+
+    return solar_term_calendar.current_term()
 
 
 @router.get("/daily")

@@ -38,7 +38,7 @@ MERIDIANS = {
             {"code": "LI11", "name": "曲池穴", "function": "清热解表，散风止痒"},
         ],
         "wellness": {
-            "principle": "清肠排毒，润肠通便",
+            "principle": "清淡饮食，润肠通便",
             "massage_tip": "沿手臂外侧由手腕向肩膀方向按摩",
             "season": "秋",
             "foods": ["粗纤维食物", "蔬菜", "香蕉", "蜂蜜"],

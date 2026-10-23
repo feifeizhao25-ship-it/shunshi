@@ -9,7 +9,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Literal
 
-from fastapi import APIRouter, Header, HTTPException, Query
+from fastapi import APIRouter, Depends, Header, HTTPException, Query
+from sqlalchemy.orm import Session
+
+from ..deps import current_user, get_session
 from pydantic import BaseModel, Field
 
 
@@ -143,11 +146,49 @@ async def life_state(day: int = Query(1, ge=1, le=7)):
     return {"success": True, "data": {"day": day, "stage": STAGES[day - 1][0]}}
 
 
+ACTION_LOG_KEY = "behavior:action_completions"
+ACTION_LOG_LIMIT = 200
+
+
 @router.post("/action/complete")
-async def complete_action(body: ActionCompletion):
+def complete_action(
+    body: ActionCompletion,
+    user_id: str = Depends(current_user),
+    session: Session = Depends(get_session),
+):
+    """记录一次行动完成。以前不落库却回 ``recorded: True``（假回执），换手机后个性化行为全部丢失。
+
+    现在写进该用户的 user_settings（只保留最近 200 条），首页卡片可据此统计；注销时随 user_settings 一并删除。
+    """
+    import json
+    import time
+
+    from ..simple_models import UserSetting
+
+    row = session.get(UserSetting, {"user_id": user_id, "key": ACTION_LOG_KEY})
+    try:
+        log = json.loads(row.value) if row else []
+    except (TypeError, ValueError):
+        log = []
+    log.append({
+        "action_type": body.action_type,
+        "completed": body.completed,
+        "rating": body.rating,
+        "skill_name": body.skill_name,
+        "duration_seconds": body.duration_seconds,
+        "at": int(time.time()),
+    })
+    log = log[-ACTION_LOG_LIMIT:]
+    session.merge(UserSetting(user_id=user_id, key=ACTION_LOG_KEY, value=json.dumps(log, ensure_ascii=False)))
+    session.commit()
     return {
         "success": True,
-        "data": {"recorded": True, "action_type": body.action_type, "completed": body.completed},
+        "data": {
+            "recorded": True,
+            "action_type": body.action_type,
+            "completed": body.completed,
+            "total_recorded": len(log),
+        },
     }
 
 

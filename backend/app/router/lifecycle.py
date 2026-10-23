@@ -150,6 +150,7 @@ async def update_lifecycle_profile(
         birth_year=profile.birth_year,
         gender=profile.gender,
     )
+    _record_history(user_id, profile.birth_year, lifecycle_engine.detect_life_stage(profile.birth_year).value, lifecycle_engine.get_age(profile.birth_year))
 
     # 返回更新后的数据
     stage = lifecycle_engine.detect_life_stage(profile.birth_year)
@@ -273,3 +274,25 @@ async def get_daily_rhythm(user_id: str = Query(..., description="用户ID"), lo
         "life_stage": stage.value,
         "daily_rhythm": rhythm,
     }
+
+# ── 批3补齐: 生命周期历史 ──────────────────────────────────────────
+def _ensure_history_table():
+    conn = get_db()
+    conn.execute("CREATE TABLE IF NOT EXISTS lifecycle_history (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id TEXT NOT NULL, birth_year INTEGER, life_stage TEXT, age INTEGER, recorded_at TEXT, source TEXT)")
+    conn.commit()
+
+def _record_history(user_id: str, birth_year: int, stage_value: str, age: int, source: str = "profile_update"):
+    _ensure_history_table()
+    conn = get_db()
+    conn.execute("INSERT INTO lifecycle_history (user_id, birth_year, life_stage, age, recorded_at, source) VALUES (?, ?, ?, ?, datetime('now'), ?)",
+                 (user_id, birth_year, stage_value, age, source))
+    conn.commit()
+
+@router.get("/history")
+async def get_lifecycle_history(user_id: str = Query(..., description="用户ID"), limit: int = Query(50, le=200)):
+    """生命周期变更历史 (每次档案更新记录一条, 按时间倒序)。"""
+    _ensure_history_table()
+    conn = get_db()
+    rows = conn.execute("SELECT birth_year, life_stage, age, recorded_at, source FROM lifecycle_history WHERE user_id = ? ORDER BY recorded_at DESC, id DESC LIMIT ?", (user_id, limit)).fetchall()
+    return {"user_id": user_id, "count": len(rows), "history": [dict(r) for r in rows]}
+

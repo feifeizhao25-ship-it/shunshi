@@ -80,7 +80,8 @@ class SubscriptionPlan {
     // Support both price (yuan) and price_cents (fen)
     int priceCents;
     if (json.containsKey('price_cents')) {
-      priceCents = json['price_cents'] ?? 0;
+      // 0S3 付费档只卖年付：月价为空时用年价，避免把付费档显示成「免费」
+      priceCents = json['price_cents'] ?? json['price_yearly_cents'] ?? 0;
     } else if (json.containsKey('price')) {
       priceCents = ((json['price'] as num) * 100).round();
     } else {

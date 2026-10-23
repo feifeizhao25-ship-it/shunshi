@@ -11,6 +11,7 @@ import '../../../core/services/feedback_service.dart';
 import '../../widgets/membership_widgets.dart';
 import '../../../core/theme/app_localizations.dart';
 import '../../../core/network/api_singleton.dart';
+import '../../../core/solar_term/solar_term_en.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -35,7 +36,7 @@ class _HomePageState extends State<HomePage> {
     'Hai': {'time': '21:00-23:00', 'organ': 'Triple Energizer', 'element': 'Water'},
   };
 
-  String _currentTerm = 'Loading...';
+  String _currentTerm = currentSolarTermEn()?.$1 ?? 'Loading...';
   String _userName = 'Friend';
   bool _isLoading = true;
   List<Map<String, dynamic>> _recommendations = [];
@@ -80,14 +81,14 @@ class _HomePageState extends State<HomePage> {
         final d = res.data['data'];
         if (mounted) {
           setState(() {
-          _currentTerm = d['name'] ?? 'Lixia';
+          _currentTerm = d['name'] ?? currentSolarTermEn()?.$1 ?? _currentTerm;
         });
         }
       }
     } catch (_) {
       if (mounted) {
         setState(() {
-        _currentTerm = 'Lixia';
+        _currentTerm = currentSolarTermEn()?.$1 ?? _currentTerm;
       });
       }
     }

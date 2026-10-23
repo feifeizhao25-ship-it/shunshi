@@ -17,6 +17,8 @@ from enum import Enum
 from typing import Optional
 import logging
 
+from app.safety.config import CRISIS_EMERGENCY_TEXT, CRISIS_HOTLINE_TEXT
+
 logger = logging.getLogger(__name__)
 
 
@@ -51,13 +53,10 @@ class SafetyResult:
 CRISIS_RESPONSE = (
     "我感受到你现在非常痛苦，你的感受很重要。💙\n\n"
     "在你继续之前，我想让你知道有人可以帮你：\n\n"
-    "📞 **24小时心理援助热线**\n"
-    "- 全国心理援助热线：400-161-9995\n"
-    "- 北京心理危机研究与干预中心：010-82951332\n"
-    "- 希望24热线：400-161-9995\n"
-    "- 生命热线：400-821-1215\n\n"
+    "📞 **心理援助热线**\n"
+    f"- {CRISIS_HOTLINE_TEXT}\n\n"
     "🏥 **紧急情况**\n"
-    "如果你或身边有人处于危险中，请立即拨打 120 或 110。\n\n"
+    f"{CRISIS_EMERGENCY_TEXT}\n\n"
     "你不需要独自面对这些。寻求帮助是勇敢的表现。"
 )
 

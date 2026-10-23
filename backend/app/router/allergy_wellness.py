@@ -112,7 +112,7 @@ ALLERGY_TYPES = {
             {"name": "黄芪炖鸡", "description": "增强肺卫功能，预防花粉入侵"},
             {"name": "蜂蜜柚子茶", "description": "润肺化痰，增强呼吸道抵抗力"},
             {"name": "薏米红豆粥", "description": "祛湿健脾，改善体质"},
-            {"name": "冬虫夏草炖瘦肉", "description": "补肺气，增强免疫功能"},
+            {"name": "冬虫夏草炖瘦肉", "description": "补肺气，日常保养"},
         ],
         "acupoints": [
             {"point": "迎香穴(LI20)", "effect": "通鼻窍，缓解鼻痒"},
@@ -135,7 +135,7 @@ ALLERGY_TYPES = {
         ],
         "acupoints": [
             {"point": "脾俞穴(BL20)", "effect": "健脾利湿，增强脾功能"},
-            {"point": "足三里(ST36)", "effect": "补气健脾，增强免疫力"},
+            {"point": "足三里(ST36)", "effect": "补气健脾，日常保养"},
             {"point": "三阴交(SP6)", "effect": "调理脾胃，改善湿气"},
         ],
         "lifestyle": "保持室内干燥，定期清洁床品，使用除湿机。",
@@ -180,13 +180,13 @@ ALLERGY_TYPES = {
     },
 }
 
-# 预防性调理方案（玉屏风散为核心）
+# 预防性调理方案（生活方式为主，不推荐任何中成药或方剂）
 PREVENTION_PLAN = {
     "stage_1": {
         "stage": "第1阶段（4周前开始）",
         "duration": "4周",
         "objective": "增强体表防御，补气固表",
-        "core_formula": "玉屏风散（黄芪、白术、防风）",
+        "core_focus": "规律作息、均衡饮食、适量运动，提高日常抵抗力；正在用药或症状明显时请先问医生",
         "food_therapy": [
             "黄芪炖鸡：每周2-3次，补气增强抵抗力",
             "山药粥：每天可食，健脾益气",
@@ -198,10 +198,10 @@ PREVENTION_PLAN = {
         "stage": "第2阶段（过敏季开始前1-2周）",
         "duration": "1-2周",
         "objective": "加强疏风驱邪功能",
-        "core_formula": "玉屏风散加减（增加疏风药物）",
+        "core_focus": "关注花粉和空气质量预报，外出戴口罩，回家后洗脸、清洗鼻腔",
         "food_therapy": [
             "黄芪红枣茶：每天1杯，持续增强抵抗力",
-            "冬虫夏草粥：每周1-2次，补肺气",
+            "山药小米粥：每周1-2次，清淡易消化",
         ],
         "acupoints": ["风门穴(BL12)", "肺俞穴(BL13)"],
         "lifestyle": "减少外出时间，使用空气净化器，准备防护措施。",
@@ -210,7 +210,7 @@ PREVENTION_PLAN = {
         "stage": "第3阶段（过敏季期间）",
         "duration": "持续至过敏季结束",
         "objective": "维持防御，随时应对",
-        "core_formula": "玉屏风散维持+按需调理",
+        "core_focus": "减少接触过敏原，做好防护；症状加重或影响睡眠、呼吸时及时就医，用药请遵医嘱",
         "food_therapy": [
             "黄芪粥：每天食用，持续增强体表防御",
             "蜂蜜柚子茶：缓解呼吸道症状",
@@ -233,7 +233,7 @@ ACUTE_RELIEF = {
             "point": "合谷穴(LI4)",
             "location": "虎口中央，拇指和食指骨交点",
             "technique": "深按1-2分钟，每天3-4次",
-            "effect": "疏风解毒，增强免疫功能",
+            "effect": "疏风解毒，日常保养",
         },
         {
             "point": "印堂穴(EX-HN3)",
@@ -339,7 +339,7 @@ async def get_prevention_plan(weeks_before: int = Query(4, ge=2, le=8, descripti
             "prevention_stages": plan_stages,
             "weeks_before": weeks_before,
             "total_stages": len(plan_stages),
-            "core_principle": "玉屏风散理论：黄芪补气固表，白术健脾祛湿，防风疏风驱邪。",
+            "core_principle": "过敏季前从作息、饮食、运动和防护做起；不推荐自行服用中成药或方剂。如有不适请就医，用药请遵医嘱。",
             "adjustment_note": adjustment_note,
         },
     }

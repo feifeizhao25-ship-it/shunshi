@@ -1,6 +1,8 @@
 """顺时 - 感恩日记测试"""
 import pytest
 
+pytestmark = pytest.mark.signed_in
+
 
 class TestGratitudeLog:
     def test_log_returns_200(self, client):
@@ -18,9 +20,9 @@ class TestGratitudeLog:
         data = client.post("/api/v1/gratitude/log", json=payload).json()
         assert data["success"] is True
 
-    def test_log_requires_user_id(self, client):
-        response = client.post("/api/v1/gratitude/log", json={"content": "感恩"})
-        assert response.status_code == 422
+    def test_log_requires_login(self, anonymous_client):
+        response = anonymous_client.post("/api/v1/gratitude/log", json={"content": "感恩"})
+        assert response.status_code == 401
 
 
 class TestGratitudeHistory:

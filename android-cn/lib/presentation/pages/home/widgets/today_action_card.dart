@@ -19,7 +19,7 @@ class TodayActionCard extends StatelessWidget {
     if (h >= 5 && h < 9) return ('晨起养阳，一杯温水唤醒身体', Icons.wb_twilight, const Color(0xFF43A047), '开始今日', '/daily-checkin');
     if (h >= 9 && h < 12) return ('辰时胃经旺，来份清淡早餐', Icons.restaurant_rounded, const Color(0xFFFF8A65), '查看养生食谱', '/diet-recommend');
     if (h >= 12 && h < 14) return ('午时心经旺盛，小憩15分钟', Icons.self_improvement, const Color(0xFFEC407A), '心经按揉指南', '/meridian-detail');
-    if (h >= 14 && h < 18) return ('申时膀胱经当令，适量饮水排毒', Icons.water_drop_rounded, const Color(0xFF29B6F6), '记录饮水', '/daily-checkin');
+    if (h >= 14 && h < 18) return ('下午记得适量喝水', Icons.water_drop_rounded, const Color(0xFF29B6F6), '记录饮水', '/daily-checkin');
     if (h >= 18 && h < 22) return ('戌时心包经，适合放松散步', Icons.directions_walk_rounded, const Color(0xFFAB47BC), '心包经按揉', '/meridian-detail');
     return ('亥时三焦经，准备安睡', Icons.bedtime_rounded, const Color(0xFF5C6BC0), '睡前记录', '/daily-checkin');
   }

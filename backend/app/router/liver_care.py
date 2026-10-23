@@ -22,7 +22,7 @@ LIVER_CARE_FOODS = [
     {"name": "西兰花", "benefit": "含萝卜硫素，支持肝脏解毒功能", "usage": "轻炒或蒸"},
     {"name": "大蒜", "benefit": "含硫化合物，促进肝脏酶活性", "usage": "生食或轻炒"},
     {"name": "绿茶", "benefit": "含儿茶素，保护肝细胞", "usage": "冲泡饮用"},
-    {"name": "核桃", "benefit": "富含精氨酸，协助肝脏排毒", "usage": "每日4-5颗"},
+    {"name": "核桃", "benefit": "富含精氨酸，营养丰富", "usage": "每日4-5颗"},
     {"name": "柠檬", "benefit": "促进胆汁分泌，助消化", "usage": "柠檬水"},
     {"name": "姜黄", "benefit": "含姜黄素，有护肝抗炎作用", "usage": "烹饪调料"},
 ]

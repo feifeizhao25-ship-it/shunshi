@@ -19,7 +19,8 @@ interface Subscription {
 interface Plan {
   id: string;
   name: string;
-  price: number;
+  price: number | null;
+  price_yearly?: number | null;
   features: string[];
   subscriber_count: number;
 }
@@ -137,21 +138,16 @@ export default function SubscriptionPage() {
                   <h3 className="font-semibold text-gray-800">{plan.name}</h3>
                   <span className="text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded">{plan.subscriber_count} 订阅</span>
                 </div>
-                <div className="text-3xl font-bold text-gray-900 mb-4">¥{plan.price}<span className="text-sm font-normal text-gray-400">/月</span></div>
+                <div className="text-3xl font-bold text-gray-900 mb-4">¥{plan.price ?? plan.price_yearly}<span className="text-sm font-normal text-gray-400">{plan.price == null ? '/年' : '/月'}</span></div>
                 <ul className="space-y-2 text-sm text-gray-600">
                   {(plan.features || []).map((f, i) => <li key={i} className="flex items-center gap-2"><span className="text-green-500">✓</span>{f}</li>)}
                 </ul>
               </div>
             )) : (
-              ['免费版', '基础版', '高级版', '家庭版'].map((name) => (
-                <div key={name} className="bg-white rounded-xl border border-gray-200 p-6">
-                  <h3 className="font-semibold text-gray-800 mb-4">{name}</h3>
-                  <div className="text-3xl font-bold text-gray-900 mb-4">
-                    ¥{name === '免费版' ? '0' : name === '基础版' ? '29' : name === '高级版' ? '59' : '99'}
-                    <span className="text-sm font-normal text-gray-400">/月</span>
-                  </div>
-                </div>
-              ))
+              // 接口没返回时不编造价格：只提示读取失败（0S3 定价：免费 / 内容订阅 ¥399/年 / 会员 ¥888/年）
+              <div className="col-span-3 bg-white rounded-xl border border-gray-200 p-6 text-sm text-gray-500">
+                暂时读不到套餐数据，请稍后刷新。
+              </div>
             )}
           </div>
         )}

@@ -1,5 +1,9 @@
 """
 SEASONS Global Version - Family Management API
+
+国内版不挂载本模块 (app/main.py INTERNATIONAL_ONLY_MODULES); 国内家庭唯一路由是
+app/router/family.py (/api/v1/family). 人数口径与国内权益注册表一致: 家庭版共 5 人
+(含购买人), 即购买人可绑定 4 位家人 (entitlements_registry tiers.family.collaboration.family_members=5).
 """
 
 import uuid
@@ -15,7 +19,7 @@ families_db: dict = {}
 family_members_db: dict = {}
 family_invites_db: dict = {}
 
-MAX_FAMILY_MEMBERS = 4
+MAX_FAMILY_MEMBERS = 5  # 含购买人共 5 人 (可绑定家人 4 位), 与国内注册表 family tier 一致
 
 
 class FamilyCreateRequest(BaseModel):

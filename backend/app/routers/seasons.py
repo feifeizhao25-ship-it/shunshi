@@ -1,8 +1,10 @@
 """季节/首页模块：契约以 Flutter 客户端实际调用为准（home_page.dart / onboarding_page.dart / audio_player_page.dart）。
 
 - GET  /api/v1/seasons/home/dashboard?hemisphere=...
-       客户端解包 data["greeting"] / data["daily_insight"]["text"] / data["suggestions"][]。
-       骨架没有内容数据源，返回空态结构（daily_insight=null、suggestions=[]），不编造内容。
+       客户端解包 data["greeting"] / data["daily_insight"]["text"] / data["suggestions"][]
+       （android-cn 的 home_page 读 gentle_suggestions[i].reason/title/duration_min，两个键给同一份列表）。
+       卡片由 app/services/home_cards.py 按节气、法定假日/调休、用户自填的地区和年龄段、目标、
+       最近 7 天的行动记录生成，每张卡带 reason/basis；只给生活方式建议，不诊断、不推荐药物。
 - POST /api/v1/seasons/onboarding/complete  真实落库 onboarding 档案（settings 表）
 - POST /api/v1/seasons/audio/progress       真实落库播放进度（audio_progress 表）
 """
@@ -23,8 +25,12 @@ ONBOARDING_KEY = "profile:onboarding"
 
 
 def _greeting(now: float | None = None) -> str:
-    """按服务器本地时段给出问候语；这是服务端可真实推导的值，非编造内容。"""
-    hour = time.localtime(now).tm_hour
+    """按北京时间时段给出问候语（以前按服务器本地时区，部署在 UTC 机器上早上 8 点会说「夜深了」）。"""
+    from datetime import datetime
+
+    from ..utils.solar_term_calendar import BEIJING
+
+    hour = datetime.fromtimestamp(time.time() if now is None else now, BEIJING).hour
     if hour < 6:
         return "夜深了，注意休息"
     if hour < 12:
@@ -38,11 +44,15 @@ def _greeting(now: float | None = None) -> str:
 def home_dashboard(
     hemisphere: str = "north",
     user_id: str = Depends(current_user),
+    session: Session = Depends(get_session),
 ):
+    from ..services.home_cards import build_dashboard
+
+    board = build_dashboard(session, user_id)
     return {
         "greeting": _greeting(),
-        "daily_insight": None,  # 空态：无内容数据源，不编造
-        "suggestions": [],
+        **board,
+        "gentle_suggestions": board["suggestions"],
         "hemisphere": hemisphere,
         "updated_at": int(time.time()),
     }

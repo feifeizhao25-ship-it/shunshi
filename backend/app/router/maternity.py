@@ -190,7 +190,7 @@ POSTPARTUM_PLANS = {
                 "recommended_foods": ["清汤面", "清粥", "清鸡汤", "清鱼汤（清汤）"],
                 "forbidden_foods": ["油腻厚腻", "辛辣刺激", "冷饮冰品"],
                 "recovery_tips": "卧床休息，温水擦浴，避免吹风受凉，保持阴部清洁干燥",
-                "tcm_formula_suggestion": "可用生化汤促进恶露排出（1-5 天内）",
+                "medication_notice": "产后是否需要中药调理，请由医生面诊后决定，不要自行服用中成药或方剂。如有不适请就医，用药请遵医嘱。",
                 "breastfeeding_diet_notes": "清淡温和，不宜进补，防止堵奶"
             },
             {
@@ -199,7 +199,7 @@ POSTPARTUM_PLANS = {
                 "recommended_foods": ["黄芪炖鸡", "红枣鸡汤", "黑鱼汤", "猪脚汤", "蛋类"],
                 "forbidden_foods": ["生冷油腻", "刺激性食物"],
                 "recovery_tips": "逐渐增加活动量，温和散步，继续温阳，促进新陈代谢",
-                "tcm_formula_suggestion": "八珍汤、四君子汤可温和补气血",
+                "medication_notice": "产后是否需要中药调理，请由医生面诊后决定，不要自行服用中成药或方剂。如有不适请就医，用药请遵医嘱。",
                 "breastfeeding_diet_notes": "营养充足但不过腻，通乳穴位按摩（膈俞、脾俞）"
             },
             {
@@ -208,7 +208,7 @@ POSTPARTUM_PLANS = {
                 "recommended_foods": ["黄芪红枣粥", "山药粥", "黑鸡汤", "核桃、黑芝麻"],
                 "forbidden_foods": ["过冷过辣"],
                 "recovery_tips": "可恢复正常活动，避免重体力劳动和性生活，持续保暖",
-                "tcm_formula_suggestion": "黄芪建中汤强健脾胃，增强体质",
+                "medication_notice": "产后是否需要中药调理，请由医生面诊后决定，不要自行服用中成药或方剂。如有不适请就医，用药请遵医嘱。",
                 "breastfeeding_diet_notes": "充分营养支持，促进乳汁分泌，避免过油易堵奶"
             }
         ]
@@ -222,7 +222,7 @@ POSTPARTUM_PLANS = {
                 "recommended_foods": ["清汤面", "清粥", "清鸡汤", "蛋羹"],
                 "forbidden_foods": ["油腻厚腻", "辛辣", "冷硬难消化"],
                 "recovery_tips": "卧床休息，避免腹部用力，伤口保持干燥无菌，温水浴",
-                "tcm_formula_suggestion": "生化汤+黄芪可促进恶露排出和伤口愈合",
+                "medication_notice": "产后是否需要中药调理，请由医生面诊后决定，不要自行服用中成药或方剂。如有不适请就医，用药请遵医嘱。",
                 "breastfeeding_diet_notes": "清淡好消化，为后续进补做准备"
             },
             {
@@ -231,7 +231,7 @@ POSTPARTUM_PLANS = {
                 "recommended_foods": ["黄芪炖鸡", "黑鱼汤", "红枣粥", "猪脚汤", "核桃"],
                 "forbidden_foods": ["过油过腻", "刺激性食物"],
                 "recovery_tips": "逐渐增加活动，避免腹部受力，温阳促进血循环有利愈合",
-                "tcm_formula_suggestion": "黄芪建中汤+生化汤可加速伤口愈合和恶露排出",
+                "medication_notice": "产后是否需要中药调理，请由医生面诊后决定，不要自行服用中成药或方剂。如有不适请就医，用药请遵医嘱。",
                 "breastfeeding_diet_notes": "营养充足支持乳汁分泌，避免过油导致堵奶"
             },
             {
@@ -240,7 +240,7 @@ POSTPARTUM_PLANS = {
                 "recommended_foods": ["黑鸡汤", "山药粥", "黑芝麻核桃", "瘦肉粥"],
                 "forbidden_foods": ["过冷过辣"],
                 "recovery_tips": "可恢复日常活动，避免重体力和性生活，伤口可按摩促进疤痕软化",
-                "tcm_formula_suggestion": "黄芪建中汤强体质，玫瑰花+丹参活血软化疤痕",
+                "medication_notice": "产后是否需要中药调理，请由医生面诊后决定，不要自行服用中成药或方剂。如有不适请就医，用药请遵医嘱。",
                 "breastfeeding_diet_notes": "充分营养，但要循序渐进，防止过度进补导致内热"
             }
         ]

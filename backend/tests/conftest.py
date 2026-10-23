@@ -1,4 +1,5 @@
 import os
+import re
 import uuid
 from pathlib import Path
 
@@ -21,6 +22,7 @@ for _candidate in (
 ):
     _candidate.unlink(missing_ok=True)
 
+from tests.signed_in_client import SignedInClient
 from app.config import Settings
 from app.db.database import init_db as init_product_db
 from app.main import create_app
@@ -65,8 +67,29 @@ def settings(tmp_path):
 
 
 @pytest.fixture()
-def client(settings):
+def anonymous_client(settings):
+    """从不带令牌的客户端：测「没登录会被拒」用。"""
     with TestClient(create_app(settings)) as test_client:
+        yield test_client
+
+
+@pytest.fixture()
+def admin_client(settings):
+    """带管理员令牌的客户端：测仅管理员可用的接口。"""
+    with SignedInClient(create_app(settings), admin=True) as test_client:
+        yield test_client
+
+
+@pytest.fixture()
+def client(request, settings):
+    """默认匿名；模块里写 ``pytestmark = pytest.mark.signed_in`` 则自动带登录态。"""
+    if request.node.get_closest_marker("admin_signed_in"):
+        test_client = SignedInClient(create_app(settings), admin=True)
+    elif request.node.get_closest_marker("signed_in"):
+        test_client = SignedInClient(create_app(settings))
+    else:
+        test_client = TestClient(create_app(settings))
+    with test_client:
         yield test_client
 
 
@@ -202,3 +225,23 @@ def postgres_database_url(postgres_admin_url):
             with admin.connect() as connection:
                 connection.execute(text(f'DROP DATABASE "{database}" WITH (FORCE)'))
         admin.dispose()
+
+
+def pytest_configure(config):
+    config.addinivalue_line(
+        "markers",
+        "signed_in: 用带登录令牌的客户端跑（功能测试用；测门禁/隔离的用例不要标）",
+    )
+    config.addinivalue_line(
+        "markers",
+        "admin_signed_in: 用带管理员令牌的客户端跑（测后台接口的功能用例）",
+    )
+
+
+def sell_legacy_sku_for_existing_purchaser(monkeypatch, product_id):
+    """模拟「停售前已购」的老用户：0S3 后旧 SKU（如家和）不再售卖，
+    但已购用户的权益与家庭席位逻辑仍需覆盖，测试里临时把该 SKU 置回可下单。"""
+    from app.router import subscription as sub_mod
+    for product in sub_mod.SUBSCRIPTION_PRODUCTS:
+        if product["product_id"] == product_id:
+            monkeypatch.setitem(product, "status", "active")

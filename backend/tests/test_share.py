@@ -1,6 +1,8 @@
 """顺时 - 社交分享测试"""
 import pytest
 
+pytestmark = pytest.mark.signed_in
+
 
 class TestShareCard:
     def test_create_card_returns_200(self, client):

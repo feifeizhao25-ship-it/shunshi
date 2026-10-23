@@ -11,7 +11,13 @@ test_journal.py
 
 import pytest
 from datetime import datetime, date, timedelta
+from zoneinfo import ZoneInfo
 import json
+
+
+def _bj_today() -> date:
+    """日记按北京时间记日期（router/journal.py 的 _today），测试也用北京时间的「今天」。"""
+    return datetime.now(ZoneInfo("Asia/Shanghai")).date()
 
 
 
@@ -85,7 +91,7 @@ class TestCreateJournalEntry:
         response = client.post("/api/v1/journal/entry", json=payload)
         assert response.status_code == 200
         data = response.json()
-        today = date.today().isoformat()
+        today = _bj_today().isoformat()
         assert data["data"]["date"] == today
 
     def test_create_entry_with_constitution(self, client, journal_user):
@@ -174,7 +180,7 @@ class TestGetJournalEntries:
         for i in range(5):
             payload = {
                 "user_id": user_id,
-                "date": (date.today() - timedelta(days=i)).isoformat(),
+                "date": (_bj_today() - timedelta(days=i)).isoformat(),
                 "mood": min(5, 3 + i),
                 "energy": 3,
                 "sleep_quality": 3,
@@ -376,7 +382,7 @@ class TestGetCheckinStreak:
         for i in range(3):
             payload = {
                 "user_id": user_id,
-                "date": (date.today() - timedelta(days=2 - i)).isoformat(),
+                "date": (_bj_today() - timedelta(days=2 - i)).isoformat(),
                 "mood": 3,
                 "energy": 3,
                 "sleep_quality": 3,
@@ -396,7 +402,7 @@ class TestGetCheckinStreak:
         for i in range(3):
             payload = {
                 "user_id": user_id,
-                "date": (date.today() - timedelta(days=4 - i)).isoformat(),
+                "date": (_bj_today() - timedelta(days=4 - i)).isoformat(),
                 "mood": 3,
                 "energy": 3,
                 "sleep_quality": 3,
@@ -405,7 +411,7 @@ class TestGetCheckinStreak:
         # 今天（间隔 1 天）
         payload = {
             "user_id": user_id,
-            "date": date.today().isoformat(),
+            "date": _bj_today().isoformat(),
             "mood": 3,
             "energy": 3,
             "sleep_quality": 3,
@@ -421,7 +427,7 @@ class TestGetCheckinStreak:
     def test_get_streak_last_entry_date(self, client, journal_user):
         """last_entry_date 应返回最新条目的日期"""
         user_id = journal_user
-        last_date = (date.today() - timedelta(days=1)).isoformat()
+        last_date = (_bj_today() - timedelta(days=1)).isoformat()
         payload = {
             "user_id": user_id,
             "date": last_date,
@@ -442,7 +448,7 @@ class TestGetCheckinStreak:
         for i in range(7):
             payload = {
                 "user_id": user_id,
-                "date": (date.today() - timedelta(days=i)).isoformat(),
+                "date": (_bj_today() - timedelta(days=i)).isoformat(),
                 "mood": 3,
                 "energy": 3,
                 "sleep_quality": 3,
@@ -474,7 +480,7 @@ class TestGetWellnessInsights:
         for i in range(3):
             payload = {
                 "user_id": user_id,
-                "date": (date.today() - timedelta(days=2 - i)).isoformat(),
+                "date": (_bj_today() - timedelta(days=2 - i)).isoformat(),
                 "mood": min(5, 3 + i),
                 "energy": min(5, 2 + i),
                 "sleep_quality": min(5, 4 + i),
@@ -496,7 +502,7 @@ class TestGetWellnessInsights:
         # 前期低分
         payload = {
             "user_id": user_id,
-            "date": (date.today() - timedelta(days=4)).isoformat(),
+            "date": (_bj_today() - timedelta(days=4)).isoformat(),
             "mood": 1,
             "energy": 1,
             "sleep_quality": 1,
@@ -505,7 +511,7 @@ class TestGetWellnessInsights:
         # 后期高分
         payload = {
             "user_id": user_id,
-            "date": (date.today() - timedelta(days=1)).isoformat(),
+            "date": (_bj_today() - timedelta(days=1)).isoformat(),
             "mood": 5,
             "energy": 5,
             "sleep_quality": 5,
@@ -523,7 +529,7 @@ class TestGetWellnessInsights:
         # 前期高分
         payload = {
             "user_id": user_id,
-            "date": (date.today() - timedelta(days=4)).isoformat(),
+            "date": (_bj_today() - timedelta(days=4)).isoformat(),
             "mood": 5,
             "energy": 5,
             "sleep_quality": 5,
@@ -532,7 +538,7 @@ class TestGetWellnessInsights:
         # 后期低分
         payload = {
             "user_id": user_id,
-            "date": (date.today() - timedelta(days=1)).isoformat(),
+            "date": (_bj_today() - timedelta(days=1)).isoformat(),
             "mood": 1,
             "energy": 1,
             "sleep_quality": 1,
@@ -668,7 +674,7 @@ class TestDeleteJournalEntry:
         for i in range(2):
             payload = {
                 "user_id": user_id,
-                "date": (date.today() - timedelta(days=1 - i)).isoformat(),
+                "date": (_bj_today() - timedelta(days=1 - i)).isoformat(),
                 "mood": 3,
                 "energy": 3,
                 "sleep_quality": 3,

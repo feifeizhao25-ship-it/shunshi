@@ -5,9 +5,12 @@ test_recommendations.py
 
 import pytest
 from fastapi.testclient import TestClient
+from tests.signed_in_client import SignedInClient
 from app.main import app
 
-client = TestClient(app)
+pytestmark = pytest.mark.signed_in
+
+client = SignedInClient(app)
 
 
 class TestRecommendationsDaily:
@@ -25,10 +28,10 @@ class TestRecommendationsDaily:
         data = response.json()
         assert "data" in data or "success" in data
 
-    def test_daily_recommendations_requires_user_id(self):
+    def test_daily_recommendations_requires_login(self, anonymous_client):
         """缺少 user_id 参数应返回错误"""
-        response = client.get("/api/v1/recommendations/daily")
-        assert response.status_code == 422
+        response = anonymous_client.get("/api/v1/recommendations/daily")
+        assert response.status_code == 401
 
     def test_daily_recommendations_respects_limit(self):
         """GET /api/v1/recommendations/daily?limit=2 最多返回 2 条推荐"""

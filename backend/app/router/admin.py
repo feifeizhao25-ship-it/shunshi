@@ -98,16 +98,16 @@ async def get_ai_models_config(
     """获取 AI 模型配置列表"""
     models = [
         {
-            "id": "deepseek-chat",
-            "name": "DeepSeek Chat",
+            "id": "deepseek-flash",
+            "name": "DeepSeek V4.1 Flash",
             "provider": "deepseek",
             "max_tokens": 4096,
             "is_default": True,
             "status": "active",
         },
         {
-            "id": "deepseek-reasoner",
-            "name": "DeepSeek Reasoner",
+            "id": "deepseek-v4-pro",
+            "name": "DeepSeek V4 Pro",
             "provider": "deepseek",
             "max_tokens": 8192,
             "is_default": False,

@@ -22,15 +22,14 @@ class SubscriptionPageV2 extends StatefulWidget {
 class _SubscriptionPageV2State extends State<SubscriptionPageV2>
     with WidgetsBindingObserver {
   static const _plans = {
-    'yiyang_monthly': '颐养版月付',
-    'yiyang_yearly': '颐养版年付',
-    'family_yearly': '家和版年付',
+    'content_yearly': '内容订阅·年付',
+    'member_yearly': '会员·年付',
   };
   UserSubscriptionStatus? _status;
   Map<String, String> _prices = {};
   bool _loading = true, _busy = false;
   String? _error, _notice;
-  String _selected = 'yiyang_yearly';
+  String _selected = 'member_yearly';
   int _generation = 0;
   @override
   void initState() {

@@ -109,13 +109,14 @@ SUBSCRIPTION_PLANS = {
     },
     "yangxin": {
         "id": "yangxin",
-        "name": "养心版",
-        "price": 29,           # 月付价格（CNY）
-        "price_yearly": 199,   # 年付价格（CNY）
-        "price_cents": 2900,   # 月付（分）
-        "price_yearly_cents": 19900,
-        "period": "month",
-        "period_name": "月",
+        "name": "内容订阅",
+        "price": None,         # 0S3：只卖年付，无月付
+        "price_yearly": 399,   # 年付价格（CNY）
+        "price_cents": None,
+        "price_yearly_cents": 39900,
+        "period": "year",
+        "period_name": "年",
+        "on_sale": True,
         "features": {
             "basic_chat": True,
             "solar_terms": True,
@@ -128,44 +129,58 @@ SUBSCRIPTION_PLANS = {
     },
     "yiyang": {
         "id": "yiyang",
-        "name": "颐养版",
-        "price": 59,
-        "price_yearly": 399,
-        "price_cents": 5900,
-        "price_yearly_cents": 39900,
-        "period": "month",
-        "period_name": "月",
+        "name": "会员",
+        "price": None,
+        "price_yearly": 888,
+        "price_cents": None,
+        "price_yearly_cents": 88800,
+        "period": "year",
+        "period_name": "年",
+        "on_sale": True,
         "features": {
             "basic_chat": True,
             "solar_terms": True,
             "unlimited_chat": True,
             "today_plan": True,
-            "deep_suggestions": True,
-            "weekly_summary": True,
+            "deep_suggestions": False,
+            "weekly_summary": False,
             "family": False
         }
     },
     "jiahe": {
         "id": "jiahe",
-        "name": "家和版",
+        "name": "家和版（已停售）",
+        "on_sale": False,      # 0S3 不再售卖；只为已购用户保留权益
         "price": 99,
         "price_yearly": 699,
         "price_cents": 9900,
         "price_yearly_cents": 69900,
         "period": "month",
         "period_name": "月",
-        "family_seats": 4,
+        "family_seats": 4,  # 实际值在下方按权益注册表覆盖
         "features": {
             "basic_chat": True,
             "solar_terms": True,
             "unlimited_chat": True,
             "today_plan": True,
-            "deep_suggestions": True,
-            "weekly_summary": True,
+            "deep_suggestions": False,
+            "weekly_summary": False,
             "family": True
         }
     },
 }
+
+
+# 对话额度、家庭席位以权益注册表（app/entitlements_registry.json）为准：以前这里写「无限对话」，
+# 实际执行的是注册表的每天 200 条（app/services/chat_quota.py）。
+from app.entitlements import daily_chat_limit_for_plan, family_seats_for_plan, registry_tier_for_plan
+
+for _plan_id, _plan in SUBSCRIPTION_PLANS.items():
+    _plan["entitlement_tier"] = registry_tier_for_plan(_plan_id)
+    _plan["daily_chat_limit"] = daily_chat_limit_for_plan(_plan_id)
+    _plan["features"]["unlimited_chat"] = _plan["daily_chat_limit"] == -1
+    if _plan["features"].get("family"):
+        _plan["family_seats"] = family_seats_for_plan(_plan_id)
 
 
 # ============ 产品 SKU（金额用分存储） ============
@@ -270,7 +285,7 @@ SUBSCRIPTION_PRODUCTS = [
         "currency": "CNY",
         "duration_days": 30,
         "platform": "alipay",
-        "family_seats": 4,
+        "family_seats": SUBSCRIPTION_PLANS["jiahe"]["family_seats"],
         "features": SUBSCRIPTION_PLANS["jiahe"]["features"],
         "status": "active",
     },
@@ -282,7 +297,7 @@ SUBSCRIPTION_PRODUCTS = [
         "currency": "CNY",
         "duration_days": 365,
         "platform": "alipay",
-        "family_seats": 4,
+        "family_seats": SUBSCRIPTION_PLANS["jiahe"]["family_seats"],
         "features": SUBSCRIPTION_PLANS["jiahe"]["features"],
         "status": "active",
     },
@@ -294,7 +309,7 @@ SUBSCRIPTION_PRODUCTS = [
         "currency": "CNY",
         "duration_days": 30,
         "platform": "apple",
-        "family_seats": 4,
+        "family_seats": SUBSCRIPTION_PLANS["jiahe"]["family_seats"],
         "features": SUBSCRIPTION_PLANS["jiahe"]["features"],
         "status": "active",
     },
@@ -306,11 +321,34 @@ SUBSCRIPTION_PRODUCTS = [
         "currency": "CNY",
         "duration_days": 365,
         "platform": "apple",
-        "family_seats": 4,
+        "family_seats": SUBSCRIPTION_PLANS["jiahe"]["family_seats"],
         "features": SUBSCRIPTION_PLANS["jiahe"]["features"],
         "status": "active",
     },
 ]
+
+# 0S3 定价（2026-10-15）：只卖年付「内容订阅 ¥399」「会员 ¥888」；陪伴档不在售。
+# 上面的养心 / 颐养 / 家和旧 SKU 全部停售（status=legacy）：不再列出、不能下单，
+# 但已购用户的权益映射（注册表 product_tier_map、_product_id_to_plan）保留不变。
+for _legacy in SUBSCRIPTION_PRODUCTS:
+    _legacy["status"] = "legacy"
+
+for _pid, _tier, _name, _cents in (
+    ("content_yearly", "yangxin", "内容订阅·年付", 39900),
+    ("member_yearly", "yiyang", "会员·年付", 88800),
+):
+    for _platform, _id in (("alipay", _pid), ("apple", _pid.replace("_yearly", "_apple_yearly"))):
+        SUBSCRIPTION_PRODUCTS.append({
+            "product_id": _id,
+            "name": _name,
+            "tier": _tier,
+            "price_cents": _cents,
+            "currency": "CNY",
+            "duration_days": 365,
+            "platform": _platform,
+            "features": SUBSCRIPTION_PLANS[_tier]["features"],
+            "status": "active",
+        })
 
 SUBSCRIPTION_PRODUCTS.extend(
     [{**product, "platform": "wechat"} for product in list(SUBSCRIPTION_PRODUCTS)
@@ -466,17 +504,17 @@ def transition_status(current: str, target: str) -> bool:
 def _init_family_seats(user_id: str, tier: str, order_id: str = None):
     """
     初始化家庭席位。
-    仅 jiahe 版有家庭席位（4个），其他版本无家庭席位。
+    仅 jiahe 版有家庭席位（数量取权益注册表），其他版本无家庭席位。
     """
     if tier == "jiahe":
         family_seats[user_id] = {
-            "family_seats": 4,
+            "family_seats": SUBSCRIPTION_PLANS["jiahe"]["family_seats"],
             "used_seats": 0,
             "members": [],
             "order_id": order_id,
             "created_at": datetime.now(timezone.utc).isoformat(),
         }
-        logger.info(f"[FamilySeats] 初始化家庭席位: user={user_id}, seats=4")
+        logger.info(f"[FamilySeats] 初始化家庭席位: user={user_id}, seats={SUBSCRIPTION_PLANS['jiahe']['family_seats']}")
     else:
         # 非家和版，清除家庭席位
         if user_id in family_seats:
@@ -645,8 +683,12 @@ async def require_tier(
 
 def _get_user_subscription_lazy(user_id: str) -> dict:
     """
-    获取用户订阅状态（带过期回退的 lazy check）
+    获取用户订阅状态（带过期回退的 lazy check）——先读 Entitlement 唯一事实来源
     """
+    ent = _entitled(user_id)
+    if ent:
+        return {"plan": ent[0], "status": "active",
+                "expires_at": datetime.fromtimestamp(ent[1], timezone.utc).isoformat() if ent[1] else None}
     if user_id not in subscriptions:
         return {"plan": "free", "status": "active", "expires_at": None}
 
@@ -717,8 +759,24 @@ def _notify_subscription_expired(user_id: str, old_plan: str):
 
 # ============ Helper Functions ============
 
+def _entitled(user_id: str):
+    try:
+        from app.services.membership_status import entitlement_plan
+        return entitlement_plan(user_id)
+    except Exception:
+        return None
+
+
 def get_user_subscription(user_id: str) -> SubscriptionStatus:
-    """获取用户订阅状态（兼容原有接口）"""
+    """获取用户订阅状态（兼容原有接口）——先读 Entitlement 唯一事实来源"""
+    ent = _entitled(user_id)
+    if ent and ent[0] in SUBSCRIPTION_PLANS:
+        plan, exp = ent
+        return SubscriptionStatus(
+            plan=plan, status="active",
+            expires_at=datetime.fromtimestamp(exp, timezone.utc).isoformat() if exp else None,
+            features=SUBSCRIPTION_PLANS[plan]["features"], auto_renew=False,
+        )
     if user_id not in subscriptions:
         return SubscriptionStatus(
             plan="free",
@@ -1172,6 +1230,8 @@ async def create_order(
     )
     if product is None:
         raise HTTPException(status_code=400, detail="商品与支付平台不匹配")
+    if product.get("status") != "active":
+        raise HTTPException(status_code=410, detail="该商品已停售，请选择内容订阅或会员年付")
 
     current_sub = get_user_subscription(user_id)
     new_tier = product["tier"]
@@ -1434,7 +1494,8 @@ def _product_id_to_plan(product_id: str) -> Optional[str]:
 
     aliases = {
         f"com.shunshi.{name}.{period}": tier
-        for name, tier in (("yangxin", "yangxin"), ("yiyang", "yiyang"), ("jiahe", "jiahe"), ("family", "jiahe"))
+        for name, tier in (("yangxin", "yangxin"), ("yiyang", "yiyang"), ("jiahe", "jiahe"), ("family", "jiahe"),
+                           ("content", "yangxin"), ("member", "yiyang"))
         for period in ("monthly", "yearly")
     }
     if product_id in aliases:
@@ -1777,11 +1838,15 @@ async def get_plans(user_id: str = Query("user-001")):
 
 
 def _get_plan_description(plan_id: str) -> str:
+    def chats(pid: str) -> str:
+        limit = daily_chat_limit_for_plan(pid)
+        return "不限次数对话" if limit == -1 else f"每天 {limit} 次对话"
+
     descriptions = {
-        "free": "基础功能，满足日常养生需求",
-        "yangxin": "无限聊天+今日计划，适合养生爱好者",
-        "yiyang": "深度建议+周总结，适合养生达人",
-        "jiahe": "家庭共享（4席位），适合全家使用"
+        "free": f"基础功能，{chats('free')}，满足日常养生需求",
+        "yangxin": f"{chats('yangxin')}+今日计划，适合养生爱好者",
+        "yiyang": f"{chats('yiyang')}+今日计划，对话次数是养心版的两倍",
+        "jiahe": f"家庭共享（{SUBSCRIPTION_PLANS['jiahe']['family_seats']} 个家人席位），适合全家使用",
     }
     return descriptions.get(plan_id, "")
 
@@ -1948,7 +2013,10 @@ async def alipay_create_order(
     if request.plan == "free":
         raise HTTPException(status_code=400, detail="免费方案无需创建支付订单")
     return await create_order(
-        CreateOrderRequest(product_id=f"{request.plan}_yearly", platform="alipay"),
+        CreateOrderRequest(
+            product_id={"yangxin": "content_yearly", "yiyang": "member_yearly"}.get(request.plan, f"{request.plan}_yearly"),
+            platform="alipay",
+        ),
         user_id,
     )
 
@@ -2071,13 +2139,10 @@ async def get_usage_stats(user_id: str = Depends(_payment_user)):
 
     sub = get_user_subscription(user_id)
 
-    limits = {
-        "free": {"daily_chat": 10, "daily_api": 50},
-        "yangxin": {"daily_chat": -1, "daily_api": -1},
-        "yiyang": {"daily_chat": -1, "daily_api": -1},
-        "jiahe": {"daily_chat": -1, "daily_api": -1},
-    }
-    limit = limits.get(sub.plan, limits["free"])
+    # 对话额度取权益注册表（以前免费写 10、付费写「无限」，与实际执行的 20 / 200 不符）
+    api_limits = {"free": 50, "yangxin": -1, "yiyang": -1, "jiahe": -1}
+    plan_id = sub.plan if sub.plan in SUBSCRIPTION_PLANS else "free"
+    limit = {"daily_chat": daily_chat_limit_for_plan(plan_id), "daily_api": api_limits.get(plan_id, 50)}
 
     return {
         "success": True,

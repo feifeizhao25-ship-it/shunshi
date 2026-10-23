@@ -5,10 +5,13 @@
 
 import pytest
 from fastapi.testclient import TestClient
+from tests.signed_in_client import SignedInClient
 from app.main import app
 
+pytestmark = pytest.mark.signed_in
 
-client = TestClient(app)
+
+client = SignedInClient(app)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -279,13 +282,13 @@ class TestPostpartumPlan:
         # 剖腹产应强调伤口愈合
         assert "伤口" in cesarean_phase1["focus"]
 
-    def test_postpartum_contains_tcm_formula(self):
-        """测试方案包含 TCM 处方建议"""
-        response = client.get("/api/v1/maternity/postpartum/natural")
-        data = response.json()
-        for phase in data["data"]["plan"]["plan"]:
-            assert "tcm_formula_suggestion" in phase
-            assert len(phase["tcm_formula_suggestion"]) > 0
+    def test_postpartum_gives_medication_notice_not_formula(self):
+        """产后各阶段只给「用药请遵医嘱」提示，不再给生化汤、八珍汤等方剂建议（顺时不开处方）"""
+        for delivery in ("natural", "cesarean"):
+            data = client.get(f"/api/v1/maternity/postpartum/{delivery}").json()
+            for phase in data["data"]["plan"]["plan"]:
+                assert "tcm_formula_suggestion" not in phase
+                assert "遵医嘱" in phase["medication_notice"]
 
     def test_postpartum_contains_breastfeeding_notes(self):
         """测试方案包含哺乳期饮食提示"""
