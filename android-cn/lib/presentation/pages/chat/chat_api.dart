@@ -11,7 +11,8 @@ String parseGuestToken(dynamic body) {
 class ChatReply {
   final String text;
   final List<String> sources;
-  ChatReply(this.text, this.sources);
+  final String? usageReminder;
+  ChatReply(this.text, this.sources, {this.usageReminder});
 }
 
 Future<ChatReply> sendChat(Dio client, String token, String text) async {
@@ -33,7 +34,17 @@ Future<ChatReply> sendChat(Dio client, String token, String text) async {
       (sources is! List || sources.any((s) => s is! String))) {
     throw const FormatException('回复来源格式错误');
   }
-  return ChatReply(content, sources == null ? [] : List<String>.from(sources));
+  String? reminder;
+  final rawReminder = body['usage_reminder'];
+  if (rawReminder is Map && rawReminder['text'] is String) {
+    final text = (rawReminder['text'] as String).trim();
+    if (text.isNotEmpty) reminder = text;
+  }
+  return ChatReply(
+    content,
+    sources == null ? [] : List<String>.from(sources),
+    usageReminder: reminder,
+  );
 }
 
 String chatFailureMessage(Object error) {

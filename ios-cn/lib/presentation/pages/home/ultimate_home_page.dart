@@ -11,6 +11,7 @@ import 'package:go_router/go_router.dart';
 import 'widgets/home_skeleton.dart';
 import '../../../core/solar_term/solar_term_table.dart';
 import '../../../data/services/offline_cache.dart';
+import '../../../core/config/app_config.dart';
 
 // ═══════════════════════════════════════════════════════════════
 // 十二时辰数据模型（本地计算）
@@ -253,7 +254,7 @@ class UltimateHomePage extends StatefulWidget {
 }
 
 class _UltimateHomePageState extends State<UltimateHomePage> {
-  static const _baseUrl = 'https://api.shunshi.app';
+  static const _baseUrl = AppConfig.apiBaseUrl;
   final _dio = Dio(BaseOptions(
     baseUrl: _baseUrl,
     connectTimeout: const Duration(seconds: 8),

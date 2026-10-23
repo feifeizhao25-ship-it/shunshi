@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../../design_system/theme.dart';
+import '../../../core/config/app_config.dart';
 
 /// 睡眠报告页 — 7天柱状图 + AI趋势分析 + 建议
 class SleepReportPage extends StatefulWidget {
@@ -30,7 +31,7 @@ class _SleepReportPageState extends State<SleepReportPage> {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('access_token') ?? '';
     return Dio(BaseOptions(
-      baseUrl: 'https://api.shunshi.app',
+      baseUrl: AppConfig.apiBaseUrl,
       headers: token.isNotEmpty ? {'Authorization': 'Bearer $token'} : {},
     ));
   }

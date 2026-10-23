@@ -10,6 +10,7 @@ import 'widgets/mood_section.dart';
 import 'widgets/premium_teaser.dart';
 import 'widgets/home_bottom_nav.dart';
 import 'widgets/home_skeleton.dart';
+import '../../../core/config/app_config.dart';
 
 /// 顺时首页 V3 — 复刻"懂生活的人在帮你安排一天"
 ///
@@ -29,7 +30,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final _dio = Dio(BaseOptions(
-    baseUrl: 'https://api.shunshi.app',
+    baseUrl: AppConfig.apiBaseUrl,
     connectTimeout: const Duration(seconds: 5),
     receiveTimeout: const Duration(seconds: 8),
   ));

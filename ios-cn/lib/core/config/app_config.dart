@@ -2,17 +2,19 @@
 /// 通过 --dart-define 在构建时注入，开发环境回退至本地地址。
 ///
 /// 用法示例:
-///   flutter run --dart-define=API_BASE_URL=https://api.shunshi.app
-///   flutter build ios --dart-define=API_BASE_URL=https://api.shunshi.app \
+///   flutter run --dart-define=API_BASE_URL=https://api.example.com
+///   flutter build ios --dart-define=API_BASE_URL=https://api.example.com \
 ///                      --dart-define=APP_VARIANT=ios-cn
 class AppConfig {
   AppConfig._();
 
   // ─── API ──────────────────────────────────────────────────────────────────
   /// 后端服务源地址（不含 /api/v1）
+  /// 未传编译参数时只连本机。正式包必须传入已备案的 API 域名。
+  /// 不要默认指向 shunshi.app / shunshi.ai。
   static const String apiBaseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'https://api.shunshi.app',
+    defaultValue: 'http://127.0.0.1:4000',
   );
 
   // ─── 应用变体 ──────────────────────────────────────────────────────────────

@@ -277,7 +277,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'privacy@shunshi.app',
+                  '联系邮箱待公司开通后填写',
                   style: TextStyle(
                     fontSize: 13,
                     color: ShunShiColors.primary,
