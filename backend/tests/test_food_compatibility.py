@@ -1,6 +1,8 @@
 """顺时 - 食物相克测试"""
 import pytest
 
+pytestmark = pytest.mark.signed_in
+
 
 class TestFoodCompatibilityList:
     def test_list_returns_200(self, client):

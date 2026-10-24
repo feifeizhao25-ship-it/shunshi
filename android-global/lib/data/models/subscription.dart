@@ -48,6 +48,9 @@ class SubscriptionPlan {
   final bool isCurrent;
   final int familySeats;
   final bool isRecommended;
+  /// ISO 4217 code from the API (e.g. USD). When the API gives none we show no amount
+  /// rather than guess (the shared backend currently returns domestic CNY amounts).
+  final String? currency;
 
   SubscriptionPlan({
     required this.id,
@@ -61,16 +64,28 @@ class SubscriptionPlan {
     this.isCurrent = false,
     this.familySeats = 0,
     this.isRecommended = false,
+    this.currency,
   });
+
+  static const pricePending = 'Price shown at checkout';
+
+  static String formatMoney(int cents, String? currency) {
+    if (currency == null || currency.isEmpty || currency.toUpperCase() == 'CNY') return pricePending;
+    const symbols = {'USD': '\$', 'EUR': '€', 'GBP': '£', 'AUD': 'A\$', 'CAD': 'C\$', 'JPY': '¥'};
+    final code = currency.toUpperCase();
+    final amount = (cents / 100).toStringAsFixed(code == 'JPY' ? 0 : 2).replaceAll(RegExp(r'\.00$'), '');
+    final sym = symbols[code];
+    return sym != null ? '$sym$amount' : '$code $amount';
+  }
 
   String get priceDisplay {
     if (priceCents == 0) return 'Free';
-    return '¥${(priceCents / 100).toStringAsFixed(0)}';
+    return formatMoney(priceCents, currency);
   }
 
   String get priceYearlyDisplay {
     if (priceYearlyCents == null) return '';
-    return '¥${(priceYearlyCents! / 100).toStringAsFixed(0)}';
+    return formatMoney(priceYearlyCents!, currency);
   }
 
   factory SubscriptionPlan.fromJson(Map<String, dynamic> json, {bool recommended = false}) {
@@ -89,8 +104,8 @@ class SubscriptionPlan {
     final featMap = {
       0: {'basic_chat': true},
       1: {'basic_chat': true, 'unlimited_chat': true, 'today_plan': true},
-      2: {'basic_chat': true, 'unlimited_chat': true, 'today_plan': true, 'deep_suggestions': true},
-      3: {'basic_chat': true, 'unlimited_chat': true, 'today_plan': true, 'deep_suggestions': true, 'family': true},
+      2: {'basic_chat': true, 'unlimited_chat': true, 'today_plan': true, 'deep_suggestions': false},
+      3: {'basic_chat': true, 'unlimited_chat': true, 'today_plan': true, 'deep_suggestions': false, 'family': true},
     };
     return SubscriptionPlan(
       id: json['id'] ?? 'free',
@@ -104,6 +119,7 @@ class SubscriptionPlan {
       isCurrent: json['is_current'] ?? false,
       familySeats: level == 3 ? 4 : 0,
       isRecommended: recommended || level == 2,
+      currency: (json['currency'] as String?)?.toUpperCase(),
     );
   }
 }
@@ -164,15 +180,29 @@ class UserSubscriptionStatus {
   });
 
   factory UserSubscriptionStatus.fromJson(Map<String, dynamic> json) {
+    // 后端 /api/v1/subscription/status 返回 plan / plan_name（中文）/ expires_at（秒级时间戳）；
+    // 原实现只认 plan_id 并对数字 DateTime.parse，一解析就抛异常，付费用户被显示成 Free。
+    final id = (json['plan_id'] ?? json['plan'] ?? 'free').toString();
+    const enNames = {'free': 'Free', 'yangxin': 'Wellness', 'yiyang': 'Premium', 'jiahe': 'Family'};
+    final rawExp = json['expires_at'];
+    DateTime? exp;
+    if (rawExp is num) {
+      exp = DateTime.fromMillisecondsSinceEpoch((rawExp * 1000).round());
+    } else if (rawExp is String && rawExp.isNotEmpty) {
+      exp = DateTime.tryParse(rawExp);
+    }
+    final rawFeatures = json['features'];
     return UserSubscriptionStatus(
-      planId: json['plan_id'] ?? 'free',
-      planName: json['plan_name'] ?? 'Free',
+      planId: id,
+      planName: enNames[id] ?? 'Free',
       isActive: json['is_active'] ?? false,
-      expiresAt: json['expires_at'] != null
-          ? DateTime.parse(json['expires_at'])
-          : null,
+      expiresAt: exp,
       dayRemaining: json['day_remaining'] ?? 0,
-      features: Map<String, bool>.from(json['features'] ?? {}),
+      features: rawFeatures is Map
+          ? Map<String, bool>.fromEntries(rawFeatures.entries
+              .where((e) => e.value is bool)
+              .map((e) => MapEntry(e.key.toString(), e.value as bool)))
+          : <String, bool>{},
     );
   }
 }

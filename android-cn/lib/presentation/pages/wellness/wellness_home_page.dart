@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../data/network/api_client.dart';
 import '../../../design_system/theme.dart';
+import '../../../core/solar_term/solar_term_table.dart';
 
 // ── 卡片数据模型 ──
 class _WellnessCategory {
@@ -44,7 +45,7 @@ class _WellnessHomePageState extends State<WellnessHomePage>
   final _api = ApiClient();
   String _bannerTitle = '午时养心，宜静坐调息';
   String _bannerDesc = '心经当令，适合闭目养神 15 分钟，配合深呼吸舒缓心火。';
-  String _bannerTag = '立夏 · 午时';
+  String _bannerTag = currentSolarTermName() ?? '今日建议';
   String _bannerEmoji = '🧘';
 
   static const _categories = [

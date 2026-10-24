@@ -19,11 +19,15 @@ import tempfile
 import os
 from typing import Optional
 
-from fastapi import APIRouter, HTTPException, UploadFile, File, Form, Query
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, Query
 from fastapi.responses import Response, JSONResponse
 from pydantic import BaseModel, Field
 
 from sqlalchemy import text
+from sqlalchemy.orm import Session
+
+from app.config import Settings
+from app.deps import current_user, get_session, get_settings
 from app.services.speech_service import (
     SpeechService,
     get_speech_service,
@@ -34,6 +38,12 @@ from app.services.speech_service import (
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/v1/speech", tags=["speech"])
+
+# 文字对话响应里与合规有关的字段，语音对话原样带上（AI 标识、年龄提示、连续使用提醒、安全标记）。
+_CHAT_PASSTHROUGH_FIELDS = frozenset({
+    "ai_generated", "ai_label", "ai_notice", "safety_flag", "care_status",
+    "usage_reminder", "age_declared", "minor_mode", "minor_notice", "senior_notice",
+})
 
 
 # ==================== 请求/响应模型 ====================
@@ -197,6 +207,9 @@ async def chat_voice(
     model: str = Form(default="sensevoice", description="ASR 模型"),
     tts_model: str = Form(default="fish-speech-1.5", description="TTS 模型"),
     voice: str = Form(default="benjamin", description="回复音色"),
+    user_id: str = Depends(current_user),
+    session: Session = Depends(get_session),
+    settings: Settings = Depends(get_settings),
 ):
     """
     语音对话: 语音输入 → 文字识别 → AI 回复 → 语音输出
@@ -221,22 +234,16 @@ async def chat_voice(
         if not asr_result.text:
             raise HTTPException(status_code=400, detail="未能识别出语音内容")
         
-        # Step 2: AI Chat
-        try:
-            from app.llm.siliconflow import chat as llm_chat
-            
-            ai_response = await llm_chat(
-                model="deepseek-v3.2",
-                prompt=asr_result.text,
-                system_prompt="你是顺时，一个温暖贴心的AI养生健康陪伴助手。回答简洁温暖，不超过100字。",
-                temperature=0.7,
-                max_tokens=200,
-            )
-            reply_text = ai_response.choices[0].get("message", {}).get("content", "抱歉，我暂时无法回答。")
-        except Exception as e:
-            logger.warning(f"[Speech API] AI Chat 调用失败: {e}")
-            reply_text = "抱歉，AI 服务暂时不可用。"
-        
+        # Step 2: AI 对话 —— 与文字对话走同一条链路（安全守卫、年龄保护、额度、境内模型、
+        # 输出拦截、AI 标识、连续使用提醒、对话记录），不在这里另写一套。
+        from app.routers.chat import ChatBody, chat as domestic_chat
+
+        result = await domestic_chat(
+            body=ChatBody(message=asr_result.text), user_id=user_id,
+            session=session, settings=settings,
+        )
+        reply_text = result["content"]
+
         # Step 3: TTS
         tts_result = await service.text_to_speech(
             text=reply_text[:500],  # 限制长度
@@ -248,6 +255,7 @@ async def chat_voice(
             content={
                 "asr_text": asr_result.text,
                 "reply_text": reply_text,
+                **{k: v for k, v in result.items() if k in _CHAT_PASSTHROUGH_FIELDS},
                 "audio_format": tts_result.format,
                 "audio_base64": tts_result.audio_data.hex(),
                 "asr_latency_ms": asr_result.latency_ms,
@@ -263,9 +271,12 @@ async def chat_voice(
     except HTTPException:
         raise
     except ASRError as e:
-        raise HTTPException(status_code=400, detail=f"语音识别失败: {e}")
+        logger.warning("[Speech API] chat-voice 识别失败: %s", e)
+        raise HTTPException(status_code=400, detail="没有听清，请再说一遍")
     except TTSError as e:
-        raise HTTPException(status_code=400, detail=f"语音合成失败: {e}")
+        logger.warning("[Speech API] chat-voice 合成失败: %s", e)
+        raise HTTPException(status_code=400, detail="语音播报暂时不可用，请稍后再试")
     except Exception as e:
-        logger.error(f"[Speech API] chat-voice 错误: {e}")
-        raise HTTPException(status_code=500, detail=f"语音对话服务异常: {e}")
+        # 原始异常只进日志，不放进响应（里面可能有接口地址、状态码、密钥片段）。
+        logger.error("[Speech API] chat-voice 错误: %s", e)
+        raise HTTPException(status_code=500, detail="语音对话暂时不可用，请稍后再试")

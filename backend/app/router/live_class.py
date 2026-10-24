@@ -88,7 +88,7 @@ class BookIn(BaseModel):
 
 @router.get("/list", summary="课程列表")
 def list_classes(
-    class_type: Optional[str] = Query(None, enum=["live", "recorded"]),
+    class_type: Optional[str] = Query(None, pattern="^(live|recorded)$"),
     category: Optional[str] = Query(None),
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=50),

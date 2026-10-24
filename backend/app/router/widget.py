@@ -75,13 +75,13 @@ async def list_widget_types():
 
 @router.get("/data/solar-term", summary="节气小组件数据")
 async def get_solar_term_widget():
-    today = date.today()
-    month = today.month
-    if month in [2, 3]: current = "lichun"
-    elif month in [4, 5]: current = "chunfen"
-    elif month in [6, 7, 8]: current = "dashu"
-    else: current = "dongzhi"
-    term = SOLAR_TERMS_MINI.get(current, {"name": "节气", "date_typical": "", "key_tip": "顺应节气养生"})
+    # 节气查天文计算的节气表（北京时间）；以前按月份分 4 档，大半年都显示「节气」两个字
+    from app.utils import solar_term_calendar
+
+    today = solar_term_calendar.beijing_today()
+    name = solar_term_calendar.term_on(today)
+    term = next((t for t in SOLAR_TERMS_MINI.values() if t["name"] == name),
+                {"name": name, "date_typical": "", "key_tip": "顺应节气，规律作息"})
     return {
         "success": True,
         "data": {

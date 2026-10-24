@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:record/record.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:dio/dio.dart';
+import '../../core/config/app_config.dart';
 
 /// 语音输入服务
 abstract class VoiceInput {
@@ -23,7 +24,7 @@ class VoiceService implements VoiceInput {
   VoiceService._();
 
   final _recorder = AudioRecorder();
-  static const String _baseUrl = 'https://api.shunshi.app';
+  static const String _baseUrl = AppConfig.apiBaseUrl;
   final _dio = Dio(BaseOptions(
     baseUrl: _baseUrl,
     connectTimeout: const Duration(seconds: 10),

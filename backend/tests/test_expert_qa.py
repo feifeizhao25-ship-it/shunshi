@@ -1,6 +1,8 @@
 """顺时 - 专家问答测试"""
 import pytest
 
+pytestmark = pytest.mark.admin_signed_in
+
 
 class TestExpertList:
     def test_experts_returns_200(self, client):

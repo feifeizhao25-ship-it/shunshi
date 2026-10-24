@@ -1,6 +1,8 @@
 """顺时 - 饮水追踪测试"""
 import pytest
 
+pytestmark = pytest.mark.signed_in
+
 
 class TestWaterTrackerLog:
     def test_log_returns_200(self, client):
@@ -13,9 +15,9 @@ class TestWaterTrackerLog:
         data = client.post("/api/v1/water-tracker/log", json=payload).json()
         assert data["success"] is True
 
-    def test_log_requires_user_id(self, client):
-        response = client.post("/api/v1/water-tracker/log", json={"amount_ml": 200})
-        assert response.status_code == 422
+    def test_log_requires_login(self, anonymous_client):
+        response = anonymous_client.post("/api/v1/water-tracker/log", json={"amount_ml": 200})
+        assert response.status_code == 401
 
 
 class TestWaterTrackerToday:

@@ -171,7 +171,7 @@ def weight_acupoints():
         "data": {
             "acupoints": [
                 {"name": "天枢穴", "location": "肚脐旁开2寸", "function": "调理肠胃，促进代谢"},
-                {"name": "丰隆穴", "location": "小腿外侧中点", "function": "化痰祛湿，利水消肿"},
+                {"name": "丰隆穴", "location": "小腿外侧中点", "function": "化痰祛湿，清爽少咸"},
                 {"name": "足三里", "location": "膝盖下三寸", "function": "补气健脾，增强代谢"},
                 {"name": "三阴交", "location": "内踝上三寸", "function": "调理内分泌，消水肿"},
                 {"name": "中脘穴", "location": "肚脐上四寸", "function": "健脾和胃，助消化"},

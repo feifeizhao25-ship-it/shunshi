@@ -284,11 +284,11 @@ class TestSafetyGuard:
         assert "110" in response
 
     def test_crisis_response_en(self, guard):
-        """危机响应(英文)包含热线"""
+        """危机响应(英文)包含热线：国内版用户用英文提问时人也在国内，给国内号码而不是美国的 988/911"""
         result = SafetyResult(level=SafetyLevel.CRISIS)
         response = guard.build_crisis_response(result, "en")
-        assert "988" in response
-        assert "911" in response
+        assert "12356" in response and "120" in response and "110" in response
+        assert "988" not in response and "911" not in response
 
     def test_empathy_prefix(self, guard):
         """共情前缀内容正确"""

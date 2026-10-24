@@ -12,6 +12,8 @@ from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict
 
+from ..aigc import ai_disclosure
+
 router = APIRouter(prefix="/api/v1/ingredient-scan", tags=["ai-ingredient-scan"])
 
 INGREDIENT_DATABASE = {
@@ -164,7 +166,9 @@ async def scan_ingredient(request: ScanResultRequest):
                 "found_in_database": False,
                 "recognition_model": recognition_model,
                 "message": "未能可靠匹配食材资料，请核对识别结果或直接输入名称"
-            }
+            },
+            # 图片识别结果来自模型：显式标识
+            **(ai_disclosure() if recognition_model else {}),
         }
 
     # 个性化建议
@@ -196,7 +200,8 @@ async def scan_ingredient(request: ScanResultRequest):
             "personalized_advice": personalized_advice,
             "season_advice": season_advice,
             "disclaimer": "营养及中医属性仅作一般信息参考，不能替代医生或营养师建议"
-        }
+        },
+        **(ai_disclosure() if recognition_model else {}),
     }
 
 

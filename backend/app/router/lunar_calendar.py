@@ -61,7 +61,7 @@ FESTIVALS = {
         "taboo_foods": ["冷粽过多", "过甜", "油炸"],
         "recommended_foods": ["粽子（限量）", "绿豆汤", "冬瓜薏米粥", "艾草茶"],
         "wellness_advice": "端午节前后是祛湿黄金期，佩戴艾草，饮艾草茶，避免过度贪凉。",
-        "tcm_principle": "温阳扶阳，祛湿排毒，防病驱邪",
+        "tcm_principle": "温阳扶阳，祛湿，防病驱邪",
         "activity_suggestions": ["划龙舟", "散步", "太极"],
     },
     "七夕": {

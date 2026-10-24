@@ -1,19 +1,24 @@
 import 'package:flutter/material.dart';
 import '../../design_system/theme.dart';
+import '../../core/solar_term/solar_term_table.dart';
 
-/// 获取当前节气
+/// 获取当前节气：查天文计算的节气表（与后端同一份数据）；超出表的年份才回退到下面的旧近似
 String _getCurrentSolarTerm() {
-  final month = DateTime.now().month;
-  final day = DateTime.now().day;
-  // Simplified solar term mapping
-  if (month == 4 && day >= 4) return '清明';
-  if (month == 4 && day >= 20) return '谷雨';
-  if (month == 3 && day >= 20) return '春分';
-  if (month == 5 && day >= 5) return '立夏';
-  if (month == 5 && day >= 21) return '小满';
-  if (month == 6 && day >= 5) return '芒种';
-  if (month == 6 && day >= 21) return '夏至';
-  return '清明'; // default fallback
+  final fromTable = currentSolarTermName();
+  if (fromTable != null) return fromTable;
+  // 超出节气表年份时的近似：24 节气完整月日表（误差约 ±1 天），按日期顺序查找，不会再回落到错误节气。
+  final now = beijingNow();
+  const approx = [
+    (1, 6, '小寒'), (1, 20, '大寒'), (2, 4, '立春'), (2, 19, '雨水'), (3, 6, '惊蛰'), (3, 21, '春分'),
+    (4, 5, '清明'), (4, 20, '谷雨'), (5, 6, '立夏'), (5, 21, '小满'), (6, 6, '芒种'), (6, 21, '夏至'),
+    (7, 7, '小暑'), (7, 23, '大暑'), (8, 8, '立秋'), (8, 23, '处暑'), (9, 8, '白露'), (9, 23, '秋分'),
+    (10, 8, '寒露'), (10, 23, '霜降'), (11, 7, '立冬'), (11, 22, '小雪'), (12, 7, '大雪'), (12, 22, '冬至'),
+  ];
+  var term = '冬至';
+  for (final t in approx) {
+    if (now.month > t.$1 || (now.month == t.$1 && now.day >= t.$2)) term = t.$3;
+  }
+  return term;
 }
 
 /// 季节信息
@@ -86,7 +91,18 @@ _SeasonInfo _getSeasonInfo(String term) {
       seasonIcon: Icons.grain,
     ),
   };
-  return seasons[term] ?? seasons['清明']!;
+  final known = seasons[term];
+  if (known != null) return known;
+  // 表里只写了 6 个春季节气：其它节气显示真实节气名 + 通用提示，不再冒充「清明」
+  final fallback = seasons['清明']!;
+  return _SeasonInfo(
+    term: term,
+    subtitle: '二十四节气',
+    description: '顺应节气，规律作息，饮食清淡，适度运动。',
+    gradientTop: fallback.gradientTop,
+    gradientBottom: fallback.gradientBottom,
+    seasonIcon: fallback.seasonIcon,
+  );
 }
 
 /// 季节 Hero 图片组件

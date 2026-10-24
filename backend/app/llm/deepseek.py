@@ -3,8 +3,9 @@
 Deepseek API Client (Official)
 
 支持的模型:
-- deepseek-chat (DeepSeek-V4)
-- deepseek-reasoner (DeepSeek-R1)
+- deepseek-flash (DeepSeek-V4.1-Flash)
+- deepseek-v4-pro (DeepSeek-V4-Pro)
+（deepseek-chat / deepseek-reasoner 已于 2026-07-24 停用，传入时自动映射到上面两个现行名）
 
 作者: Claw 🦅
 日期: 2026-05
@@ -29,14 +30,18 @@ DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "")
 DEEPSEEK_BASE_URL = os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
 
 # 模型映射
+# DeepSeek 官方更新日志（https://api-docs.deepseek.com/zh-cn/updates ，2026-04-24 条目）：旧模型名 deepseek-chat /
+# deepseek-reasoner 于 2026-07-24 停止使用；现行定价页（2026-10-13 核对）的模型参数名是 deepseek-flash（V4.1-Flash）
+# 与 deepseek-v4-pro。旧名、旧别名一律映射到现行名，避免历史配置调用失败。
 MODEL_NAME_MAP = {
-    "deepseek-v4": "deepseek-chat",
+    "deepseek-flash": "deepseek-flash",
     "deepseek-v4-pro": "deepseek-v4-pro",
-    "deepseek-v4-flash": "deepseek-v4-flash",
-    "deepseek-v3.2": "deepseek-v4-pro",  # v3.2 已下架，映射到 v4-pro
-    "deepseek-r1": "deepseek-reasoner",
-    "deepseek-chat": "deepseek-chat",
-    "deepseek-reasoner": "deepseek-reasoner",
+    "deepseek-v4-flash": "deepseek-flash",
+    "deepseek-v4": "deepseek-flash",
+    "deepseek-v3.2": "deepseek-v4-pro",  # v3.2 已下架
+    "deepseek-r1": "deepseek-v4-pro",
+    "deepseek-chat": "deepseek-flash",
+    "deepseek-reasoner": "deepseek-v4-pro",
 }
 
 

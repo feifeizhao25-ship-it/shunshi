@@ -15,6 +15,7 @@ import '../../core/theme/shunshi_spacing.dart';
 import '../../core/theme/shunshi_text_styles.dart';
 import '../../data/network/api_client.dart';
 import 'solar/solar_term_detail_page.dart';
+import '../../core/solar_term/solar_term_table.dart';
 
 // ── Mock 数据模型 ──────────────────────────────────────
 
@@ -407,6 +408,13 @@ List<SolarTermInfo> _getOrderedTerms() {
 SolarTermInfo _getCurrentSolarTerm() {
   final now = DateTime.now();
   final terms = _getOrderedTerms();
+  // 接口不可用时的本地兜底：先查节气表（与后端同一份数据），超出表的年份才用下面的固定月日
+  final fromTable = currentSolarTermName();
+  if (fromTable != null) {
+    for (final t in terms) {
+      if (t.name == fromTable) return t;
+    }
+  }
   // 按月份+日期排序找到最近的节气
   int currentIndex = 0;
   // 逻辑顺序: 2月立春开始

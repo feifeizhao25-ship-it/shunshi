@@ -12,19 +12,6 @@ from .retriever import retrieve
 
 logger = logging.getLogger(__name__)
 
-# 当前季节和节气的简易映射（中国农历近似）
-_SOLAR_TERMS = [
-    # (month, day, name, season)
-    (2, 4, "立春", "春"), (2, 19, "雨水", "春"), (3, 6, "惊蛰", "春"),
-    (3, 21, "春分", "春"), (4, 5, "清明", "春"), (4, 20, "谷雨", "春"),
-    (5, 6, "立夏", "夏"), (5, 21, "小满", "夏"), (6, 6, "芒种", "夏"),
-    (6, 21, "夏至", "夏"), (7, 7, "小暑", "夏"), (7, 23, "大暑", "夏"),
-    (8, 7, "立秋", "秋"), (8, 23, "处暑", "秋"), (9, 8, "白露", "秋"),
-    (9, 23, "秋分", "秋"), (10, 8, "寒露", "秋"), (10, 23, "霜降", "秋"),
-    (11, 7, "立冬", "冬"), (11, 22, "小雪", "冬"), (12, 7, "大雪", "冬"),
-    (12, 22, "冬至", "冬"), (1, 6, "小寒", "冬"), (1, 20, "大寒", "冬"),
-]
-
 _GL_SEASONS = [
     (3, "spring"), (6, "summer"), (9, "autumn"), (12, "winter"),
 ]
@@ -139,16 +126,14 @@ _EMOTION_ADVICE_GL = {
 
 
 def _get_current_solar_term_cn() -> tuple[str, str]:
-    """获取当前节气和季节（近似）"""
-    now = datetime.now()
-    month, day = now.month, now.day
+    """当前节气和季节：查天文计算的节气表（北京时间）。
 
-    current = ("大寒", "冬")  # 默认
-    for m, d, name, season in _SOLAR_TERMS:
-        if (month == m and day >= d) or month > m:
-            current = (name, season)
+    以前的月日表循环写错了（1 月的两项排在最后，10 月也会落到「大寒」）。
+    """
+    from app.utils import solar_term_calendar
 
-    return current
+    name = solar_term_calendar.current_term()
+    return name, solar_term_calendar.season_of(name)
 
 
 def _get_current_season_gl() -> str:

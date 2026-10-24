@@ -2,7 +2,7 @@
 from fastapi import APIRouter, Query, HTTPException
 from pydantic import BaseModel
 from typing import List, Optional
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 
 router = APIRouter(prefix="/api/v1/solar-terms", tags=["节气"])
 
@@ -618,13 +618,14 @@ SOLAR_TERMS = [
 # ============ Helper Functions ============
 
 def get_current_solar_term():
-    """获取当前节气"""
-    month = datetime.now().month
-    day = datetime.now().day
-    
-    # 简化逻辑：按月份返回对应节气
-    idx = ((month - 2) * 2 + (1 if day > 15 else 0)) % 24
-    return SOLAR_TERMS[idx]
+    """获取当前节气：查天文计算的节气表（北京时间）。
+
+    以前按「每月 15 日换节气」近似，2026-10-01 至 10-07 会提前显示寒露（实际 10-08 交节）。
+    """
+    from app.utils import solar_term_calendar
+
+    name = solar_term_calendar.current_term()
+    return get_solar_term_by_name(name) or SOLAR_TERMS[0]
 
 def get_solar_term_by_name(name: str):
     """根据名称获取节气"""
@@ -693,10 +694,13 @@ async def get_today_solar_term(locale: str = Query("zh-CN", description="语言:
     prev_term = SOLAR_TERMS[current_idx - 1] if current_idx > 0 else SOLAR_TERMS[-1]
     next_term = SOLAR_TERMS[current_idx + 1] if current_idx < len(SOLAR_TERMS) - 1 else SOLAR_TERMS[0]
     
-    # 生成七日养生建议
+    # 生成七日养生建议：每一天按节气表查当天所处的节气（以前是一天换一个节气）
+    from app.utils import solar_term_calendar
+
+    today = solar_term_calendar.beijing_today()
     seven_day_suggestions = []
     for i in range(7):
-        day_term = SOLAR_TERMS[(current_idx + i) % 24]
+        day_term = get_solar_term_by_name(solar_term_calendar.term_on(today + timedelta(days=i))) or current
         localized = _localize_term(day_term, locale)
         seven_day_suggestions.append({
             "day": i + 1,
@@ -717,42 +721,30 @@ async def get_today_solar_term(locale: str = Query("zh-CN", description="语言:
 
 @router.get("/upcoming", response_model=dict, summary="即将到来的节气", description="返回未来7天内即将到来的节气列表")
 async def get_upcoming_solar_term(locale: str = Query("zh-CN", description="语言: zh-CN/en-US")):
-    """获取即将到来的节气（7天内）"""
-    now = datetime.now()
+    """获取即将到来的节气（今天交节或 7 天内交节），日期查节气表（北京时间）。"""
+    from app.utils import solar_term_calendar
+
+    today = solar_term_calendar.beijing_today()
     upcoming = []
-    
-    for term in SOLAR_TERMS:
-        try:
-            start_str = f"{now.year}-{term['start_date']}"
-            start_date = datetime.strptime(start_str, "%Y-%m-%d")
-            
-            # 如果开始日期已过但结束日期未到，视为当前进行中
-            try:
-                end_str = f"{now.year}-{term['end_date']}"
-                end_date = datetime.strptime(end_str, "%Y-%m-%d")
-            except ValueError:
-                continue
-            
-            # 检查7天内
-            delta_start = (start_date - now).days
-            if -1 <= delta_start <= 7:  # -1 表示今天或进行中
-                days_until = max(delta_start, 0)
+    for year in (today.year, today.year + 1):
+        for row in solar_term_calendar.term_dates(year):
+            start = date.fromisoformat(row["date"])
+            delta = (start - today).days
+            term = get_solar_term_by_name(row["name"])
+            if term and 0 <= delta <= 7:
                 upcoming.append({
                     **_localize_term(term, locale),
-                    "days_until": days_until,
-                    "start_at": start_date.isoformat(),
+                    "days_until": delta,
+                    "start_at": datetime.combine(start, datetime.min.time()).isoformat(),
                 })
-        except (ValueError, KeyError):
-            continue
-    
     upcoming.sort(key=lambda x: x["days_until"])
-    
+
     return {
         "success": True,
         "data": {
             "items": upcoming[:5],
             "total": len(upcoming),
-            "now": now.isoformat(),
+            "now": datetime.now(solar_term_calendar.BEIJING).isoformat(),
         }
     }
 
@@ -762,15 +754,21 @@ async def get_solar_terms_schedule(
     locale: str = Query("zh-CN", description="语言: zh-CN/en-US"),
 ):
     """获取全年节气日程"""
-    target_year = year or datetime.now().year
+    from app.utils import solar_term_calendar
+
+    target_year = year or solar_term_calendar.beijing_today().year
+    rows = solar_term_calendar.term_dates(target_year)
+    following = solar_term_calendar.term_dates(target_year + 1)[0]
     schedule = []
-    for term in SOLAR_TERMS:
+    for i, row in enumerate(rows):
+        term = get_solar_term_by_name(row["name"]) or {}
+        nxt = rows[i + 1] if i + 1 < len(rows) else following
         schedule.append({
-            "id": term["id"],
-            "name": term["name"],
-            "date": f"{target_year}-{term['start_date']}",
-            "start_date": f"{target_year}-{term['start_date']}",
-            "end_date": f"{target_year}-{term['end_date']}",
+            "id": term.get("id", ""),
+            "name": row["name"],
+            "date": row["date"],
+            "start_date": row["date"],
+            "end_date": (date.fromisoformat(nxt["date"]) - timedelta(days=1)).isoformat(),
             "emoji": term.get("emoji", ""),
         })
     return {"success": True, "data": schedule}

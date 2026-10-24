@@ -10,6 +10,7 @@ import 'widgets/mood_section.dart';
 import 'widgets/premium_teaser.dart';
 import 'widgets/home_bottom_nav.dart';
 import 'widgets/home_skeleton.dart';
+import '../../../core/config/app_config.dart';
 
 /// 顺时首页 V3 — 复刻"懂生活的人在帮你安排一天"
 ///
@@ -29,7 +30,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final _dio = Dio(BaseOptions(
-    baseUrl: 'https://api.shunshi.app',
+    baseUrl: AppConfig.apiBaseUrl,
     connectTimeout: const Duration(seconds: 5),
     receiveTimeout: const Duration(seconds: 8),
   ));
@@ -148,7 +149,7 @@ class _HomePageState extends State<HomePage> {
     final h = DateTime.now().hour;
     if (h < 9) return '卯时大肠经旺，温水助排便。辰时胃经旺，适合吃早餐。';
     if (h < 14) return '午时心经当令，心血最旺。小憩可养心安神。';
-    if (h < 18) return '申时膀胱经旺，身体排毒高峰，多喝水帮助代谢。';
+    if (h < 18) return '下午时段，记得起身走动、小口多喝温水。';
     if (h < 22) return '戌时心包经旺，放松心情，释放一天的压力。';
     return '亥时三焦经旺，身体进入修复模式，早睡养阴。';
   }

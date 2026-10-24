@@ -193,7 +193,7 @@ class BoundariesPage extends StatelessWidget {
                         const SizedBox(height: 4),
                         Text(
                           '持续的情绪低落、失眠、食欲不振、有自我伤害的想法，请立即寻求专业帮助：\n'
-                          '• 拨打心理援助热线：400-161-9995\n'
+                          '• 拨打全国统一心理援助热线：12356\n'
                           '• 或前往就近医院精神科就医\n'
                           '• 你不是一个人，寻求帮助是一种勇气',
                           style: ShunshiTextStyles.body.copyWith(

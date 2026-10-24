@@ -11,6 +11,7 @@ from fastapi import APIRouter, HTTPException
 from fastapi.responses import Response
 from pydantic import BaseModel, Field
 
+from app.aigc import AI_HEADERS, ensure_prompt_allowed
 from app.multimodal.speech import generate_speech
 
 logger = logging.getLogger(__name__)
@@ -49,6 +50,7 @@ MiniMax TTS 语音合成接口，支持生成：
 )
 async def create_speech(req: SpeechGenerateRequest) -> Response:
     """生成语音"""
+    ensure_prompt_allowed(req.text)
     try:
         audio_bytes = await generate_speech(
             text=req.text,
@@ -76,6 +78,7 @@ async def create_speech(req: SpeechGenerateRequest) -> Response:
             headers={
                 "Content-Disposition": f'attachment; filename="shunshi_speech.{req.format}"',
                 "Content-Length": str(len(audio_bytes)),
+                **AI_HEADERS,
             },
         )
     except ValueError as e:
@@ -83,7 +86,7 @@ async def create_speech(req: SpeechGenerateRequest) -> Response:
         raise HTTPException(status_code=400, detail=str(e))
     except RuntimeError as e:
         logger.error(f"[Multimodal Speech] 生成失败: {e}")
-        raise HTTPException(status_code=502, detail=str(e))
+        raise HTTPException(status_code=502, detail="语音服务暂时不可用，请稍后再试")
     except Exception as e:
         logger.exception(f"[Multimodal Speech] 未知错误: {e}")
-        raise HTTPException(status_code=500, detail=f"内部错误: {e}")
+        raise HTTPException(status_code=500, detail="服务暂时不可用，请稍后再试")

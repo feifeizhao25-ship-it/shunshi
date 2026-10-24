@@ -14,8 +14,10 @@ import 'chat/chat_history_store.dart';
 import 'chat/chat_membership.dart';
 import 'chat/chat_api.dart';
 import 'chat/chat_widgets.dart';
+import '../../core/solar_term/solar_term_table.dart';
+import '../../core/config/app_config.dart';
 
-const _baseUrl = 'https://api.shunshi.app';
+const _baseUrl = AppConfig.apiBaseUrl;
 
 class ChatPage extends StatefulWidget {
   final String? conversationId;
@@ -94,7 +96,8 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
 
   String _userName = '';
   String _token = '';
-  final String _currentSolarTerm = '清明';
+  // 以前写死「清明」，全年对话开场都说「清明时节」；改为查节气表（与后端同一份数据）
+  final String _currentSolarTerm = currentSolarTermName() ?? '清明';
   final String _solarTermDesc = '春意渐深，万物清洁而明净。适合踏青、放风筝，心情也该舒展。';
   String? _conversationId;
 
@@ -277,7 +280,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
                     SuggestionCard(
                       type: 'crisis',
                       title: '紧急求助热线',
-                      subtitle: '400-161-9995 · 24小时心理援助',
+                      subtitle: '12356 · 全国统一心理援助热线',
                       icon: Icons.phone_in_talk,
                     ),
                   ]
@@ -325,6 +328,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
       List<SuggestionCard>? cards,
       List<String>? sources,
       String? convId,
+      String? usageReminder,
     }) {
       var reply = aiText;
       final c =
@@ -336,10 +340,18 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
               subtitle: '顺应天时，调和身心',
             ),
           ];
-      if (hasRisk) reply = '⚠️ 以下建议仅供参考，不能替代医生诊断。如有不适请及时就医。\n\n$reply';
-      reply = '$reply\n\n💡 以上建议基于中医养生理论，仅供参考';
+      if (hasRisk) reply = '⚠️ 以下内容仅供作息参考，不能替代医生诊断。如有不适请及时就医。\n\n$reply';
       if (convId != null) _conversationId = convId;
       setState(() {
+        if (usageReminder != null && usageReminder!.trim().isNotEmpty) {
+          _messages.add(
+            ChatMessage(
+              role: 'ai',
+              text: usageReminder!.trim(),
+              time: _fmt(DateTime.now()),
+            ),
+          );
+        }
         _messages.add(
           ChatMessage(
             role: 'ai',
@@ -360,7 +372,12 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
       final reply = await sendChat(_dio, requestToken, text);
       final prefs = await SharedPreferences.getInstance();
       if (!mounted || prefs.getString('auth_token') != requestToken) return;
-      handleAIReply(reply.text, cards: [], sources: reply.sources);
+      handleAIReply(
+        reply.text,
+        cards: [],
+        sources: reply.sources,
+        usageReminder: reply.usageReminder,
+      );
     } catch (error) {
       final prefs = await SharedPreferences.getInstance();
       if (!mounted || prefs.getString('auth_token') != requestToken) return;
@@ -504,8 +521,8 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
         ),
         content: const Text(
           '您提到的内容涉及健康安全风险。请您立即联系专业医疗机构或拨打：\n\n'
-          '• 24小时心理援助热线：400-161-9995\n'
-          '• 急救电话：120\n\n'
+          '• 全国统一心理援助热线：12356\n'
+          '• 急救电话：120，报警电话：110\n\n'
           '顺时AI不能替代专业医疗诊断。',
           style: TextStyle(
             fontSize: 15,
@@ -664,11 +681,19 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
         child: Column(
           children: [
             _buildTopBar(),
+            const Padding(
+              padding: EdgeInsets.fromLTRB(16, 6, 16, 2),
+              child: Text(
+                '你在和人工智能对话，不是真人',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+              ),
+            ),
             Expanded(child: _buildList()),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               child: Text(
-                '内容由AI生成，仅供健康养生参考，不构成医疗诊断建议。如有不适请及时就医。',
+                '内容由AI生成，仅供作息与节气安排参考，不构成医疗诊断或治疗建议。',
                 style: TextStyle(fontSize: 11, color: Colors.grey[500]),
                 textAlign: TextAlign.center,
               ),
@@ -726,7 +751,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
                       ),
                     ),
                     Text(
-                      '温暖陪伴',
+                      'AI 生成',
                       style: TextStyle(
                         fontFamily: ShunShiTypography.sansFamily,
                         fontSize: 12,
@@ -794,6 +819,20 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
                   color: ShunShiColors.textTertiary,
                 ),
                 onSelected: (v) async {
+                  if (v == 'end') {
+                    setState(() {
+                      _messages
+                        ..clear()
+                        ..add(ChatMessage(
+                          role: 'ai',
+                          text: '这次陪伴先到这里。你在和人工智能对话，不是真人。需要的时候可以再开始。',
+                          time: _fmt(DateTime.now()),
+                        ));
+                      _conversationId = null;
+                    });
+                    await _saveConversation();
+                    return;
+                  }
                   if (v == 'clear') {
                     setState(() => _messages.clear());
                     await _saveConversation();
@@ -801,6 +840,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
                   }
                 },
                 itemBuilder: (_) => [
+                  const PopupMenuItem(value: 'end', child: Text('结束陪伴')),
                   const PopupMenuItem(value: 'clear', child: Text('清空对话')),
                 ],
               ),

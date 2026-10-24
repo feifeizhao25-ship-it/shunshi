@@ -735,7 +735,7 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
       buffer.writeln('╚══════════════════════════════════════╝');
       buffer.writeln();
       buffer.writeln('Report ID: ${r.resultId}');
-      buffer.writeln('Test Date：${DateTime.now().toString().substring(0, 19)}');
+      buffer.writeln('Test Date: ${DateTime.now().toString().substring(0, 19)}');
       buffer.writeln();
       buffer.writeln('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
       buffer.writeln('  Your Body Type');

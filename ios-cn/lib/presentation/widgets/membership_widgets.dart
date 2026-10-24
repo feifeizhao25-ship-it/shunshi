@@ -61,7 +61,7 @@ class _MembershipCardState extends State<MembershipCard> {
               const SizedBox(width: 12),
               const Expanded(
                 child: Text(
-                  '养心版会员',
+                  '内容订阅会员',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
@@ -80,10 +80,9 @@ class _MembershipCardState extends State<MembershipCard> {
 
           // 权益列表
           ...[
-            ('💬', '无限AI对话'),
-            ('📊', '深度养生建议'),
-            ('👨‍👩‍👧‍👦', '家庭共享'),
-            ('📅', '专属节气报告'),
+            ('💬', '更多每日对话次数'),
+            ('📅', '今日计划'),
+            ('🌿', '年付：内容订阅 ¥399 / 会员 ¥888'),
           ].map((item) => Padding(
             padding: const EdgeInsets.only(bottom: 8),
             child: Row(
@@ -180,7 +179,7 @@ class TokenBalanceBar extends StatelessWidget {
             Expanded(
               child: Text(
                 isLow
-                    ? '升级养心版，无限对话'
+                    ? '升级会员，每天更多对话'
                     : '今日对话剩余 $remaining 次',
                 style: TextStyle(
                   fontSize: 12,

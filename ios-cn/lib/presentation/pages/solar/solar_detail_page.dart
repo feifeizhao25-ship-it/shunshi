@@ -5,6 +5,7 @@ library;
 import 'package:flutter/material.dart';
 import '../../../../design_system/theme.dart';
 import 'package:dio/dio.dart';
+import '../../../core/config/app_config.dart';
 
 class SolarDetailPage extends StatefulWidget {
   const SolarDetailPage({super.key});
@@ -26,7 +27,7 @@ class _SolarDetailPageState extends State<SolarDetailPage> {
   Future<void> _loadData() async {
     try {
       final dio = Dio(BaseOptions(
-        baseUrl: 'https://api.shunshi.app',
+        baseUrl: AppConfig.apiBaseUrl,
         connectTimeout: const Duration(seconds: 5),
       ));
       final res = await dio.get('/api/v1/solar-wellness/daily-advice');

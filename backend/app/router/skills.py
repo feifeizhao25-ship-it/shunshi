@@ -23,6 +23,8 @@ from ..skills.orchestrator import SkillOrchestrator, SkillExecutionResult
 
 from ..skill_access import SkillAccess, get_skill_access
 
+from ..aigc import AI_IDENTITY_NOTICE, AI_LABEL
+
 router = APIRouter(prefix="/api/v1/skills")
 
 
@@ -93,6 +95,10 @@ class ExecuteResponse(BaseModel):
     total_latency_ms: int
     safety_flag: str = "none"
     follow_up: Optional[Dict[str, Any]] = None
+    # AI 生成内容的显式标识：作为字段默认值，新增出口不会漏。
+    ai_generated: bool = True
+    ai_label: str = AI_LABEL
+    ai_notice: str = AI_IDENTITY_NOTICE
 
 
 class DailyPlanRequest(BaseModel):

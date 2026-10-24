@@ -21,7 +21,7 @@ from typing import Optional, List, Dict, Any
 
 from pydantic import BaseModel
 
-from app.safety.config import SAFETY_CONFIG
+from app.safety.config import CRISIS_EMERGENCY_TEXT, CRISIS_HOTLINE, CRISIS_HOTLINE_NAME, SAFETY_CONFIG
 from app.safety.rules import (
     get_rules,
     reload_rules,
@@ -74,9 +74,9 @@ CRISIS_RESPONSE_CN = (
     "我感受到你现在非常痛苦，你的感受很重要。\n\n"
     "在你继续之前，我想让你知道有人可以帮你：\n\n"
     "📞 **心理援助热线**\n"
-    "- 全国心理援助热线：12356\n\n"
+    f"- {CRISIS_HOTLINE_NAME}：{CRISIS_HOTLINE}\n\n"
     "🏥 **紧急情况**\n"
-    "如果你或身边有人处于危险中，请立即拨打 120 或 110。\n\n"
+    f"{CRISIS_EMERGENCY_TEXT}\n\n"
     "你不需要独自面对这些。寻求帮助是勇敢的表现。"
 )
 
@@ -84,11 +84,10 @@ CRISIS_RESPONSE_EN = (
     "I can feel that you're going through a really difficult time right now, "
     "and your feelings matter.\n\n"
     "Before we continue, I want you to know there are people who can help:\n\n"
-    "📞 **24/7 Crisis Hotlines**\n"
-    "- National Suicide Prevention Lifeline: 988\n"
-    "- Crisis Text Line: Text HOME to 741741\n\n"
+    "📞 **Psychological assistance hotline (China)**\n"
+    f"- {CRISIS_HOTLINE_NAME} ({CRISIS_HOTLINE})\n\n"
     "🏥 **Emergency**\n"
-    "If you or someone nearby is in immediate danger, please call 911.\n\n"
+    "If you or someone nearby is in immediate danger, please call 120 (ambulance) or 110 (police).\n\n"
     "You don't have to face this alone. Reaching out for help is an act of courage."
 )
 
@@ -115,7 +114,7 @@ EMPATHY_PREFIX_EN = (
 # 依赖检测响应后缀
 DEPENDENCY_SUFFIX_CN = (
     "\n\n另外，虽然我很愿意陪伴你，但你的感受值得被更多的人听到。"
-    "如果你愿意，也可以和身边信任的人聊聊，或者拨打心理援助热线 12356。"
+    f"如果你愿意，也可以和身边信任的人聊聊，或者拨打{CRISIS_HOTLINE_NAME} {CRISIS_HOTLINE}。"
 )
 
 

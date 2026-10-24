@@ -138,7 +138,7 @@ CROWD_KNOWLEDGE = [
                 "每年做一次肝功能检查",
                 "少吃油炸和加工食品，减轻肝脏负担",
                 "保持情绪舒畅，怒伤肝",
-                "晨起空腹一杯温水，促进肝脏排毒",
+                "晨起空腹一杯温水，让身体舒服地开始一天",
             ]
         }
     },
@@ -156,7 +156,7 @@ CROWD_KNOWLEDGE = [
                 {"title": "黄芪当归乌鸡汤", "desc": "补气养血，改善面色和脱发", "frequency": "每周2次", "difficulty": "中等"},
                 {"title": "黑豆红枣粥", "desc": "补肾养血，富含植物雌激素", "frequency": "每周3次", "difficulty": "简单"},
                 {"title": "核桃芝麻糊", "desc": "补肾固发，改善产后脱发", "frequency": "每周3次", "difficulty": "简单"},
-                {"title": "山药排骨汤", "desc": "健脾益气，增强免疫力", "frequency": "每周2次", "difficulty": "中等"},
+                {"title": "山药排骨汤", "desc": "健脾益气，日常保养", "frequency": "每周2次", "difficulty": "中等"},
             ],
             "exercise": [
                 {"title": "凯格尔运动", "desc": "产后盆底肌恢复，预防漏尿", "frequency": "每日3组", "difficulty": "简单"},
@@ -324,7 +324,7 @@ CROWD_KNOWLEDGE = [
             "diet": [
                 {"title": "山药小米粥", "desc": "健脾养胃，容易消化", "frequency": "每日早餐", "difficulty": "简单"},
                 {"title": "芝麻核桃粉", "desc": "补肾健脑，改善记忆力", "frequency": "每日1勺", "difficulty": "简单"},
-                {"title": "鱼汤/鸡汤", "desc": "优质蛋白，增强免疫力", "frequency": "每周3次", "difficulty": "简单"},
+                {"title": "鱼汤/鸡汤", "desc": "优质蛋白，日常保养", "frequency": "每周3次", "difficulty": "简单"},
                 {"title": "食物煮烂煮软", "desc": "减轻胃肠负担，促进消化吸收", "frequency": "长期", "difficulty": "简单"},
             ],
             "exercise": [
@@ -389,7 +389,7 @@ CROWD_KNOWLEDGE = [
             "diet": [
                 {"title": "孕早期：生姜陈皮水止吐", "desc": "缓解孕吐恶心", "frequency": "孕吐时", "difficulty": "简单"},
                 {"title": "孕中期：补铁食物（猪肝/菠菜）", "desc": "预防孕期贫血", "frequency": "每周3次", "difficulty": "简单"},
-                {"title": "孕晚期：冬瓜鲫鱼汤", "desc": "利水消肿，补充蛋白质", "frequency": "每周2次", "difficulty": "中等"},
+                {"title": "孕晚期：冬瓜鲫鱼汤", "desc": "清爽少咸，补充蛋白质", "frequency": "每周2次", "difficulty": "中等"},
                 {"title": "全孕期：叶酸+DHA", "desc": "按医嘱补充，不可过量", "frequency": "每日", "difficulty": "简单"},
             ],
             "exercise": [

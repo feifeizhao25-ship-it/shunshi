@@ -331,7 +331,7 @@ class UpgradeNudge extends StatelessWidget {
             Icon(Icons.auto_awesome, size: 18, color: ShunShiColors.gold),
             const SizedBox(width: 10),
             Expanded(
-                child: Text('继续深度对话，养心版一键解锁',
+                child: Text('继续深度对话，开通会员一键解锁',
                     style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w500,

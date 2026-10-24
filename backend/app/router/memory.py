@@ -182,6 +182,61 @@ async def delete_all_memories(user_id: str = Depends(current_user)):
     }
 
 
+
+class UpdateMemoryRequest(BaseModel):
+    content: str
+    confidence: Optional[float] = None
+
+class RetentionRequest(BaseModel):
+    retention_days: int
+
+@router.get("/search")
+async def search_memories(q: str = Query(..., min_length=1, description="搜索关键词"), user_id: str = Depends(current_user), limit: int = Query(50, le=100)):
+    """按关键词搜索本人记忆。"""
+    results = memory_system.search_memories(user_id, q, limit=limit)
+    return {"user_id": user_id, "query": q, "count": len(results), "memories": results}
+
+
+@router.get("/settings/retention")
+async def get_retention(user_id: str = Depends(current_user)):
+    """查询记忆保留期设置 (null=不限期)。"""
+    return {"user_id": user_id, "retention_days": memory_system.get_retention_days(user_id)}
+
+@router.put("/settings/retention")
+async def set_retention(request: RetentionRequest, user_id: str = Depends(current_user)):
+    """设置记忆保留期(天); <=0 不限期。设置后立即清理过期记忆。"""
+    if request.retention_days < 0 or request.retention_days > 3650:
+        raise HTTPException(status_code=422, detail="保留期须在 0-3650 天之间 (0=不限期)")
+    deleted = memory_system.set_retention_days(user_id, request.retention_days)
+    return {"success": True, "retention_days": request.retention_days, "pruned_count": deleted}
+
+@router.put("/{memory_id}")
+async def update_memory(memory_id: str, request: UpdateMemoryRequest, user_id: str = Depends(current_user)):
+    """更新单条记忆内容 (仅本人)。"""
+    ok = memory_system.update_memory_content(memory_id, user_id, request.content, request.confidence)
+    if not ok:
+        raise HTTPException(status_code=404, detail="记忆不存在或无权修改")
+    return {"success": True, "message": "记忆已更新"}
+
+@router.get("/report")
+async def export_report(format: str = Query("pdf", description="pdf|docx|md"), user_id: str = Depends(current_user), limit: int = Query(200, le=500)):
+    """导出可读养生记忆报告 (PDF/Word/Markdown); JSON 仍走 /export。"""
+    from fastapi.responses import Response
+    from app.services.report_export import build_pdf, build_docx, build_markdown
+    memories = memory_system.get_recent_memories(user_id=user_id, limit=limit, memory_type=None)
+    fmt = format.lower()
+    if fmt == "md":
+        return Response(content=build_markdown(user_id, memories), media_type="text/markdown", headers={"Content-Disposition": "attachment; filename=shunshi-report.md"})
+    if fmt == "docx":
+        return Response(content=build_docx(user_id, memories), media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document", headers={"Content-Disposition": "attachment; filename=shunshi-report.docx"})
+    if fmt == "pdf":
+        try:
+            data = build_pdf(user_id, memories)
+        except RuntimeError as exc:
+            raise HTTPException(status_code=501, detail=str(exc))
+        return Response(content=data, media_type="application/pdf", headers={"Content-Disposition": "attachment; filename=shunshi-report.pdf"})
+    raise HTTPException(status_code=422, detail="format 仅支持 pdf|docx|md")
+
 @router.delete("/{memory_id}")
 async def delete_memory(
     memory_id: str,

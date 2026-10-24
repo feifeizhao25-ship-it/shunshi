@@ -636,7 +636,8 @@ class TestExerciseErrorHandling:
         assert response.status_code == 404
         data = response.json()
         assert "detail" in data
-        assert "Constitution type" in data["detail"]
+        # 国内版界面全中文：原来的英文原文 "Constitution type ... not found" 由统一出口换成中文（app/errors.py）
+        assert data["detail"] == "没有找到相关内容"
 
     def test_valid_routes_return_200(self, client):
         """所有有效路由都返回 200"""

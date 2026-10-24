@@ -78,7 +78,11 @@ def test_ai_chat_contract_via_shunshi_router(gateway_client):
     )
     assert response.status_code == 200
     assert response.json()["content"]
-    assert captured["payload"]["messages"][0] == {"role": "system", "content": chat_module.SYSTEM_PROMPT}
+    from app.services.age_policy import BASE_IDENTITY_RULES
+
+    # 服务端提示词 = 固定策略 + 面向所有人的身份规则；客户端传来的 prompt 不得替换它。
+    assert captured["payload"]["messages"][0] == {
+        "role": "system", "content": chat_module.SYSTEM_PROMPT + BASE_IDENTITY_RULES}
     assert all(item["content"] != "系统提示词" for item in captured["payload"]["messages"])
     assert captured["payload"]["messages"][-1] == {"role": "user", "content": "最近总是失眠"}
     assert captured["tier"] == "free"

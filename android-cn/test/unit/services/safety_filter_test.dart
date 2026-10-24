@@ -51,7 +51,7 @@ void main() {
         final result = await filter.check('我想自杀');
         expect(result.isSafe, isFalse);
         expect(result.flag, 'sensitive');
-        expect(result.response, contains('400-161-9995'));
+        expect(result.response, contains('12356'));
       });
 
       test('自残关键词触发拦截', () async {

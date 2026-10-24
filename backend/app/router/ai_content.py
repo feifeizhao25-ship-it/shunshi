@@ -410,7 +410,7 @@ async def batch_generate(req: BatchGenerateRequest):
 async def daily_tip(
     user_id: str = Query(...),
     constitution_type: str = Query(...),
-    lang: str = Query("zh", regex="^(zh|en)$"),
+    lang: str = Query("zh", pattern="^(zh|en)$"),
 ):
     """返回当日不重复的个性化养生贴士"""
     season = _get_current_season()

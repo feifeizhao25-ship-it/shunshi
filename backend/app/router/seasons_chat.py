@@ -229,7 +229,7 @@ async def seasons_chat(
         
         response = await client.chat(
             messages=all_messages,
-            model="deepseek-chat",
+            model="deepseek-flash",
             temperature=0.8,
             max_tokens=300
         )

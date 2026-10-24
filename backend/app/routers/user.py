@@ -440,6 +440,17 @@ def delete_account(
         ):
             result = session.execute(delete(model).where(column == user_id))
             counts[model.__tablename__] = result.rowcount
+        # 别人家庭席位里指向本人的引用：席位属于邀请方，不删；只把本人的账号 ID 与名字抹掉。
+        result = session.execute(
+            update(FamilySeat).where(FamilySeat.member_user_id == user_id)
+            .values(member_user_id=None, member_name="已注销成员")
+        )
+        counts["family_seats(anonymized_as_member)"] = result.rowcount
+        # 验证码表以手机号为键（含验证码哈希与尝试次数），没有 user_id，按手机号清。
+        phone = session.scalar(select(User.phone).where(User.id == user_id))
+        if phone:
+            result = session.execute(delete(SmsCode).where(SmsCode.phone == phone))
+            counts["sms_codes"] = result.rowcount
         # The durable intent survives any later record/product store failure.
         session.add(AccountErasureJob(user_id=user_id))
         result = session.execute(delete(User).where(User.id == user_id))

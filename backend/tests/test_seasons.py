@@ -1,11 +1,12 @@
-"""季节/首页模块：dashboard 空态不编造；onboarding/音频进度真实落库；内容 fail-closed。"""
+"""季节/首页模块：dashboard 按节气等真实输入给卡、不编造；onboarding/音频进度真实落库；内容 fail-closed。"""
 
 
 def test_dashboard_requires_auth(client):
     assert client.get("/api/v1/seasons/home/dashboard").status_code == 401
 
 
-def test_dashboard_empty_state(client, auth_headers):
+def test_dashboard_has_term_card_with_reason(client, auth_headers):
+    """以前首页固定返回空态；现在至少有一张按节气表生成、带理由的卡（详见 test_home_dashboard.py）"""
     response = client.get(
         "/api/v1/seasons/home/dashboard",
         params={"hemisphere": "north"},
@@ -14,9 +15,8 @@ def test_dashboard_empty_state(client, auth_headers):
     assert response.status_code == 200
     data = response.json()
     assert isinstance(data["greeting"], str) and data["greeting"]
-    # 无内容数据源：空态结构，不编造
-    assert data["daily_insight"] is None
-    assert data["suggestions"] == []
+    assert data["daily_insight"]["text"]
+    assert any(card["basis"] == "solar_term" and card["reason"] for card in data["suggestions"])
     assert data["hemisphere"] == "north"
 
 

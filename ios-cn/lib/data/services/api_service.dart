@@ -826,10 +826,11 @@ class SubscriptionService {
   List<Map<String, dynamic>> _fallbackPlans() => [
     {'id': 'free', 'name': '免费版', 'price': 0, 'daily_ai_limit': 5,
      'features': ['AI 对话', '基础养生', '每日建议']},
-    {'id': 'yangxin', 'name': '养心会员', 'price': 29, 'daily_ai_limit': 50,
-     'features': ['AI 对话', '全部养生功能', '家庭关怀', '专属体质报告', '优先客服']},
-    {'id': 'yiyang', 'name': '颐养会员', 'price': 199, 'daily_ai_limit': 100,
-     'features': ['AI 对话', '全部养生功能', '家庭关怀', '专属体质报告', '优先客服', '线下活动', '专属顾问']},
+    // 0S3：只卖年付；额度以后端权益注册表为准，这里只是离线兜底展示
+    {'id': 'yangxin', 'name': '内容订阅', 'price': 399, 'period': 'year', 'daily_ai_limit': 100,
+     'features': ['AI 对话', '全部养生内容']},
+    {'id': 'yiyang', 'name': '会员', 'price': 888, 'period': 'year', 'daily_ai_limit': 200,
+     'features': ['AI 对话', '全部养生内容', '今日计划']},
   ];
 
   /// 订阅

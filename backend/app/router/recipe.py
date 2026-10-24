@@ -1,5 +1,5 @@
 """
-顺时 — 食疗方剂 API
+顺时 — 食疗食谱 API
 提供体质食疗配方、节气美食、功效检索与烹饪指南。
 """
 
@@ -10,7 +10,7 @@ from datetime import datetime
 router = APIRouter(prefix="/api/v1/recipes", tags=["recipes"])
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 食疗方剂知识库
+# 食疗食谱知识库
 # ─────────────────────────────────────────────────────────────────────────────
 RECIPES = [
     {
@@ -33,10 +33,10 @@ RECIPES = [
             "调味可加少许冰糖或盐。",
         ],
         "benefits": ["健脾益气", "补中焦", "祛湿气", "改善疲劳"],
-        "tcm_principle": "脾为后天之本，气血生化之源。山药补脾，薏米祛湿，两者相合专治脾气虚弱、湿气困重。",
+        "tcm_principle": "山药、薏米都是常见的药食同源食材，传统上用来健脾、祛湿，家常煮粥即可。",
         "prep_time_minutes": 50,
         "difficulty": "easy",
-        "cultural_note": "四君子汤化粥，温和而有效，四季皆宜，尤宜脾虚食少者。",
+        "cultural_note": "家常粥品，四季皆宜；有慢性病或正在服药的人，饮食调整请先问医生。",
     },
     {
         "id": "jujube_longan_soup",
@@ -71,7 +71,7 @@ RECIPES = [
         "seasons": ["summer"],
         "constitution_types": ["damp_heat", "heat"],
         "ingredients": [
-            {"name": "绿豆", "amount": "50g", "tcm_property": "清热解毒，利水消肿"},
+            {"name": "绿豆", "amount": "50g", "tcm_property": "清热解毒，清爽少咸"},
             {"name": "薏苡仁", "amount": "30g", "tcm_property": "健脾祛湿，清热排脓"},
             {"name": "冰糖", "amount": "适量", "tcm_property": "调味"},
             {"name": "水", "amount": "1000ml", "tcm_property": ""},
@@ -82,7 +82,7 @@ RECIPES = [
             "大火烧开转小火，煮60分钟至豆烂。",
             "加冰糖调味。",
         ],
-        "benefits": ["清热祛湿", "利水消肿", "清热解毒", "缓解痘痘"],
+        "benefits": ["清热祛湿", "清爽少咸", "清热解毒", "缓解痘痘"],
         "tcm_principle": "绿豆清热解毒，薏米祛湿健脾，夏季湿热最宜。",
         "prep_time_minutes": 70,
         "difficulty": "easy",
@@ -163,7 +163,7 @@ RECIPES = [
             "大火烧开转小火，炖60分钟。",
             "取出黄芪包，加盐调味。",
         ],
-        "benefits": ["补气健脾", "益卫气固表", "增强免疫", "补气补虚"],
+        "benefits": ["补气健脾", "益卫气固表", "日常保养", "补气补虚"],
         "tcm_principle": "黄芪为补气第一要药，鸡肉补气健脾，长期饮用可增强体质。",
         "prep_time_minutes": 75,
         "difficulty": "easy",
@@ -330,7 +330,7 @@ def _current_season(hemisphere: str = "north") -> str:
 # 端点
 # ─────────────────────────────────────────────────────────────────────────────
 
-@router.get("/", summary="食疗方剂列表")
+@router.get("/", summary="食疗食谱列表")
 async def list_recipes(
     season: Optional[str] = Query(None, description="季节: spring/summer/autumn/winter"),
     constitution: Optional[str] = Query(None, description="体质类型"),
@@ -338,7 +338,7 @@ async def list_recipes(
     difficulty: Optional[str] = Query(None, description="难度: easy/medium"),
     limit: int = Query(10, ge=1, le=20),
 ):
-    """返回食疗方剂列表，支持按季节、体质、分类、难度筛选。"""
+    """返回食疗食谱列表，支持按季节、体质、分类、难度筛选。"""
     results = RECIPES.copy()
 
     if season:

@@ -2,6 +2,7 @@
 /// Wellness Diary页 V3 — 接 API
 library;
 
+import '../../../core/solar_term/solar_term_en.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import '../../../core/theme/shunshi_colors.dart';
@@ -110,8 +111,8 @@ class _DiaryPageV2State extends State<DiaryPageV2> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final now = DateTime.now();
-    final solarTerms = ['Minor Cold','Major Cold','Start of Spring','Rain Water','Awakening','Spring Equinox','Clear & Bright','Grain Rain','Start of Summer','Grain Buds','Grain in Ear','Summer Solstice','Minor Heat','Major Heat','Start of Autumn','End of Heat','White Dew','Autumn Equinox','Cold Dew','Frost Descent','Start of Winter','Minor Snow','Major Snow','Winter Solstice'];
-    final termIdx = ((now.month - 1) * 2 + (now.day >= 6 ? 1 : 0)) % 24;
+    // 按天文节气表取当天节气（原来按“每月 6 日切换”估算，并且整体错位一格，10/16 会显示成 Frost Descent）
+    final termName = currentSolarTermEn()?.$1 ?? '';
     
     return Scaffold(
 
@@ -134,7 +135,7 @@ class _DiaryPageV2State extends State<DiaryPageV2> {
                       fontSize: 22, fontWeight: FontWeight.bold, color: ShunShiColors.textPrimary,
                     )),
                     const Spacer(),
-                    Text('${now.month}/${now.day} · ${solarTerms[termIdx]}',
+                    Text('${now.month}/${now.day}${termName.isEmpty ? '' : ' · $termName'}',
                       style: TextStyle(fontSize: 13, color: ShunShiColors.textTertiary)),
                   ]),
                 ),

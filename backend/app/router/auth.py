@@ -961,7 +961,7 @@ async def google_auth(request: GoogleAuthRequest):
                     raise HTTPException(status_code=401, detail="Google token verification failed")
                 token_info = await resp.json()
     except aiohttp.ClientError as e:
-        raise HTTPException(status_code=502, detail=f"Google verification service unavailable: {e}")
+        raise HTTPException(status_code=502, detail="第三方登录服务暂时不可用，请稍后再试")
 
     google_user_id = token_info.get("sub")
     google_email = token_info.get("email", request.email)
@@ -1080,7 +1080,7 @@ async def apple_login(request: AppleLoginRequest):
     try:
         token_data = await verify_fn(request.identity_token, APPLE_BUNDLE_ID)
     except ValueError as e:
-        raise HTTPException(status_code=401, detail=f"Apple token 验证失败: {e}")
+        raise HTTPException(status_code=401, detail="Apple 登录验证失败，请重新登录")
 
     apple_user_id = token_data["sub"]
     apple_email = token_data.get("email") or request.email
@@ -1221,7 +1221,7 @@ async def apple_refresh_token(request: AppleRefreshRequest):
             token_response = resp.json()
     except Exception as e:
         logger.error(f"[Apple] 刷新 token 失败: {e}")
-        raise HTTPException(status_code=502, detail=f"Apple token 刷新失败: {e}")
+        raise HTTPException(status_code=502, detail="Apple 登录状态刷新失败，请稍后重试")
 
     # 返回 Apple 的 refresh_token (不存储，由客户端保存)
     # Apple 的 access_token 有效期仅 1 小时

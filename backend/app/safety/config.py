@@ -3,6 +3,16 @@
 SafeGuard Configuration
 """
 
+# ── 危机热线：后端唯一来源 ──────────────────────────────────────────────
+# 所有面向用户的危机/求助文案都从这里取号码，不要在别处写死（tests/test_crisis_hotline_single_source.py 会检查）。
+# 依据：国家卫健委 2024-12-06 通知，2025-05-01 前全国开通统一心理援助热线 12356。
+# https://www.gov.cn/zhengce/zhengceku/202412/content_6994470.htm
+CRISIS_HOTLINE = "12356"
+CRISIS_HOTLINE_NAME = "全国统一心理援助热线"
+CRISIS_HOTLINE_TEXT = f"{CRISIS_HOTLINE_NAME} {CRISIS_HOTLINE}"
+CRISIS_EMERGENCY_NUMBERS = ("120", "110")  # 医疗急救、报警
+CRISIS_EMERGENCY_TEXT = "如果你或身边有人处于危险中，请立即拨打 120 或 110。"
+
 SAFETY_CONFIG = {
     # 开关
     "enable_input_check": True,
@@ -12,9 +22,9 @@ SAFETY_CONFIG = {
     # 国家卫健委统一号码，核验于 2026-09-06。
     # https://www.nhc.gov.cn/yzygj/c100068/202412/49a1a65386cd4be582d4702fd0926ee8.shtml
     # 危机热线
-    "crisis_hotline_cn": "12356",       # 全国心理援助热线
-    "crisis_emergency": "120",                   # 医疗急救
-    "crisis_police": "110",                      # 报警
+    "crisis_hotline_cn": CRISIS_HOTLINE,         # 全国统一心理援助热线
+    "crisis_emergency": CRISIS_EMERGENCY_NUMBERS[0],  # 医疗急救
+    "crisis_police": CRISIS_EMERGENCY_NUMBERS[1],     # 报警
 
     # 告警阈值
     "max_sensitive_streak": 5,    # 连续N次敏感输入触发告警
@@ -48,6 +58,10 @@ SAFETY_CONFIG = {
         "撑不下去", "活不下去", "没有活下去的意义",
         "想离开这个世界", "再也不想醒来",
         "让我死", "杀死自己",
+        # 不带「死」「自杀」字样的隐性说法
+        "不想再活", "结束这一切", "一了百了", "生无可恋", "一死了之",
+        "活够了", "轻生", "结束自己的生命", "了结自己", "了结生命",
+        "吃了一瓶安眠药", "吞了安眠药", "吞药自杀", "过量服药",
         # English crisis keywords (SEASONS Global)
         "want to die", "wanna die", "kill myself", "end my life",
         "suicide", "suicidal", "kill me", "hurt myself",
@@ -104,6 +118,17 @@ SAFETY_CONFIG = {
         r"(你|您)(应该|可以|需要).{0,6}(吃药|服药|用药|服用)",
         r"(诊断|确诊|患病).{0,6}(为|是).{0,6}(病|症)",
         r"(剂量|每日|每次).{0,6}(服用|吃|口服)",
+        # 中药/药物的服法、用量：煎服、冲服、送服，或「药材 + 数字 + 克」
+        r"(煎服|水煎|冲服|送服|温水送|空腹服|饭后服|饭前服)",
+        r"(人参|黄芪|当归|川芎|党参|白术|茯苓|甘草|熟地|生地|枸杞|丹参|柴胡|半夏|附子|麻黄|桂枝|黄连|黄芩|大黄|红花|桃仁|杜仲|陈皮)"
+        r"\s*\d+(\.\d+)?\s*(克|g|毫克|mg)",
+        # 配伍结论
+        r"(药|方|汤|剂|芪|归|芎|参).{0,6}配伍|配伍.{0,6}(使用|服用|煎|禁忌|不可|可以)",
+        # 劝用户自行停药、减药、加量
+        r"(停药|停用.{0,4}药|自行(减|加|调整).{0,3}(药|量)|药.{0,6}(减半|减量|加量|加倍))",
+        # 功效化措辞（模型输出闭环）：不得承诺增强免疫/排毒/利尿/消肿等功效
+        r"(增强|提高|提升).{0,4}免疫(力|功能)?",
+        r"(排毒|利尿|消肿|祛湿排毒|抗病毒|降血压|降血糖|降血脂|治愈|根治|疗效显著|改善目赤肿痛)",
     ],
 
     # 响应语言

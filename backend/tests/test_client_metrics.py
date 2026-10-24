@@ -5,6 +5,8 @@ test_client_metrics.py
 
 import pytest
 
+pytestmark = pytest.mark.signed_in
+
 
 class TestMetricsBatch:
     """客户端指标批量摄入端点测试"""

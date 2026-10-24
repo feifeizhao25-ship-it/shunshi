@@ -15,7 +15,7 @@ def test_alipay_service_rejects_missing_merchant_configuration(monkeypatch):
     service.mode = "production"
 
     with pytest.raises(RuntimeError, match="商户配置不完整"):
-        service.create_order("yangxin_monthly", "user-1")
+        service.create_order("content_yearly", "user-1")
 
 
 def test_alipay_catalog_matches_domestic_display_prices_and_entitlements():
@@ -25,10 +25,10 @@ def test_alipay_catalog_matches_domestic_display_prices_and_entitlements():
         if product["platform"] == "alipay"
     }
     sku_to_product = {
-        "yangxin_monthly": "yangxin_monthly",
-        "yangxin_yearly": "yangxin_yearly",
-        "yiyang_monthly": "yiyang_monthly",
-        "yiyang_yearly": "yiyang_yearly",
+        "content_yearly": "content_yearly",
+        "content_yearly": "content_yearly",
+        "member_yearly": "member_yearly",
+        "member_yearly": "member_yearly",
         "family_monthly": "jiahe_monthly",
         "family_yearly": "jiahe_yearly",
     }
@@ -44,7 +44,7 @@ def test_alipay_bypass_order_endpoint_is_retired(client, auth_headers):
     response = client.post(
         "/api/v1/payments/alipay/create-order",
         headers=auth_headers,
-        json={"product_sku": "yangxin_monthly"},
+        json={"product_sku": "content_yearly"},
     )
     assert response.status_code == 410
 
@@ -68,7 +68,7 @@ async def test_subscription_create_order_returns_503_instead_of_mock(monkeypatch
 
     monkeypatch.setattr(alipay_module.alipay_service, "create_order", unavailable)
     request = subscription.CreateOrderRequest(
-        product_id="yangxin_monthly",
+        product_id="content_yearly",
         platform="alipay",
     )
 
@@ -93,7 +93,7 @@ def test_verified_alipay_callback_activates_mobile_entitlement(
     user_id = jwt.decode(token, settings.jwt_secret, algorithms=["HS256"])["sub"]
     created = client.post(
         "/api/v1/subscription/create-order",
-        json={"product_id": "yiyang_yearly", "platform": "alipay"},
+        json={"product_id": "member_yearly", "platform": "alipay"},
         headers=auth_headers,
     )
     assert created.status_code == 200, created.text
@@ -104,9 +104,9 @@ def test_verified_alipay_callback_activates_mobile_entitlement(
         out_trade_no=order_no,
         trade_no=f"TRADE-{order_id}",
         trade_status="TRADE_SUCCESS",
-        total_amount="399.00",
+        total_amount="888.00",
         buyer_id="buyer-test",
-        passback_params=f"user_id={user_id}&sku=yiyang_yearly",
+        passback_params=f"user_id={user_id}&sku=member_yearly",
     )
     monkeypatch.setattr(alipay_module.alipay_service, "verify_notify", lambda _params: notify)
 

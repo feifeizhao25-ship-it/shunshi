@@ -5,6 +5,8 @@ configured:false，绝不假开通会员；配置后按 HMAC-SHA256 验签才入
 """
 
 import hashlib
+import json
+from pydantic import ValidationError
 import hmac
 import time
 
@@ -66,7 +68,11 @@ async def billing_callback(
     if not hmac.compare_digest(signature, expected):
         raise HTTPException(status_code=401, detail="回调签名验证失败")
 
-    body = CallbackBody.model_validate(await request.json())
+    try:
+        body = CallbackBody.model_validate(json.loads(raw))
+    except (ValueError, ValidationError) as exc:
+        # 签名已通过但请求体格式不对：属于调用方错误，返回 422 而不是 500
+        raise HTTPException(status_code=422, detail="回调请求体格式不正确") from exc
     if body.expires_at <= time.time():
         raise HTTPException(status_code=400, detail="订阅已过期，拒绝入账")
 

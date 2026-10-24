@@ -15,6 +15,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 
 from app.database.db import get_db
+from app.safety.config import CRISIS_HOTLINE_TEXT
 
 logger = logging.getLogger(__name__)
 
@@ -61,7 +62,7 @@ PRESET_PROMPTS: Dict[str, dict] = {
         "description": "情绪共情前缀",
     },
     "chat.crisis_response": {
-        "content": "我看到你的消息了，你在经历一些非常困难的事情。你的感受是真实的，也是重要的。我虽然是一个AI助手，但我真心关心你的感受。\n\n如果你现在感到不安全，请拨打心理援助热线：400-161-9995（24小时）\n或者拨打急救电话：120\n\n你不需要独自面对这一切。请给自己一个机会，和专业人士聊一聊。他们可以帮助你度过这个难关。\n\n我会一直在这里陪伴你。",
+        "content": "我看到你的消息了，你在经历一些非常困难的事情。你的感受是真实的，也是重要的。我虽然是一个AI助手，但我真心关心你的感受。\n\n如果你现在感到不安全，请拨打" + CRISIS_HOTLINE_TEXT + "\n如果你或身边有人处于危险中，请立即拨打 120 或 110\n\n你不需要独自面对这一切。请给自己一个机会，和专业人士聊一聊。他们可以帮助你度过这个难关。\n\n我会一直在这里陪伴你。",
         "category": "safety",
         "description": "危机响应模板",
     },

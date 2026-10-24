@@ -9,9 +9,9 @@
 """
 
 import json
-from datetime import datetime
+from datetime import date, datetime
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
@@ -101,3 +101,78 @@ def check_quiet_hours(
         current = datetime.now().strftime("%H:%M")
         is_quiet = start <= current < end if start < end else current >= start or current < end
     return {**settings, "is_quiet": is_quiet}
+
+
+class RegionProfile(BaseModel):
+    province: str = Field(min_length=2, max_length=12, description="省级行政区，如「四川」「广西壮族自治区」")
+
+
+@router.get("/settings/region")
+def get_region(
+    user_id: str = Depends(current_user), session: Session = Depends(get_session)
+):
+    """用户自填的所在省份（只到省，不收集城市和定位），用于首页的地区气候提示。"""
+    from ..services.home_cards import REGION_KEY, zone_for
+
+    data = _read(session, user_id, REGION_KEY, {})
+    province = data.get("province")
+    return {"declared": bool(province), "province": province, "zone": zone_for(province) if province else None}
+
+
+@router.post("/settings/region")
+@router.put("/settings/region")
+def set_region(
+    body: RegionProfile,
+    user_id: str = Depends(current_user),
+    session: Session = Depends(get_session),
+):
+    from ..services.home_cards import PROVINCES, REGION_KEY, zone_for
+
+    # 「四川省」「广西壮族自治区」「香港特别行政区」都按开头的简称认
+    raw = body.province.strip()
+    province = next((p for p in PROVINCES if raw.startswith(p)), None)
+    if province is None:
+        raise HTTPException(status_code=422, detail="请选择一个省、自治区、直辖市或特别行政区")
+    _write(session, user_id, REGION_KEY, {"province": province})
+    return {"declared": True, "province": province, "zone": zone_for(province)}
+
+
+@router.delete("/settings/region")
+def clear_region(
+    user_id: str = Depends(current_user), session: Session = Depends(get_session)
+):
+    """随时可以清除，清除后首页不再按地区给提示。"""
+    from ..services.home_cards import REGION_KEY
+
+    row = session.get(UserSetting, {"user_id": user_id, "key": REGION_KEY})
+    if row:
+        session.delete(row)
+    return {"declared": False, "province": None, "zone": None}
+
+
+class AgeProfile(BaseModel):
+    birth_date: date
+
+
+@router.get("/settings/age-profile")
+def get_age_profile(
+    user_id: str = Depends(current_user), session: Session = Depends(get_session)
+):
+    """只返回年龄段，不回传出生日期。"""
+    from ..services.age_policy import read_group
+
+    group = read_group(session, user_id)
+    return {"declared": group != "unknown", "age_group": group}
+
+
+@router.post("/settings/age-profile")
+def set_age_profile(
+    body: AgeProfile,
+    user_id: str = Depends(current_user),
+    session: Session = Depends(get_session),
+):
+    """填写出生日期（自报）。用于未成年人保护与老年用户的健康使用提示。"""
+    from ..services.age_policy import declare_birth_date
+
+    group = declare_birth_date(session, user_id, body.birth_date)
+    return {"declared": True, "age_group": group}

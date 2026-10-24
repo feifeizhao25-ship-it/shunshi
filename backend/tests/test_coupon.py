@@ -1,6 +1,8 @@
 """顺时 - 优惠券测试"""
 import pytest
 
+pytestmark = pytest.mark.admin_signed_in
+
 
 class TestCouponIssue:
     def test_issue_returns_200(self, client):

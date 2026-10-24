@@ -1,6 +1,8 @@
 """顺时 - 新手引导测试"""
 import pytest
 
+pytestmark = pytest.mark.signed_in
+
 
 class TestOnboardingSteps:
     def test_steps_returns_200(self, client):

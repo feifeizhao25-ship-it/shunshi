@@ -501,6 +501,6 @@ async def get_gift_card_info():
                 "summer_discount": "6-8 月购买送礼品卡享 10% 折扣",
                 "family_bundle": "家庭计划 3 个月送 1 个月免费",
             },
-            "support_email": "gift@seasons-tcm.com",
+            "support_email": "support@shunshi.cn",
         },
     }

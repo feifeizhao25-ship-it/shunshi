@@ -53,7 +53,8 @@ def test_validate_registry_rejects_bad_schema():
 
 
 def test_tier_for_product_mapping():
-    assert tier_for_product("shunshi_yangxin_monthly") == "pro"
+    assert tier_for_product("shunshi_yangxin_monthly") == "plus"  # 养心版：每天 100 次
+    assert tier_for_product("shunshi_yiyang_monthly") == "pro"    # 颐养版：每天 200 次
     assert tier_for_product("shunshi_family_monthly") == "family"
     assert tier_for_product("unknown-product") == "free"
 

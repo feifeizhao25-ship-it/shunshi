@@ -20,6 +20,10 @@ class SkillAccess:
 
 
 def get_skill_access(user_id: str = Depends(current_user), session: Session = Depends(get_session)) -> SkillAccess:
+    # 未满 14 周岁不提供 AI 能力（与对话一致；监护人同意目前没有可靠核验手段，见 services/age_policy.py）
+    from .services.age_policy import policy_for
+
+    policy_for(session, user_id)
     entitlement = session.get(Entitlement, user_id)
     premium = bool(entitlement and entitlement.expires_at > time.time()
                    and tier_for_product(entitlement.product_id) != 'free')

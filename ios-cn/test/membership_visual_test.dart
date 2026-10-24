@@ -53,9 +53,8 @@ void main() {
                 );
               },
               loadPrices: () async => {
-                'yiyang_yearly': '¥388.00',
-                'yiyang_monthly': '¥58.00',
-                'family_yearly': '¥688.00',
+                'content_yearly': '¥399.00',
+                'member_yearly': '¥888.00',
               },
             ),
           ),

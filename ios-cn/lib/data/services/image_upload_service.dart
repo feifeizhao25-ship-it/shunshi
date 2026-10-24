@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 import '../storage/storage_manager.dart';
+import '../../core/config/app_config.dart';
 
 /// 图片上传状态
 enum ImageUploadState {
@@ -155,10 +156,7 @@ class ImageUploadService {
   // 获取 API Base URL
   static String _getBaseUrl() {
     // 从环境或默认配置获取
-    return const String.fromEnvironment(
-      'API_BASE_URL',
-      defaultValue: 'https://api.shunshi.app',
-    );
+    return AppConfig.apiBaseUrl;
   }
   
   // 获取存储的 Token

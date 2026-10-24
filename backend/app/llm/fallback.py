@@ -185,7 +185,7 @@ class ModelFallbackChain:
         last_error: Optional[Exception] = None
 
         if primary_model is None:
-            primary_model = "deepseek-chat"
+            primary_model = "deepseek-flash"
 
         # 确定模型候选列表: 先用目标模型，超预算用 fallback_model
         model_candidates = [primary_model]

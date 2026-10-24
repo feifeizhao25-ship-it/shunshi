@@ -6,6 +6,8 @@
 """
 
 import pytest
+
+pytestmark = pytest.mark.signed_in
 from app.core.safety_filter import safety_filter, SafetyLevel, CRISIS_RESPONSE
 from app.skills.intent_classifier import IntentClassifier, Intent
 from app.skills.orchestrator import SkillOrchestrator

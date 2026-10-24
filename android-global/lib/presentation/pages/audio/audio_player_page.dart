@@ -42,6 +42,7 @@ class AudioPlayerPage extends StatefulWidget {
 class _AudioPlayerPageState extends State<AudioPlayerPage>
     with TickerProviderStateMixin {
   late AudioPlayer _player;
+  bool _usingBundled = false;
   bool _isPlaying = false;
   bool _isPremium = false;
   bool _isLoading = true;
@@ -109,7 +110,9 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
     } else if (widget.audioId != null && widget.audioId!.isNotEmpty) {
       _loadAudioFromId();
     } else {
-      // 无数据，回退到静态 UI
+      // No track given: fall back to the bundled breathing guide (assets/audio)
+      _usingBundled = true;
+      _player.setAsset('assets/audio/audio_breathe_2.mp3');
       setState(() => _isLoading = false);
     }
   }
@@ -188,6 +191,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
       await _player.pause();
       _reportProgress();
     } else {
+      if (_usingBundled && mounted) setState(() => _isPlaying = true);
       await _player.play();
     }
   }
