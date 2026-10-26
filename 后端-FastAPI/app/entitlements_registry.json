@@ -1,0 +1,131 @@
+{
+  "product": "shunshi",
+  "version": "1.0.0",
+  "tiers": {
+    "free": {
+      "quotas": {
+        "ai_daily_messages": 20,
+        "reflections_per_day": 3,
+        "audio_daily_minutes": 30
+      },
+      "knowledge": {
+        "daily_insight": true,
+        "wellness_library": "basic",
+        "long_term_trends": false,
+        "weekly_deep_report": false
+      },
+      "personalization": {
+        "onboarding_profile": true,
+        "adaptive_suggestions": false,
+        "ai_memory": false
+      },
+      "export": {
+        "data_export": true,
+        "formats": ["json"]
+      },
+      "collaboration": {
+        "family_members": 1,
+        "shared_spaces": false
+      },
+      "service": {
+        "support": "community",
+        "api_access": false
+      }
+    },
+    "pro": {
+      "quotas": {
+        "ai_daily_messages": 200,
+        "reflections_per_day": -1,
+        "audio_daily_minutes": -1
+      },
+      "knowledge": {
+        "daily_insight": true,
+        "wellness_library": "full",
+        "long_term_trends": true,
+        "weekly_deep_report": true
+      },
+      "personalization": {
+        "onboarding_profile": true,
+        "adaptive_suggestions": true,
+        "ai_memory": true
+      },
+      "export": {
+        "data_export": true,
+        "formats": ["json", "csv"]
+      },
+      "collaboration": {
+        "family_members": 1,
+        "shared_spaces": false
+      },
+      "service": {
+        "support": "priority",
+        "api_access": false
+      }
+    },
+    "family": {
+      "quotas": {
+        "ai_daily_messages": 200,
+        "reflections_per_day": -1,
+        "audio_daily_minutes": -1
+      },
+      "knowledge": {
+        "daily_insight": true,
+        "wellness_library": "full",
+        "long_term_trends": true,
+        "weekly_deep_report": true
+      },
+      "personalization": {
+        "onboarding_profile": true,
+        "adaptive_suggestions": true,
+        "ai_memory": true
+      },
+      "export": {
+        "data_export": true,
+        "formats": ["json", "csv"]
+      },
+      "collaboration": {
+        "family_members": 6,
+        "shared_spaces": true
+      },
+      "service": {
+        "support": "priority",
+        "api_access": false
+      }
+    },
+    "enterprise": {
+      "quotas": {
+        "ai_daily_messages": -1,
+        "reflections_per_day": -1,
+        "audio_daily_minutes": -1
+      },
+      "knowledge": {
+        "daily_insight": true,
+        "wellness_library": "full",
+        "long_term_trends": true,
+        "weekly_deep_report": true
+      },
+      "personalization": {
+        "onboarding_profile": true,
+        "adaptive_suggestions": true,
+        "ai_memory": true
+      },
+      "export": {
+        "data_export": true,
+        "formats": ["json", "csv"]
+      },
+      "collaboration": {
+        "family_members": -1,
+        "shared_spaces": true
+      },
+      "service": {
+        "support": "dedicated",
+        "api_access": true
+      }
+    }
+  },
+  "product_tier_map": {
+    "shunshi_yangxin_monthly": "pro",
+    "shunshi_healing_monthly": "pro",
+    "shunshi_family_monthly": "family"
+  }
+}

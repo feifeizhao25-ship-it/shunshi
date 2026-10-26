@@ -1,0 +1,51 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: shunshi
+      POSTGRES_PASSWORD: shunshi_dev_password
+      POSTGRES_DB: shunshi
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U shunshi"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      SHUNSHI_ENV: production
+      SHUNSHI_DATABASE_URL: postgresql+psycopg://shunshi:shunshi_dev_password@postgres:5432/shunshi
+      SHUNSHI_REDIS_URL: redis://redis:6379/0
+      SHUNSHI_JWT_SECRET: ${SHUNSHI_JWT_SECRET:?请通过环境变量提供至少 32 位 JWT 密钥}
+      SHUNSHI_CORS_ORIGINS: ${SHUNSHI_CORS_ORIGINS:-http://localhost:3000}
+      SHUNSHI_MODEL_ROUTER_URL: ${SHUNSHI_MODEL_ROUTER_URL:-}
+      SHUNSHI_SMS_PROVIDER_URL: ${SHUNSHI_SMS_PROVIDER_URL:-}
+      SHUNSHI_SMS_PROVIDER_TOKEN: ${SHUNSHI_SMS_PROVIDER_TOKEN:-}
+      SHUNSHI_PAYMENT_CALLBACK_SECRET: ${SHUNSHI_PAYMENT_CALLBACK_SECRET:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request,os;exit(0 if urllib.request.urlopen('http://localhost:8000/healthz').status==200 else 1)\""]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+volumes:
+  postgres-data:
