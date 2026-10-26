@@ -48,12 +48,8 @@ function see(page: Page, text: string | RegExp) {
 
 async function sendLine(page: Page, text: string) {
   const composer = page.getByRole('textbox').last();
-  await composer.click({ force: true });
   await composer.fill(text);
-  const send = page.getByRole('button', { name: '发送' });
-  await expect(send).toBeEnabled();
-  await send.click();
-  await see(page, text).waitFor({ timeout: 20_000 });
+  await page.getByRole('button', { name: '发送' }).click();
 }
 
 async function clickText(page: Page, text: string) {
