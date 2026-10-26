@@ -305,7 +305,7 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
     return _stepWrapper(
       icon: '✨',
       title: '你的性别是？',
-      subtitle: '用于个性化养生建议',
+      subtitle: '用于安排适合你的作息',
       child: Column(
         children: [
           const SizedBox(height: 32),
@@ -367,7 +367,7 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
     return _stepWrapper(
       icon: '🎂',
       title: '你出生在哪一年？',
-      subtitle: '用于推荐适合你年龄的养生方案',
+      subtitle: '用于按年龄安排作息',
       child: Column(
         children: [
           const SizedBox(height: 40),
@@ -466,7 +466,7 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
     return _stepWrapper(
       icon: '🌿',
       title: '了解你的体质类型',
-      subtitle: '选择你的中医体质，获得个性化养生建议',
+      subtitle: '选一个体质标签，只用于作息安排，不是诊断',
       child: Column(
         children: [
           const SizedBox(height: 16),

@@ -41,19 +41,16 @@ function see(page: Page, text: string | RegExp) {
 }
 
 async function clickText(page: Page, text: string) {
-  const exact = page.getByRole('button', { name: text, exact: true });
-  if (await exact.count()) {
-    await exact.last().click();
+  const button = page.getByRole('button', { name: new RegExp(text) }).last();
+  try {
+    await button.waitFor({ state: 'visible', timeout: 8_000 });
+    await button.click();
     return;
+  } catch {
+    const target = page.getByText(text).last();
+    await target.waitFor({ state: 'visible', timeout: 12_000 });
+    await target.click();
   }
-  const loose = page.getByRole('button', { name: new RegExp(text) });
-  if (await loose.count()) {
-    await loose.last().click();
-    return;
-  }
-  const target = page.getByText(text, { exact: true }).last();
-  await target.waitFor({ state: 'visible', timeout: 20_000 });
-  await target.click();
 }
 
 function userIdFromToken(token: string): string {
