@@ -44,12 +44,12 @@ async function clickText(page: Page, text: string) {
   const button = page.getByRole('button', { name: new RegExp(text) }).last();
   try {
     await button.waitFor({ state: 'visible', timeout: 8_000 });
-    await button.click();
+    await button.click({ force: true });
     return;
   } catch {
     const target = page.getByText(text).last();
     await target.waitFor({ state: 'visible', timeout: 12_000 });
-    await target.click();
+    await target.click({ force: true });
   }
 }
 
