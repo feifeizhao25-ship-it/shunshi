@@ -18,6 +18,9 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
   bool _shichenReminder = true;
   bool _checkinReminder = false;
   bool _elderMode = false;
+  String _displayName = '朋友';
+  String _accountLine = '未登录';
+  bool _loggedIn = false;
 
   @override
   void initState() {
@@ -33,6 +36,13 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
         _shichenReminder = prefs.getBool('shichen_reminder') ?? true;
         _checkinReminder = prefs.getBool('checkin_reminder') ?? false;
         _elderMode = prefs.getBool('elder_mode') ?? false;
+        _displayName = prefs.getString('user_name') ?? '朋友';
+        final token = prefs.getString('auth_token') ?? '';
+        final phone = prefs.getString('user_phone') ?? '';
+        _loggedIn = token.isNotEmpty;
+        _accountLine = phone.isNotEmpty
+            ? '已绑定手机号'
+            : (token.isNotEmpty ? '游客体验' : '未登录');
       });
     }
   }
@@ -95,14 +105,14 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                  Text('云水禅心',
+                  Text(_displayName,
                       style: TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w600,
                           fontFamily: ShunShiTypography.serifFamily,
                           color: textPrimary)),
                   const SizedBox(height: 2),
-                  Text('账号：shunshi_2024',
+                  Text(_accountLine,
                       style: TextStyle(fontSize: 12, color: textTertiary)),
                 ]),
               ),
@@ -121,11 +131,13 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
               boxShadow: isDark ? [] : ShunShiShadows.sm,
             ),
             child: Column(children: [
-              _buildNavTile(context, Icons.shield_outlined, '账号安全中心',
-                  const [Color(0xFF5C6BC0), Color(0xFF7986CB)]),
+              _buildNavTile(context, Icons.shield_outlined, '账号与数据',
+                  const [Color(0xFF5C6BC0), Color(0xFF7986CB)],
+                  onTap: () => context.push('/privacy')),
               _buildDivider(isDark),
-              _buildNavTile(context, Icons.lock_outline, '隐私设置',
-                  const [Color(0xFF4DB6AC), Color(0xFF80CBC4)]),
+              _buildNavTile(context, Icons.lock_outline, '隐私政策',
+                  const [Color(0xFF4DB6AC), Color(0xFF80CBC4)],
+                  onTap: () => context.push('/privacy-policy')),
             ]),
           ),
           const SizedBox(height: 24),
@@ -143,7 +155,7 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildSwitchTile(context, '节气提醒', '跟随二十四节气，获取养生建议',
+                _buildSwitchTile(context, '节气提醒', '跟随二十四节气，提示当天作息',
                     Icons.eco, _solarReminder, (v) {
                   setState(() => _solarReminder = v);
                   _savePref('solar_reminder', v);
@@ -155,7 +167,7 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
                   _savePref('shichen_reminder', v);
                 }),
                 const SizedBox(height: 8),
-                _buildSwitchTile(context, '打卡提醒', '每日养生任务完成提醒',
+                _buildSwitchTile(context, '打卡提醒', '提醒完成当天的小行动',
                     Icons.done_all, _checkinReminder, (v) {
                   setState(() => _checkinReminder = v);
                   _savePref('checkin_reminder', v);
@@ -216,8 +228,12 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
             child: Column(children: [
               _buildNavTile(context, Icons.cleaning_services_outlined, '清除缓存',
                   const [Color(0xFF90A4AE), Color(0xFFB0BEC5)],
-                  trailing: Text('124.5 MB',
-                      style: TextStyle(fontSize: 13, color: textTertiary))),
+                  onTap: () {
+                    PaintingBinding.instance.imageCache.clear();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('已清除图片缓存')),
+                    );
+                  }),
               _buildDivider(isDark),
               _buildNavTile(context, Icons.info_outline, '关于顺时',
                   const [Color(0xFF90A4AE), Color(0xFFB0BEC5)],
@@ -235,7 +251,12 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
           // ── 退出登录 ──
           Center(
             child: GestureDetector(
-              onTap: () => context.go('/login'),
+              onTap: () async {
+                final prefs = await SharedPreferences.getInstance();
+                await prefs.remove('auth_token');
+                if (!context.mounted) return;
+                context.go('/login');
+              },
               child: Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
@@ -243,7 +264,7 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
                   border: Border.all(color: ShunShiColors.error.withValues(alpha: 0.3)),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Text('退出登录',
+                child: Text(_loggedIn ? '退出登录' : '登录',
                     style: TextStyle(
                       fontSize: 15,
                       color: ShunShiColors.error,
@@ -254,7 +275,7 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
           ),
           const SizedBox(height: 16),
           Center(
-              child: Text('DESIGNED BY SHUNSHI · 顺时养生',
+              child: Text('顺时 · 节气作息陪伴',
                   style: TextStyle(
                       fontSize: 10,
                       color: textTertiary,

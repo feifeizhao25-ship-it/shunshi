@@ -3,8 +3,8 @@
 // 不依赖 Google 服务，兼容华为/小米等国产手机
 
 import 'dart:async';
-import 'dart:io';
 import 'package:flutter/material.dart';
+import 'voice_path_io.dart' if (dart.library.html) 'voice_path_web.dart';
 import 'package:record/record.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:dio/dio.dart';
@@ -95,32 +95,28 @@ class VoiceService implements VoiceInput {
         return null;
       }
 
-      final file = File(path);
-      if (!await file.exists() || await file.length() < 500) {
+      if (!await voiceFileUsable(path)) {
         _errorMsg = '录音太短，请按住说话';
         return null;
       }
 
-      return await _recognizeFile(file);
+      return await _recognizeFile(path);
     } catch (e) {
       _errorMsg = '语音识别失败，请重新录音或输入文字';
       debugPrint('[VoiceService] stopAndRecognize error: $e');
       return null;
     } finally {
       try {
-        if (_recordPath.isNotEmpty) {
-          final file = File(_recordPath);
-          if (await file.exists()) await file.delete();
-        }
+        if (_recordPath.isNotEmpty) await deleteVoiceFile(_recordPath);
       } catch (_) {}
     }
   }
 
   /// 用 SiliconFlow ASR 识别音频文件
-  Future<String?> _recognizeFile(File file) async {
+  Future<String?> _recognizeFile(String path) async {
     try {
       final formData = FormData.fromMap({
-        'file': await MultipartFile.fromFile(file.path, filename: 'voice.aac'),
+        'file': await MultipartFile.fromFile(path, filename: 'voice.aac'),
         'model': 'sensevoice',
       });
 
@@ -162,7 +158,7 @@ class VoiceService implements VoiceInput {
       return null;
     } finally {
       try {
-        if (await file.exists()) await file.delete();
+        await deleteVoiceFile(path);
       } catch (_) {}
     }
   }
@@ -182,10 +178,7 @@ class VoiceService implements VoiceInput {
       await _recorder.stop();
     }
     try {
-      if (_recordPath.isNotEmpty) {
-        final f = File(_recordPath);
-        if (await f.exists()) await f.delete();
-      }
+      if (_recordPath.isNotEmpty) await deleteVoiceFile(_recordPath);
     } catch (_) {}
   }
 

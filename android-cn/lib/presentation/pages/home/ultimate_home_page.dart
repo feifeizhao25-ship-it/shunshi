@@ -12,7 +12,6 @@ import 'widgets/home_skeleton.dart';
 import '../../../core/solar_term/solar_term_table.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/cache/cache_service.dart';
-import '../../../data/storage/storage_manager.dart';
 
 // ═══════════════════════════════════════════════════════════════
 // 十二时辰数据模型（本地计算）
@@ -432,7 +431,6 @@ class _UltimateHomePageState extends State<UltimateHomePage>
       final results = await Future.wait([
         _api.get('/seasons/home/dashboard', queryParameters: {'locale': 'zh-CN'}, level: SpeedLevel.s1),
         _api.get('/solar-terms/current', level: SpeedLevel.s1),
-        _api.get('/followup/due', queryParameters: {'user_id': 'user-001', 'limit': 1}, level: SpeedLevel.s0),
       ]);
 
       if (!mounted) return;
@@ -444,16 +442,16 @@ class _UltimateHomePageState extends State<UltimateHomePage>
       }
 
       final solar = results[1].data;
-      if (solar is Map) {
-        // Could enhance solar term info from API
-      }
-
-      final followupRes = results[2].data;
-      if (followupRes is Map && followupRes['due_followups'] is List) {
-        final due = (followupRes['due_followups'] as List);
-        if (due.isNotEmpty) {
-          _followUp = Map<String, dynamic>.from(due.first);
-          _hasFollowUp = true;
+      if (solar is Map && solar['success'] == true && solar['data'] is Map) {
+        final data = solar['data'] as Map;
+        final name = data['name']?.toString();
+        final description = data['description']?.toString();
+        if (name != null && name.isNotEmpty && mounted) {
+          setState(() {
+            _solarTermInfo = description == null || description.isEmpty
+                ? name
+                : '$name · $description';
+          });
         }
       }
 
@@ -469,13 +467,10 @@ class _UltimateHomePageState extends State<UltimateHomePage>
 
   Future<void> _fetchRecommendations() async {
     try {
-      final token = StorageManager.user.getToken();
-      final endpoint = token != null && token.isNotEmpty
-          ? '/recommend/personalized'
-          : '/contents/recommend';
-      final res = await _api.get(endpoint, queryParameters: {'limit': 6}, level: SpeedLevel.s1);
+      final res = await _api.get('/contents/recommend', queryParameters: {'limit': 6}, level: SpeedLevel.s1);
       if (!mounted) return;
-      final data = res.data;
+      final raw = res.data;
+      final data = raw is Map && raw['data'] is Map ? raw['data'] as Map : raw;
       if (data is Map && data['items'] is List) {
         final items = (data['items'] as List).cast<Map<String, dynamic>>();
         if (items.isNotEmpty) {

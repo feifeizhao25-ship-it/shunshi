@@ -144,6 +144,28 @@ def build_rules() -> List[SafetyRule]:
         ),
     ))
 
+    # ===== 4b. 中成药克数 / 每次用量（输入侧阻断，不把克数交给模型） =====
+    rules.append(SafetyRule(
+        name="medical_dosage_patterns",
+        category=RuleCategory.MEDICAL_BOUNDARY,
+        patterns=[
+            r"(丸|散|膏|丹|颗粒|胶囊).{0,16}\d+(\.\d+)?\s*(克|g|毫克|mg)",
+            r"(每次|每日|一日).{0,8}\d+(\.\d+)?\s*(克|g|毫克|mg)",
+        ],
+        is_regex=True,
+        severity=RuleSeverity.BLOCK,
+        action=RuleAction.BLOCK,
+        response_template=(
+            "我不是医生，无法给出专业的医疗建议。\n\n"
+            "每个人的身体状况不同，用药和治疗方案需要医生根据具体情况来判断。"
+            "建议您：\n"
+            "1. 前往正规医院就诊\n"
+            "2. 咨询专业医生获取诊断\n"
+            "3. 不要自行用药\n\n"
+            "如果您有其他作息、节气方面的问题，我很乐意帮您~"
+        ),
+    ))
+
     # ===== 5. 儿童保护规则 =====
     rules.append(SafetyRule(
         name="child_protection",

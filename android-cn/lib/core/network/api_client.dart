@@ -3,6 +3,7 @@
 import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import '../../data/storage/storage_manager.dart';
 import '../config/app_config.dart';
 import '../storage/token_storage.dart';
 
@@ -129,9 +130,18 @@ class ApiClient {
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
-    // 1. 自动加 token
-    final token = await tokenStorage.getAccessToken();
-    if (token != null) {
+    // 登录页把凭证写在 SharedPreferences。安全存储里没有时也要带上，
+    // 否则首页会不带身份去请求，接口一律 401。
+    String? token;
+    try {
+      token = await tokenStorage.getAccessToken();
+    } catch (_) {}
+    if (token == null || token.isEmpty) {
+      try {
+        token = StorageManager.user.getToken();
+      } catch (_) {}
+    }
+    if (token != null && token.isNotEmpty) {
       options.headers['Authorization'] = 'Bearer $token';
     }
 

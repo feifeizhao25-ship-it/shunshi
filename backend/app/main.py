@@ -179,7 +179,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         CORSMiddleware,
         allow_origins=settings.cors_origin_list() or ["http://localhost:3000"],
         allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE"],
-        allow_headers=["Authorization", "Content-Type", "X-Request-ID"],
+        # 客户端会带 ngrok 标记、幂等键和请求号。只放行三个头时，浏览器预检直接 400，登录和对话都发不出去。
+        allow_headers=["*"],
     )
 
     app.include_router(health.router)
@@ -208,6 +209,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     # proxy is intentionally excluded because the production content router
     # below owns the public catalogue and search contract.
     app.include_router(user.router)
+    app.include_router(user.profile_router)
     app.include_router(memory.router)
     app.include_router(chat.router)
     app.include_router(chat.legacy_router)

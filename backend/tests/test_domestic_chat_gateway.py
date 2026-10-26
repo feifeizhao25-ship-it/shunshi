@@ -42,6 +42,36 @@ def _ok(text):
 
 # ── 一、出口本身 ──────────────────────────────────────────────
 
+def test_local_stub_answers_without_calling_a_provider():
+    seen = []
+
+    def handler(request):
+        seen.append(request.url.host)
+        return _ok("不该被用到")
+
+    text = asyncio.run(
+        gw.complete(
+            MESSAGES,
+            client=_mock(handler),
+            env={"SHUNSHI_LLM_STUB": "1", "SHUNSHI_ENV": "development"},
+        )
+    )
+    assert "本地演示回复" in text
+    assert "可长期服用" not in text
+    assert seen == []
+
+
+def test_local_stub_is_refused_in_production():
+    with pytest.raises(Exception) as info:
+        asyncio.run(
+            gw.complete(
+                MESSAGES,
+                env={"SHUNSHI_LLM_STUB": "1", "SHUNSHI_ENV": "production"},
+            )
+        )
+    assert info.value.status_code == 503
+
+
 def test_no_domestic_key_is_503_and_names_the_variables():
     with pytest.raises(Exception) as info:
         asyncio.run(gw.complete(MESSAGES, env={}))

@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'dart:io';
 import '../storage/storage_manager.dart';
 import '../../core/config/app_config.dart';
 
@@ -24,9 +23,6 @@ class ApiException implements Exception {
 
 /// 自动检测 baseUrl：模拟器用 10.0.2.2，真机用局域网 IP
 class ApiClient {
-  // 模拟器地址（Android emulator → host localhost）
-  static const _emulatorUrl = 'http://10.0.2.2:4000';
-  // 真机：优先公网直连
   static final String _realDeviceUrl = AppConfig.apiBaseUrl.replaceAll(
     '/api/v1',
     '',
@@ -37,19 +33,9 @@ class ApiClient {
 
   /// 自动检测网络环境（仅模拟器需要）
   static Future<void> detectBaseUrl() async {
-    if (_detected) return;
+    // 网页和当前客户端都使用编译时配置的地址，不再探测模拟器网卡。
     _detected = true;
-    try {
-      final socket = await Socket.connect(
-        '10.0.2.2',
-        4000,
-        timeout: const Duration(seconds: 1),
-      );
-      socket.destroy();
-      baseUrl = _emulatorUrl;
-    } catch (_) {
-      baseUrl = _realDeviceUrl;
-    }
+    baseUrl = _realDeviceUrl;
   }
 
   late final Dio _dio;

@@ -192,6 +192,19 @@ class TestSafetyGuard:
         result = guard.check_input("给我开处方", user_context)
         assert result.should_block is True
 
+    def test_patent_medicine_dose_and_long_term_claim_are_blocked(self, guard, user_context):
+        """中成药克数和「可长期服用」不得进入模型。"""
+        for text in (
+            "六味地黄丸每次 9 克怎么吃",
+            "这个方子可长期服用吗",
+        ):
+            result = guard.check_input(text, user_context)
+            assert result.should_block is True, text
+            assert "不是医生" in (result.override_response or "")
+            assert "9" not in (result.override_response or "")
+        echoed = guard.check_output("可以，六味地黄丸每次 9 克，可长期服用。", user_context)
+        assert echoed.flag == "output_violation"
+
     # --- 正常输入 ---
 
     def test_normal_input(self, guard, user_context):

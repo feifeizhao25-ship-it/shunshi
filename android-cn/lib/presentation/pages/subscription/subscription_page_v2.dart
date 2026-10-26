@@ -737,19 +737,14 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
         _buildBenefit(
           Icons.auto_awesome,
           'AI私人订制方案',
-          '基于二十四节气与体质实时调整的个性化调理建议。',
+          '按二十四节气安排当天作息，不是诊疗方案。',
         ),
         _buildBenefit(
           Icons.restaurant_menu,
           '完整内容库',
           '解锁当前已上架并持续更新的食养、作息与节气内容。',
         ),
-        _buildBenefit(Icons.headphones, '会员音频', '按实际上架范围收听冥想导引与养生音频。'),
-        _buildBenefit(
-          Icons.family_restroom,
-          '家庭成员关怀',
-          '家和版最多提供4个家庭席位，并由成员自行控制共享范围。',
-        ),
+        _buildBenefit(Icons.headphones, '已上架音频', '只播放当前已经上架的音频。'),
         const SizedBox(height: 8),
         Text(
           '当前支付宝方案为单次购买，不自动续费；支付前会再次展示金额与订单信息。',
@@ -828,17 +823,12 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              '如何取消自动续费？',
+              '当前是单次购买，不会自动续费。',
               style: TextStyle(
                 fontSize: 14,
                 color: ShunShiColors.textSecondary,
               ),
             ),
-          ),
-          Icon(
-            Icons.chevron_right,
-            color: ShunShiColors.textTertiary,
-            size: 18,
           ),
         ],
       ),

@@ -13,8 +13,8 @@ void main() async {
 
   AppErrorHandler.init();
 
+  await StorageManager.init();
   Future.wait([
-    StorageManager.init(),
     NotificationService().init(),
     WechatPayClient.initialize(),
   ]).catchError((Object e) {
