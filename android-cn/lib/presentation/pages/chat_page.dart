@@ -838,6 +838,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
                 ),
               ),
               PopupMenuButton<String>(
+                tooltip: '更多',
                 icon: const Icon(
                   Icons.more_vert,
                   size: 22,

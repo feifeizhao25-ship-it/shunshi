@@ -528,7 +528,10 @@ class _GradientSendButtonState extends State<GradientSendButton> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return Semantics(
+      button: true,
+      label: '发送',
+      child: GestureDetector(
       onTapDown: (_) => setState(() => _scale = 0.85),
       onTapUp: (_) {
         setState(() => _scale = 1.0);
@@ -553,6 +556,7 @@ class _GradientSendButtonState extends State<GradientSendButton> {
           child: const Icon(Icons.send, color: Colors.white, size: 18),
         ),
       ),
+    ),
     );
   }
 }

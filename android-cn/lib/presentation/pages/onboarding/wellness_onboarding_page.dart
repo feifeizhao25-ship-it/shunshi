@@ -27,7 +27,7 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
   static const _concerns = [
     _Concern('睡眠', '😴', '改善睡眠质量'),
     _Concern('饮食', '🍵', '饮食调理养生'),
-    _Concern('运动', '🏃', '增强体质功法'),
+    _Concern('运动', '🏃', '走动拉伸'),
     _Concern('情绪', '🧘', '情绪管理减压'),
   ];
 
@@ -344,7 +344,7 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
 
   // ── Page 3: 准备就绪 (5秒) ──
   Widget _page3() {
-    final concern = _selectedConcern ?? '养生';
+    final concern = _selectedConcern ?? '作息';
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -373,7 +373,7 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
         ),
         const SizedBox(height: 16),
         Text(
-          '我们将围绕「$concern」为你定制\n个性化养生方案',
+          '我们将围绕「$concern」为你安排\n这一季的作息',
           textAlign: TextAlign.center,
           style: const TextStyle(
             fontFamily: ShunShiTypography.sansFamily,

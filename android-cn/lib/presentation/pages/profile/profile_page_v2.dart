@@ -349,7 +349,20 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
                   _buildDivider(isDark),
                   _buildMenuTile(context, Icons.dark_mode_outlined,
                       '深色模式', const [Color(0xFF5C6BC0), Color(0xFF7986CB)],
-                      () => context.push('/theme-settings')),
+                      () async {
+                    final next = ThemeNotifier.instance.mode == ThemeMode.dark
+                        ? ThemeMode.light
+                        : ThemeMode.dark;
+                    await ThemeNotifier.instance.setMode(next);
+                    if (!context.mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text(next == ThemeMode.dark ? '已切换到深色模式' : '已切换到浅色模式'),
+                    ));
+                  }),
+                  _buildDivider(isDark),
+                  _buildMenuTile(context, Icons.settings_outlined,
+                      '设置', const [Color(0xFF78909C), Color(0xFF90A4AE)],
+                      () => context.push('/settings')),
                   _buildDivider(isDark),
                   _buildMenuTile(context, Icons.info_outline,
                       '关于', const [Color(0xFF90A4AE), Color(0xFFB0BEC5)],

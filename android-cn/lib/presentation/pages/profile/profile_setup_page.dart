@@ -11,6 +11,8 @@ import '../../../core/theme/shunshi_text_styles.dart';
 import '../../../data/network/api_client.dart';
 
 /// 中医九种体质
+const _healthConcernOptions = ['睡眠', '饮食', '走动', '情绪'];
+
 const _constitutionTypes = [
   '平和质',
   '气虚质',
@@ -417,7 +419,7 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: _healthConcerns.map((c) {
+            children: _healthConcernOptions.map((c) {
               final selected = _healthConcerns.contains(c);
               return GestureDetector(
                 onTap: () {
