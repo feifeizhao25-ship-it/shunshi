@@ -108,6 +108,18 @@ def test_operator_endpoints_need_admin(ctx, method, path):
     assert client.request(method, path, json={}, headers=admin).status_code not in (401, 403)
 
 
+def test_alerts_list_requires_admin_and_returns_empty_history(ctx):
+    client, bearer, admin = ctx
+    alice, _ = _ids()
+    assert client.get("/api/v1/alerts", params={"limit": 5, "resolved": False}).status_code == 401
+    assert client.get("/api/v1/alerts", headers=bearer(alice)).status_code == 403
+    response = client.get("/api/v1/alerts", params={"limit": 5, "resolved": False}, headers=admin)
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["success"] is True
+    assert body["data"] == []
+
+
 def test_admin_login_stays_public(ctx):
     client, _, _ = ctx
     response = client.post("/api/v1/admin/auth/login", json={"username": "x", "password": "y"})

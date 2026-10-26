@@ -88,6 +88,7 @@ function userIdFromToken(token: string): string {
 test('国内版主要流程', async ({ page }) => {
   const consoleErrors: string[] = [];
   const failedRequests: string[] = [];
+  const loggedOutDenials: string[] = [];
   page.on('console', (message) => {
     if (message.type() === 'error') consoleErrors.push(message.text());
   });
@@ -96,6 +97,12 @@ test('国内版主要流程', async ({ page }) => {
     const url = response.url();
     if (url.startsWith(api) && response.status() >= 500) {
       failedRequests.push(`${response.status()} ${url}`);
+    }
+    if (
+      response.status() === 401 &&
+      (url.includes('/api/v1/favorites') || url.includes('/api/v1/records/care/stats'))
+    ) {
+      loggedOutDenials.push(`${response.status()} ${url}`);
     }
   });
 
@@ -117,6 +124,7 @@ test('国内版主要流程', async ({ page }) => {
 
   await clickText(page, '我的');
   await page.getByRole('button', { name: '设置', exact: true }).waitFor();
+  await see(page, '登录后查看收藏和养护记录').waitFor();
   await shot(page, '06-profile.png');
   await clickText(page, '设置');
   await page.getByRole('heading', { name: '设置' }).waitFor();
@@ -231,11 +239,16 @@ test('国内版主要流程', async ({ page }) => {
     JSON.stringify({ consoleErrors, failedRequests }, null, 2),
   );
   expect(failedRequests, failedRequests.join('\n')).toEqual([]);
+  expect(loggedOutDenials, loggedOutDenials.join('\n')).toEqual([]);
 });
 
 test('管理后台桌面', async ({ browser }) => {
   const context = await browser.newContext({ viewport: { width: 1280, height: 800 } });
   const page = await context.newPage();
+  const alertStatuses: number[] = [];
+  page.on('response', (response) => {
+    if (response.url().includes('/api/v1/alerts')) alertStatuses.push(response.status());
+  });
   const reachable = await page.goto(`${adminUrl}/login`).then((response) => response?.ok() ?? false).catch(() => false);
   if (!reachable) {
     test.skip(true, '管理后台没有启动');
@@ -244,10 +257,12 @@ test('管理后台桌面', async ({ browser }) => {
   await page.locator('input[name="username"], input[type="text"]').first().fill('admin');
   await page.locator('input[name="password"]').fill('ui-test-dummy-password');
   await page.getByRole('button', { name: /登录/ }).click();
-  await page.waitForTimeout(1500);
+  await page.getByText('暂无活跃告警').waitFor({ timeout: 10_000 });
   await shot(page, '30-admin-after-login.png');
   await page.goto(`${adminUrl}/subscription`);
   await page.waitForTimeout(1000);
   await shot(page, '31-admin-subscription.png');
+  expect(alertStatuses.length, '仪表盘应请求告警列表').toBeGreaterThan(0);
+  expect(alertStatuses, alertStatuses.join(',')).not.toContain(404);
   await context.close();
 });

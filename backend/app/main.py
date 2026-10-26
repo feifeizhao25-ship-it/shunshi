@@ -5,7 +5,7 @@ import asyncio
 import importlib
 import pkgutil
 
-from fastapi import APIRouter, FastAPI
+from fastapi import APIRouter, Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .config import Settings
@@ -210,6 +210,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     # below owns the public catalogue and search contract.
     app.include_router(user.router)
     app.include_router(user.profile_router)
+    from .alerts.router import router as alerts_router
+    from .product_access import product_access_guard
+
+    app.include_router(alerts_router, dependencies=[Depends(product_access_guard)])
     app.include_router(memory.router)
     app.include_router(chat.router)
     app.include_router(chat.legacy_router)

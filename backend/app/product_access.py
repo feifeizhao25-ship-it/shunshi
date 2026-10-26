@@ -68,6 +68,8 @@ ADMIN_ONLY: tuple[tuple[frozenset[str] | None, re.Pattern[str]], ...] = tuple(
         # 列出的是**所有用户**的到期随访任务
         (None, r"^/api/v1/followup/(due|check)$"),
         (None, r"^/api/v1/analytics/app-stats$"),
+        # 告警历史是全站运营数据，和后台仪表盘同一级，只给管理员。
+        (None, r"^/api/v1/alerts(/|$)"),
         (frozenset({"POST", "PUT", "PATCH", "DELETE"}), r"^/api/v1/banner(/|$)"),
     )
 )
