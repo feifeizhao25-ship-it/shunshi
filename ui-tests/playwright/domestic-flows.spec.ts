@@ -147,6 +147,7 @@ test('国内版主要流程', async ({ page }) => {
   await clickText(page, '平和质');
   await clickText(page, '完成');
   await see(page, '今日').waitFor({ timeout: 20_000 });
+  await see(page, /当令|霜降/).waitFor({ timeout: 20_000 });
   await shot(page, '13-home-after-setup.png');
 
   await clickText(page, '聊天');
