@@ -2,10 +2,9 @@ import 'dart:convert';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:dio/dio.dart';
-import 'dart:io';
 import '../../../data/network/api_client.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import '../../../core/theme/shunshi_text_styles.dart';
@@ -652,16 +651,13 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
       }
       buffer.writeln('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
       buffer.writeln();
-      buffer.writeln('  本报告由「顺时」AI养生顾问生成');
-      buffer.writeln('  仅供参考，不构成医疗建议');
-      buffer.writeln('  如有健康问题请咨询专业中医师');
+      buffer.writeln('  本报告由顺时生成，仅供作息安排参考');
+      buffer.writeln('  不构成医疗诊断或治疗建议');
+      buffer.writeln('  身体不适请到正规医院就诊');
       buffer.writeln();
 
-      final dir = await getApplicationDocumentsDirectory();
-      final file = File('${dir.path}/顺时体质报告_${r.typeName}.txt');
-      await file.writeAsString(buffer.toString());
-
-      if (mounted) _showSnackBar('报告已保存：${file.path}');
+      await Clipboard.setData(ClipboardData(text: buffer.toString()));
+      if (mounted) _showSnackBar('报告已复制，可粘贴到你选择的位置保存');
     } catch (e) {
       if (mounted) _showSnackBar('保存失败');
     }
