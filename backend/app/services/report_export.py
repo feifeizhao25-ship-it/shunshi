@@ -8,6 +8,7 @@ PDF 中文字体: 依次找环境变量 SHUNSHI_REPORT_FONT、系统 STHeiti/Pin
 from __future__ import annotations
 import io, os, zipfile
 from datetime import datetime, timezone
+from pathlib import Path
 from xml.sax.saxutils import escape
 
 def _report_lines(user_id: str, memories: list) -> list:
@@ -44,8 +45,16 @@ def build_docx(user_id: str, memories: list) -> bytes:
         z.writestr("word/document.xml", document)
     return buf.getvalue()
 
-_FONT_CANDIDATES = ["/System/Library/Fonts/STHeiti Medium.ttc", "/System/Library/Fonts/PingFang.ttc",
-                    "/System/Library/Fonts/Supplemental/PingFang.ttc", "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc"]
+# Noto Sans SC（SIL Open Font License 1.1），简体子集，TrueType。
+# 仓库里的 NotoSansCJKsc-Regular.otf 是 PostScript 轮廓，reportlab 画不了。
+_BUNDLED_FONT = Path(__file__).resolve().parent.parent / "assets" / "fonts" / "NotoSansSC-Regular.ttf"
+_FONT_CANDIDATES = [
+    str(_BUNDLED_FONT),
+    "/System/Library/Fonts/STHeiti Medium.ttc",
+    "/System/Library/Fonts/PingFang.ttc",
+    "/System/Library/Fonts/Supplemental/PingFang.ttc",
+    "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+]
 
 def _cjk_font_path():
     env = os.environ.get("SHUNSHI_REPORT_FONT")
