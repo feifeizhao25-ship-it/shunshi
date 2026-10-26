@@ -209,6 +209,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     # proxy is intentionally excluded because the production content router
     # below owns the public catalogue and search contract.
     app.include_router(user.router)
+    app.include_router(user.profile_router)
     app.include_router(memory.router)
     app.include_router(chat.router)
     app.include_router(chat.legacy_router)

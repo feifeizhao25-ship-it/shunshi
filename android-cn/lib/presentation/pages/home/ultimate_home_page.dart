@@ -432,7 +432,6 @@ class _UltimateHomePageState extends State<UltimateHomePage>
       final results = await Future.wait([
         _api.get('/seasons/home/dashboard', queryParameters: {'locale': 'zh-CN'}, level: SpeedLevel.s1),
         _api.get('/solar-terms/current', level: SpeedLevel.s1),
-        _api.get('/followup/due', queryParameters: {'user_id': 'user-001', 'limit': 1}, level: SpeedLevel.s0),
       ]);
 
       if (!mounted) return;
@@ -444,16 +443,16 @@ class _UltimateHomePageState extends State<UltimateHomePage>
       }
 
       final solar = results[1].data;
-      if (solar is Map) {
-        // Could enhance solar term info from API
-      }
-
-      final followupRes = results[2].data;
-      if (followupRes is Map && followupRes['due_followups'] is List) {
-        final due = (followupRes['due_followups'] as List);
-        if (due.isNotEmpty) {
-          _followUp = Map<String, dynamic>.from(due.first);
-          _hasFollowUp = true;
+      if (solar is Map && solar['success'] == true && solar['data'] is Map) {
+        final data = solar['data'] as Map;
+        final name = data['name']?.toString();
+        final description = data['description']?.toString();
+        if (name != null && name.isNotEmpty && mounted) {
+          setState(() {
+            _solarTermInfo = description == null || description.isEmpty
+                ? name
+                : '$name · $description';
+          });
         }
       }
 

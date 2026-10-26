@@ -33,7 +33,7 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
     // 1. Load stats from API
     try {
       final results = await Future.wait([
-        ApiClient().get('/api/v1/favorites', queryParameters: {'user_id': 'guest', 'limit': 1}),
+        ApiClient().get('/api/v1/favorites', queryParameters: {'limit': 1}),
         ApiClient().get('/api/v1/records/care/stats'),
       ]);
       // Favorites count
