@@ -17,5 +17,16 @@ export default defineConfig({
     screenshot: 'off',
     video: 'off',
     trace: 'off',
+    launchOptions: {
+      args: [
+        '--no-sandbox',
+        '--disable-dev-shm-usage',
+        '--use-gl=angle',
+        '--use-angle=swiftshader',
+        '--enable-webgl',
+        '--ignore-gpu-blocklist',
+        '--enable-unsafe-swiftshader',
+      ],
+    },
   },
 });

@@ -17,10 +17,10 @@ async function enableSemantics(page: Page) {
     null,
     { timeout: 90_000 },
   );
-  const placeholder = page.locator('flt-semantics-placeholder');
-  if (await placeholder.count()) {
-    await placeholder.first().click({ force: true });
-  }
+  await page.evaluate(() => {
+    const placeholder = document.querySelector('flt-semantics-placeholder');
+    if (placeholder instanceof HTMLElement) placeholder.click();
+  });
   await page.locator('flt-semantics').first().waitFor({ state: 'attached', timeout: 20_000 });
 }
 
@@ -37,6 +37,16 @@ async function openRoute(page: Page, route: string) {
 }
 
 async function clickText(page: Page, text: string) {
+  const exact = page.getByRole('button', { name: text, exact: true });
+  if (await exact.count()) {
+    await exact.last().click();
+    return;
+  }
+  const loose = page.getByRole('button', { name: new RegExp(text) });
+  if (await loose.count()) {
+    await loose.last().click();
+    return;
+  }
   const target = page.getByText(text, { exact: true }).last();
   await target.waitFor({ state: 'visible', timeout: 20_000 });
   await target.click();
