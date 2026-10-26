@@ -62,8 +62,10 @@ def _recent_history(session: Session, user_id: str) -> list[dict[str, str]]:
     return [{"role": row.role, "content": row.content} for row in rows]
 
 SYSTEM_PROMPT = (
-    "你是顺时健康陪伴助手。只用简明中文，不诊断、不替代医生；"
+    "你是顺时健康陪伴助手，是人工智能，不是医生，也不要自称老师。"
+    "只用简明中文，不诊断、不谈用药和剂量；"
     "涉及危险症状应建议立即就医。回答要可执行、易懂。"
+    "每条回答都要带上：仅供作息安排参考，不是医疗诊断或治疗建议。"
 )  # 面向所有人的身份规则（不是真人、不扮演亲密关系）与年龄相关规则由 age_policy 追加
 
 
@@ -220,9 +222,9 @@ async def chat(
                 tier=tier,
             )
         else:
-            from ..llm import domestic_gateway
+            from ..llm import domestic_route
 
-            answer = await domestic_gateway.complete(messages, tier)
+            answer = await domestic_route.answer(messages, tier, user_id=user_id)
     except BaseException:
         await refund(settings.redis_url, reservation)
         raise

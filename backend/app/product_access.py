@@ -94,11 +94,28 @@ def _bearer(request: Request) -> str:
     return token.strip() if scheme.lower() == "bearer" else ""
 
 
+def _ops_hub_token_ok(token: str) -> bool:
+    """运营中枢令牌。比较哈希，避免长度不同时 compare_digest 直接抛错，也不把原值写进日志。"""
+    import hashlib
+    import hmac
+    import os
+
+    expected = os.environ.get("OPENCLAW_SHUNSHI_ADMIN_TOKEN") or ""
+    if not token or not expected:
+        return False
+    return hmac.compare_digest(
+        hashlib.sha256(token.encode()).digest(),
+        hashlib.sha256(expected.encode()).digest(),
+    )
+
+
 def _is_admin(request: Request) -> bool:
     from .router.admin_auth import _verify_token, _token
 
     token = _token(request.headers.get("x-admin-token"), request.headers.get("authorization"))
-    return bool(token and _verify_token(token))
+    if token and _verify_token(token):
+        return True
+    return bool(token and _ops_hub_token_ok(token))
 
 
 def _body_model_fields(route: Any) -> set[str]:

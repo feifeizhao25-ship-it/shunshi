@@ -87,8 +87,14 @@ class DeepseekClient:
         default_model: str = "deepseek-chat",
         timeout: int = 120,
     ):
-        self.api_key = api_key or DEEPSEEK_API_KEY
-        self.base_url = (base_url or DEEPSEEK_BASE_URL).rstrip("/")
+        # 产品密钥，不用 OpenClaw 的 DEEPSEEK_API_KEY。地址只允许官方主机。
+        if api_key is None:
+            self.api_key = (os.getenv("SHUNSHI_DEEPSEEK_API_KEY") or "").strip()
+        else:
+            self.api_key = api_key
+        requested = (base_url or "https://api.deepseek.com").rstrip("/")
+        host = requested.split("://", 1)[-1].split("/", 1)[0]
+        self.base_url = requested if host == "api.deepseek.com" else "https://api.deepseek.com"
         self.default_model = default_model
         self.timeout = timeout
         self._session: Optional[aiohttp.ClientSession] = None

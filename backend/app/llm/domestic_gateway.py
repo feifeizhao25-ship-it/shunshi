@@ -11,9 +11,9 @@
 - 要让它能用，只能把 URL 指向见己的 svc-model-router——两条产品线共用一个模型出口、
   共用一份预算与日志，违反「四条产品线互不交叉」的约束。
 
-现在顺时在进程内直连境内供应商：DeepSeek（api.deepseek.com）优先，硅基流动
-（api.siliconflow.cn）备用。两家都没配 key 时 503 并写明缺哪个变量；不会回落到任何
-境外供应商（``app/llm/openrouter.py`` 不在这条路径上）。
+现在顺时在进程内直连境内供应商：DeepSeek Flash 跑量，豆包 lite 与千问 plus 作备选，
+硅基流动仅在迁移完成前保留。都没配产品密钥时 503，并写明缺哪个变量。
+不会回落到境外供应商。
 ``SHUNSHI_MODEL_ROUTER_URL`` 仍可用，但只应指向顺时自己的网关。
 """
 
@@ -36,15 +36,35 @@ class Provider:
     key_vars: tuple[str, ...]
     endpoint: str
     model: str
+    # 待核实的模型名可以改环境变量，缺省仍是官方文档里的 id。
+    model_env: str = ""
 
 
-# 只列境内供应商。地址写死，不从环境变量读——防止被配置成境外地址。
+# 只列境内供应商。缺省地址写死，不接受境外主机。
+# 跑量：DeepSeek V4.1 Flash。备选：豆包 2.0-lite → qwen-plus。
+# 硅基流动只在迁移到百炼完成前保留（文档 12）。
+# 密钥只用顺时产品服务器的变量，不用 OpenClaw 的 DEEPSEEK_API_KEY / DASHSCOPE_API_KEY / ARK_API_KEY。
 PROVIDERS: tuple[Provider, ...] = (
     Provider(
         "deepseek",
-        ("SHUNSHI_DEEPSEEK_API_KEY", "DEEPSEEK_API_KEY"),
+        ("SHUNSHI_DEEPSEEK_API_KEY",),
         "https://api.deepseek.com/chat/completions",
-        "deepseek-flash",  # 官方 2026-07-24 停用 deepseek-chat，见 app/llm/deepseek.py
+        "deepseek-flash",
+        "SHUNSHI_DEEPSEEK_MODEL",
+    ),
+    Provider(
+        "ark",
+        ("SHUNSHI_ARK_API_KEY",),
+        "https://ark.cn-beijing.volces.com/api/v3/chat/completions",
+        "doubao-seed-2-0-lite-260428",
+        "SHUNSHI_ARK_CHAT_MODEL",
+    ),
+    Provider(
+        "dashscope",
+        ("SHUNSHI_DASHSCOPE_API_KEY",),
+        "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+        "qwen-plus",
+        "SHUNSHI_QWEN_FALLBACK_MODEL",
     ),
     Provider(
         "siliconflow",
@@ -53,11 +73,46 @@ PROVIDERS: tuple[Provider, ...] = (
         "deepseek-ai/DeepSeek-V3",
     ),
 )
-DOMESTIC_HOSTS = frozenset({"api.deepseek.com", "api.siliconflow.cn"})
+DOMESTIC_HOSTS = frozenset({
+    "api.deepseek.com",
+    "api.siliconflow.cn",
+    "ark.cn-beijing.volces.com",
+    "dashscope.aliyuncs.com",
+    "green-cip.cn-beijing.aliyuncs.com",
+    "green-cip-vpc.cn-beijing.aliyuncs.com",
+})
+BAILIAN_HOST_SUFFIX = ".cn-beijing.maas.aliyuncs.com"
 
 # 按会员档位给出的单次回答长度上限（token）。
 MAX_TOKENS_BY_TIER = {"free": 600}
 DEFAULT_MAX_TOKENS = 1200
+
+
+def host_allowed(host: str | None) -> bool:
+    if not host:
+        return False
+    if host in DOMESTIC_HOSTS:
+        return True
+    # 百炼业务空间域名。WorkspaceId 待核实，只接受华北 2（北京）后缀。
+    return host.endswith(BAILIAN_HOST_SUFFIX) and host != BAILIAN_HOST_SUFFIX.lstrip(".")
+
+
+def llm_timeout(env: dict | None = None) -> float:
+    source = os.environ if env is None else env
+    raw = (source.get("SHUNSHI_LLM_TIMEOUT_SECONDS") or "20").strip()
+    try:
+        value = float(raw)
+    except ValueError:
+        value = 20.0
+    return min(max(value, 1.0), 60.0)
+
+
+def _model_for(provider: Provider, env: dict) -> str:
+    if provider.model_env:
+        override = (env.get(provider.model_env) or "").strip()
+        if override:
+            return override
+    return provider.model
 
 
 def _key_for(provider: Provider, env: dict | None = None) -> str:
@@ -90,6 +145,71 @@ def local_stub_reply(env: dict | None = None) -> str | None:
     if (source.get("SHUNSHI_ENV") or "development").strip().lower() == "production":
         return None
     return LOCAL_STUB_REPLY
+
+
+def _payload(provider: Provider, model: str, messages: list, tier: str) -> dict:
+    payload: dict[str, Any] = {
+        "model": model,
+        "messages": messages,
+        "temperature": 0.7,
+        "max_tokens": MAX_TOKENS_BY_TIER.get(tier, DEFAULT_MAX_TOKENS),
+        "stream": False,
+    }
+    # qwen3.5 默认开思考，文档 12 的价格按非思考档。
+    if provider.name == "dashscope":
+        payload["enable_thinking"] = False
+    if provider.name == "ark":
+        payload["thinking"] = {"type": "disabled"}
+    return payload
+
+
+async def _post_provider(
+    client: httpx.AsyncClient,
+    provider: Provider,
+    key: str,
+    messages: list,
+    tier: str,
+    env: dict,
+    failures: list[str],
+    timeout: float,
+    *,
+    model: str | None = None,
+    endpoint: str | None = None,
+) -> str | None:
+    url = endpoint or provider.endpoint
+    host = httpx.URL(url).host
+    if not host_allowed(host):
+        failures.append(f"{provider.name}:offshore")
+        return None
+    body = _payload(provider, model or _model_for(provider, env), messages, tier)
+    try:
+        response = await client.post(
+            url,
+            json=body,
+            headers={"Authorization": f"Bearer {key}"},
+            timeout=timeout,
+        )
+    except httpx.HTTPError as exc:
+        failures.append(f"{provider.name}:{type(exc).__name__}")
+        return None
+    if response.status_code != 200:
+        failures.append(f"{provider.name}:{response.status_code}")
+        return None
+    try:
+        text = _extract_text(response.json())
+    except ValueError:
+        text = None
+    if text:
+        return text
+    failures.append(f"{provider.name}:empty")
+    return None
+
+
+def provider_by_name(name: str) -> Provider | None:
+    for provider in PROVIDERS:
+        if provider.name == name:
+            return provider
+    return None
 
 
 def _extract_text(data: Any) -> str | None:
@@ -125,40 +245,17 @@ async def complete(
         )
 
     owns_client = client is None
-    client = client or httpx.AsyncClient(timeout=60)
+    timeout = llm_timeout(env)
+    client = client or httpx.AsyncClient(timeout=timeout)
+    source = os.environ if env is None else env
     failures: list[str] = []
     try:
         for provider, key in providers:
-            host = httpx.URL(provider.endpoint).host
-            if host not in DOMESTIC_HOSTS:  # pragma: no cover - 防御性检查
-                failures.append(f"{provider.name}:offshore")
-                continue
-            payload = {
-                "model": provider.model,
-                "messages": messages,
-                "temperature": 0.7,
-                "max_tokens": MAX_TOKENS_BY_TIER.get(tier, DEFAULT_MAX_TOKENS),
-                "stream": False,
-            }
-            try:
-                response = await client.post(
-                    provider.endpoint,
-                    json=payload,
-                    headers={"Authorization": f"Bearer {key}"},
-                )
-            except httpx.HTTPError as exc:
-                failures.append(f"{provider.name}:{type(exc).__name__}")
-                continue
-            if response.status_code != 200:
-                failures.append(f"{provider.name}:{response.status_code}")
-                continue
-            try:
-                text = _extract_text(response.json())
-            except ValueError:
-                text = None
+            text = await _post_provider(
+                client, provider, key, messages, tier, source, failures, timeout
+            )
             if text:
                 return text
-            failures.append(f"{provider.name}:empty")
     finally:
         if owns_client:
             await client.aclose()

@@ -95,13 +95,41 @@ class RemoteReranker:
         return [float(score) for score in scores]
 
 
+class BailianEmbedder:
+    """百炼 text-embedding-v4。没配密钥或请求失败时退回本地哈希。"""
+
+    def embed(self, texts: list[str]) -> list[list[float]]:
+        from app.llm.rag_client import embed_sync
+
+        vectors = embed_sync(texts)
+        if not vectors:
+            return LocalHashEmbedder().embed(texts)
+        return vectors
+
+
+class BailianReranker:
+    """百炼 qwen3-rerank，只对调用方已经截断的列表打分。"""
+
+    def rerank(self, query: str, documents: list[str]) -> list[float]:
+        from app.llm.rag_client import rerank_sync
+
+        scores = rerank_sync(query, documents)
+        if not scores:
+            return LocalOverlapReranker().rerank(query, documents)
+        return scores
+
+
 def get_embedder(provider: str, url: str = "") -> Embedder:
+    if provider in {"bailian", "text-embedding-v4"}:
+        return BailianEmbedder()
     if provider == "bge-m3" and url.strip():
         return BgeM3Embedder(url)
     return LocalHashEmbedder()
 
 
 def get_reranker(name: str, url: str = "") -> Reranker:
+    if name in {"qwen3-rerank", "bailian"}:
+        return BailianReranker()
     if name == "bge-reranker-v2-m3" and url.strip():
         return RemoteReranker(url)
     return LocalOverlapReranker()

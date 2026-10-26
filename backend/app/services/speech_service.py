@@ -155,7 +155,9 @@ class SpeechService:
     
     def __init__(self, api_key: str = None, base_url: str = None, timeout: int = 60):
         self.api_key = api_key or SILICONFLOW_API_KEY
-        self.base_url = base_url or SILICONFLOW_BASE_URL
+        requested = base_url or SILICONFLOW_BASE_URL
+        host = requested.split("://", 1)[-1].split("/", 1)[0]
+        self.base_url = requested if host == "api.siliconflow.cn" else SILICONFLOW_BASE_URL
         self.timeout = timeout
         
         if not self.api_key:
@@ -173,7 +175,42 @@ class SpeechService:
         }
     
     # ── TTS ──────────────────────────────────────
-    
+
+    async def _dashscope_tts(self, text: str, response_format: str) -> Optional[bytes]:
+        """CosyVoice v3.5-flash。模型名和地址待核实，可用环境变量改。没配密钥则返回 None。"""
+        key = (os.getenv("SHUNSHI_DASHSCOPE_API_KEY") or "").strip()
+        if not key:
+            return None
+        model = (os.getenv("SHUNSHI_TTS_MODEL") or "cosyvoice-v3.5-flash").strip()
+        endpoint = (
+            os.getenv("SHUNSHI_TTS_ENDPOINT")
+            or "https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation"
+        ).strip()
+        host = endpoint.split("://", 1)[-1].split("/", 1)[0]
+        if host != "dashscope.aliyuncs.com" and not host.endswith(".cn-beijing.maas.aliyuncs.com"):
+            return None
+        payload = {
+            "model": model,
+            "input": {"text": text, "format": response_format},
+        }
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.post(
+                    endpoint,
+                    headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
+                    json=payload,
+                    timeout=aiohttp.ClientTimeout(total=self.timeout),
+                ) as response:
+                    if response.status != 200:
+                        return None
+                    content_type = response.headers.get("Content-Type", "")
+                    data = await response.read()
+                    if data and ("audio" in content_type or content_type.startswith("application/octet-stream")):
+                        return data
+        except (aiohttp.ClientError, TimeoutError):
+            return None
+        return None
+
     async def text_to_speech(
         self,
         text: str,
@@ -198,6 +235,16 @@ class SpeechService:
         Raises:
             TTSError: TTS 转换失败
         """
+        dashscope_audio = await self._dashscope_tts(text, response_format)
+        if dashscope_audio is not None:
+            return TTSResult(
+                audio_data=dashscope_audio,
+                format=response_format,
+                model=os.getenv("SHUNSHI_TTS_MODEL", "cosyvoice-v3.5-flash"),
+                voice="preset",
+                input_text=text,
+                latency_ms=0,
+            )
         if not self.api_key:
             raise TTSError("SILICONFLOW_API_KEY 未配置")
         

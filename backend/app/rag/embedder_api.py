@@ -20,6 +20,14 @@ from dataclasses import dataclass
 logger = logging.getLogger(__name__)
 
 
+def _default_embedding_provider() -> str:
+    if (os.getenv("SHUNSHI_DASHSCOPE_API_KEY") or "").strip():
+        return "bailian"
+    if (os.getenv("SHUNSHI_SILICONFLOW_API_KEY") or os.getenv("SILICONFLOW_API_KEY") or "").strip():
+        return "siliconflow"
+    return "local"
+
+
 @dataclass
 class EmbeddingResult:
     """Embedding 结果"""
@@ -39,12 +47,12 @@ class EmbeddingClient:
     - local: sentence-transformers (本地，无网络依赖)
     """
     
-    SUPPORTED_PROVIDERS = ["siliconflow", "openai", "local"]
+    SUPPORTED_PROVIDERS = ["bailian", "siliconflow", "local"]
     
     # 默认模型映射
     DEFAULT_MODELS = {
+        "bailian": "text-embedding-v4",
         "siliconflow": "BAAI/bge-large-zh-v1.5",
-        "openai": "text-embedding-3-small",
         "local": "BAAI/bge-small-zh-v1.5",
     }
     
@@ -52,8 +60,7 @@ class EmbeddingClient:
     DIMENSIONS = {
         "BAAI/bge-large-zh-v1.5": 1024,
         "BAAI/bge-small-zh-v1.5": 512,
-        "text-embedding-3-small": 1536,
-        "text-embedding-3-large": 3072,
+        "text-embedding-v4": 1024,
     }
     
     def __init__(
@@ -63,7 +70,10 @@ class EmbeddingClient:
         api_key: Optional[str] = None,
         base_url: Optional[str] = None,
     ):
-        self.provider = provider or os.getenv("EMBEDDING_PROVIDER", "siliconflow")
+        self.provider = provider or os.getenv("EMBEDDING_PROVIDER") or _default_embedding_provider()
+        if self.provider == "openai":
+            logger.warning("[Embedder] 境外向量服务已停用")
+            self.provider = "bailian" if os.getenv("SHUNSHI_DASHSCOPE_API_KEY") else "local"
         self.model = model or self.DEFAULT_MODELS.get(self.provider, "BAAI/bge-large-zh-v1.5")
         self.api_key = api_key or self._get_api_key()
         self.base_url = base_url or self._get_base_url()
@@ -71,25 +81,27 @@ class EmbeddingClient:
         self._local_model = None
         
         if self.provider not in self.SUPPORTED_PROVIDERS:
-            logger.warning(f"[Embedder] 未知 provider: {self.provider}, 回退到 siliconflow")
-            self.provider = "siliconflow"
+            logger.warning("[Embedder] 未知 provider: %s, 回退到本地", self.provider)
+            self.provider = "local"
         
         logger.info(f"[Embedder] 初始化: provider={self.provider}, model={self.model}, dim={self.dimensions}")
     
     def _get_api_key(self) -> str:
         """获取 API Key"""
+        if self.provider == "bailian":
+            return os.getenv("SHUNSHI_DASHSCOPE_API_KEY", "")
         if self.provider == "siliconflow":
-            return os.getenv("SILICONFLOW_API_KEY", "")
-        elif self.provider == "openai":
-            return os.getenv("OPENAI_API_KEY", "")
+            return os.getenv("SHUNSHI_SILICONFLOW_API_KEY") or os.getenv("SILICONFLOW_API_KEY", "")
         return ""
     
     def _get_base_url(self) -> str:
         """获取 Base URL"""
         if self.provider == "siliconflow":
-            return os.getenv("SILICONFLOW_BASE_URL", "https://api.siliconflow.cn/v1")
-        elif self.provider == "openai":
-            return os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1")
+            raw = os.getenv("SILICONFLOW_BASE_URL", "https://api.siliconflow.cn/v1")
+            host = raw.split("://", 1)[-1].split("/", 1)[0]
+            return raw if host == "api.siliconflow.cn" else "https://api.siliconflow.cn/v1"
+        if self.provider == "bailian":
+            return "https://dashscope.aliyuncs.com/compatible-mode/v1"
         return ""
     
     async def embed(self, texts: Union[str, List[str]]) -> EmbeddingResult:
@@ -105,20 +117,19 @@ class EmbeddingClient:
         if isinstance(texts, str):
             texts = [texts]
         
+        if self.provider == "bailian":
+            try:
+                return await self._embed_bailian(texts)
+            except Exception as e:
+                logger.warning("[Embedder] 百炼向量失败，回退到本地模型: %s", type(e).__name__)
+                return await self._embed_local(texts)
         if self.provider == "siliconflow":
             try:
                 return await self._embed_siliconflow(texts)
             except Exception as e:
-                logger.warning(f"[Embedder] SiliconFlow 失败，回退到本地模型: {e}")
+                logger.warning("[Embedder] SiliconFlow 失败，回退到本地模型: %s", type(e).__name__)
                 return await self._embed_local(texts)
-        elif self.provider == "openai":
-            try:
-                return await self._embed_openai(texts)
-            except Exception as e:
-                logger.warning(f"[Embedder] OpenAI 失败，回退到本地模型: {e}")
-                return await self._embed_local(texts)
-        else:
-            return await self._embed_local(texts)
+        return await self._embed_local(texts)
     
     async def _embed_siliconflow(self, texts: List[str]) -> EmbeddingResult:
         """SiliconFlow Embedding API"""
@@ -157,42 +168,30 @@ class EmbeddingClient:
                     total_tokens=total_tokens,
                 )
     
-    async def _embed_openai(self, texts: List[str]) -> EmbeddingResult:
-        """OpenAI Embedding API"""
-        import aiohttp
-        
-        headers = {
-            "Authorization": f"Bearer {self.api_key}",
-            "Content-Type": "application/json",
-        }
-        
-        payload = {
-            "model": self.model,
-            "input": texts,
-        }
-        
-        async with aiohttp.ClientSession() as session:
-            async with session.post(
-                f"{self.base_url}/embeddings",
-                headers=headers,
-                json=payload,
-                timeout=aiohttp.ClientTimeout(total=30),
-            ) as response:
-                if response.status != 200:
-                    text = await response.text()
-                    raise RuntimeError(f"OpenAI embedding failed: {response.status} - {text}")
-                
-                data = await response.json()
-                vectors = [item["embedding"] for item in data["data"]]
-                total_tokens = data.get("usage", {}).get("total_tokens", 0)
-                
-                return EmbeddingResult(
-                    vectors=vectors,
-                    model=self.model,
-                    dimensions=self.dimensions,
-                    total_tokens=total_tokens,
-                )
-    
+    async def _embed_bailian(self, texts: List[str]) -> EmbeddingResult:
+        import httpx
+
+        from app.llm.rag_client import _base, dashscope_key
+
+        key = self.api_key or dashscope_key()
+        if not key:
+            raise RuntimeError("missing dashscope key")
+        async with httpx.AsyncClient(timeout=20) as client:
+            response = await client.post(
+                f"{_base(os.environ, 'embed')}/embeddings",
+                json={"model": self.model or "text-embedding-v4", "input": texts, "encoding_format": "float"},
+                headers={"Authorization": f"Bearer {key}"},
+            )
+            response.raise_for_status()
+            data = response.json()
+        vectors = [item["embedding"] for item in data["data"]]
+        return EmbeddingResult(
+            vectors=vectors,
+            model=self.model,
+            dimensions=len(vectors[0]) if vectors else self.dimensions,
+            total_tokens=data.get("usage", {}).get("total_tokens", 0),
+        )
+
     async def _embed_local(self, texts: List[str]) -> EmbeddingResult:
         """
         本地 Embedding（sentence-transformers）

@@ -110,7 +110,19 @@ def build_rules() -> List[SafetyRule]:
         action=RuleAction.ATTACH_PREFIX,
     ))
 
-    # ===== 3. 医疗边界规则(关键词) =====
+    # ===== 3. 症状 / 用药 / 疾病治疗 / 孕产儿童用药（固定话术，不调用模型） =====
+    # 放在关键词规则前面：同一条问题若两边都命中，固定话术优先（严重级别相同，先命中的模板留下）。
+    rules.append(SafetyRule(
+        name="health_boundary_refuse",
+        category=RuleCategory.MEDICAL_BOUNDARY,
+        patterns=config["health_refuse_patterns"],
+        is_regex=True,
+        severity=RuleSeverity.BLOCK,
+        action=RuleAction.BLOCK,
+        response_template=config["health_boundary_reply"],
+    ))
+
+    # ===== 4. 医疗边界规则(关键词) =====
     rules.append(SafetyRule(
         name="medical_block_keywords",
         category=RuleCategory.MEDICAL_BOUNDARY,
