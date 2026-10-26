@@ -98,15 +98,19 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
   String _token = '';
   // 先用节气表（与后端同一份数据）给出当前节气，接口返回后再以接口为准
   String _currentSolarTerm = currentSolarTermName() ?? '立夏';
-  String _solarTermDesc = '夏之始，养心安神。清淡饮食，适当午睡，防暑防晒。';
+  String _solarTermDesc = '按这个节气把作息放慢一点。';
   String? _conversationId;
 
   @override
   void initState() {
     super.initState();
     _conversationId = widget.conversationId;
-    _fetchSolarTerm();
-    _initChat();
+    _openChat();
+  }
+
+  Future<void> _openChat() async {
+    await _fetchSolarTerm();
+    if (mounted) await _initChat();
   }
 
   Future<void> _fetchSolarTerm() async {
@@ -652,12 +656,12 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
               children:
                   [
                         '最近睡眠不好',
-                        '换季怎么调理',
+                        '换季怎么安排',
                         '推荐节气食谱',
                         '适合什么运动',
                         '情绪低落怎么办',
                         '想学八段锦',
-                        '推荐养生茶饮',
+                        '换季喝什么',
                         '体质测试',
                       ]
                       .map(

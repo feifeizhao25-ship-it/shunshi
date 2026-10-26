@@ -37,7 +37,13 @@ async function openRoute(page: Page, route: string) {
 }
 
 function see(page: Page, text: string | RegExp) {
-  return page.getByText(text).first();
+  const pattern = text instanceof RegExp
+    ? text
+    : new RegExp(text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+  return page
+    .getByText(text)
+    .or(page.getByRole('group', { name: pattern }))
+    .first();
 }
 
 async function clickText(page: Page, text: string) {
@@ -155,7 +161,7 @@ test('国内版主要流程', async ({ page }) => {
 
   await composer.fill('这个方子可长期服用吗');
   await page.getByRole('button', { name: '发送' }).click();
-  await expect(page.getByText('不要自行用药', { exact: false })).toHaveCount(2);
+  await expect(page.getByRole('group', { name: /不要自行用药/ })).toHaveCount(2);
   await shot(page, '18-long-term-claim-blocked.png');
 
   await page.getByRole('button', { name: '更多' }).click();

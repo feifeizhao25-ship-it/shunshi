@@ -459,8 +459,8 @@ class QuickQuestionChips extends StatelessWidget {
   static const _questions = [
     '今天吃什么好',
     '适合什么运动',
-    '推荐养生茶饮',
-    '换季怎么调理',
+    '换季喝什么',
+    '换季怎么安排',
     '最近睡眠不好',
     '情绪低落怎么办',
   ];
