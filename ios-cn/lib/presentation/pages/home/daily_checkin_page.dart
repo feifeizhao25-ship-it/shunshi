@@ -2,8 +2,9 @@ import '../../../core/router/safe_pop.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
+import '../../../core/config/app_config.dart';
 
-const _baseUrl = 'https://api.shunshi.app';
+const _baseUrl = AppConfig.apiBaseUrl;
 
 class DailyCheckinPage extends StatefulWidget {
   const DailyCheckinPage({super.key});

@@ -51,6 +51,8 @@ async def list_products():
     from app.services.alipay_service import ALIPAY_PRODUCTS
     products = []
     for sku, product in ALIPAY_PRODUCTS.items():
+        if not product.get("on_sale"):
+            continue
         products.append({
             "sku": sku,
             "product_id": product["product_id"],
@@ -59,7 +61,9 @@ async def list_products():
             "price": str(product["price"]),
             "currency": product["currency"],
             "duration_days": product["duration_days"],
+            "period": "year",
             "max_family_seats": product["max_family_seats"],
+            "on_sale": True,
         })
     return {"success": True, "data": products}
 

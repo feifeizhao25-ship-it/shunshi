@@ -46,6 +46,8 @@ PUBLIC_PREFIXES: tuple[str, ...] = (
     # 支付平台的异步通知：身份由处理函数验签确定，不可能带用户 token。
     "/api/v1/payments/alipay/notify",
     "/api/v1/payments/wechat/notify",
+    # 落地页曝光发生在注册之前。付费和注册事件在处理函数里另行核对登录凭证。
+    "/api/v1/growth/events",
 )
 
 # 仅管理员。(方法集合或 None=全部方法, 路径正则)
@@ -68,6 +70,8 @@ ADMIN_ONLY: tuple[tuple[frozenset[str] | None, re.Pattern[str]], ...] = tuple(
         # 列出的是**所有用户**的到期随访任务
         (None, r"^/api/v1/followup/(due|check)$"),
         (None, r"^/api/v1/analytics/app-stats$"),
+        # 告警历史是全站运营数据，和后台仪表盘同一级，只给管理员。
+        (None, r"^/api/v1/alerts(/|$)"),
         (frozenset({"POST", "PUT", "PATCH", "DELETE"}), r"^/api/v1/banner(/|$)"),
     )
 )

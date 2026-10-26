@@ -1,0 +1,1539 @@
+{
+  "ranking_metrics_known_gold_only": {
+    "recall_at_5": 1.0,
+    "mrr_at_5": 0.9583333333333334,
+    "ndcg_at_5": 0.9692441461309548,
+    "empty_query_correct": 1.0
+  },
+  "scope": "research_keyword_retrieval_only",
+  "cases": 18,
+  "passed": 18,
+  "results": [
+    {
+      "id": "lookup-01",
+      "passed": true,
+      "retrieved_ids": [
+        "R040"
+      ],
+      "expected_ids": [
+        "R040"
+      ],
+      "isolated": true,
+      "ranking": {
+        "recall_at_5": 1.0,
+        "mrr_at_5": 1.0,
+        "ndcg_at_5": 1.0,
+        "empty_query_correct": null
+      }
+    },
+    {
+      "id": "lookup-02",
+      "passed": true,
+      "retrieved_ids": [
+        "R041"
+      ],
+      "expected_ids": [
+        "R041"
+      ],
+      "isolated": true,
+      "ranking": {
+        "recall_at_5": 1.0,
+        "mrr_at_5": 1.0,
+        "ndcg_at_5": 1.0,
+        "empty_query_correct": null
+      }
+    },
+    {
+      "id": "lookup-03",
+      "passed": true,
+      "retrieved_ids": [
+        "R043"
+      ],
+      "expected_ids": [
+        "R043"
+      ],
+      "isolated": true,
+      "ranking": {
+        "recall_at_5": 1.0,
+        "mrr_at_5": 1.0,
+        "ndcg_at_5": 1.0,
+        "empty_query_correct": null
+      }
+    },
+    {
+      "id": "lookup-04",
+      "passed": true,
+      "retrieved_ids": [
+        "R044"
+      ],
+      "expected_ids": [
+        "R044"
+      ],
+      "isolated": true,
+      "ranking": {
+        "recall_at_5": 1.0,
+        "mrr_at_5": 1.0,
+        "ndcg_at_5": 1.0,
+        "empty_query_correct": null
+      }
+    },
+    {
+      "id": "lookup-05",
+      "passed": true,
+      "retrieved_ids": [
+        "R033",
+        "R034",
+        "R035"
+      ],
+      "expected_ids": [
+        "R033",
+        "R034",
+        "R035"
+      ],
+      "isolated": true,
+      "ranking": {
+        "recall_at_5": 1.0,
+        "mrr_at_5": 1.0,
+        "ndcg_at_5": 1.0,
+        "empty_query_correct": null
+      }
+    },
+    {
+      "id": "lookup-06",
+      "passed": true,
+      "retrieved_ids": [
+        "R032",
+        "R048"
+      ],
+      "expected_ids": [
+        "R032"
+      ],
+      "isolated": true,
+      "ranking": {
+        "recall_at_5": 1.0,
+        "mrr_at_5": 1.0,
+        "ndcg_at_5": 1.0,
+        "empty_query_correct": null
+      }
+    },
+    {
+      "id": "lookup-07",
+      "passed": true,
+      "retrieved_ids": [
+        "R036"
+      ],
+      "expected_ids": [
+        "R036"
+      ],
+      "isolated": true,
+      "ranking": {
+        "recall_at_5": 1.0,
+        "mrr_at_5": 1.0,
+        "ndcg_at_5": 1.0,
+        "empty_query_correct": null
+      }
+    },
+    {
+      "id": "lookup-08",
+      "passed": true,
+      "retrieved_ids": [
+        "R037",
+        "R038"
+      ],
+      "expected_ids": [
+        "R037",
+        "R038"
+      ],
+      "isolated": true,
+      "ranking": {
+        "recall_at_5": 1.0,
+        "mrr_at_5": 1.0,
+        "ndcg_at_5": 1.0,
+        "empty_query_correct": null
+      }
+    },
+    {
+      "id": "isolation-09",
+      "passed": true,
+      "retrieved_ids": [],
+      "expected_ids": [],
+      "isolated": true,
+      "ranking": {
+        "recall_at_5": null,
+        "mrr_at_5": null,
+        "ndcg_at_5": null,
+        "empty_query_correct": true
+      }
+    },
+    {
+      "id": "isolation-10",
+      "passed": true,
+      "retrieved_ids": [],
+      "expected_ids": [],
+      "isolated": true,
+      "ranking": {
+        "recall_at_5": null,
+        "mrr_at_5": null,
+        "ndcg_at_5": null,
+        "empty_query_correct": true
+      }
+    },
+    {
+      "id": "isolation-11",
+      "passed": true,
+      "retrieved_ids": [],
+      "expected_ids": [],
+      "isolated": true,
+      "ranking": {
+        "recall_at_5": null,
+        "mrr_at_5": null,
+        "ndcg_at_5": null,
+        "empty_query_correct": true
+      }
+    },
+    {
+      "id": "isolation-12",
+      "passed": true,
+      "retrieved_ids": [],
+      "expected_ids": [],
+      "isolated": true,
+      "ranking": {
+        "recall_at_5": null,
+        "mrr_at_5": null,
+        "ndcg_at_5": null,
+        "empty_query_correct": true
+      }
+    },
+    {
+      "id": "lookup-13",
+      "passed": true,
+      "retrieved_ids": [
+        "R053"
+      ],
+      "expected_ids": [
+        "R053"
+      ],
+      "isolated": true,
+      "ranking": {
+        "recall_at_5": 1.0,
+        "mrr_at_5": 1.0,
+        "ndcg_at_5": 1.0,
+        "empty_query_correct": null
+      }
+    },
+    {
+      "id": "lookup-14",
+      "passed": true,
+      "retrieved_ids": [
+        "R022",
+        "R054"
+      ],
+      "expected_ids": [
+        "R054"
+      ],
+      "isolated": true,
+      "ranking": {
+        "recall_at_5": 1.0,
+        "mrr_at_5": 0.5,
+        "ndcg_at_5": 0.6309297535714575,
+        "empty_query_correct": null
+      }
+    },
+    {
+      "id": "lookup-15",
+      "passed": true,
+      "retrieved_ids": [
+        "R059"
+      ],
+      "expected_ids": [
+        "R059"
+      ],
+      "isolated": true,
+      "ranking": {
+        "recall_at_5": 1.0,
+        "mrr_at_5": 1.0,
+        "ndcg_at_5": 1.0,
+        "empty_query_correct": null
+      }
+    },
+    {
+      "id": "lookup-16",
+      "passed": true,
+      "retrieved_ids": [
+        "R061"
+      ],
+      "expected_ids": [
+        "R061"
+      ],
+      "isolated": true,
+      "ranking": {
+        "recall_at_5": 1.0,
+        "mrr_at_5": 1.0,
+        "ndcg_at_5": 1.0,
+        "empty_query_correct": null
+      }
+    },
+    {
+      "id": "isolation-17",
+      "passed": true,
+      "retrieved_ids": [],
+      "expected_ids": [],
+      "isolated": true,
+      "ranking": {
+        "recall_at_5": null,
+        "mrr_at_5": null,
+        "ndcg_at_5": null,
+        "empty_query_correct": true
+      }
+    },
+    {
+      "id": "isolation-18",
+      "passed": true,
+      "retrieved_ids": [],
+      "expected_ids": [],
+      "isolated": true,
+      "ranking": {
+        "recall_at_5": null,
+        "mrr_at_5": null,
+        "ndcg_at_5": null,
+        "empty_query_correct": true
+      }
+    }
+  ],
+  "registry_sha256": "29298266d158ab0929e6d21470e99cd27174b4d25724d786efc7020f8c909a06",
+  "cases_sha256": "cdd5c851a1d4218648adb3b5e582f0afe40e5c3081c88548828abfafdab23e49",
+  "model_answers_evaluated": false,
+  "production_ready": false,
+  "projects": [
+    {
+      "product": "shunshi",
+      "research_files_valid": true,
+      "errors": [],
+      "production_skill_loading": "not_verified_by_this_audit"
+    },
+    {
+      "product": "jianji",
+      "research_files_valid": true,
+      "errors": [],
+      "production_skill_loading": "not_verified_by_this_audit"
+    },
+    {
+      "product": "contentflow",
+      "research_files_valid": true,
+      "errors": [],
+      "production_skill_loading": "not_verified_by_this_audit"
+    },
+    {
+      "product": "energy",
+      "research_files_valid": true,
+      "errors": [],
+      "production_skill_loading": "not_verified_by_this_audit"
+    }
+  ],
+  "energy_evidence": {
+    "audit_ok": true,
+    "errors": [],
+    "total": 12,
+    "review_queue": [
+      {
+        "source_id": "std-gb50797",
+        "reasons": [
+          "content_review_required"
+        ],
+        "evidence_status": "legacy_unreviewed",
+        "source_url": "https://openstd.samr.gov.cn/bzgk/gb/index",
+        "source_sha256": "83b370875c52d43489c09646310380ee7b19a3a292213b91e208566d24f112d3",
+        "retrieval_allowed_by_review": true
+      },
+      {
+        "source_id": "std-iec61724",
+        "reasons": [
+          "content_review_required"
+        ],
+        "evidence_status": "legacy_unreviewed",
+        "source_url": "https://webstore.iec.ch/",
+        "source_sha256": "9c5c8b712eaecccfa692ba37389268e11d6814b2b16e3321333b7e2a14c6ee62",
+        "retrieval_allowed_by_review": true
+      },
+      {
+        "source_id": "policy-us-itc",
+        "reasons": [
+          "content_review_required",
+          "freshness_review_required"
+        ],
+        "evidence_status": "legacy_unreviewed",
+        "source_url": "https://www.energy.gov/eere/solar",
+        "source_sha256": "b21704d087fac2b7d51a9925c9e5ed0bed505e111c2de104eb7219709f9b8307",
+        "retrieval_allowed_by_review": true
+      },
+      {
+        "source_id": "std-ieee1547",
+        "reasons": [
+          "content_review_required"
+        ],
+        "evidence_status": "legacy_unreviewed",
+        "source_url": "https://standards.ieee.org/",
+        "source_sha256": "e0ccc5ecbdd37b329e2800b48853deaa2f1dd75da1a8340fd621e16eaebaccd2",
+        "retrieval_allowed_by_review": true
+      },
+      {
+        "source_id": "guide-grid-interconnection",
+        "reasons": [
+          "content_review_required",
+          "freshness_review_required"
+        ],
+        "evidence_status": "legacy_unreviewed",
+        "source_url": "https://www.nrel.gov/solar/",
+        "source_sha256": "aaa98803ac8457c4b833f2f46ef17b610928f5a82a9cba0c57c6fc30f5ef7e35",
+        "retrieval_allowed_by_review": true
+      },
+      {
+        "source_id": "price-cn-module",
+        "reasons": [
+          "content_review_required",
+          "freshness_review_required"
+        ],
+        "evidence_status": "legacy_unreviewed",
+        "source_url": "http://www.chinapv.org.cn/",
+        "source_sha256": "51f3c7bec8b5cb4dd1f88292d5e04bd37b6e64cefe649a3752d663a39587d2af",
+        "retrieval_allowed_by_review": true
+      },
+      {
+        "source_id": "price-us-eia",
+        "reasons": [
+          "content_review_required",
+          "freshness_review_required"
+        ],
+        "evidence_status": "legacy_unreviewed",
+        "source_url": "https://www.eia.gov/electricity/monthly/",
+        "source_sha256": "6da85de5f50f2727c862eabcaaf193ccf63f0824ea953e4e5c79b834b3278fb3",
+        "retrieval_allowed_by_review": true
+      },
+      {
+        "source_id": "research-irena-capacity-2026",
+        "reasons": [
+          "content_review_required",
+          "freshness_review_required"
+        ],
+        "evidence_status": "legacy_unreviewed",
+        "source_url": "https://www.irena.org/Publications/2026/Mar/Renewable-capacity-statistics-2026",
+        "source_sha256": "f5847f3207a857350b0afb3fea59ecb252fb80c48355ded796ee6283cbd450ba",
+        "retrieval_allowed_by_review": true
+      },
+      {
+        "source_id": "research-iea-global-review-2026",
+        "reasons": [
+          "content_review_required",
+          "freshness_review_required"
+        ],
+        "evidence_status": "legacy_unreviewed",
+        "source_url": "https://www.iea.org/reports/global-energy-review-2026",
+        "source_sha256": "4f4ee1dcedeef81d3c3cff4e3695e9a55ef856c22bedc86913c5fc3776d4a228",
+        "retrieval_allowed_by_review": true
+      }
+    ],
+    "production_modified": false
+  },
+  "maintenance_queue": {
+    "tasks": [
+      {
+        "id": "contentflow:retry_source_fetch:R006",
+        "product": "contentflow",
+        "kind": "retry_source_fetch",
+        "source_id": "R006",
+        "priority": 1,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "R006",
+          "error": "URLError",
+          "reason_type": "SSLEOFError"
+        }
+      },
+      {
+        "id": "contentflow:retry_source_fetch:R015",
+        "product": "contentflow",
+        "kind": "retry_source_fetch",
+        "source_id": "R015",
+        "priority": 1,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "R015",
+          "error": "URLError",
+          "reason_type": "SSLEOFError"
+        }
+      },
+      {
+        "id": "contentflow:retry_source_fetch:R061",
+        "product": "contentflow",
+        "kind": "retry_source_fetch",
+        "source_id": "R061",
+        "priority": 1,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "R061",
+          "error": "HTTPError",
+          "http_status": 403
+        }
+      },
+      {
+        "id": "energy:retry_source_fetch:R006",
+        "product": "energy",
+        "kind": "retry_source_fetch",
+        "source_id": "R006",
+        "priority": 1,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "R006",
+          "error": "URLError",
+          "reason_type": "SSLEOFError"
+        }
+      },
+      {
+        "id": "energy:retry_source_fetch:R015",
+        "product": "energy",
+        "kind": "retry_source_fetch",
+        "source_id": "R015",
+        "priority": 1,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "R015",
+          "error": "URLError",
+          "reason_type": "SSLEOFError"
+        }
+      },
+      {
+        "id": "jianji:retry_source_fetch:R006",
+        "product": "jianji",
+        "kind": "retry_source_fetch",
+        "source_id": "R006",
+        "priority": 1,
+        "maintenance_only": true,
+        "production_approved": false,
+        "details": {
+          "source_id": "R006",
+          "error": "URLError",
+          "reason_type": "SSLEOFError"
+        }
+      },
+      {
+        "id": "jianji:retry_source_fetch:R015",
+        "product": "jianji",
+        "kind": "retry_source_fetch",
+        "source_id": "R015",
+        "priority": 1,
+        "maintenance_only": true,
+        "production_approved": false,
+        "details": {
+          "source_id": "R015",
+          "error": "URLError",
+          "reason_type": "SSLEOFError"
+        }
+      },
+      {
+        "id": "shunshi:retry_source_fetch:R006",
+        "product": "shunshi",
+        "kind": "retry_source_fetch",
+        "source_id": "R006",
+        "priority": 1,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "R006",
+          "error": "URLError",
+          "reason_type": "SSLEOFError"
+        }
+      },
+      {
+        "id": "shunshi:retry_source_fetch:R015",
+        "product": "shunshi",
+        "kind": "retry_source_fetch",
+        "source_id": "R015",
+        "priority": 1,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "R015",
+          "error": "URLError",
+          "reason_type": "SSLEOFError"
+        }
+      },
+      {
+        "id": "energy:review_product_evidence:guide-grid-interconnection",
+        "product": "energy",
+        "kind": "review_product_evidence",
+        "source_id": "guide-grid-interconnection",
+        "priority": 2,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "guide-grid-interconnection",
+          "reasons": [
+            "content_review_required",
+            "freshness_review_required"
+          ],
+          "evidence_status": "legacy_unreviewed",
+          "source_url": "https://www.nrel.gov/solar/",
+          "source_sha256": "aaa98803ac8457c4b833f2f46ef17b610928f5a82a9cba0c57c6fc30f5ef7e35",
+          "retrieval_allowed_by_review": true
+        }
+      },
+      {
+        "id": "energy:review_product_evidence:policy-us-itc",
+        "product": "energy",
+        "kind": "review_product_evidence",
+        "source_id": "policy-us-itc",
+        "priority": 2,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "policy-us-itc",
+          "reasons": [
+            "content_review_required",
+            "freshness_review_required"
+          ],
+          "evidence_status": "legacy_unreviewed",
+          "source_url": "https://www.energy.gov/eere/solar",
+          "source_sha256": "b21704d087fac2b7d51a9925c9e5ed0bed505e111c2de104eb7219709f9b8307",
+          "retrieval_allowed_by_review": true
+        }
+      },
+      {
+        "id": "energy:review_product_evidence:price-cn-module",
+        "product": "energy",
+        "kind": "review_product_evidence",
+        "source_id": "price-cn-module",
+        "priority": 2,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "price-cn-module",
+          "reasons": [
+            "content_review_required",
+            "freshness_review_required"
+          ],
+          "evidence_status": "legacy_unreviewed",
+          "source_url": "http://www.chinapv.org.cn/",
+          "source_sha256": "51f3c7bec8b5cb4dd1f88292d5e04bd37b6e64cefe649a3752d663a39587d2af",
+          "retrieval_allowed_by_review": true
+        }
+      },
+      {
+        "id": "energy:review_product_evidence:price-us-eia",
+        "product": "energy",
+        "kind": "review_product_evidence",
+        "source_id": "price-us-eia",
+        "priority": 2,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "price-us-eia",
+          "reasons": [
+            "content_review_required",
+            "freshness_review_required"
+          ],
+          "evidence_status": "legacy_unreviewed",
+          "source_url": "https://www.eia.gov/electricity/monthly/",
+          "source_sha256": "6da85de5f50f2727c862eabcaaf193ccf63f0824ea953e4e5c79b834b3278fb3",
+          "retrieval_allowed_by_review": true
+        }
+      },
+      {
+        "id": "energy:review_product_evidence:research-iea-global-review-2026",
+        "product": "energy",
+        "kind": "review_product_evidence",
+        "source_id": "research-iea-global-review-2026",
+        "priority": 2,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "research-iea-global-review-2026",
+          "reasons": [
+            "content_review_required",
+            "freshness_review_required"
+          ],
+          "evidence_status": "legacy_unreviewed",
+          "source_url": "https://www.iea.org/reports/global-energy-review-2026",
+          "source_sha256": "4f4ee1dcedeef81d3c3cff4e3695e9a55ef856c22bedc86913c5fc3776d4a228",
+          "retrieval_allowed_by_review": true
+        }
+      },
+      {
+        "id": "energy:review_product_evidence:research-irena-capacity-2026",
+        "product": "energy",
+        "kind": "review_product_evidence",
+        "source_id": "research-irena-capacity-2026",
+        "priority": 2,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "research-irena-capacity-2026",
+          "reasons": [
+            "content_review_required",
+            "freshness_review_required"
+          ],
+          "evidence_status": "legacy_unreviewed",
+          "source_url": "https://www.irena.org/Publications/2026/Mar/Renewable-capacity-statistics-2026",
+          "source_sha256": "f5847f3207a857350b0afb3fea59ecb252fb80c48355ded796ee6283cbd450ba",
+          "retrieval_allowed_by_review": true
+        }
+      },
+      {
+        "id": "energy:review_product_evidence:std-gb50797",
+        "product": "energy",
+        "kind": "review_product_evidence",
+        "source_id": "std-gb50797",
+        "priority": 2,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "std-gb50797",
+          "reasons": [
+            "content_review_required"
+          ],
+          "evidence_status": "legacy_unreviewed",
+          "source_url": "https://openstd.samr.gov.cn/bzgk/gb/index",
+          "source_sha256": "83b370875c52d43489c09646310380ee7b19a3a292213b91e208566d24f112d3",
+          "retrieval_allowed_by_review": true
+        }
+      },
+      {
+        "id": "energy:review_product_evidence:std-iec61724",
+        "product": "energy",
+        "kind": "review_product_evidence",
+        "source_id": "std-iec61724",
+        "priority": 2,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "std-iec61724",
+          "reasons": [
+            "content_review_required"
+          ],
+          "evidence_status": "legacy_unreviewed",
+          "source_url": "https://webstore.iec.ch/",
+          "source_sha256": "9c5c8b712eaecccfa692ba37389268e11d6814b2b16e3321333b7e2a14c6ee62",
+          "retrieval_allowed_by_review": true
+        }
+      },
+      {
+        "id": "energy:review_product_evidence:std-ieee1547",
+        "product": "energy",
+        "kind": "review_product_evidence",
+        "source_id": "std-ieee1547",
+        "priority": 2,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "std-ieee1547",
+          "reasons": [
+            "content_review_required"
+          ],
+          "evidence_status": "legacy_unreviewed",
+          "source_url": "https://standards.ieee.org/",
+          "source_sha256": "e0ccc5ecbdd37b329e2800b48853deaa2f1dd75da1a8340fd621e16eaebaccd2",
+          "retrieval_allowed_by_review": true
+        }
+      },
+      {
+        "id": "contentflow:review_upstream_change:R004",
+        "product": "contentflow",
+        "kind": "review_upstream_change",
+        "source_id": "R004",
+        "priority": 3,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "R004",
+          "kind": "changed",
+          "before": {
+            "id": "pgvector/pgvector",
+            "updated": "2026-10-15T23:08:40Z",
+            "license": "NOASSERTION",
+            "archived": false,
+            "default_branch": "master"
+          },
+          "after": {
+            "id": "pgvector/pgvector",
+            "updated": "2026-10-18T12:20:41Z",
+            "license": "NOASSERTION",
+            "archived": false,
+            "default_branch": "master"
+          },
+          "action": "review_candidate",
+          "production_approved": false
+        }
+      },
+      {
+        "id": "contentflow:review_upstream_change:R008",
+        "product": "contentflow",
+        "kind": "review_upstream_change",
+        "source_id": "R008",
+        "priority": 3,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "R008",
+          "kind": "changed",
+          "before": {
+            "id": "docling-project/docling",
+            "updated": "2026-10-16T15:44:42Z",
+            "license": "MIT",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "after": {
+            "id": "docling-project/docling",
+            "updated": "2026-10-18T07:20:32Z",
+            "license": "MIT",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "action": "review_candidate",
+          "production_approved": false
+        }
+      },
+      {
+        "id": "contentflow:review_upstream_change:R011",
+        "product": "contentflow",
+        "kind": "review_upstream_change",
+        "source_id": "R011",
+        "priority": 3,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "R011",
+          "kind": "changed",
+          "before": {
+            "id": "infiniflow/ragflow",
+            "updated": "2026-10-17T00:23:13Z",
+            "license": "Apache-2.0",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "after": {
+            "id": "infiniflow/ragflow",
+            "updated": "2026-10-17T13:11:26Z",
+            "license": "Apache-2.0",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "action": "review_candidate",
+          "production_approved": false
+        }
+      },
+      {
+        "id": "contentflow:review_upstream_change:R016",
+        "product": "contentflow",
+        "kind": "review_upstream_change",
+        "source_id": "R016",
+        "priority": 3,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "R016",
+          "kind": "changed",
+          "before": {
+            "id": "mem0ai/mem0",
+            "updated": "2026-10-16T20:26:26Z",
+            "license": "Apache-2.0",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "after": {
+            "id": "mem0ai/mem0",
+            "updated": "2026-10-17T21:06:52Z",
+            "license": "Apache-2.0",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "action": "review_candidate",
+          "production_approved": false
+        }
+      },
+      {
+        "id": "contentflow:review_upstream_change:R032",
+        "product": "contentflow",
+        "kind": "review_upstream_change",
+        "source_id": "R032",
+        "priority": 3,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "R032",
+          "kind": "changed",
+          "before": {
+            "id": "gitroomhq/postiz-app",
+            "updated": "2026-10-16T07:58:54Z",
+            "license": "AGPL-3.0",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "after": {
+            "id": "gitroomhq/postiz-app",
+            "updated": "2026-10-18T19:43:50Z",
+            "license": "AGPL-3.0",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "action": "review_candidate",
+          "production_approved": false
+        }
+      },
+      {
+        "id": "contentflow:review_upstream_change:R054",
+        "product": "contentflow",
+        "kind": "review_upstream_change",
+        "source_id": "R054",
+        "priority": 3,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "R054",
+          "kind": "changed",
+          "before": {
+            "id": "embeddings-benchmark/mteb",
+            "updated": "2026-10-16T19:34:53Z",
+            "license": "Apache-2.0",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "after": {
+            "id": "embeddings-benchmark/mteb",
+            "updated": "2026-10-18T20:21:39Z",
+            "license": "Apache-2.0",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "action": "review_candidate",
+          "production_approved": false
+        }
+      },
+      {
+        "id": "contentflow:review_upstream_change:R057",
+        "product": "contentflow",
+        "kind": "review_upstream_change",
+        "source_id": "R057",
+        "priority": 3,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "R057",
+          "kind": "changed",
+          "before": {
+            "id": "openclaw/openclaw",
+            "updated": "2026-10-17T01:17:35Z",
+            "license": "MIT",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "after": {
+            "id": "openclaw/openclaw",
+            "updated": "2026-10-19T01:01:53Z",
+            "license": "MIT",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "action": "review_candidate",
+          "production_approved": false
+        }
+      },
+      {
+        "id": "energy:review_upstream_change:R004",
+        "product": "energy",
+        "kind": "review_upstream_change",
+        "source_id": "R004",
+        "priority": 3,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "R004",
+          "kind": "changed",
+          "before": {
+            "id": "pgvector/pgvector",
+            "updated": "2026-10-15T23:08:40Z",
+            "license": "NOASSERTION",
+            "archived": false,
+            "default_branch": "master"
+          },
+          "after": {
+            "id": "pgvector/pgvector",
+            "updated": "2026-10-18T12:20:41Z",
+            "license": "NOASSERTION",
+            "archived": false,
+            "default_branch": "master"
+          },
+          "action": "review_candidate",
+          "production_approved": false
+        }
+      },
+      {
+        "id": "energy:review_upstream_change:R008",
+        "product": "energy",
+        "kind": "review_upstream_change",
+        "source_id": "R008",
+        "priority": 3,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "R008",
+          "kind": "changed",
+          "before": {
+            "id": "docling-project/docling",
+            "updated": "2026-10-16T15:44:42Z",
+            "license": "MIT",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "after": {
+            "id": "docling-project/docling",
+            "updated": "2026-10-18T07:20:32Z",
+            "license": "MIT",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "action": "review_candidate",
+          "production_approved": false
+        }
+      },
+      {
+        "id": "energy:review_upstream_change:R011",
+        "product": "energy",
+        "kind": "review_upstream_change",
+        "source_id": "R011",
+        "priority": 3,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "R011",
+          "kind": "changed",
+          "before": {
+            "id": "infiniflow/ragflow",
+            "updated": "2026-10-17T00:23:13Z",
+            "license": "Apache-2.0",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "after": {
+            "id": "infiniflow/ragflow",
+            "updated": "2026-10-17T13:11:26Z",
+            "license": "Apache-2.0",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "action": "review_candidate",
+          "production_approved": false
+        }
+      },
+      {
+        "id": "energy:review_upstream_change:R016",
+        "product": "energy",
+        "kind": "review_upstream_change",
+        "source_id": "R016",
+        "priority": 3,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "R016",
+          "kind": "changed",
+          "before": {
+            "id": "mem0ai/mem0",
+            "updated": "2026-10-16T20:26:26Z",
+            "license": "Apache-2.0",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "after": {
+            "id": "mem0ai/mem0",
+            "updated": "2026-10-17T21:06:52Z",
+            "license": "Apache-2.0",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "action": "review_candidate",
+          "production_approved": false
+        }
+      },
+      {
+        "id": "energy:review_upstream_change:R036",
+        "product": "energy",
+        "kind": "review_upstream_change",
+        "source_id": "R036",
+        "priority": 3,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "R036",
+          "kind": "changed",
+          "before": {
+            "id": "pvlib/pvlib-python",
+            "updated": "2026-10-15T11:30:13Z",
+            "license": "BSD-3-Clause",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "after": {
+            "id": "pvlib/pvlib-python",
+            "updated": "2026-10-18T15:42:46Z",
+            "license": "BSD-3-Clause",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "action": "review_candidate",
+          "production_approved": false
+        }
+      },
+      {
+        "id": "energy:review_upstream_change:R037",
+        "product": "energy",
+        "kind": "review_upstream_change",
+        "source_id": "R037",
+        "priority": 3,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "R037",
+          "kind": "changed",
+          "before": {
+            "id": "PyPSA/PyPSA",
+            "updated": "2026-10-16T08:07:23Z",
+            "license": "MIT",
+            "archived": false,
+            "default_branch": "master"
+          },
+          "after": {
+            "id": "PyPSA/PyPSA",
+            "updated": "2026-10-18T08:00:11Z",
+            "license": "MIT",
+            "archived": false,
+            "default_branch": "master"
+          },
+          "action": "review_candidate",
+          "production_approved": false
+        }
+      },
+      {
+        "id": "energy:review_upstream_change:R054",
+        "product": "energy",
+        "kind": "review_upstream_change",
+        "source_id": "R054",
+        "priority": 3,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "R054",
+          "kind": "changed",
+          "before": {
+            "id": "embeddings-benchmark/mteb",
+            "updated": "2026-10-16T19:34:53Z",
+            "license": "Apache-2.0",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "after": {
+            "id": "embeddings-benchmark/mteb",
+            "updated": "2026-10-18T20:21:39Z",
+            "license": "Apache-2.0",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "action": "review_candidate",
+          "production_approved": false
+        }
+      },
+      {
+        "id": "energy:review_upstream_change:R057",
+        "product": "energy",
+        "kind": "review_upstream_change",
+        "source_id": "R057",
+        "priority": 3,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "R057",
+          "kind": "changed",
+          "before": {
+            "id": "openclaw/openclaw",
+            "updated": "2026-10-17T01:17:35Z",
+            "license": "MIT",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "after": {
+            "id": "openclaw/openclaw",
+            "updated": "2026-10-19T01:01:53Z",
+            "license": "MIT",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "action": "review_candidate",
+          "production_approved": false
+        }
+      },
+      {
+        "id": "jianji:review_upstream_change:R004",
+        "product": "jianji",
+        "kind": "review_upstream_change",
+        "source_id": "R004",
+        "priority": 3,
+        "maintenance_only": true,
+        "production_approved": false,
+        "details": {
+          "source_id": "R004",
+          "kind": "changed",
+          "before": {
+            "id": "pgvector/pgvector",
+            "updated": "2026-10-15T23:08:40Z",
+            "license": "NOASSERTION",
+            "archived": false,
+            "default_branch": "master"
+          },
+          "after": {
+            "id": "pgvector/pgvector",
+            "updated": "2026-10-18T12:20:41Z",
+            "license": "NOASSERTION",
+            "archived": false,
+            "default_branch": "master"
+          },
+          "action": "review_candidate",
+          "production_approved": false
+        }
+      },
+      {
+        "id": "jianji:review_upstream_change:R008",
+        "product": "jianji",
+        "kind": "review_upstream_change",
+        "source_id": "R008",
+        "priority": 3,
+        "maintenance_only": true,
+        "production_approved": false,
+        "details": {
+          "source_id": "R008",
+          "kind": "changed",
+          "before": {
+            "id": "docling-project/docling",
+            "updated": "2026-10-16T15:44:42Z",
+            "license": "MIT",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "after": {
+            "id": "docling-project/docling",
+            "updated": "2026-10-18T07:20:32Z",
+            "license": "MIT",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "action": "review_candidate",
+          "production_approved": false
+        }
+      },
+      {
+        "id": "jianji:review_upstream_change:R011",
+        "product": "jianji",
+        "kind": "review_upstream_change",
+        "source_id": "R011",
+        "priority": 3,
+        "maintenance_only": true,
+        "production_approved": false,
+        "details": {
+          "source_id": "R011",
+          "kind": "changed",
+          "before": {
+            "id": "infiniflow/ragflow",
+            "updated": "2026-10-17T00:23:13Z",
+            "license": "Apache-2.0",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "after": {
+            "id": "infiniflow/ragflow",
+            "updated": "2026-10-17T13:11:26Z",
+            "license": "Apache-2.0",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "action": "review_candidate",
+          "production_approved": false
+        }
+      },
+      {
+        "id": "jianji:review_upstream_change:R016",
+        "product": "jianji",
+        "kind": "review_upstream_change",
+        "source_id": "R016",
+        "priority": 3,
+        "maintenance_only": true,
+        "production_approved": false,
+        "details": {
+          "source_id": "R016",
+          "kind": "changed",
+          "before": {
+            "id": "mem0ai/mem0",
+            "updated": "2026-10-16T20:26:26Z",
+            "license": "Apache-2.0",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "after": {
+            "id": "mem0ai/mem0",
+            "updated": "2026-10-17T21:06:52Z",
+            "license": "Apache-2.0",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "action": "review_candidate",
+          "production_approved": false
+        }
+      },
+      {
+        "id": "jianji:review_upstream_change:R054",
+        "product": "jianji",
+        "kind": "review_upstream_change",
+        "source_id": "R054",
+        "priority": 3,
+        "maintenance_only": true,
+        "production_approved": false,
+        "details": {
+          "source_id": "R054",
+          "kind": "changed",
+          "before": {
+            "id": "embeddings-benchmark/mteb",
+            "updated": "2026-10-16T19:34:53Z",
+            "license": "Apache-2.0",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "after": {
+            "id": "embeddings-benchmark/mteb",
+            "updated": "2026-10-18T20:21:39Z",
+            "license": "Apache-2.0",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "action": "review_candidate",
+          "production_approved": false
+        }
+      },
+      {
+        "id": "jianji:review_upstream_change:R057",
+        "product": "jianji",
+        "kind": "review_upstream_change",
+        "source_id": "R057",
+        "priority": 3,
+        "maintenance_only": true,
+        "production_approved": false,
+        "details": {
+          "source_id": "R057",
+          "kind": "changed",
+          "before": {
+            "id": "openclaw/openclaw",
+            "updated": "2026-10-17T01:17:35Z",
+            "license": "MIT",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "after": {
+            "id": "openclaw/openclaw",
+            "updated": "2026-10-19T01:01:53Z",
+            "license": "MIT",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "action": "review_candidate",
+          "production_approved": false
+        }
+      },
+      {
+        "id": "shunshi:review_upstream_change:R004",
+        "product": "shunshi",
+        "kind": "review_upstream_change",
+        "source_id": "R004",
+        "priority": 3,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "R004",
+          "kind": "changed",
+          "before": {
+            "id": "pgvector/pgvector",
+            "updated": "2026-10-15T23:08:40Z",
+            "license": "NOASSERTION",
+            "archived": false,
+            "default_branch": "master"
+          },
+          "after": {
+            "id": "pgvector/pgvector",
+            "updated": "2026-10-18T12:20:41Z",
+            "license": "NOASSERTION",
+            "archived": false,
+            "default_branch": "master"
+          },
+          "action": "review_candidate",
+          "production_approved": false
+        }
+      },
+      {
+        "id": "shunshi:review_upstream_change:R008",
+        "product": "shunshi",
+        "kind": "review_upstream_change",
+        "source_id": "R008",
+        "priority": 3,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "R008",
+          "kind": "changed",
+          "before": {
+            "id": "docling-project/docling",
+            "updated": "2026-10-16T15:44:42Z",
+            "license": "MIT",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "after": {
+            "id": "docling-project/docling",
+            "updated": "2026-10-18T07:20:32Z",
+            "license": "MIT",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "action": "review_candidate",
+          "production_approved": false
+        }
+      },
+      {
+        "id": "shunshi:review_upstream_change:R011",
+        "product": "shunshi",
+        "kind": "review_upstream_change",
+        "source_id": "R011",
+        "priority": 3,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "R011",
+          "kind": "changed",
+          "before": {
+            "id": "infiniflow/ragflow",
+            "updated": "2026-10-17T00:23:13Z",
+            "license": "Apache-2.0",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "after": {
+            "id": "infiniflow/ragflow",
+            "updated": "2026-10-17T13:11:26Z",
+            "license": "Apache-2.0",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "action": "review_candidate",
+          "production_approved": false
+        }
+      },
+      {
+        "id": "shunshi:review_upstream_change:R016",
+        "product": "shunshi",
+        "kind": "review_upstream_change",
+        "source_id": "R016",
+        "priority": 3,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "R016",
+          "kind": "changed",
+          "before": {
+            "id": "mem0ai/mem0",
+            "updated": "2026-10-16T20:26:26Z",
+            "license": "Apache-2.0",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "after": {
+            "id": "mem0ai/mem0",
+            "updated": "2026-10-17T21:06:52Z",
+            "license": "Apache-2.0",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "action": "review_candidate",
+          "production_approved": false
+        }
+      },
+      {
+        "id": "shunshi:review_upstream_change:R054",
+        "product": "shunshi",
+        "kind": "review_upstream_change",
+        "source_id": "R054",
+        "priority": 3,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "R054",
+          "kind": "changed",
+          "before": {
+            "id": "embeddings-benchmark/mteb",
+            "updated": "2026-10-16T19:34:53Z",
+            "license": "Apache-2.0",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "after": {
+            "id": "embeddings-benchmark/mteb",
+            "updated": "2026-10-18T20:21:39Z",
+            "license": "Apache-2.0",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "action": "review_candidate",
+          "production_approved": false
+        }
+      },
+      {
+        "id": "shunshi:review_upstream_change:R057",
+        "product": "shunshi",
+        "kind": "review_upstream_change",
+        "source_id": "R057",
+        "priority": 3,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "R057",
+          "kind": "changed",
+          "before": {
+            "id": "openclaw/openclaw",
+            "updated": "2026-10-17T01:17:35Z",
+            "license": "MIT",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "after": {
+            "id": "openclaw/openclaw",
+            "updated": "2026-10-19T01:01:53Z",
+            "license": "MIT",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "action": "review_candidate",
+          "production_approved": false
+        }
+      }
+    ],
+    "total": 45,
+    "monitor_checked_at": "2026-10-19T01:01:45.884781+00:00",
+    "monitor_registry_matches": true,
+    "scope": "research_and_evidence_maintenance_only",
+    "production_modified": false
+  },
+  "maintenance_ledger": {
+    "path": "/Users/feifei00/Documents/运营资料-OpenClaw/automation/output/domestic-research/maintenance-ledger.json",
+    "open": 115,
+    "closed": 2,
+    "production_modified": false
+  },
+  "checked_at": "2026-10-19T01:03:13.250866+00:00"
+}

@@ -208,6 +208,12 @@ class SpeechService:
         if voice not in model_config["voices"]:
             raise TTSError(f"音色 '{voice}' 不在模型 {model} 的可用音色中: {model_config['voices']}")
         
+        if not isinstance(text, str) or not text.strip():
+            raise TTSError("播报文本不能为空")
+        if response_format not in {"mp3", "wav", "pcm", "opus"}:
+            raise TTSError("不支持的音频格式")
+        if isinstance(speed, bool) or not isinstance(speed, (int, float)) or not 0.5 <= speed <= 2.0:
+            raise TTSError("语速必须在0.5到2.0之间")
         if len(text) > model_config["max_input"]:
             raise TTSError(f"文本过长: {len(text)} > {model_config['max_input']} 字符")
         
@@ -237,6 +243,11 @@ class SpeechService:
                 ) as response:
                     if response.status == 200:
                         audio_data = await response.read()
+                        if not audio_data:
+                            raise TTSError("语音服务未返回音频")
+                        content_type = response.headers.get("Content-Type", "").split(";")[0].lower()
+                        if not (content_type.startswith("audio/") or content_type == "application/octet-stream"):
+                            raise TTSError("语音服务返回的不是音频")
                         latency = int(time.time() * 1000 - start_time)
                         
                         logger.info(
@@ -253,11 +264,10 @@ class SpeechService:
                             latency_ms=latency,
                         )
                     else:
-                        error_text = await response.text()
-                        logger.error(f"[SpeechService] TTS API 错误: {response.status} - {error_text}")
-                        raise TTSError(f"API 错误 {response.status}: {error_text[:200]}")
+                        logger.error("[SpeechService] TTS API status=%s", response.status)
+                        raise TTSError(f"语音服务暂不可用（状态码{response.status}）")
                         
-        except aiohttp.ClientTimeout:
+        except asyncio.TimeoutError:
             raise TTSError(f"请求超时 ({self.timeout}s)")
         except TTSError:
             raise
@@ -295,6 +305,8 @@ class SpeechService:
         if not model_config:
             raise ASRError(f"不支持的 ASR 模型: {model}, 可用: {list(ASR_MODELS.keys())}")
         
+        if not isinstance(audio_data, bytes) or not audio_data:
+            raise ASRError("录音内容不能为空")
         # 检查文件大小
         max_size = model_config["max_file_size_mb"] * 1024 * 1024
         if len(audio_data) > max_size:
@@ -325,7 +337,10 @@ class SpeechService:
                 ) as response:
                     if response.status == 200:
                         result = await response.json()
-                        text = result.get("text", "").strip()
+                        text = result.get("text") if isinstance(result, dict) else None
+                        if not isinstance(text, str):
+                            raise ASRError("识别服务返回的文字格式无效")
+                        text = text.strip()
                         latency = int(time.time() * 1000 - start_time)
                         
                         # 如果当前模型返回空文本，自动降级尝试备用模型
@@ -339,7 +354,7 @@ class SpeechService:
                                 return fallback_result
                         
                         if not text:
-                            logger.warning(f"[SpeechService] ASR 返回空文本: model={model}")
+                            raise ASRError("未识别到语音内容，请重新录音")
                         
                         logger.info(
                             f"[SpeechService] ASR 成功: model={model}, "
@@ -352,11 +367,10 @@ class SpeechService:
                             latency_ms=latency,
                         )
                     else:
-                        error_text = await response.text()
-                        logger.error(f"[SpeechService] ASR API 错误: {response.status} - {error_text}")
-                        raise ASRError(f"API 错误 {response.status}: {error_text[:200]}")
+                        logger.error("[SpeechService] ASR API status=%s", response.status)
+                        raise ASRError(f"识别服务暂不可用（状态码{response.status}）")
                         
-        except aiohttp.ClientTimeout:
+        except asyncio.TimeoutError:
             raise ASRError(f"请求超时 ({self.timeout * 5}s)")
         except ASRError:
             raise

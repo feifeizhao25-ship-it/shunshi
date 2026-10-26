@@ -8,6 +8,7 @@ import '../../widgets/state_view.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
+import '../../../core/config/app_config.dart';
 
 class SolarTermPageV2 extends StatefulWidget {
   final String? termName;
@@ -18,7 +19,7 @@ class SolarTermPageV2 extends StatefulWidget {
 }
 
 class _SolarTermPageV2State extends State<SolarTermPageV2> {
-  static const _baseUrl = 'https://api.shunshi.app';
+  static const _baseUrl = AppConfig.apiBaseUrl;
   final _dio = Dio(BaseOptions(
     baseUrl: _baseUrl,
     connectTimeout: const Duration(seconds: 8),

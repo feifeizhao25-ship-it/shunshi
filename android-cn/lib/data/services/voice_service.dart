@@ -3,15 +3,22 @@
 // 不依赖 Google 服务，兼容华为/小米等国产手机
 
 import 'dart:async';
-import 'dart:io';
 import 'package:flutter/material.dart';
+import 'voice_path_io.dart' if (dart.library.html) 'voice_path_web.dart';
 import 'package:record/record.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:dio/dio.dart';
 import '../../core/config/app_config.dart';
 
 /// 语音输入服务
-class VoiceService {
+abstract class VoiceInput {
+  String get errorMsg;
+  Future<bool> startRecording();
+  Future<String?> stopAndRecognize();
+  Future<void> cancel();
+}
+
+class VoiceService implements VoiceInput {
   static final VoiceService _instance = VoiceService._();
   factory VoiceService() => _instance;
   VoiceService._();
@@ -52,6 +59,7 @@ class VoiceService {
   Future<bool> startRecording() async {
     try {
       if (await _recorder.isRecording()) return true;
+      if (!await _checkPermission()) return false;
 
       final dir = await getTemporaryDirectory();
       _recordPath = '${dir.path}/voice_${DateTime.now().millisecondsSinceEpoch}.aac';
@@ -65,7 +73,7 @@ class VoiceService {
       _errorMsg = '';
       return true;
     } catch (e) {
-      _errorMsg = '录音启动失败: $e';
+      _errorMsg = '录音启动失败，请检查麦克风权限后重试';
       debugPrint('[VoiceService] startRecording error: $e');
       return false;
     }
@@ -76,7 +84,10 @@ class VoiceService {
   Future<String?> stopAndRecognize() async {
     try {
       _isListening = false;
-      if (!(await _recorder.isRecording())) return null;
+      if (!(await _recorder.isRecording())) {
+        _errorMsg = '录音已停止，请重新录音';
+        return null;
+      }
 
       final path = await _recorder.stop();
       if (path == null || path.isEmpty) {
@@ -84,25 +95,28 @@ class VoiceService {
         return null;
       }
 
-      final file = File(path);
-      if (!await file.exists() || await file.length() < 500) {
+      if (!await voiceFileUsable(path)) {
         _errorMsg = '录音太短，请按住说话';
         return null;
       }
 
-      return await _recognizeFile(file);
+      return await _recognizeFile(path);
     } catch (e) {
-      _errorMsg = '语音识别失败: $e';
+      _errorMsg = '语音识别失败，请重新录音或输入文字';
       debugPrint('[VoiceService] stopAndRecognize error: $e');
       return null;
+    } finally {
+      try {
+        if (_recordPath.isNotEmpty) await deleteVoiceFile(_recordPath);
+      } catch (_) {}
     }
   }
 
   /// 用 SiliconFlow ASR 识别音频文件
-  Future<String?> _recognizeFile(File file) async {
+  Future<String?> _recognizeFile(String path) async {
     try {
       final formData = FormData.fromMap({
-        'file': await MultipartFile.fromFile(file.path, filename: 'voice.aac'),
+        'file': await MultipartFile.fromFile(path, filename: 'voice.aac'),
         'model': 'sensevoice',
       });
 
@@ -139,12 +153,12 @@ class VoiceService {
       debugPrint('[VoiceService] _recognizeFile error: ${e.message}');
       return null;
     } catch (e) {
-      _errorMsg = '识别失败: $e';
+      _errorMsg = '语音识别失败，请重新录音或输入文字';
       debugPrint('[VoiceService] _recognizeFile error: $e');
       return null;
     } finally {
       try {
-        if (await file.exists()) await file.delete();
+        await deleteVoiceFile(path);
       } catch (_) {}
     }
   }
@@ -164,10 +178,7 @@ class VoiceService {
       await _recorder.stop();
     }
     try {
-      if (_recordPath.isNotEmpty) {
-        final f = File(_recordPath);
-        if (await f.exists()) await f.delete();
-      }
+      if (_recordPath.isNotEmpty) await deleteVoiceFile(_recordPath);
     } catch (_) {}
   }
 

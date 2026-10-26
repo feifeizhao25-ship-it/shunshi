@@ -478,3 +478,57 @@ def delete_account(
         raise
     finally:
         close_test_connection(db)
+
+
+profile_router = APIRouter(prefix="/api/v1/user", tags=["user"])
+
+_PROFILE_KEY = "profile:setup"
+
+
+class ProfileBody(BaseModel):
+    nickname: str = Field(default="", max_length=64)
+    gender: str | None = Field(default=None, max_length=16)
+    birth_year: int | None = Field(default=None, ge=1900, le=2100)
+    constitution_type: str | None = Field(default=None, max_length=32)
+    health_concerns: list[str] = Field(default_factory=list, max_length=8)
+    body_description: str | None = Field(default=None, max_length=500)
+    phone: str | None = Field(default=None, max_length=16)
+
+
+@profile_router.post("/profile")
+def save_profile(
+    body: ProfileBody,
+    user_id: str = Depends(current_user),
+    session: Session = Depends(get_session),
+):
+    """资料向导提交的称呼、性别和出生年。客户端在这条接口失败时也会先记在本机。"""
+    user = session.get(User, user_id)
+    if user is None:
+        raise HTTPException(status_code=401, detail="请先登录")
+    nickname = body.nickname.strip()
+    if nickname:
+        user.nickname = nickname
+        _mirror_to_record_store(user_id, nickname=nickname)
+    concerns = [item.strip()[:32] for item in body.health_concerns if item.strip()]
+    payload = {
+        "nickname": user.nickname,
+        "gender": body.gender,
+        "birth_year": body.birth_year,
+        "constitution_type": body.constitution_type,
+        "health_concerns": concerns,
+        "body_description": (body.body_description or "").strip()[:500],
+    }
+    if body.birth_year is not None:
+        from datetime import date
+
+        from ..services.age_policy import declare_birth_date
+
+        declare_birth_date(session, user_id, date(body.birth_year, 1, 1))
+    session.merge(
+        UserSetting(
+            user_id=user_id,
+            key=_PROFILE_KEY,
+            value=json.dumps(payload, ensure_ascii=False),
+        )
+    )
+    return {"saved": True, "nickname": user.nickname}

@@ -203,7 +203,7 @@ class FoodDetailPage extends StatelessWidget {
                   _sectionTitle('营养与能量'),
                   const SizedBox(height: 8),
                   const Text(
-                    '本食谱富含优质蛋白质与多种微量元素，特有的黄芪多糖能显著增强免疫应答。'
+                    '本食谱含优质蛋白质，口味温和，适合换季时的日常餐桌。'
                     '每百毫升含热量约为 85kcal。',
                     style: TextStyle(
                       fontSize: 13, color: ShunShiColors.textSecondary,

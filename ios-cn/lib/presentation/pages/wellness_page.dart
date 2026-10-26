@@ -107,7 +107,7 @@ const List<WellnessItem> _kWellnessItems = [
     category: 'food',
     duration: '1h',
     difficulty: '简单',
-    tags: ['祛湿', '健脾', '消肿'],
+    tags: ['祛湿', '健脾', '清淡'],
     ingredients: ['红豆 50g', '薏米 50g', '粳米 50g'],
     steps: [
       '红豆、薏米提前浸泡4小时',

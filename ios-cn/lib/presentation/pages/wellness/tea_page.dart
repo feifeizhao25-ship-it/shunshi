@@ -2,8 +2,6 @@ import '../../../core/router/safe_pop.dart';
 import 'package:flutter/material.dart';
 import '../../../data/network/api_client.dart';
 import '../../widgets/skeleton_loading.dart';
-import '../../widgets/paywall_banner.dart';
-
 /// 茶饮推荐页面
 class TeaPage extends StatefulWidget {
   const TeaPage({super.key});
@@ -89,7 +87,6 @@ class _TeaPageState extends State<TeaPage> {
       ),
       body: Column(
         children: [
-          const PaywallBanner(message: '升级会员解锁定制节气茶饮方案', icon: Icons.local_cafe),
           Container(
             padding: const EdgeInsets.all(16),
             color: Colors.green[50],

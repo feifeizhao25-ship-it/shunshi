@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../design_system/theme.dart';
 import '../../../design_system/theme_helper.dart';
+import '../../../core/config/app_config.dart';
 
-const _baseUrl = 'https://api.shunshi.app';
+const _baseUrl = AppConfig.apiBaseUrl;
 
 class SubscriptionPage extends StatefulWidget {
   const SubscriptionPage({super.key});

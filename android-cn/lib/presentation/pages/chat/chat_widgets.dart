@@ -33,7 +33,8 @@ class _AIAvatar extends StatelessWidget {
 class AIBubble extends StatelessWidget {
   final ChatMessage message;
   final VoidCallback? onFeedback;
-  const AIBubble({super.key, required this.message, this.onFeedback});
+  final VoidCallback? onSpeak;
+  const AIBubble({super.key, required this.message, this.onFeedback, this.onSpeak});
 
   @override
   Widget build(BuildContext context) {
@@ -87,16 +88,11 @@ class AIBubble extends StatelessWidget {
                             fontSize: 11,
                             color: AppColors.textTertiary(context))),
                     const SizedBox(width: 8),
-                    GestureDetector(
-                        onTap: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text('正在播报...'),
-                                  duration: Duration(seconds: 2)));
-                        },
-                        child: Icon(Icons.volume_up,
-                            size: 16,
-                            color: AppColors.textTertiary(context))),
+                    IconButton(
+                      tooltip: onSpeak == null ? '语音播报尚未接通' : '朗读回复',
+                      onPressed: onSpeak,
+                      icon: const Icon(Icons.volume_up, size: 16),
+                    ),
                     const SizedBox(width: 8),
                     if (onFeedback != null)
                       GestureDetector(
@@ -463,8 +459,8 @@ class QuickQuestionChips extends StatelessWidget {
   static const _questions = [
     '今天吃什么好',
     '适合什么运动',
-    '推荐养生茶饮',
-    '换季怎么调理',
+    '换季喝什么',
+    '换季怎么安排',
     '最近睡眠不好',
     '情绪低落怎么办',
   ];
@@ -521,7 +517,8 @@ class QuickQuestionChips extends StatelessWidget {
 
 class GradientSendButton extends StatefulWidget {
   final VoidCallback onTap;
-  const GradientSendButton({super.key, required this.onTap});
+  final bool enabled;
+  const GradientSendButton({super.key, required this.onTap, this.enabled = true});
 
   @override
   State<GradientSendButton> createState() => _GradientSendButtonState();
@@ -532,12 +529,18 @@ class _GradientSendButtonState extends State<GradientSendButton> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTapDown: (_) => setState(() => _scale = 0.85),
-      onTapUp: (_) {
-        setState(() => _scale = 1.0);
-        widget.onTap();
-      },
+    return Semantics(
+      button: true,
+      enabled: widget.enabled,
+      label: '发送',
+      child: GestureDetector(
+      onTapDown: widget.enabled ? (_) => setState(() => _scale = 0.85) : null,
+      onTapUp: widget.enabled
+          ? (_) {
+              setState(() => _scale = 1.0);
+              widget.onTap();
+            }
+          : null,
       onTapCancel: () => setState(() => _scale = 1.0),
       child: AnimatedScale(
         scale: _scale,
@@ -557,6 +560,7 @@ class _GradientSendButtonState extends State<GradientSendButton> {
           child: const Icon(Icons.send, color: Colors.white, size: 18),
         ),
       ),
+    ),
     );
   }
 }

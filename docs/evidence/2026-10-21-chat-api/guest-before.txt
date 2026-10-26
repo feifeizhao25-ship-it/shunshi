@@ -1,0 +1,35 @@
+
+00:00 +0: loading /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_api_test.dart
+00:01 +0: loading /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_api_test.dart
+00:01 +0: guest token authenticates subsequent chat and full text is displayed
+00:01 +0: guest token authenticates subsequent chat and full text is displayed
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: 'guest-test-token'
+  Actual: <null>
+   Which: not an <Instance of 'String'>
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure> (file:///Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_api_test.dart:155:7)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1059:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_api_test.dart line 155
+The test description was:
+  guest token authenticates subsequent chat and full text is displayed
+════════════════════════════════════════════════════════════════════════════════════════════════════
+
+00:01 +0 -1: guest token authenticates subsequent chat and full text is displayed [E]
+  Test failed. See exception logs above.
+  The test description was: guest token authenticates subsequent chat and full text is displayed
+
+
+To run this test again: /Users/feifei00/flutter/bin/cache/dart-sdk/bin/dart test /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_api_test.dart -p vm --plain-name 'guest token authenticates subsequent chat and full text is displayed'
+
+00:02 +0 -1: Some tests failed.

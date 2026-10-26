@@ -41,13 +41,14 @@ def test_list_tiers_returns_all_tiers():
     response = client.get("/api/v1/membership/tiers")
     assert response.status_code == 200
     data = response.json()["data"]
-    assert len(data["tiers"]) == 4
+    assert len(data["tiers"]) == 3
     tier_names = [t["tier"] for t in data["tiers"]]
     assert "free" in tier_names
-    # 档位与收费 SKU 一致：养心 / 颐养 / 家和（以前是另一套 basic/premium/family）
+    # 在售目录只含免费 / 内容订阅 / 会员。家和已停售，不出现在可购买列表。
     assert "yangxin" in tier_names
     assert "yiyang" in tier_names
-    assert "jiahe" in tier_names
+    assert "jiahe" not in tier_names
+    assert all(t["on_sale"] is True for t in data["tiers"])
 
 
 def test_tiers_have_required_fields():
@@ -71,6 +72,9 @@ def test_tier_pricing():
     # 价格只有一份：SUBSCRIPTION_PLANS（支付宝/微信/Apple 实际收费）。以前这里是 18/38/58，与收费的 29/59/99 矛盾
     from app.router.subscription import SUBSCRIPTION_PLANS
     for plan_id, plan in SUBSCRIPTION_PLANS.items():
+        if plan.get("on_sale") is False:
+            assert plan_id not in tier_dict
+            continue
         assert tier_dict[plan_id]["price_monthly"] == plan["price"]
         assert tier_dict[plan_id]["price_yearly"] == plan.get("price_yearly")
 
@@ -100,11 +104,12 @@ def test_paid_tier_features_follow_registry():
 
 
 def test_family_tier_5_members():
-    """家庭版支持5个成员"""
-    response = client.get("/api/v1/membership/tiers")
+    """已停售家和仍按 5 人（含购买人）说明，但不作为在售月付报价"""
+    response = client.get("/api/v1/membership/benefits/jiahe")
     data = response.json()["data"]
-    family_tier = next(t for t in data["tiers"] if t["tier"] == "jiahe")
-    assert family_tier["features"]["family_members"] == 5
+    assert data["on_sale"] is False
+    assert data["price_monthly"] is None
+    assert data["features"]["family_members"] == 5
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -408,7 +413,10 @@ def test_compare_returns_all_tiers():
     response = client.get("/api/v1/membership/compare")
     assert response.status_code == 200
     data = response.json()["data"]
-    assert len(data["tiers"]) == 4
+    assert len(data["tiers"]) == 3
+    assert all("元/月" not in t["price"] for t in data["tiers"])
+    yangxin = next(t for t in data["tiers"] if t["tier"] == "yangxin")
+    assert yangxin["price"] == "¥399 元/年"
 
 
 def test_compare_has_feature_categories():

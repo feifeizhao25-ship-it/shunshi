@@ -5,6 +5,7 @@ import '../../../core/router/safe_pop.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../../design_system/theme.dart';
+import '../../../core/config/app_config.dart';
 
 class SolarTermDetailPage extends StatefulWidget {
   final String termName;
@@ -59,7 +60,7 @@ class _SolarTermDetailPageState extends State<SolarTermDetailPage> {
     try {
       // Use the base URL from app config or default to ECS
       // In production this should come from app_constants
-      final baseUrl = 'https://api.shunshi.app';
+      final baseUrl = AppConfig.apiBaseUrl;
       final url = '$baseUrl/api/v1/solar-terms/detail/${Uri.encodeComponent(widget.termName)}';
       final resp = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 8));
       if (resp.statusCode == 200 && mounted) {

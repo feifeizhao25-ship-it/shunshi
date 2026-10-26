@@ -27,11 +27,16 @@ class PrivacyPolicyPage extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         children: [
           _sectionTitle('顺时（ShunShi）隐私政策'),
-          _body('最后更新日期：2025年5月\n生效日期：2025年5月', textColor),
+          _body(
+            '最后更新日期：2026年10月23日\n'
+            '运营者：北京艾瑞见时科技有限公司。个人信息存放在中国境内。\n'
+            '这是上线前按代码事实改过的稿子，律师定稿之前不能当成已经审过的法律文本。',
+            textColor,
+          ),
           const SizedBox(height: 12),
           _sectionTitle('一、信息收集范围'),
           _body(
-            '我们收集以下类型的信息，以向您提供养生服务：\n\n'
+            '我们收集以下信息，用来提供节气与作息安排。体质、作息等与健康有关的内容属于敏感个人信息，只在你填写后用于这些生活提示，不构成医疗诊断，也不用于训练模型。当前没有单独的训练同意开关，因为不会拿这些内容去训练模型。\n\n'
             '1.1 账户信息\n'
             '• 注册信息：手机号码、微信/OpenID、昵称、头像\n'
             '• 认证信息：登录凭证、设备标识符\n\n'
@@ -61,7 +66,7 @@ class PrivacyPolicyPage extends StatelessWidget {
             '• 家庭成员健康状态共享（需您明确授权）\n\n'
             '2.2 服务改进\n'
             '• 分析使用数据以改善产品体验\n'
-            '• 优化 AI 模型的养生推荐质量\n'
+            '• 对话和健康相关内容不用于训练模型\n'
             '• 进行去标识化统计分析\n\n'
             '2.3 安全保障\n'
             '• 检测和防范欺诈、滥用行为\n'
@@ -112,7 +117,7 @@ class PrivacyPolicyPage extends StatelessWidget {
             '• 撤回同意权：随时撤回对数据处理的同意\n'
             '• 自动化决策拒绝权：拒绝仅通过自动化决策做出的分析\n\n'
             '5.2 行使权利\n'
-            '您可以通过应用内「设置 > 隐私 > 数据管理」或联系 privacy@shunshi.app 行使上述权利。我们将在 15 个工作日内回复您的请求。',
+            '你可以通过应用内「设置」里的导出和注销行使这些权利。公司联系邮箱开通前，不使用 shunshi.app 或 shunshi.ai。我们将在 15 个工作日内回复。',
             textColor,
           ),
           const SizedBox(height: 12),
@@ -140,9 +145,9 @@ class PrivacyPolicyPage extends StatelessWidget {
           _sectionTitle('九、联系我们'),
           _body(
             '数据保护相关问题：\n'
-            '• 邮箱：privacy@shunshi.app\n'
-            '• 数据保护官：dpo@shunshi.app\n'
-            '• 通信地址：[公司注册地址]\n\n'
+            '• 运营者：北京艾瑞见时科技有限公司\n'
+            '• 联系邮箱：待公司开通后填写，不使用 shunshi.app / shunshi.ai\n'
+            '• 通信地址：以营业执照住所为准，备案材料里填写\n\n'
             '我们将在 15 个工作日内回复您的请求。',
             textColor,
           ),

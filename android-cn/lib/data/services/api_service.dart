@@ -618,17 +618,19 @@ class SubscriptionService {
       'daily_ai_limit': 5,
       'features': ['AI 对话', '基础养生', '每日建议'],
     },
-    'monthly': {
-      'name': '月度会员',
-      'price': 29,
-      'daily_ai_limit': 50,
-      'features': ['AI 对话', '全部养生功能', '家庭关怀', '专属体质报告', '优先客服'],
-    },
-    'yearly': {
-      'name': '年度会员',
-      'price': 199,
+    'content_yearly': {
+      'name': '内容订阅',
+      'price': 399,
+      'period': 'year',
       'daily_ai_limit': 100,
-      'features': ['AI 对话', '全部养生功能', '家庭关怀', '专属体质报告', '优先客服', '线下活动', '专属顾问'],
+      'features': ['AI 对话', '今日计划'],
+    },
+    'member_yearly': {
+      'name': '会员',
+      'price': 888,
+      'period': 'year',
+      'daily_ai_limit': 200,
+      'features': ['AI 对话', '今日计划'],
     },
   };
   
@@ -664,9 +666,7 @@ class SubscriptionService {
     
     final now = DateTime.now();
     DateTime? expiresAt;
-    if (planType == 'monthly') {
-      expiresAt = now.add(const Duration(days: 30));
-    } else if (planType == 'yearly') {
+    if (plan['period'] == 'year') {
       expiresAt = now.add(const Duration(days: 365));
     }
     

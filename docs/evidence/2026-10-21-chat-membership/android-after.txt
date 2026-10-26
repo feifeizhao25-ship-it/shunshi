@@ -1,0 +1,27 @@
+
+00:00 +0: loading /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_membership_test.dart
+00:00 +0: loading /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_history_codec_test.dart
+00:00 +0: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_history_codec_test.dart: round trips 25 multiline messages without truncation
+00:00 +1: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_history_codec_test.dart: round trips 25 multiline messages without truncation
+00:00 +1: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_history_codec_test.dart: preserves sources and complete cards
+00:00 +2: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_history_codec_test.dart: preserves sources and complete cards
+00:00 +2: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_history_codec_test.dart: migrates legacy multiline messages beyond ten rows
+00:00 +3: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_history_codec_test.dart: migrates legacy multiline messages beyond ten rows
+00:00 +3: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_history_codec_test.dart: damaged data does not crash
+00:00 +4: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_history_codec_test.dart: damaged data does not crash
+00:00 +4: loading /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_membership_test.dart
+00:00 +4: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_membership_test.dart: actual membership contract handles free and all paid plans without data.tier
+00:00 +5: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_membership_test.dart: actual membership contract handles free and all paid plans without data.tier
+00:00 +5: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_membership_test.dart: missing, unknown and contradictory fields never grant membership
+00:00 +6: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_membership_test.dart: missing, unknown and contradictory fields never grant membership
+00:00 +6: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_membership_test.dart: free badge follows server fields without fabricated quota
+00:01 +6: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_membership_test.dart: free badge follows server fields without fabricated quota
+00:01 +7: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_membership_test.dart: free badge follows server fields without fabricated quota
+00:01 +8: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_membership_test.dart: free badge follows server fields without fabricated quota
+00:01 +9: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_history_page_test.dart: history renders even when membership and solar term HTTP requests fail
+00:01 +10: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_history_page_test.dart: history renders even when membership and solar term HTTP requests fail
+00:01 +11: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_history_page_test.dart: history renders even when membership and solar term HTTP requests fail
+00:01 +12: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_history_page_test.dart: history renders even when membership and solar term HTTP requests fail
+00:01 +13: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_membership_test.dart: failed lookup is unknown and retry restores verified state
+00:01 +14: /Users/feifei00/Documents/CodexWorktrees/shunshi-production/android-cn/test/chat_membership_test.dart: failed lookup is unknown and retry restores verified state
+00:01 +14: All tests passed!

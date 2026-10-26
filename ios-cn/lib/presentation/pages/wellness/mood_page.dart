@@ -1,7 +1,5 @@
 import '../../../core/router/safe_pop.dart';
 import 'package:flutter/material.dart';
-import '../../widgets/paywall_banner.dart';
-
 /// 正念呼吸引导数据
 final List<Map<String, String>> _breathingSteps = [
   {'title': '调整姿势', 'desc': '找一个舒适的坐姿或仰卧位，轻轻闭上双眼'},
@@ -140,7 +138,6 @@ class _MoodPageState extends State<MoodPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const PaywallBanner(message: '升级会员解锁情绪追踪与AI情绪分析', icon: Icons.favorite),
             // AI 对话入口
             Card(
               color: Colors.pink[50],

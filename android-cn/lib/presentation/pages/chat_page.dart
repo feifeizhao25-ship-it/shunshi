@@ -3,14 +3,17 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../core/services/ai_safety.dart';
-import '../../../data/services/voice_service.dart';
-import '../../../design_system/theme.dart';
-import '../../../design_system/theme_helper.dart';
+import '../../core/services/ai_safety.dart';
+import '../../data/services/voice_service.dart';
+import '../../design_system/theme.dart';
+import '../../design_system/theme_helper.dart';
 import '../widgets/feedback_sheet.dart';
-import '../../../core/config/app_config.dart';
+import '../../core/config/app_config.dart';
 import '../widgets/membership_widgets.dart';
 import 'chat/chat_models.dart';
+import 'chat/chat_history_store.dart';
+import 'chat/chat_membership.dart';
+import 'chat/chat_api.dart';
 import 'chat/chat_widgets.dart';
 import '../../core/solar_term/solar_term_table.dart';
 
@@ -18,7 +21,9 @@ final String _baseUrl = AppConfig.apiBaseUrl.replaceAll('/api/v1', '');
 
 class ChatPage extends StatefulWidget {
   final String? conversationId;
-  const ChatPage({super.key, this.conversationId});
+  final Dio? client;
+  final VoiceInput? voiceInput;
+  const ChatPage({super.key, this.conversationId, this.client, this.voiceInput});
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -79,26 +84,33 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
   final _scrollController = ScrollController();
   final _focusNode = FocusNode();
   final List<ChatMessage> _messages = [];
-  final _dio = Dio(BaseOptions(baseUrl: _baseUrl));
+  late final _dio = widget.client ?? Dio(BaseOptions(baseUrl: _baseUrl, connectTimeout: const Duration(seconds: 10)));
   bool _isLoading = false;
+  String? _chatError;
   bool _isRecording = false;
-  int _quotaRemaining = 10;
-  int _quotaLimit = 10;
+  bool _voiceBusy = false;
+  VoiceInput? _voice;
+  bool _membershipKnown = false;
+  bool _membershipLoading = false;
   bool _isVip = false;
 
   String _userName = '';
   String _token = '';
   // 先用节气表（与后端同一份数据）给出当前节气，接口返回后再以接口为准
   String _currentSolarTerm = currentSolarTermName() ?? '立夏';
-  String _solarTermDesc = '夏之始，养心安神。清淡饮食，适当午睡，防暑防晒。';
+  String _solarTermDesc = '按这个节气把作息放慢一点。';
   String? _conversationId;
 
   @override
   void initState() {
     super.initState();
     _conversationId = widget.conversationId;
-    _fetchSolarTerm();
-    _initChat();
+    _openChat();
+  }
+
+  Future<void> _openChat() async {
+    await _fetchSolarTerm();
+    if (mounted) await _initChat();
   }
 
   Future<void> _fetchSolarTerm() async {
@@ -117,6 +129,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
 
   @override
   void dispose() {
+    _voice?.cancel().catchError((Object _) {});
     _controller.dispose();
     _scrollController.dispose();
     _focusNode.dispose();
@@ -136,15 +149,19 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
       try {
         final res = await _dio.post(
           '/api/v1/auth/guest-login',
+          options: Options(receiveTimeout: const Duration(seconds: 10)),
           data: {
             'device_id': 'shunshi_${DateTime.now().millisecondsSinceEpoch}',
           },
         );
-        if (res.data != null && res.data['data']?['token'] != null) {
-          _token = res.data['data']['token'];
-          await prefs.setString('auth_token', _token);
-        }
-      } catch (_) {}
+        final token = parseGuestToken(res.data);
+        if (!mounted || (prefs.getString('auth_token') ?? '').isNotEmpty) return;
+        await prefs.setString('auth_token', token);
+        if (!mounted) return;
+        setState(() => _token = token);
+      } catch (_) {
+        if (mounted) setState(() => _chatError = '暂时无法建立访客登录，请检查网络或登录账户后重试。');
+      }
     }
     await _loadConversation(prefs);
     if (_messages.isEmpty && mounted) {
@@ -165,55 +182,61 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
         );
       });
     }
-    _loadQuota();
+    _loadMembership();
   }
 
-  Future<void> _loadQuota() async {
+  Future<void> _loadMembership() async {
+    if (_membershipLoading || !mounted) return;
+    setState(() => _membershipLoading = true);
     try {
       _dio.options.headers['Authorization'] = 'Bearer $_token';
-      final res = await _dio.get('/api/v1/subscription/status');
-      if (res.data != null && res.data['data'] != null) {
-        final data = res.data['data'];
-        setState(() {
-          _quotaLimit = data['limit'] ?? 10;
-          _quotaRemaining = data['remaining'] ?? (data['limit'] ?? 10);
-          _isVip = data['tier'] != 'free';
-        });
-      }
-    } catch (_) {}
+      final res = await _dio.get('/api/v1/subscription/status',
+          options: Options(receiveTimeout: const Duration(seconds: 10)));
+      final paid = parseChatMembership(res.data);
+      if (!mounted) return;
+      setState(() {
+        _isVip = paid;
+        _membershipKnown = true;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _isVip = false;
+        _membershipKnown = false;
+      });
+    } finally {
+      if (mounted) setState(() => _membershipLoading = false);
+    }
   }
 
   // ── 对话持久化 ──
 
   Future<void> _saveConversation() async {
-    final prefs = await SharedPreferences.getInstance();
-    final msgs = _messages.map((m) => '${m.role}|${m.text}').join('\n');
-    await prefs.setString('chat_history', msgs);
-    await prefs.setString('conversation_id', _conversationId ?? '');
+    final token = _token;
+    final messages = List<ChatMessage>.of(_messages);
+    final conversation = _conversationId;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await ChatHistoryStore(prefs, token).save(messages, conversation);
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('聊天记录未能保存，请先复制重要内容再重试')),
+        );
+      }
+    }
   }
 
   Future<void> _loadConversation(SharedPreferences prefs) async {
-    final saved = prefs.getString('chat_history');
-    _conversationId =
-        prefs.getString('conversation_id') ?? widget.conversationId;
-    if (saved != null && saved.isNotEmpty) {
-      final lines = saved.split('\n');
-      final recent = lines.length > 10
-          ? lines.sublist(lines.length - 10)
-          : lines;
-      for (final line in recent) {
-        final sepIdx = line.indexOf('|');
-        if (sepIdx > 0) {
-          _messages.add(
-            ChatMessage(
-              role: line.substring(0, sepIdx),
-              text: line.substring(sepIdx + 1),
-              time: _fmt(DateTime.now()),
-            ),
-          );
-        }
-      }
-    }
+    final stored = ChatHistoryStore(prefs, _token)
+        .load(conversationId: widget.conversationId);
+    if (!mounted) return;
+    setState(() {
+      _conversationId = stored.conversationId;
+      _messages
+        ..clear()
+        ..addAll(stored.messages);
+    });
   }
 
   void _scrollToBottom() {
@@ -233,10 +256,11 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
   Future<void> _sendMessage() async {
     final text = _controller.text.trim();
     if (text.isEmpty || _isLoading) return;
-    if (!_isVip && _quotaRemaining <= 0) {
-      _showUpgradePrompt();
+    if (_token.isEmpty) {
+      setState(() => _chatError = '尚未完成登录，请稍后重试或登录账户。');
       return;
     }
+    setState(() => _chatError = null);
     _controller.clear();
 
     // Prompt Injection 防护
@@ -323,6 +347,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
       List<SuggestionCard>? cards,
       List<String>? sources,
       String? convId,
+      String? usageReminder,
     }) {
       var reply = aiText;
       final c =
@@ -334,10 +359,19 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
               subtitle: '顺应天时，调和身心',
             ),
           ];
-      if (hasRisk) reply = '⚠️ 以下建议仅供参考，不能替代医生诊断。如有不适请及时就医。\n\n$reply';
-      reply = '$reply\n\n💡 以上建议基于中医养生理论，仅供参考';
+      if (hasRisk) reply = '⚠️ 以下内容仅供作息参考，不能替代医生诊断。如有不适请及时就医。\n\n$reply';
       if (convId != null) _conversationId = convId;
       setState(() {
+        final reminder = usageReminder?.trim() ?? '';
+        if (reminder.isNotEmpty && !reply.contains(reminder)) {
+          _messages.add(
+            ChatMessage(
+              role: 'ai',
+              text: reminder,
+              time: _fmt(DateTime.now()),
+            ),
+          );
+        }
         _messages.add(
           ChatMessage(
             role: 'ai',
@@ -348,128 +382,34 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
           ),
         );
         _isLoading = false;
-        if (!_isVip) _quotaRemaining--;
         _incrementChatCount();
       });
       _saveConversation();
     }
 
+    final requestToken = _token;
     try {
-      _dio.options.headers['Authorization'] = 'Bearer $_token';
-      final res = await _dio.post(
-        '/ai/chat',
-        data: {
-          'message': text,
-          'solar_term': _currentSolarTerm,
-          'conversation_id': _conversationId,
-        },
-      );
-      var aiText = res.data?['text'] ?? '抱歉，暂时无法回应。';
-      List<SuggestionCard> cards = [];
-      if (res.data?['suggestions'] != null) {
-        for (var s in res.data['suggestions']) {
-          cards.add(
-            SuggestionCard(
-              type: s['type'] ?? 'tip',
-              title: s['title'] ?? '',
-              subtitle: s['content'] ?? '',
-              icon: iconForType(s['type']),
-            ),
-          );
-        }
-      }
-      final sources = (res.data?['sources'] as List?)?.cast<String>() ?? [];
+      final reply = await sendChat(_dio, requestToken, text);
+      final prefs = await SharedPreferences.getInstance();
+      if (!mounted || prefs.getString('auth_token') != requestToken) return;
       handleAIReply(
-        aiText,
-        cards: cards,
-        sources: sources,
-        convId: res.data?['conversation_id'],
+        reply.text,
+        cards: [],
+        sources: reply.sources,
+        usageReminder: reply.usageReminder,
       );
-    } catch (_) {
-      try {
-        final v2Dio = Dio(
-          BaseOptions(
-            baseUrl: AppConfig.apiBaseUrl.replaceAll('/api/v1', ''),
-            connectTimeout: const Duration(seconds: 10),
-            receiveTimeout: const Duration(seconds: 60),
-          ),
-        );
-        v2Dio.options.headers['Authorization'] = 'Bearer $_token';
-        final v2Res = await v2Dio.post(
-          '/api/v1/chat?message=${Uri.encodeComponent(text)}&conversation_id=${_conversationId ?? ''}',
-        );
-        final v2Data = v2Res.data;
-        final aiText =
-            v2Data?['data']?['text'] ?? v2Data?['reply'] ?? '抱歉，暂时无法回应。';
-        final convId =
-            v2Data?['data']?['conversation_id'] ?? v2Data?['conversation_id'];
-        List<SuggestionCard> v2Cards = [];
-        final so = v2Res.data?['structured_output'];
-        if (so != null) {
-          final actions = so['actions'] as List?;
-          if (actions != null) {
-            for (var a in actions) {
-              final duration = a['duration_min'] != null
-                  ? '约${a['duration_min']}分钟'
-                  : '';
-              v2Cards.add(
-                SuggestionCard(
-                  type: a['type'] ?? 'tip',
-                  title: a['title'] ?? '',
-                  subtitle: '${a['description'] ?? ''} $duration'.trim(),
-                  icon: iconForType(a['type']),
-                ),
-              );
-            }
-          }
-          if (v2Cards.isEmpty) {
-            v2Cards.add(
-              SuggestionCard(
-                type: 'insight',
-                title: so['title'] ?? '养生建议',
-                subtitle: so['insight'] ?? aiText,
-                icon: iconForType('insight'),
-              ),
-            );
-          }
-        } else {
-          v2Cards.add(
-            SuggestionCard(
-              type: 'insight',
-              title: '节气调护建议',
-              subtitle: '顺应天时，调和身心',
-            ),
-          );
-        }
-        final v2Sources = (so?['disclaimer'] != null)
-            ? ['⚠️ ${so?["disclaimer"]}']
-            : <String>[];
-        handleAIReply(
-          aiText,
-          cards: v2Cards,
-          sources: v2Sources,
-          convId: convId,
-        );
-      } catch (_) {
-        handleAIReply(
-          _offlineReply(),
-          cards: [
-            SuggestionCard(
-              type: 'info',
-              title: '服务暂不可用',
-              subtitle: '请检查网络后重试，离线状态不生成健康建议',
-              icon: Icons.cloud_off,
-            ),
-          ],
-          sources: const ['离线模式｜未调用知识库｜没有生成健康结论'],
-        );
-      }
+    } catch (error) {
+      final prefs = await SharedPreferences.getInstance();
+      if (!mounted || prefs.getString('auth_token') != requestToken) return;
+      setState(() {
+        _chatError = chatFailureMessage(error);
+        if (_controller.text.isEmpty) _controller.text = text;
+      });
+      await _saveConversation();
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
     _scrollToBottom();
-  }
-
-  String _offlineReply() {
-    return '当前无法连接顺时服务，因此没有调用已核验知识库，也不会在离线状态生成健康建议。请检查网络后重试；如有明显或持续不适，请及时咨询医疗专业人员。';
   }
 
   String _fmt(DateTime dt) =>
@@ -521,7 +461,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
             ),
             const SizedBox(height: 16),
             const Text(
-              '今日免费消息已用完',
+              '查看会员权益',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
@@ -530,7 +470,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
             ),
             const SizedBox(height: 8),
             Text(
-              '升级会员，每天 $_quotaLimit 条专属AI养生建议\n解锁全部体质测试 + 家庭成员管理',
+              '查看各档会员的对话、养生建议与家庭功能\n具体权益以套餐页面为准',
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 14,
@@ -629,47 +569,44 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
   // ── 语音 ──
 
   void _showVoiceInput() async {
-    if (_isRecording) {
-      setState(() => _isRecording = false);
-      try {
-        final voice = VoiceService();
-        final text = await voice.stopAndRecognize();
-        if (text != null && text.isNotEmpty && mounted) {
-          setState(() => _controller.text = text);
-        }
-      } catch (e) {
-        if (mounted)
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('语音识别失败: $e'),
-              duration: const Duration(seconds: 2),
-            ),
-          );
-      }
-      return;
-    }
+    if (_voiceBusy) return;
+    final voice = _voice ??= widget.voiceInput ?? VoiceService();
+    setState(() {
+      _voiceBusy = true;
+      _chatError = null;
+    });
     try {
-      final voice = VoiceService();
-      final started = await voice.startRecording();
-      if (!started) {
-        if (mounted)
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('录音启动失败，请检查麦克风权限'),
-              duration: Duration(seconds: 2),
-            ),
-          );
-        return;
+      if (_isRecording) {
+        setState(() => _isRecording = false);
+        final text = await voice.stopAndRecognize();
+        if (!mounted) return;
+        if (text == null || text.trim().isEmpty) {
+          setState(() => _chatError = voice.errorMsg.isEmpty
+              ? '未识别到语音，请重新录音或输入文字。' : voice.errorMsg);
+        } else {
+          // Never overwrite words typed while recognition was in flight.
+          setState(() => _controller.text = _controller.text.isEmpty
+              ? text : '${_controller.text}\n$text');
+        }
+      } else {
+        final started = await voice.startRecording();
+        if (!mounted) {
+          await voice.cancel();
+          return;
+        }
+        setState(() {
+          _isRecording = started;
+          if (!started) _chatError = voice.errorMsg.isEmpty
+              ? '录音启动失败，请检查麦克风权限。' : voice.errorMsg;
+        });
       }
-      setState(() => _isRecording = true);
-    } catch (e) {
-      if (mounted)
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('录音失败: $e'),
-            duration: const Duration(seconds: 2),
-          ),
-        );
+    } catch (_) {
+      if (mounted) setState(() {
+        _isRecording = false;
+        _chatError = '语音服务暂不可用，请重新录音或输入文字。';
+      });
+    } finally {
+      if (mounted) setState(() => _voiceBusy = false);
     }
   }
 
@@ -720,12 +657,12 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
               children:
                   [
                         '最近睡眠不好',
-                        '换季怎么调理',
+                        '换季怎么安排',
                         '推荐节气食谱',
                         '适合什么运动',
                         '情绪低落怎么办',
                         '想学八段锦',
-                        '推荐养生茶饮',
+                        '换季喝什么',
                         '体质测试',
                       ]
                       .map(
@@ -767,11 +704,19 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
         child: Column(
           children: [
             _buildTopBar(),
+            const Padding(
+              padding: EdgeInsets.fromLTRB(16, 6, 16, 2),
+              child: Text(
+                '你在和人工智能对话，不是真人',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+              ),
+            ),
             Expanded(child: _buildList()),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               child: Text(
-                '内容由AI生成，仅供健康养生参考，不构成医疗诊断建议。如有不适请及时就医。',
+                '内容由AI生成，仅供作息与节气安排参考，不构成医疗诊断或治疗建议。',
                 style: TextStyle(fontSize: 11, color: Colors.grey[500]),
                 textAlign: TextAlign.center,
               ),
@@ -801,15 +746,12 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
       ),
       child: Column(
         children: [
-          if (!_isVip)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: TokenBalanceBar(
-                remaining: _quotaRemaining,
-                limit: _quotaLimit,
-                isVip: _isVip,
-                onTapUpgrade: _showUpgradePrompt,
-              ),
+          if (!_membershipKnown)
+            TextButton(
+              onPressed: _membershipLoading ? null : _loadMembership,
+              child: Text(_membershipLoading
+                  ? '正在查询会员状态'
+                  : '会员状态暂未查到，点击重试'),
             ),
           Row(
             children: [
@@ -839,7 +781,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
                       ),
                     ),
                     Text(
-                      '温暖陪伴',
+                      'AI 生成',
                       style: TextStyle(
                         fontFamily: ShunShiTypography.sansFamily,
                         fontSize: 12,
@@ -877,21 +819,21 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
                       ),
                     ] else ...[
                       Icon(
-                        _quotaRemaining > 3
+                        _membershipKnown
                             ? Icons.chat_bubble_outline_rounded
                             : Icons.chat_bubble_rounded,
                         size: 13,
-                        color: _quotaRemaining > 3
+                        color: _membershipKnown
                             ? ShunShiColors.primary
                             : Colors.orange,
                       ),
                       const SizedBox(width: 3),
                       Text(
-                        '$_quotaRemaining/$_quotaLimit',
+                        _membershipKnown ? '免费版' : '状态待查询',
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w500,
-                          color: _quotaRemaining > 3
+                          color: _membershipKnown
                               ? ShunShiColors.primary
                               : Colors.orange,
                         ),
@@ -901,19 +843,35 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
                 ),
               ),
               PopupMenuButton<String>(
+                tooltip: '更多',
                 icon: const Icon(
                   Icons.more_vert,
                   size: 22,
                   color: ShunShiColors.textTertiary,
                 ),
-                onSelected: (v) {
+                onSelected: (v) async {
+                  if (v == 'end') {
+                    setState(() {
+                      _messages
+                        ..clear()
+                        ..add(ChatMessage(
+                          role: 'ai',
+                          text: '这次陪伴先到这里。你在和人工智能对话，不是真人。需要的时候可以再开始。',
+                          time: _fmt(DateTime.now()),
+                        ));
+                      _conversationId = null;
+                    });
+                    await _saveConversation();
+                    return;
+                  }
                   if (v == 'clear') {
                     setState(() => _messages.clear());
-                    _saveConversation();
-                    _initChat();
+                    await _saveConversation();
+                    if (mounted) await _initChat();
                   }
                 },
                 itemBuilder: (_) => [
+                  const PopupMenuItem(value: 'end', child: Text('结束陪伴')),
                   const PopupMenuItem(value: 'clear', child: Text('清空对话')),
                 ],
               ),
@@ -925,7 +883,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
   }
 
   Widget _buildList() {
-    final showUpgradeNudge = _aiMessageCount >= 5 && !_isVip;
+    final showUpgradeNudge = _aiMessageCount >= 5 && _membershipKnown && !_isVip;
     if (_messages.isEmpty && _isLoading) {
       return ListView(
         children: [
@@ -988,6 +946,12 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          if (_chatError != null)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Text(_chatError!, key: const ValueKey('chat-error'),
+                  style: TextStyle(color: Theme.of(context).colorScheme.error)),
+            ),
           // 快捷提问标签
           QuickQuestionChips(
             onTap: (q) {
@@ -1095,7 +1059,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
                   ),
                 ),
                 const SizedBox(width: 8),
-                GradientSendButton(onTap: _sendMessage),
+                GradientSendButton(onTap: _sendMessage, enabled: !_isLoading),
               ],
             ),
           ),

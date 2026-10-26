@@ -1,0 +1,36 @@
+{
+  "refresh": {
+    "checked_at": "2026-10-21T07:12:43.553783+00:00",
+    "status": "partial",
+    "checked": 23,
+    "failures": [
+      {
+        "source_id": "R007",
+        "error": "URLError",
+        "reason_type": "SSLEOFError"
+      },
+      {
+        "source_id": "R054",
+        "error": "URLError",
+        "reason_type": "SSLEOFError"
+      }
+    ]
+  },
+  "evaluation": {
+    "passed": 18,
+    "ranking_metrics_known_gold_only": {
+      "recall_at_5": 1.0,
+      "mrr_at_5": 0.9583333333333334,
+      "ndcg_at_5": 0.9692441461309548,
+      "empty_query_correct": 1.0
+    },
+    "consistency": null,
+    "maintenance_ledger": {
+      "path": "/Users/feifei00/Documents/运营资料-OpenClaw/automation/output/domestic-research/maintenance-ledger.json",
+      "open": 121,
+      "closed": 2,
+      "production_modified": false
+    }
+  },
+  "production_modified": false
+}

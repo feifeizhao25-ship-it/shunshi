@@ -77,6 +77,15 @@ def _build_tiers() -> dict:
 MEMBERSHIP_TIERS = _build_tiers()
 
 
+def _plan_on_sale(plan_id: str) -> bool:
+    """在售目录只包含免费档和年付内容订阅 / 会员。家和保留给已购用户查询。"""
+    return bool(SUBSCRIPTION_PLANS[plan_id].get("on_sale", True))
+
+
+def _public_tiers() -> dict:
+    return {key: value for key, value in MEMBERSHIP_TIERS.items() if _plan_on_sale(key)}
+
+
 def _get_default_free_membership() -> dict:
     """获取默认的免费会员套餐"""
     now = datetime.now()
@@ -130,12 +139,13 @@ def _get_days_remaining(membership: dict) -> int:
 async def list_tiers():
     """获取所有可用的会员等级及其详细信息"""
     tiers_list = []
-    for tier_key, tier_data in MEMBERSHIP_TIERS.items():
+    for tier_key, tier_data in _public_tiers().items():
         tiers_list.append({
             "tier": tier_key,
             "name": tier_data["name"],
             "price_monthly": tier_data["price_monthly"],
             "price_yearly": tier_data["price_yearly"],
+            "on_sale": True,
             "description": tier_data["description"],
             "features": tier_data["features"],
         })
@@ -306,7 +316,9 @@ async def get_tier_benefits(tier: str):
         "data": {
             "tier": tier,
             "name": tier_data["name"],
-            "price_monthly": tier_data["price_monthly"],
+            "price_monthly": tier_data["price_monthly"] if _plan_on_sale(tier) else None,
+            "price_yearly": tier_data["price_yearly"],
+            "on_sale": _plan_on_sale(tier),
             "description": tier_data["description"],
             "benefits": benefits,
             "features": tier_data["features"],
@@ -324,11 +336,11 @@ async def compare_tiers():
             "内容权限",
             "音频时长",
             "家庭成员",
-            "月度价格",
+            "价格",
         ],
     }
 
-    for tier_key, tier_data in MEMBERSHIP_TIERS.items():
+    for tier_key, tier_data in _public_tiers().items():
         features = tier_data["features"]
         comparison["tiers"].append({
             "tier": tier_key,
@@ -344,8 +356,9 @@ async def compare_tiers():
             ),
             "family_members": f"{features['family_members']}人",
             "price": (
-                f"¥{tier_data['price_yearly']} 元/年" if tier_data["price_monthly"] is None
-                else f"¥{tier_data['price_monthly']} 元/月" if tier_data["price_monthly"] > 0 else "免费"
+                "免费" if not tier_data["price_yearly"] and not tier_data["price_monthly"]
+                else f"¥{tier_data['price_yearly']} 元/年" if tier_data.get("price_yearly")
+                else "免费"
             ),
         })
 

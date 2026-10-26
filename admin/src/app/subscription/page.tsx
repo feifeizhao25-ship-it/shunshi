@@ -21,8 +21,24 @@ interface Plan {
   name: string;
   price: number | null;
   price_yearly?: number | null;
-  features: string[];
+  period?: string | null;
+  on_sale?: boolean;
+  features: string[] | Record<string, unknown>;
   subscriber_count: number;
+}
+
+function planFeatureLines(features: Plan['features'] | undefined): string[] {
+  if (Array.isArray(features)) return features.map((item) => String(item));
+  if (!features || typeof features !== 'object') return [];
+  const labels: Record<string, string> = {
+    basic_chat: '基础对话',
+    solar_terms: '节气内容',
+    today_plan: '今日计划',
+    family: '家庭席位（仅已购旧档）',
+  };
+  return Object.entries(features)
+    .filter(([, value]) => value === true)
+    .map(([key]) => labels[key] ?? key);
 }
 
 export default function SubscriptionPage() {
@@ -132,18 +148,28 @@ export default function SubscriptionPage() {
 
         {tab === 'plans' && (
           <div className="grid grid-cols-3 gap-6">
-            {plans.length > 0 ? plans.map((plan) => (
+            {plans.length > 0 ? plans.map((plan) => {
+              const onSale = plan.on_sale !== false;
+              const yearly = plan.price_yearly ?? (plan.period === 'year' ? plan.price : null);
+              const amount = onSale ? (yearly ?? plan.price ?? 0) : null;
+              const features = planFeatureLines(plan.features);
+              return (
               <div key={plan.id} className="bg-white rounded-xl border border-gray-200 p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-semibold text-gray-800">{plan.name}</h3>
-                  <span className="text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded">{plan.subscriber_count} 订阅</span>
+                  <span className={`text-xs px-2 py-1 rounded ${onSale ? 'bg-blue-50 text-blue-600' : 'bg-gray-100 text-gray-500'}`}>
+                    {onSale ? '在售' : '已停售'}
+                  </span>
                 </div>
-                <div className="text-3xl font-bold text-gray-900 mb-4">¥{plan.price ?? plan.price_yearly}<span className="text-sm font-normal text-gray-400">{plan.price == null ? '/年' : '/月'}</span></div>
+                <div className="text-3xl font-bold text-gray-900 mb-4">
+                  {amount == null ? '不再售卖' : <>¥{amount}<span className="text-sm font-normal text-gray-400">/年</span></>}
+                </div>
                 <ul className="space-y-2 text-sm text-gray-600">
-                  {(plan.features || []).map((f, i) => <li key={i} className="flex items-center gap-2"><span className="text-green-500">✓</span>{f}</li>)}
+                  {features.map((f) => <li key={f} className="flex items-center gap-2"><span className="text-green-500">✓</span>{f}</li>)}
                 </ul>
               </div>
-            )) : (
+              );
+            }) : (
               // 接口没返回时不编造价格：只提示读取失败（0S3 定价：免费 / 内容订阅 ¥399/年 / 会员 ¥888/年）
               <div className="col-span-3 bg-white rounded-xl border border-gray-200 p-6 text-sm text-gray-500">
                 暂时读不到套餐数据，请稍后刷新。

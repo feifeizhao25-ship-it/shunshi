@@ -14,7 +14,7 @@ def test_medicines_have_no_dosage_or_course():
 
 def test_output_efficacy_filter_blocks_claims():
     from app.safety.guard import safety_guard
-    for text in ["常喝这个可以增强免疫力。", "有助于排毒消肿。", "能提高免疫功能，利尿。"]:
+    for text in ["常喝这个可以增强免疫力。", "有助于排毒消肿。", "能提高免疫功能，利尿。", "这个可以长期服用。"]:
         r = safety_guard.check_output(text, {"user_id": "test"})
         assert r.flag == "output_violation", text
     ok = safety_guard.check_output("早睡早起、规律作息对精神状态有帮助。", {"user_id": "test"})

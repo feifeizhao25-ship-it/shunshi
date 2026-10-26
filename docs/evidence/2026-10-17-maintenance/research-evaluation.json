@@ -1,0 +1,1011 @@
+{
+  "scope": "research_keyword_retrieval_only",
+  "cases": 12,
+  "passed": 12,
+  "results": [
+    {
+      "id": "lookup-01",
+      "passed": true,
+      "retrieved_ids": [
+        "R040"
+      ],
+      "expected_ids": [
+        "R040"
+      ],
+      "isolated": true
+    },
+    {
+      "id": "lookup-02",
+      "passed": true,
+      "retrieved_ids": [
+        "R041"
+      ],
+      "expected_ids": [
+        "R041"
+      ],
+      "isolated": true
+    },
+    {
+      "id": "lookup-03",
+      "passed": true,
+      "retrieved_ids": [
+        "R043"
+      ],
+      "expected_ids": [
+        "R043"
+      ],
+      "isolated": true
+    },
+    {
+      "id": "lookup-04",
+      "passed": true,
+      "retrieved_ids": [
+        "R044"
+      ],
+      "expected_ids": [
+        "R044"
+      ],
+      "isolated": true
+    },
+    {
+      "id": "lookup-05",
+      "passed": true,
+      "retrieved_ids": [
+        "R033",
+        "R034",
+        "R035"
+      ],
+      "expected_ids": [
+        "R033",
+        "R034",
+        "R035"
+      ],
+      "isolated": true
+    },
+    {
+      "id": "lookup-06",
+      "passed": true,
+      "retrieved_ids": [
+        "R032",
+        "R048"
+      ],
+      "expected_ids": [
+        "R032"
+      ],
+      "isolated": true
+    },
+    {
+      "id": "lookup-07",
+      "passed": true,
+      "retrieved_ids": [
+        "R036"
+      ],
+      "expected_ids": [
+        "R036"
+      ],
+      "isolated": true
+    },
+    {
+      "id": "lookup-08",
+      "passed": true,
+      "retrieved_ids": [
+        "R037",
+        "R038"
+      ],
+      "expected_ids": [
+        "R037",
+        "R038"
+      ],
+      "isolated": true
+    },
+    {
+      "id": "isolation-09",
+      "passed": true,
+      "retrieved_ids": [],
+      "expected_ids": [],
+      "isolated": true
+    },
+    {
+      "id": "isolation-10",
+      "passed": true,
+      "retrieved_ids": [],
+      "expected_ids": [],
+      "isolated": true
+    },
+    {
+      "id": "isolation-11",
+      "passed": true,
+      "retrieved_ids": [],
+      "expected_ids": [],
+      "isolated": true
+    },
+    {
+      "id": "isolation-12",
+      "passed": true,
+      "retrieved_ids": [],
+      "expected_ids": [],
+      "isolated": true
+    }
+  ],
+  "registry_sha256": "cd3e9664223f37c46e03bdc5cd3ff856f5b11af1fff6d18d934701160b1e8d63",
+  "cases_sha256": "f94152f8c451c3691b765c5e0a497fe1a04dcd19ca064ab6286e63f80a0af1d7",
+  "model_answers_evaluated": false,
+  "production_ready": false,
+  "projects": [
+    {
+      "product": "shunshi",
+      "research_files_valid": true,
+      "errors": [],
+      "production_skill_loading": "not_verified_by_this_audit"
+    },
+    {
+      "product": "jianji",
+      "research_files_valid": true,
+      "errors": [],
+      "production_skill_loading": "not_verified_by_this_audit"
+    },
+    {
+      "product": "contentflow",
+      "research_files_valid": true,
+      "errors": [],
+      "production_skill_loading": "not_verified_by_this_audit"
+    },
+    {
+      "product": "energy",
+      "research_files_valid": true,
+      "errors": [],
+      "production_skill_loading": "not_verified_by_this_audit"
+    }
+  ],
+  "energy_evidence": {
+    "audit_ok": true,
+    "errors": [],
+    "total": 12,
+    "review_queue": [
+      {
+        "source_id": "std-gb50797",
+        "reasons": [
+          "content_review_required"
+        ],
+        "evidence_status": "legacy_unreviewed",
+        "source_url": "https://openstd.samr.gov.cn/bzgk/gb/index",
+        "retrieval_allowed_by_review": true
+      },
+      {
+        "source_id": "policy-cn-136",
+        "reasons": [
+          "content_review_required"
+        ],
+        "evidence_status": "legacy_unreviewed",
+        "source_url": "https://www.nea.gov.cn/20260520/9e1c4277ce324c8ab82a84da98da7980/c.html",
+        "retrieval_allowed_by_review": true
+      },
+      {
+        "source_id": "policy-cn-energy-plan-2030",
+        "reasons": [
+          "content_review_required",
+          "freshness_review_required"
+        ],
+        "evidence_status": "legacy_unreviewed",
+        "source_url": "https://www.nea.gov.cn/20260625/0ccfdc1674e84868b49480edf584eb5f/c.html",
+        "retrieval_allowed_by_review": true
+      },
+      {
+        "source_id": "std-iec61724",
+        "reasons": [
+          "content_review_required"
+        ],
+        "evidence_status": "legacy_unreviewed",
+        "source_url": "https://webstore.iec.ch/",
+        "retrieval_allowed_by_review": true
+      },
+      {
+        "source_id": "policy-us-itc",
+        "reasons": [
+          "content_review_required",
+          "freshness_review_required"
+        ],
+        "evidence_status": "legacy_unreviewed",
+        "source_url": "https://www.energy.gov/eere/solar",
+        "retrieval_allowed_by_review": true
+      },
+      {
+        "source_id": "std-ieee1547",
+        "reasons": [
+          "content_review_required"
+        ],
+        "evidence_status": "legacy_unreviewed",
+        "source_url": "https://standards.ieee.org/",
+        "retrieval_allowed_by_review": true
+      },
+      {
+        "source_id": "guide-grid-interconnection",
+        "reasons": [
+          "content_review_required",
+          "freshness_review_required"
+        ],
+        "evidence_status": "legacy_unreviewed",
+        "source_url": "https://www.nrel.gov/solar/",
+        "retrieval_allowed_by_review": true
+      },
+      {
+        "source_id": "price-cn-module",
+        "reasons": [
+          "content_review_required",
+          "freshness_review_required"
+        ],
+        "evidence_status": "legacy_unreviewed",
+        "source_url": "http://www.chinapv.org.cn/",
+        "retrieval_allowed_by_review": true
+      },
+      {
+        "source_id": "price-us-eia",
+        "reasons": [
+          "content_review_required",
+          "freshness_review_required"
+        ],
+        "evidence_status": "legacy_unreviewed",
+        "source_url": "https://www.eia.gov/electricity/monthly/",
+        "retrieval_allowed_by_review": true
+      },
+      {
+        "source_id": "research-irena-capacity-2026",
+        "reasons": [
+          "content_review_required",
+          "freshness_review_required"
+        ],
+        "evidence_status": "legacy_unreviewed",
+        "source_url": "https://www.irena.org/Publications/2026/Mar/Renewable-capacity-statistics-2026",
+        "retrieval_allowed_by_review": true
+      },
+      {
+        "source_id": "research-iea-global-review-2026",
+        "reasons": [
+          "content_review_required",
+          "freshness_review_required"
+        ],
+        "evidence_status": "legacy_unreviewed",
+        "source_url": "https://www.iea.org/reports/global-energy-review-2026",
+        "retrieval_allowed_by_review": true
+      }
+    ],
+    "production_modified": false
+  },
+  "maintenance_queue": {
+    "tasks": [
+      {
+        "id": "energy:review_product_evidence:guide-grid-interconnection",
+        "product": "energy",
+        "kind": "review_product_evidence",
+        "source_id": "guide-grid-interconnection",
+        "priority": 2,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "guide-grid-interconnection",
+          "reasons": [
+            "content_review_required",
+            "freshness_review_required"
+          ],
+          "evidence_status": "legacy_unreviewed",
+          "source_url": "https://www.nrel.gov/solar/",
+          "retrieval_allowed_by_review": true
+        }
+      },
+      {
+        "id": "energy:review_product_evidence:policy-cn-136",
+        "product": "energy",
+        "kind": "review_product_evidence",
+        "source_id": "policy-cn-136",
+        "priority": 2,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "policy-cn-136",
+          "reasons": [
+            "content_review_required"
+          ],
+          "evidence_status": "legacy_unreviewed",
+          "source_url": "https://www.nea.gov.cn/20260520/9e1c4277ce324c8ab82a84da98da7980/c.html",
+          "retrieval_allowed_by_review": true
+        }
+      },
+      {
+        "id": "energy:review_product_evidence:policy-cn-energy-plan-2030",
+        "product": "energy",
+        "kind": "review_product_evidence",
+        "source_id": "policy-cn-energy-plan-2030",
+        "priority": 2,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "policy-cn-energy-plan-2030",
+          "reasons": [
+            "content_review_required",
+            "freshness_review_required"
+          ],
+          "evidence_status": "legacy_unreviewed",
+          "source_url": "https://www.nea.gov.cn/20260625/0ccfdc1674e84868b49480edf584eb5f/c.html",
+          "retrieval_allowed_by_review": true
+        }
+      },
+      {
+        "id": "energy:review_product_evidence:policy-us-itc",
+        "product": "energy",
+        "kind": "review_product_evidence",
+        "source_id": "policy-us-itc",
+        "priority": 2,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "policy-us-itc",
+          "reasons": [
+            "content_review_required",
+            "freshness_review_required"
+          ],
+          "evidence_status": "legacy_unreviewed",
+          "source_url": "https://www.energy.gov/eere/solar",
+          "retrieval_allowed_by_review": true
+        }
+      },
+      {
+        "id": "energy:review_product_evidence:price-cn-module",
+        "product": "energy",
+        "kind": "review_product_evidence",
+        "source_id": "price-cn-module",
+        "priority": 2,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "price-cn-module",
+          "reasons": [
+            "content_review_required",
+            "freshness_review_required"
+          ],
+          "evidence_status": "legacy_unreviewed",
+          "source_url": "http://www.chinapv.org.cn/",
+          "retrieval_allowed_by_review": true
+        }
+      },
+      {
+        "id": "energy:review_product_evidence:price-us-eia",
+        "product": "energy",
+        "kind": "review_product_evidence",
+        "source_id": "price-us-eia",
+        "priority": 2,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "price-us-eia",
+          "reasons": [
+            "content_review_required",
+            "freshness_review_required"
+          ],
+          "evidence_status": "legacy_unreviewed",
+          "source_url": "https://www.eia.gov/electricity/monthly/",
+          "retrieval_allowed_by_review": true
+        }
+      },
+      {
+        "id": "energy:review_product_evidence:research-iea-global-review-2026",
+        "product": "energy",
+        "kind": "review_product_evidence",
+        "source_id": "research-iea-global-review-2026",
+        "priority": 2,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "research-iea-global-review-2026",
+          "reasons": [
+            "content_review_required",
+            "freshness_review_required"
+          ],
+          "evidence_status": "legacy_unreviewed",
+          "source_url": "https://www.iea.org/reports/global-energy-review-2026",
+          "retrieval_allowed_by_review": true
+        }
+      },
+      {
+        "id": "energy:review_product_evidence:research-irena-capacity-2026",
+        "product": "energy",
+        "kind": "review_product_evidence",
+        "source_id": "research-irena-capacity-2026",
+        "priority": 2,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "research-irena-capacity-2026",
+          "reasons": [
+            "content_review_required",
+            "freshness_review_required"
+          ],
+          "evidence_status": "legacy_unreviewed",
+          "source_url": "https://www.irena.org/Publications/2026/Mar/Renewable-capacity-statistics-2026",
+          "retrieval_allowed_by_review": true
+        }
+      },
+      {
+        "id": "energy:review_product_evidence:std-gb50797",
+        "product": "energy",
+        "kind": "review_product_evidence",
+        "source_id": "std-gb50797",
+        "priority": 2,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "std-gb50797",
+          "reasons": [
+            "content_review_required"
+          ],
+          "evidence_status": "legacy_unreviewed",
+          "source_url": "https://openstd.samr.gov.cn/bzgk/gb/index",
+          "retrieval_allowed_by_review": true
+        }
+      },
+      {
+        "id": "energy:review_product_evidence:std-iec61724",
+        "product": "energy",
+        "kind": "review_product_evidence",
+        "source_id": "std-iec61724",
+        "priority": 2,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "std-iec61724",
+          "reasons": [
+            "content_review_required"
+          ],
+          "evidence_status": "legacy_unreviewed",
+          "source_url": "https://webstore.iec.ch/",
+          "retrieval_allowed_by_review": true
+        }
+      },
+      {
+        "id": "energy:review_product_evidence:std-ieee1547",
+        "product": "energy",
+        "kind": "review_product_evidence",
+        "source_id": "std-ieee1547",
+        "priority": 2,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "std-ieee1547",
+          "reasons": [
+            "content_review_required"
+          ],
+          "evidence_status": "legacy_unreviewed",
+          "source_url": "https://standards.ieee.org/",
+          "retrieval_allowed_by_review": true
+        }
+      },
+      {
+        "id": "contentflow:review_upstream_change:R006",
+        "product": "contentflow",
+        "kind": "review_upstream_change",
+        "source_id": "R006",
+        "priority": 3,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "R006",
+          "kind": "changed",
+          "before": {
+            "id": "stanfordnlp/dspy",
+            "updated": "2026-10-15T21:46:24Z",
+            "license": "MIT",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "after": {
+            "id": "stanfordnlp/dspy",
+            "updated": "2026-10-16T19:33:56Z",
+            "license": "MIT",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "action": "review_candidate",
+          "production_approved": false
+        }
+      },
+      {
+        "id": "contentflow:review_upstream_change:R008",
+        "product": "contentflow",
+        "kind": "review_upstream_change",
+        "source_id": "R008",
+        "priority": 3,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "R008",
+          "kind": "changed",
+          "before": {
+            "id": "docling-project/docling",
+            "updated": "2026-10-16T09:00:49Z",
+            "license": "MIT",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "after": {
+            "id": "docling-project/docling",
+            "updated": "2026-10-16T15:44:42Z",
+            "license": "MIT",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "action": "review_candidate",
+          "production_approved": false
+        }
+      },
+      {
+        "id": "contentflow:review_upstream_change:R011",
+        "product": "contentflow",
+        "kind": "review_upstream_change",
+        "source_id": "R011",
+        "priority": 3,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "R011",
+          "kind": "changed",
+          "before": {
+            "id": "infiniflow/ragflow",
+            "updated": "2026-10-16T12:16:07Z",
+            "license": "Apache-2.0",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "after": {
+            "id": "infiniflow/ragflow",
+            "updated": "2026-10-17T00:23:13Z",
+            "license": "Apache-2.0",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "action": "review_candidate",
+          "production_approved": false
+        }
+      },
+      {
+        "id": "contentflow:review_upstream_change:R016",
+        "product": "contentflow",
+        "kind": "review_upstream_change",
+        "source_id": "R016",
+        "priority": 3,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "R016",
+          "kind": "changed",
+          "before": {
+            "id": "mem0ai/mem0",
+            "updated": "2026-10-16T12:17:30Z",
+            "license": "Apache-2.0",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "after": {
+            "id": "mem0ai/mem0",
+            "updated": "2026-10-16T20:26:26Z",
+            "license": "Apache-2.0",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "action": "review_candidate",
+          "production_approved": false
+        }
+      },
+      {
+        "id": "energy:review_upstream_change:R006",
+        "product": "energy",
+        "kind": "review_upstream_change",
+        "source_id": "R006",
+        "priority": 3,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "R006",
+          "kind": "changed",
+          "before": {
+            "id": "stanfordnlp/dspy",
+            "updated": "2026-10-15T21:46:24Z",
+            "license": "MIT",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "after": {
+            "id": "stanfordnlp/dspy",
+            "updated": "2026-10-16T19:33:56Z",
+            "license": "MIT",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "action": "review_candidate",
+          "production_approved": false
+        }
+      },
+      {
+        "id": "energy:review_upstream_change:R008",
+        "product": "energy",
+        "kind": "review_upstream_change",
+        "source_id": "R008",
+        "priority": 3,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "R008",
+          "kind": "changed",
+          "before": {
+            "id": "docling-project/docling",
+            "updated": "2026-10-16T09:00:49Z",
+            "license": "MIT",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "after": {
+            "id": "docling-project/docling",
+            "updated": "2026-10-16T15:44:42Z",
+            "license": "MIT",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "action": "review_candidate",
+          "production_approved": false
+        }
+      },
+      {
+        "id": "energy:review_upstream_change:R011",
+        "product": "energy",
+        "kind": "review_upstream_change",
+        "source_id": "R011",
+        "priority": 3,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "R011",
+          "kind": "changed",
+          "before": {
+            "id": "infiniflow/ragflow",
+            "updated": "2026-10-16T12:16:07Z",
+            "license": "Apache-2.0",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "after": {
+            "id": "infiniflow/ragflow",
+            "updated": "2026-10-17T00:23:13Z",
+            "license": "Apache-2.0",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "action": "review_candidate",
+          "production_approved": false
+        }
+      },
+      {
+        "id": "energy:review_upstream_change:R016",
+        "product": "energy",
+        "kind": "review_upstream_change",
+        "source_id": "R016",
+        "priority": 3,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "R016",
+          "kind": "changed",
+          "before": {
+            "id": "mem0ai/mem0",
+            "updated": "2026-10-16T12:17:30Z",
+            "license": "Apache-2.0",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "after": {
+            "id": "mem0ai/mem0",
+            "updated": "2026-10-16T20:26:26Z",
+            "license": "Apache-2.0",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "action": "review_candidate",
+          "production_approved": false
+        }
+      },
+      {
+        "id": "jianji:review_upstream_change:R006",
+        "product": "jianji",
+        "kind": "review_upstream_change",
+        "source_id": "R006",
+        "priority": 3,
+        "maintenance_only": true,
+        "production_approved": false,
+        "details": {
+          "source_id": "R006",
+          "kind": "changed",
+          "before": {
+            "id": "stanfordnlp/dspy",
+            "updated": "2026-10-15T21:46:24Z",
+            "license": "MIT",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "after": {
+            "id": "stanfordnlp/dspy",
+            "updated": "2026-10-16T19:33:56Z",
+            "license": "MIT",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "action": "review_candidate",
+          "production_approved": false
+        }
+      },
+      {
+        "id": "jianji:review_upstream_change:R008",
+        "product": "jianji",
+        "kind": "review_upstream_change",
+        "source_id": "R008",
+        "priority": 3,
+        "maintenance_only": true,
+        "production_approved": false,
+        "details": {
+          "source_id": "R008",
+          "kind": "changed",
+          "before": {
+            "id": "docling-project/docling",
+            "updated": "2026-10-16T09:00:49Z",
+            "license": "MIT",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "after": {
+            "id": "docling-project/docling",
+            "updated": "2026-10-16T15:44:42Z",
+            "license": "MIT",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "action": "review_candidate",
+          "production_approved": false
+        }
+      },
+      {
+        "id": "jianji:review_upstream_change:R011",
+        "product": "jianji",
+        "kind": "review_upstream_change",
+        "source_id": "R011",
+        "priority": 3,
+        "maintenance_only": true,
+        "production_approved": false,
+        "details": {
+          "source_id": "R011",
+          "kind": "changed",
+          "before": {
+            "id": "infiniflow/ragflow",
+            "updated": "2026-10-16T12:16:07Z",
+            "license": "Apache-2.0",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "after": {
+            "id": "infiniflow/ragflow",
+            "updated": "2026-10-17T00:23:13Z",
+            "license": "Apache-2.0",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "action": "review_candidate",
+          "production_approved": false
+        }
+      },
+      {
+        "id": "jianji:review_upstream_change:R016",
+        "product": "jianji",
+        "kind": "review_upstream_change",
+        "source_id": "R016",
+        "priority": 3,
+        "maintenance_only": true,
+        "production_approved": false,
+        "details": {
+          "source_id": "R016",
+          "kind": "changed",
+          "before": {
+            "id": "mem0ai/mem0",
+            "updated": "2026-10-16T12:17:30Z",
+            "license": "Apache-2.0",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "after": {
+            "id": "mem0ai/mem0",
+            "updated": "2026-10-16T20:26:26Z",
+            "license": "Apache-2.0",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "action": "review_candidate",
+          "production_approved": false
+        }
+      },
+      {
+        "id": "jianji:review_upstream_change:R042",
+        "product": "jianji",
+        "kind": "review_upstream_change",
+        "source_id": "R042",
+        "priority": 3,
+        "maintenance_only": true,
+        "production_approved": false,
+        "details": {
+          "source_id": "R042",
+          "kind": "changed",
+          "before": {
+            "id": "HabitRPG/habitica",
+            "updated": "2026-10-15T16:11:51Z",
+            "license": "NOASSERTION",
+            "archived": false,
+            "default_branch": "develop"
+          },
+          "after": {
+            "id": "HabitRPG/habitica",
+            "updated": "2026-10-16T20:21:32Z",
+            "license": "NOASSERTION",
+            "archived": false,
+            "default_branch": "develop"
+          },
+          "action": "review_candidate",
+          "production_approved": false
+        }
+      },
+      {
+        "id": "shunshi:review_upstream_change:R006",
+        "product": "shunshi",
+        "kind": "review_upstream_change",
+        "source_id": "R006",
+        "priority": 3,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "R006",
+          "kind": "changed",
+          "before": {
+            "id": "stanfordnlp/dspy",
+            "updated": "2026-10-15T21:46:24Z",
+            "license": "MIT",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "after": {
+            "id": "stanfordnlp/dspy",
+            "updated": "2026-10-16T19:33:56Z",
+            "license": "MIT",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "action": "review_candidate",
+          "production_approved": false
+        }
+      },
+      {
+        "id": "shunshi:review_upstream_change:R008",
+        "product": "shunshi",
+        "kind": "review_upstream_change",
+        "source_id": "R008",
+        "priority": 3,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "R008",
+          "kind": "changed",
+          "before": {
+            "id": "docling-project/docling",
+            "updated": "2026-10-16T09:00:49Z",
+            "license": "MIT",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "after": {
+            "id": "docling-project/docling",
+            "updated": "2026-10-16T15:44:42Z",
+            "license": "MIT",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "action": "review_candidate",
+          "production_approved": false
+        }
+      },
+      {
+        "id": "shunshi:review_upstream_change:R011",
+        "product": "shunshi",
+        "kind": "review_upstream_change",
+        "source_id": "R011",
+        "priority": 3,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "R011",
+          "kind": "changed",
+          "before": {
+            "id": "infiniflow/ragflow",
+            "updated": "2026-10-16T12:16:07Z",
+            "license": "Apache-2.0",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "after": {
+            "id": "infiniflow/ragflow",
+            "updated": "2026-10-17T00:23:13Z",
+            "license": "Apache-2.0",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "action": "review_candidate",
+          "production_approved": false
+        }
+      },
+      {
+        "id": "shunshi:review_upstream_change:R016",
+        "product": "shunshi",
+        "kind": "review_upstream_change",
+        "source_id": "R016",
+        "priority": 3,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "R016",
+          "kind": "changed",
+          "before": {
+            "id": "mem0ai/mem0",
+            "updated": "2026-10-16T12:17:30Z",
+            "license": "Apache-2.0",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "after": {
+            "id": "mem0ai/mem0",
+            "updated": "2026-10-16T20:26:26Z",
+            "license": "Apache-2.0",
+            "archived": false,
+            "default_branch": "main"
+          },
+          "action": "review_candidate",
+          "production_approved": false
+        }
+      },
+      {
+        "id": "shunshi:review_upstream_change:R042",
+        "product": "shunshi",
+        "kind": "review_upstream_change",
+        "source_id": "R042",
+        "priority": 3,
+        "maintenance_only": false,
+        "production_approved": false,
+        "details": {
+          "source_id": "R042",
+          "kind": "changed",
+          "before": {
+            "id": "HabitRPG/habitica",
+            "updated": "2026-10-15T16:11:51Z",
+            "license": "NOASSERTION",
+            "archived": false,
+            "default_branch": "develop"
+          },
+          "after": {
+            "id": "HabitRPG/habitica",
+            "updated": "2026-10-16T20:21:32Z",
+            "license": "NOASSERTION",
+            "archived": false,
+            "default_branch": "develop"
+          },
+          "action": "review_candidate",
+          "production_approved": false
+        }
+      }
+    ],
+    "total": 29,
+    "monitor_checked_at": "2026-10-17T00:41:11.729390+00:00",
+    "monitor_registry_matches": true,
+    "scope": "research_and_evidence_maintenance_only",
+    "production_modified": false
+  },
+  "checked_at": "2026-10-17T01:01:42.897922+00:00"
+}

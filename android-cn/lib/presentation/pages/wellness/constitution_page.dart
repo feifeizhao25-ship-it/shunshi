@@ -2,11 +2,9 @@ import 'dart:convert';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:dio/dio.dart';
 import 'package:go_router/go_router.dart';
-import 'dart:io';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:dio/dio.dart';
 import '../../../data/network/api_client.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import '../../../core/theme/shunshi_text_styles.dart';
@@ -33,7 +31,7 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
   List<ConstitutionType> _types = kConstitutionTypes;
   String _view = 'home'; // home / quiz / result / detail
   ConstitutionDetail? _detail;
-  bool _reportUnlocked = false; // 是否已解锁完整报告
+  bool _reportUnlocked = true; // 调理建议随测试结果给出，不挂未接通的会员锁
 
   @override
   void initState() {
@@ -53,21 +51,7 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
   }
 
   Future<void> _checkPremium() async {
-    final prefs = await SharedPreferences.getInstance();
-    final isSubscribed = prefs.getBool('is_subscribed') ?? false;
-    _reportUnlocked = isSubscribed || (prefs.getBool('constitution_report_unlocked') ?? false);
-  }
-
-  Future<void> _unlockReport() async {
-    final prefs = await SharedPreferences.getInstance();
-    final isSubscribed = prefs.getBool('is_subscribed') ?? false;
-    if (!isSubscribed) {
-      // 未订阅，跳转订阅页
-      if (mounted) context.push('/subscription');
-      return;
-    }
-    await prefs.setBool('constitution_report_unlocked', true);
-    if (mounted) setState(() => _reportUnlocked = true);
+    _reportUnlocked = true;
   }
 
   Future<void> _loadTypes() async {
@@ -578,30 +562,6 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
       decoration: BoxDecoration(color: Colors.white, boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 20, offset: const Offset(0, -4))]),
       child: SafeArea(top: false, child: Column(mainAxisSize: MainAxisSize.min, children: [
-        if (!_reportUnlocked) ...[
-          // 付费墙提示
-          Container(width: double.infinity, padding: const EdgeInsets.all(14), margin: const EdgeInsets.only(bottom: 12),
-            decoration: BoxDecoration(gradient: LinearGradient(colors: [const Color(0xFFFFF7ED), const Color(0xFFFFF1E0)]), borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFFE5A84B).withValues(alpha: 0.3))),
-            child: Row(children: [
-              const Text('👑', style: TextStyle(fontSize: 20)),
-              const SizedBox(width: 10),
-              const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('解锁完整体质报告', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF92400E))),
-                SizedBox(height: 2),
-                Text('饮食·茶饮·运动·穴位·四季调理方案', style: TextStyle(fontSize: 11, color: Color(0xFFB07937))),
-              ])),
-              Icon(Icons.chevron_right, color: const Color(0xFFD4956A).withValues(alpha: 0.6)),
-            ]),
-          ),
-          Row(children: [
-            Expanded(child: ElevatedButton.icon(
-              onPressed: () { _unlockReport(); setState(() {}); },
-              icon: const Icon(Icons.lock_open, size: 18),
-              label: const Text('解锁报告', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
-              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFE5A84B), foregroundColor: Colors.white, elevation: 0, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), padding: const EdgeInsets.symmetric(vertical: 14)),
-            )),
-          ]),
-        ] else ...[
           Row(children: [
             Expanded(child: OutlinedButton.icon(
               onPressed: () { setState(() { _view = 'home'; _questions.clear(); _answers.clear(); _result = null; }); },
@@ -624,7 +584,6 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
             label: const Text('下载报告', style: TextStyle(fontSize: 13)),
             style: OutlinedButton.styleFrom(foregroundColor: ShunshiColors.textSecondary, side: const BorderSide(color: ShunshiColors.divider), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
           )),
-        ],
       ])),
     );
   }
@@ -692,16 +651,13 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
       }
       buffer.writeln('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
       buffer.writeln();
-      buffer.writeln('  本报告由「顺时」AI养生顾问生成');
-      buffer.writeln('  仅供参考，不构成医疗建议');
-      buffer.writeln('  如有健康问题请咨询专业中医师');
+      buffer.writeln('  本报告由顺时生成，仅供作息安排参考');
+      buffer.writeln('  不构成医疗诊断或治疗建议');
+      buffer.writeln('  身体不适请到正规医院就诊');
       buffer.writeln();
 
-      final dir = await getApplicationDocumentsDirectory();
-      final file = File('${dir.path}/顺时体质报告_${r.typeName}.txt');
-      await file.writeAsString(buffer.toString());
-
-      if (mounted) _showSnackBar('报告已保存：${file.path}');
+      await Clipboard.setData(ClipboardData(text: buffer.toString()));
+      if (mounted) _showSnackBar('报告已复制，可粘贴到你选择的位置保存');
     } catch (e) {
       if (mounted) _showSnackBar('保存失败');
     }

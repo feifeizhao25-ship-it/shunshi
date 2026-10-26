@@ -10,6 +10,8 @@ from __future__ import annotations
 import logging
 from typing import Optional, List, Dict, Any
 
+from app.safety.efficacy import redact_efficacy_claims
+
 from .embedder_api import get_embedder, EmbeddingClient
 from .vector_store import get_vector_store, VectorStore, VectorDocument, SearchResult
 from .knowledge_base import cn_kb, gl_kb, KnowledgeChunk
@@ -76,7 +78,7 @@ class SemanticRetriever:
             for r in results:
                 formatted.append({
                     "chunk_id": r.id,
-                    "content": r.content,
+                    "content": redact_efficacy_claims(r.content),
                     "score": round(r.score, 4),
                     "metadata": r.metadata,
                     "retriever": "semantic",

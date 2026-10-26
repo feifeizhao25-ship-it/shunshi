@@ -27,6 +27,8 @@ def make_session_factory(engine: Engine) -> sessionmaker[Session]:
 
 
 def init_db(engine: Engine) -> None:
+    from app import growth as _growth_models  # noqa: F401  注册增长表
+
     Base.metadata.create_all(engine)
 
 

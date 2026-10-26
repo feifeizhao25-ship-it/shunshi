@@ -1,0 +1,62 @@
+{
+  "date": "2026-10-19",
+  "scope": "research-only",
+  "queries": [
+    {
+      "channel": "X",
+      "query": "site.x.com Qwen3 embedding retrieval evaluation",
+      "url": "https://x.com/jandotai/status/1947359485317812606",
+      "read_scope": "初次未得到相关X结果；二次限定x.com的Qwen3 embedding evaluation返回无关生成模型摘录，不采纳"
+    },
+    {
+      "channel": "Reddit",
+      "query": "site.reddit.com RAG Chinese retrieval evaluation",
+      "url": "https://www.reddit.com/r/LLMDevs/comments/1u9p5a1/how_do_you_evaluate_your_retrieval_step_in_rag/",
+      "read_scope": "已打开公开讨论页面，仅检视工具返回内容，不作为技术效果证据"
+    },
+    {
+      "channel": "Hacker News",
+      "query": "site.news.ycombinator.com RAG retrieval evaluation",
+      "url": "https://news.ycombinator.com/item?id=46635422",
+      "read_scope": "搜索摘录；打开失败Internal Error，未读讨论正文"
+    },
+    {
+      "channel": "B站",
+      "query": "site.bilibili.com RAG 检索 评估 重排",
+      "url": "https://www.bilibili.com/video/BV1EfTs6sEA8/",
+      "read_scope": "搜索摘录；打开失败Internal Error，未观看视频或读取字幕"
+    },
+    {
+      "channel": "GitHub",
+      "query": "site.github.com/QwenLM/Qwen3-Embedding evaluation",
+      "url": "https://github.com/QwenLM/Qwen3-Embedding/blob/main/evaluation/README.md",
+      "read_scope": "打开项目README与evaluation README；未执行代码、未阅读全仓"
+    },
+    {
+      "channel": "Hugging Face",
+      "query": "site.huggingface.co/Qwen/Qwen3-Embedding-0.6B model card",
+      "url": "https://huggingface.co/Qwen/Qwen3-Embedding-0.6B",
+      "read_scope": "模型卡可见参数与用法部分；未下载权重、未复现榜单"
+    },
+    {
+      "channel": "arXiv",
+      "query": "site.arxiv.org/abs/2506.05176",
+      "url": "https://arxiv.org/abs/2506.05176",
+      "read_scope": "摘要页；未读论文全文"
+    },
+    {
+      "channel": "官方文档",
+      "query": "site.pvlib-python.readthedocs.io pvwatts dc pdc0 gamma_pdc",
+      "url": "https://pvlib-python.readthedocs.io/en/stable/reference/generated/pvlib.pvsystem.pvwatts_dc.html",
+      "read_scope": "函数文档页面；未执行pvlib对照，不把DC功率函数等同年发电量模型"
+    }
+  ],
+  "registered_source_ids_reviewed": [
+    "R018",
+    "R023",
+    "R036"
+  ],
+  "new_sources_promoted": [],
+  "experiments_selected": [],
+  "production_approved": false
+}

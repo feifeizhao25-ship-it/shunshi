@@ -41,6 +41,26 @@ def test_register_login_password_flow(client):
     assert wrong.status_code == 401
 
 
+def test_profile_setup_saves_nickname_for_the_signed_in_user(client, auth_headers):
+    missing = client.post("/api/v1/user/profile", json={"nickname": "阿时"})
+    assert missing.status_code == 401
+
+    saved = client.post(
+        "/api/v1/user/profile",
+        headers=auth_headers,
+        json={
+            "nickname": "阿时",
+            "gender": "female",
+            "birth_year": 1990,
+            "constitution_type": "平和质",
+            "health_concerns": ["睡眠"],
+        },
+    )
+    assert saved.status_code == 200
+    assert saved.json()["saved"] is True
+    assert saved.json()["nickname"] == "阿时"
+
+
 def test_sms_endpoints_fail_closed_when_provider_unconfigured(client):
     send = client.post("/api/v1/auth/sms/send", json={"phone": "13800138000"})
     assert send.status_code == 503

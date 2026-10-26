@@ -1,0 +1,35 @@
+
+00:00 +0: loading /Users/feifei00/Documents/CodexWorktrees/shunshi-production/ios-cn/test/chat_history_codec_test.dart                                                                                 Package url_launcher:android references url_launcher_android:android as the default plugin, but the package does not exist, or is not a plugin package.
+Ask the maintainers of url_launcher to either avoid referencing a default implementation via `platforms: android: default_package: url_launcher_android` or create a plugin named url_launcher_android.
+
+Package path_provider:android references path_provider_android:android as the default plugin, but the package does not exist, or is not a plugin package.
+Ask the maintainers of path_provider to either avoid referencing a default implementation via `platforms: android: default_package: path_provider_android` or create a plugin named path_provider_android.
+
+Package in_app_purchase:android references in_app_purchase_android:android as the default plugin, but the package does not exist, or is not a plugin package.
+Ask the maintainers of in_app_purchase to either avoid referencing a default implementation via `platforms: android: default_package: in_app_purchase_android` or create a plugin named in_app_purchase_android.
+
+Package url_launcher:ios references url_launcher_ios:ios as the default plugin, but the package does not exist, or is not a plugin package.
+Ask the maintainers of url_launcher to either avoid referencing a default implementation via `platforms: ios: default_package: url_launcher_ios` or create a plugin named url_launcher_ios.
+
+Package url_launcher:linux references url_launcher_linux:linux as the default plugin, but the package does not exist, or is not a plugin package.
+Ask the maintainers of url_launcher to either avoid referencing a default implementation via `platforms: linux: default_package: url_launcher_linux` or create a plugin named url_launcher_linux.
+
+Package url_launcher:macos references url_launcher_macos:macos as the default plugin, but the package does not exist, or is not a plugin package.
+Ask the maintainers of url_launcher to either avoid referencing a default implementation via `platforms: macos: default_package: url_launcher_macos` or create a plugin named url_launcher_macos.
+
+Package url_launcher:windows references url_launcher_windows:windows as the default plugin, but the package does not exist, or is not a plugin package.
+Ask the maintainers of url_launcher to either avoid referencing a default implementation via `platforms: windows: default_package: url_launcher_windows` or create a plugin named url_launcher_windows.
+
+
+00:01 +0: loading /Users/feifei00/Documents/CodexWorktrees/shunshi-production/ios-cn/test/chat_history_codec_test.dart
+00:02 +0: loading /Users/feifei00/Documents/CodexWorktrees/shunshi-production/ios-cn/test/chat_history_codec_test.dart
+00:03 +0: loading /Users/feifei00/Documents/CodexWorktrees/shunshi-production/ios-cn/test/chat_history_codec_test.dart
+00:03 +0: round trips 25 multiline messages without truncation
+00:03 +1: round trips 25 multiline messages without truncation
+00:03 +1: preserves sources and complete cards
+00:03 +2: preserves sources and complete cards
+00:03 +2: migrates legacy multiline messages beyond ten rows
+00:03 +3: migrates legacy multiline messages beyond ten rows
+00:03 +3: damaged data does not crash
+00:03 +4: damaged data does not crash
+00:03 +4: All tests passed!

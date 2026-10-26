@@ -1,0 +1,17 @@
+test_asr_timeout_is_domain_error (test_speech_contract.SpeechContract) ... ok
+test_empty_and_non_audio_success_rejected (test_speech_contract.SpeechContract) ... ok
+test_empty_asr_fallback_also_empty_is_failure (test_speech_contract.SpeechContract) ... ok
+test_empty_recording_never_requests_provider (test_speech_contract.SpeechContract) ... ok
+test_http_errors_do_not_become_typeerror (test_speech_contract.SpeechContract) ... [SpeechService] TTS API status=503
+[SpeechService] ASR API status=503
+ok
+test_invalid_asr_types_rejected (test_speech_contract.SpeechContract) ... ok
+test_tts_invalid_input_never_requests_provider (test_speech_contract.SpeechContract) ... ok
+test_tts_timeout_is_domain_error (test_speech_contract.SpeechContract) ... ok
+test_valid_asr_fallback_retains_text (test_speech_contract.SpeechContract) ... ok
+test_valid_tts_preserves_complete_input (test_speech_contract.SpeechContract) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.017s
+
+OK

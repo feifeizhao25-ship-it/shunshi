@@ -23,6 +23,7 @@ const navItems = [
   { href: '/solar-terms', label: '节气管理', icon: '🌙' },
   { href: '/family', label: '家庭管理', icon: '👨‍👩‍👧‍👦' },
   { href: '/rag', label: '知识库', icon: '📚' },
+  { href: '/growth', label: '增长草稿', icon: '📣' },
 ];
 
 export default function Sidebar({ active }: { active?: string }) {

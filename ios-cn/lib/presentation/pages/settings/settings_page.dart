@@ -431,7 +431,7 @@ class _SettingsPageState extends State<SettingsPage> {
     else if (hour >= 9 && hour < 11) { scName = '巳时'; scOrgan = '脾经当令'; scAdvice = '高效工作时段'; }
     else if (hour >= 11 && hour < 13) { scName = '午时'; scOrgan = '心经当令'; scAdvice = '午休养心安神'; }
     else if (hour >= 13 && hour < 15) { scName = '未时'; scOrgan = '小肠经当令'; scAdvice = '午后小憩助消化'; }
-    else if (hour >= 15 && hour < 17) { scName = '申时'; scOrgan = '膀胱经当令'; scAdvice = '运动排毒好时机'; }
+    else if (hour >= 15 && hour < 17) { scName = '申时'; scOrgan = '膀胱经当令'; scAdvice = '起身走动喝温水'; }
     else if (hour >= 17 && hour < 19) { scName = '酉时'; scOrgan = '肾经当令'; scAdvice = '滋阴补肾放松'; }
     else if (hour >= 19 && hour < 21) { scName = '戌时'; scOrgan = '心包经当令'; scAdvice = '家人时光养心'; }
     else if (hour >= 21 && hour < 23) { scName = '亥时'; scOrgan = '三焦经当令'; scAdvice = '泡脚安眠入梦'; }

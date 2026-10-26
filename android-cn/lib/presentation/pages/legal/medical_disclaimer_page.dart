@@ -33,7 +33,7 @@ class MedicalDisclaimerPage extends StatelessWidget {
           const SizedBox(height: 16),
           _sectionTitle('一、服务性质说明'),
           _body(
-            '1.1 顺时（ShunShi）是一款基于传统中医养生理论和人工智能技术的健康管理辅助工具。\n\n'
+            '1.1 顺时是节气作息陪伴工具。内容由人工智能生成，不是真人，不提供医疗、诊断或治疗。\n\n'
             '1.2 本应用提供的所有内容，包括但不限于：\n'
             '• 节气养生建议\n'
             '• 体质辨识分析\n'
@@ -98,8 +98,8 @@ class MedicalDisclaimerPage extends StatelessWidget {
           _sectionTitle('六、联系方式'),
           _body(
             '如有关于医疗免责声明的问题：\n'
-            '• 邮箱：legal@shunshi.app\n'
-            '• 客服：support@shunshi.app',
+            '• 运营者：北京艾瑞见时科技有限公司\n'
+            '• 联系邮箱：待公司开通后填写',
             textColor,
           ),
           const SizedBox(height: 40),

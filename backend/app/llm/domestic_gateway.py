@@ -73,6 +73,25 @@ def configured_providers(env: dict | None = None) -> list[tuple[Provider, str]]:
     return [(p, k) for p in PROVIDERS if (k := _key_for(p, env))]
 
 
+_STUB_FLAGS = frozenset({"1", "true", "yes", "on"})
+# 只给本地界面测试用。生产环境即使误设了开关也不走这里，避免绕过真实供应商。
+LOCAL_STUB_REPLY = (
+    "这是本地演示回复。你在和人工智能对话，不是真人。"
+    "可以按节气把作息安排得松一点：早一点睡、白天起来走动、晚饭清淡。"
+    "身体不舒服请去医院，我不能提供用药建议。"
+)
+
+
+def local_stub_reply(env: dict | None = None) -> str | None:
+    source = os.environ if env is None else env
+    flag = (source.get("SHUNSHI_LLM_STUB") or "").strip().lower()
+    if flag not in _STUB_FLAGS:
+        return None
+    if (source.get("SHUNSHI_ENV") or "development").strip().lower() == "production":
+        return None
+    return LOCAL_STUB_REPLY
+
+
 def _extract_text(data: Any) -> str | None:
     if not isinstance(data, dict):
         return None
@@ -92,6 +111,9 @@ async def complete(
     env: dict | None = None,
 ) -> str:
     """依次尝试已配置的境内供应商，返回第一条有效回答。"""
+    stub = local_stub_reply(env)
+    if stub is not None:
+        return stub
     providers = configured_providers(env)
     if not providers:
         raise HTTPException(

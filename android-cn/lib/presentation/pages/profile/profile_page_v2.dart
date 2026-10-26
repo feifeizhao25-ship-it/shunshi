@@ -19,6 +19,7 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
   int _favoriteCount = 0;
   int _wellnessDays = 0;
   int _checkinCount = 0;
+  bool _loggedIn = false;
   String _userName = '顺时小朋友';
   int _checkinDays = 0;
   String _constitution = '';
@@ -30,10 +31,17 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
   }
 
   Future<void> _loadData() async {
-    // 1. Load stats from API
+    final prefs = await SharedPreferences.getInstance();
+    final loggedIn = (prefs.getString('auth_token') ?? '').isNotEmpty;
+    if (mounted) setState(() => _loggedIn = loggedIn);
+    // 未登录时不要打收藏和养护统计，那两条都会 401。
+    if (!loggedIn) {
+      await _loadLocalProfile(prefs);
+      return;
+    }
     try {
       final results = await Future.wait([
-        ApiClient().get('/api/v1/favorites', queryParameters: {'user_id': 'guest', 'limit': 1}),
+        ApiClient().get('/api/v1/favorites', queryParameters: {'limit': 1}),
         ApiClient().get('/api/v1/records/care/stats'),
       ]);
       // Favorites count
@@ -52,9 +60,11 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
         });
       }
     } catch (_) {}
-    // 2. Load from SharedPreferences
+    await _loadLocalProfile(prefs);
+  }
+
+  Future<void> _loadLocalProfile(SharedPreferences prefs) async {
     try {
-      final prefs = await SharedPreferences.getInstance();
       final name = prefs.getString('user_name');
       final days = prefs.getInt('checkin_days') ?? 0;
       final constitution = prefs.getString('constitution_type') ?? '';
@@ -284,15 +294,33 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: isDark ? [] : ShunShiShadows.sm,
                 ),
-                child: Row(
-                  children: [
-                    _buildStat(context, '养生天数', '$_wellnessDays', isDark),
-                    _buildStatDivider(isDark),
-                    _buildStat(context, '打卡次数', '$_checkinCount', isDark),
-                    _buildStatDivider(isDark),
-                    _buildStat(context, '收藏数', '$_favoriteCount', isDark),
-                  ],
-                ),
+                child: _loggedIn
+                    ? Row(
+                        children: [
+                          _buildStat(context, '养生天数', '$_wellnessDays', isDark),
+                          _buildStatDivider(isDark),
+                          _buildStat(context, '打卡次数', '$_checkinCount', isDark),
+                          _buildStatDivider(isDark),
+                          _buildStat(context, '收藏数', '$_favoriteCount', isDark),
+                        ],
+                      )
+                    : Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Column(
+                          children: [
+                            Text(
+                              '登录后查看收藏和养护记录',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(fontSize: 14, color: textSecondary),
+                            ),
+                            const SizedBox(height: 8),
+                            TextButton(
+                              onPressed: () => context.push('/login'),
+                              child: const Text('去登录'),
+                            ),
+                          ],
+                        ),
+                      ),
               ),
             ),
           ),
@@ -349,7 +377,20 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
                   _buildDivider(isDark),
                   _buildMenuTile(context, Icons.dark_mode_outlined,
                       '深色模式', const [Color(0xFF5C6BC0), Color(0xFF7986CB)],
-                      () => context.push('/theme-settings')),
+                      () async {
+                    final next = ThemeNotifier.instance.mode == ThemeMode.dark
+                        ? ThemeMode.light
+                        : ThemeMode.dark;
+                    await ThemeNotifier.instance.setMode(next);
+                    if (!context.mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text(next == ThemeMode.dark ? '已切换到深色模式' : '已切换到浅色模式'),
+                    ));
+                  }),
+                  _buildDivider(isDark),
+                  _buildMenuTile(context, Icons.settings_outlined,
+                      '设置', const [Color(0xFF78909C), Color(0xFF90A4AE)],
+                      () => context.push('/settings')),
                   _buildDivider(isDark),
                   _buildMenuTile(context, Icons.info_outline,
                       '关于', const [Color(0xFF90A4AE), Color(0xFFB0BEC5)],
