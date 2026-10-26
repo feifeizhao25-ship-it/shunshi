@@ -80,15 +80,17 @@ test('增长后台：未登录拦截，登录后看技能、来源、漏斗、�
 
   await page.getByRole('link', { name: '增长草稿' }).click();
   await page.getByRole('heading', { name: '技能版本' }).waitFor();
-  await expect(page.getByRole('cell', { name: 'xhs-note' })).toBeVisible();
-  await expect(page.getByRole('cell', { name: '0.1.0' }).first()).toBeVisible();
-  await expect(page.getByRole('cell', { name: 'zhihu-answer' })).toBeVisible();
+  const skills = page.locator('#growth-skills');
+  await expect(skills.getByRole('cell', { name: 'xhs-note', exact: true })).toBeVisible();
+  await expect(skills.getByRole('cell', { name: '0.1.0', exact: true }).first()).toBeVisible();
+  await expect(skills.getByRole('cell', { name: 'zhihu-answer', exact: true })).toBeVisible();
   await shot(page, 'growth-03.png', '#growth-skills');
 
-  await expect(page.getByRole('cell', { name: 'A01' })).toBeVisible();
-  await expect(page.getByText('生成合成内容需要显式标识')).toBeVisible();
-  await expect(page.getByRole('cell', { name: 'B20' })).toBeVisible();
-  await expect(page.getByText('待人审').first()).toBeVisible();
+  const sources = page.locator('#growth-sources');
+  await expect(sources.getByRole('cell', { name: 'A01', exact: true })).toBeVisible();
+  await expect(sources.getByText('生成合成内容需要显式标识')).toBeVisible();
+  await expect(sources.getByRole('cell', { name: 'B20', exact: true })).toBeVisible();
+  await expect(sources.getByText('待人审').first()).toBeVisible();
   await shot(page, 'growth-04.png', '#growth-sources');
 
   await expect(page.getByText('规划 ARPU ¥600')).toBeVisible();
@@ -107,7 +109,7 @@ test('增长后台：未登录拦截，登录后看技能、来源、漏斗、�
   await expect(page.getByText('异常：标记了已外发')).toHaveCount(0);
   await shot(page, 'growth-07.png', '#growth-queue');
 
-  await expect(page.getByRole('cell', { name: 'human_confirm' }).first()).toBeVisible();
+  await expect(page.locator('#growth-audit').getByRole('cell', { name: 'human_confirm', exact: true }).first()).toBeVisible();
   await shot(page, 'growth-08.png', '#growth-audit');
   await shot(page, 'growth-09.png');
 
