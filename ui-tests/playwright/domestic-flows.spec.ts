@@ -48,8 +48,16 @@ function see(page: Page, text: string | RegExp) {
 
 async function sendLine(page: Page, text: string) {
   const composer = page.getByRole('textbox').last();
-  await composer.fill(text);
-  await page.getByRole('button', { name: '发送' }).click();
+  await composer.click({ force: true });
+  const current = await composer.inputValue().catch(() => '');
+  if (!current.includes(text)) {
+    await composer.fill(text);
+  }
+  const afterFill = await composer.inputValue().catch(() => '');
+  if (!afterFill.includes(text)) {
+    await composer.pressSequentially(text, { delay: 12 });
+  }
+  await page.getByRole('button', { name: '发送' }).click({ force: true });
 }
 
 async function clickText(page: Page, text: string) {
