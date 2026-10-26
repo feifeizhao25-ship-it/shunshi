@@ -38,11 +38,25 @@ class TestAlertRequest(BaseModel):
 async def list_alerts(
     level: Optional[str] = Query(None, description="按级别过滤"),
     category: Optional[str] = Query(None, description="按类别过滤"),
+    resolved: Optional[bool] = Query(None, description="管理后台按是否已处理筛选；当前记录没有处理状态"),
     limit: int = Query(50, ge=1, le=200, description="返回数量"),
 ):
-    """查询告警历史"""
+    """查询告警历史。记录里还没有处理标记，已处理筛选暂时为空。"""
+    if resolved is True:
+        return {"success": True, "data": []}
     alerts = alert_store.list_alerts(level=level, category=category, limit=limit)
-    return {"success": True, "data": alerts}
+    return {
+        "success": True,
+        "data": [
+            {
+                **item,
+                "type": item.get("category") or "",
+                "time": item.get("created_at") or "",
+                "resolved": False,
+            }
+            for item in alerts
+        ],
+    }
 
 
 @router.get("/stats")
