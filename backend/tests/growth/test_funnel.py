@@ -82,8 +82,27 @@ def test_funnel_attributes_signup_and_uses_arpu(client):
 
 
 def test_admin_growth_routes_reject_anonymous(anonymous_client):
-    assert anonymous_client.get("/api/v1/admin/growth/funnel").status_code == 401
-    assert anonymous_client.get("/api/v1/admin/growth/queue").status_code == 401
+    for path in (
+        "/api/v1/admin/growth/funnel",
+        "/api/v1/admin/growth/queue",
+        "/api/v1/admin/growth/audit",
+        "/api/v1/admin/growth/skills",
+        "/api/v1/admin/growth/sources",
+    ):
+        assert anonymous_client.get(path).status_code == 401, path
+
+
+def test_admin_can_read_skill_versions_and_sources(client):
+    skills = client.get("/api/v1/admin/growth/skills")
+    assert skills.status_code == 200
+    versions = {row["name"]: row["version"] for row in skills.json()["data"]}
+    assert versions["xhs-note"] == "0.1.0"
+    assert versions["zhihu-answer"] == "0.1.0"
+    sources = client.get("/api/v1/admin/growth/sources")
+    assert sources.status_code == 200
+    listed = {row["source_id"]: row for row in sources.json()["data"]}
+    assert listed["A01"]["license"] == "internal-summary"
+    assert listed["A01"]["status"] == "registered"
 
 
 def test_confirm_endpoint_does_not_publish(client):

@@ -13,7 +13,9 @@ from app.growth.audit import append_audit
 from app.growth.events import record_event
 from app.growth.kb.ingest import IngestRefused, activate_source
 from app.growth.funnel import summarize
-from app.growth.models import GrowthAuditLog, GrowthDraft
+from app.growth.kb.sources import REGISTRY
+from app.growth.models import GrowthAuditLog, GrowthDraft, GrowthKbChunk
+from app.growth.skills.library import list_skills
 
 events_router = APIRouter(prefix="/api/v1/growth", tags=["growth"])
 admin_router = APIRouter(prefix="/api/v1/admin/growth", tags=["growth-admin"])
@@ -54,6 +56,29 @@ def post_event(
         "success": True,
         "data": {"id": row.id, "event_type": row.event_type, "inviter_user_id": row.inviter_user_id},
     }
+
+
+@admin_router.get("/skills", summary="流量技能和版本")
+def get_skills():
+    return {
+        "success": True,
+        "data": [
+            {
+                "name": pack.name,
+                "version": pack.version,
+                "description": pack.description,
+                "channels": pack.channels,
+                "golden_count": len(pack.golden),
+                "redteam_count": len(pack.redteam),
+            }
+            for pack in list_skills()
+        ],
+    }
+
+
+@admin_router.get("/sources", summary="增长知识库来源")
+def get_sources(session: Session = Depends(get_session)):
+    return {"success": True, "data": _source_rows(session)}
 
 
 @admin_router.get("/funnel", summary="流量到付费的漏斗")
@@ -160,6 +185,50 @@ def get_audit(session: Session = Depends(get_session)):
             for row in rows
         ],
     }
+
+
+def _source_rows(session: Session) -> list[dict]:
+    grouped: dict[str, set[str]] = {}
+    for source_id, status in session.query(GrowthKbChunk.source_id, GrowthKbChunk.status):
+        grouped.setdefault(source_id, set()).add(status)
+    rows = []
+    seen: set[str] = set()
+    for record in REGISTRY:
+        seen.add(record.source_id)
+        rows.append(
+            {
+                "source_id": record.source_id,
+                "title": record.title,
+                "license": record.license,
+                "tier": record.tier,
+                "published_at": record.published_at,
+                "status": _source_status(grouped.get(record.source_id, set())),
+            }
+        )
+    for source_id in sorted(set(grouped) - seen):
+        rows.append(
+            {
+                "source_id": source_id,
+                "title": "",
+                "license": "",
+                "tier": "",
+                "published_at": "",
+                "status": _source_status(grouped[source_id]),
+            }
+        )
+    return rows
+
+
+def _source_status(statuses: set[str]) -> str:
+    if not statuses:
+        return "registered"
+    if "active" in statuses:
+        return "active"
+    if "candidate" in statuses:
+        return "candidate"
+    if "archived" in statuses:
+        return "archived"
+    return sorted(statuses)[0]
 
 
 def _proposal(item: dict) -> ProposalInput:
