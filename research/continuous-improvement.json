@@ -1,0 +1,10 @@
+{
+  "product": "shunshi",
+  "research_engine": "/Users/feifei00/Documents/运营资料-OpenClaw/automation/domestic_research/cycle.py",
+  "sources_registry": "/Users/feifei00/Documents/运营资料-OpenClaw/automation/domestic_research/sources.json",
+  "daily": "metadata change detection",
+  "weekly": "evaluated local improvements",
+  "production_auto_deploy": false,
+  "status": "local_integration",
+  "frozen": false
+}

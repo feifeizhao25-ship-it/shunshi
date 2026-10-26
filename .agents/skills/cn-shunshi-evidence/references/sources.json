@@ -1,0 +1,967 @@
+[
+  {
+    "id": "R001",
+    "kind": "engineering",
+    "title": "Agent Skills规范",
+    "url": "https://agentskills.io/specification",
+    "products": [
+      "common"
+    ],
+    "application": "技能元数据与按需加载",
+    "priority": "P1",
+    "license_status": "需按固定版本复核",
+    "review_status": "primary_reviewed",
+    "reviewed_at": "2026-10-16",
+    "ingestion": "metadata_and_original_summary_only",
+    "production_approved": false,
+    "watch": null,
+    "review_scope": "官方页面/模型卡/摘要或公开搜索摘录；未进行效果复现"
+  },
+  {
+    "id": "R002",
+    "kind": "engineering",
+    "title": "Agent Skills参考实现",
+    "url": "https://github.com/agentskills/agentskills",
+    "products": [
+      "common"
+    ],
+    "application": "验证技能包结构",
+    "priority": "P1",
+    "license_status": "需按固定版本复核",
+    "review_status": "primary_reviewed",
+    "reviewed_at": "2026-10-16",
+    "ingestion": "metadata_and_original_summary_only",
+    "production_approved": false,
+    "watch": {
+      "provider": "github",
+      "id": "agentskills/agentskills"
+    },
+    "review_scope": "官方页面/模型卡/摘要或公开搜索摘录；未进行效果复现"
+  },
+  {
+    "id": "R003",
+    "kind": "engineering",
+    "title": "Anthropic技能示例",
+    "url": "https://github.com/anthropics/skills",
+    "products": [
+      "common"
+    ],
+    "application": "学习技能组织；逐文件审许可，不整包安装",
+    "priority": "P1",
+    "license_status": "需按固定版本复核",
+    "review_status": "primary_reviewed",
+    "reviewed_at": "2026-10-16",
+    "ingestion": "metadata_and_original_summary_only",
+    "production_approved": false,
+    "watch": {
+      "provider": "github",
+      "id": "anthropics/skills"
+    },
+    "review_scope": "官方页面/模型卡/摘要或公开搜索摘录；未进行效果复现"
+  },
+  {
+    "id": "R004",
+    "kind": "engineering",
+    "title": "pgvector",
+    "url": "https://github.com/pgvector/pgvector",
+    "products": [
+      "common"
+    ],
+    "application": "已有Postgres条件下试验混合检索",
+    "priority": "P1",
+    "license_status": "需按固定版本复核",
+    "review_status": "primary_reviewed",
+    "reviewed_at": "2026-10-16",
+    "ingestion": "metadata_and_original_summary_only",
+    "production_approved": false,
+    "watch": {
+      "provider": "github",
+      "id": "pgvector/pgvector"
+    },
+    "review_scope": "官方页面/模型卡/摘要或公开搜索摘录；未进行效果复现"
+  },
+  {
+    "id": "R005",
+    "kind": "engineering",
+    "title": "Ragas",
+    "url": "https://github.com/explodinggradients/ragas",
+    "products": [
+      "common"
+    ],
+    "application": "检索与回答分开评测；模型评分须人工校准",
+    "priority": "P1",
+    "license_status": "需按固定版本复核",
+    "review_status": "primary_reviewed",
+    "reviewed_at": "2026-10-16",
+    "ingestion": "metadata_and_original_summary_only",
+    "production_approved": false,
+    "watch": {
+      "provider": "github",
+      "id": "vibrantlabsai/ragas"
+    },
+    "review_scope": "官方页面/模型卡/摘要或公开搜索摘录；未进行效果复现",
+    "canonical_url": "https://github.com/vibrantlabsai/ragas",
+    "redirect_note": "2026-10-16 GitHub API confirmed repository rename"
+  },
+  {
+    "id": "R006",
+    "kind": "engineering",
+    "title": "DSPy",
+    "url": "https://github.com/stanfordnlp/dspy",
+    "products": [
+      "common"
+    ],
+    "application": "在开发集优化提示词，在独立留出集验证",
+    "priority": "P1",
+    "license_status": "需按固定版本复核",
+    "review_status": "primary_reviewed",
+    "reviewed_at": "2026-10-16",
+    "ingestion": "metadata_and_original_summary_only",
+    "production_approved": false,
+    "watch": {
+      "provider": "github",
+      "id": "stanfordnlp/dspy"
+    },
+    "review_scope": "官方页面/模型卡/摘要或公开搜索摘录；未进行效果复现"
+  },
+  {
+    "id": "R007",
+    "kind": "engineering",
+    "title": "GEPA实现",
+    "url": "https://github.com/CerebrasResearch/gepa",
+    "products": [
+      "common"
+    ],
+    "application": "每周最多两个候选提示词，比较质量成本",
+    "priority": "P1",
+    "license_status": "需按固定版本复核",
+    "review_status": "primary_reviewed",
+    "reviewed_at": "2026-10-16",
+    "ingestion": "metadata_and_original_summary_only",
+    "production_approved": false,
+    "watch": {
+      "provider": "github",
+      "id": "CerebrasResearch/gepa"
+    },
+    "review_scope": "官方页面/模型卡/摘要或公开搜索摘录；未进行效果复现"
+  },
+  {
+    "id": "R008",
+    "kind": "engineering",
+    "title": "Docling",
+    "url": "https://github.com/docling-project/docling",
+    "products": [
+      "common"
+    ],
+    "application": "保留页码表格的文档解析试验",
+    "priority": "P1",
+    "license_status": "需按固定版本复核",
+    "review_status": "primary_reviewed",
+    "reviewed_at": "2026-10-16",
+    "ingestion": "metadata_and_original_summary_only",
+    "production_approved": false,
+    "watch": {
+      "provider": "github",
+      "id": "docling-project/docling"
+    },
+    "review_scope": "官方页面/模型卡/摘要或公开搜索摘录；未进行效果复现"
+  },
+  {
+    "id": "R009",
+    "kind": "engineering",
+    "title": "FlagEmbedding",
+    "url": "https://github.com/FlagOpen/FlagEmbedding",
+    "products": [
+      "common"
+    ],
+    "application": "中文嵌入与重排基线",
+    "priority": "P1",
+    "license_status": "需按固定版本复核",
+    "review_status": "primary_reviewed",
+    "reviewed_at": "2026-10-16",
+    "ingestion": "metadata_and_original_summary_only",
+    "production_approved": false,
+    "watch": {
+      "provider": "github",
+      "id": "FlagOpen/FlagEmbedding"
+    },
+    "review_scope": "官方页面/模型卡/摘要或公开搜索摘录；未进行效果复现"
+  },
+  {
+    "id": "R010",
+    "kind": "engineering",
+    "title": "LightRAG",
+    "url": "https://github.com/HKUDS/LightRAG",
+    "products": [
+      "common"
+    ],
+    "application": "新能源跨文件关系问题的小范围对照",
+    "priority": "P1",
+    "license_status": "需按固定版本复核",
+    "review_status": "primary_reviewed",
+    "reviewed_at": "2026-10-16",
+    "ingestion": "metadata_and_original_summary_only",
+    "production_approved": false,
+    "watch": {
+      "provider": "github",
+      "id": "HKUDS/LightRAG"
+    },
+    "review_scope": "官方页面/模型卡/摘要或公开搜索摘录；未进行效果复现"
+  },
+  {
+    "id": "R011",
+    "kind": "engineering",
+    "title": "RAGFlow",
+    "url": "https://github.com/infiniflow/ragflow",
+    "products": [
+      "common"
+    ],
+    "application": "参考解析检索测试，不立即整栈替换",
+    "priority": "P1",
+    "license_status": "需按固定版本复核",
+    "review_status": "primary_reviewed",
+    "reviewed_at": "2026-10-16",
+    "ingestion": "metadata_and_original_summary_only",
+    "production_approved": false,
+    "watch": {
+      "provider": "github",
+      "id": "infiniflow/ragflow"
+    },
+    "review_scope": "官方页面/模型卡/摘要或公开搜索摘录；未进行效果复现"
+  },
+  {
+    "id": "R012",
+    "kind": "engineering",
+    "title": "GraphRAG",
+    "url": "https://microsoft.github.io/graphrag/index/overview/",
+    "products": [
+      "common"
+    ],
+    "application": "仅复杂跨文档聚合问题试验",
+    "priority": "P1",
+    "license_status": "需按固定版本复核",
+    "review_status": "primary_reviewed",
+    "reviewed_at": "2026-10-16",
+    "ingestion": "metadata_and_original_summary_only",
+    "production_approved": false,
+    "watch": null,
+    "review_scope": "官方页面/模型卡/摘要或公开搜索摘录；未进行效果复现"
+  },
+  {
+    "id": "R013",
+    "kind": "engineering",
+    "title": "Langfuse与Promptfoo",
+    "url": "https://langfuse.com/integrations/other/promptfoo",
+    "products": [
+      "common"
+    ],
+    "application": "提示词版本、实验与成本跟踪",
+    "priority": "P1",
+    "license_status": "需按固定版本复核",
+    "review_status": "primary_reviewed",
+    "reviewed_at": "2026-10-16",
+    "ingestion": "metadata_and_original_summary_only",
+    "production_approved": false,
+    "watch": null,
+    "review_scope": "官方页面/模型卡/摘要或公开搜索摘录；未进行效果复现"
+  },
+  {
+    "id": "R014",
+    "kind": "engineering",
+    "title": "Promptfoo集成",
+    "url": "https://www.promptfoo.dev/docs/integrations/langfuse/",
+    "products": [
+      "common"
+    ],
+    "application": "在CI中检查回归",
+    "priority": "P1",
+    "license_status": "需按固定版本复核",
+    "review_status": "primary_reviewed",
+    "reviewed_at": "2026-10-16",
+    "ingestion": "metadata_and_original_summary_only",
+    "production_approved": false,
+    "watch": null,
+    "review_scope": "官方页面/模型卡/摘要或公开搜索摘录；未进行效果复现"
+  },
+  {
+    "id": "R015",
+    "kind": "engineering",
+    "title": "GPT Researcher",
+    "url": "https://github.com/assafelovic/gpt-researcher",
+    "products": [
+      "common"
+    ],
+    "application": "研究报告引用链参考，不委托无界抓取",
+    "priority": "P1",
+    "license_status": "需按固定版本复核",
+    "review_status": "primary_reviewed",
+    "reviewed_at": "2026-10-16",
+    "ingestion": "metadata_and_original_summary_only",
+    "production_approved": false,
+    "watch": {
+      "provider": "github",
+      "id": "assafelovic/gpt-researcher"
+    },
+    "review_scope": "官方页面/模型卡/摘要或公开搜索摘录；未进行效果复现"
+  },
+  {
+    "id": "R016",
+    "kind": "engineering",
+    "title": "Mem0",
+    "url": "https://github.com/mem0ai/mem0",
+    "products": [
+      "common"
+    ],
+    "application": "个人记忆分层参考，优先做好删除隔离",
+    "priority": "P1",
+    "license_status": "需按固定版本复核",
+    "review_status": "primary_reviewed",
+    "reviewed_at": "2026-10-16",
+    "ingestion": "metadata_and_original_summary_only",
+    "production_approved": false,
+    "watch": {
+      "provider": "github",
+      "id": "mem0ai/mem0"
+    },
+    "review_scope": "官方页面/模型卡/摘要或公开搜索摘录；未进行效果复现"
+  },
+  {
+    "id": "R017",
+    "kind": "engineering",
+    "title": "OpenClaw自动任务",
+    "url": "https://docs.openclaw.ai/automation/cron-jobs",
+    "products": [
+      "common"
+    ],
+    "application": "复用现有调度，任务互斥、失败可见",
+    "priority": "P1",
+    "license_status": "需按固定版本复核",
+    "review_status": "primary_reviewed",
+    "reviewed_at": "2026-10-16",
+    "ingestion": "metadata_and_original_summary_only",
+    "production_approved": false,
+    "watch": null,
+    "review_scope": "官方页面/模型卡/摘要或公开搜索摘录；未进行效果复现"
+  },
+  {
+    "id": "R018",
+    "kind": "model",
+    "title": "Qwen3 Embedding 0.6B",
+    "url": "https://huggingface.co/Qwen/Qwen3-Embedding-0.6B",
+    "products": [
+      "common"
+    ],
+    "application": "低成本中文语义召回候选",
+    "priority": "P1",
+    "license_status": "需按固定版本复核",
+    "review_status": "primary_reviewed",
+    "reviewed_at": "2026-10-16",
+    "ingestion": "metadata_and_original_summary_only",
+    "production_approved": false,
+    "watch": {
+      "provider": "huggingface",
+      "id": "Qwen/Qwen3-Embedding-0.6B"
+    },
+    "review_scope": "官方页面/模型卡/摘要或公开搜索摘录；未进行效果复现"
+  },
+  {
+    "id": "R019",
+    "kind": "model",
+    "title": "Qwen3 Reranker 0.6B",
+    "url": "https://huggingface.co/Qwen/Qwen3-Reranker-0.6B",
+    "products": [
+      "common"
+    ],
+    "application": "对top20候选重排到top5",
+    "priority": "P1",
+    "license_status": "需按固定版本复核",
+    "review_status": "primary_reviewed",
+    "reviewed_at": "2026-10-16",
+    "ingestion": "metadata_and_original_summary_only",
+    "production_approved": false,
+    "watch": {
+      "provider": "huggingface",
+      "id": "Qwen/Qwen3-Reranker-0.6B"
+    },
+    "review_scope": "官方页面/模型卡/摘要或公开搜索摘录；未进行效果复现"
+  },
+  {
+    "id": "R020",
+    "kind": "model",
+    "title": "Qwen3 Reranker 8B",
+    "url": "https://huggingface.co/Qwen/Qwen3-Reranker-8B",
+    "products": [
+      "common"
+    ],
+    "application": "仅离线质量上限对照",
+    "priority": "P1",
+    "license_status": "需按固定版本复核",
+    "review_status": "primary_reviewed",
+    "reviewed_at": "2026-10-16",
+    "ingestion": "metadata_and_original_summary_only",
+    "production_approved": false,
+    "watch": {
+      "provider": "huggingface",
+      "id": "Qwen/Qwen3-Reranker-8B"
+    },
+    "review_scope": "官方页面/模型卡/摘要或公开搜索摘录；未进行效果复现"
+  },
+  {
+    "id": "R021",
+    "kind": "model",
+    "title": "BGE M3",
+    "url": "https://huggingface.co/BAAI/bge-m3",
+    "products": [
+      "common"
+    ],
+    "application": "多语言和稀疏稠密检索候选",
+    "priority": "P1",
+    "license_status": "需按固定版本复核",
+    "review_status": "primary_reviewed",
+    "reviewed_at": "2026-10-16",
+    "ingestion": "metadata_and_original_summary_only",
+    "production_approved": false,
+    "watch": {
+      "provider": "huggingface",
+      "id": "BAAI/bge-m3"
+    },
+    "review_scope": "官方页面/模型卡/摘要或公开搜索摘录；未进行效果复现"
+  },
+  {
+    "id": "R022",
+    "kind": "dataset",
+    "title": "C-MTEB数据目录",
+    "url": "https://huggingface.co/C-MTEB/datasets",
+    "products": [
+      "common"
+    ],
+    "application": "筛选中文评测子集；逐数据集核验许可和污染",
+    "priority": "P1",
+    "license_status": "逐数据集许可",
+    "review_status": "primary_reviewed",
+    "reviewed_at": "2026-10-16",
+    "ingestion": "metadata_and_original_summary_only",
+    "production_approved": false,
+    "watch": null,
+    "review_scope": "官方页面/模型卡/摘要或公开搜索摘录；未进行效果复现"
+  },
+  {
+    "id": "R023",
+    "kind": "paper",
+    "title": "Qwen3 Embedding技术报告",
+    "url": "https://arxiv.org/abs/2506.05176",
+    "products": [
+      "common"
+    ],
+    "application": "嵌入指令和重排格式以模型卡实现为准",
+    "priority": "P1",
+    "license_status": "需按固定版本复核",
+    "review_status": "primary_reviewed",
+    "reviewed_at": "2026-10-16",
+    "ingestion": "metadata_and_original_summary_only",
+    "production_approved": false,
+    "watch": null,
+    "review_scope": "官方页面/模型卡/摘要或公开搜索摘录；未进行效果复现"
+  },
+  {
+    "id": "R024",
+    "kind": "paper",
+    "title": "Self-RAG",
+    "url": "https://arxiv.org/abs/2310.11511",
+    "products": [
+      "common"
+    ],
+    "application": "检索不足拒答，验证后再补查",
+    "priority": "P1",
+    "license_status": "需按固定版本复核",
+    "review_status": "primary_reviewed",
+    "reviewed_at": "2026-10-16",
+    "ingestion": "metadata_and_original_summary_only",
+    "production_approved": false,
+    "watch": null,
+    "review_scope": "官方页面/模型卡/摘要或公开搜索摘录；未进行效果复现"
+  },
+  {
+    "id": "R025",
+    "kind": "paper",
+    "title": "Corrective RAG",
+    "url": "https://arxiv.org/abs/2401.15884",
+    "products": [
+      "common"
+    ],
+    "application": "检测低质量召回；限制补查预算",
+    "priority": "P1",
+    "license_status": "需按固定版本复核",
+    "review_status": "primary_reviewed",
+    "reviewed_at": "2026-10-16",
+    "ingestion": "metadata_and_original_summary_only",
+    "production_approved": false,
+    "watch": null,
+    "review_scope": "官方页面/模型卡/摘要或公开搜索摘录；未进行效果复现"
+  },
+  {
+    "id": "R026",
+    "kind": "paper",
+    "title": "RAGAS",
+    "url": "https://arxiv.org/abs/2309.15217",
+    "products": [
+      "common"
+    ],
+    "application": "分离上下文相关性和回答忠实度",
+    "priority": "P1",
+    "license_status": "需按固定版本复核",
+    "review_status": "primary_reviewed",
+    "reviewed_at": "2026-10-16",
+    "ingestion": "metadata_and_original_summary_only",
+    "production_approved": false,
+    "watch": null,
+    "review_scope": "官方页面/模型卡/摘要或公开搜索摘录；未进行效果复现"
+  },
+  {
+    "id": "R027",
+    "kind": "paper",
+    "title": "RAGChecker",
+    "url": "https://arxiv.org/abs/2408.08067",
+    "products": [
+      "common"
+    ],
+    "application": "定位检索漏召回与生成幻觉",
+    "priority": "P1",
+    "license_status": "需按固定版本复核",
+    "review_status": "primary_reviewed",
+    "reviewed_at": "2026-10-16",
+    "ingestion": "metadata_and_original_summary_only",
+    "production_approved": false,
+    "watch": null,
+    "review_scope": "官方页面/模型卡/摘要或公开搜索摘录；未进行效果复现"
+  },
+  {
+    "id": "R028",
+    "kind": "paper",
+    "title": "Lost in the Middle",
+    "url": "https://arxiv.org/abs/2307.03172",
+    "products": [
+      "common"
+    ],
+    "application": "限制上下文长度，最相关证据前置",
+    "priority": "P1",
+    "license_status": "需按固定版本复核",
+    "review_status": "primary_reviewed",
+    "reviewed_at": "2026-10-16",
+    "ingestion": "metadata_and_original_summary_only",
+    "production_approved": false,
+    "watch": null,
+    "review_scope": "官方页面/模型卡/摘要或公开搜索摘录；未进行效果复现"
+  },
+  {
+    "id": "R029",
+    "kind": "paper",
+    "title": "GEPA论文",
+    "url": "https://arxiv.org/abs/2507.19457",
+    "products": [
+      "common"
+    ],
+    "application": "基于失败轨迹迭代；保留未参与优化的测试集",
+    "priority": "P1",
+    "license_status": "需按固定版本复核",
+    "review_status": "primary_reviewed",
+    "reviewed_at": "2026-10-16",
+    "ingestion": "metadata_and_original_summary_only",
+    "production_approved": false,
+    "watch": null,
+    "review_scope": "官方页面/模型卡/摘要或公开搜索摘录；未进行效果复现"
+  },
+  {
+    "id": "R030",
+    "kind": "paper",
+    "title": "LightRAG论文",
+    "url": "https://arxiv.org/abs/2410.05779",
+    "products": [
+      "common"
+    ],
+    "application": "比较图增强收益和索引成本",
+    "priority": "P1",
+    "license_status": "需按固定版本复核",
+    "review_status": "primary_reviewed",
+    "reviewed_at": "2026-10-16",
+    "ingestion": "metadata_and_original_summary_only",
+    "production_approved": false,
+    "watch": null,
+    "review_scope": "官方页面/模型卡/摘要或公开搜索摘录；未进行效果复现"
+  },
+  {
+    "id": "R031",
+    "kind": "paper",
+    "title": "Qwen3多模态检索",
+    "url": "https://arxiv.org/abs/2601.04720",
+    "products": [
+      "common"
+    ],
+    "application": "报告图表检索后续候选",
+    "priority": "P1",
+    "license_status": "需按固定版本复核",
+    "review_status": "primary_reviewed",
+    "reviewed_at": "2026-10-16",
+    "ingestion": "metadata_and_original_summary_only",
+    "production_approved": false,
+    "watch": null,
+    "review_scope": "官方页面/模型卡/摘要或公开搜索摘录；未进行效果复现"
+  },
+  {
+    "id": "R040",
+    "kind": "official",
+    "title": "睡眠健康核心信息解读",
+    "url": "https://www.nhc.gov.cn/guihuaxxs/c100132/202503/c5cc339a34954d79ba23347b911d0c5d.shtml",
+    "products": [
+      "shunshi"
+    ],
+    "application": "官方科普来源；不推导疗效",
+    "priority": "P0",
+    "license_status": "官方文档；摘要引用",
+    "review_status": "primary_reviewed",
+    "reviewed_at": "2026-10-16",
+    "ingestion": "metadata_and_original_summary_only",
+    "production_approved": false,
+    "watch": null,
+    "review_scope": "官方页面/模型卡/摘要或公开搜索摘录；未进行效果复现"
+  },
+  {
+    "id": "R041",
+    "kind": "official",
+    "title": "体重管理指导原则通知",
+    "url": "https://www.nhc.gov.cn/wjw/c100378/202412/f3f58b54fbeb4c87b14164fac898bf08.shtml",
+    "products": [
+      "shunshi"
+    ],
+    "application": "生活习惯科普依据，特殊人群引导就医",
+    "priority": "P0",
+    "license_status": "官方文档；摘要引用",
+    "review_status": "primary_reviewed",
+    "reviewed_at": "2026-10-16",
+    "ingestion": "metadata_and_original_summary_only",
+    "production_approved": false,
+    "watch": null,
+    "review_scope": "官方页面/模型卡/摘要或公开搜索摘录；未进行效果复现"
+  },
+  {
+    "id": "R042",
+    "kind": "project",
+    "title": "Habitica许可",
+    "url": "https://github.com/HabitRPG/habitica/blob/develop/LICENSE",
+    "products": [
+      "shunshi",
+      "jianji"
+    ],
+    "application": "参考习惯反馈设计；素材和代码许可分开",
+    "priority": "P2",
+    "license_status": "GPL；素材不能默认商用",
+    "review_status": "primary_reviewed",
+    "reviewed_at": "2026-10-16",
+    "ingestion": "metadata_and_original_summary_only",
+    "production_approved": false,
+    "watch": {
+      "provider": "github",
+      "id": "HabitRPG/habitica"
+    },
+    "review_scope": "官方页面/模型卡/摘要或公开搜索摘录；未进行效果复现"
+  },
+  {
+    "id": "R044",
+    "kind": "paper",
+    "title": "微随机试验设计",
+    "url": "https://arxiv.org/abs/2107.03544",
+    "products": [
+      "shunshi",
+      "jianji"
+    ],
+    "application": "提醒时机实验方法；不等于医学有效性",
+    "priority": "P2",
+    "license_status": "需按固定版本复核",
+    "review_status": "primary_reviewed",
+    "reviewed_at": "2026-10-16",
+    "ingestion": "metadata_and_original_summary_only",
+    "production_approved": false,
+    "watch": null,
+    "review_scope": "官方页面/模型卡/摘要或公开搜索摘录；未进行效果复现"
+  },
+  {
+    "id": "R045",
+    "kind": "paper",
+    "title": "移动干预上下文Bandit",
+    "url": "https://arxiv.org/abs/1706.09090",
+    "products": [
+      "shunshi"
+    ],
+    "application": "研究提醒选择方法，先用明确偏好与静默时段",
+    "priority": "P2",
+    "license_status": "需按固定版本复核",
+    "review_status": "primary_reviewed",
+    "reviewed_at": "2026-10-16",
+    "ingestion": "metadata_and_original_summary_only",
+    "production_approved": false,
+    "watch": null,
+    "review_scope": "官方页面/模型卡/摘要或公开搜索摘录；未进行效果复现"
+  },
+  {
+    "id": "R046",
+    "kind": "benchmark",
+    "title": "RevenueCat 2026",
+    "url": "https://www.revenuecat.com/state-of-subscription-apps",
+    "products": [
+      "shunshi",
+      "jianji"
+    ],
+    "application": "国际订阅样本压力测试，不能当作中国市场实测",
+    "priority": "P1",
+    "license_status": "需按固定版本复核",
+    "review_status": "primary_reviewed",
+    "reviewed_at": "2026-10-16",
+    "ingestion": "metadata_and_original_summary_only",
+    "production_approved": false,
+    "watch": null,
+    "review_scope": "官方页面/模型卡/摘要或公开搜索摘录；未进行效果复现"
+  },
+  {
+    "id": "R049",
+    "kind": "social",
+    "title": "RAG开发者检索与重排经验",
+    "url": "https://www.reddit.com/r/Rag/comments/1wvmja5/i_built_a_document_rag_chatbot_with_hybrid_search/",
+    "products": [
+      "common"
+    ],
+    "application": "识别重排延迟与评测问题；不作为效果证据",
+    "priority": "P2",
+    "license_status": "链接及自写摘要",
+    "review_status": "community_lead",
+    "reviewed_at": "2026-10-16",
+    "ingestion": "metadata_and_original_summary_only",
+    "production_approved": false,
+    "watch": null,
+    "review_scope": "官方页面/模型卡/摘要或公开搜索摘录；未进行效果复现"
+  },
+  {
+    "id": "R050",
+    "kind": "social",
+    "title": "B站RAGFlow安装教程",
+    "url": "https://www.bilibili.com/video/BV1QH4y1u7Nt/",
+    "products": [
+      "common"
+    ],
+    "application": "中文操作学习线索；功能以官方版本为准",
+    "priority": "P2",
+    "license_status": "链接，不复制视频",
+    "review_status": "community_lead",
+    "reviewed_at": "2026-10-16",
+    "ingestion": "metadata_and_original_summary_only",
+    "production_approved": false,
+    "watch": null,
+    "review_scope": "官方页面/模型卡/摘要或公开搜索摘录；未进行效果复现"
+  },
+  {
+    "id": "R051",
+    "kind": "social",
+    "title": "X工程团队嵌入实践",
+    "url": "https://blog.x.com/engineering/en_us/topics/insights/2018/embeddingsattwitter",
+    "products": [
+      "common"
+    ],
+    "application": "动态表征与离线质量评测思路；旧文章非新模型证据",
+    "priority": "P2",
+    "license_status": "摘要引用",
+    "review_status": "primary_reviewed",
+    "reviewed_at": "2026-10-16",
+    "ingestion": "metadata_and_original_summary_only",
+    "production_approved": false,
+    "watch": null,
+    "review_scope": "官方页面/模型卡/摘要或公开搜索摘录；未进行效果复现"
+  },
+  {
+    "id": "R053",
+    "kind": "engineering",
+    "title": "BEIR检索评估",
+    "url": "https://github.com/BEIR-cellar/beir",
+    "products": [
+      "common"
+    ],
+    "application": "固定相关性标注，分开评价召回与排序",
+    "priority": "P1",
+    "license_status": "按固定版本及各文件许可复核；仅保存原创摘要和链接",
+    "review_status": "primary_reviewed",
+    "reviewed_at": "2026-10-17",
+    "ingestion": "metadata_and_original_summary_only",
+    "production_approved": false,
+    "watch": {
+      "provider": "github",
+      "id": "BEIR-cellar/beir"
+    },
+    "review_scope": "页面/README/模型卡/论文摘要；未全文复现或验证性能"
+  },
+  {
+    "id": "R054",
+    "kind": "engineering",
+    "title": "MTEB评估框架",
+    "url": "https://github.com/embeddings-benchmark/mteb",
+    "products": [
+      "common"
+    ],
+    "application": "对中文与业务数据分别评估嵌入，榜单不能替代本地验证",
+    "priority": "P1",
+    "license_status": "按固定版本及各文件许可复核；仅保存原创摘要和链接",
+    "review_status": "primary_reviewed",
+    "reviewed_at": "2026-10-17",
+    "ingestion": "metadata_and_original_summary_only",
+    "production_approved": false,
+    "watch": {
+      "provider": "github",
+      "id": "embeddings-benchmark/mteb"
+    },
+    "review_scope": "页面/README/模型卡/论文摘要；未全文复现或验证性能"
+  },
+  {
+    "id": "R056",
+    "kind": "engineering",
+    "title": "OpenClaw技能加载文档",
+    "url": "https://github.com/openclaw/openclaw/blob/main/docs/tools/skills.md",
+    "products": [
+      "common"
+    ],
+    "application": "区分技能发现、目录优先级和工具权限；核对本机版本后采用",
+    "priority": "P1",
+    "license_status": "按固定版本及各文件许可复核；仅保存原创摘要和链接",
+    "review_status": "primary_reviewed",
+    "reviewed_at": "2026-10-17",
+    "ingestion": "metadata_and_original_summary_only",
+    "production_approved": false,
+    "watch": null,
+    "review_scope": "页面/README/模型卡/论文摘要；未全文复现或验证性能"
+  },
+  {
+    "id": "R057",
+    "kind": "engineering",
+    "title": "OpenClaw主仓库",
+    "url": "https://github.com/openclaw/openclaw",
+    "products": [
+      "common"
+    ],
+    "application": "追踪自动化运行时变更；不自动升级宿主",
+    "priority": "P1",
+    "license_status": "按固定版本及各文件许可复核；仅保存原创摘要和链接",
+    "review_status": "primary_reviewed",
+    "reviewed_at": "2026-10-17",
+    "ingestion": "metadata_and_original_summary_only",
+    "production_approved": false,
+    "watch": {
+      "provider": "github",
+      "id": "openclaw/openclaw"
+    },
+    "review_scope": "页面/README/模型卡/论文摘要；未全文复现或验证性能"
+  },
+  {
+    "id": "R058",
+    "kind": "paper",
+    "title": "BGE M3论文",
+    "url": "https://arxiv.org/abs/2402.03216",
+    "products": [
+      "common"
+    ],
+    "application": "多语言稠密稀疏检索研究，先建立本地候选与排序对照",
+    "priority": "P1",
+    "license_status": "按固定版本及各文件许可复核；仅保存原创摘要和链接",
+    "review_status": "primary_reviewed",
+    "reviewed_at": "2026-10-17",
+    "ingestion": "metadata_and_original_summary_only",
+    "production_approved": false,
+    "watch": null,
+    "review_scope": "页面/README/模型卡/论文摘要；未全文复现或验证性能"
+  },
+  {
+    "id": "R059",
+    "kind": "paper",
+    "title": "PEARL行为干预试验",
+    "url": "https://arxiv.org/abs/2508.10060",
+    "products": [
+      "shunshi"
+    ],
+    "application": "个性化提醒内容和时机试验设计；不可把外部试验收益当作本产品效果",
+    "priority": "P1",
+    "license_status": "按固定版本及各文件许可复核；仅保存原创摘要和链接",
+    "review_status": "primary_reviewed",
+    "reviewed_at": "2026-10-17",
+    "ingestion": "metadata_and_original_summary_only",
+    "production_approved": false,
+    "watch": null,
+    "review_scope": "页面/README/模型卡/论文摘要；未全文复现或验证性能"
+  },
+  {
+    "id": "R060",
+    "kind": "paper",
+    "title": "StepCountJITAI模拟环境论文",
+    "url": "https://arxiv.org/abs/2411.00336",
+    "products": [
+      "shunshi"
+    ],
+    "application": "先模拟评估提醒策略和负担，模拟收益不等于真人收益",
+    "priority": "P1",
+    "license_status": "按固定版本及各文件许可复核；仅保存原创摘要和链接",
+    "review_status": "primary_reviewed",
+    "reviewed_at": "2026-10-17",
+    "ingestion": "metadata_and_original_summary_only",
+    "production_approved": false,
+    "watch": null,
+    "review_scope": "页面/README/模型卡/论文摘要；未全文复现或验证性能"
+  },
+  {
+    "id": "R062",
+    "kind": "community",
+    "title": "Reddit重排退步案例",
+    "url": "https://www.reddit.com/r/Rag/comments/1v7g3oe/hybrid_search_and_reranking_made_my_rag_worse/",
+    "products": [
+      "common"
+    ],
+    "application": "社区经验线索：先定位召回失败还是排序失败，不移植其性能数字",
+    "priority": "P2",
+    "license_status": "按固定版本及各文件许可复核；仅保存原创摘要和链接",
+    "review_status": "discovery_only",
+    "reviewed_at": "2026-10-17",
+    "ingestion": "metadata_and_original_summary_only",
+    "production_approved": false,
+    "watch": null,
+    "review_scope": "公开页面或搜索摘录；不是效果证据"
+  },
+  {
+    "id": "R063",
+    "kind": "community",
+    "title": "B站RAGFlow评测教程目录",
+    "url": "https://www.bilibili.com/video/BV11Xj3zeE6C/",
+    "products": [
+      "common"
+    ],
+    "application": "培训线索；仅核对页面目录，未观看视频或复制课件",
+    "priority": "P2",
+    "license_status": "按固定版本及各文件许可复核；仅保存原创摘要和链接",
+    "review_status": "discovery_only",
+    "reviewed_at": "2026-10-17",
+    "ingestion": "metadata_and_original_summary_only",
+    "production_approved": false,
+    "watch": null,
+    "review_scope": "公开页面或搜索摘录；不是效果证据"
+  },
+  {
+    "id": "R064",
+    "kind": "community",
+    "title": "HN Ragas作者发布讨论",
+    "url": "https://news.ycombinator.com/item?id=39780114",
+    "products": [
+      "common"
+    ],
+    "application": "评估工具讨论入口；技术采用依据仍回查官方仓库和文档",
+    "priority": "P2",
+    "license_status": "按固定版本及各文件许可复核；仅保存原创摘要和链接",
+    "review_status": "discovery_only",
+    "reviewed_at": "2026-10-17",
+    "ingestion": "metadata_and_original_summary_only",
+    "production_approved": false,
+    "watch": null,
+    "review_scope": "公开页面或搜索摘录；不是效果证据"
+  }
+]

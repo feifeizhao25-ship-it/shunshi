@@ -1,0 +1,9 @@
+{
+  "last_reviewed": "2026-10-16",
+  "success_criteria": [
+    "source_traceability",
+    "no_regression",
+    "product_isolation"
+  ],
+  "production_auto_apply": false
+}

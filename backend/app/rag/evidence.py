@@ -9,7 +9,7 @@ from .retriever import retrieve
 def verified_cn_context(query: str, top_k: int = 3) -> tuple[str, list[str], list[dict]]:
     if not cn_kb.loaded or not cn_kb.chunks:
         raise RuntimeError("国内知识库未加载")
-    candidates = retrieve(query, lang="cn", top_k=12)
+    candidates = retrieve(query, lang="cn", top_k=top_k, verified_only=True)
     verified = [
         chunk
         for chunk in candidates

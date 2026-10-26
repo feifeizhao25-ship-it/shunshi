@@ -3,6 +3,7 @@
 基于 TF-IDF 相似度检索知识库 chunks，支持过滤
 """
 import logging
+from datetime import date
 from typing import Optional
 
 from .knowledge_base import cn_kb, gl_kb, KnowledgeChunk
@@ -16,6 +17,7 @@ def retrieve(
     lang: str = "cn",
     top_k: int = 5,
     filters: Optional[dict] = None,
+    verified_only: bool = False,
 ) -> list[dict]:
     """
     检索知识库
@@ -43,13 +45,25 @@ def retrieve(
 
     # TF-IDF 检索
     embedder = get_embedder(lang)
-    raw_results = embedder.query(query, top_k=top_k * 3)  # 多取一些，过滤后再截取
+    if top_k <= 0:
+        return []
+    # Evidence eligibility must be applied before top-k. Otherwise many highly
+    # similar legacy passages can crowd every verified source out of the pool.
+    raw_results = embedder.query(query, top_k=len(kb.chunks) if verified_only else top_k * 3)
 
     # 应用过滤
     filtered = []
     for idx, score in raw_results:
         chunk = kb.chunks[idx]
         meta = chunk.metadata
+        if verified_only:
+            try:
+                valid = (meta.get('evidence_status') == 'verified_official'
+                         and date.fromisoformat(meta['valid_until']) >= date.today())
+            except (KeyError, TypeError, ValueError):
+                valid = False
+            if not valid:
+                continue
 
         # 季节过滤
         if "season" in filters:
