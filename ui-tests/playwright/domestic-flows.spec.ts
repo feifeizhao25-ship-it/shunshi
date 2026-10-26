@@ -43,6 +43,7 @@ function see(page: Page, text: string | RegExp) {
   return page
     .getByText(text)
     .or(page.getByRole('group', { name: pattern }))
+    .or(page.getByRole('menuitem', { name: pattern }))
     .first();
 }
 
@@ -61,15 +62,19 @@ async function sendLine(page: Page, text: string) {
 }
 
 async function clickText(page: Page, text: string) {
-  const button = page.getByRole('button', { name: new RegExp(text) }).last();
+  const pattern = new RegExp(text);
+  const target = page
+    .getByRole('button', { name: pattern })
+    .or(page.getByRole('menuitem', { name: pattern }))
+    .last();
   try {
-    await button.waitFor({ state: 'visible', timeout: 8_000 });
-    await button.click({ force: true });
+    await target.waitFor({ state: 'visible', timeout: 8_000 });
+    await target.click({ force: true });
     return;
   } catch {
-    const target = page.getByText(text).last();
-    await target.waitFor({ state: 'visible', timeout: 12_000 });
-    await target.click({ force: true });
+    const fallback = page.getByText(text).last();
+    await fallback.waitFor({ state: 'visible', timeout: 12_000 });
+    await fallback.click({ force: true });
   }
 }
 
