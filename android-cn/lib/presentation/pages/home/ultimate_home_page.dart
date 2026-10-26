@@ -12,7 +12,6 @@ import 'widgets/home_skeleton.dart';
 import '../../../core/solar_term/solar_term_table.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/cache/cache_service.dart';
-import '../../../data/storage/storage_manager.dart';
 
 // ═══════════════════════════════════════════════════════════════
 // 十二时辰数据模型（本地计算）
@@ -468,13 +467,10 @@ class _UltimateHomePageState extends State<UltimateHomePage>
 
   Future<void> _fetchRecommendations() async {
     try {
-      final token = StorageManager.user.getToken();
-      final endpoint = token != null && token.isNotEmpty
-          ? '/recommend/personalized'
-          : '/contents/recommend';
-      final res = await _api.get(endpoint, queryParameters: {'limit': 6}, level: SpeedLevel.s1);
+      final res = await _api.get('/contents/recommend', queryParameters: {'limit': 6}, level: SpeedLevel.s1);
       if (!mounted) return;
-      final data = res.data;
+      final raw = res.data;
+      final data = raw is Map && raw['data'] is Map ? raw['data'] as Map : raw;
       if (data is Map && data['items'] is List) {
         final items = (data['items'] as List).cast<Map<String, dynamic>>();
         if (items.isNotEmpty) {
