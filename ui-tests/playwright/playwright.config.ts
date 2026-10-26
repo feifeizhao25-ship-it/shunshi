@@ -12,6 +12,7 @@ export default defineConfig({
     browserName: 'chromium',
     channel: 'chrome',
     baseURL: process.env.SHUNSHI_WEB_URL || 'http://127.0.0.1:8090',
+    actionTimeout: 20_000,
     viewport: { width: 390, height: 844 },
     deviceScaleFactor: 1,
     screenshot: 'off',

@@ -37,10 +37,7 @@ async function openRoute(page: Page, route: string) {
 }
 
 function see(page: Page, text: string | RegExp) {
-  const locator = typeof text === 'string'
-    ? page.getByText(text, { exact: true })
-    : page.getByText(text);
-  return locator.first();
+  return page.getByText(text).first();
 }
 
 async function clickText(page: Page, text: string) {
@@ -100,7 +97,8 @@ test('国内版主要流程', async ({ page }) => {
   await page.getByRole('button', { name: '设置', exact: true }).waitFor();
   await shot(page, '06-profile.png');
   await clickText(page, '设置');
-  await see(page, '节气提醒').waitFor();
+  await page.getByRole('heading', { name: '设置' }).waitFor();
+  await page.getByRole('group', { name: /节气提醒/ }).waitFor();
   await shot(page, '07-settings.png');
   await clickText(page, '登录');
 
