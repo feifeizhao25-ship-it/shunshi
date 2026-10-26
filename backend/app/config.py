@@ -26,6 +26,10 @@ class Settings(BaseSettings):
     growth_reranker_url: str = ""
     growth_allow_publish: bool = False
     growth_allow_paid_ads: bool = False
+    growth_allow_in_app_cards: bool = False
+    growth_allow_app_push: bool = False
+    # 打开后增长发布全部停住。默认关着，表示没有急停。
+    kill_switch: bool = False
 
     def cors_origin_list(self) -> list[str]:
         return [item.strip() for item in self.cors_origins.split(",") if item.strip()]

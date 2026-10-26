@@ -135,6 +135,12 @@ class OpenRouterClient:
     def _get_model_name(self, config_name: str) -> str:
         return ALL_MODEL_MAP.get(config_name, config_name)
 
+    def _refuse_offshore(self) -> None:
+        # 境外通道默认关闭。单测替身不会走到这里。
+        flag = (os.getenv("SHUNSHI_OFFSHORE_ENABLED") or "").strip().lower()
+        if flag not in {"1", "true", "yes", "on"}:
+            raise RuntimeError("offshore provider disabled")
+
     async def chat_completion(
         self,
         model: str,
@@ -148,6 +154,7 @@ class OpenRouterClient:
         prompt_version: str = "",
         **kwargs,
     ) -> ChatCompletionResponse:
+        self._refuse_offshore()
         or_model = self._get_model_name(model)
 
         # 审计准备
@@ -294,6 +301,7 @@ class OpenRouterClient:
         temperature: float = 0.7,
         max_tokens: int = 8192,
     ) -> AsyncIterator[str]:
+        self._refuse_offshore()
         or_model = self._get_model_name(model)
 
         payload = {

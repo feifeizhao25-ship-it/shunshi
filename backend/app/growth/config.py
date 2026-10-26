@@ -14,6 +14,9 @@ class GrowthConfig:
     reranker_url: str = ""
     allow_publish: bool = False
     allow_paid_ads: bool = False
+    allow_in_app_cards: bool = False
+    allow_app_push: bool = False
+    kill_switch: bool = False
 
     @classmethod
     def from_settings(cls, settings) -> "GrowthConfig":
@@ -25,4 +28,7 @@ class GrowthConfig:
             reranker_url=settings.growth_reranker_url or "",
             allow_publish=bool(settings.growth_allow_publish),
             allow_paid_ads=bool(settings.growth_allow_paid_ads),
+            allow_in_app_cards=bool(getattr(settings, "growth_allow_in_app_cards", False)),
+            allow_app_push=bool(getattr(settings, "growth_allow_app_push", False)),
+            kill_switch=bool(getattr(settings, "kill_switch", False)),
         )

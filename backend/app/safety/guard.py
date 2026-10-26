@@ -21,7 +21,13 @@ from typing import Optional, List, Dict, Any
 
 from pydantic import BaseModel
 
-from app.safety.config import CRISIS_EMERGENCY_TEXT, CRISIS_HOTLINE, CRISIS_HOTLINE_NAME, SAFETY_CONFIG
+from app.safety.config import (
+    CRISIS_EMERGENCY_TEXT,
+    CRISIS_HOTLINE,
+    CRISIS_HOTLINE_NAME,
+    HEALTH_BOUNDARY_REPLY,
+    SAFETY_CONFIG,
+)
 from app.safety.rules import (
     get_rules,
     reload_rules,
@@ -341,7 +347,8 @@ class SafetyGuard:
         if triggered_rules:
             result.level = SafetyLevel.SENSITIVE
             result.flag = "output_violation"
-            result.should_block = False
+            result.should_block = True
+            result.override_response = HEALTH_BOUNDARY_REPLY
             result.prefix = response_template or ""
             result.log_reason = f"Output violation: {', '.join(matched_contents)}"
             result.detection_rules = triggered_rules

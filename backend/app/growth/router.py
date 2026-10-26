@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
-from app.deps import get_session
+from app.deps import current_user, get_session
 from app.growth.config import GrowthConfig
 from app.growth.cycle import ProposalInput, confirm_draft, rollback, run_cycle
 from app.growth.audit import append_audit
@@ -14,7 +14,8 @@ from app.growth.events import record_event
 from app.growth.kb.ingest import IngestRefused, activate_source
 from app.growth.funnel import summarize
 from app.growth.kb.sources import REGISTRY
-from app.growth.models import GrowthAuditLog, GrowthDraft, GrowthKbChunk
+from app.growth.models import GrowthAuditLog, GrowthDraft, GrowthInAppCard, GrowthKbChunk
+from app.growth.ops import OpsRefused, publish, read_opt_in, record_approval, write_opt_in
 from app.growth.skills.library import list_skills
 
 events_router = APIRouter(prefix="/api/v1/growth", tags=["growth"])
@@ -41,8 +42,60 @@ class RollbackIn(BaseModel):
     object_key: str
 
 
+class OptIn(BaseModel):
+    in_app_cards: bool = False
+    app_push: bool = False
+
+
+class ApprovalIn(BaseModel):
+    channel: str
+    title: str = ""
+    body: str = ""
+    content_sha256: str
+
+
+class PublishIn(BaseModel):
+    channel: str
+    title: str = ""
+    body: str = ""
+    content_sha256: str
+    user_ids: list[str] = Field(default_factory=list)
+
+
 def _config(request: Request) -> GrowthConfig:
     return GrowthConfig.from_settings(request.app.state.settings)
+
+
+@events_router.get("/opt-in", summary="增长卡片和推送的订阅开关")
+def get_opt_in(user_id: str = Depends(current_user), session: Session = Depends(get_session)):
+    return {"success": True, "data": read_opt_in(session, user_id)}
+
+
+@events_router.post("/opt-in", summary="打开或关闭增长卡片和推送")
+def post_opt_in(
+    body: OptIn,
+    user_id: str = Depends(current_user),
+    session: Session = Depends(get_session),
+):
+    saved = write_opt_in(
+        session, user_id, in_app_cards=body.in_app_cards, app_push=body.app_push
+    )
+    return {"success": True, "data": saved}
+
+
+@events_router.get("/cards", summary="已投放到本人的站内卡片")
+def get_cards(user_id: str = Depends(current_user), session: Session = Depends(get_session)):
+    rows = (
+        session.query(GrowthInAppCard)
+        .filter(GrowthInAppCard.user_id == user_id)
+        .order_by(GrowthInAppCard.created_at.desc())
+        .limit(50)
+        .all()
+    )
+    return {
+        "success": True,
+        "data": [{"id": row.id, "title": row.title, "body": row.body} for row in rows],
+    }
 
 
 @events_router.post("/events", summary="记录流量漏斗事件")
@@ -184,6 +237,66 @@ def get_audit(session: Session = Depends(get_session)):
             }
             for row in rows
         ],
+    }
+
+
+def _ops_call(action):
+    try:
+        return action()
+    except OpsRefused as exc:
+        raise HTTPException(status_code=exc.status_code, detail=exc.detail) from exc
+
+
+@admin_router.post("/approvals", summary="记录运营中枢已经批准的内容")
+def post_approval(body: ApprovalIn, session: Session = Depends(get_session)):
+    row = _ops_call(
+        lambda: record_approval(
+            session,
+            channel=body.channel,
+            title=body.title,
+            body=body.body,
+            content_sha256_hex=body.content_sha256,
+        )
+    )
+    return {"success": True, "data": {"id": row.id, "content_sha256": row.content_sha256}}
+
+
+@admin_router.post("/publish", summary="按审批哈希投放站内卡片或推送")
+def post_publish(body: PublishIn, request: Request, session: Session = Depends(get_session)):
+    result = _ops_call(
+        lambda: publish(
+            session,
+            _config(request),
+            channel=body.channel,
+            title=body.title,
+            body=body.body,
+            content_sha256_hex=body.content_sha256,
+            user_ids=body.user_ids,
+        )
+    )
+    return {"success": True, "data": result}
+
+
+@admin_router.get("/metrics", summary="增长指标，给运营中枢只读")
+def get_metrics(request: Request, session: Session = Depends(get_session)):
+    config = _config(request)
+    funnel = summarize(session, config.arpu_yuan)
+    from app.growth.models import GrowthPushDelivery
+
+    return {
+        "success": True,
+        "data": {
+            "funnel": funnel,
+            "in_app_cards": session.query(GrowthInAppCard).count(),
+            "app_pushes": session.query(GrowthPushDelivery).count(),
+            "switches": {
+                "allow_publish": config.allow_publish,
+                "allow_paid_ads": config.allow_paid_ads,
+                "allow_in_app_cards": config.allow_in_app_cards,
+                "allow_app_push": config.allow_app_push,
+                "kill_switch": config.kill_switch,
+            },
+        },
     }
 
 

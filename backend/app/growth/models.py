@@ -114,6 +114,43 @@ class GrowthProposal(Base):
     created_at: Mapped[int] = mapped_column(Integer, default=now_ts)
 
 
+class GrowthApproval(Base):
+    """运营中枢写下的已批准内容。发布时按 content_sha256 再核一次。"""
+
+    __tablename__ = "growth_approval"
+
+    id: Mapped[str] = mapped_column(String(64), primary_key=True, default=new_id)
+    channel: Mapped[str] = mapped_column(String(32), default="", index=True)
+    title: Mapped[str] = mapped_column(String(200), default="")
+    body: Mapped[str] = mapped_column(Text, default="")
+    content_sha256: Mapped[str] = mapped_column(String(64), default="", index=True)
+    status: Mapped[str] = mapped_column(String(32), default="approved", index=True)
+    created_at: Mapped[int] = mapped_column(Integer, default=now_ts)
+
+
+class GrowthInAppCard(Base):
+    __tablename__ = "growth_in_app_card"
+
+    id: Mapped[str] = mapped_column(String(64), primary_key=True, default=new_id)
+    user_id: Mapped[str] = mapped_column(String(64), index=True)
+    title: Mapped[str] = mapped_column(String(200), default="")
+    body: Mapped[str] = mapped_column(Text, default="")
+    content_sha256: Mapped[str] = mapped_column(String(64), default="", index=True)
+    created_at: Mapped[int] = mapped_column(Integer, default=now_ts)
+
+
+class GrowthPushDelivery(Base):
+    __tablename__ = "growth_push_delivery"
+
+    id: Mapped[str] = mapped_column(String(64), primary_key=True, default=new_id)
+    user_id: Mapped[str] = mapped_column(String(64), index=True)
+    title: Mapped[str] = mapped_column(String(200), default="")
+    body: Mapped[str] = mapped_column(Text, default="")
+    content_sha256: Mapped[str] = mapped_column(String(64), default="", index=True)
+    status: Mapped[str] = mapped_column(String(32), default="recorded")
+    created_at: Mapped[int] = mapped_column(Integer, default=now_ts)
+
+
 class GrowthDraft(Base):
     __tablename__ = "growth_draft"
 

@@ -21,22 +21,22 @@ from app.growth.constants import (
     REFUSAL,
 )
 
-# 与 app/safety/config.py 的 output_violation_patterns 同一组。
-# 增长门不 import app.safety，避免把内容库的初始化带进 cron。
-OUTPUT_PATTERNS = (
-    r"建议.{0,6}(服用|吃|使用).{0,6}(药|胶囊|片|针|阿莫西林|布洛芬|头孢)",
-    r"(你|您)(应该|可以|需要).{0,6}(吃药|服药|用药|服用)",
-    r"(诊断|确诊|患病).{0,6}(为|是).{0,6}(病|症)",
-    r"(剂量|每日|每次).{0,6}(服用|吃|口服)",
-    r"(煎服|水煎|冲服|送服|温水送|空腹服|饭后服|饭前服)",
-    r"(人参|黄芪|当归|川芎|党参|白术|茯苓|甘草|熟地|生地|枸杞|丹参|柴胡|半夏|附子|麻黄|桂枝|黄连|黄芩|大黄|红花|桃仁|杜仲|陈皮)"
-    r"\s*\d+(\.\d+)?\s*(克|g|毫克|mg)",
-    r"(药|方|汤|剂|芪|归|芎|参).{0,6}配伍|配伍.{0,6}(使用|服用|煎|禁忌|不可|可以)",
-    r"(停药|停用.{0,4}药|自行(减|加|调整).{0,3}(药|量)|药.{0,6}(减半|减量|加量|加倍))",
-    r"可长期服用|长期服用",
-    r"(增强|提高|提升).{0,4}免疫(力|功能)?",
-    r"(排毒|利尿|消肿|祛湿排毒|抗病毒|降血压|降血糖|降血脂|治愈|根治|疗效显著|改善目赤肿痛)",
-)
+# 与 app/safety/config.py 的 output_violation_patterns 同一份。
+# 不用 import app.safety：包初始化会打开内容库，cron 的 --dry-run 不能打出 [DB]。
+def _output_patterns() -> tuple[str, ...]:
+    import importlib.util
+    from pathlib import Path
+
+    path = Path(__file__).resolve().parents[2] / "safety" / "config.py"
+    spec = importlib.util.spec_from_file_location("shunshi_safety_config_leaf", path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError("缺少安全配置")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return tuple(module.SAFETY_CONFIG["output_violation_patterns"])
+
+
+OUTPUT_PATTERNS = _output_patterns()
 
 ABSOLUTE_TERMS = (
     "国家级",
@@ -56,7 +56,7 @@ ABSOLUTE_TERMS = (
 
 # 与 app/safety/rules.py 的 medical_dosage_patterns 保持同一写法。
 DOSAGE_PATTERNS = (
-    r"(丸|散|膏|丹|颗粒|胶囊).{0,16}\d+(\.\d+)?\s*(克|g|毫克|mg)",
+    r"(丸|散|膏|丹|颗粒|胶囊|口服液).{0,20}\d+(\.\d+)?\s*(克|g|毫克|mg)",
     r"(每次|每日|一日).{0,8}\d+(\.\d+)?\s*(克|g|毫克|mg)",
     r"(煎服|水煎|冲服|送服|温水送|空腹服|饭后服|饭前服)",
     r"(人参|黄芪|当归|川芎|党参|白术|茯苓|甘草|熟地|生地|枸杞|丹参|柴胡|半夏|附子|麻黄|桂枝|黄连|黄芩|大黄|红花|桃仁|杜仲|陈皮)"
@@ -66,7 +66,7 @@ DOSAGE_PATTERNS = (
 LONG_TERM_RE = re.compile(r"可长期服用|长期服用")
 EFFICACY_RE = re.compile(
     r"(增强|提高|提升).{0,4}免疫(力|功能)?"
-    r"|排毒|利尿|消肿|祛湿排毒|抗病毒|降血压|降血糖|降血脂|治愈|根治|疗效显著"
+    r"|排毒|利尿|消肿|祛湿排毒|抗病毒|降血压|降血糖|降血脂|治愈|根治|疗效"
 )
 PURCHASE_RE = re.compile(r"购买|下单|立即买|马上买")
 LINK_RE = re.compile(r"https?://")
