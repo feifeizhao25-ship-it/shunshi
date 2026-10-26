@@ -18,6 +18,14 @@ class Settings(BaseSettings):
     payment_callback_secret: str = ""  # 未配置 → 购买回调 503 configured:false
     content_source_url: str = ""  # 内容源（CMS/音频）基址，未配置 → /api/v1/contents* 等 503
     cors_origins: str = ""  # 逗号分隔
+    # 增长系统。外部嵌入、重排和发布默认关闭，不读取真实密钥。
+    growth_arpu_yuan: float = 600
+    growth_embedding_provider: str = "local"  # local | bge-m3
+    growth_reranker: str = "local"  # local | bge-reranker-v2-m3
+    growth_embedding_url: str = ""
+    growth_reranker_url: str = ""
+    growth_allow_publish: bool = False
+    growth_allow_paid_ads: bool = False
 
     def cors_origin_list(self) -> list[str]:
         return [item.strip() for item in self.cors_origins.split(",") if item.strip()]

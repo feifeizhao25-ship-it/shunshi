@@ -1,0 +1,7 @@
+hook_threshold: 0.35
+min_titles: 5
+max_rouge_l: 0.6
+require_aigc: true
+require_citation: true
+redteam_must_pass: 1
+promote_lift: 0.03

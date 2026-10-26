@@ -211,9 +211,13 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(user.router)
     app.include_router(user.profile_router)
     from .alerts.router import router as alerts_router
+    from .growth.router import admin_router as growth_admin_router
+    from .growth.router import events_router as growth_events_router
     from .product_access import product_access_guard
 
     app.include_router(alerts_router, dependencies=[Depends(product_access_guard)])
+    app.include_router(growth_events_router, dependencies=[Depends(product_access_guard)])
+    app.include_router(growth_admin_router, dependencies=[Depends(product_access_guard)])
     app.include_router(memory.router)
     app.include_router(chat.router)
     app.include_router(chat.legacy_router)
