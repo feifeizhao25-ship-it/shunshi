@@ -91,11 +91,15 @@ def test_the_enforced_difference_is_the_daily_message_quota(registry):
 
 
 def test_knowledge_depth_remains_a_paid_difference(registry):
-    """深度内容仍然是付费差异：长期趋势与周深度报告。"""
+    """长期趋势仍是付费差异。周度深度报告没有执行点，各档都关着。
+
+    2026-10-18 定稿（test_unimplemented_benefits_not_promoted）：
+    weekly_deep_report 不能在付费档打开，否则订阅页会宣传一个没人实现的权益。
+    """
     free = registry["tiers"]["free"]["knowledge"]
     pro = registry["tiers"]["pro"]["knowledge"]
     assert free["long_term_trends"] is False and pro["long_term_trends"] is True
-    assert free["weekly_deep_report"] is False and pro["weekly_deep_report"] is True
+    assert free["weekly_deep_report"] is False and pro["weekly_deep_report"] is False
 
 
 def test_no_unenforced_memory_quota_sneaks_in(registry):

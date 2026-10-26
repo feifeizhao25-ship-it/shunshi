@@ -10,6 +10,12 @@ BACKEND = pathlib.Path(__file__).resolve().parents[1]
 APP = BACKEND / "app"
 EXTRA = [BACKEND / "scripts", BACKEND / "seed_db.py"]
 EXEMPT = {"wellness_myth.py", "config.py", "efficacy.py"}
+# 合规门里的词是匹配规则，和 safety/config.py 一样，不是下发给用户的文案。
+# 红队样例是「草稿必须拒绝」的输入，不是推荐语。
+FILTER_PATHS = {
+    pathlib.Path("app/growth/compliance/gate.py"),
+    pathlib.Path("app/growth/skills/redteam_fixtures.py"),
+}
 
 
 def _hits(root: pathlib.Path) -> list[str]:
@@ -19,6 +25,8 @@ def _hits(root: pathlib.Path) -> list[str]:
         if f.name in EXEMPT and "safety" in f.parts:
             continue
         if f.name == "wellness_myth.py":
+            continue
+        if f.relative_to(BACKEND) in FILTER_PATHS:
             continue
         for i, line in enumerate(f.read_text(encoding="utf-8").splitlines(), 1):
             if BANNED.search(line):

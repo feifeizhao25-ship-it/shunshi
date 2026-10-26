@@ -92,9 +92,11 @@ PATENT_MEDICINE = re.compile(
     r"|理中[汤丸]|附子理中|旋覆代赭|半夏泻心|平胃散|五苓散|麻子仁|五子衍宗|板蓝根|连花清瘟|安宫牛黄"
     r"|可长期调理|代表方|核心方剂"
 )
-# 这些文件里的成药名是「禁止/拦截」名单，不是推荐
+# 这些文件里的成药名是「禁止/拦截」名单，不是推荐。
+# 红队样例同样是拒绝输入：技能草稿必须避开这些方剂名，文件本身不下发。
 PATENT_SCAN_EXCLUDED = {
     APP_DIR / "safety" / "config.py",
+    APP_DIR / "growth" / "skills" / "redteam_fixtures.py",
 }
 CONTENT_SUFFIXES = {".py", ".json", ".md", ".html", ".txt", ".yaml", ".yml"}
 

@@ -293,8 +293,8 @@ class TestProductQuery:
     async def test_tier_structure(self, client):
         resp = await client.get(f"{API_BASE}/products")
         data = resp.json()["data"]
-        # tiers 应该包含4个层级
-        assert data["tiers"] == ["free", "yangxin", "yiyang", "jiahe"]
+        # 购买目录只列在售档。家和已停售，仍在 /plans 里以 on_sale=false 保留给老用户。
+        assert data["tiers"] == ["free", "yangxin", "yiyang"]
         # 在售商品只覆盖内容订阅与会员（家和 0S3 停售）
         tiers_in_products = {p["tier"] for p in data["products"]}
         assert tiers_in_products == {"yangxin", "yiyang"}
