@@ -362,11 +362,12 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
       if (hasRisk) reply = '⚠️ 以下内容仅供作息参考，不能替代医生诊断。如有不适请及时就医。\n\n$reply';
       if (convId != null) _conversationId = convId;
       setState(() {
-        if (usageReminder != null && usageReminder!.trim().isNotEmpty) {
+        final reminder = usageReminder?.trim() ?? '';
+        if (reminder.isNotEmpty && !reply.contains(reminder)) {
           _messages.add(
             ChatMessage(
               role: 'ai',
-              text: usageReminder!.trim(),
+              text: reminder,
               time: _fmt(DateTime.now()),
             ),
           );
@@ -1058,7 +1059,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
                   ),
                 ),
                 const SizedBox(width: 8),
-                GradientSendButton(onTap: _sendMessage),
+                GradientSendButton(onTap: _sendMessage, enabled: !_isLoading),
               ],
             ),
           ),

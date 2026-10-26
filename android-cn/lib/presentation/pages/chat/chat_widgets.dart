@@ -517,7 +517,8 @@ class QuickQuestionChips extends StatelessWidget {
 
 class GradientSendButton extends StatefulWidget {
   final VoidCallback onTap;
-  const GradientSendButton({super.key, required this.onTap});
+  final bool enabled;
+  const GradientSendButton({super.key, required this.onTap, this.enabled = true});
 
   @override
   State<GradientSendButton> createState() => _GradientSendButtonState();
@@ -530,13 +531,16 @@ class _GradientSendButtonState extends State<GradientSendButton> {
   Widget build(BuildContext context) {
     return Semantics(
       button: true,
+      enabled: widget.enabled,
       label: '发送',
       child: GestureDetector(
-      onTapDown: (_) => setState(() => _scale = 0.85),
-      onTapUp: (_) {
-        setState(() => _scale = 1.0);
-        widget.onTap();
-      },
+      onTapDown: widget.enabled ? (_) => setState(() => _scale = 0.85) : null,
+      onTapUp: widget.enabled
+          ? (_) {
+              setState(() => _scale = 1.0);
+              widget.onTap();
+            }
+          : null,
       onTapCancel: () => setState(() => _scale = 1.0),
       child: AnimatedScale(
         scale: _scale,

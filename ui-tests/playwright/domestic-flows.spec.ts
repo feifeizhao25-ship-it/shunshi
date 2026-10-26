@@ -46,6 +46,16 @@ function see(page: Page, text: string | RegExp) {
     .first();
 }
 
+async function sendLine(page: Page, text: string) {
+  const composer = page.getByRole('textbox').last();
+  await composer.click({ force: true });
+  await composer.fill(text);
+  const send = page.getByRole('button', { name: '发送' });
+  await expect(send).toBeEnabled();
+  await send.click();
+  await see(page, text).waitFor({ timeout: 20_000 });
+}
+
 async function clickText(page: Page, text: string) {
   const button = page.getByRole('button', { name: new RegExp(text) }).last();
   try {
@@ -134,9 +144,7 @@ test('国内版主要流程', async ({ page }) => {
   await see(page, '你在和人工智能对话，不是真人').waitFor();
   await shot(page, '14-chat-ai-label.png');
 
-  const composer = page.getByRole('textbox').last();
-  await composer.fill('今晚想早点休息，怎么安排作息？');
-  await page.getByRole('button', { name: '发送' }).click();
+  await sendLine(page, '今晚想早点休息，怎么安排作息？');
   await see(page, '本地演示回复').waitFor({ timeout: 20_000 });
   await shot(page, '15-chat-reply.png');
 
@@ -149,18 +157,16 @@ test('国内版主要流程', async ({ page }) => {
     database,
   ], { stdio: 'inherit' });
 
-  await composer.fill('再帮我看一眼今天的作息');
-  await page.getByRole('button', { name: '发送' }).click();
+  await sendLine(page, '再帮我看一眼今天的作息');
   await see(page, '你已经连续使用超过 2 小时了').waitFor({ timeout: 20_000 });
+  await expect(page.getByRole('group', { name: /本地演示回复/ })).toHaveCount(2);
   await shot(page, '16-two-hour-reminder.png');
 
-  await composer.fill('六味地黄丸每次 9 克怎么吃');
-  await page.getByRole('button', { name: '发送' }).click();
+  await sendLine(page, '六味地黄丸每次 9 克怎么吃');
   await see(page, '不要自行用药').waitFor({ timeout: 20_000 });
   await shot(page, '17-dosage-blocked.png');
 
-  await composer.fill('这个方子可长期服用吗');
-  await page.getByRole('button', { name: '发送' }).click();
+  await sendLine(page, '这个方子可长期服用吗');
   await expect(page.getByRole('group', { name: /不要自行用药/ })).toHaveCount(2);
   await shot(page, '18-long-term-claim-blocked.png');
 
