@@ -30,7 +30,7 @@ class AboutPage extends StatelessWidget {
             const SizedBox(height: 16),
             Text('顺时 · ShunShi', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 24, fontWeight: FontWeight.bold, color: ShunShiColors.textPrimary)),
             const SizedBox(height: 4),
-            Text('Version 2.4.0', style: TextStyle(fontSize: 14, color: ShunShiColors.textTertiary)),
+            Text('版本 1.0.0', style: TextStyle(fontSize: 14, color: ShunShiColors.textTertiary)),
           ])),
           const SizedBox(height: 32),
 

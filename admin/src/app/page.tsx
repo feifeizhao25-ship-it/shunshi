@@ -74,12 +74,12 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="flex">
+    <div className="flex min-h-screen bg-gray-50">
       <Sidebar active="/" />
-      <main className="flex-1 p-8">
-        <div className="flex items-center justify-between mb-6">
+      <main className="flex-1 min-w-0 p-4 md:p-8">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
           <h2 className="text-2xl font-bold text-gray-800">仪表盘</h2>
-          <span className="text-sm text-gray-400">
+          <span className="text-sm text-gray-600">
             {new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' })}
           </span>
         </div>
@@ -104,7 +104,7 @@ export default function DashboardPage() {
                 <span className="text-sm text-gray-500">{stat.label}</span>
               </div>
               <div className="text-3xl font-bold text-gray-900">{stat.value}</div>
-              <div className="text-sm text-gray-400 mt-1">{stat.change}</div>
+              <div className="text-sm text-gray-600 mt-1">{stat.change}</div>
             </div>
           ))}
         </div>
@@ -118,19 +118,19 @@ export default function DashboardPage() {
           {alerts.length > 0 ? (
             <div className="divide-y divide-gray-100">
               {alerts.map((alert, i) => (
-                <div key={alert.id || i} className="flex items-center justify-between px-6 py-4">
-                  <div className="flex items-center gap-4">
+                <div key={alert.id || i} className="flex flex-col gap-2 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+                  <div className="flex items-start gap-4 min-w-0">
                     <span className={`px-2.5 py-1 rounded text-xs font-medium ${levelStyles[alert.level] || 'bg-gray-100 text-gray-700'}`}>
                       {alert.type}
                     </span>
                     <span className="text-sm text-gray-700">{alert.message}</span>
                   </div>
-                  <span className="text-xs text-gray-400 whitespace-nowrap ml-4">{alert.time}</span>
+                  <span className="text-xs text-gray-600 sm:whitespace-nowrap sm:ml-4">{alert.time}</span>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="px-6 py-8 text-center text-gray-400 text-sm">
+            <div className="px-6 py-8 text-center text-gray-600 text-sm">
               {loading ? '加载中...' : loadError ? '告警数据暂时无法读取' : '暂无活跃告警'}
             </div>
           )}
@@ -147,7 +147,7 @@ export default function DashboardPage() {
             <a key={action.href} href={action.href} className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-md hover:border-blue-300 transition-all">
               <div className="text-2xl mb-2">{action.icon}</div>
               <div className="font-medium text-gray-800">{action.label}</div>
-              <div className="text-xs text-gray-400 mt-1">{action.desc}</div>
+              <div className="text-xs text-gray-600 mt-1">{action.desc}</div>
             </a>
           ))}
         </div>

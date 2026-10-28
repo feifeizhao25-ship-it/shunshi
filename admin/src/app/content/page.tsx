@@ -167,8 +167,8 @@ export default function ContentPage() {
   return (
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar active="/content" />
-      <main className="flex-1 p-8">
-        <div className="flex items-center justify-between mb-6">
+      <main className="flex-1 min-w-0 p-4 md:p-8">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
           <h2 className="text-2xl font-bold text-gray-900">内容管理 (CMS)</h2>
           <button onClick={openCreate} className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700">
             + 新建内容
@@ -176,7 +176,7 @@ export default function ContentPage() {
         </div>
 
         {/* 统计卡片 */}
-        <div className="grid grid-cols-5 gap-4 mb-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
           {[
             { label: '全部', value: stats.total, color: 'bg-blue-50 text-blue-700' },
             { label: '草稿', value: stats.draft, color: 'bg-yellow-50 text-yellow-700' },
@@ -192,7 +192,7 @@ export default function ContentPage() {
         </div>
 
         {/* 筛选器 */}
-        <div className="flex items-center gap-4 mb-6">
+        <div className="flex flex-col gap-3 mb-6 lg:flex-row lg:items-center">
           <div className="flex gap-2 flex-wrap">
             {types.map((t) => (
               <button key={t} onClick={() => setFilterType(t)}
@@ -208,8 +208,8 @@ export default function ContentPage() {
         </div>
 
         {/* 内容表格 */}
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <table className="min-w-full divide-y divide-gray-200">
+        <div className="bg-white rounded-lg shadow overflow-x-auto">
+          <table className="min-w-[720px] w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">标题</th>
@@ -272,7 +272,7 @@ export default function ContentPage() {
             <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-auto">
               <div className="p-6 border-b border-gray-200 flex justify-between items-center">
                 <h3 className="text-lg font-bold">{editingId ? '编辑内容' : '新建内容'}</h3>
-                <button onClick={() => { setShowModal(false); setEditingId(null); }} className="text-gray-400 hover:text-gray-600">✕</button>
+                <button onClick={() => { setShowModal(false); setEditingId(null); }} className="text-gray-600 hover:text-gray-900">✕</button>
               </div>
               <div className="p-6 space-y-4">
                 <div>

@@ -36,10 +36,10 @@ export default function Sidebar({ active }: { active?: string }) {
   };
 
   return (
-    <aside className="w-16 md:w-64 shrink-0 bg-white border-r border-gray-200 min-h-screen flex flex-col">
+    <aside className="w-16 md:w-64 shrink-0 max-w-16 md:max-w-64 overflow-hidden bg-white border-r border-gray-200 min-h-screen flex flex-col">
       <div className="px-2 md:px-6 py-5 border-b border-gray-200">
         <h1 className="text-xl font-bold text-gray-800">顺时</h1>
-        <p className="hidden md:block text-xs text-gray-400 mt-1">国内版管理后台</p>
+        <p className="hidden md:block text-xs text-gray-600 mt-1">国内版管理后台</p>
       </div>
       <nav className="flex-1 p-1 md:p-4 space-y-1 overflow-y-auto">
         {navItems.map((item) => (
@@ -69,7 +69,7 @@ export default function Sidebar({ active }: { active?: string }) {
           <span>🚪</span>
           <span className="hidden md:inline">退出登录</span>
         </button>
-        <div className="hidden md:block text-xs text-gray-400 text-center">
+        <div className="hidden md:block text-xs text-gray-600 text-center">
           接口：{process.env.NEXT_PUBLIC_API_URL || '同源安全代理'}
         </div>
       </div>

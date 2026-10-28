@@ -40,7 +40,7 @@ class _MeditationFocusV2State extends State<MeditationFocusV2> {
               fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white,
             )),
             const SizedBox(height: 4),
-            Text('10 Min · Grounding', style: TextStyle(fontSize: 14, color: Colors.white54)),
+            Text('十分钟 · 静心', style: TextStyle(fontSize: 14, color: Colors.white54)),
 
             const SizedBox(height: 40),
 
@@ -90,7 +90,7 @@ class _MeditationFocusV2State extends State<MeditationFocusV2> {
                 const SizedBox(height: 10),
                 Wrap(spacing: 10, children: [
                   ('Soft Rain', Icons.water_drop),
-                  ('Morning Forest', Icons.forest),
+                  ('晨间林地', Icons.forest),
                   ('Sanctuary', Icons.spa),
                   ('Season', Icons.wb_sunny),
                 ].map((a) => GestureDetector(

@@ -38,8 +38,8 @@ class ShunshiColors {
 
   // ── 文字 ──
   static const Color textPrimary = Color(0xFF1C1C19);
-  static const Color textSecondary = Color(0xFF6B7B7D);
-  static const Color textTertiary = Color(0xFF9CA3A5);
+  static const Color textSecondary = Color(0xFF3F4E50);
+  static const Color textTertiary = Color(0xFF5A6567);
   static const Color textHint = Color(0xFFB5BBBD);
 
   // ── 辅助色：自然系 ──
@@ -90,8 +90,8 @@ class ShunshiDarkColors {
   static const Color surface = Color(0xFF1E1E1E);
   static const Color surfaceDim = Color(0xFF2A2A2A);
   static const Color textPrimary = Color(0xFFE8E6E1);
-  static const Color textSecondary = Color(0xFF9C9C96);
-  static const Color textHint = Color(0xFF6E6E68);
+  static const Color textSecondary = Color(0xFFC9C7C0);
+  static const Color textHint = Color(0xFFA6A49D);
   static const Color divider = Color(0xFF3A3A36);
   static const Color border = Color(0xFF3A3A36);
   static const Color error = Color(0xFFE57373);

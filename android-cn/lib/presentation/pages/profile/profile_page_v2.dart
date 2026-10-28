@@ -100,7 +100,7 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
                 padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
                 child: Row(
                   children: [
-                    Text('ShunShi AI',
+                    Text('顺时',
                         style: TextStyle(
                           fontFamily: ShunShiTypography.serifFamily,
                           fontSize: 18,

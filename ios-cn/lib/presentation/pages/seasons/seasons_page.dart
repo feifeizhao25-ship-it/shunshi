@@ -57,7 +57,18 @@ String _seasonEmoji(String season) {
 }
 
 String _seasonDisplayName(String season) {
-  return season[0].toUpperCase() + season.substring(1);
+  switch (season) {
+    case 'spring':
+      return '春季';
+    case 'summer':
+      return '夏季';
+    case 'autumn':
+      return '秋季';
+    case 'winter':
+      return '冬季';
+    default:
+      return '当季';
+  }
 }
 
 // ── 当前季节辅助 ──────────────────────────────────────
@@ -163,7 +174,8 @@ class _HeroSection extends StatelessWidget {
               _seasonDisplayName(season),
               style: const TextStyle(
                 fontSize: 32,
-                fontWeight: FontWeight.w200,
+                fontWeight: FontWeight.w600,
+                fontFamily: 'NotoSerifSC',
                 color: SeasonsColors.textPrimary,
                 height: 1.3,
                 letterSpacing: -0.5,
@@ -188,15 +200,15 @@ class _HeroSection extends StatelessWidget {
   String _getSeasonTagline(String season) {
     switch (season) {
       case 'spring':
-        return 'A time for renewal';
+        return '生发的时候';
       case 'summer':
-        return 'Embrace the warmth';
+        return '长养的时候';
       case 'autumn':
-        return 'Transition & reflection';
+        return '收敛的时候';
       case 'winter':
-        return 'Rest & nourish';
+        return '闭藏的时候';
       default:
-        return 'Live in rhythm';
+        return '顺着节气过';
     }
   }
 }
@@ -356,7 +368,7 @@ class _OtherSeasons extends StatelessWidget {
         children: [
           const SizedBox(height: 40),
           Text(
-            'Other Seasons',
+            '其他季节',
             style: SeasonsTextStyles.heading.copyWith(
               color: SeasonsColors.textSecondary,
             ),

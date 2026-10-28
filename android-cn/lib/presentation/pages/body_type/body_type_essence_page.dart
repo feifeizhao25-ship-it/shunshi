@@ -3,7 +3,7 @@
 ///
 /// Structure:
 /// 1. Header with essence name
-/// 2. Vitality radar (6 metrics)
+/// 2. 平时可以留意 radar (6 metrics)
 /// 3. Solar Dominance + Terrene Stability cards
 /// 4. Natural Rhythm description
 /// 5. Seasonal Adjustments
@@ -17,12 +17,12 @@ class BodyTypeEssencePage extends StatelessWidget {
   const BodyTypeEssencePage({super.key, this.bodyType});
 
   static const _metrics = [
-    _Metric('Vitality', 0.82, Icons.favorite),
-    _Metric('Circulation', 0.75, Icons.water_drop),
-    _Metric('Digestion', 0.88, Icons.restaurant),
-    _Metric('Resilience', 0.70, Icons.shield),
-    _Metric('Metabolism', 0.65, Icons.local_fire_department),
-    _Metric('睡眠质量', 0.78, Icons.bedtime),
+    _Metric('日常作息', 0, Icons.favorite),
+    _Metric('手足冷暖', 0, Icons.water_drop),
+    _Metric('饮食规律', 0, Icons.restaurant),
+    _Metric('换季适应', 0, Icons.shield),
+    _Metric('白天精神', 0, Icons.local_fire_department),
+    _Metric('夜里睡眠', 0, Icons.bedtime),
   ];
 
   @override
@@ -31,7 +31,6 @@ class BodyTypeEssencePage extends StatelessWidget {
     final bg = isDark ? ShunShiColors.darkBackground : ShunShiColors.background;
 
     return Scaffold(
-  appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
       backgroundColor: bg,
       body: CustomScrollView(
         slivers: [
@@ -44,12 +43,7 @@ class BodyTypeEssencePage extends StatelessWidget {
               icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
               onPressed: () => Navigator.pop(context),
             ),
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.settings_outlined, color: Colors.white),
-                onPressed: () {},
-              ),
-            ],
+            actions: const [],
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
                 decoration: BoxDecoration(
@@ -57,7 +51,7 @@ class BodyTypeEssencePage extends StatelessWidget {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      ShunShiColors.primaryDark ?? ShunShiColors.primary,
+                      ShunShiColors.primaryContainer,
                       ShunShiColors.primary,
                     ],
                   ),
@@ -78,7 +72,7 @@ class BodyTypeEssencePage extends StatelessWidget {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          '你的季节体质：平和质',
+                          '平和质 · 一般说明',
                           style: const TextStyle(
                             fontSize: 24, fontWeight: FontWeight.w700,
                             color: Colors.white, fontFamily: ShunShiTypography.serifFamily,
@@ -86,8 +80,8 @@ class BodyTypeEssencePage extends StatelessWidget {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Your constitution mirrors the transition between Spring and Autumn. '
-                          'You possess a resilient core with a fluid adaptability to external shifts.',
+                          ''
+                          '下面是平和质的一般特点，不是个人检测结果。完成体质问卷后，才会显示你自己的情况。',
                           style: TextStyle(
                             fontSize: 13, color: Colors.white.withValues(alpha: 0.8),
                             height: 1.5, fontFamily: ShunShiTypography.sansFamily,
@@ -107,8 +101,8 @@ class BodyTypeEssencePage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // ── Vitality Metrics ──
-                  _sectionTitle('filter_vintage', 'Vitality'),
+                  // ── 平时可以留意 Metrics ──
+                  _sectionTitle('filter_vintage', '平时可以留意'),
                   const SizedBox(height: 12),
                   ..._metrics.map((m) => Padding(
                     padding: const EdgeInsets.only(bottom: 14),
@@ -149,7 +143,7 @@ class BodyTypeEssencePage extends StatelessWidget {
                   ]),
                   const SizedBox(height: 8),
                   Text(
-                    'Your energy peaks with the rising sun. Morning rituals are your strongest foundation.',
+                    '早晨是比较适合活动的时候，可以安排散步或拉伸。',
                     style: TextStyle(
                       fontSize: 14, color: ShunShiColors.textSecondary,
                       height: 1.6, fontFamily: ShunShiTypography.sansFamily,
@@ -168,7 +162,7 @@ class BodyTypeEssencePage extends StatelessWidget {
                   ]),
                   const SizedBox(height: 8),
                   Text(
-                    'Grounded and deliberate. Your body recovers best through stillness and earthy textures.',
+                    '累了就停下来休息，饮食以温软为主。',
                     style: TextStyle(
                       fontSize: 14, color: ShunShiColors.textSecondary,
                       height: 1.6, fontFamily: ShunShiTypography.sansFamily,
@@ -190,20 +184,18 @@ class BodyTypeEssencePage extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
-                          'The Balanced type is rare, characterized by a symmetry of fire and earth. '
-                          'You don\'t experience the drastic highs or lows of more singular constitutions, '
-                          'but you are sensitive to seasonal transitions.',
+                          '平和质的人平时起伏不大，换季时仍要注意作息。',
                           style: TextStyle(
                             fontSize: 14, color: ShunShiColors.textSecondary,
                             height: 1.7, fontFamily: ShunShiTypography.sansFamily,
                           ),
                         ),
                         const SizedBox(height: 16),
-                        _checkItem('Optimal resting heart rate during twilight hours.'),
+                        _checkItem('傍晚宜安静，不必再安排剧烈活动。'),
                         const SizedBox(height: 8),
-                        _checkItem('Digestive fire is strongest between 11 AM and 2 PM.'),
+                        _checkItem('午饭前后把正餐吃好。'),
                         const SizedBox(height: 8),
-                        _checkItem('Cognitive peak occurs in the second hour after waking.'),
+                        _checkItem('起床后先活动一下再开始忙碌。'),
                       ],
                     ),
                   ),
@@ -213,15 +205,15 @@ class BodyTypeEssencePage extends StatelessWidget {
                   _sectionTitle('eco', '季节调整'),
                   const SizedBox(height: 12),
                   _seasonCard('活跃季节', '春季 · 木行',
-                    'Your most vital period. Channel energy into creative projects and morning movement practices.',
+                    '春季适合早起走动，别一下安排太满。',
                     ShunShiColors.primary),
                   const SizedBox(height: 12),
                   _seasonCard('休养季节', '长夏 · 土行',
-                    'Focus on grounding. Nourish with warm, cooked foods and prioritize sleep.',
+                    '长夏注意少吃生冷，把觉睡够。',
                     const Color(0xFFF59E0B)),
                   const SizedBox(height: 12),
                   _seasonCard('挑战季节', '冬季 · 水行',
-                    'Your resilience is tested. Extra rest, warm teas, and minimal social obligation.',
+                    '冬季多休息，喝温热的水，应酬可以少一些。',
                     const Color(0xFF3B82F6)),
 
                   const SizedBox(height: 40),
@@ -248,42 +240,10 @@ class BodyTypeEssencePage extends StatelessWidget {
     return Row(children: [
       Icon(m.icon, size: 18, color: ShunShiColors.primary),
       const SizedBox(width: 10),
-      SizedBox(
-        width: 90,
-        child: Text(m.name, style: TextStyle(
-          fontSize: 13, color: ShunShiColors.textSecondary,
-          fontFamily: ShunShiTypography.sansFamily,
-        )),
-      ),
-      Expanded(
-        child: Stack(children: [
-          Container(
-            height: 6,
-            decoration: BoxDecoration(
-              color: ShunShiColors.surfaceContainerLow,
-              borderRadius: BorderRadius.circular(3),
-            ),
-          ),
-          FractionallySizedBox(
-            widthFactor: m.value,
-            child: Container(
-              height: 6,
-              decoration: BoxDecoration(
-                color: ShunShiColors.primary,
-                borderRadius: BorderRadius.circular(3),
-              ),
-            ),
-          ),
-        ]),
-      ),
-      const SizedBox(width: 10),
-      SizedBox(
-        width: 36,
-        child: Text('${(m.value * 100).round()}%', style: TextStyle(
-          fontSize: 12, fontWeight: FontWeight.w600, color: ShunShiColors.primary,
-          fontFamily: ShunShiTypography.sansFamily,
-        ), textAlign: TextAlign.right),
-      ),
+      Expanded(child: Text(m.name, style: TextStyle(
+        fontSize: 14, color: ShunShiColors.textSecondary,
+        fontFamily: ShunShiTypography.sansFamily,
+      ))),
     ]);
   }
 

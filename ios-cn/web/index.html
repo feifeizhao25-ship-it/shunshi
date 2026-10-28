@@ -5,14 +5,14 @@
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="顺时 ShunShi - AI 养生陪伴系统，随时随地守护您的健康">
-  <meta name="keywords" content="中医,养生,AI健康,健康陪伴,二十四节气,顺时养生">
-  <meta name="author" content="ShunShi">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  <meta name="description" content="顺时——按二十四节气安排作息。对话由人工智能生成，不是真人，不提供医疗诊断或治疗。">
+  <meta name="keywords" content="节气,作息,养生,二十四节气,顺时">
+  <meta name="author" content="顺时">
 
   <!-- Open Graph -->
-  <meta property="og:title" content="顺时 ShunShi - AI 养生陪伴">
-  <meta property="og:description" content="AI 养生陪伴系统，随时随地守护您的健康">
+  <meta property="og:title" content="顺时｜节气作息陪伴">
+  <meta property="og:description" content="按二十四节气安排作息。对话由人工智能生成，不是真人。">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="zh_CN">
 
@@ -30,24 +30,28 @@
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
 
-  <title>顺时 ShunShi - AI 养生陪伴</title>
+  <title>顺时｜节气作息陪伴</title>
   <link rel="manifest" href="manifest.json">
 
   <style>
-    body {
+    html, body {
       margin: 0;
       padding: 0;
-      background: linear-gradient(135deg, #FDF5E6 0%, #FAF0E6 50%, #FFF8DC 100%);
-      min-height: 100vh;
+      height: 100%;
+      min-height: 100dvh;
+      min-height: -webkit-fill-available;
+      background: #fdf9f4;
     }
     .loading {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      height: 100vh;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      color: #8B5A2B;
+      height: 100%;
+      min-height: 100dvh;
+      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', sans-serif;
+      color: #144227;
+      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
     }
     .loading h1 {
       font-size: 2rem;
@@ -63,8 +67,8 @@
     .spinner {
       width: 40px;
       height: 40px;
-      border: 3px solid rgba(139, 90, 43, 0.2);
-      border-top-color: #8B5A2B;
+      border: 3px solid rgba(20, 66, 39, 0.2);
+      border-top-color: #144227;
       border-radius: 50%;
       animation: spin 1s linear infinite;
     }
@@ -75,8 +79,8 @@
 </head>
 <body>
   <div class="loading" id="loading">
-    <h1>顺 时</h1>
-    <p>AI 养生陪伴</p>
+    <h1>顺时</h1>
+    <p>按节气安排作息</p>
     <div class="spinner"></div>
   </div>
   <script>
@@ -84,6 +88,18 @@
       var el = document.getElementById('loading');
       if (el) el.style.display = 'none';
     });
+  </script>
+  <script>
+    (function () {
+      var fit = 'viewport-fit=cover';
+      function keepFit() {
+        document.querySelectorAll('meta[name="viewport"]').forEach(function (meta) {
+          if (meta.content.indexOf(fit) === -1) meta.content = meta.content.replace(/\s+$/, '') + ', ' + fit;
+        });
+      }
+      keepFit();
+      new MutationObserver(keepFit).observe(document.head, { childList: true, subtree: true, attributes: true, attributeFilter: ['content'] });
+    })();
   </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>

@@ -35,8 +35,9 @@ class ShunShiColors {
   
   // ── 文字色：不用纯黑，用 onBackground #1C1C19 ──
   static const Color textPrimary = Color(0xFF1C1C19);
-  static const Color textSecondary = Color(0xFF6B7B7D);
-  static const Color textTertiary = Color(0xFF9CA3A5);
+  // 次要/辅助文字需在宣纸底上达到正文对比度，避免发灰看不清。
+  static const Color textSecondary = Color(0xFF3F4E50);
+  static const Color textTertiary = Color(0xFF5A6567);
   static const Color textDisabled = Color(0xFFB5BBBD);
   
   // ── 边框（Ghost Border: 20% opacity，无硬线原则）──
@@ -58,8 +59,8 @@ class ShunShiColors {
   static const Color darkSurfaceContainerLow = Color(0xFF1A1A1A);
   static const Color darkSurfaceContainerLowest = Color(0xFF2A2A2A);
   static const Color darkTextPrimary = Color(0xFFE8E6E1);
-  static const Color darkTextSecondary = Color(0xFF9C9C96);
-  static const Color darkTextTertiary = Color(0xFF6E6E68);
+  static const Color darkTextSecondary = Color(0xFFC9C7C0);
+  static const Color darkTextTertiary = Color(0xFFA6A49D);
   static const Color darkTextDisabled = Color(0xFF5A5855);
   static const Color darkBorder = Color(0xFF3A3A36);
   static const Color darkBorderGhost = Color(0xFF2E2E2B);
@@ -121,8 +122,8 @@ class ShunShiColors {
     surfaceContainerLowVal: surfaceContainerLow,
     surfaceContainerLowestVal: surfaceContainerLowest,
     textPrimaryVal: Color(0xFF1C1C19),
-    textSecondaryVal: Color(0xFF6B7B7D),
-    textTertiaryVal: Color(0xFF9CA3A5),
+    textSecondaryVal: textSecondary,
+    textTertiaryVal: textTertiary,
     textDisabledVal: Color(0xFFB5BBBD),
     borderVal: Color(0x331C1C19),
     borderGhostVal: Color(0x331C1C19),
@@ -160,12 +161,13 @@ class ThemeNotifier extends ChangeNotifier {
   ThemeNotifier._();
   ThemeNotifier(); // keep public constructor for compatibility
 
-  ThemeMode _mode = ThemeMode.system;
+  ThemeMode _mode = ThemeMode.light;
   ThemeMode get mode => _mode;
 
   Future<void> load() async {
     final prefs = await SharedPreferences.getInstance();
-    final index = prefs.getInt('theme_mode') ?? 0; // default: light (dark mode not fully ready)
+    // 未选择过时用浅色。深色需要用户在设置里打开，避免系统深色直接落到未适配的页面上。
+    final index = prefs.getInt('theme_mode') ?? ThemeMode.light.index;
     _mode = ThemeMode.values[index.clamp(0, 2)];
     notifyListeners();
   }

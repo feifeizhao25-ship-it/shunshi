@@ -38,15 +38,15 @@ export default function PromptsPage() {
   const filteredPrompts = filterCategory === 'all' ? prompts : prompts.filter((p) => p.category === filterCategory);
 
   return (
-    <div className="flex">
+    <div className="flex min-h-screen bg-gray-50">
       <Sidebar active="/prompts" />
-      <main className="flex-1 p-8">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-800">Prompt 管理</h2>
-          <button className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700">+ 新建Prompt</button>
+      <main className="flex-1 min-w-0 p-4 md:p-8">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+          <h2 className="text-2xl font-bold text-gray-800">提示词管理</h2>
+          <button type="button" disabled title="待人工处理：新建提示词尚未接入" className="px-4 py-2 bg-gray-200 text-gray-600 rounded-lg text-sm cursor-not-allowed">新建待人工处理</button>
         </div>
 
-        <div className="flex gap-2 mb-6">
+        <div className="flex gap-2 mb-6 flex-wrap">
           {categories.map((c) => (
             <button key={c} onClick={() => setFilterCategory(c)}
               className={`px-3 py-2 rounded-lg text-sm ${filterCategory === c ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600'}`}>
@@ -55,13 +55,12 @@ export default function PromptsPage() {
           ))}
         </div>
 
-        <div className="grid grid-cols-3 gap-6">
-          {/* Prompt List */}
-          <div className="col-span-1 space-y-2 max-h-[80vh] overflow-y-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="space-y-2 max-h-[80vh] overflow-y-auto">
             {loading ? (
-              <div className="text-center text-gray-400 py-12">加载中...</div>
+              <div className="text-center text-gray-600 py-12">加载中...</div>
             ) : filteredPrompts.length === 0 ? (
-              <div className="text-center text-gray-400 py-12">暂无Prompt</div>
+              <div className="text-center text-gray-600 py-12">暂无提示词</div>
             ) : (
               filteredPrompts.map((p) => (
                 <div key={p.id} onClick={() => setSelectedPrompt(p)}
@@ -72,19 +71,19 @@ export default function PromptsPage() {
                       {p.is_active ? '启用' : '禁用'}
                     </span>
                   </div>
-                  <div className="text-xs text-gray-400">{p.category} · v{p.version} · 使用 {p.usage_count} 次</div>
+                  <div className="text-xs text-gray-600">{p.category} · v{p.version} · 使用 {p.usage_count} 次</div>
                 </div>
               ))
             )}
           </div>
 
           {/* Prompt Detail */}
-          <div className="col-span-2">
+          <div className="lg:col-span-2">
             {selectedPrompt ? (
               <div className="bg-white rounded-xl border border-gray-200 p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold text-gray-800">{selectedPrompt.name}</h3>
-                  <span className="text-xs text-gray-400">v{selectedPrompt.version}</span>
+                  <span className="text-xs text-gray-600">v{selectedPrompt.version}</span>
                 </div>
                 <p className="text-sm text-gray-500 mb-4">{selectedPrompt.description}</p>
                 <div className="mb-4">
@@ -93,15 +92,15 @@ export default function PromptsPage() {
                     {selectedPrompt.template}
                   </pre>
                 </div>
-                <div className="flex gap-6 text-sm text-gray-400">
+                <div className="flex gap-6 text-sm text-gray-600">
                   <span>使用次数: {selectedPrompt.usage_count}</span>
                   <span>平均延迟: {selectedPrompt.avg_latency_ms}ms</span>
                   <span>更新: {selectedPrompt.updated_at ? new Date(selectedPrompt.updated_at).toLocaleDateString('zh-CN') : '-'}</span>
                 </div>
               </div>
             ) : (
-              <div className="bg-white rounded-xl border border-gray-200 p-12 text-center text-gray-400">
-                选择左侧的Prompt查看详情
+              <div className="bg-white rounded-xl border border-gray-200 p-12 text-center text-gray-600">
+                选择左侧的提示词查看详情
               </div>
             )}
           </div>

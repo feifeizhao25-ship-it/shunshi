@@ -23,12 +23,12 @@ class _WellnessLibraryPageState extends State<WellnessLibraryPage> {
 
   List<Map<String, dynamic>> _contents = [];
   List<Map<String, dynamic>> _filtered = [];
-  String _activeFilter = 'All';
+  String _activeFilter = '全部';
   bool _loading = true;
   bool _searching = false;
   final _searchController = TextEditingController();
 
-  static const _filters = ['All', 'Sleep', 'Nutrition', 'Movement', 'Mindfulness', 'Seasonal'];
+  static const _filters = ['全部', '睡眠', '饮食', '运动', '冥想', '节气养生'];
 
   Future<void> _search(String query) async {
     if (query.trim().isEmpty) {
@@ -72,7 +72,7 @@ class _WellnessLibraryPageState extends State<WellnessLibraryPage> {
 
   void _applyFilter(String filter) {
     _activeFilter = filter;
-    if (filter == 'All') {
+    if (filter == '全部') {
       _filtered = List.from(_contents);
     } else {
       final lower = filter.toLowerCase();
@@ -98,10 +98,10 @@ class _WellnessLibraryPageState extends State<WellnessLibraryPage> {
     switch (category) {
       case 'sleep': return const Color(0xFF3F51B5);
       case 'nutrition': return const Color(0xFF4CAF50);
-      case 'movement': return const Color(0xFF533afd);
+      case 'movement': return ShunShiColors.primary;
       case 'mindfulness': return const Color(0xFF00BCD4);
       case 'seasonal': return const Color(0xFFFF9800);
-      default: return const Color(0xFF533afd);
+      default: return ShunShiColors.primary;
     }
   }
 
@@ -110,9 +110,9 @@ class _WellnessLibraryPageState extends State<WellnessLibraryPage> {
     return Scaffold(
       backgroundColor: ShunShiColors.background,
       body: _loading
-          ? const Center(child: CircularProgressIndicator(color: Color(0xFF533afd)))
+          ? const Center(child: CircularProgressIndicator(color: ShunShiColors.primary))
           : RefreshIndicator(
-              color: const Color(0xFF533afd),
+              color: ShunShiColors.primary,
               onRefresh: _fetchContents,
               child: CustomScrollView(
                 physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
@@ -123,11 +123,16 @@ class _WellnessLibraryPageState extends State<WellnessLibraryPage> {
                       child: Padding(
                         padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
                         child: Row(children: [
-                          const Icon(Icons.menu, color: Color(0xFF533afd)),
+                          IconButton(
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                            icon: const Icon(Icons.arrow_back_ios_new, color: ShunShiColors.primary, size: 18),
+                            onPressed: () => Navigator.of(context).maybePop(),
+                          ),
                           const Spacer(),
-                          Text('SEASONS', style: TextStyle(
+                          Text('顺时', style: TextStyle(
                             fontFamily: ShunShiTypography.serifFamily,
-                            fontSize: 18, fontWeight: FontWeight.w600, color: const Color(0xFF533afd),
+                            fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.primary,
                           )),
                           const Spacer(),
                           const SizedBox(width: 24),
@@ -140,7 +145,7 @@ class _WellnessLibraryPageState extends State<WellnessLibraryPage> {
                   SliverToBoxAdapter(
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
-                      child: Text('Wellness Library', style: TextStyle(
+                      child: Text('养生文库', style: TextStyle(
                         fontFamily: ShunShiTypography.serifFamily,
                         fontSize: 28, fontWeight: FontWeight.bold, color: ShunShiColors.textPrimary,
                       )),
@@ -160,8 +165,8 @@ class _WellnessLibraryPageState extends State<WellnessLibraryPage> {
                           controller: _searchController,
                           onChanged: (v) => _search(v),
                           decoration: InputDecoration(
-                            hintText: 'Search wellness content...',
-                            hintStyle: TextStyle(fontSize: 14, color: ShunShiColors.textTertiary),
+                            hintText: '搜索养生内容',
+                            hintStyle: TextStyle(fontSize: 16, color: ShunShiColors.textTertiary),
                             border: InputBorder.none,
                             icon: Icon(Icons.search, color: ShunShiColors.textTertiary, size: 20),
                             suffixIcon: _searchController.text.isNotEmpty ? IconButton(
@@ -169,7 +174,7 @@ class _WellnessLibraryPageState extends State<WellnessLibraryPage> {
                               onPressed: () { _searchController.clear(); _search(''); },
                             ) : null,
                           ),
-                          style: TextStyle(fontSize: 14, color: ShunShiColors.textPrimary),
+                          style: const TextStyle(fontSize: 16, color: ShunShiColors.textPrimary),
                         ),
                       ),
                     ),
@@ -193,15 +198,15 @@ class _WellnessLibraryPageState extends State<WellnessLibraryPage> {
                       child: _filtered.isEmpty
                           ? Center(child: Padding(
                               padding: const EdgeInsets.all(40),
-                              child: Text('No content found for this filter', style: TextStyle(color: ShunShiColors.textTertiary)),
+                              child: Text('这个分类下还没有内容', style: TextStyle(color: ShunShiColors.textTertiary)),
                             ))
                           : Column(
                               children: _filtered.map((item) => Padding(
                                 padding: const EdgeInsets.only(bottom: 10),
                                 child: _buildContentCard(
                                   icon: _iconForType(item['type']),
-                                  category: (item['category'] ?? 'general').toString().capitalize(),
-                                  title: item['title'] ?? 'Untitled',
+                                  category: (item['category'] ?? '养生').toString(),
+                                  title: item['title'] ?? '未命名',
                                   desc: item['subtitle'] ?? item['description']?.toString().substring(0, (item['description']?.toString().length ?? 50).clamp(0, 80)) ?? '',
                                   color: _colorForCategory(item['category']),
                                 ),
@@ -223,9 +228,9 @@ class _WellnessLibraryPageState extends State<WellnessLibraryPage> {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
           decoration: BoxDecoration(
-            color: active ? const Color(0xFF533afd) : ShunShiColors.surface,
+            color: active ? ShunShiColors.primary : ShunShiColors.surface,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: active ? const Color(0xFF533afd) : ShunShiColors.borderGhost),
+            border: Border.all(color: active ? ShunShiColors.primary : ShunShiColors.borderGhost),
           ),
           child: Text(label, style: TextStyle(
             fontSize: 12, fontWeight: FontWeight.w500,
@@ -261,8 +266,4 @@ class _WellnessLibraryPageState extends State<WellnessLibraryPage> {
       ]),
     );
   }
-}
-
-extension on String {
-  String capitalize() => isEmpty ? '' : '${this[0].toUpperCase()}${substring(1)}';
 }

@@ -659,7 +659,7 @@ class _UltimateHomePageState extends State<UltimateHomePage>
             ),
             const SizedBox(width: 12),
             Text(
-              '顺时 ShunShi',
+              '顺时',
               style: ShunShiTypography.headlineSmall.copyWith(
                 fontFamily: ShunShiTypography.serifFamily,
                 fontWeight: FontWeight.w700,
@@ -959,7 +959,7 @@ class _UltimateHomePageState extends State<UltimateHomePage>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '养生精要 Wellness Principle',
+                      '养生精要',
                       style: ShunShiTypography.caption.copyWith(
                         color: ShunShiColors.secondary,
                         fontWeight: FontWeight.w500,

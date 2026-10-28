@@ -216,7 +216,7 @@ class MembershipCenterPage extends StatelessWidget {
                     color: Colors.white.withValues(alpha: 0.8),
                   )),
                   const SizedBox(height: 4),
-                  const Text('ShunShi AI', style: TextStyle(
+                  const Text('顺时', style: TextStyle(
                     fontSize: 28, fontStyle: FontStyle.italic,
                     fontFamily: ShunShiTypography.serifFamily,
                     color: Colors.white,

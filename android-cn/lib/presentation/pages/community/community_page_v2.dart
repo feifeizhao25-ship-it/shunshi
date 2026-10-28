@@ -79,7 +79,7 @@ class _CommunityPageV2State extends State<CommunityPageV2> with SingleTickerProv
           SliverToBoxAdapter(child: SafeArea(child: Padding(
             padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
             child: Row(children: [
-              Text('顺时 ShunShi', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.primary)),
+              Text('顺时', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.primary)),
               const Spacer(),
               const Icon(Icons.menu, color: ShunShiColors.textSecondary),
             ]),

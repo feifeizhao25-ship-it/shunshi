@@ -23,15 +23,15 @@ class _MeditationFocusPageState extends State<MeditationFocusPage>
     with SingleTickerProviderStateMixin {
   late AnimationController _progressController;
   Timer? _timer;
-  int _elapsedSeconds = 222; // 3:42 demo
+  int _elapsedSeconds = 0;
   final int _totalSeconds = 600; // 10 min
   bool _isPlaying = false;
   int _selectedAtmosphere = 0;
 
   static const _atmospheres = [
     _Atmosphere('细雨', Icons.water_drop),
-    _Atmosphere('Morning Forest', Icons.forest),
-    _Atmosphere('Sanctuary', Icons.spa),
+    _Atmosphere('晨间林地', Icons.forest),
+    _Atmosphere('静室', Icons.spa),
     _Atmosphere('节气', Icons.wb_sunny),
   ];
 
@@ -117,7 +117,7 @@ class _MeditationFocusPageState extends State<MeditationFocusPage>
               color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.serifFamily,
             )),
             const SizedBox(height: 4),
-            Text('10 Min · Grounding', style: TextStyle(
+            Text('十分钟 · 静心', style: TextStyle(
               fontSize: 14, color: ShunShiColors.textSecondary,
               fontFamily: ShunShiTypography.sansFamily,
             )),
