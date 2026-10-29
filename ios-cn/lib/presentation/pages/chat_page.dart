@@ -681,12 +681,12 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
         child: Column(
           children: [
             _buildTopBar(),
-            const Padding(
-              padding: EdgeInsets.fromLTRB(16, 6, 16, 2),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 6, 16, 2),
               child: Text(
                 '你在和人工智能对话，不是真人',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+                style: TextStyle(fontSize: 12, color: AppColors.textSecondary(context)),
               ),
             ),
             Expanded(child: _buildList()),
@@ -694,7 +694,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               child: Text(
                 '内容由AI生成，仅供作息与节气安排参考，不构成医疗诊断或治疗建议。',
-                style: TextStyle(fontSize: 11, color: Colors.grey[500]),
+                style: TextStyle(fontSize: 11, color: AppColors.textTertiary(context)),
                 textAlign: TextAlign.center,
               ),
             ),
@@ -706,12 +706,18 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
   }
 
   Widget _buildTopBar() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bar = AppColors.background(context);
+    final ink = AppColors.textPrimary(context);
+    final muted = AppColors.textTertiary(context);
+    final accent = AppColors.primary(context);
+    final vip = isDark ? ShunShiColors.goldLight : ShunShiColors.gold;
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
       decoration: BoxDecoration(
-        color: ShunShiColors.background,
+        color: bar,
         border: Border(
-          bottom: BorderSide(color: ShunShiColors.borderGhost, width: 0.5),
+          bottom: BorderSide(color: AppColors.borderGhost(context), width: 0.5),
         ),
       ),
       child: Column(
@@ -737,7 +743,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
                 ),
               ),
               const SizedBox(width: 12),
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -747,7 +753,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
                         fontFamily: ShunShiTypography.sansFamily,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: ShunShiColors.textPrimary,
+                        color: ink,
                       ),
                     ),
                     Text(
@@ -755,7 +761,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
                       style: TextStyle(
                         fontFamily: ShunShiTypography.sansFamily,
                         fontSize: 12,
-                        color: ShunShiColors.textTertiary,
+                        color: muted,
                       ),
                     ),
                   ],
@@ -765,26 +771,26 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: _isVip
-                      ? ShunShiColors.gold.withValues(alpha: 0.15)
-                      : ShunShiColors.primary.withValues(alpha: 0.1),
+                      ? vip.withValues(alpha: 0.15)
+                      : accent.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     if (_isVip) ...[
-                      const Icon(
+                      Icon(
                         Icons.star_rounded,
                         size: 14,
-                        color: ShunShiColors.gold,
+                        color: vip,
                       ),
                       const SizedBox(width: 2),
-                      const Text(
+                      Text(
                         '会员',
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
-                          color: ShunShiColors.gold,
+                          color: vip,
                         ),
                       ),
                     ] else ...[
@@ -794,7 +800,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
                             : Icons.chat_bubble_rounded,
                         size: 13,
                         color: _membershipKnown
-                            ? ShunShiColors.primary
+                            ? accent
                             : Colors.orange,
                       ),
                       const SizedBox(width: 3),
@@ -804,7 +810,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
                           fontSize: 11,
                           fontWeight: FontWeight.w500,
                           color: _membershipKnown
-                              ? ShunShiColors.primary
+                              ? accent
                               : Colors.orange,
                         ),
                       ),
@@ -813,10 +819,10 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
                 ),
               ),
               PopupMenuButton<String>(
-                icon: const Icon(
+                icon: Icon(
                   Icons.more_vert,
                   size: 22,
-                  color: ShunShiColors.textTertiary,
+                  color: muted,
                 ),
                 onSelected: (v) async {
                   if (v == 'end') {
@@ -896,12 +902,19 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
   }
 
   Widget _buildInput() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bar = AppColors.background(context);
+    final field = AppColors.surface(context);
+    final ink = AppColors.textPrimary(context);
+    final muted = AppColors.textTertiary(context);
+    final sendBg = isDark ? ShunShiColors.darkPrimary : ShunShiColors.primary;
+    final sendFg = isDark ? const Color(0xFF121212) : Colors.white;
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
       decoration: BoxDecoration(
-        color: ShunShiColors.background,
+        color: bar,
         border: Border(
-          top: BorderSide(color: ShunShiColors.borderGhost, width: 0.5),
+          top: BorderSide(color: AppColors.borderGhost(context), width: 0.5),
         ),
       ),
       child: Row(
@@ -913,13 +926,13 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
               height: 40,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: ShunShiColors.surface,
-                border: Border.all(color: ShunShiColors.border),
+                color: field,
+                border: Border.all(color: AppColors.border(context)),
               ),
               child: Icon(
                 Icons.add_circle_outline,
                 size: 20,
-                color: ShunShiColors.textTertiary,
+                color: muted,
               ),
             ),
           ),
@@ -933,15 +946,20 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
                 maxLines: null,
                 textInputAction: TextInputAction.send,
                 onSubmitted: (_) => _sendMessage(),
+                style: TextStyle(
+                  fontFamily: ShunShiTypography.sansFamily,
+                  fontSize: 15,
+                  color: ink,
+                ),
                 decoration: InputDecoration(
                   hintText: '输入想和顺时聊的...',
                   hintStyle: TextStyle(
                     fontFamily: ShunShiTypography.sansFamily,
                     fontSize: 15,
-                    color: ShunShiColors.textTertiary,
+                    color: muted,
                   ),
                   filled: true,
-                  fillColor: ShunShiColors.surface,
+                  fillColor: field,
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 10,
@@ -978,11 +996,11 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
             child: Container(
               width: 40,
               height: 40,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: ShunShiColors.primary,
+                color: sendBg,
               ),
-              child: const Icon(Icons.send, color: Colors.white, size: 18),
+              child: Icon(Icons.send, color: sendFg, size: 18),
             ),
           ),
         ],

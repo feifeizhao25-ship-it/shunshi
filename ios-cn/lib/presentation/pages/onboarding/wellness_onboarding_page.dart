@@ -81,13 +81,24 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
     if (mounted) context.go('/today');
   }
 
+  bool get _dark => Theme.of(context).brightness == Brightness.dark;
+  bool get _wide => MediaQuery.sizeOf(context).shortestSide >= 600;
+  Color get _bg => _dark ? ShunShiColors.darkBackground : ShunShiColors.background;
+  Color get _text => _dark ? ShunShiColors.darkTextPrimary : ShunShiColors.textPrimary;
+  Color get _textSecondary => _dark ? ShunShiColors.darkTextSecondary : ShunShiColors.textSecondary;
+  Color get _textTertiary => _dark ? ShunShiColors.darkTextTertiary : ShunShiColors.textTertiary;
+  Color get _surface => _dark ? ShunShiColors.darkSurfaceContainerLowest : ShunShiColors.surfaceContainerLowest;
+  Color get _border => _dark ? ShunShiColors.darkBorder : ShunShiColors.border;
+  Color get _accent => _dark ? ShunShiColors.darkPrimary : ShunShiColors.primary;
+  Color get _onButton => _dark ? const Color(0xFF121212) : Colors.white;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: _bg,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(24),
+          padding: EdgeInsets.all(_wide ? 40 : 24),
           child: Column(
             children: [
               Expanded(
@@ -127,45 +138,45 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
       children: [
         // Logo
         Container(
-          width: 88, height: 88,
+          width: _wide ? 120 : 88, height: _wide ? 120 : 88,
           decoration: BoxDecoration(
             gradient: const LinearGradient(
               colors: [ShunShiColors.primary, ShunShiColors.primaryLight],
             ),
-            borderRadius: BorderRadius.circular(22),
+            borderRadius: BorderRadius.circular(_wide ? 28 : 22),
           ),
-          child: const Icon(Icons.eco, size: 44, color: Colors.white),
+          child: Icon(Icons.eco, size: _wide ? 60 : 44, color: Colors.white),
         ),
-        const SizedBox(height: 32),
-        const Text(
+        SizedBox(height: _wide ? 40 : 32),
+        Text(
           '顺时',
           style: TextStyle(
             fontFamily: ShunShiTypography.serifFamily,
-            fontSize: 36, fontWeight: FontWeight.w700,
-            color: ShunShiColors.textPrimary,
+            fontSize: _wide ? 52 : 36, fontWeight: FontWeight.w700,
+            color: _text,
           ),
         ),
         const SizedBox(height: 12),
-        const Text(
+        Text(
           '顺应天时，养身心',
           style: TextStyle(
             fontFamily: ShunShiTypography.sansFamily,
-            fontSize: 18, color: ShunShiColors.textSecondary,
+            fontSize: _wide ? 24 : 18, color: _textSecondary,
           ),
         ),
-        const SizedBox(height: 56),
+        SizedBox(height: _wide ? 72 : 56),
         SizedBox(
           width: double.infinity,
-          height: 54,
+          height: _wide ? 68 : 54,
           child: ElevatedButton(
             onPressed: _nextPage,
             style: ElevatedButton.styleFrom(
-              backgroundColor: ShunShiColors.primary,
-              foregroundColor: Colors.white,
+              backgroundColor: _dark ? ShunShiColors.darkPrimary : ShunShiColors.primary,
+              foregroundColor: _onButton,
               elevation: 0,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             ),
-            child: const Text('开始使用', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
+            child: Text('开始使用', style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: _wide ? 22 : 17, fontWeight: FontWeight.w600)),
           ),
         ),
       ],
@@ -177,20 +188,20 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Text(
+        Text(
           '你最关注什么？',
           style: TextStyle(
             fontFamily: ShunShiTypography.serifFamily,
-            fontSize: 26, fontWeight: FontWeight.w700,
-            color: ShunShiColors.textPrimary,
+            fontSize: _wide ? 36 : 26, fontWeight: FontWeight.w700,
+            color: _text,
           ),
         ),
         const SizedBox(height: 8),
-        const Text(
+        Text(
           '选择一项，我们为你定制方案',
           style: TextStyle(
             fontFamily: ShunShiTypography.sansFamily,
-            fontSize: 14, color: ShunShiColors.textTertiary,
+            fontSize: _wide ? 18 : 14, color: _textTertiary,
           ),
         ),
         const SizedBox(height: 36),
@@ -203,13 +214,13 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
               decoration: BoxDecoration(
                 color: _selectedConcern == c.label
-                    ? ShunShiColors.primary.withValues(alpha: 0.08)
-                    : ShunShiColors.surfaceContainerLowest,
+                    ? _accent.withValues(alpha: 0.18)
+                    : _surface,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
                   color: _selectedConcern == c.label
-                      ? ShunShiColors.primary
-                      : ShunShiColors.border,
+                      ? _accent
+                      : _border,
                   width: _selectedConcern == c.label ? 2 : 1,
                 ),
               ),
@@ -222,21 +233,19 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(c.label, style: TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.w600,
+                          fontSize: _wide ? 22 : 18, fontWeight: FontWeight.w600,
                           fontFamily: ShunShiTypography.serifFamily,
-                          color: _selectedConcern == c.label
-                              ? ShunShiColors.primary
-                              : ShunShiColors.textPrimary,
+                          color: _selectedConcern == c.label ? _accent : _text,
                         )),
                         const SizedBox(height: 2),
-                        Text(c.desc, style: const TextStyle(
-                          fontSize: 13, color: ShunShiColors.textTertiary,
+                        Text(c.desc, style: TextStyle(
+                          fontSize: _wide ? 16 : 13, color: _textTertiary,
                         )),
                       ],
                     ),
                   ),
                   if (_selectedConcern == c.label)
-                    const Icon(Icons.check_circle, color: ShunShiColors.primary, size: 24),
+                    Icon(Icons.check_circle, color: _accent, size: 24),
                 ],
               ),
             ),
@@ -255,42 +264,42 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
         Container(
           width: 80, height: 80,
           decoration: BoxDecoration(
-            color: ShunShiColors.primary.withValues(alpha: 0.1),
+            color: _accent.withValues(alpha: _dark ? 0.22 : 0.1),
             shape: BoxShape.circle,
           ),
-          child: const Icon(Icons.check_rounded, size: 44, color: ShunShiColors.primary),
+          child: Icon(Icons.check_rounded, size: 44, color: _accent),
         ),
         const SizedBox(height: 28),
-        const Text(
+        Text(
           '准备就绪！',
           style: TextStyle(
             fontFamily: ShunShiTypography.serifFamily,
-            fontSize: 30, fontWeight: FontWeight.w700,
-            color: ShunShiColors.textPrimary,
+            fontSize: _wide ? 40 : 30, fontWeight: FontWeight.w700,
+            color: _text,
           ),
         ),
         const SizedBox(height: 16),
         Text(
           '我们将围绕「$concern」为你定制\n个性化养生方案',
           textAlign: TextAlign.center,
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: ShunShiTypography.sansFamily,
-            fontSize: 16, color: ShunShiColors.textSecondary, height: 1.6,
+            fontSize: _wide ? 20 : 16, color: _textSecondary, height: 1.6,
           ),
         ),
         const SizedBox(height: 44),
         SizedBox(
           width: double.infinity,
-          height: 54,
+          height: _wide ? 68 : 54,
           child: ElevatedButton(
             onPressed: _finish,
             style: ElevatedButton.styleFrom(
-              backgroundColor: ShunShiColors.primary,
-              foregroundColor: Colors.white,
+              backgroundColor: _dark ? ShunShiColors.darkPrimary : ShunShiColors.primary,
+              foregroundColor: _onButton,
               elevation: 0,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             ),
-            child: const Text('开始体验', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
+            child: Text('开始体验', style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: _wide ? 22 : 17, fontWeight: FontWeight.w600)),
           ),
         ),
       ],
@@ -307,7 +316,7 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
         width: i == _page ? 28 : 8,
         height: 8,
         decoration: BoxDecoration(
-          color: i == _page ? ShunShiColors.primary : ShunShiColors.border,
+          color: i == _page ? _accent : _border,
           borderRadius: BorderRadius.circular(4),
         ),
       )),

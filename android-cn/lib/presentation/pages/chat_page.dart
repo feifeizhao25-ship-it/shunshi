@@ -704,12 +704,12 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
         child: Column(
           children: [
             _buildTopBar(),
-            const Padding(
-              padding: EdgeInsets.fromLTRB(16, 6, 16, 2),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 6, 16, 2),
               child: Text(
                 '你在和人工智能对话，不是真人',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+                style: TextStyle(fontSize: 12, color: AppColors.textSecondary(context)),
               ),
             ),
             Expanded(child: _buildList()),
@@ -717,7 +717,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               child: Text(
                 '内容由AI生成，仅供作息与节气安排参考，不构成医疗诊断或治疗建议。',
-                style: TextStyle(fontSize: 11, color: Colors.grey[500]),
+                style: TextStyle(fontSize: 11, color: AppColors.textTertiary(context)),
                 textAlign: TextAlign.center,
               ),
             ),
