@@ -22,7 +22,7 @@ void main() {
           );
         await font.load();
         await (FontLoader('NotoSerifSC')..addFont(
-              rootBundle.load('assets/fonts/NotoSerifCJKsc-Regular.otf'),
+              rootBundle.load('assets/fonts/NotoSerifSC-Regular.ttf'),
             ))
             .load();
         await (FontLoader(

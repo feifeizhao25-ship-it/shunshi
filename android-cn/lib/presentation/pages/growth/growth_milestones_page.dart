@@ -15,14 +15,14 @@ class GrowthMilestonesPage extends StatelessWidget {
   const GrowthMilestonesPage({super.key});
 
   static const _milestones = [
-    _Milestone('🌅', '早起达人', '连续7天6点前起床', true, 120, Color(0xFFF59E0B)),
-    _Milestone('🌿', '节气探索者', '完成你的第一个节气仪式', true, 200, Color(0xFF22C55E)),
-    _Milestone('🧘', 'Still Mind', 'Meditate for 30 consecutive days', true, 350, Color(0xFF8B5CF6)),
-    _Milestone('🍵', 'Tea Ceremony', 'Brew 10 different seasonal teas', true, 180, Color(0xFF06B6D4)),
+    _Milestone('🌅', '早起', '连续 7 天在 6 点前起床', false, 0, Color(0xFFF59E0B)),
+    _Milestone('🌿', '节气', '完成一次节气练习', false, 0, Color(0xFF22C55E)),
+    _Milestone('🧘', '静心', '连续 30 天做一段静坐', false, 0, Color(0xFF8B5CF6)),
+    _Milestone('🍵', '时令茶', '喝过 10 种应季茶饮', false, 0, Color(0xFF06B6D4)),
     _Milestone('📖', '百日养生', '坚持养生练习100天', false, 500, null),
     _Milestone('🌍', '节气守护', '完成所有节气挑战', false, 800, null),
-    _Milestone('🔥', 'Inner Fire', 'Master all 8 movements of Ba Duan Jin', false, 600, null),
-    _Milestone('✨', 'Sovereign', 'Unlock all other milestones', false, 1000, null),
+    _Milestone('🔥', '八段锦', '练完八段锦的八式', false, 0, null),
+    _Milestone('✨', '全部完成', '完成上面每一项', false, 0, null),
   ];
 
   @override
@@ -55,7 +55,7 @@ class GrowthMilestonesPage extends StatelessWidget {
           children: [
             const SizedBox(height: 8),
             Text(
-              'Your journey of mindful growth',
+              '完成打卡以后，这里才会记下你做到的事',
               style: TextStyle(
                 fontSize: 14, color: ShunShiColors.textSecondary,
                 fontFamily: ShunShiTypography.sansFamily,
@@ -91,7 +91,7 @@ class GrowthMilestonesPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Experience Points',
+                    '练习记录',
                     style: TextStyle(
                       fontSize: 14, color: ShunShiColors.textSecondary,
                       fontFamily: ShunShiTypography.sansFamily,
@@ -99,7 +99,7 @@ class GrowthMilestonesPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    '等级: 养生探索者',
+                    '完成后才会记在这里',
                     style: TextStyle(
                       fontSize: 14, fontWeight: FontWeight.w600,
                       color: ShunShiColors.textPrimary,
@@ -108,7 +108,7 @@ class GrowthMilestonesPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '下一: 内在智者 — 还差 570 XP',
+                    '目前没有打卡记录，不显示分数',
                     style: TextStyle(
                       fontSize: 12, color: ShunShiColors.textTertiary,
                       fontFamily: ShunShiTypography.sansFamily,
@@ -145,7 +145,7 @@ class GrowthMilestonesPage extends StatelessWidget {
               color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.serifFamily,
             )),
             const SizedBox(height: 4),
-            Text('${unlocked.length} / ${_milestones.length} milestones', style: TextStyle(
+            Text('已完成 ${unlocked.length} / ${_milestones.length}', style: TextStyle(
               fontSize: 13, color: ShunShiColors.textTertiary,
               fontFamily: ShunShiTypography.sansFamily,
             )),
@@ -252,7 +252,7 @@ class GrowthMilestonesPage extends StatelessWidget {
             )),
           ]),
         ),
-        Text('${m.xp} XP', style: TextStyle(
+        Text('未开始', style: TextStyle(
           fontSize: 12, color: ShunShiColors.textTertiary,
           fontFamily: ShunShiTypography.sansFamily,
         )),

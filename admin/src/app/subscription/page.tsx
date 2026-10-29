@@ -77,13 +77,13 @@ export default function SubscriptionPage() {
   const statusLabels: Record<string, string> = { active: '活跃', trial: '试用', cancelled: '已取消', expired: '已过期' };
 
   return (
-    <div className="flex">
+    <div className="flex min-h-screen bg-gray-50">
       <Sidebar active="/subscription" />
-      <main className="flex-1 p-8">
+      <main className="flex-1 min-w-0 p-4 md:p-8">
         <h2 className="text-2xl font-bold text-gray-800 mb-6">订阅管理</h2>
 
         {/* Stats */}
-        <div className="grid grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
           {[
             { label: '总收入', value: `¥${stats.total_revenue.toLocaleString()}`, color: 'text-green-600' },
             { label: '活跃订阅', value: stats.active_subs.toLocaleString(), color: 'text-blue-600' },
@@ -108,8 +108,8 @@ export default function SubscriptionPage() {
         </div>
 
         {tab === 'subs' && (
-          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-            <table className="w-full">
+          <div className="bg-white rounded-xl border border-gray-200 overflow-x-auto">
+            <table className="min-w-[760px] w-full">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">用户ID</th>
@@ -123,9 +123,9 @@ export default function SubscriptionPage() {
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {loading ? (
-                  <tr><td colSpan={7} className="px-6 py-12 text-center text-gray-400">加载中...</td></tr>
+                  <tr><td colSpan={7} className="px-6 py-12 text-center text-gray-600">加载中...</td></tr>
                 ) : subscriptions.length === 0 ? (
-                  <tr><td colSpan={7} className="px-6 py-12 text-center text-gray-400">暂无订阅数据</td></tr>
+                  <tr><td colSpan={7} className="px-6 py-12 text-center text-gray-600">暂无订阅数据</td></tr>
                 ) : (
                   subscriptions.map((sub) => (
                     <tr key={sub.id} className="hover:bg-gray-50">
@@ -135,8 +135,8 @@ export default function SubscriptionPage() {
                         <span className={`px-2 py-1 rounded text-xs font-medium ${statusColors[sub.status]}`}>{statusLabels[sub.status]}</span>
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-600">¥{sub.amount}</td>
-                      <td className="px-6 py-4 text-sm text-gray-400">{sub.start_date ? new Date(sub.start_date).toLocaleDateString('zh-CN') : '-'}</td>
-                      <td className="px-6 py-4 text-sm text-gray-400">{sub.end_date ? new Date(sub.end_date).toLocaleDateString('zh-CN') : '-'}</td>
+                      <td className="px-6 py-4 text-sm text-gray-600">{sub.start_date ? new Date(sub.start_date).toLocaleDateString('zh-CN') : '-'}</td>
+                      <td className="px-6 py-4 text-sm text-gray-600">{sub.end_date ? new Date(sub.end_date).toLocaleDateString('zh-CN') : '-'}</td>
                       <td className="px-6 py-4 text-sm">{sub.auto_renew ? '✅' : '❌'}</td>
                     </tr>
                   ))
@@ -147,7 +147,7 @@ export default function SubscriptionPage() {
         )}
 
         {tab === 'plans' && (
-          <div className="grid grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             {plans.length > 0 ? plans.map((plan) => {
               const onSale = plan.on_sale !== false;
               const yearly = plan.price_yearly ?? (plan.period === 'year' ? plan.price : null);
@@ -162,7 +162,7 @@ export default function SubscriptionPage() {
                   </span>
                 </div>
                 <div className="text-3xl font-bold text-gray-900 mb-4">
-                  {amount == null ? '不再售卖' : <>¥{amount}<span className="text-sm font-normal text-gray-400">/年</span></>}
+                  {amount == null ? '不再售卖' : <>¥{amount}<span className="text-sm font-normal text-gray-600">/年</span></>}
                 </div>
                 <ul className="space-y-2 text-sm text-gray-600">
                   {features.map((f) => <li key={f} className="flex items-center gap-2"><span className="text-green-500">✓</span>{f}</li>)}

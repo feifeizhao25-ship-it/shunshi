@@ -70,14 +70,14 @@ export default function LLMAuditPage() {
   return (
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar active="/llm-audit" />
-      <main className="flex-1 p-8">
+      <main className="flex-1 min-w-0 p-4 md:p-8">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">LLM 审计看板</h1>
-          <p className="text-gray-500 mt-1">追踪 AI 调用、Token 消耗与成本</p>
+          <h1 className="text-2xl font-bold text-gray-900">模型调用审计</h1>
+          <p className="text-gray-600 mt-1">只展示接口返回的调用记录。</p>
         </div>
 
         {/* 标签页 */}
-        <div className="flex gap-2 mb-6">
+        <div className="flex flex-wrap gap-2 mb-6">
           {[
             { key: 'recent', label: '最近调用' },
             { key: 'models', label: '模型统计' },
@@ -99,8 +99,8 @@ export default function LLMAuditPage() {
 
         {/* 最近调用 */}
         {activeTab === 'recent' && (
-          <div className="bg-white rounded-lg shadow overflow-hidden">
-            <table className="min-w-full divide-y divide-gray-200">
+          <div className="bg-white rounded-lg shadow overflow-x-auto">
+            <table className="min-w-[760px] w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">时间</th>
@@ -148,8 +148,8 @@ export default function LLMAuditPage() {
 
         {/* 模型统计 */}
         {activeTab === 'models' && (
-          <div className="bg-white rounded-lg shadow overflow-hidden">
-            <table className="min-w-full divide-y divide-gray-200">
+          <div className="bg-white rounded-lg shadow overflow-x-auto">
+            <table className="min-w-[760px] w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">模型</th>
@@ -183,7 +183,7 @@ export default function LLMAuditPage() {
         {/* 用户用量 */}
         {activeTab === 'users' && (
           <div className="bg-white rounded-lg shadow p-8 text-center">
-            <p className="text-gray-500">用户用量统计功能开发中...</p>
+            <p className="text-gray-600">用户用量还没有接入，这里不展示估计数字。</p>
           </div>
         )}
 
@@ -195,43 +195,43 @@ export default function LLMAuditPage() {
                 <h3 className="text-lg font-bold">调用详情</h3>
                 <button
                   onClick={() => setSelectedCall(null)}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-gray-600 hover:text-gray-900"
                 >
                   ✕
                 </button>
               </div>
               <div className="p-6 space-y-4">
                 <div>
-                  <label className="text-xs font-medium text-gray-500 uppercase">Event ID</label>
+                  <label className="text-xs font-medium text-gray-600">事件编号</label>
                   <p className="text-sm font-mono text-gray-900">{selectedCall.event_id}</p>
                 </div>
                 <div>
-                  <label className="text-xs font-medium text-gray-500 uppercase">Prompt</label>
+                  <label className="text-xs font-medium text-gray-600">提示词</label>
                   <pre className="mt-1 p-3 bg-gray-50 rounded text-sm text-gray-800 overflow-auto max-h-40">
                     {selectedCall.prompt || '(空)'}
                   </pre>
                 </div>
                 <div>
-                  <label className="text-xs font-medium text-gray-500 uppercase">Response</label>
+                  <label className="text-xs font-medium text-gray-600">回复</label>
                   <pre className="mt-1 p-3 bg-gray-50 rounded text-sm text-gray-800 overflow-auto max-h-40">
                     {selectedCall.response || '(空)'}
                   </pre>
                 </div>
-                <div className="grid grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                   <div>
-                    <label className="text-xs font-medium text-gray-500 uppercase">Tokens</label>
+                    <label className="text-xs font-medium text-gray-600">词元</label>
                     <p className="text-sm font-bold">{selectedCall.tokens_used}</p>
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-gray-500 uppercase">延迟</label>
+                    <label className="text-xs font-medium text-gray-600">延迟</label>
                     <p className="text-sm font-bold">{selectedCall.latency_ms}ms</p>
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-gray-500 uppercase">成本</label>
+                    <label className="text-xs font-medium text-gray-600">成本</label>
                     <p className="text-sm font-bold">{formatCost(selectedCall.cost_usd)}</p>
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-gray-500 uppercase">状态</label>
+                    <label className="text-xs font-medium text-gray-600">状态</label>
                     <p className="text-sm font-bold">{selectedCall.status}</p>
                   </div>
                 </div>

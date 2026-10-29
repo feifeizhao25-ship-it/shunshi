@@ -22,7 +22,7 @@ class SeasonsColors {
 
   // ── 文字：更浅 ──
   static const Color textPrimary = Color(0xFF3C3C3C);
-  static const Color textSecondary = Color(0xFF999999);
+  static const Color textSecondary = Color(0xFF595959);
   static const Color textHint = Color(0xFFCCCCCC);
 
   // ── 辅助：更冷调 ──
@@ -64,7 +64,7 @@ class SeasonsDarkColors {
   static const Color surfaceDim = Color(0xFF2C2C2C);
 
   static const Color textPrimary = Color(0xFFE0E0E0);
-  static const Color textSecondary = Color(0xFF909090);
+  static const Color textSecondary = Color(0xFFC9C7C0);
   static const Color textHint = Color(0xFF606060);
 
   static const Color warm = Color(0xFFC0A888);

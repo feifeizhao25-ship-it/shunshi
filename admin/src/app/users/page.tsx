@@ -68,17 +68,17 @@ export default function UsersPage() {
   const totalPages = Math.ceil(total / pageSize);
 
   return (
-    <div className="flex">
+    <div className="flex min-h-screen bg-gray-50">
       <Sidebar active="/users" />
-      <main className="flex-1 p-8">
-        <div className="flex items-center justify-between mb-6">
+      <main className="flex-1 min-w-0 p-4 md:p-8">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
           <h2 className="text-2xl font-bold text-gray-800">用户管理</h2>
-          <span className="text-sm text-gray-400">共 {total} 位用户</span>
+          <span className="text-sm text-gray-600">共 {total} 位用户</span>
         </div>
 
         {/* Filters */}
-        <div className="flex items-center gap-4 mb-6">
-          <div className="flex-1 relative">
+        <div className="flex flex-col gap-3 mb-6 lg:flex-row lg:items-center">
+          <div className="flex-1 min-w-0 relative">
             <input
               type="text"
               placeholder="搜索用户ID/手机号/昵称..."
@@ -88,7 +88,7 @@ export default function UsersPage() {
               className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             {tiers.map((tier) => (
               <button
                 key={tier}
@@ -107,8 +107,8 @@ export default function UsersPage() {
         </div>
 
         {/* Table */}
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-          <table className="w-full">
+        <div className="bg-white rounded-xl border border-gray-200 overflow-x-auto">
+          <table className="min-w-[760px] w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">用户ID</th>
@@ -123,9 +123,9 @@ export default function UsersPage() {
             </thead>
             <tbody className="divide-y divide-gray-100">
               {loading ? (
-                <tr><td colSpan={8} className="px-6 py-12 text-center text-gray-400">加载中...</td></tr>
+                <tr><td colSpan={8} className="px-6 py-12 text-center text-gray-600">加载中...</td></tr>
               ) : users.length === 0 ? (
-                <tr><td colSpan={8} className="px-6 py-12 text-center text-gray-400">暂无用户数据</td></tr>
+                <tr><td colSpan={8} className="px-6 py-12 text-center text-gray-600">暂无用户数据</td></tr>
               ) : (
                 users.map((user) => (
                   <tr key={user.id} className="hover:bg-gray-50">
@@ -142,7 +142,7 @@ export default function UsersPage() {
                       <span className={`inline-flex w-2 h-2 rounded-full ${user.is_active ? 'bg-green-500' : 'bg-red-500'}`} />
                       <span className="ml-2 text-sm text-gray-600">{user.is_active ? '活跃' : '禁用'}</span>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-400">
+                    <td className="px-6 py-4 text-sm text-gray-600">
                       {new Date(user.created_at).toLocaleDateString('zh-CN')}
                     </td>
                     <td className="px-6 py-4">
@@ -163,7 +163,7 @@ export default function UsersPage() {
         {/* Pagination */}
         {totalPages > 1 && (
           <div className="flex items-center justify-between mt-6">
-            <span className="text-sm text-gray-400">
+            <span className="text-sm text-gray-600">
               第 {page}/{totalPages} 页，共 {total} 条
             </span>
             <div className="flex gap-2">

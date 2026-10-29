@@ -47,6 +47,14 @@ import '../../presentation/pages/diary/diary_page_v2.dart';
 import '../../presentation/pages/diary/diary_report_page.dart';
 import '../../presentation/pages/diary/sleep_report_page.dart';
 import '../../presentation/pages/about/about_page.dart';
+import '../../presentation/pages/library/wellness_library_page.dart';
+import '../../presentation/pages/growth/growth_milestones_page.dart';
+import '../../presentation/pages/report/wellness_report_page.dart';
+import '../../presentation/pages/seasons/seasons_page.dart';
+import '../../presentation/pages/meditation/meditation_focus_page.dart';
+import '../../presentation/pages/body_type/body_type_essence_page.dart';
+import '../../presentation/pages/wellness/mood_page.dart';
+import '../../presentation/pages/wellness/tea_page.dart';
 import '../../presentation/pages/legal/terms_page.dart';
 import '../../presentation/pages/legal/privacy_policy_page.dart';
 import '../../presentation/widgets/shell/main_shell.dart';
@@ -131,6 +139,14 @@ class AppRouter {
       }),
       GoRoute(path: '/favorites', builder: (context, state) => const FavoritesPage()),
       GoRoute(path: '/about', builder: (context, state) => const AboutPage()),
+      GoRoute(path: '/library', builder: (context, state) => const WellnessLibraryPage()),
+      GoRoute(path: '/growth', builder: (context, state) => const GrowthMilestonesPage()),
+      GoRoute(path: '/wellness-report', builder: (context, state) => const WellnessReportPage()),
+      GoRoute(path: '/seasons', builder: (context, state) => const SeasonsPage()),
+      GoRoute(path: '/meditation', builder: (context, state) => const MeditationFocusPage()),
+      GoRoute(path: '/body-type-essence', builder: (context, state) => const BodyTypeEssencePage()),
+      GoRoute(path: '/mood', builder: (context, state) => const MoodPage()),
+      GoRoute(path: '/tea', builder: (context, state) => const TeaPage()),
       GoRoute(path: '/search', builder: (context, state) => const GlobalSearchPage()),
       GoRoute(path: '/feedback', builder: (context, state) => const fb.FeedbackPage()),
       GoRoute(path: '/notifications', builder: (context, state) => const NotificationsPage()),

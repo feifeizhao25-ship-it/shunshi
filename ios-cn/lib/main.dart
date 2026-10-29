@@ -52,6 +52,20 @@ class _ShunshiAppState extends State<ShunshiApp> {
           theme: ShunShiTheme.lightTheme,
           darkTheme: ShunShiTheme.darkTheme,
           themeMode: _themeNotifier.mode,
+          builder: (context, child) {
+            final media = MediaQuery.of(context);
+            if (media.size.width < 720 || child == null) return child ?? const SizedBox.shrink();
+            const frameWidth = 480.0;
+            return ColoredBox(
+              color: const Color(0xFFE7E0D4),
+              child: Center(
+                child: MediaQuery(
+                  data: media.copyWith(size: Size(frameWidth, media.size.height)),
+                  child: SizedBox(width: frameWidth, height: media.size.height, child: child),
+                ),
+              ),
+            );
+          },
         );
       },
     );

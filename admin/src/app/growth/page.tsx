@@ -134,7 +134,7 @@ export default function GrowthPage() {
                   ['付费', counts.subscription_paid || 0, 'funnel-paid'],
                 ].map(([label, value, testId]) => (
                   <div key={String(label)} className="bg-white rounded-lg border border-gray-200 p-4">
-                    <div className="text-xs text-gray-400">{label}</div>
+                    <div className="text-xs text-gray-600">{label}</div>
                     <div data-testid={String(testId)} className="text-xl font-semibold text-gray-900">{value}</div>
                   </div>
                 ))}
@@ -145,18 +145,18 @@ export default function GrowthPage() {
               </p>
             </>
           ) : (
-            <p className="mt-3 text-sm text-gray-400">{loading ? '加载中' : '漏斗没有加载出来'}</p>
+            <p className="mt-3 text-sm text-gray-600">{loading ? '加载中' : '漏斗没有加载出来'}</p>
           )}
         </section>
 
         <section id="growth-skills" className="mt-8">
           <h2 className="text-lg font-medium text-gray-900">技能版本</h2>
           <div className="mt-3 bg-white rounded-lg border border-gray-200 overflow-x-auto">
-            {loading ? <p className="p-4 text-sm text-gray-400">加载中</p> : null}
-            {!loading && skills.length === 0 ? <p className="p-4 text-sm text-gray-400">没有读到技能</p> : null}
+            {loading ? <p className="p-4 text-sm text-gray-600">加载中</p> : null}
+            {!loading && skills.length === 0 ? <p className="p-4 text-sm text-gray-600">没有读到技能</p> : null}
             {skills.length > 0 ? (
               <table className="w-full text-sm">
-                <thead className="text-left text-gray-400">
+                <thead className="text-left text-gray-600">
                   <tr>
                     <th className="px-4 py-2 font-normal">技能</th>
                     <th className="px-4 py-2 font-normal">版本</th>
@@ -184,10 +184,10 @@ export default function GrowthPage() {
         <section id="growth-sources" className="mt-8">
           <h2 className="text-lg font-medium text-gray-900">知识库来源</h2>
           <div className="mt-3 bg-white rounded-lg border border-gray-200 overflow-x-auto">
-            {!loading && sources.length === 0 ? <p className="p-4 text-sm text-gray-400">没有读到来源</p> : null}
+            {!loading && sources.length === 0 ? <p className="p-4 text-sm text-gray-600">没有读到来源</p> : null}
             {sources.length > 0 ? (
               <table className="w-full text-sm">
-                <thead className="text-left text-gray-400">
+                <thead className="text-left text-gray-600">
                   <tr>
                     <th className="px-4 py-2 font-normal">编号</th>
                     <th className="px-4 py-2 font-normal">标题</th>
@@ -213,13 +213,13 @@ export default function GrowthPage() {
         <section id="growth-queue" className="mt-8">
           <h2 className="text-lg font-medium text-gray-900">发布队列</h2>
           <div className="mt-3 bg-white rounded-lg border border-gray-200">
-            {!loading && drafts.length === 0 ? <p className="p-4 text-sm text-gray-400">还没有待确认的草稿</p> : null}
+            {!loading && drafts.length === 0 ? <p className="p-4 text-sm text-gray-600">还没有待确认的草稿</p> : null}
             <ul>
               {drafts.map((draft) => (
                 <li key={draft.id} className="flex items-center justify-between gap-3 px-4 py-3 border-t border-gray-100">
                   <div>
                     <div className="text-sm text-gray-900">{draft.title || '未命名草稿'}</div>
-                    <div className="text-xs text-gray-400">
+                    <div className="text-xs text-gray-600">
                       {draft.platform} · {DRAFT_STATUS[draft.status] || draft.status}
                       {draft.aigc_labeled ? ' · 已标人工智能生成' : ''}
                       {draft.external_posted ? ' · 异常：标记了已外发' : ' · 未外发'}
@@ -242,10 +242,10 @@ export default function GrowthPage() {
         <section id="growth-audit" className="mt-8">
           <h2 className="text-lg font-medium text-gray-900">审计日志</h2>
           <div className="mt-3 bg-white rounded-lg border border-gray-200 overflow-x-auto">
-            {!loading && audit.length === 0 ? <p className="p-4 text-sm text-gray-400">还没有审计记录</p> : null}
+            {!loading && audit.length === 0 ? <p className="p-4 text-sm text-gray-600">还没有审计记录</p> : null}
             {audit.length > 0 ? (
               <table className="w-full text-sm">
-                <thead className="text-left text-gray-400">
+                <thead className="text-left text-gray-600">
                   <tr>
                     <th className="px-4 py-2 font-normal">动作</th>
                     <th className="px-4 py-2 font-normal">决定</th>

@@ -32,7 +32,7 @@ class _MeditationFocusV2State extends State<MeditationFocusV2>
 
   static const _atmospheres = [
     ('细雨', Icons.water_drop),
-    ('Morning Forest', Icons.forest),
+    ('晨间林地', Icons.forest),
     ('Sanctuary', Icons.spa),
     ('节气', Icons.wb_sunny),
   ];

@@ -18,6 +18,7 @@
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
   <meta name="description" content="顺时——按二十四节气安排作息。对话由人工智能生成，不是真人，不提供医疗诊断或治疗。">
   <meta name="theme-color" content="#315B4A">
 
@@ -32,8 +33,30 @@
 
   <title>顺时｜节气作息陪伴</title>
   <link rel="manifest" href="manifest.json">
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      min-height: 100dvh;
+      min-height: -webkit-fill-available;
+      background: #fdf9f4;
+    }
+  </style>
 </head>
 <body>
+  <script>
+    // Flutter 启动时会重写 viewport，这里把刘海安全区保留下来。
+    (function () {
+      var fit = 'viewport-fit=cover';
+      function keepFit() {
+        document.querySelectorAll('meta[name="viewport"]').forEach(function (meta) {
+          if (meta.content.indexOf(fit) === -1) meta.content = meta.content.replace(/\s+$/, '') + ', ' + fit;
+        });
+      }
+      keepFit();
+      new MutationObserver(keepFit).observe(document.head, { childList: true, subtree: true, attributes: true, attributeFilter: ['content'] });
+    })();
+  </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>

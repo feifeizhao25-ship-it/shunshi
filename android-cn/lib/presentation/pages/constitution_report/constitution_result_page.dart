@@ -45,7 +45,7 @@ class ConstitutionResultPage extends StatelessWidget {
                       child: const Icon(Icons.person, size: 20, color: ShunShiColors.textSecondary),
                     ),
                     const SizedBox(width: 12),
-                    const Text('ShunShi AI', style: TextStyle(
+                    const Text('顺时', style: TextStyle(
                       fontSize: 20, fontStyle: FontStyle.italic,
                       fontFamily: ShunShiTypography.serifFamily,
                       color: ShunShiColors.primary,

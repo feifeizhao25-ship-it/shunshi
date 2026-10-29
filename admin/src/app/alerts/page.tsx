@@ -57,20 +57,19 @@ export default function AlertsPage() {
   const levelCounts = alerts.reduce((acc, a) => { acc[a.level] = (acc[a.level] || 0) + 1; return acc; }, {} as Record<string, number>);
 
   return (
-    <div className="flex">
+    <div className="flex min-h-screen bg-gray-50">
       <Sidebar active="/alerts" />
-      <main className="flex-1 p-8">
-        <div className="flex items-center justify-between mb-6">
+      <main className="flex-1 min-w-0 p-4 md:p-8">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
           <h2 className="text-2xl font-bold text-gray-800">告警管理</h2>
           <button onClick={loadAlerts} className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700">刷新</button>
         </div>
 
-        {/* Level Summary */}
-        <div className="grid grid-cols-5 gap-4 mb-6">
-          {['critical', 'high', 'medium', 'low', 'info'].map((level) => (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
+          {(['critical', 'high', 'medium', 'low', 'info'] as const).map((level) => (
             <div key={level} onClick={() => setFilterLevel(filterLevel === level ? 'all' : level)}
               className={`p-4 rounded-xl border cursor-pointer transition-all ${filterLevel === level ? 'ring-2 ring-blue-500' : ''} ${levelColors[level]}`}>
-              <div className="text-sm font-medium capitalize">{level}</div>
+              <div className="text-sm font-medium">{{ critical: '严重', high: '高', medium: '中', low: '低', info: '提示' }[level]}</div>
               <div className="text-2xl font-bold mt-1">{levelCounts[level] || 0}</div>
             </div>
           ))}
@@ -89,21 +88,21 @@ export default function AlertsPage() {
         {/* Alerts List */}
         <div className="space-y-3">
           {loading ? (
-            <div className="bg-white rounded-xl border border-gray-200 p-12 text-center text-gray-400">加载中...</div>
+            <div className="bg-white rounded-xl border border-gray-200 p-12 text-center text-gray-600">加载中...</div>
           ) : alerts.length === 0 ? (
-            <div className="bg-white rounded-xl border border-gray-200 p-12 text-center text-gray-400">暂无告警</div>
+            <div className="bg-white rounded-xl border border-gray-200 p-12 text-center text-gray-600">暂无告警</div>
           ) : (
             alerts.map((alert) => (
               <div key={alert.id} className={`bg-white rounded-xl border p-5 ${alert.resolved ? 'opacity-60' : ''}`}>
-                <div className="flex items-start justify-between">
-                  <div className="flex items-start gap-4">
-                    <span className={`px-2.5 py-1 rounded text-xs font-medium mt-0.5 ${levelColors[alert.level]}`}>
-                      {alert.level.toUpperCase()}
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="flex items-start gap-4 min-w-0">
+                    <span className={`px-2.5 py-1 rounded text-xs font-medium mt-0.5 shrink-0 ${levelColors[alert.level]}`}>
+                      {{ critical: '严重', high: '高', medium: '中', low: '低', info: '提示' }[alert.level] || alert.level}
                     </span>
                     <div>
                       <div className="font-medium text-gray-800">{alert.type}</div>
                       <div className="text-sm text-gray-600 mt-1">{alert.message}</div>
-                      <div className="flex gap-4 mt-2 text-xs text-gray-400">
+                      <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-xs text-gray-600">
                         <span>来源: {alert.source}</span>
                         <span>{new Date(alert.created_at).toLocaleString('zh-CN')}</span>
                         {alert.resolved_by && <span>处理人: {alert.resolved_by}</span>}

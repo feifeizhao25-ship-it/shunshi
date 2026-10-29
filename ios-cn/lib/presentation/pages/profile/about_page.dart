@@ -38,7 +38,7 @@ class AboutPage extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              '顺时 ShunShi',
+              '顺时',
               style: TextStyle(
                 fontFamily: ShunShiTypography.serifFamily,
                 fontSize: 24,
@@ -82,7 +82,7 @@ class AboutPage extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             Text(
-              '© 2024-2026 顺时 ShunShi',
+              '© 2024-2026 顺时',
               style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary),
             ),
           ],

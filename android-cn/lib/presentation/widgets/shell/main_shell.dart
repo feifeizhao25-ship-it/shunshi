@@ -54,7 +54,7 @@ class MainShell extends StatelessWidget {
               child: SafeArea(
                 top: false,
                 child: Padding(
-                  padding: const EdgeInsets.only(top: 4, bottom: 4),
+                  padding: const EdgeInsets.only(top: 12, bottom: 4),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: _tabs.asMap().entries.map((entry) {
@@ -218,7 +218,7 @@ class _CenterNavTab extends StatelessWidget {
         children: [
           // Raised circle button
           Transform.translate(
-            offset: const Offset(0, -8),
+            offset: Offset.zero,
             child: Container(
               width: 50,
               height: 50,
