@@ -13,30 +13,35 @@ class _SecurityItem extends StatelessWidget {
   const _SecurityItem({required this.icon, required this.title, required this.subtitle, required this.onTap});
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final card = isDark ? ShunShiColors.darkSurfaceContainerLowest : ShunShiColors.surfaceContainerLowest;
+    final accent = isDark ? ShunShiColors.darkPrimary : ShunShiColors.primary;
+    final ink = isDark ? ShunShiColors.darkTextPrimary : ShunShiColors.textPrimary;
+    final faint = isDark ? ShunShiColors.darkTextTertiary : ShunShiColors.textTertiary;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: ShunShiColors.surfaceContainerLowest,
+          color: card,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(children: [
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: ShunShiColors.primary.withValues(alpha: 0.1),
+              color: accent.withValues(alpha: 0.16),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(icon, size: 20, color: ShunShiColors.primary),
+            child: Icon(icon, size: 20, color: accent),
           ),
           const SizedBox(width: 12),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(title, style: ShunShiTypography.titleMedium),
-            Text(subtitle, style: ShunShiTypography.caption),
+            Text(title, style: ShunShiTypography.titleMedium.copyWith(color: ink)),
+            Text(subtitle, style: ShunShiTypography.caption.copyWith(color: faint)),
           ])),
-          Icon(Icons.chevron_right, size: 18, color: ShunShiColors.textTertiary),
+          Icon(Icons.chevron_right, size: 18, color: faint),
         ]),
       ),
     );
@@ -73,19 +78,33 @@ class _SettingsPageState extends State<SettingsPage> {
   Future<void> _loadDarkMode() async {
     final notifier = ThemeNotifier.instance;
     await notifier.load();
-    if (mounted) setState(() => _darkMode = notifier.mode == ThemeMode.dark);
+    final followSystem = notifier.mode == ThemeMode.system &&
+        WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.dark;
+    if (mounted) setState(() => _darkMode = notifier.mode == ThemeMode.dark || followSystem);
   }
+
+  bool get _isDark => Theme.of(context).brightness == Brightness.dark;
+  Color get _pageBg => _isDark ? ShunShiColors.darkBackground : ShunShiColors.background;
+  Color get _card => _isDark ? ShunShiColors.darkSurfaceContainerLowest : ShunShiColors.surfaceContainerLowest;
+  Color get _ink => _isDark ? ShunShiColors.darkTextPrimary : ShunShiColors.textPrimary;
+  Color get _muted => _isDark ? ShunShiColors.darkTextSecondary : ShunShiColors.textSecondary;
+  Color get _faint => _isDark ? ShunShiColors.darkTextTertiary : ShunShiColors.textTertiary;
+  Color get _chip => _isDark ? ShunShiColors.darkSurfaceContainerLow : ShunShiColors.surfaceContainerLow;
+  Color get _accent => _isDark ? ShunShiColors.darkPrimary : ShunShiColors.primary;
+  Color get _onAccent => _isDark ? const Color(0xFF121212) : Colors.white;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: _pageBg,
       appBar: AppBar(
+        backgroundColor: _pageBg,
+        foregroundColor: _ink,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, size: 20),
           onPressed: () => safePop(context),
         ),
-        title: Text('设置', style: ShunShiTypography.headlineSmall),
+        title: Text('设置', style: ShunShiTypography.headlineSmall.copyWith(color: _ink)),
       ),
       body: ListView(
         padding: const EdgeInsets.symmetric(
@@ -126,8 +145,8 @@ class _SettingsPageState extends State<SettingsPage> {
           _sectionHeader('关于'),
           _buildTile(Icons.description_outlined, '用户协议', onTap: () { ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('用户协议页面开发中'), duration: Duration(seconds: 1))); }),
           _buildTile(Icons.policy_outlined, '隐私政策', onTap: () => context.push('/privacy')),
-          _buildTile(Icons.info_outline, '版本信息', trailing: Text('v2.4.0', style: ShunShiTypography.bodySmall)),
-          _buildTile(Icons.cleaning_services_outlined, '清除缓存', trailing: Text('124.5 MB', style: ShunShiTypography.bodySmall), onTap: () {
+          _buildTile(Icons.info_outline, '版本信息', trailing: Text('v2.4.0', style: ShunShiTypography.bodySmall.copyWith(color: _faint))),
+          _buildTile(Icons.cleaning_services_outlined, '清除缓存', trailing: Text('124.5 MB', style: ShunShiTypography.bodySmall.copyWith(color: _faint)), onTap: () {
             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('缓存已清除'), duration: Duration(seconds: 1)));
           }),
           const SizedBox(height: ShunShiSpacing.xxl),
@@ -143,7 +162,7 @@ class _SettingsPageState extends State<SettingsPage> {
     return Padding(
       padding: const EdgeInsets.only(bottom: ShunShiSpacing.sm),
       child: Text(title, style: ShunShiTypography.labelLarge.copyWith(
-        color: ShunShiColors.textSecondary,
+        color: _muted,
       )),
     );
   }
@@ -152,13 +171,13 @@ class _SettingsPageState extends State<SettingsPage> {
     return Container(
       margin: const EdgeInsets.only(bottom: ShunShiSpacing.xxs),
       decoration: BoxDecoration(
-        color: ShunShiColors.surfaceContainerLowest,
+        color: _card,
         borderRadius: ShunShiRadius.cardRadius,
       ),
       child: ListTile(
-        leading: Icon(icon, size: 22, color: ShunShiColors.textSecondary),
-        title: Text(title, style: ShunShiTypography.bodyMedium),
-        trailing: trailing ?? const Icon(Icons.chevron_right, size: 20, color: ShunShiColors.textTertiary),
+        leading: Icon(icon, size: 22, color: _muted),
+        title: Text(title, style: ShunShiTypography.bodyMedium.copyWith(color: _ink)),
+        trailing: trailing ?? Icon(Icons.chevron_right, size: 20, color: _faint),
         onTap: onTap,
         shape: RoundedRectangleBorder(borderRadius: ShunShiRadius.cardRadius),
       ),
@@ -169,15 +188,15 @@ class _SettingsPageState extends State<SettingsPage> {
     return Container(
       margin: const EdgeInsets.only(bottom: ShunShiSpacing.xxs),
       decoration: BoxDecoration(
-        color: ShunShiColors.surfaceContainerLowest,
+        color: _card,
         borderRadius: ShunShiRadius.cardRadius,
       ),
       child: SwitchListTile(
-        title: Text(title, style: ShunShiTypography.bodyMedium),
-        subtitle: Text(subtitle, style: ShunShiTypography.caption),
+        title: Text(title, style: ShunShiTypography.bodyMedium.copyWith(color: _ink)),
+        subtitle: Text(subtitle, style: ShunShiTypography.caption.copyWith(color: _faint)),
         value: value,
         onChanged: onChanged,
-        activeThumbColor: ShunShiColors.primary,
+        activeThumbColor: _accent,
         shape: RoundedRectangleBorder(borderRadius: ShunShiRadius.cardRadius),
       ),
     );
@@ -192,12 +211,12 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
       child: SwitchListTile(
         title: Text('深色模式', style: ShunShiTypography.bodyMedium.copyWith(color: AppColors.textPrimary(context))),
-        subtitle: Text('保护眼睛，减少蓝光', style: ShunShiTypography.caption),
+        subtitle: Text('跟随系统外观。打开后固定为深色，关闭后固定为浅色。', style: ShunShiTypography.caption.copyWith(color: _faint)),
         value: _darkMode,
         onChanged: (v) async {
           final notifier = ThemeNotifier.instance;
-          await notifier.toggle();
-          setState(() => _darkMode = notifier.mode == ThemeMode.dark);
+          await notifier.setMode(v ? ThemeMode.dark : ThemeMode.light);
+          if (mounted) setState(() => _darkMode = v);
         },
         activeThumbColor: AppColors.primary(context),
         shape: RoundedRectangleBorder(borderRadius: ShunShiRadius.cardRadius),
@@ -211,12 +230,12 @@ class _SettingsPageState extends State<SettingsPage> {
       margin: const EdgeInsets.only(bottom: ShunShiSpacing.xxs),
       padding: const EdgeInsets.symmetric(horizontal: ShunShiSpacing.md, vertical: ShunShiSpacing.sm),
       decoration: BoxDecoration(
-        color: ShunShiColors.surfaceContainerLowest,
+        color: _card,
         borderRadius: ShunShiRadius.cardRadius,
       ),
       child: Row(
         children: [
-          Text('字体大小', style: ShunShiTypography.bodyMedium),
+          Text('字体大小', style: ShunShiTypography.bodyMedium.copyWith(color: _ink)),
           const Spacer(),
           ...List.generate(labels.length, (i) {
             final selected = i == _fontScaleIndex;
@@ -226,11 +245,11 @@ class _SettingsPageState extends State<SettingsPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                 margin: const EdgeInsets.only(left: 6),
                 decoration: BoxDecoration(
-                  color: selected ? ShunShiColors.primary : ShunShiColors.surfaceContainerLow,
+                  color: selected ? _accent : _chip,
                   borderRadius: ShunShiRadius.chipRadius,
                 ),
                 child: Text(labels[i], style: ShunShiTypography.labelMedium.copyWith(
-                  color: selected ? Colors.white : ShunShiColors.textSecondary,
+                  color: selected ? _onAccent : _muted,
                 )),
               ),
             );
@@ -245,20 +264,20 @@ class _SettingsPageState extends State<SettingsPage> {
       margin: const EdgeInsets.only(bottom: ShunShiSpacing.xxs),
       padding: const EdgeInsets.symmetric(horizontal: ShunShiSpacing.md, vertical: ShunShiSpacing.sm),
       decoration: BoxDecoration(
-        color: ShunShiColors.surfaceContainerLowest,
+        color: _card,
         borderRadius: ShunShiRadius.cardRadius,
       ),
       child: Row(
         children: [
           Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text('温度单位', style: ShunShiTypography.bodyMedium),
+            Text('温度单位', style: ShunShiTypography.bodyMedium.copyWith(color: _ink)),
             const SizedBox(height: 2),
-            Text(_tempUnitC ? '摄氏度 (°C)' : '华氏度 (°F)', style: ShunShiTypography.caption),
+            Text(_tempUnitC ? '摄氏度 (°C)' : '华氏度 (°F)', style: ShunShiTypography.caption.copyWith(color: _faint)),
           ]),
           const Spacer(),
           Container(
             decoration: BoxDecoration(
-              color: ShunShiColors.surfaceContainerLow,
+              color: _chip,
               borderRadius: ShunShiRadius.chipRadius,
             ),
             child: Row(children: [
@@ -277,11 +296,11 @@ class _SettingsPageState extends State<SettingsPage> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
         decoration: BoxDecoration(
-          color: selected ? ShunShiColors.primary : Colors.transparent,
+          color: selected ? _accent : Colors.transparent,
           borderRadius: ShunShiRadius.chipRadius,
         ),
         child: Text(label, style: ShunShiTypography.labelMedium.copyWith(
-          color: selected ? Colors.white : ShunShiColors.textSecondary,
+          color: selected ? _onAccent : _muted,
         )),
       ),
     );
@@ -292,14 +311,14 @@ class _SettingsPageState extends State<SettingsPage> {
       margin: const EdgeInsets.only(bottom: ShunShiSpacing.xxs),
       padding: const EdgeInsets.symmetric(horizontal: ShunShiSpacing.md, vertical: ShunShiSpacing.sm),
       decoration: BoxDecoration(
-        color: ShunShiColors.surfaceContainerLowest,
+        color: _card,
         borderRadius: ShunShiRadius.cardRadius,
       ),
       child: ListTile(
         contentPadding: EdgeInsets.zero,
-        title: Text('静默时段', style: ShunShiTypography.bodyMedium),
-        subtitle: Text('${_silentStart.format(context)} - ${_silentEnd.format(context)}', style: ShunShiTypography.caption),
-        trailing: const Icon(Icons.schedule, size: 20, color: ShunShiColors.textTertiary),
+        title: Text('静默时段', style: ShunShiTypography.bodyMedium.copyWith(color: _ink)),
+        subtitle: Text('${_silentStart.format(context)} - ${_silentEnd.format(context)}', style: ShunShiTypography.caption.copyWith(color: _faint)),
+        trailing: Icon(Icons.schedule, size: 20, color: _faint),
         onTap: () async {
           final start = await showTimePicker(context: context, initialTime: _silentStart);
           if (start != null) setState(() => _silentStart = start);
@@ -314,12 +333,12 @@ class _SettingsPageState extends State<SettingsPage> {
       margin: const EdgeInsets.only(bottom: ShunShiSpacing.xxs),
       padding: const EdgeInsets.symmetric(horizontal: ShunShiSpacing.md, vertical: ShunShiSpacing.sm),
       decoration: BoxDecoration(
-        color: ShunShiColors.surfaceContainerLowest,
+        color: _card,
         borderRadius: ShunShiRadius.cardRadius,
       ),
       child: Row(
         children: [
-          Text('提醒风格', style: ShunShiTypography.bodyMedium),
+          Text('提醒风格', style: ShunShiTypography.bodyMedium.copyWith(color: _ink)),
           const Spacer(),
           ...List.generate(labels.length, (i) {
             final selected = i == _styleIndex;
@@ -329,11 +348,11 @@ class _SettingsPageState extends State<SettingsPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 margin: const EdgeInsets.only(left: 6),
                 decoration: BoxDecoration(
-                  color: selected ? ShunShiColors.primary : ShunShiColors.surfaceContainerLow,
+                  color: selected ? _accent : _chip,
                   borderRadius: ShunShiRadius.chipRadius,
                 ),
                 child: Text(labels[i], style: ShunShiTypography.labelMedium.copyWith(
-                  color: selected ? Colors.white : ShunShiColors.textSecondary,
+                  color: selected ? _onAccent : _muted,
                 )),
               ),
             );
@@ -349,12 +368,12 @@ class _SettingsPageState extends State<SettingsPage> {
       margin: const EdgeInsets.only(bottom: ShunShiSpacing.xxs),
       padding: const EdgeInsets.symmetric(horizontal: ShunShiSpacing.md, vertical: ShunShiSpacing.sm),
       decoration: BoxDecoration(
-        color: ShunShiColors.surfaceContainerLowest,
+        color: _card,
         borderRadius: ShunShiRadius.cardRadius,
       ),
       child: Row(
         children: [
-          Text('提醒频率', style: ShunShiTypography.bodyMedium),
+          Text('提醒频率', style: ShunShiTypography.bodyMedium.copyWith(color: _ink)),
           const Spacer(),
           ...List.generate(labels.length, (i) {
             final selected = i == _freqIndex;
@@ -364,11 +383,11 @@ class _SettingsPageState extends State<SettingsPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 margin: const EdgeInsets.only(left: 6),
                 decoration: BoxDecoration(
-                  color: selected ? ShunShiColors.primary : ShunShiColors.surfaceContainerLow,
+                  color: selected ? _accent : _chip,
                   borderRadius: ShunShiRadius.chipRadius,
                 ),
                 child: Text(labels[i], style: ShunShiTypography.labelMedium.copyWith(
-                  color: selected ? Colors.white : ShunShiColors.textSecondary,
+                  color: selected ? _onAccent : _muted,
                 )),
               ),
             );
@@ -382,7 +401,7 @@ class _SettingsPageState extends State<SettingsPage> {
   void _showSecuritySheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (ctx) => DraggableScrollableSheet(
@@ -391,12 +410,12 @@ class _SettingsPageState extends State<SettingsPage> {
           Container(
             padding: const EdgeInsets.all(20),
             child: Row(children: [
-              Text('账号安全中心', style: ShunShiTypography.titleMedium),
+              Text('账号安全中心', style: ShunShiTypography.titleMedium.copyWith(color: AppColors.textPrimary(context))),
               const Spacer(),
               IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(ctx)),
             ]),
           ),
-          Divider(height: 1, color: ShunShiColors.border),
+          Divider(height: 1, color: AppColors.border(context)),
           Expanded(child: ListView(controller: scrollController, padding: const EdgeInsets.all(20), children: [
             _SecurityItem(icon: Icons.password_outlined, title: '修改密码', subtitle: '定期更换密码保护账号安全', onTap: () {
               Navigator.pop(ctx);
@@ -441,23 +460,23 @@ class _SettingsPageState extends State<SettingsPage> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: ShunShiColors.primary.withValues(alpha: 0.08),
+        color: _accent.withValues(alpha: _isDark ? 0.2 : 0.08),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(children: [
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: ShunShiColors.primary.withValues(alpha: 0.15),
+            color: _accent.withValues(alpha: _isDark ? 0.28 : 0.15),
             borderRadius: BorderRadius.circular(10),
           ),
-          child: const Icon(Icons.schedule, size: 24, color: ShunShiColors.primary),
+          child: Icon(Icons.schedule, size: 24, color: _accent),
         ),
         const SizedBox(width: 12),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('现在是 $scName · $scOrgan', style: ShunShiTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
+          Text('现在是 $scName · $scOrgan', style: ShunShiTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600, color: _ink)),
           const SizedBox(height: 2),
-          Text(scAdvice, style: ShunShiTypography.caption),
+          Text(scAdvice, style: ShunShiTypography.caption.copyWith(color: _faint)),
         ])),
       ]),
     );
@@ -471,9 +490,9 @@ class _SettingsPageState extends State<SettingsPage> {
           showDialog(
             context: context,
             builder: (ctx) => AlertDialog(
-              backgroundColor: ShunShiColors.surface,
-              title: Text('退出登录', style: ShunShiTypography.titleMedium),
-              content: Text('确定要退出当前账号吗？', style: ShunShiTypography.bodyMedium),
+              backgroundColor: AppColors.surface(context),
+              title: Text('退出登录', style: ShunShiTypography.titleMedium.copyWith(color: AppColors.textPrimary(context))),
+              content: Text('确定要退出当前账号吗？', style: ShunShiTypography.bodyMedium.copyWith(color: AppColors.textPrimary(context))),
               actions: [
                 TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('取消')),
                 TextButton(
@@ -495,7 +514,7 @@ class _SettingsPageState extends State<SettingsPage> {
           padding: const EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(borderRadius: ShunShiRadius.buttonRadius),
         ),
-        child: Text('退出登录', style: ShunShiTypography.labelLarge),
+        child: Text('退出登录', style: ShunShiTypography.labelLarge.copyWith(color: ShunShiColors.error)),
       ),
     );
   }

@@ -161,13 +161,13 @@ class ThemeNotifier extends ChangeNotifier {
   ThemeNotifier._();
   ThemeNotifier(); // keep public constructor for compatibility
 
-  ThemeMode _mode = ThemeMode.light;
+  ThemeMode _mode = ThemeMode.system;
   ThemeMode get mode => _mode;
 
   Future<void> load() async {
     final prefs = await SharedPreferences.getInstance();
-    // 未选择过时用浅色。深色需要用户在设置里打开，避免系统深色直接落到未适配的页面上。
-    final index = prefs.getInt('theme_mode') ?? ThemeMode.light.index;
+    // 未手动选过时跟随系统。0 是 ThemeMode.system。
+    final index = prefs.getInt('theme_mode') ?? ThemeMode.system.index;
     _mode = ThemeMode.values[index.clamp(0, 2)];
     notifyListeners();
   }
@@ -532,10 +532,10 @@ class ShunShiTheme {
       brightness: Brightness.dark,
       colorScheme: ColorScheme.dark(
         primary: ShunShiColors.darkPrimary,
-        onPrimary: Colors.white,
+        onPrimary: const Color(0xFF121212),
         primaryContainer: ShunShiColors.darkPrimary.withValues(alpha: 0.2),
         secondary: ShunShiColors.darkSecondary,
-        onSecondary: Colors.white,
+        onSecondary: const Color(0xFF121212),
         surface: ShunShiColors.darkSurface,
         onSurface: ShunShiColors.darkTextPrimary,
         surfaceContainerLowest: ShunShiColors.darkSurfaceContainerLowest,
@@ -561,8 +561,9 @@ class ShunShiTheme {
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: ShunShiColors.darkPrimary,
-          foregroundColor: Colors.white,
+          foregroundColor: Color(0xFF121212),
           elevation: 0,
+          textStyle: ShunShiTypography.labelLarge.copyWith(color: const Color(0xFF121212)),
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
           shape: RoundedRectangleBorder(borderRadius: ShunShiRadius.buttonRadius),
         ),

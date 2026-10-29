@@ -23,17 +23,20 @@ class MainShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final currentPath = GoRouterState.of(context).uri.path;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final background = isDark ? ShunShiColors.darkBackground : ShunShiColors.background;
+    final line = isDark ? ShunShiColors.darkBorderGhost : ShunShiColors.borderGhost;
 
     return PopScope(
       canPop: false,
       child: Scaffold(
-        backgroundColor: ShunShiColors.darkBackground,
+        backgroundColor: background,
         body: child,
         bottomNavigationBar: Container(
           decoration: BoxDecoration(
-            color: ShunShiColors.darkBackground.withValues(alpha: 0.85),
+            color: background.withValues(alpha: 0.92),
             border: Border(
-              top: BorderSide(color: ShunShiColors.borderGhost, width: 0.5),
+              top: BorderSide(color: line, width: 0.5),
             ),
           ),
           child: ClipRect(
@@ -52,6 +55,7 @@ class MainShell extends StatelessWidget {
                         activeIcon: tab.activeIcon,
                         label: tab.label,
                         isActive: isActive,
+                        isDark: isDark,
                         onTap: () => context.go(tab.path),
                       );
                     }).toList(),
@@ -84,6 +88,7 @@ class _NavTab extends StatelessWidget {
   final IconData activeIcon;
   final String label;
   final bool isActive;
+  final bool isDark;
   final VoidCallback onTap;
 
   const _NavTab({
@@ -91,11 +96,14 @@ class _NavTab extends StatelessWidget {
     required this.activeIcon,
     required this.label,
     required this.isActive,
+    required this.isDark,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    final active = isDark ? ShunShiColors.darkPrimary : ShunShiColors.primary;
+    final inactive = isDark ? ShunShiColors.darkTextSecondary : ShunShiColors.textTertiary;
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
@@ -111,7 +119,7 @@ class _NavTab extends StatelessWidget {
                 isActive ? activeIcon : icon,
                 key: ValueKey(isActive),
                 size: 22,
-                color: isActive ? ShunShiColors.primary : ShunShiColors.textTertiary,
+                color: isActive ? active : inactive,
               ),
             ),
             const SizedBox(height: 2),
@@ -121,7 +129,7 @@ class _NavTab extends StatelessWidget {
                 fontFamily: ShunShiTypography.sansFamily,
                 fontSize: 10,
                 fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
-                color: isActive ? ShunShiColors.primary : ShunShiColors.textTertiary,
+                color: isActive ? active : inactive,
               ),
             ),
             if (isActive) ...[
@@ -130,7 +138,7 @@ class _NavTab extends StatelessWidget {
                 width: 16,
                 height: 2,
                 decoration: BoxDecoration(
-                  color: ShunShiColors.primary,
+                  color: active,
                   borderRadius: BorderRadius.circular(1),
                 ),
               ),

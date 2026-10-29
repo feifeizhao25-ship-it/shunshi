@@ -180,6 +180,8 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
 
   // ── Page 1: 欢迎 (2秒) ──
   Widget _page1() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final wide = MediaQuery.sizeOf(context).shortestSide >= 600;
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -187,8 +189,8 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
         ScaleTransition(
           scale: _breath,
           child: Container(
-            width: 88,
-            height: 88,
+            width: wide ? 120 : 88,
+            height: wide ? 120 : 88,
             decoration: BoxDecoration(
               gradient: const LinearGradient(
                 begin: Alignment.topLeft,
@@ -204,42 +206,44 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
                 ),
               ],
             ),
-            child: const Icon(Icons.eco, size: 44, color: Colors.white),
+            child: Icon(Icons.eco, size: wide ? 60 : 44, color: Colors.white),
           ),
         ),
         const SizedBox(height: 32),
-        const Text(
+        Text(
           '顺时',
           style: TextStyle(
             fontFamily: ShunShiTypography.serifFamily,
-            fontSize: 36,
+            fontSize: wide ? 52 : 36,
             fontWeight: FontWeight.w700,
-            color: ShunShiColors.textPrimary,
+            color: isDark ? ShunShiColors.darkTextPrimary : ShunShiColors.textPrimary,
           ),
         ),
         const SizedBox(height: 12),
-        const Text(
+        Text(
           '顺应天时，养身心',
           style: TextStyle(
             fontFamily: ShunShiTypography.sansFamily,
-            fontSize: 18,
-            color: ShunShiColors.textSecondary,
+            fontSize: wide ? 24 : 18,
+            color: isDark ? ShunShiColors.darkTextSecondary : ShunShiColors.textSecondary,
           ),
         ),
         const SizedBox(height: 56),
         // "开始使用" button with gradient + shadow
         SizedBox(
           width: double.infinity,
-          height: 54,
+          height: wide ? 68 : 54,
           child: DecoratedBox(
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [ShunShiColors.primary, ShunShiColors.primaryLight],
+              gradient: LinearGradient(
+                colors: isDark
+                    ? [ShunShiColors.darkPrimary, ShunShiColors.darkPrimary]
+                    : [ShunShiColors.primary, ShunShiColors.primaryLight],
               ),
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: ShunShiColors.primary.withValues(alpha: 0.35),
+                  color: ShunShiColors.primary.withValues(alpha: isDark ? 0 : 0.35),
                   blurRadius: 16,
                   offset: const Offset(0, 6),
                 ),
@@ -249,16 +253,16 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
               onPressed: _nextPage,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.transparent,
-                foregroundColor: Colors.white,
+                foregroundColor: isDark ? const Color(0xFF121212) : Colors.white,
                 elevation: 0,
                 shadowColor: Colors.transparent,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
               ),
-              child: const Text(
+              child: Text(
                 '开始使用',
-                style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+                style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: wide ? 22 : 17, fontWeight: FontWeight.w600),
               ),
             ),
           ),
@@ -269,25 +273,29 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
 
   // ── Page 2: 关注选择 (3秒) ──
   Widget _page2() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final text = isDark ? ShunShiColors.darkTextPrimary : ShunShiColors.textPrimary;
+    final tertiary = isDark ? ShunShiColors.darkTextTertiary : ShunShiColors.textTertiary;
+    final accent = isDark ? ShunShiColors.darkPrimary : ShunShiColors.primary;
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Text(
+        Text(
           '你最关注什么？',
           style: TextStyle(
             fontFamily: ShunShiTypography.serifFamily,
             fontSize: 26,
             fontWeight: FontWeight.w700,
-            color: ShunShiColors.textPrimary,
+            color: text,
           ),
         ),
         const SizedBox(height: 8),
-        const Text(
+        Text(
           '选择一项，我们为你定制方案',
           style: TextStyle(
             fontFamily: ShunShiTypography.sansFamily,
             fontSize: 14,
-            color: ShunShiColors.textTertiary,
+            color: tertiary,
           ),
         ),
         const SizedBox(height: 36),
@@ -311,26 +319,24 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
                             fontFamily: ShunShiTypography.serifFamily,
-                            color: _selectedConcern == c.label
-                                ? ShunShiColors.primary
-                                : ShunShiColors.textPrimary,
+                            color: _selectedConcern == c.label ? accent : text,
                           ),
                         ),
                         const SizedBox(height: 2),
                         Text(
                           c.desc,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 13,
-                            color: ShunShiColors.textTertiary,
+                            color: tertiary,
                           ),
                         ),
                       ],
                     ),
                   ),
                   if (_selectedConcern == c.label)
-                    const Icon(
+                    Icon(
                       Icons.check_circle,
-                      color: ShunShiColors.primary,
+                      color: accent,
                       size: 24,
                     ),
                 ],
@@ -344,6 +350,9 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
 
   // ── Page 3: 准备就绪 (5秒) ──
   Widget _page3() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final text = isDark ? ShunShiColors.darkTextPrimary : ShunShiColors.textPrimary;
+    final secondary = isDark ? ShunShiColors.darkTextSecondary : ShunShiColors.textSecondary;
     final concern = _selectedConcern ?? '作息';
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -352,33 +361,33 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
           width: 80,
           height: 80,
           decoration: BoxDecoration(
-            color: ShunShiColors.primary.withValues(alpha: 0.1),
+            color: (isDark ? ShunShiColors.darkPrimary : ShunShiColors.primary).withValues(alpha: isDark ? 0.22 : 0.1),
             shape: BoxShape.circle,
           ),
-          child: const Icon(
+          child: Icon(
             Icons.check_rounded,
             size: 44,
-            color: ShunShiColors.primary,
+            color: isDark ? ShunShiColors.darkPrimary : ShunShiColors.primary,
           ),
         ),
         const SizedBox(height: 28),
-        const Text(
+        Text(
           '准备就绪！',
           style: TextStyle(
             fontFamily: ShunShiTypography.serifFamily,
             fontSize: 30,
             fontWeight: FontWeight.w700,
-            color: ShunShiColors.textPrimary,
+            color: text,
           ),
         ),
         const SizedBox(height: 16),
         Text(
           '我们将围绕「$concern」为你安排\n这一季的作息',
           textAlign: TextAlign.center,
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: ShunShiTypography.sansFamily,
             fontSize: 16,
-            color: ShunShiColors.textSecondary,
+            color: secondary,
             height: 1.6,
           ),
         ),
@@ -413,7 +422,7 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
               ),
               child: const Text(
                 '开始体验',
-                style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+                style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 17, fontWeight: FontWeight.w600),
               ),
             ),
           ),
@@ -424,6 +433,8 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
 
   // ── Progress bar (replaces dots) ──
   Widget _buildProgressBar() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final active = isDark ? ShunShiColors.darkPrimary : ShunShiColors.primary;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -438,9 +449,7 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
                   duration: const Duration(milliseconds: 400),
                   height: isCurrent ? 4 : 3,
                   decoration: BoxDecoration(
-                    color: isActive
-                        ? ShunShiColors.primary
-                        : ShunShiColors.primary.withValues(alpha: 0.15),
+                    color: isActive ? active : active.withValues(alpha: isDark ? 0.28 : 0.15),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -515,6 +524,10 @@ class _BounceSelectionCardState extends State<_BounceSelectionCard>
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final fill = isDark ? ShunShiColors.darkSurfaceContainerLowest : ShunShiColors.surfaceContainerLowest;
+    final border = isDark ? ShunShiColors.darkBorder : ShunShiColors.border;
+    final accent = isDark ? ShunShiColors.darkPrimary : ShunShiColors.primary;
     return ScaleTransition(
       scale: _bounceAnim,
       child: GestureDetector(
@@ -523,14 +536,10 @@ class _BounceSelectionCardState extends State<_BounceSelectionCard>
           duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
           decoration: BoxDecoration(
-            color: widget.isSelected
-                ? ShunShiColors.primary.withValues(alpha: 0.08)
-                : ShunShiColors.surfaceContainerLowest,
+            color: widget.isSelected ? accent.withValues(alpha: 0.18) : fill,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: widget.isSelected
-                  ? ShunShiColors.primary
-                  : ShunShiColors.border,
+              color: widget.isSelected ? accent : border,
               width: widget.isSelected ? 2 : 1,
             ),
           ),

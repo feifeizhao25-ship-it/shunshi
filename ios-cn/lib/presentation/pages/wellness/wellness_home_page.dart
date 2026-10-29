@@ -11,8 +11,14 @@ class WellnessHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final background = isDark ? ShunShiColors.darkBackground : ShunShiColors.background;
+    final title = isDark ? ShunShiColors.darkTextPrimary : ShunShiColors.textPrimary;
+    final accent = isDark ? ShunShiColors.darkPrimary : ShunShiColors.primary;
+    final muted = isDark ? ShunShiColors.darkTextSecondary : ShunShiColors.textTertiary;
+    final field = isDark ? ShunShiColors.darkSurfaceContainerLow : ShunShiColors.surfaceContainerLow;
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: background,
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: Column(
@@ -33,15 +39,15 @@ class WellnessHomePage extends StatelessWidget {
                       child: const Icon(Icons.person, size: 20, color: ShunShiColors.textSecondary),
                     ),
                     const SizedBox(width: 12),
-                    const Text('养生馆', style: TextStyle(
+                    Text('养生馆', style: TextStyle(
                       fontSize: 20, fontWeight: FontWeight.w300, letterSpacing: -0.3,
-                      color: ShunShiColors.primary,
+                      color: accent,
                       fontFamily: ShunShiTypography.serifFamily,
                     )),
                     const Spacer(),
                     GestureDetector(
                       onTap: () {},
-                      child: const Icon(Icons.notifications_outlined, size: 22, color: ShunShiColors.primary),
+                      child: Icon(Icons.notifications_outlined, size: 22, color: accent),
                     ),
                   ],
                 ),
@@ -57,14 +63,15 @@ class WellnessHomePage extends StatelessWidget {
                   // ── 搜索栏 ──
                   Container(
                     decoration: BoxDecoration(
-                      color: ShunShiColors.surfaceContainerLow,
+                      color: field,
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const TextField(
+                    child: TextField(
+                      style: TextStyle(color: title, fontSize: 16),
                       decoration: InputDecoration(
                         hintText: '搜索调理方案、节气食谱...',
-                        hintStyle: TextStyle(color: ShunShiColors.textTertiary, fontSize: 14),
-                        prefixIcon: Icon(Icons.search, color: ShunShiColors.textTertiary, size: 22),
+                        hintStyle: TextStyle(color: muted, fontSize: 16),
+                        prefixIcon: Icon(Icons.search, color: muted, size: 22),
                         border: InputBorder.none,
                         contentPadding: EdgeInsets.symmetric(vertical: 16),
                       ),
@@ -81,12 +88,12 @@ class WellnessHomePage extends StatelessWidget {
                     crossAxisSpacing: 16,
                     childAspectRatio: 0.75,
                     children: [
-                      _gridIcon(Icons.health_and_safety, '体质调养', () => context.push('/wellness/constitution')),
-                      _gridIcon(Icons.restaurant_menu, '节气食谱', () => context.push('/wellness/food_therapy')),
-                      _gridIcon(Icons.emoji_food_beverage, '养生茶饮', () => context.push('/wellness/tea')),
-                      _gridIcon(Icons.architecture, '经络穴位', () => context.push('/wellness/acupressure')),
-                      _gridIcon(Icons.self_improvement, '传统功法', () => context.push('/wellness/exercise')),
-                      _gridIcon(Icons.graphic_eq, '助眠音频', () => context.push('/wellness/sleep')),
+                      _gridIcon(context, Icons.health_and_safety, '体质调养', () => context.push('/wellness/constitution')),
+                      _gridIcon(context, Icons.restaurant_menu, '节气食谱', () => context.push('/wellness/food_therapy')),
+                      _gridIcon(context, Icons.emoji_food_beverage, '养生茶饮', () => context.push('/wellness/tea')),
+                      _gridIcon(context, Icons.architecture, '经络穴位', () => context.push('/wellness/acupressure')),
+                      _gridIcon(context, Icons.self_improvement, '传统功法', () => context.push('/wellness/exercise')),
+                      _gridIcon(context, Icons.graphic_eq, '助眠音频', () => context.push('/wellness/sleep')),
                     ],
                   ),
                   const SizedBox(height: 48),
@@ -173,7 +180,11 @@ class WellnessHomePage extends StatelessWidget {
     );
   }
 
-  Widget _gridIcon(IconData icon, String label, VoidCallback onTap) {
+  Widget _gridIcon(BuildContext context, IconData icon, String label, VoidCallback onTap) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final disc = isDark ? ShunShiColors.darkSurfaceContainerLowest : ShunShiColors.surfaceContainerLowest;
+    final accent = isDark ? ShunShiColors.darkPrimary : ShunShiColors.primary;
+    final labelColor = isDark ? ShunShiColors.darkTextPrimary : ShunShiColors.textPrimary;
     return GestureDetector(
       onTap: onTap,
       child: Column(
@@ -182,16 +193,15 @@ class WellnessHomePage extends StatelessWidget {
             width: 60, height: 60,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: ShunShiColors.surfaceContainerLowest,
-              border: Border.all(color: ShunShiColors.textTertiary.withValues(alpha: 0.1)),
-              boxShadow: ShunShiShadows.sm,
+              color: disc,
+              border: Border.all(color: (isDark ? ShunShiColors.darkBorder : ShunShiColors.textTertiary).withValues(alpha: 0.35)),
             ),
-            child: Icon(icon, size: 28, color: ShunShiColors.primary),
+            child: Icon(icon, size: 28, color: accent),
           ),
           const SizedBox(height: 10),
           Text(label, style: TextStyle(
             fontSize: 13, fontWeight: FontWeight.w500,
-            color: ShunShiColors.textPrimary,
+            color: labelColor,
           )),
         ],
       ),
