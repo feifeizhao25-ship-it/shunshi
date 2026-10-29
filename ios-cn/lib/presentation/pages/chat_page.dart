@@ -917,7 +917,19 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
           top: BorderSide(color: AppColors.borderGhost(context), width: 0.5),
         ),
       ),
-      child: Row(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (_chatError != null)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(4, 0, 4, 8),
+              child: Text(
+                _chatError!,
+                key: const ValueKey('chat-error'),
+                style: TextStyle(color: Theme.of(context).colorScheme.error, fontSize: 13, height: 1.4),
+              ),
+            ),
+          Row(
         children: [
           GestureDetector(
             onTap: _showQuickTopics,
@@ -1003,6 +1015,8 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
               child: Icon(Icons.send, color: sendFg, size: 18),
             ),
           ),
+        ],
+      ),
         ],
       ),
     );

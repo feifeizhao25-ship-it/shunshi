@@ -413,13 +413,18 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
   }
 
   Widget _buildMenuTile(IconData icon, String title, VoidCallback? onTap) {
-    return ListTile(
-      leading: Icon(icon, color: ShunShiColors.primary, size: 22),
-      title: Text(title, style: TextStyle(
-        fontSize: 15, color: ShunShiColors.textPrimary,
-      )),
-      trailing: const Icon(Icons.chevron_right, color: ShunShiColors.textTertiary, size: 20),
-      onTap: onTap,
+    // 卡片已经有底色。ListTile 的水波纹画在最近的 Material 上，
+    // 中间再隔一层带颜色的盒子，点击反馈会被挡住。
+    return Material(
+      color: Colors.transparent,
+      child: ListTile(
+        leading: Icon(icon, color: ShunShiColors.primary, size: 22),
+        title: Text(title, style: TextStyle(
+          fontSize: 15, color: ShunShiColors.textPrimary,
+        )),
+        trailing: const Icon(Icons.chevron_right, color: ShunShiColors.textTertiary, size: 20),
+        onTap: onTap,
+      ),
     );
   }
 
