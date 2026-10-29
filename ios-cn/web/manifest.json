@@ -4,7 +4,7 @@
     "start_url": ".",
     "display": "standalone",
     "background_color": "#FAF0E6",
-    "theme_color": "#8B5A2B",
+    "theme_color": "#115363",
     "description": "顺时 ShunShi - AI 养生陪伴系统，随时随地守护您的健康",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
