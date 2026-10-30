@@ -383,3 +383,19 @@ def test_fetch_restrictions_and_extraction():
         fetch_mod.fetch_page("http://www.ndrc.gov.cn/x", POLICY, http=http)
     with pytest.raises(fetch_mod.FetchRefused):
         fetch_mod.fetch_page("https://evil.com/x", POLICY, http=http)
+
+
+def test_primary_metric_for_no_skill_lift_is_configurable():
+    from importlib import import_module
+
+    g = import_module("app.self_improve.gates")
+    th = g.GateThresholds(not_applicable=frozenset({"faithfulness", "calc_error", "recall_at_8"}), primary_metric="redteam_pass_rate")
+    cand = {k: v for k, v in GOOD.items() if k not in ("recall_at_8", "faithfulness", "calc_error")}
+    base = dict(cand)
+    ok = g.evaluate_gates(base, cand, th, no_skill={"redteam_pass_rate": 0.4})
+    assert ok.passed, ok.reasons
+    assert "no_skill_lift" in ok.checked
+    worse = g.evaluate_gates(base, cand, th, no_skill={"redteam_pass_rate": 1.0}, )
+    assert worse.passed  # lift == 0 不低于 no_skill_lift_min(0)
+    bad = g.evaluate_gates(base, {**cand, "redteam_pass_rate": 1.0}, th, no_skill={"recall_at_8": 0.0})
+    assert not bad.passed  # 缺主指标 → fail-closed

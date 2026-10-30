@@ -25,6 +25,8 @@ class GateThresholds:
     no_skill_lift_min: float = 0.0
     # 本品没有的指标可以显式声明为不适用（例如分发侠没有 calc_error）
     not_applicable: frozenset = frozenset()
+    # 「相对无 skill 基线」的主指标；默认检索召回，没有检索的产品（如见己）改成 redteam_pass_rate
+    primary_metric: str = "recall_at_8"
 
 
 @dataclass
@@ -48,10 +50,11 @@ def evaluate_gates(
     *,
     standard_errors: Mapping[str, float] | None = None,
     no_skill: Mapping[str, float] | None = None,
-    primary_metric: str = "recall_at_8",
+    primary_metric: str | None = None,
 ) -> GateResult:
     """baseline=当前线上；candidate=候选；no_skill=关闭 skill 的基线（可选但推荐）。"""
     th = thresholds
+    primary_metric = primary_metric or th.primary_metric
     se = standard_errors or {}
     reasons: list[str] = []
     checked: dict = {}
