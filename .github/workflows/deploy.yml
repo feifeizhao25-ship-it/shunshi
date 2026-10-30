@@ -63,9 +63,24 @@ jobs:
         run: |
           python - <<'PY'
           from pathlib import Path
+          import re
+          from urllib.parse import urlparse
           config = Path('android-cn/lib/core/config/app_config.dart').read_text()
-          assert "defaultValue: 'https://api.shunshi.app'" in config
+          # Debug/dev default may be loopback http; any other default must be https.
+          default = re.search(r"defaultValue:\s*'([^']+)'", config).group(1)
+          host = urlparse(default).hostname
+          assert default.startswith('https://') or (
+              default.startswith('http://') and host in ('127.0.0.1', 'localhost')
+          ), f'non-loopback http API default: {default}'
           assert '不含 /api/v1' in config
+          # Release/production web build must be pinned to the https production API.
+          dockerfile = Path('android-cn/Dockerfile.web').read_text()
+          arg = re.search(r'ARG API_BASE_URL=(\S+)', dockerfile).group(1)
+          assert arg == 'https://api.shunshi.app', f'Dockerfile.web release API must be https production: {arg}'
+          assert '--dart-define=API_BASE_URL=${API_BASE_URL}' in dockerfile
+          workflow = Path('.github/workflows/deploy.yml').read_text()
+          assert re.search(r'^\s*build-args:\s*API_BASE_URL=https://api\.shunshi\.app\s*$', workflow, re.M)
+          assert not re.search(r'^\s*build-args:\s*API_BASE_URL=http:', workflow, re.M)
           manifest = Path('android-cn/web/manifest.json').read_text()
           assert '顺时' in manifest and 'A new Flutter project' not in manifest
           PY
