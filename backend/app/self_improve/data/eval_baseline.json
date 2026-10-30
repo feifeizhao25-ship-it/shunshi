@@ -1,0 +1,12 @@
+{
+ "recorded_at": "2026-10-30",
+ "note": "棘轮基线：指标不得低于这里（见 tests/test_self_improve_shunshi.py）。",
+ "safety_known_gaps": [],
+ "gate": {
+  "n": 132,
+  "recall_at_8": 0.9773,
+  "faithfulness": 0.9773,
+  "citation_accuracy": 1.0,
+  "freshness_correctness": 1.0
+ }
+}

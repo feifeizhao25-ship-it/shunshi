@@ -3,6 +3,7 @@
 基于 TF-IDF 相似度检索知识库 chunks，支持过滤
 """
 import logging
+import re
 from typing import Optional
 
 from app.safety.efficacy import redact_efficacy_claims
@@ -11,6 +12,20 @@ from .knowledge_base import cn_kb, gl_kb, KnowledgeChunk
 from .embedder import get_embedder
 
 logger = logging.getLogger(__name__)
+
+# 标题精确命中加权：用户问「立春…」时，标题就是「立春」的片段应排在最前。
+# 自改进评测（app/self_improve/evals.py）显示纯 TF-IDF 的 top1 有据率只有 0.72。
+_NUM = re.compile(r"^\s*(?:第[一二三四五六七八九十]+章[:：]\s*|[一二三四五六七八九十]+、\s*|\d+\.\s*)")
+_PAREN = re.compile(r"[（(].*?[）)]")
+_GENERIC_HEADINGS = frozenset({"说明", "简介", "概述", "注意事项", "总结", "前言", "备注"})
+HEADING_BOOST = 0.5
+STALE_PENALTY = 0.5
+
+
+def _heading_topic(heading_path: list[str]) -> str:
+    if not heading_path:
+        return ""
+    return _PAREN.sub("", _NUM.sub("", heading_path[-1])).strip()
 
 
 def retrieve(
@@ -76,6 +91,13 @@ def retrieve(
             content_has = filter_const in chunk.content
             if not content_has and chunk_const != filter_const:
                 score *= 0.3
+
+        if meta.get("stale"):
+            score *= STALE_PENALTY  # 来源已过期：降权，不删除，避免集体过期时问答变空白
+
+        topic = _heading_topic(chunk.heading_path)
+        if len(topic) >= 2 and topic not in _GENERIC_HEADINGS and topic in query:
+            score += HEADING_BOOST
 
         filtered.append((idx, score))
 

@@ -11,7 +11,10 @@ from typing import Optional, List
 from datetime import datetime
 import random
 
+from app.services.companion_safeguards import UseTracker, decorate, enabled as safeguards_enabled, screen_text
+
 router = APIRouter(prefix="/api/v1/companion", tags=["ai_companion"])
+_tracker = UseTracker()
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -282,7 +285,7 @@ async def daily_greet(request: CompanionGreetRequest):
 
     time_period = _get_time_period()
     season = _get_season()
-    intimacy = min(profile["intimacy_level"], 3)  # Clamp to 1-3 for greeting index
+    intimacy = min(profile["intimacy_level"], 2 if safeguards_enabled() else 3)  # 开启拟人化保守处理时问候封顶 2 级
 
     greeting_list = GREETINGS[time_period][intimacy]
     greeting = random.choice(greeting_list)
@@ -296,7 +299,7 @@ async def daily_greet(request: CompanionGreetRequest):
 
     return {
         "success": True,
-        "data": {
+        "data": decorate({
             "companion_name": COMPANION_NAME,
             "greeting": greeting,
             "season": season,
@@ -305,7 +308,7 @@ async def daily_greet(request: CompanionGreetRequest):
             "seasonal_insight": seasonal_info["tcm_insight"],
             "seasonal_advice": seasonal_info["advice"],
             "timestamp": datetime.now().isoformat(),
-        },
+        }, request.user_id, _tracker),
     }
 
 
@@ -318,6 +321,17 @@ async def wellness_checkin(request: CompanionCheckInRequest):
     profile = _ensure_profile(request.user_id)
     profile["total_interactions"] += 1
     profile["last_seen"] = datetime.now().isoformat()
+
+    if safeguards_enabled():
+        screened = screen_text(request.notes, request.user_id)
+        if screened is not None and screened.level.value == "crisis":
+            # 危机：只给求助资源，不做「陪伴式」回应，也不记录用户原话。
+            return {"success": True, "data": decorate({
+                "companion_name": COMPANION_NAME,
+                "response": screened.override_response,
+                "crisis": True,
+                "timestamp": datetime.now().isoformat(),
+            }, request.user_id, _tracker)}
 
     key = (request.mood, request.energy)
     response_text = CHECKIN_RESPONSES.get(key, "你的状态很独特，照顾好自己最重要。")
@@ -335,7 +349,7 @@ async def wellness_checkin(request: CompanionCheckInRequest):
 
     return {
         "success": True,
-        "data": {
+        "data": decorate({
             "companion_name": COMPANION_NAME,
             "response": response_text,
             "seasonal_practice": seasonal_practice,
@@ -343,8 +357,17 @@ async def wellness_checkin(request: CompanionCheckInRequest):
             "energy": request.energy,
             "intimacy_level": profile["intimacy_level"],
             "timestamp": datetime.now().isoformat(),
-        },
+        }, request.user_id, _tracker),
     }
+
+
+@router.delete("/data/{user_id}", summary="删除我的陪伴数据")
+async def delete_my_data(user_id: str):
+    """办法要求用户可删除交互数据。只清内存里的档案、历史与计时。"""
+    _profiles.pop(user_id, None)
+    _messages.pop(user_id, None)
+    _tracker.forget(user_id)
+    return {"success": True}
 
 
 @router.get("/profile/{user_id}", summary="获取伴侣档案")
