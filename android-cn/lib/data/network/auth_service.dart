@@ -123,7 +123,7 @@ class AuthService {
     } on DioException catch (e) {
       return ApiResult.failure(_handleAppleError(e));
     } catch (e) {
-      return ApiResult.failure('Apple 登录失败: ${e.toString()}');
+      return ApiResult.failure('Apple 登录失败，请稍后重试');
     }
   }
   
@@ -164,7 +164,7 @@ class AuthService {
     } on DioException catch (e) {
       return ApiResult.failure(_handleAppleError(e));
     } catch (e) {
-      return ApiResult.failure('Google 登录失败: ${e.toString()}');
+      return ApiResult.failure('Google 登录失败，请稍后重试');
     }
   }
   

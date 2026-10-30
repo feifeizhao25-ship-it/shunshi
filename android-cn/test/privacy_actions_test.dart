@@ -28,7 +28,7 @@ void main() {
     expect(find.text('我的账户数据'), findsOneWidget);
     expect(find.byType(SelectableText), findsOneWidget);
     expect(tester.widget<SelectableText>(find.byType(SelectableText)).data, contains('test-user'));
-    expect(find.text('复制 JSON'), findsOneWidget);
+    expect(find.text('复制数据'), findsOneWidget);
     await tester.tap(find.text('关闭'));
     await tester.pumpAndSettle();
   });

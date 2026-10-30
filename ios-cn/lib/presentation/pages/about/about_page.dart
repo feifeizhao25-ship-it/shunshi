@@ -29,7 +29,7 @@ class AboutPage extends StatelessWidget {
               borderRadius: BorderRadius.circular(20),
             ), child: const Center(child: Text('🌿', style: TextStyle(fontSize: 36)))),
             const SizedBox(height: 16),
-            Text('顺时 · ShunShi', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textPrimary(context))),
+            Text('顺时', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textPrimary(context))),
             const SizedBox(height: 4),
             Text('版本 1.0.0', style: TextStyle(fontSize: 14, color: AppColors.textTertiary(context))),
           ])),

@@ -455,5 +455,5 @@ class RestoreResult {
 
   @override
   String toString() =>
-      'RestoreResult(success: $success, plan: $plan, message: $message)';
+      'RestoreResult(success: $success, plan: $plan, message: $message)'; // zh-gate:allow toString 调试文字
 }

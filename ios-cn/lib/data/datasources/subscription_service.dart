@@ -80,7 +80,7 @@ class SubscriptionService {
     final token = StorageManager.user.getToken();
     return token == null || token.isEmpty
         ? const {}
-        : {'Authorization': 'Bearer $token'};
+        : {'Authorization': 'Bearer $token'}; // zh-gate:allow HTTP 头
   }
 
   /// 轮询订单状态（扫码支付场景）

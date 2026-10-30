@@ -109,10 +109,10 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
           ? '连接超时，请检查网络'
           : e.type == DioExceptionType.connectionError
               ? '无法连接服务器，请检查网络设置'
-              : '网络异常: ${e.message}';
+              : '网络异常，请稍后重试';
       _showSnackBar(msg);
     } catch (e) {
-      _showSnackBar('加载失败: $e');
+      _showSnackBar('加载失败，请稍后重试');
     } finally {
       setState(() => _loading = false);
     }
@@ -604,7 +604,7 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
         '我的体质类型：${r.typeName} ${r.emoji}\n'
         '体质概述：${r.description}\n\n'
         '体质特点：\n${r.characteristics.map((c) => '  · $c').join('\n')}\n\n'
-        '—— 顺时App AI养生顾问';
+        '—— 顺时 AI 养生顾问';
     await Clipboard.setData(ClipboardData(text: text));
     _showSnackBar('报告已复制到剪贴板');
   }

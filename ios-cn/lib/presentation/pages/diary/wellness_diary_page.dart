@@ -114,9 +114,9 @@ class _WellnessDiaryPageState extends State<WellnessDiaryPage>
                   const SizedBox(height: 16),
                   Row(
                     children: [
-                      Expanded(child: _sleepCard('入睡时间', '22:45', 'PM')),
+                      Expanded(child: _sleepCard('入睡时间', '22:45', '晚间')),
                       const SizedBox(width: 16),
-                      Expanded(child: _sleepCard('醒来时间', '06:30', 'AM')),
+                      Expanded(child: _sleepCard('醒来时间', '06:30', '清晨')),
                     ],
                   ),
                   const SizedBox(height: 40),

@@ -511,7 +511,7 @@ class _SolarTermPageV2State extends State<SolarTermPageV2>
                                   ),
                                 ),
                                 Text(
-                                  '${_next['countdown_days'] != null ? '${_next['countdown_days']}天后' : _next['date'] ?? ''}',
+                                  '${_next['countdown_days'] != null ? '${_next['countdown_days']}天后' : _next['date'] ?? ''}', // zh-gate:allow 误报：插值里的键名
                                   style: TextStyle(
                                     fontSize: 12,
                                     color: textTertiary,

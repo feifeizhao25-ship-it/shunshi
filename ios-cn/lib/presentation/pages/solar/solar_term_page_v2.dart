@@ -122,9 +122,6 @@ class _SolarTermPageV2State extends State<SolarTermPageV2> {
                             fontFamily: ShunShiTypography.serifFamily,
                             fontSize: 32, fontWeight: FontWeight.bold, color: AppColors.textPrimary(context),
                           )),
-                          Text(_term['name_en']?.toString() ?? '', style: TextStyle(
-                            fontSize: 14, color: AppColors.textTertiary(context),
-                          )),
                         ])),
                       ]),
                       const SizedBox(height: 8),
@@ -153,7 +150,7 @@ class _SolarTermPageV2State extends State<SolarTermPageV2> {
                           const SizedBox(width: 12),
                           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                             Text('下一个：${_next['name']}', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
-                            Text('${_next['name_en'] ?? ''} · ${_next['countdown_days'] != null ? '${_next['countdown_days']}天后' : _next['date'] ?? ''}',
+                            Text('${_next['countdown_days'] != null ? '${_next['countdown_days']}天后' : _next['date'] ?? ''}', // zh-gate:allow 误报：插值里的键名
                               style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context))),
                           ])),
                         ]),

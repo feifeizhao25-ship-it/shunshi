@@ -85,9 +85,9 @@ class FoodDetailPage extends StatelessWidget {
                       children: [
                         // Season tag
                         Row(children: [
-                          _heroTag('SPRING · 春'),
+                          _heroTag('春季'),
                           const SizedBox(width: 8),
-                          _heroTag('MEAL · 食疗'),
+                          _heroTag('食疗'),
                         ]),
                         const SizedBox(height: 12),
                         Text(
@@ -217,13 +217,13 @@ class FoodDetailPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   // Nutrition bars
-                  _nutritionBar('Protein', '28g', 0.7, ShunShiColors.primary),
+                  _nutritionBar('蛋白质', '28g', 0.7, ShunShiColors.primary),
                   const SizedBox(height: 8),
-                  _nutritionBar('Fat', '12g', 0.3, ShunShiColors.gold),
+                  _nutritionBar('脂肪', '12g', 0.3, ShunShiColors.gold),
                   const SizedBox(height: 8),
-                  _nutritionBar('Carbs', '8g', 0.2, ShunShiColors.apricot),
+                  _nutritionBar('碳水化合物', '8g', 0.2, ShunShiColors.apricot),
                   const SizedBox(height: 8),
-                  _nutritionBar('Fiber', '3g', 0.15, ShunShiColors.calm),
+                  _nutritionBar('膳食纤维', '3g', 0.15, ShunShiColors.calm),
                   const SizedBox(height: 24),
 
                   // ── 适宜人群 ──

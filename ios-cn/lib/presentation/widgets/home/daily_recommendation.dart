@@ -1,3 +1,4 @@
+import 'package:shunshi/core/utils/zh_labels.dart';
 import 'package:flutter/material.dart';
 import 'package:shunshi/core/theme/shunshi_colors.dart';
 import 'package:shunshi/core/theme/shunshi_text_styles.dart';
@@ -67,7 +68,7 @@ class _RecommendationItem extends StatelessWidget {
     final reason = item['reason'] ?? '';
     final type = item['type'] ?? '';
     final duration = item['duration'] ?? '';
-    final difficulty = item['difficulty'] ?? '';
+    final difficulty = ZhLabels.difficulty(item['difficulty']);
 
     return GestureDetector(
       onTap: onTap,

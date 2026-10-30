@@ -27,7 +27,7 @@ class PrivacyPolicyPage extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         children: [
-          _sectionTitle(context, '顺时（ShunShi）隐私政策'),
+          _sectionTitle(context, '顺时隐私政策'),
           _body(
             '最后更新日期：2026年10月23日\n'
             '运营者：北京艾瑞见时科技有限公司。个人信息存放在中国境内。\n'
@@ -39,7 +39,7 @@ class PrivacyPolicyPage extends StatelessWidget {
           _body(
             '我们收集以下信息，用来提供节气与作息安排。体质、作息等与健康有关的内容属于敏感个人信息，只在你填写后用于这些生活提示，不构成医疗诊断，也不用于训练模型。当前没有单独的训练同意开关，因为不会拿这些内容去训练模型。\n\n'
             '1.1 账户信息\n'
-            '• 注册信息：手机号码、微信/OpenID、昵称、头像\n'
+            '• 注册信息：手机号码、微信账号标识、昵称、头像\n'
             '• 认证信息：登录凭证、设备标识符\n\n'
             '1.2 健康与养生数据\n'
             '• 体质测试结果（中医九种体质分类）\n'
@@ -49,11 +49,11 @@ class PrivacyPolicyPage extends StatelessWidget {
             '1.3 设备与技术信息\n'
             '• 设备型号、操作系统版本\n'
             '• 应用版本、语言设置\n'
-            '• 网络状态（WiFi/移动数据）\n'
+            '• 网络状态（无线网络或移动数据）\n'
             '• 崩溃日志与性能数据\n\n'
             '1.4 位置信息\n'
             '• 粗略位置（城市级别），用于提供节气与时令建议\n'
-            '• 我们不会收集精确GPS定位',
+            '• 我们不会收集精确的卫星定位信息',
             textColor,
           ),
           const SizedBox(height: 12),
@@ -80,7 +80,7 @@ class PrivacyPolicyPage extends StatelessWidget {
             '我们不会出售您的个人数据。在以下场景中，我们可能与第三方共享必要信息：\n\n'
             '3.1 服务提供商\n'
             '• 支付服务：用于处理订阅和购买（支付宝、微信支付）\n'
-            '• 推送服务：用于发送通知（极光推送、APNs/FCM）\n'
+            '• 推送服务：用于发送通知（极光推送及系统推送通道）\n'
             '• 云存储：用于数据备份与同步（阿里云/腾讯云）\n'
             '• AI 服务：用于生成养生建议（深度求索 DeepSeek、硅基流动 SiliconFlow，均为境内服务商）\n'
             '• 短信服务：用于发送登录验证码（境内短信服务商）\n\n'
@@ -95,10 +95,10 @@ class PrivacyPolicyPage extends StatelessWidget {
           _sectionTitle(context, '四、数据安全措施'),
           _body(
             '4.1 传输安全\n'
-            '• 所有网络通信使用 TLS 1.2+ 加密\n'
-            '• API 请求采用 HTTPS 协议\n\n'
+            '• 所有网络通信使用 1.2 及以上版本的传输层加密\n'
+            '• 接口请求采用 HTTPS 加密协议\n\n'
             '4.2 存储安全\n'
-            '• 用户密码只保存加盐哈希（bcrypt / scrypt），不保存明文\n'
+            '• 用户密码只保存加盐哈希，不保存明文\n'
             '• 数据库访问采用最小权限原则\n\n'
             '4.3 运营安全\n'
             '• 定期进行安全审计与渗透测试\n'
@@ -109,7 +109,7 @@ class PrivacyPolicyPage extends StatelessWidget {
           const SizedBox(height: 12),
           _sectionTitle(context, '五、您的权利'),
           _body(
-            '5.1 根据《个人信息保护法》（PIPL），您享有以下权利：\n\n'
+            '5.1 根据《个人信息保护法》，您享有以下权利：\n\n'
             '• 知情权：了解我们收集、使用您个人信息的目的和方式\n'
             '• 访问权：查看我们持有的您的个人数据\n'
             '• 更正权：更正不准确的个人数据\n'
@@ -118,7 +118,7 @@ class PrivacyPolicyPage extends StatelessWidget {
             '• 撤回同意权：随时撤回对数据处理的同意\n'
             '• 自动化决策拒绝权：拒绝仅通过自动化决策做出的分析\n\n'
             '5.2 行使权利\n'
-            '你可以通过应用内「设置」里的导出和注销行使这些权利。公司联系邮箱开通前，不使用 shunshi.app 或 shunshi.ai。我们将在 15 个工作日内回复。',
+            '你可以通过应用内「设置」里的导出和注销行使这些权利。公司联系邮箱开通前。我们将在 15 个工作日内回复。',
             textColor,
           ),
           const SizedBox(height: 12),
@@ -147,7 +147,7 @@ class PrivacyPolicyPage extends StatelessWidget {
           _body(
             '数据保护相关问题：\n'
             '• 运营者：北京艾瑞见时科技有限公司\n'
-            '• 联系邮箱：待公司开通后填写，不使用 shunshi.app / shunshi.ai\n'
+            '• 联系邮箱：待公司开通后填写\n'
             '• 通信地址：以营业执照住所为准，备案材料里填写\n\n'
             '我们将在 15 个工作日内回复您的请求。',
             textColor,

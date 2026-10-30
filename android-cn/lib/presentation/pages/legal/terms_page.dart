@@ -26,7 +26,7 @@ class TermsPage extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         children: [
-          _sectionTitle('顺时（ShunShi）用户协议'),
+          _sectionTitle('顺时用户协议'),
           _body(
             '最后更新日期：2026年10月23日\n'
             '运营者：北京艾瑞见时科技有限公司。律师定稿前，这是按产品事实改过的稿子。',
@@ -41,7 +41,7 @@ class TermsPage extends StatelessWidget {
             '• AI 对话（标明由 AI 生成）\n'
             '• 饮食、运动、穴位的生活建议，不作治疗依据\n'
             '• 已购家庭席位内的共享（家和已停售，已购权益保留）\n\n'
-            '1.2 本应用通过订阅制提供增值服务（顺时 Pro），具体权益以应用内说明为准。\n\n'
+            '1.2 本应用通过订阅制提供增值服务（顺时会员），具体权益以应用内说明为准。\n\n'
             '1.3 我们保留随时修改、暂停或终止任何服务功能的权利，并将提前通知用户。',
             textColor,
           ),
@@ -112,7 +112,7 @@ class TermsPage extends StatelessWidget {
             '7.1 本协议构成您与开发者之间关于使用本应用的完整协议。\n\n'
             '7.2 本协议的任何条款如被认定为无效或不可执行，不影响其他条款的效力。\n\n'
             '7.3 我们未行使任何权利不构成对该权利的放弃。\n\n'
-            '如有疑问，请通过关于页的运营者联系。公司邮箱开通前不使用 shunshi.app。',
+            '如有疑问，请通过关于页的运营者联系。公司邮箱开通后将在此公布。',
             textColor,
           ),
           const SizedBox(height: 40),

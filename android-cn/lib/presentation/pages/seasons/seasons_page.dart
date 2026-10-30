@@ -274,7 +274,7 @@ class _GentleSuggestions extends StatelessWidget {
           // Food
           if (foods.isNotEmpty) ...[
             Text(
-              'Nourish',
+              '饮食调养',
               style: SeasonsTextStyles.heading,
             ),
             const SizedBox(height: 18),
@@ -291,7 +291,7 @@ class _GentleSuggestions extends StatelessWidget {
           if (stretches.isNotEmpty) ...[
             const SizedBox(height: 32),
             Text(
-              'Move',
+              '适度活动',
               style: SeasonsTextStyles.heading,
             ),
             const SizedBox(height: 18),

@@ -23,7 +23,7 @@ class BodyTypeEssencePage extends StatelessWidget {
     _Metric('饮食规律', 0, Icons.restaurant),
     _Metric('换季适应', 0, Icons.shield),
     _Metric('白天精神', 0, Icons.local_fire_department),
-    _Metric('Sleep Quality', 0.78, Icons.bedtime),
+    _Metric('睡眠质量', 0.78, Icons.bedtime),
   ];
 
   @override
@@ -118,7 +118,7 @@ class BodyTypeEssencePage extends StatelessWidget {
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
-                          '"Harmony in Flux"',
+                          '「阴阳流转，动态平衡」',
                           style: TextStyle(
                             fontSize: 16, fontWeight: FontWeight.w600,
                             color: AppColors.primary(context),
@@ -134,7 +134,7 @@ class BodyTypeEssencePage extends StatelessWidget {
                   Row(children: [
                     const Icon(Icons.wb_sunny, size: 20, color: Color(0xFFF59E0B)),
                     const SizedBox(width: 8),
-                    Text('Solar Dominance', style: TextStyle(
+                    Text('阳气偏盛', style: TextStyle(
                       fontSize: 16, fontWeight: FontWeight.w700,
                       color: AppColors.textPrimary(context), fontFamily: ShunShiTypography.serifFamily,
                     )),
@@ -153,7 +153,7 @@ class BodyTypeEssencePage extends StatelessWidget {
                   Row(children: [
                     Icon(Icons.spa, size: 20, color: AppColors.primary(context)),
                     const SizedBox(width: 8),
-                    Text('Terrene Stability', style: TextStyle(
+                    Text('中土安稳', style: TextStyle(
                       fontSize: 16, fontWeight: FontWeight.w700,
                       color: AppColors.textPrimary(context), fontFamily: ShunShiTypography.serifFamily,
                     )),
@@ -200,17 +200,17 @@ class BodyTypeEssencePage extends StatelessWidget {
                   const SizedBox(height: 28),
 
                   // ── Seasonal Adjustments ──
-                  _sectionTitle(context, 'eco', 'Seasonal Adjustments'),
+                  _sectionTitle(context, 'eco', '四季调养'),
                   const SizedBox(height: 12),
-                  _seasonCard(context, 'Active Season', 'Spring · Wood Element',
+                  _seasonCard(context, '适宜进取的季节', '春 · 木',
                     '春季适合早起走动，别一下安排太满。',
                     AppColors.primary(context)),
                   const SizedBox(height: 12),
-                  _seasonCard(context, 'Rest Season', 'Late Summer · Earth Element',
+                  _seasonCard(context, '适宜休养的季节', '长夏 · 土',
                     '长夏注意少吃生冷，把觉睡够。',
                     const Color(0xFFF59E0B)),
                   const SizedBox(height: 12),
-                  _seasonCard(context, 'Challenge Season', 'Winter · Water Element',
+                  _seasonCard(context, '需要多留意的季节', '冬 · 水',
                     '冬季多休息，喝温热的水，应酬可以少一些。',
                     const Color(0xFF3B82F6)),
 

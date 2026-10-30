@@ -204,7 +204,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
                   color: AppColors.textPrimary(context),
                   fontFamily: ShunShiTypography.serifFamily,
                 )),
-                Text("Editor's Choice", style: TextStyle(
+                Text('编辑精选', style: TextStyle(
                   fontSize: 12, color: AppColors.textTertiary(context),
                   fontFamily: ShunShiTypography.sansFamily,
                 )),

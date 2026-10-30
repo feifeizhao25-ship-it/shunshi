@@ -17,7 +17,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
 
   static const _categories = [
     ('general', '综合反馈'),
-    ('bug', 'Bug 报告'),
+    ('bug', '问题报告'),
     ('feature', '功能建议'),
     ('content', '内容建议'),
   ];
@@ -47,7 +47,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('提交失败: $e'), duration: const Duration(seconds: 2)),
+          SnackBar(content: Text('提交失败，请稍后重试'), duration: const Duration(seconds: 2)),
         );
       }
     } finally {

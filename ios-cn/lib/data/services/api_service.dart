@@ -259,7 +259,7 @@ class UserService {
       }
       return res.data as Map<String, dynamic>;
     } catch (e) {
-      return {'error': '登录失败: $e'};
+      return {'error': '登录失败，请稍后重试'};
     }
   }
 
@@ -282,7 +282,7 @@ class UserService {
       }
       return res.data as Map<String, dynamic>;
     } catch (e) {
-      return {'error': '注册失败: $e'};
+      return {'error': '注册失败，请稍后重试'};
     }
   }
 
@@ -316,7 +316,7 @@ class UserService {
       }
       return res.data as Map<String, dynamic>;
     } catch (e) {
-      return {'error': '更新失败: $e'};
+      return {'error': '更新失败，请稍后重试'};
     }
   }
 
@@ -340,7 +340,7 @@ class UserService {
       });
       return res.data as Map<String, dynamic>;
     } catch (e) {
-      return {'error': 'Google 登录失败: $e'};
+      return {'error': 'Google 登录失败，请稍后重试'};
     }
   }
 
@@ -362,7 +362,7 @@ class UserService {
       });
       return res.data as Map<String, dynamic>;
     } catch (e) {
-      return {'error': 'Apple 登录失败: $e'};
+      return {'error': 'Apple 登录失败，请稍后重试'};
     }
   }
 
@@ -384,7 +384,7 @@ class UserService {
       }
       return res.data as Map<String, dynamic>;
     } catch (e) {
-      return {'error': '游客登录失败: $e'};
+      return {'error': '游客登录失败，请稍后重试'};
     }
   }
 
@@ -398,7 +398,7 @@ class UserService {
       }
       return res.data as Map<String, dynamic>;
     } catch (e) {
-      return {'error': '获取用户信息失败: $e'};
+      return {'error': '获取用户信息失败，请稍后重试'};
     }
   }
 }
@@ -651,7 +651,7 @@ class FamilyService {
       }
       return res.data as Map<String, dynamic>;
     } catch (e) {
-      return {'error': '获取家庭信息失败: $e', 'members': []};
+      return {'error': '获取家庭信息失败，请稍后重试', 'members': []};
     }
   }
 
@@ -677,7 +677,7 @@ class FamilyService {
       }
       return res.data as Map<String, dynamic>;
     } catch (e) {
-      return {'error': '添加成员失败: $e'};
+      return {'error': '添加成员失败，请稍后重试'};
     }
   }
 
@@ -687,7 +687,7 @@ class FamilyService {
       final res = await _dio.delete('/api/v1/family/members/$memberId');
       return {'success': res.statusCode == 200};
     } catch (e) {
-      return {'error': '移除成员失败: $e'};
+      return {'error': '移除成员失败，请稍后重试'};
     }
   }
 
@@ -705,7 +705,7 @@ class FamilyService {
       });
       return res.data as Map<String, dynamic>;
     } catch (e) {
-      return {'error': '发送关怀失败: $e'};
+      return {'error': '发送关怀失败，请稍后重试'};
     }
   }
 
@@ -718,7 +718,7 @@ class FamilyService {
       }
       return res.data as Map<String, dynamic>;
     } catch (e) {
-      return {'error': '获取概览失败: $e'};
+      return {'error': '获取概览失败，请稍后重试'};
     }
   }
 
@@ -741,7 +741,7 @@ class FamilyService {
       final res = await _dio.post('/api/v1/family/invite', data: {'user_id': userId});
       return res.data as Map<String, dynamic>;
     } catch (e) {
-      return {'error': '生成邀请码失败: $e'};
+      return {'error': '生成邀请码失败，请稍后重试'};
     }
   }
 
@@ -751,7 +751,7 @@ class FamilyService {
       final res = await _dio.post('/api/v1/family/join', data: {'invite_code': inviteCode});
       return res.data as Map<String, dynamic>;
     } catch (e) {
-      return {'error': '加入家庭失败: $e'};
+      return {'error': '加入家庭失败，请稍后重试'};
     }
   }
 
@@ -761,7 +761,7 @@ class FamilyService {
       final res = await _dio.get('/api/v1/family/overview', queryParameters: {'user_id': userId});
       return res.data as Map<String, dynamic>;
     } catch (e) {
-      return {'error': '获取摘要失败: $e'};
+      return {'error': '获取摘要失败，请稍后重试'};
     }
   }
 }
@@ -842,7 +842,7 @@ class SubscriptionService {
       });
       return res.data as Map<String, dynamic>;
     } catch (e) {
-      return {'error': '订阅失败: $e'};
+      return {'error': '订阅失败，请稍后重试'};
     }
   }
 
@@ -854,7 +854,7 @@ class SubscriptionService {
       });
       return res.data as Map<String, dynamic>;
     } catch (e) {
-      return {'error': '取消失败: $e'};
+      return {'error': '取消失败，请稍后重试'};
     }
   }
 

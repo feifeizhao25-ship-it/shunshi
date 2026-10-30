@@ -57,7 +57,7 @@ class CacheStats {
 /// 缓存键命名规范
 class CacheKeys {
   // 今日数据
-  static String today([String? location]) => 'today:${location ?? 'default'}';
+  static String today([String? location]) => 'today:${location ?? 'default'}'; // zh-gate:allow 缓存键，不显示
   // 节气
   static String solarTerms() => 'solar_terms';
   static String solarTerm(String slug) => 'solar_term:$slug';
@@ -69,16 +69,16 @@ class CacheKeys {
   static String herb(String slug) => 'herb:$slug';
   // 用户
   static String userProfile() => 'user:profile';
-  static String userFavorites([int? page]) => 'user:favorites:${page ?? 1}';
+  static String userFavorites([int? page]) => 'user:favorites:${page ?? 1}'; // zh-gate:allow 缓存键，不显示
   static String userJournals(String from, String to) => 'user:journals:$from:$to';
   static String userBodyType() => 'user:body_type';
   // 对话
   static String chatSession(String id) => 'chat:session:$id';
-  static String chatSessions([int? page]) => 'chat:sessions:${page ?? 1}';
+  static String chatSessions([int? page]) => 'chat:sessions:${page ?? 1}'; // zh-gate:allow 缓存键，不显示
   // 搜索
   static String search(String query) => 'search:$query';
   // 社区
-  static String communityFeed(String type, [int? page]) => 'community:feed:$type:${page ?? 1}';
+  static String communityFeed(String type, [int? page]) => 'community:feed:$type:${page ?? 1}'; // zh-gate:allow 缓存键，不显示
   // 会员
   static String plans() => 'plans';
 

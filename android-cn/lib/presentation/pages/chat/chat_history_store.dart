@@ -31,7 +31,7 @@ class ChatHistoryStore {
   ChatHistoryStore(this.prefs, this.token);
 
   String _key(String owner, String kind, [String? conversation]) =>
-      'chat_v2_${base64Url.encode(utf8.encode(jsonEncode([owner, kind, conversation])))}';
+      'chat_v2_${base64Url.encode(utf8.encode(jsonEncode([owner, kind, conversation])))}'; // zh-gate:allow 存储键，不显示
 
   bool get _current =>
       token.isNotEmpty && prefs.getString('auth_token') == token;

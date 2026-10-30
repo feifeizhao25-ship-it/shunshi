@@ -85,11 +85,13 @@ class AISafetyService {
     '结束生命', '活着没意思',
   ];
 
+  // zh-gate:allow-begin 用于识别用户输入里的英文求助/症状词，不会显示给用户
   static const List<String> _crisisKeywordsEn = [
     'suicide', 'kill myself', 'end my life', 'want to die',
     "don't want to live", 'self-harm', 'self harm', 'hurt myself',
     'overdose', 'end it all',
   ];
+  // zh-gate:allow-end
 
   // 高风险关键词 — 需要强烈警告
   static const List<String> _highRiskKeywords = [
@@ -98,11 +100,13 @@ class AISafetyService {
     '过敏休克', '呼吸困难', '胸痛', '剧烈头痛',
   ];
 
+  // zh-gate:allow-begin 用于识别用户输入里的英文求助/症状词，不会显示给用户
   static const List<String> _highRiskKeywordsEn = [
     'depression', 'heart attack', 'cancer', 'tumor', 'seizure',
     'overdose', 'anaphylaxis', 'can\'t breathe', 'chest pain',
     'severe headache', 'stroke',
   ];
+  // zh-gate:allow-end
 
   // 中等风险关键词 — 添加免责声明
   static const List<String> _mediumRiskKeywords = [
@@ -111,11 +115,13 @@ class AISafetyService {
     '吃药', '用药', '停药', '药物', '手术', '怀孕', '流产',
   ];
 
+  // zh-gate:allow-begin 用于识别用户输入里的英文求助/症状词，不会显示给用户
   static const List<String> _mediumRiskKeywordsEn = [
     'fever', 'cough', 'headache', 'stomach pain', 'diarrhea', 'vomiting',
     'rash', 'bleeding', 'high blood pressure', 'diabetes', 'heart disease',
     'pregnancy', 'medication', 'surgery',
   ];
+  // zh-gate:allow-end
 
   /// 评估输入的健康风险等级
   static RiskLevel assessRisk(String input) {
@@ -149,10 +155,7 @@ class AISafetyService {
   }
 
   /// 获取危机响应文本
-  static String getCrisisResponse(RiskLevel level, {bool isEnglish = false}) {
-    if (isEnglish) {
-      return _getCrisisResponseEn(level);
-    }
+  static String getCrisisResponse(RiskLevel level) {
     return _getCrisisResponseCn(level);
   }
 
@@ -168,30 +171,6 @@ class AISafetyService {
             '顺时是人工智能，不是真人，不能替代医生诊断。';
       case RiskLevel.medium:
         return '📌 以下内容只供作息参考。如有持续不适，请咨询医师。';
-      case RiskLevel.low:
-        return '';
-    }
-  }
-
-  static String _getCrisisResponseEn(RiskLevel level) {
-    switch (level) {
-      case RiskLevel.crisis:
-        return 'It sounds like you\'re going through a really difficult time. '
-            'Please reach out to someone who can help:\n\n'
-            '• 988 Suicide & Crisis Lifeline (US)\n'
-            '• 111 NHS Mental Health (UK)\n'
-            '• findahelpline.com (International)\n\n'
-            'You don\'t have to face this alone. SEASONS cannot replace '
-            'professional medical care.';
-      case RiskLevel.high:
-        return '⚠️ The health issue you mentioned requires professional medical '
-            'attention. Please consult a healthcare provider as soon as possible.\n\n'
-            'SEASONS provides wellness suggestions based on traditional wisdom only '
-            'and cannot replace medical diagnosis.';
-      case RiskLevel.medium:
-        return '📌 Note: Suggestions below are based on traditional wellness '
-            'principles and are for reference only. Please consult a healthcare '
-            'provider for persistent symptoms.';
       case RiskLevel.low:
         return '';
     }

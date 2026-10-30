@@ -82,7 +82,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
                   _message('复制失败，请重试');
                 }
               },
-              child: const Text('复制 JSON'),
+              child: const Text('复制数据'),
             ),
           ],
         ),
@@ -199,7 +199,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
           _buildTile(
             icon: Icons.download_outlined,
             title: '导出我的数据',
-            subtitle: '查看账户数据及国内付款、退款申请记录，可复制 JSON',
+            subtitle: '查看账户数据及国内付款、退款申请记录，可复制数据',
             onTap: (_exporting || _deleting) ? null : _exportData,
             trailing: _exporting
                 ? SizedBox(

@@ -93,7 +93,7 @@ class ApiClient {
                     await StorageManager.user.saveRefreshToken(newRefresh);
                   // 重试原请求
                   error.requestOptions.headers['Authorization'] =
-                      'Bearer $newToken';
+                      'Bearer $newToken'; // zh-gate:allow HTTP 头
                   return handler.resolve(
                     await _dio.fetch(error.requestOptions),
                   );

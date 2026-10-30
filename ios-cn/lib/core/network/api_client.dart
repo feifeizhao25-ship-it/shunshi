@@ -18,7 +18,7 @@ class ApiClient {
         receiveTimeout: const Duration(seconds: 30),
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json',
+          'Accept': 'application/json', // zh-gate:allow HTTP 头
           if (authToken != null) 'Authorization': 'Bearer $authToken',
         },
       ),

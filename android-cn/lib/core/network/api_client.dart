@@ -106,7 +106,7 @@ class ApiClient {
         sendTimeout: AppConfig.sendTimeout,
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json',
+          'Accept': 'application/json', // zh-gate:allow HTTP 头
         },
       ),
     );
@@ -181,7 +181,7 @@ class ApiClient {
     final p95 = _p95TargetByLevel[_parseLevel(level)] ?? 300;
 
     if (kDebugMode) {
-      final warn = duration > p95 ? ' ⚠️ SLOW' : '';
+      final warn = duration > p95 ? ' ⚠️ SLOW' : ''; // zh-gate:allow 调试日志
       print(
         '← ${response.statusCode} ${response.requestOptions.path} ${duration}ms [$level]$warn',
       );
@@ -279,7 +279,7 @@ class ApiClient {
 
     if (kDebugMode) {
       print(
-        '✗ ${options.method} ${options.path} ${error.message} (retry=$retryCount)',
+        '✗ ${options.method} ${options.path} ${error.message} (retry=$retryCount)', // zh-gate:allow 调试日志
       );
     }
 
@@ -304,7 +304,7 @@ class ApiClient {
     try {
       final refreshToken = await tokenStorage.getRefreshToken();
       if (refreshToken == null) {
-        _refreshCompleter!.completeError('No refresh token');
+        _refreshCompleter!.completeError('登录凭证已失效，请重新登录');
         return null;
       }
 
@@ -335,7 +335,7 @@ class ApiClient {
         return newAccessToken;
       }
 
-      _refreshCompleter!.completeError('Invalid refresh response');
+      _refreshCompleter!.completeError('登录状态刷新失败，请重新登录');
       return null;
     } catch (e) {
       _refreshCompleter!.completeError(e);
@@ -458,7 +458,7 @@ class ApiClient {
     final opts = Options(
       responseType: ResponseType.stream,
       extra: {'speedLevel': SpeedLevel.s3},
-      headers: {'Accept': 'text/event-stream', 'Cache-Control': 'no-cache'},
+      headers: {'Accept': 'text/event-stream', 'Cache-Control': 'no-cache'}, // zh-gate:allow HTTP 头
     );
     final response = await _dio.post<ResponseBody>(
       _versionedPath(path),
@@ -555,5 +555,5 @@ class PerformanceEvent {
 
   @override
   String toString() =>
-      '$method $endpoint → $statusCode ${durationMs}ms [$level] cache=$cacheHit';
+      '$method $endpoint → $statusCode ${durationMs}ms [$level] cache=$cacheHit'; // zh-gate:allow 调试日志
 }

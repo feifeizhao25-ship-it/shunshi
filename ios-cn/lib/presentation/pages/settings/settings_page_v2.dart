@@ -65,7 +65,7 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
               const SizedBox(width: 12),
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text('云水禅心', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
-                Text('账号：shunshi_2024', style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context))),
+                Text('账号信息见「我的」页', style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context))),
               ]),
             ]),
           ),
@@ -151,7 +151,7 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
             ),
           ),
           const SizedBox(height: 16),
-          Center(child: Text('DESIGNED BY SHUNSHI · 顺时养生', style: TextStyle(fontSize: 10, color: AppColors.textTertiary(context), letterSpacing: 1))),
+          Center(child: Text('顺时 · 顺应节气的日常养生', style: TextStyle(fontSize: 10, color: AppColors.textTertiary(context), letterSpacing: 1))),
           const SizedBox(height: 32),
         ],
       ),

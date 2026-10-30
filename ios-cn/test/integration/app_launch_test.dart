@@ -25,13 +25,13 @@ void main() {
       expect(find.byType(MaterialApp), findsOneWidget);
     });
 
-    testWidgets('app title is 顺时 ShunShi', (tester) async {
+    testWidgets('app title is 顺时', (tester) async {
       await tester.pumpWidget(
         const ProviderScope(child: ShunshiApp()),
       );
 
       final MaterialApp app = tester.widget(find.byType(MaterialApp));
-      expect(app.title, '顺时 ShunShi');
+      expect(app.title, '顺时');
       await tester.pump(const Duration(milliseconds: 1600));
     });
   });
