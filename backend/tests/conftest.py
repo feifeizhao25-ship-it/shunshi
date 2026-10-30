@@ -33,6 +33,18 @@ init_product_db()
 
 
 @pytest.fixture(autouse=True)
+def _drop_legacy_jwt_secret_env(monkeypatch):
+    """CI exports the legacy JWT_SECRET next to SHUNSHI_JWT_SECRET.
+
+    create_app() refuses to start when the legacy name differs from the secret in
+    the Settings object, and many tests build Settings with their own secret. The
+    legacy name is only read at import time by a few tests, so dropping it for the
+    duration of each test keeps those tests independent of the CI environment.
+    """
+    monkeypatch.delenv("JWT_SECRET", raising=False)
+
+
+@pytest.fixture(autouse=True)
 def stub_external_alipay_order_creation(monkeypatch):
     """Keep tests deterministic without weakening production payment checks."""
 
