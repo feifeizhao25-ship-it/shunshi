@@ -129,7 +129,7 @@ class _ExerciseDetailPageState extends State<ExerciseDetailPage>
                       children: [
                         // Title + duration
                         Text(
-                          'QI GONG TUTORIAL',
+                          '功法教程',
                           style: TextStyle(
                             fontFamily: ShunShiTypography.sansFamily,
                             fontSize: 11,

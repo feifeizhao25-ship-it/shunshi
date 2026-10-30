@@ -1,3 +1,4 @@
+import 'package:shunshi/core/utils/zh_labels.dart';
 import 'package:flutter/material.dart';
 import 'package:shunshi/core/theme/shunshi_colors.dart';
 import 'package:shunshi/core/theme/shunshi_text_styles.dart';
@@ -111,7 +112,7 @@ class SystemPromptCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
-                '${cardData['difficulty']}',
+                ZhLabels.difficulty(cardData['difficulty']),
                 style: ShunshiTextStyles.caption.copyWith(color: Colors.white),
               ),
             ),
@@ -278,7 +279,7 @@ class SystemPromptCard extends StatelessWidget {
 
   Widget _buildSleepContent(BuildContext context) {
     final method = cardData['method'] ?? '';
-    final bestTime = cardData['best_time'] ?? '';
+    final bestTime = ZhLabels.bestTime(cardData['best_time']);
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
       child: Column(

@@ -152,7 +152,7 @@ class StoreService {
     } catch (e) {
       debugPrint('[StoreService] 处理恢复购买异常: $e');
       _onRestoreComplete?.call(
-        RestoreResult(success: false, message: '恢复购买失败: $e'),
+        RestoreResult(success: false, message: '恢复购买失败，请稍后重试'),
       );
     }
   }
@@ -270,7 +270,7 @@ class StoreService {
       return RestoreResult(success: false, message: '网络连接失败，请检查网络后重试');
     } catch (e) {
       debugPrint('[StoreService] 恢复购买异常: $e');
-      return RestoreResult(success: false, message: '恢复购买失败: $e');
+      return RestoreResult(success: false, message: '恢复购买失败，请稍后重试');
     }
   }
 
@@ -319,7 +319,7 @@ class StoreService {
       // 调用方通过 onResult 回调获取结果
     } catch (e) {
       debugPrint('[StoreService] 恢复购买异常: $e');
-      onResult?.call(RestoreResult(success: false, message: '恢复购买失败: $e'));
+      onResult?.call(RestoreResult(success: false, message: '恢复购买失败，请稍后重试'));
     }
   }
 
@@ -408,5 +408,5 @@ class RestoreResult {
 
   @override
   String toString() =>
-      'RestoreResult(success: $success, plan: $plan, message: $message)';
+      'RestoreResult(success: $success, plan: $plan, message: $message)'; // zh-gate:allow toString 调试文字
 }

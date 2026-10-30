@@ -1,3 +1,4 @@
+import 'package:shunshi/core/utils/zh_labels.dart';
 import '../../../core/router/safe_pop.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -250,7 +251,7 @@ class _ExercisePageState extends State<ExercisePage> {
                 spacing: 8,
                 children: [
                   _buildTag(exercise['duration'] ?? '', Colors.grey[200]!),
-                  _buildTag(exercise['difficulty'] ?? '', Colors.green[100]!),
+                  _buildTag(ZhLabels.difficulty(exercise['difficulty']), Colors.green[100]!),
                   _buildTag(exercise['category'] ?? '', Colors.orange[100]!),
                   ...tags.map((t) => _buildTag(t.toString(), Colors.blue[50]!)),
                 ],
@@ -393,7 +394,7 @@ class _ExerciseCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${exercise['category'] ?? ''} · ${exercise['duration'] ?? ''} · ${exercise['difficulty'] ?? ''}',
+                      '${exercise['category'] ?? ''} · ${exercise['duration'] ?? ''} · ${ZhLabels.difficulty(exercise['difficulty'])}',
                       style: TextStyle(color: Colors.grey[600]),
                     ),
                     if (benefits.isNotEmpty) ...[

@@ -149,7 +149,7 @@ class _AcupointTimerSheetState extends State<AcupointTimerSheet>
           )),
           Column(children: [
             Text(_formatTime(_remainingSeconds), style: TextStyle(
-              fontSize: 40, fontWeight: FontWeight.w300, color: ShunShiColors.textPrimary, fontFamily: 'SF Mono')),
+              fontSize: 40, fontWeight: FontWeight.w300, color: ShunShiColors.textPrimary, fontFamily: 'SF Mono')), // zh-gate:allow 字体名
             const SizedBox(height: 4),
             Text(_breathPhase, style: TextStyle(fontSize: 14, color: _breathPhase == '完成'
               ? Colors.green : ShunShiColors.primary, fontWeight: FontWeight.w500)),

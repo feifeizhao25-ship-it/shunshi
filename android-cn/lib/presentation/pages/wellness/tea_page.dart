@@ -1,3 +1,4 @@
+import 'package:shunshi/core/utils/zh_labels.dart';
 import '../../../core/router/safe_pop.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -424,6 +425,6 @@ class _TeaCard extends StatelessWidget {
       'evening': '晚上',
       'all': '全天',
     };
-    return labels[timeOfDay] ?? timeOfDay;
+    return labels[timeOfDay] ?? ZhLabels.bestTime(timeOfDay);
   }
 }

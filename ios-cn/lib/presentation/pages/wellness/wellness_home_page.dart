@@ -121,7 +121,7 @@ class WellnessHomePage extends StatelessWidget {
                                 fontFamily: ShunShiTypography.serifFamily,
                                 color: AppColors.primary(context), letterSpacing: -0.5,
                               )),
-                              Text("Editor's Choice", style: TextStyle(
+                              Text('编辑精选', style: TextStyle(
                                 fontSize: 11, fontWeight: FontWeight.w500,
                                 color: AppColors.secondary(context), letterSpacing: 1.5,
                               )),

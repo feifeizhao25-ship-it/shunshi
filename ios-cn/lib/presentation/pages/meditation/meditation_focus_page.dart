@@ -30,10 +30,10 @@ class _MeditationFocusPageState extends State<MeditationFocusPage>
   int _selectedAtmosphere = 0;
 
   static const _atmospheres = [
-    _Atmosphere('Soft Rain', Icons.water_drop),
+    _Atmosphere('细雨', Icons.water_drop),
     _Atmosphere('晨间林地', Icons.forest),
     _Atmosphere('静室', Icons.spa),
-    _Atmosphere('Season', Icons.wb_sunny),
+    _Atmosphere('四时', Icons.wb_sunny),
   ];
 
   @override
@@ -92,7 +92,7 @@ class _MeditationFocusPageState extends State<MeditationFocusPage>
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Row(children: [
-                    Text('SEASONS', style: TextStyle(
+                    Text('顺时', style: TextStyle(
                       fontSize: 16, fontWeight: FontWeight.w700,
                       color: AppColors.primary(context), fontFamily: ShunShiTypography.serifFamily,
                     )),
@@ -108,7 +108,7 @@ class _MeditationFocusPageState extends State<MeditationFocusPage>
             const Spacer(),
 
             // ── Title ──
-            Text('Breathing into Change', style: TextStyle(
+            Text('随呼吸，顺时而变', style: TextStyle(
               fontSize: 24, fontWeight: FontWeight.w700,
               color: AppColors.textPrimary(context), fontFamily: ShunShiTypography.serifFamily,
             )),
@@ -195,7 +195,7 @@ class _MeditationFocusPageState extends State<MeditationFocusPage>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Atmosphere Layer', style: TextStyle(
+                  Text('环境音', style: TextStyle(
                     fontSize: 13, fontWeight: FontWeight.w600,
                     color: AppColors.textSecondary(context),
                     fontFamily: ShunShiTypography.sansFamily,

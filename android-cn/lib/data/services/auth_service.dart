@@ -52,7 +52,7 @@ class AuthService {
         return {'error': response['detail'] ?? 'Google 登录失败'};
       }
     } catch (e) {
-      return {'error': 'Google 登录失败: ${e.toString()}'};
+      return {'error': 'Google 登录失败，请稍后重试'};
     }
   }
 
@@ -93,10 +93,10 @@ class AuthService {
       } else {
         return {'error': response['detail'] ?? 'Apple 登录失败'};
       }
-    } on SignInWithAppleException catch (e) {
-      return {'error': 'Apple 登录失败: ${e.toString()}'};
+    } on SignInWithAppleException {
+      return {'error': 'Apple 登录失败，请稍后重试'};
     } catch (e) {
-      return {'error': 'Apple 登录失败: ${e.toString()}'};
+      return {'error': 'Apple 登录失败，请稍后重试'};
     }
   }
 
@@ -119,7 +119,7 @@ class AuthService {
         return {'error': response['detail'] ?? '登录失败'};
       }
     } catch (e) {
-      return {'error': '登录失败: ${e.toString()}'};
+      return {'error': '登录失败，请稍后重试'};
     }
   }
 
@@ -142,7 +142,7 @@ class AuthService {
         return {'error': response['detail'] ?? '注册失败'};
       }
     } catch (e) {
-      return {'error': '注册失败: ${e.toString()}'};
+      return {'error': '注册失败，请稍后重试'};
     }
   }
 
@@ -164,7 +164,7 @@ class AuthService {
         return {'error': response['detail'] ?? '游客登录失败'};
       }
     } catch (e) {
-      return {'error': '游客登录失败: ${e.toString()}'};
+      return {'error': '游客登录失败，请稍后重试'};
     }
   }
 
@@ -211,7 +211,7 @@ class AuthService {
         return {'error': response['detail'] ?? '升级失败'};
       }
     } catch (e) {
-      return {'error': '升级失败: ${e.toString()}'};
+      return {'error': '升级失败，请稍后重试'};
     }
   }
 

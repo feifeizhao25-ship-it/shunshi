@@ -48,7 +48,7 @@ class _ShunshiAppState extends State<ShunshiApp> {
       builder: (context, _) {
         return MaterialApp.router(
           routerConfig: AppRouter.router,
-          title: '顺时 ShunShi',
+          title: '顺时',
           debugShowCheckedModeBanner: false,
           theme: ShunShiTheme.lightTheme,
           darkTheme: ShunShiTheme.darkTheme,

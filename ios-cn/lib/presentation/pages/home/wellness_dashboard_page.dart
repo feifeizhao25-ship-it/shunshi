@@ -104,7 +104,7 @@ class WellnessDashboardPage extends StatelessWidget {
                       fontSize: 42, fontWeight: FontWeight.w300, color: AppColors.primary(context),
                       height: 1.1, letterSpacing: -1, fontFamily: ShunShiTypography.serifFamily,
                     )),
-                    Text('Spring Equinox', style: TextStyle(
+                    Text('二十四节气', style: TextStyle(
                       fontSize: 16, fontWeight: FontWeight.w300, color: AppColors.primary(context),
                       fontFamily: ShunShiTypography.serifFamily, fontStyle: FontStyle.italic,
                     )),

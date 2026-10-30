@@ -387,9 +387,9 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
   bool get _isPaidTier {
     final t = _subscriptionTier ?? '';
     if (t.isEmpty) return false;
-    const freeWords = ['免费', 'free', 'Free', 'FREE'];
+    const freeWords = ['免费', 'free', 'Free', 'FREE']; // zh-gate:allow 匹配后端档位名，不显示
     if (freeWords.any(t.contains)) return false;
-    const paidWords = ['VIP', 'vip', 'SVIP', 'Pro', 'pro', '会员', '年卡', '月卡', 'Plus', 'plus'];
+    const paidWords = ['VIP', 'vip', 'SVIP', 'Pro', 'pro', '会员', '年卡', '月卡', 'Plus', 'plus']; // zh-gate:allow 匹配后端档位名，不显示
     return paidWords.any(t.contains);
   }
 

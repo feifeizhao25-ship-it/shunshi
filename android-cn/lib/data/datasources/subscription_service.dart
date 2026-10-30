@@ -20,7 +20,7 @@ class SubscriptionService {
     dio.interceptors.add(InterceptorsWrapper(onRequest: (options, handler) {
       final token = StorageManager.user.getToken();
       if (token != null && token.isNotEmpty) {
-        options.headers['Authorization'] = 'Bearer $token';
+        options.headers['Authorization'] = 'Bearer $token'; // zh-gate:allow HTTP 头
       }
       handler.next(options);
     }));
@@ -134,7 +134,7 @@ class SubscriptionService {
     final token = StorageManager.user.getToken();
     return token == null || token.isEmpty
         ? const {}
-        : {'Authorization': 'Bearer $token'};
+        : {'Authorization': 'Bearer $token'}; // zh-gate:allow HTTP 头
   }
 
   /// 轮询订单状态（扫码支付场景）

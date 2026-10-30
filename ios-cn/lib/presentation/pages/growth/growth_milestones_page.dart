@@ -39,7 +39,7 @@ class GrowthMilestonesPage extends StatelessWidget {
           icon: const Icon(Icons.arrow_back_ios_new, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text('Growth Milestones', style: TextStyle(
+        title: Text('成长里程碑', style: TextStyle(
           fontSize: 20, fontWeight: FontWeight.w700,
           fontFamily: ShunShiTypography.serifFamily,
           color: AppColors.textPrimary(context),
@@ -138,7 +138,7 @@ class GrowthMilestonesPage extends StatelessWidget {
             const SizedBox(height: 28),
 
             // ── Unlocked ──
-            Text('Unlocked', style: TextStyle(
+            Text('已解锁', style: TextStyle(
               fontSize: 16, fontWeight: FontWeight.w700,
               color: AppColors.textPrimary(context), fontFamily: ShunShiTypography.serifFamily,
             )),
@@ -155,7 +155,7 @@ class GrowthMilestonesPage extends StatelessWidget {
             const SizedBox(height: 24),
 
             // ── Locked ──
-            Text('Journey Ahead', style: TextStyle(
+            Text('前路可期', style: TextStyle(
               fontSize: 16, fontWeight: FontWeight.w700,
               color: AppColors.textPrimary(context), fontFamily: ShunShiTypography.serifFamily,
             )),

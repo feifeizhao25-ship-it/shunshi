@@ -120,7 +120,7 @@ class BodyTypeEssencePage extends StatelessWidget {
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
-                          '"Harmony in Flux"',
+                          '「阴阳流转，动态平衡」',
                           style: TextStyle(
                             fontSize: 16, fontWeight: FontWeight.w600,
                             color: ShunShiColors.primary,

@@ -1,3 +1,4 @@
+import 'package:shunshi/core/utils/zh_labels.dart';
 import '../../../core/router/safe_pop.dart';
 import 'package:flutter/material.dart';
 import '../../../data/network/api_client.dart';
@@ -184,7 +185,7 @@ class _AcupressurePageState extends State<AcupressurePage> {
                           ],
                           if (point['difficulty'] != null) ...[
                             const SizedBox(height: 8),
-                            _buildInfoRow('难度', point['difficulty']),
+                            _buildInfoRow('难度', ZhLabels.difficulty(point['difficulty'])),
                           ],
                           if (point['steps'] != null && point['steps'] is List) ...[
                             const SizedBox(height: 12),

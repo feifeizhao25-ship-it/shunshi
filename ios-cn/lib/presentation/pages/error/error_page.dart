@@ -31,7 +31,7 @@ class ErrorPage extends StatelessWidget {
     }
     if (error is Exception || error is Error) {
       final msg = error.toString();
-      if (msg.contains('404') || msg.toLowerCase().contains('not found')) {
+      if (msg.contains('404') || msg.toLowerCase().contains('not found')) { // zh-gate:allow 匹配异常文字，不显示
         return '找不到这个页面';
       }
       if (msg.contains('network') || msg.contains('socket')) {
@@ -189,7 +189,7 @@ class _DebugErrorCardState extends State<_DebugErrorCard> {
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  'Debug 信息 (点击${_expanded ? '收起' : '展开'})',
+                  '调试信息（点击${_expanded ? '收起' : '展开'})',
                   style: ShunshiTextStyles.caption.copyWith(
                     color:
                         isDark ? ShunshiDarkColors.textHint : AppColors.textTertiary(context),

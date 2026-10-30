@@ -20,7 +20,7 @@ class SolarTermAIDetailPage extends StatelessWidget {
   // 节气数据映射
   static const _termData = {
     '春分': _TermData(
-      englishName: 'Spring Equinox',
+      englishName: '二十四节气 · 第4个',
       season: '春季 · 第四节气',
       quote: '昼夜均而寒暑平。',
       description: '春分，是春季九十日之半。此日太阳直射赤道，阴阳相半，万物生长进入最为繁茂的阶段。于身心而言，正是调和阴阳、顺应生发的黄金时刻。',
@@ -33,11 +33,11 @@ class SolarTermAIDetailPage extends StatelessWidget {
       exerciseDesc: '调理脾胃须单举。调理脾胃气机，促进中焦运化。',
       meditationTitle: '春分 · 阴阳平衡引导',
       meditationDesc: '随着柔和的春雨声，引导意识在身体内达成动态平衡，如同春分的昼夜一般和谐。',
-      meditationDuration: '12:00 MIN',
+      meditationDuration: '12 分钟',
       gradient: [Color(0xFF144227), Color(0xFF2D5A3D)],
     ),
     '惊蛰': _TermData(
-      englishName: 'Awakening of Insects',
+      englishName: '二十四节气 · 第3个',
       season: '春季 · 第三节气',
       quote: '春雷响，万物长。',
       description: '惊蛰时节，阳气上升，万物萌动。人体肝气亦随之旺盛，宜疏肝理气、养护脾胃。',
@@ -50,7 +50,7 @@ class SolarTermAIDetailPage extends StatelessWidget {
       exerciseDesc: '两手托天理三焦。疏通三焦气机，调和内脏。',
       meditationTitle: '惊蛰 · 肝木舒展',
       meditationDesc: '倾听春雷渐起，感受体内阳气如草木般萌动。',
-      meditationDuration: '10:00 MIN',
+      meditationDuration: '10 分钟',
       gradient: [Color(0xFF2D5A3D), Color(0xFF3B684A)],
     ),
   };
@@ -58,7 +58,7 @@ class SolarTermAIDetailPage extends StatelessWidget {
   _TermData get _data =>
       _termData[termName] ??
       _TermData(
-        englishName: englishName ?? termName,
+        englishName: englishName ?? '二十四节气',
         season: season ?? '二十四节气',
         quote: '顺天时，养正气。',
         description: '$termName时节，阴阳交替，万物更新。顺应自然节律，调和身心。',
@@ -71,7 +71,7 @@ class SolarTermAIDetailPage extends StatelessWidget {
         exerciseDesc: '适度运动，疏通经络。',
         meditationTitle: '$termName · 静心引导',
         meditationDesc: '聆听自然之声，感受节气韵律。',
-        meditationDuration: '10:00 MIN',
+        meditationDuration: '10 分钟',
         gradient: [Color(0xFF144227), Color(0xFF2D5A3D)],
       );
 

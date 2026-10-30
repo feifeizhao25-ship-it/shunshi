@@ -736,7 +736,7 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
         const SizedBox(height: 12),
         _buildBenefit(
           Icons.auto_awesome,
-          'AI私人订制方案',
+          'AI 个性化方案',
           '按二十四节气安排当天作息，不是诊疗方案。',
         ),
         _buildBenefit(
