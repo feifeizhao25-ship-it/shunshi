@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/theme.dart';
+import '../../../design_system/app_colors.dart';
 
 /// 温和按钮 — 顺时版
 ///
@@ -59,8 +60,8 @@ class _GentleButtonState extends State<GentleButton>
           : ShunshiDarkColors.surfaceDim;
     }
     return widget.isPrimary
-        ? ShunshiColors.primary
-        : ShunshiColors.surfaceDim;
+        ? AppColors.primary(context)
+        : AppColors.surfaceContainerLow(context);
   }
 
   Color _textColor(BuildContext context) {
@@ -69,7 +70,7 @@ class _GentleButtonState extends State<GentleButton>
           ? ShunshiDarkColors.background
           : ShunshiDarkColors.textPrimary;
     }
-    return widget.isPrimary ? Colors.white : ShunshiColors.textPrimary;
+    return widget.isPrimary ? Colors.white : AppColors.textPrimary(context);
   }
 
   @override

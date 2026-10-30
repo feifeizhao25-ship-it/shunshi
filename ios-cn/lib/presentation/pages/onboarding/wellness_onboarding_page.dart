@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../design_system/theme.dart';
+import '../../../design_system/app_colors.dart';
 
 /// 极速引导页 — 3步完成，每步2-5秒
 class WellnessOnboardingPage extends StatefulWidget {
@@ -83,13 +84,13 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
 
   bool get _dark => Theme.of(context).brightness == Brightness.dark;
   bool get _wide => MediaQuery.sizeOf(context).shortestSide >= 600;
-  Color get _bg => _dark ? ShunShiColors.darkBackground : ShunShiColors.background;
-  Color get _text => _dark ? ShunShiColors.darkTextPrimary : ShunShiColors.textPrimary;
-  Color get _textSecondary => _dark ? ShunShiColors.darkTextSecondary : ShunShiColors.textSecondary;
-  Color get _textTertiary => _dark ? ShunShiColors.darkTextTertiary : ShunShiColors.textTertiary;
-  Color get _surface => _dark ? ShunShiColors.darkSurfaceContainerLowest : ShunShiColors.surfaceContainerLowest;
-  Color get _border => _dark ? ShunShiColors.darkBorder : ShunShiColors.border;
-  Color get _accent => _dark ? ShunShiColors.darkPrimary : ShunShiColors.primary;
+  Color get _bg => _dark ? ShunShiColors.darkBackground : AppColors.background(context);
+  Color get _text => _dark ? ShunShiColors.darkTextPrimary : AppColors.textPrimary(context);
+  Color get _textSecondary => _dark ? ShunShiColors.darkTextSecondary : AppColors.textSecondary(context);
+  Color get _textTertiary => _dark ? ShunShiColors.darkTextTertiary : AppColors.textTertiary(context);
+  Color get _surface => _dark ? ShunShiColors.darkSurfaceContainerLowest : AppColors.surfaceContainerLowest(context);
+  Color get _border => _dark ? ShunShiColors.darkBorder : AppColors.border(context);
+  Color get _accent => _dark ? ShunShiColors.darkPrimary : AppColors.primary(context);
   Color get _onButton => _dark ? const Color(0xFF121212) : Colors.white;
 
   @override
@@ -140,8 +141,8 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
         Container(
           width: _wide ? 120 : 88, height: _wide ? 120 : 88,
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [ShunShiColors.primary, ShunShiColors.primaryLight],
+            gradient: LinearGradient(
+              colors: [AppColors.primary(context), AppColors.primaryLight(context)],
             ),
             borderRadius: BorderRadius.circular(_wide ? 28 : 22),
           ),
@@ -171,7 +172,7 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
           child: ElevatedButton(
             onPressed: _nextPage,
             style: ElevatedButton.styleFrom(
-              backgroundColor: _dark ? ShunShiColors.darkPrimary : ShunShiColors.primary,
+              backgroundColor: _dark ? ShunShiColors.darkPrimary : AppColors.primary(context),
               foregroundColor: _onButton,
               elevation: 0,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -294,7 +295,7 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
           child: ElevatedButton(
             onPressed: _finish,
             style: ElevatedButton.styleFrom(
-              backgroundColor: _dark ? ShunShiColors.darkPrimary : ShunShiColors.primary,
+              backgroundColor: _dark ? ShunShiColors.darkPrimary : AppColors.primary(context),
               foregroundColor: _onButton,
               elevation: 0,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),

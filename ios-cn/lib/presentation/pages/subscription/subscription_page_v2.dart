@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../data/network/api_client.dart';
 import '../../../data/models/subscription.dart';
 import '../../../data/services/store_service.dart';
+import '../../../design_system/app_colors.dart';
 
 class SubscriptionPageV2 extends StatefulWidget {
   const SubscriptionPageV2({
@@ -145,7 +146,7 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2>
     final paid = _status?.isActive == true && _status?.planId != 'free';
     final expiry = _status?.expiresAt?.toLocal();
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7F3),
+      backgroundColor: AppColors.background(context),
       appBar: AppBar(
         title: const Text('会员中心'),
         actions: [
@@ -162,7 +163,7 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2>
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: const Color(0xFF205C44),
+              color: AppColors.primaryContainerDeep(context),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Column(
@@ -228,9 +229,9 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2>
               ),
             ),
           const SizedBox(height: 12),
-          const Text(
+          Text(
             '价格由苹果商店提供，金额、订阅周期及续订条件请在购买确认页核对。您可在苹果账户的订阅设置中管理订阅。',
-            style: TextStyle(height: 1.6, color: Color(0xFF58645D)),
+            style: TextStyle(height: 1.6, color: AppColors.textSecondary(context)),
           ),
           const SizedBox(height: 16),
           FilledButton(
@@ -253,9 +254,9 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2>
               child: Text(_notice!, style: const TextStyle(height: 1.6)),
             ),
           const SizedBox(height: 12),
-          const Text(
+          Text(
             '更换设备后，请使用原购买所用的苹果账户恢复购买。未完成核验的订单不会在本页显示为已开通。',
-            style: TextStyle(height: 1.6, color: Color(0xFF58645D)),
+            style: TextStyle(height: 1.6, color: AppColors.textSecondary(context)),
           ),
         ],
       ),

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import '../../../core/theme/shunshi_text_styles.dart';
+import '../../../design_system/app_colors.dart';
+import '../../../design_system/style_theming.dart';
 
 /// 顺时边界公示页 — 清楚告知用户产品边界
 class BoundariesPage extends StatelessWidget {
@@ -10,10 +12,10 @@ class BoundariesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ShunshiColors.background,
+      backgroundColor: AppColors.background(context),
       appBar: AppBar(
-        backgroundColor: ShunshiColors.background,
-        foregroundColor: ShunshiColors.textPrimary,
+        backgroundColor: AppColors.background(context),
+        foregroundColor: AppColors.textPrimary(context),
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -35,8 +37,8 @@ class BoundariesPage extends StatelessWidget {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    ShunshiColors.primary.withValues(alpha: 0.1),
-                    ShunshiColors.primary.withValues(alpha: 0.05),
+                    AppColors.primary(context).withValues(alpha: 0.1),
+                    AppColors.primary(context).withValues(alpha: 0.05),
                   ],
                 ),
                 borderRadius: BorderRadius.circular(16),
@@ -50,13 +52,13 @@ class BoundariesPage extends StatelessWidget {
                   const SizedBox(height: 12),
                   Text(
                     '顺时不是什么',
-                    style: ShunshiTextStyles.heading.copyWith(fontSize: 22),
+                    style: ShunshiTextStyles.heading.copyWith(fontSize: 22).themed(context),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     '我们坚守的产品底线，为你的健康负责',
                     style: ShunshiTextStyles.body.copyWith(
-                      color: ShunshiColors.textSecondary,
+                      color: AppColors.textSecondary(context),
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -216,7 +218,7 @@ class BoundariesPage extends StatelessWidget {
               child: Text(
                 '顺时 · 祝你顺应自然，身心和谐',
                 style: ShunshiTextStyles.caption.copyWith(
-                  color: ShunshiColors.textHint,
+                  color: AppColors.textTertiary(context),
                 ),
               ),
             ),
@@ -265,7 +267,7 @@ class _SectionTitle extends StatelessWidget {
           child: Text(
             subtitle,
             style: ShunshiTextStyles.caption.copyWith(
-              color: ShunshiColors.textSecondary,
+              color: AppColors.textSecondary(context),
             ),
           ),
         ),
@@ -293,7 +295,7 @@ class _BoundaryCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface(context),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: color.withValues(alpha: 0.3),
@@ -313,7 +315,7 @@ class _BoundaryCard extends StatelessWidget {
                   title,
                   style: ShunshiTextStyles.body.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: ShunshiColors.textPrimary,
+                    color: AppColors.textPrimary(context),
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -321,7 +323,7 @@ class _BoundaryCard extends StatelessWidget {
                   description,
                   style: ShunshiTextStyles.body.copyWith(
                     fontSize: 13,
-                    color: ShunshiColors.textSecondary,
+                    color: AppColors.textSecondary(context),
                     height: 1.5,
                   ),
                 ),

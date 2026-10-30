@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/router/safe_pop.dart';
+import '../../../design_system/app_colors.dart';
 
 class PrivacyPolicyPage extends StatelessWidget {
   const PrivacyPolicyPage({super.key});
@@ -8,8 +9,8 @@ class PrivacyPolicyPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? ShunShiColors.darkBackground : ShunShiColors.background;
-    final textColor = isDark ? ShunShiColors.textPrimary : ShunShiColors.textSecondary;
+    final bg = isDark ? ShunShiColors.darkBackground : AppColors.background(context);
+    final textColor = isDark ? AppColors.textPrimary(context) : AppColors.textSecondary(context);
 
     return Scaffold(
       backgroundColor: bg,
@@ -26,7 +27,7 @@ class PrivacyPolicyPage extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         children: [
-          _sectionTitle('顺时（ShunShi）隐私政策'),
+          _sectionTitle(context, '顺时（ShunShi）隐私政策'),
           _body(
             '最后更新日期：2026年10月23日\n'
             '运营者：北京艾瑞见时科技有限公司。个人信息存放在中国境内。\n'
@@ -34,7 +35,7 @@ class PrivacyPolicyPage extends StatelessWidget {
             textColor,
           ),
           const SizedBox(height: 12),
-          _sectionTitle('一、信息收集范围'),
+          _sectionTitle(context, '一、信息收集范围'),
           _body(
             '我们收集以下信息，用来提供节气与作息安排。体质、作息等与健康有关的内容属于敏感个人信息，只在你填写后用于这些生活提示，不构成医疗诊断，也不用于训练模型。当前没有单独的训练同意开关，因为不会拿这些内容去训练模型。\n\n'
             '1.1 账户信息\n'
@@ -56,7 +57,7 @@ class PrivacyPolicyPage extends StatelessWidget {
             textColor,
           ),
           const SizedBox(height: 12),
-          _sectionTitle('二、信息使用目的'),
+          _sectionTitle(context, '二、信息使用目的'),
           _body(
             '您的信息仅用于以下目的：\n\n'
             '2.1 核心服务\n'
@@ -74,7 +75,7 @@ class PrivacyPolicyPage extends StatelessWidget {
             textColor,
           ),
           const SizedBox(height: 12),
-          _sectionTitle('三、第三方信息共享'),
+          _sectionTitle(context, '三、第三方信息共享'),
           _body(
             '我们不会出售您的个人数据。在以下场景中，我们可能与第三方共享必要信息：\n\n'
             '3.1 服务提供商\n'
@@ -91,7 +92,7 @@ class PrivacyPolicyPage extends StatelessWidget {
             textColor,
           ),
           const SizedBox(height: 12),
-          _sectionTitle('四、数据安全措施'),
+          _sectionTitle(context, '四、数据安全措施'),
           _body(
             '4.1 传输安全\n'
             '• 所有网络通信使用 TLS 1.2+ 加密\n'
@@ -106,7 +107,7 @@ class PrivacyPolicyPage extends StatelessWidget {
             textColor,
           ),
           const SizedBox(height: 12),
-          _sectionTitle('五、您的权利'),
+          _sectionTitle(context, '五、您的权利'),
           _body(
             '5.1 根据《个人信息保护法》（PIPL），您享有以下权利：\n\n'
             '• 知情权：了解我们收集、使用您个人信息的目的和方式\n'
@@ -121,7 +122,7 @@ class PrivacyPolicyPage extends StatelessWidget {
             textColor,
           ),
           const SizedBox(height: 12),
-          _sectionTitle('六、数据保留'),
+          _sectionTitle(context, '六、数据保留'),
           _body(
             '• 账户存续期间：保留所有必要数据以提供服务\n'
             '• 账户注销时：立即删除您的个人数据（对话、记录、家庭成员等）\n'
@@ -130,19 +131,19 @@ class PrivacyPolicyPage extends StatelessWidget {
             textColor,
           ),
           const SizedBox(height: 12),
-          _sectionTitle('七、未成年人保护'),
+          _sectionTitle(context, '七、未成年人保护'),
           _body(
             '我们不向 14 周岁以下未成年人提供服务。如果我们在不知情的情况下收集了未成年人的数据，将在发现后立即删除。',
             textColor,
           ),
           const SizedBox(height: 12),
-          _sectionTitle('八、隐私政策更新'),
+          _sectionTitle(context, '八、隐私政策更新'),
           _body(
             '我们可能会不定期更新本隐私政策。重大变更将通过应用内通知或邮件方式告知您。继续使用本应用即表示您同意更新后的政策。',
             textColor,
           ),
           const SizedBox(height: 12),
-          _sectionTitle('九、联系我们'),
+          _sectionTitle(context, '九、联系我们'),
           _body(
             '数据保护相关问题：\n'
             '• 运营者：北京艾瑞见时科技有限公司\n'
@@ -157,16 +158,16 @@ class PrivacyPolicyPage extends StatelessWidget {
     );
   }
 
-  Widget _sectionTitle(String text) {
+  Widget _sectionTitle(BuildContext context, String text) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Text(
         text,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 17,
           fontWeight: FontWeight.w700,
           fontFamily: ShunShiTypography.serifFamily,
-          color: ShunShiColors.textPrimary,
+          color: AppColors.textPrimary(context),
         ),
       ),
     );

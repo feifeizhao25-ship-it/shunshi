@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/theme/theme.dart';
 import '../../widgets/components/components.dart';
+import '../../../design_system/app_colors.dart';
 
 /// 重新设计的 Onboarding 页面 — 3张核心价值展示
 /// 使用 PageView + dots indicator + SharedPreferences 持久化
@@ -68,17 +69,17 @@ class _OnboardingPageState extends State<OnboardingPage> {
       Theme.of(context).brightness == Brightness.dark;
 
   Color _bg(BuildContext context) =>
-      _isDark(context) ? ShunshiDarkColors.background : ShunshiColors.background;
+      _isDark(context) ? ShunshiDarkColors.background : AppColors.background(context);
   Color _primary(BuildContext context) =>
-      _isDark(context) ? ShunshiDarkColors.primary : ShunshiColors.primary;
+      _isDark(context) ? ShunshiDarkColors.primary : AppColors.primary(context);
   Color _textPrimary(BuildContext context) =>
-      _isDark(context) ? ShunshiDarkColors.textPrimary : ShunshiColors.textPrimary;
+      _isDark(context) ? ShunshiDarkColors.textPrimary : AppColors.textPrimary(context);
   Color _textSecondary(BuildContext context) =>
-      _isDark(context) ? ShunshiDarkColors.textSecondary : ShunshiColors.textSecondary;
+      _isDark(context) ? ShunshiDarkColors.textSecondary : AppColors.textSecondary(context);
   Color _textHint(BuildContext context) =>
-      _isDark(context) ? ShunshiDarkColors.textHint : ShunshiColors.textHint;
+      _isDark(context) ? ShunshiDarkColors.textHint : AppColors.textTertiary(context);
   Color _surfaceDim(BuildContext context) =>
-      _isDark(context) ? ShunshiDarkColors.surfaceDim : ShunshiColors.surfaceDim;
+      _isDark(context) ? ShunshiDarkColors.surfaceDim : AppColors.surfaceContainerLow(context);
 
   @override
   Widget build(BuildContext context) {

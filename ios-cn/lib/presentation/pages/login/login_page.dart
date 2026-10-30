@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../core/theme/shunshi_colors.dart';
+import '../../../design_system/app_colors.dart';
 import '../../../core/theme/shunshi_spacing.dart';
 import '../../../core/theme/shunshi_text_styles.dart';
 import '../../../data/network/api_client.dart';
@@ -260,7 +260,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F6F1), // 强制亮色背景
+      backgroundColor: AppColors.background(context),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(
@@ -279,7 +279,7 @@ class _LoginPageState extends State<LoginPage> {
                       width: 72,
                       height: 72,
                       decoration: BoxDecoration(
-                        color: ShunshiColors.primary.withValues(alpha: 0.15),
+                        color: AppColors.primary(context).withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: const Center(
@@ -287,9 +287,9 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    Text('顺时', style: ShunshiTextStyles.greeting),
+                    Text('顺时', style: ShunshiTextStyles.greeting.copyWith(color: AppColors.textPrimary(context))),
                     const SizedBox(height: 4),
-                    Text('顺应时节，养生有道', style: ShunshiTextStyles.bodySecondary),
+                    Text('顺应时节，养生有道', style: ShunshiTextStyles.bodySecondary.copyWith(color: AppColors.textSecondary(context))),
                   ],
                 ),
               ),
@@ -302,7 +302,7 @@ class _LoginPageState extends State<LoginPage> {
                   width: double.infinity,
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: ShunshiColors.error.withValues(alpha: 0.15),
+                    color: AppColors.error(context).withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(
                       ShunshiSpacing.radiusMedium,
                     ),
@@ -310,7 +310,7 @@ class _LoginPageState extends State<LoginPage> {
                   child: Text(
                     _errorMessage!,
                     style: ShunshiTextStyles.caption.copyWith(
-                      color: ShunshiColors.error,
+                      color: AppColors.error(context),
                     ),
                   ),
                 ),
@@ -351,8 +351,8 @@ class _LoginPageState extends State<LoginPage> {
                               : '获取验证码',
                           style: ShunshiTextStyles.buttonSmall.copyWith(
                             color: _codeSent && _countdown > 0
-                                ? ShunshiColors.textHint
-                                : ShunshiColors.primary,
+                                ? AppColors.textTertiary(context)
+                                : AppColors.primary(context),
                           ),
                         ),
                       ),
@@ -385,7 +385,7 @@ class _LoginPageState extends State<LoginPage> {
                   child: Text(
                     _mode == _LoginMode.sms ? '密码登录' : '验证码登录',
                     style: ShunshiTextStyles.caption.copyWith(
-                      color: ShunshiColors.primary,
+                      color: AppColors.primary(context),
                     ),
                   ),
                 ),
@@ -402,9 +402,9 @@ class _LoginPageState extends State<LoginPage> {
                       ? null
                       : (_mode == _LoginMode.sms ? _smsLogin : _passwordLogin),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: ShunshiColors.primary,
-                    foregroundColor: Colors.white,
-                    disabledBackgroundColor: ShunshiColors.primary.withValues(
+                    backgroundColor: AppColors.primary(context),
+                    foregroundColor: AppColors.onPrimary(context),
+                    disabledBackgroundColor: AppColors.primary(context).withValues(
                       alpha: 0.5,
                     ),
                     shape: RoundedRectangleBorder(
@@ -415,15 +415,15 @@ class _LoginPageState extends State<LoginPage> {
                     elevation: 0,
                   ),
                   child: _isLoading
-                      ? const SizedBox(
+                      ? SizedBox(
                           width: 24,
                           height: 24,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: Colors.white,
+                            color: AppColors.onPrimary(context),
                           ),
                         )
-                      : Text('登录', style: ShunshiTextStyles.button),
+                      : Text('登录', style: ShunshiTextStyles.button.copyWith(color: AppColors.onPrimary(context))),
                 ),
               ),
 
@@ -441,7 +441,7 @@ class _LoginPageState extends State<LoginPage> {
                   child: Text(
                     '还没有账号？立即注册',
                     style: ShunshiTextStyles.caption.copyWith(
-                      color: ShunshiColors.primary,
+                      color: AppColors.primary(context),
                     ),
                   ),
                 ),
@@ -452,17 +452,17 @@ class _LoginPageState extends State<LoginPage> {
               // 分割线
               Row(
                 children: [
-                  const Expanded(child: Divider(color: ShunshiColors.divider)),
+                  Expanded(child: Divider(color: AppColors.divider(context))),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Text(
                       '其他登录方式',
                       style: ShunshiTextStyles.caption.copyWith(
-                        color: ShunshiColors.textHint,
+                        color: AppColors.textTertiary(context),
                       ),
                     ),
                   ),
-                  const Expanded(child: Divider(color: ShunshiColors.divider)),
+                  Expanded(child: Divider(color: AppColors.divider(context))),
                 ],
               ),
 
@@ -484,7 +484,7 @@ class _LoginPageState extends State<LoginPage> {
                   _buildSocialButton(
                     icon: Icons.explore_outlined,
                     label: '体验模式',
-                    color: ShunshiColors.primary,
+                    color: AppColors.primary(context),
                     onTap: _guestLogin,
                   ),
                 ],
@@ -499,7 +499,7 @@ class _LoginPageState extends State<LoginPage> {
                   child: Text(
                     '免登录直接体验 →',
                     style: ShunshiTextStyles.caption.copyWith(
-                      color: ShunshiColors.primary,
+                      color: AppColors.primary(context),
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -525,10 +525,10 @@ class _LoginPageState extends State<LoginPage> {
     return Container(
       height: 52,
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF3A3A37) : ShunshiColors.surfaceDim,
+        color: isDark ? const Color(0xFF3A3A37) : AppColors.surfaceContainerLow(context),
         borderRadius: BorderRadius.circular(ShunshiSpacing.radiusMedium),
         border: Border.all(
-          color: isDark ? const Color(0xFF5A5A55) : ShunshiColors.borderLight,
+          color: isDark ? const Color(0xFF5A5A55) : AppColors.border(context),
         ),
       ),
       child: TextField(
@@ -542,11 +542,11 @@ class _LoginPageState extends State<LoginPage> {
         decoration: InputDecoration(
           hintText: hint,
           hintStyle: ShunshiTextStyles.caption.copyWith(
-            color: isDark ? const Color(0xFF9C9C96) : ShunshiColors.textHint,
+            color: isDark ? const Color(0xFF9C9C96) : AppColors.textTertiary(context),
           ),
           prefixIcon: Icon(
             prefix,
-            color: isDark ? const Color(0xFF9C9C96) : ShunshiColors.textHint,
+            color: isDark ? const Color(0xFF9C9C96) : AppColors.textTertiary(context),
             size: 20,
           ),
           border: InputBorder.none,
@@ -576,7 +576,7 @@ class _LoginPageState extends State<LoginPage> {
             child: Icon(icon, color: color, size: 28),
           ),
           const SizedBox(height: 8),
-          Text(label, style: ShunshiTextStyles.caption),
+          Text(label, style: ShunshiTextStyles.caption.copyWith(color: AppColors.textSecondary(context))),
         ],
       ),
     );
@@ -599,7 +599,7 @@ class _LoginPageState extends State<LoginPage> {
             child: const Icon(Icons.apple, color: Colors.white, size: 28),
           ),
           const SizedBox(height: 8),
-          Text('Apple', style: ShunshiTextStyles.caption),
+          Text('Apple', style: ShunshiTextStyles.caption.copyWith(color: AppColors.textSecondary(context))),
         ],
       ),
     );

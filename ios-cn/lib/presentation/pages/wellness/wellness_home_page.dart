@@ -5,6 +5,7 @@ library;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
+import '../../../design_system/app_colors.dart';
 
 class WellnessHomePage extends StatelessWidget {
   const WellnessHomePage({super.key});
@@ -12,11 +13,11 @@ class WellnessHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final background = isDark ? ShunShiColors.darkBackground : ShunShiColors.background;
-    final title = isDark ? ShunShiColors.darkTextPrimary : ShunShiColors.textPrimary;
-    final accent = isDark ? ShunShiColors.darkPrimary : ShunShiColors.primary;
-    final muted = isDark ? ShunShiColors.darkTextSecondary : ShunShiColors.textTertiary;
-    final field = isDark ? ShunShiColors.darkSurfaceContainerLow : ShunShiColors.surfaceContainerLow;
+    final background = isDark ? ShunShiColors.darkBackground : AppColors.background(context);
+    final title = isDark ? ShunShiColors.darkTextPrimary : AppColors.textPrimary(context);
+    final accent = isDark ? ShunShiColors.darkPrimary : AppColors.primary(context);
+    final muted = isDark ? ShunShiColors.darkTextSecondary : AppColors.textTertiary(context);
+    final field = isDark ? ShunShiColors.darkSurfaceContainerLow : AppColors.surfaceContainerLow(context);
     return Scaffold(
       backgroundColor: background,
       body: SingleChildScrollView(
@@ -34,9 +35,9 @@ class WellnessHomePage extends StatelessWidget {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: ShunShiColors.surfaceVariant,
-                        border: Border.all(color: ShunShiColors.textTertiary.withValues(alpha: 0.1)),
+                        border: Border.all(color: AppColors.textTertiary(context).withValues(alpha: 0.1)),
                       ),
-                      child: const Icon(Icons.person, size: 20, color: ShunShiColors.textSecondary),
+                      child: Icon(Icons.person, size: 20, color: AppColors.textSecondary(context)),
                     ),
                     const SizedBox(width: 12),
                     Text('养生馆', style: TextStyle(
@@ -53,7 +54,7 @@ class WellnessHomePage extends StatelessWidget {
                 ),
               ),
             ),
-            Container(height: 1, color: ShunShiColors.surfaceContainerLow, margin: const EdgeInsets.symmetric(horizontal: 20)),
+            Container(height: 1, color: AppColors.surfaceContainerLow(context), margin: const EdgeInsets.symmetric(horizontal: 20)),
 
             // ── Content ──
             Padding(
@@ -115,26 +116,26 @@ class WellnessHomePage extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(height: 8),
-                              const Text('精选编辑', style: TextStyle(
+                              Text('精选编辑', style: TextStyle(
                                 fontSize: 28, fontWeight: FontWeight.w700,
                                 fontFamily: ShunShiTypography.serifFamily,
-                                color: ShunShiColors.primary, letterSpacing: -0.5,
+                                color: AppColors.primary(context), letterSpacing: -0.5,
                               )),
                               Text("Editor's Choice", style: TextStyle(
                                 fontSize: 11, fontWeight: FontWeight.w500,
-                                color: ShunShiColors.secondary, letterSpacing: 1.5,
+                                color: AppColors.secondary(context), letterSpacing: 1.5,
                               )),
                             ],
                           ),
                           GestureDetector(
                             onTap: () {},
                             child: Row(
-                              children: const [
+                              children: [
                                 Text('查看全部', style: TextStyle(
-                                  fontSize: 14, fontWeight: FontWeight.w600, color: ShunShiColors.primary,
+                                  fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.primary(context),
                                 )),
                                 SizedBox(width: 2),
-                                Icon(Icons.chevron_right, size: 18, color: ShunShiColors.primary),
+                                Icon(Icons.chevron_right, size: 18, color: AppColors.primary(context)),
                               ],
                             ),
                           ),
@@ -144,24 +145,27 @@ class WellnessHomePage extends StatelessWidget {
 
                       // 3 Editor Cards
                       _editorCard(
+                        context: context,
                         tag: '惊蛰',
                         readTime: '5分钟阅读',
                         title: '春季养生：从调理肝气开始',
                         desc: '惊蛰时节，阳气初动。本期编辑精选为您带来春季护肝的三个关键穴位与食疗方案。',
                         likes: '1,208',
-                        gradient: [ShunShiColors.apricotLight, ShunShiColors.secondary],
+                        gradient: [ShunShiColors.apricotLight, AppColors.secondary(context)],
                       ),
                       const SizedBox(height: 16),
                       _editorCard(
+                        context: context,
                         tag: '功法',
                         readTime: '8分钟阅读',
                         title: '八段锦：唤醒身体的经络能量',
                         desc: '简单易学的传统健身功法，每天十分钟，改善久坐带来的肩颈僵硬。',
                         likes: '3,450',
-                        gradient: [ShunShiColors.primaryContainer, ShunShiColors.primaryLight],
+                        gradient: [ShunShiColors.primaryContainer, AppColors.primaryLight(context)],
                       ),
                       const SizedBox(height: 16),
                       _editorCard(
+                        context: context,
                         tag: '食补',
                         readTime: '4分钟阅读',
                         title: '五味入五脏：平衡你的日常膳食',
@@ -182,9 +186,9 @@ class WellnessHomePage extends StatelessWidget {
 
   Widget _gridIcon(BuildContext context, IconData icon, String label, VoidCallback onTap) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final disc = isDark ? ShunShiColors.darkSurfaceContainerLowest : ShunShiColors.surfaceContainerLowest;
-    final accent = isDark ? ShunShiColors.darkPrimary : ShunShiColors.primary;
-    final labelColor = isDark ? ShunShiColors.darkTextPrimary : ShunShiColors.textPrimary;
+    final disc = isDark ? ShunShiColors.darkSurfaceContainerLowest : AppColors.surfaceContainerLowest(context);
+    final accent = isDark ? ShunShiColors.darkPrimary : AppColors.primary(context);
+    final labelColor = isDark ? ShunShiColors.darkTextPrimary : AppColors.textPrimary(context);
     return GestureDetector(
       onTap: onTap,
       child: Column(
@@ -194,7 +198,7 @@ class WellnessHomePage extends StatelessWidget {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: disc,
-              border: Border.all(color: (isDark ? ShunShiColors.darkBorder : ShunShiColors.textTertiary).withValues(alpha: 0.35)),
+              border: Border.all(color: (isDark ? ShunShiColors.darkBorder : AppColors.textTertiary(context)).withValues(alpha: 0.35)),
             ),
             child: Icon(icon, size: 28, color: accent),
           ),
@@ -209,6 +213,7 @@ class WellnessHomePage extends StatelessWidget {
   }
 
   Widget _editorCard({
+    required BuildContext context,
     required String tag,
     required String readTime,
     required String title,
@@ -220,10 +225,10 @@ class WellnessHomePage extends StatelessWidget {
       onTap: () {},
       child: Container(
         decoration: BoxDecoration(
-          color: ShunShiColors.surfaceContainerLowest,
+          color: AppColors.surfaceContainerLowest(context),
           borderRadius: BorderRadius.circular(16),
           boxShadow: ShunShiShadows.sm,
-          border: Border.all(color: ShunShiColors.textTertiary.withValues(alpha: 0.05)),
+          border: Border.all(color: AppColors.textTertiary(context).withValues(alpha: 0.05)),
         ),
         child: Row(
           children: [
@@ -263,12 +268,12 @@ class WellnessHomePage extends StatelessWidget {
                               ),
                               child: Text(tag, style: TextStyle(
                                 fontSize: 10, fontWeight: FontWeight.w700,
-                                color: ShunShiColors.textPrimary,
+                                color: AppColors.textPrimary(context),
                               )),
                             ),
                             const SizedBox(width: 8),
                             Text(readTime, style: TextStyle(
-                              fontSize: 10, color: ShunShiColors.textTertiary,
+                              fontSize: 10, color: AppColors.textTertiary(context),
                             )),
                           ],
                         ),
@@ -276,22 +281,22 @@ class WellnessHomePage extends StatelessWidget {
                         Text(title, style: TextStyle(
                           fontSize: 17, fontWeight: FontWeight.w500,
                           fontFamily: ShunShiTypography.serifFamily,
-                          color: ShunShiColors.textPrimary, height: 1.3,
+                          color: AppColors.textPrimary(context), height: 1.3,
                         )),
                         const SizedBox(height: 6),
                         Text(desc, style: TextStyle(
-                          fontSize: 12, color: ShunShiColors.textSecondary,
+                          fontSize: 12, color: AppColors.textSecondary(context),
                           height: 1.5,
                         ), maxLines: 2, overflow: TextOverflow.ellipsis),
                       ],
                     ),
                     Row(
                       children: [
-                        Icon(Icons.favorite, size: 14, color: ShunShiColors.secondary),
+                        Icon(Icons.favorite, size: 14, color: AppColors.secondary(context)),
                         const SizedBox(width: 4),
                         Text('$likes 收藏', style: TextStyle(
                           fontSize: 11, fontWeight: FontWeight.w500,
-                          color: ShunShiColors.secondary,
+                          color: AppColors.secondary(context),
                         )),
                       ],
                     ),

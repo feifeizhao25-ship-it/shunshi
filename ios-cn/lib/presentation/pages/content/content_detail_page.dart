@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
 import '../../../data/network/api_client.dart';
 import '../../widgets/state_view.dart';
+import '../../../design_system/app_colors.dart';
 
 class ContentDetailPage extends StatefulWidget {
   final String contentId;
@@ -55,9 +56,9 @@ class _ContentDetailPageState extends State<ContentDetailPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       appBar: AppBar(
-        backgroundColor: ShunShiColors.background,
+        backgroundColor: AppColors.background(context),
         leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
         actions: [
           IconButton(
@@ -91,7 +92,7 @@ class _ContentDetailPageState extends State<ContentDetailPage> {
               _sectionTitle('概述'),
               const SizedBox(height: 8),
               Text(data['description'].toString(),
-                style: TextStyle(fontSize: 14, color: ShunShiColors.textSecondary, height: 1.8)),
+                style: TextStyle(fontSize: 14, color: AppColors.textSecondary(context), height: 1.8)),
               const SizedBox(height: 20),
             ],
 
@@ -108,7 +109,7 @@ class _ContentDetailPageState extends State<ContentDetailPage> {
               _sectionTitle('详细内容'),
               const SizedBox(height: 8),
               Text(data['content'].toString(),
-                style: TextStyle(fontSize: 14, color: ShunShiColors.textSecondary, height: 1.8)),
+                style: TextStyle(fontSize: 14, color: AppColors.textSecondary(context), height: 1.8)),
               const SizedBox(height: 20),
             ],
 
@@ -135,14 +136,14 @@ class _ContentDetailPageState extends State<ContentDetailPage> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: ShunShiColors.surface,
+                  color: AppColors.surface(context),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Row(children: [
-                  Icon(Icons.menu_book, size: 16, color: ShunShiColors.textTertiary),
+                  Icon(Icons.menu_book, size: 16, color: AppColors.textTertiary(context)),
                   const SizedBox(width: 8),
                   Text('出处：${data['source_classic']}',
-                    style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary, fontStyle: FontStyle.italic)),
+                    style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context), fontStyle: FontStyle.italic)),
                 ]),
               ),
               const SizedBox(height: 20),
@@ -154,10 +155,10 @@ class _ContentDetailPageState extends State<ContentDetailPage> {
                 children: (data['tags'] as List).map((t) => Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: ShunShiColors.primary.withOpacity(0.08),
+                    color: AppColors.primary(context).withOpacity(0.08),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Text(t.toString(), style: TextStyle(fontSize: 12, color: ShunShiColors.primary)),
+                  child: Text(t.toString(), style: TextStyle(fontSize: 12, color: AppColors.primary(context))),
                 )).toList()),
               const SizedBox(height: 20),
             ],
@@ -223,7 +224,7 @@ class _ContentDetailPageState extends State<ContentDetailPage> {
 
   Widget _sectionTitle(String title) {
     return Text(title,
-      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary));
+      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context)));
   }
 
   Widget _buildSteps(dynamic steps) {
@@ -242,15 +243,15 @@ class _ContentDetailPageState extends State<ContentDetailPage> {
           Container(
             width: 28, height: 28,
             decoration: BoxDecoration(
-              color: ShunShiColors.primary.withOpacity(0.1),
+              color: AppColors.primary(context).withOpacity(0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Center(child: Text('${e.key + 1}',
-              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: ShunShiColors.primary))),
+              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.primary(context)))),
           ),
           const SizedBox(width: 12),
           Expanded(child: Text(e.value,
-            style: TextStyle(fontSize: 14, color: ShunShiColors.textSecondary, height: 1.6))),
+            style: TextStyle(fontSize: 14, color: AppColors.textSecondary(context), height: 1.6))),
         ]),
       );
     }).toList());
@@ -262,10 +263,10 @@ class _ContentDetailPageState extends State<ContentDetailPage> {
       case 'tea': return const Color(0xFF8D6E63);
       case 'recipe': return const Color(0xFFFF9800);
       case 'herb': return const Color(0xFF9C27B0);
-      case 'meridian': return ShunShiColors.primary;
+      case 'meridian': return AppColors.primary(context);
       case 'exercise': return const Color(0xFF2196F3);
       case 'acupoint': return const Color(0xFFE91E63);
-      default: return ShunShiColors.primary;
+      default: return AppColors.primary(context);
     }
   }
 

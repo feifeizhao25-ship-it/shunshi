@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
 import '../../../data/network/api_client.dart';
 import '../../widgets/state_view.dart';
+import '../../../design_system/app_colors.dart';
 
 class NotificationsPage extends StatefulWidget {
   const NotificationsPage({super.key});
@@ -53,9 +54,9 @@ class _NotificationsPageState extends State<NotificationsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       appBar: AppBar(
-        backgroundColor: ShunShiColors.background,
+        backgroundColor: AppColors.background(context),
         leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
         title: Text('通知', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18, fontWeight: FontWeight.w600)),
       ),
@@ -79,29 +80,29 @@ class _NotificationsPageState extends State<NotificationsPage> {
                   return Container(
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: isRead ? ShunShiColors.surface : ShunShiColors.primary.withOpacity(0.04),
+                      color: isRead ? AppColors.surface(context) : AppColors.primary(context).withOpacity(0.04),
                       borderRadius: BorderRadius.circular(14),
                     ),
                     child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       Container(
                         width: 40, height: 40,
                         decoration: BoxDecoration(
-                          color: ShunShiColors.primary.withOpacity(0.1),
+                          color: AppColors.primary(context).withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: Icon(_typeIcon(item['type']), color: ShunShiColors.primary, size: 20),
+                        child: Icon(_typeIcon(item['type']), color: AppColors.primary(context), size: 20),
                       ),
                       const SizedBox(width: 12),
                       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Text(item['title'] ?? '通知', style: TextStyle(fontSize: 15, fontWeight: isRead ? FontWeight.w400 : FontWeight.w600, color: ShunShiColors.textPrimary)),
+                        Text(item['title'] ?? '通知', style: TextStyle(fontSize: 15, fontWeight: isRead ? FontWeight.w400 : FontWeight.w600, color: AppColors.textPrimary(context))),
                         if (item['body'] != null && item['body'].toString().isNotEmpty) ...[
                           const SizedBox(height: 4),
-                          Text(item['body'].toString(), style: TextStyle(fontSize: 13, color: ShunShiColors.textSecondary, height: 1.5)),
+                          Text(item['body'].toString(), style: TextStyle(fontSize: 13, color: AppColors.textSecondary(context), height: 1.5)),
                         ],
                         const SizedBox(height: 4),
-                        Text(item['created_at']?.toString().substring(0, 16) ?? '', style: TextStyle(fontSize: 11, color: ShunShiColors.textTertiary)),
+                        Text(item['created_at']?.toString().substring(0, 16) ?? '', style: TextStyle(fontSize: 11, color: AppColors.textTertiary(context))),
                       ])),
-                      if (!isRead) Container(width: 8, height: 8, decoration: const BoxDecoration(color: ShunShiColors.primary, shape: BoxShape.circle)),
+                      if (!isRead) Container(width: 8, height: 8, decoration: BoxDecoration(color: AppColors.primary(context), shape: BoxShape.circle)),
                     ]),
                   );
                 },

@@ -9,6 +9,8 @@ import '../../../core/theme/shunshi_colors.dart';
 import '../../../core/theme/shunshi_spacing.dart';
 import '../../../core/theme/shunshi_text_styles.dart';
 import '../../../data/network/api_client.dart';
+import '../../../design_system/app_colors.dart';
+import '../../../design_system/style_theming.dart';
 
 /// 中医九种体质
 const _constitutionTypes = [
@@ -158,7 +160,7 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ShunshiColors.background,
+      backgroundColor: AppColors.background(context),
       body: SafeArea(
         child: Column(
           children: [
@@ -195,8 +197,8 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
               margin: const EdgeInsets.symmetric(horizontal: 4),
               decoration: BoxDecoration(
                 color: active
-                    ? ShunshiColors.primary
-                    : ShunshiColors.borderLight,
+                    ? AppColors.primary(context)
+                    : AppColors.border(context),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -216,8 +218,8 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
             Padding(
               padding: const EdgeInsets.only(bottom: 12),
               child: Text(_error!,
-                  style: ShunshiTextStyles.caption
-                      .copyWith(color: ShunshiColors.error)),
+                  style: ShunshiTextStyles.caption.themed(context)
+                      .copyWith(color: AppColors.error(context))),
             ),
           SizedBox(
             width: double.infinity,
@@ -226,11 +228,11 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
               onPressed: _isLoading ? null : _nextStep,
               style: ElevatedButton.styleFrom(
                 backgroundColor: _canProceed
-                    ? ShunshiColors.primary
-                    : ShunshiColors.primary.withValues(alpha: 0.4),
+                    ? AppColors.primary(context)
+                    : AppColors.primary(context).withValues(alpha: 0.4),
                 foregroundColor: Colors.white,
                 disabledBackgroundColor:
-                    ShunshiColors.primary.withValues(alpha: 0.5),
+                    AppColors.primary(context).withValues(alpha: 0.5),
                 shape: RoundedRectangleBorder(
                   borderRadius:
                       BorderRadius.circular(ShunshiSpacing.radiusMedium),
@@ -246,7 +248,7 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
                     )
                   : Text(
                       _currentStep == 3 ? '完成' : '下一步',
-                      style: ShunshiTextStyles.button
+                      style: ShunshiTextStyles.button.themed(context)
                           .copyWith(color: Colors.white),
                     ),
             ),
@@ -262,8 +264,8 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
                 setState(() => _currentStep--);
               },
               child: Text('返回',
-                  style: ShunshiTextStyles.caption
-                      .copyWith(color: ShunshiColors.textHint)),
+                  style: ShunshiTextStyles.caption.themed(context)
+                      .copyWith(color: AppColors.textTertiary(context))),
             ),
         ],
       ),
@@ -283,18 +285,18 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
           Container(
             height: 56,
             decoration: BoxDecoration(
-              color: ShunshiColors.surfaceDim,
+              color: AppColors.surfaceContainerLow(context),
               borderRadius:
                   BorderRadius.circular(ShunshiSpacing.radiusMedium),
-              border: Border.all(color: ShunshiColors.borderLight),
+              border: Border.all(color: AppColors.border(context)),
             ),
             child: TextField(
               controller: _nicknameController,
-              style: ShunshiTextStyles.heading,
+              style: ShunshiTextStyles.heading.themed(context),
               textAlign: TextAlign.center,
               decoration: InputDecoration(
                 hintText: '输入你的昵称',
-                hintStyle: ShunshiTextStyles.bodySecondary,
+                hintStyle: ShunshiTextStyles.bodySecondary.themed(context),
                 border: InputBorder.none,
                 contentPadding:
                     const EdgeInsets.symmetric(horizontal: 20),
@@ -342,14 +344,14 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
         height: 120,
         decoration: BoxDecoration(
           color: selected
-              ? ShunshiColors.primary.withValues(alpha: 0.12)
-              : ShunshiColors.surfaceDim,
+              ? AppColors.primary(context).withValues(alpha: 0.12)
+              : AppColors.surfaceContainerLow(context),
           borderRadius:
               BorderRadius.circular(ShunshiSpacing.radiusLarge),
           border: Border.all(
             color: selected
-                ? ShunshiColors.primary
-                : ShunshiColors.borderLight,
+                ? AppColors.primary(context)
+                : AppColors.border(context),
             width: selected ? 2 : 1,
           ),
         ),
@@ -361,8 +363,8 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
             Text(label,
                 style: ShunshiTextStyles.heading.copyWith(
                     color: selected
-                        ? ShunshiColors.primary
-                        : ShunshiColors.textSecondary)),
+                        ? AppColors.primary(context)
+                        : AppColors.textSecondary(context))),
           ],
         ),
       ),
@@ -380,21 +382,21 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
         children: [
           const SizedBox(height: 40),
           Text('$_birthYear',
-              style: const TextStyle(
+              style: TextStyle(
                   fontSize: 56,
                   fontWeight: FontWeight.w200,
-                  color: ShunshiColors.textPrimary)),
+                  color: AppColors.textPrimary(context))),
           const SizedBox(height: 8),
           Text('${_currentYear - _birthYear}岁',
-              style: ShunshiTextStyles.bodySecondary),
+              style: ShunshiTextStyles.bodySecondary.themed(context)),
           const SizedBox(height: 32),
           SliderTheme(
             data: SliderThemeData(
-              activeTrackColor: ShunshiColors.primary,
-              inactiveTrackColor: ShunshiColors.borderLight,
-              thumbColor: ShunshiColors.primary,
+              activeTrackColor: AppColors.primary(context),
+              inactiveTrackColor: AppColors.border(context),
+              thumbColor: AppColors.primary(context),
               overlayColor:
-                  ShunshiColors.primary.withValues(alpha: 0.12),
+                  AppColors.primary(context).withValues(alpha: 0.12),
             ),
             child: Slider(
               value: _birthYear.toDouble(),
@@ -409,19 +411,19 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('1940', style: ShunshiTextStyles.caption),
-                Text('2010', style: ShunshiTextStyles.caption),
+                Text('1940', style: ShunshiTextStyles.caption.themed(context)),
+                Text('2010', style: ShunshiTextStyles.caption.themed(context)),
               ],
             ),
           ),
           const SizedBox(height: 24),
           // 选填：健康关注
-          const Divider(color: ShunshiColors.divider),
+          Divider(color: AppColors.divider(context)),
           const SizedBox(height: 16),
           Align(
             alignment: Alignment.centerLeft,
             child: Text('主要健康关注（选填）',
-                style: ShunshiTextStyles.heading.copyWith(fontSize: 15)),
+                style: ShunshiTextStyles.heading.copyWith(fontSize: 15).themed(context)),
           ),
           const SizedBox(height: 12),
           Wrap(
@@ -445,20 +447,20 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
                     color: selected
-                        ? ShunshiColors.primary.withValues(alpha: 0.12)
-                        : ShunshiColors.surfaceDim,
+                        ? AppColors.primary(context).withValues(alpha: 0.12)
+                        : AppColors.surfaceContainerLow(context),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
                       color: selected
-                          ? ShunshiColors.primary
-                          : ShunshiColors.borderLight,
+                          ? AppColors.primary(context)
+                          : AppColors.border(context),
                     ),
                   ),
                   child: Text(c,
                       style: ShunshiTextStyles.caption.copyWith(
                           color: selected
-                              ? ShunshiColors.primary
-                              : ShunshiColors.textSecondary)),
+                              ? AppColors.primary(context)
+                              : AppColors.textSecondary(context))),
                 ),
               );
             }).toList(),
@@ -491,20 +493,20 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                   decoration: BoxDecoration(
                     color: selected
-                        ? ShunshiColors.primary.withValues(alpha: 0.12)
-                        : ShunshiColors.surfaceDim,
+                        ? AppColors.primary(context).withValues(alpha: 0.12)
+                        : AppColors.surfaceContainerLow(context),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
                       color: selected
-                          ? ShunshiColors.primary
-                          : ShunshiColors.borderLight,
+                          ? AppColors.primary(context)
+                          : AppColors.border(context),
                     ),
                   ),
                   child: Text(type,
                       style: ShunshiTextStyles.bodyMedium.copyWith(
                           color: selected
-                              ? ShunshiColors.primary
-                              : ShunshiColors.textSecondary)),
+                              ? AppColors.primary(context)
+                              : AppColors.textSecondary(context))),
                 ),
               );
             }).toList(),
@@ -519,8 +521,8 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
             icon: const Icon(Icons.quiz_outlined, size: 18),
             label: const Text('不知道，帮我测'),
             style: OutlinedButton.styleFrom(
-              foregroundColor: ShunshiColors.primary,
-              side: const BorderSide(color: ShunshiColors.primary),
+              foregroundColor: AppColors.primary(context),
+              side: BorderSide(color: AppColors.primary(context)),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20)),
             ),
@@ -530,25 +532,25 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
           Align(
             alignment: Alignment.centerLeft,
             child: Text('描述你的身体状况（选填）',
-                style: ShunshiTextStyles.heading.copyWith(fontSize: 15)),
+                style: ShunshiTextStyles.heading.copyWith(fontSize: 15).themed(context)),
           ),
           const SizedBox(height: 8),
           Container(
             constraints: const BoxConstraints(maxHeight: 100),
             decoration: BoxDecoration(
-              color: ShunshiColors.surfaceDim,
+              color: AppColors.surfaceContainerLow(context),
               borderRadius:
                   BorderRadius.circular(ShunshiSpacing.radiusMedium),
-              border: Border.all(color: ShunshiColors.borderLight),
+              border: Border.all(color: AppColors.border(context)),
             ),
             child: TextField(
               controller: _bodyDescController,
               maxLines: 3,
-              style: ShunshiTextStyles.bodyMedium,
+              style: ShunshiTextStyles.bodyMedium.themed(context),
               decoration: InputDecoration(
                 hintText: '比如：容易疲劳、睡眠不好、容易感冒...',
-                hintStyle: ShunshiTextStyles.caption
-                    .copyWith(color: ShunshiColors.textHint),
+                hintStyle: ShunshiTextStyles.caption.themed(context)
+                    .copyWith(color: AppColors.textTertiary(context)),
                 border: InputBorder.none,
                 contentPadding: const EdgeInsets.all(12),
               ),
@@ -578,13 +580,13 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
           const SizedBox(height: 16),
           Center(
             child: Text(title,
-                style: ShunshiTextStyles.heading
+                style: ShunshiTextStyles.heading.themed(context)
                     .copyWith(fontSize: 20)),
           ),
           const SizedBox(height: 4),
           Center(
             child: Text(subtitle,
-                style: ShunshiTextStyles.bodySecondary
+                style: ShunshiTextStyles.bodySecondary.themed(context)
                     .copyWith(fontSize: 14)),
           ),
           child,

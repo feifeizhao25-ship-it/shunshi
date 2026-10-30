@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
+import '../../../design_system/app_colors.dart';
 
 /// MainShell — 5 Tab 底部导航
 ///
@@ -24,8 +25,8 @@ class MainShell extends StatelessWidget {
   Widget build(BuildContext context) {
     final currentPath = GoRouterState.of(context).uri.path;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final background = isDark ? ShunShiColors.darkBackground : ShunShiColors.background;
-    final line = isDark ? ShunShiColors.darkBorderGhost : ShunShiColors.borderGhost;
+    final background = isDark ? ShunShiColors.darkBackground : AppColors.background(context);
+    final line = isDark ? ShunShiColors.darkBorderGhost : AppColors.borderGhost(context);
 
     return PopScope(
       canPop: false,
@@ -102,8 +103,8 @@ class _NavTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final active = isDark ? ShunShiColors.darkPrimary : ShunShiColors.primary;
-    final inactive = isDark ? ShunShiColors.darkTextSecondary : ShunShiColors.textTertiary;
+    final active = isDark ? ShunShiColors.darkPrimary : AppColors.primary(context);
+    final inactive = isDark ? ShunShiColors.darkTextSecondary : AppColors.textTertiary(context);
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,

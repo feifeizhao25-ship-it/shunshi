@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/theme/theme.dart';
 import '../../../data/storage/storage_manager.dart';
+import '../../../design_system/app_colors.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -84,14 +85,14 @@ class _SplashPageState extends State<SplashPage>
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final primary = isDark ? ShunshiDarkColors.primary : ShunshiColors.primary;
+    final primary = isDark ? ShunshiDarkColors.primary : AppColors.primary(context);
     final primaryLight =
-        isDark ? ShunshiDarkColors.primaryLight : ShunshiColors.primaryLight;
+        isDark ? ShunshiDarkColors.primaryLight : AppColors.primaryLight(context);
     final textPrimary =
-        isDark ? ShunshiDarkColors.textPrimary : ShunshiColors.textPrimary;
+        isDark ? ShunshiDarkColors.textPrimary : AppColors.textPrimary(context);
     final textSecondary =
-        isDark ? ShunshiDarkColors.textSecondary : ShunshiColors.textSecondary;
-    final bg = isDark ? ShunshiDarkColors.background : ShunshiColors.background;
+        isDark ? ShunshiDarkColors.textSecondary : AppColors.textSecondary(context);
+    final bg = isDark ? ShunshiDarkColors.background : AppColors.background(context);
 
     return PopScope(
       canPop: false, // Splash 页面按返回键直接退出 app，不黑屏

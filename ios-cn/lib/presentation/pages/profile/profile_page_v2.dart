@@ -28,6 +28,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../design_system/theme.dart';
 import '../../../data/network/api_client.dart';
 import '../../../data/storage/storage_manager.dart';
+import '../../../design_system/app_colors.dart';
 
 class ProfilePageV2 extends StatefulWidget {
   const ProfilePageV2({super.key});
@@ -107,7 +108,7 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? ShunShiColors.darkBackground : ShunShiColors.background;
+    final bg = isDark ? ShunShiColors.darkBackground : AppColors.background(context);
 
     return Scaffold(
       backgroundColor: bg,
@@ -124,7 +125,7 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
                     Text('顺时', style: TextStyle(
                       fontFamily: ShunShiTypography.serifFamily,
                       fontSize: 18, fontWeight: FontWeight.w600,
-                      color: ShunShiColors.primary,
+                      color: AppColors.primary(context),
                     )),
                     const Spacer(),
                     GestureDetector(
@@ -132,10 +133,10 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
                       child: Container(
                         width: 40, height: 40,
                         decoration: BoxDecoration(
-                          color: ShunShiColors.surfaceContainerLow,
+                          color: AppColors.surfaceContainerLow(context),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Icon(Icons.notifications_outlined, size: 20, color: ShunShiColors.textSecondary),
+                        child: Icon(Icons.notifications_outlined, size: 20, color: AppColors.textSecondary(context)),
                       ),
                     ),
                   ],
@@ -160,7 +161,7 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
                         begin: Alignment.topLeft, end: Alignment.bottomRight,
                       ),
                       boxShadow: [
-                        BoxShadow(color: ShunShiColors.primary.withValues(alpha: 0.2), blurRadius: 12, offset: const Offset(0, 4)),
+                        BoxShadow(color: AppColors.primary(context).withValues(alpha: 0.2), blurRadius: 12, offset: const Offset(0, 4)),
                       ],
                     ),
                     child: const Icon(Icons.person, size: 36, color: Colors.white),
@@ -174,7 +175,7 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
                     style: TextStyle(
                       fontFamily: ShunShiTypography.serifFamily,
                       fontSize: 22, fontWeight: FontWeight.bold,
-                      color: ShunShiColors.textPrimary,
+                      color: AppColors.textPrimary(context),
                     ),
                   ),
                   if (!_loggedIn) ...[
@@ -182,7 +183,7 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
                     TextButton(
                       onPressed: () => context.push('/login'),
                       child: Text('登录后查看我的收藏与订阅', style: TextStyle(
-                        fontSize: 13, color: ShunShiColors.primary,
+                        fontSize: 13, color: AppColors.primary(context),
                       )),
                     ),
                   ],
@@ -196,12 +197,12 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
                             child: Container(
                               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
                               decoration: BoxDecoration(
-                                color: ShunShiColors.primaryLight.withValues(alpha: 0.12),
+                                color: AppColors.primaryLight(context).withValues(alpha: 0.12),
                                 borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: ShunShiColors.primaryLight.withValues(alpha: 0.3)),
+                                border: Border.all(color: AppColors.primaryLight(context).withValues(alpha: 0.3)),
                               ),
                               child: Text('🌿 ${snap.data}', style: TextStyle(
-                                fontSize: 12, color: ShunShiColors.primary,
+                                fontSize: 12, color: AppColors.primary(context),
                                 fontWeight: FontWeight.w500,
                               )),
                             ),
@@ -218,11 +219,11 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
                         gradient: _isPaidTier
                             ? const LinearGradient(colors: [Color(0xFFFFD700), Color(0xFFFFA500)])
                             : null,
-                        color: _isPaidTier ? null : ShunShiColors.surfaceContainerLow,
+                        color: _isPaidTier ? null : AppColors.surfaceContainerLow(context),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(_subscriptionTier!, style: TextStyle(
-                        color: _isPaidTier ? Colors.white : ShunShiColors.textSecondary,
+                        color: _isPaidTier ? Colors.white : AppColors.textSecondary(context),
                         fontSize: 11, fontWeight: FontWeight.bold,
                       )),
                     ),
@@ -238,7 +239,7 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 decoration: BoxDecoration(
-                  color: ShunShiColors.surface,
+                  color: AppColors.surface(context),
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 8, offset: const Offset(0, 2)),
@@ -253,7 +254,7 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
                 child: Row(
                   children: [
                     _buildStat('收藏', _loggedIn ? (_favoriteCount?.toString() ?? '—') : '—'),
-                    Container(width: 1, height: 32, color: ShunShiColors.borderGhost),
+                    Container(width: 1, height: 32, color: AppColors.borderGhost(context)),
                     _buildStat('订阅', _loggedIn ? (_subscriptionTier ?? '—') : '—'),
                   ],
                 ),
@@ -267,7 +268,7 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
               padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
               child: Container(
                 decoration: BoxDecoration(
-                  color: ShunShiColors.surface,
+                  color: AppColors.surface(context),
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 8, offset: const Offset(0, 2)),
@@ -304,7 +305,7 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
                   children: [
                     Text('邀请好友领会员', style: TextStyle(
                       fontSize: 17, fontWeight: FontWeight.w600,
-                      color: ShunShiColors.surface,
+                      color: AppColors.surface(context),
                     )),
                     const SizedBox(height: 4),
                     Text('与友偕行，共享颐养时光', style: TextStyle(
@@ -324,7 +325,7 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Text('立即邀请', style: TextStyle(
-                          fontSize: 13, color: ShunShiColors.surface, fontWeight: FontWeight.w500,
+                          fontSize: 13, color: AppColors.surface(context), fontWeight: FontWeight.w500,
                         )),
                       ),
                     ),
@@ -340,7 +341,7 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
               padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
               child: Container(
                 decoration: BoxDecoration(
-                  color: ShunShiColors.surface,
+                  color: AppColors.surface(context),
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 8, offset: const Offset(0, 2)),
@@ -370,7 +371,7 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
               child: Center(
                 child: Text('顺应天时，颐养身心', style: TextStyle(
                   fontFamily: ShunShiTypography.serifFamily,
-                  fontSize: 14, color: ShunShiColors.textTertiary,
+                  fontSize: 14, color: AppColors.textTertiary(context),
                   fontStyle: FontStyle.italic,
                 )),
               ),
@@ -402,11 +403,11 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 18, fontWeight: FontWeight.bold,
-            color: ShunShiColors.textPrimary,
+            color: AppColors.textPrimary(context),
           )),
         const SizedBox(height: 2),
         Text(label, style: TextStyle(
-          fontSize: 12, color: ShunShiColors.textTertiary,
+          fontSize: 12, color: AppColors.textTertiary(context),
         )),
       ]),
     );
@@ -418,11 +419,11 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
     return Material(
       color: Colors.transparent,
       child: ListTile(
-        leading: Icon(icon, color: ShunShiColors.primary, size: 22),
+        leading: Icon(icon, color: AppColors.primary(context), size: 22),
         title: Text(title, style: TextStyle(
-          fontSize: 15, color: ShunShiColors.textPrimary,
+          fontSize: 15, color: AppColors.textPrimary(context),
         )),
-        trailing: const Icon(Icons.chevron_right, color: ShunShiColors.textTertiary, size: 20),
+        trailing: Icon(Icons.chevron_right, color: AppColors.textTertiary(context), size: 20),
         onTap: onTap,
       ),
     );
@@ -431,7 +432,7 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
   Widget _buildDivider() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Divider(height: 1, color: ShunShiColors.borderGhost),
+      child: Divider(height: 1, color: AppColors.borderGhost(context)),
     );
   }
 }

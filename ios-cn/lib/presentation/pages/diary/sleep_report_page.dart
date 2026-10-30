@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/config/app_config.dart';
+import '../../../design_system/app_colors.dart';
 
 /// 睡眠报告页 — 7天柱状图 + AI趋势分析 + 建议
 class SleepReportPage extends StatefulWidget {
@@ -99,7 +100,7 @@ class _SleepReportPageState extends State<SleepReportPage> {
         barRods: [
           BarChartRodData(
             toY: sleep,
-            color: sleep >= 4 ? const Color(0xFF4CAF50) : sleep >= 3 ? ShunShiColors.primary : const Color(0xFFFF7043),
+            color: sleep >= 4 ? const Color(0xFF4CAF50) : sleep >= 3 ? AppColors.primary(context) : const Color(0xFFFF7043),
             width: 20,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(6)),
           ),
@@ -112,9 +113,9 @@ class _SleepReportPageState extends State<SleepReportPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       appBar: AppBar(
-        backgroundColor: ShunShiColors.background,
+        backgroundColor: AppColors.background(context),
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, size: 20),
@@ -124,7 +125,7 @@ class _SleepReportPageState extends State<SleepReportPage> {
             style: TextStyle(fontFamily: ShunShiTypography.serifFamily)),
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator(color: ShunShiColors.primary))
+          ? Center(child: CircularProgressIndicator(color: AppColors.primary(context)))
           : SingleChildScrollView(
               padding: const EdgeInsets.all(20),
               child: Column(
@@ -150,18 +151,18 @@ class _SleepReportPageState extends State<SleepReportPage> {
                       width: double.infinity,
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: ShunShiColors.surfaceContainerLowest,
+                        color: AppColors.surfaceContainerLowest(context),
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: ShunShiColors.borderGhost),
+                        border: Border.all(color: AppColors.borderGhost(context)),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(_insight!['trend'] ?? '',
-                              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
                           const SizedBox(height: 8),
                           Text(_insight!['insight'] ?? '',
-                              style: const TextStyle(fontSize: 14, color: ShunShiColors.textSecondary, height: 1.6)),
+                              style: TextStyle(fontSize: 14, color: AppColors.textSecondary(context), height: 1.6)),
                         ],
                       ),
                     ),
@@ -175,7 +176,7 @@ class _SleepReportPageState extends State<SleepReportPage> {
                         margin: const EdgeInsets.only(bottom: 10),
                         padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
-                          color: ShunShiColors.primary.withValues(alpha: 0.05),
+                          color: AppColors.primary(context).withValues(alpha: 0.05),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Row(
@@ -184,7 +185,7 @@ class _SleepReportPageState extends State<SleepReportPage> {
                             const Text('💡', style: TextStyle(fontSize: 18)),
                             const SizedBox(width: 10),
                             Expanded(child: Text(s.toString(),
-                                style: const TextStyle(fontSize: 14, color: ShunShiColors.textPrimary, height: 1.5))),
+                                style: TextStyle(fontSize: 14, color: AppColors.textPrimary(context), height: 1.5))),
                           ],
                         ),
                       )),
@@ -200,7 +201,7 @@ class _SleepReportPageState extends State<SleepReportPage> {
                               context.push('/chat?prefill=${Uri.encodeComponent("我昨晚试了这个建议：$first，感觉如何？")}');
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: ShunShiColors.primary,
+                              backgroundColor: AppColors.primary(context),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                             ),
                             child: const Text('今晚试试这个建议',
@@ -217,12 +218,12 @@ class _SleepReportPageState extends State<SleepReportPage> {
   }
 
   Widget _sectionTitle(String t) => Text(t,
-      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700,
-          fontFamily: ShunShiTypography.serifFamily, color: ShunShiColors.textPrimary));
+      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700,
+          fontFamily: ShunShiTypography.serifFamily, color: AppColors.textPrimary(context)));
 
   Widget _buildScoreCard() {
     final score = _insight?['score'] ?? 0;
-    final color = score >= 80 ? const Color(0xFF4CAF50) : score >= 60 ? ShunShiColors.primary : const Color(0xFFFF7043);
+    final color = score >= 80 ? const Color(0xFF4CAF50) : score >= 60 ? AppColors.primary(context) : const Color(0xFFFF7043);
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -236,7 +237,7 @@ class _SleepReportPageState extends State<SleepReportPage> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('睡眠评分', style: TextStyle(fontSize: 13, color: ShunShiColors.textTertiary)),
+              Text('睡眠评分', style: TextStyle(fontSize: 13, color: AppColors.textTertiary(context))),
               const SizedBox(height: 4),
               Text('$score', style: TextStyle(fontSize: 36, fontWeight: FontWeight.w700, color: color)),
             ],
@@ -261,9 +262,9 @@ class _SleepReportPageState extends State<SleepReportPage> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: ShunShiColors.surfaceContainerLowest,
+        color: AppColors.surfaceContainerLowest(context),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: ShunShiColors.borderGhost),
+        border: Border.all(color: AppColors.borderGhost(context)),
       ),
       height: 200,
       child: BarChart(
@@ -277,7 +278,7 @@ class _SleepReportPageState extends State<SleepReportPage> {
                 showTitles: true,
                 reservedSize: 24,
                 getTitlesWidget: (v, _) => Text('${v.toInt()}',
-                    style: const TextStyle(fontSize: 10, color: ShunShiColors.textTertiary)),
+                    style: TextStyle(fontSize: 10, color: AppColors.textTertiary(context))),
               ),
             ),
             bottomTitles: AxisTitles(
@@ -289,7 +290,7 @@ class _SleepReportPageState extends State<SleepReportPage> {
                   return Padding(
                     padding: const EdgeInsets.only(top: 8),
                     child: Text('${d.month}/${d.day}',
-                        style: const TextStyle(fontSize: 9, color: ShunShiColors.textTertiary)),
+                        style: TextStyle(fontSize: 9, color: AppColors.textTertiary(context))),
                   );
                 },
               ),
@@ -303,7 +304,7 @@ class _SleepReportPageState extends State<SleepReportPage> {
             drawVerticalLine: false,
             horizontalInterval: 1,
             getDrawingHorizontalLine: (v) => FlLine(
-              color: ShunShiColors.borderGhost,
+              color: AppColors.borderGhost(context),
               strokeWidth: 1,
             ),
           ),
@@ -316,16 +317,16 @@ class _SleepReportPageState extends State<SleepReportPage> {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
       decoration: BoxDecoration(
-        color: ShunShiColors.surfaceContainerLowest,
+        color: AppColors.surfaceContainerLowest(context),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: ShunShiColors.borderGhost),
+        border: Border.all(color: AppColors.borderGhost(context)),
       ),
-      child: const Column(
+      child: Column(
         children: [
           Text('🌙', style: TextStyle(fontSize: 40)),
           SizedBox(height: 12),
           Text('再记录几天，就能解锁专属睡眠分析 ✨',
-              style: TextStyle(fontSize: 15, color: ShunShiColors.textTertiary),
+              style: TextStyle(fontSize: 15, color: AppColors.textTertiary(context)),
               textAlign: TextAlign.center),
         ],
       ),

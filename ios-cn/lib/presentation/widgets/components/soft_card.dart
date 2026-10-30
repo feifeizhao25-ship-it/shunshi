@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/theme.dart';
+import '../../../design_system/app_colors.dart';
 
 /// 柔和卡片 — 顺时版
 ///
@@ -58,14 +59,14 @@ class _SoftCardState extends State<SoftCard>
     if (widget.color != null) return widget.color!;
     return _isDark(context)
         ? ShunshiDarkColors.surfaceDim
-        : ShunshiColors.surfaceDim;
+        : AppColors.surfaceContainerLow(context);
   }
 
   Color _borderColor(BuildContext context) {
     if (widget.borderColor != null) return widget.borderColor!;
     return _isDark(context)
         ? ShunshiDarkColors.border
-        : ShunshiColors.border;
+        : AppColors.border(context);
   }
 
   @override

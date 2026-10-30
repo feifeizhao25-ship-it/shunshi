@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/config/app_config.dart';
+import '../../../design_system/app_colors.dart';
 
 class SolarTermPageV2 extends StatefulWidget {
   final String? termName;
@@ -67,10 +68,10 @@ class _SolarTermPageV2State extends State<SolarTermPageV2> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? ShunShiColors.darkBackground : ShunShiColors.background;
-    final surfaceLow = isDark ? ShunShiColors.darkSurfaceContainerLow : ShunShiColors.surfaceContainerLow;
-    final surface = isDark ? ShunShiColors.darkSurface : ShunShiColors.surface;
-    final textPrimary = isDark ? ShunShiColors.darkTextPrimary : ShunShiColors.textPrimary;
+    final bg = isDark ? ShunShiColors.darkBackground : AppColors.background(context);
+    final surfaceLow = isDark ? ShunShiColors.darkSurfaceContainerLow : AppColors.surfaceContainerLow(context);
+    final surface = isDark ? ShunShiColors.darkSurface : AppColors.surface(context);
+    final textPrimary = isDark ? ShunShiColors.darkTextPrimary : AppColors.textPrimary(context);
 
     return Scaffold(
       backgroundColor: bg,
@@ -99,7 +100,7 @@ class _SolarTermPageV2State extends State<SolarTermPageV2> {
                         Text('顺时', style: TextStyle(
                           fontFamily: ShunShiTypography.serifFamily,
                           fontSize: 16, fontWeight: FontWeight.w600,
-                          color: isDark ? ShunShiColors.darkPrimary : ShunShiColors.primary,
+                          color: isDark ? ShunShiColors.darkPrimary : AppColors.primary(context),
                         )),
                         const Spacer(),
                         const SizedBox(width: 40),
@@ -119,19 +120,19 @@ class _SolarTermPageV2State extends State<SolarTermPageV2> {
                         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                           Text(_term['name']?.toString() ?? '节气', style: TextStyle(
                             fontFamily: ShunShiTypography.serifFamily,
-                            fontSize: 32, fontWeight: FontWeight.bold, color: ShunShiColors.textPrimary,
+                            fontSize: 32, fontWeight: FontWeight.bold, color: AppColors.textPrimary(context),
                           )),
                           Text(_term['name_en']?.toString() ?? '', style: TextStyle(
-                            fontSize: 14, color: ShunShiColors.textTertiary,
+                            fontSize: 14, color: AppColors.textTertiary(context),
                           )),
                         ])),
                       ]),
                       const SizedBox(height: 8),
                       if (_term['date'] != null)
-                        Text('${_term['date']}', style: TextStyle(fontSize: 13, color: ShunShiColors.textSecondary)),
+                        Text('${_term['date']}', style: TextStyle(fontSize: 13, color: AppColors.textSecondary(context))),
                       if (_term['days_remaining'] != null) ...[
                         const SizedBox(height: 4),
-                        Text('距下一个节气还有 ${_term['days_remaining']} 天', style: TextStyle(fontSize: 13, color: ShunShiColors.primary, fontWeight: FontWeight.w500)),
+                        Text('距下一个节气还有 ${_term['days_remaining']} 天', style: TextStyle(fontSize: 13, color: AppColors.primary(context), fontWeight: FontWeight.w500)),
                       ],
                     ]),
                   ),
@@ -145,15 +146,15 @@ class _SolarTermPageV2State extends State<SolarTermPageV2> {
                       child: Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: ShunShiColors.primary.withValues(alpha: 0.06), borderRadius: BorderRadius.circular(14),
+                          color: AppColors.primary(context).withValues(alpha: 0.06), borderRadius: BorderRadius.circular(14),
                         ),
                         child: Row(children: [
                           Text(_next['emoji']?.toString() ?? '🌱', style: const TextStyle(fontSize: 24)),
                           const SizedBox(width: 12),
                           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                            Text('下一个：${_next['name']}', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+                            Text('下一个：${_next['name']}', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
                             Text('${_next['name_en'] ?? ''} · ${_next['countdown_days'] != null ? '${_next['countdown_days']}天后' : _next['date'] ?? ''}',
-                              style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
+                              style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context))),
                           ])),
                         ]),
                       ),
@@ -218,14 +219,14 @@ class _SolarTermPageV2State extends State<SolarTermPageV2> {
     return SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
-        child: Text(title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+        child: Text(title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
       ),
     );
   }
 
   Widget _buildWellnessCard({required String icon, required String title, required String desc, List<String> tags = const []}) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final surfaceColor = isDark ? ShunShiColors.darkSurface : ShunShiColors.surface;
+    final surfaceColor = isDark ? ShunShiColors.darkSurface : AppColors.surface(context);
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Container(
@@ -235,16 +236,16 @@ class _SolarTermPageV2State extends State<SolarTermPageV2> {
           Row(children: [
             Text(icon, style: const TextStyle(fontSize: 20)),
             const SizedBox(width: 10),
-            Expanded(child: Text(title, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary))),
+            Expanded(child: Text(title, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context)))),
           ]),
           const SizedBox(height: 6),
-          Text(desc, style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary, height: 1.5), maxLines: 3, overflow: TextOverflow.ellipsis),
+          Text(desc, style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context), height: 1.5), maxLines: 3, overflow: TextOverflow.ellipsis),
           if (tags.isNotEmpty) ...[
             const SizedBox(height: 8),
             Wrap(spacing: 6, children: tags.map((t) => Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-              decoration: BoxDecoration(color: ShunShiColors.primary.withValues(alpha: 0.06), borderRadius: BorderRadius.circular(8)),
-              child: Text(t, style: TextStyle(fontSize: 10, color: ShunShiColors.primary, fontWeight: FontWeight.w500)),
+              decoration: BoxDecoration(color: AppColors.primary(context).withValues(alpha: 0.06), borderRadius: BorderRadius.circular(8)),
+              child: Text(t, style: TextStyle(fontSize: 10, color: AppColors.primary(context), fontWeight: FontWeight.w500)),
             )).toList()),
           ],
         ]),

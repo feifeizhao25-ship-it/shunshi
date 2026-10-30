@@ -12,6 +12,8 @@ import 'widgets/home_skeleton.dart';
 import '../../../core/solar_term/solar_term_table.dart';
 import '../../../data/services/offline_cache.dart';
 import '../../../core/config/app_config.dart';
+import '../../../design_system/app_colors.dart';
+import '../../../design_system/style_theming.dart';
 
 // ═══════════════════════════════════════════════════════════════
 // 十二时辰数据模型（本地计算）
@@ -342,7 +344,7 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
     final timeDisplay = '${sc.timeRange.replaceAll('-', ':00 - ')}:00';
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? ShunShiColors.darkBackground : ShunShiColors.background;
+    final bg = isDark ? ShunShiColors.darkBackground : AppColors.background(context);
 
     if (_loading) return const HomeSkeleton();
 
@@ -448,10 +450,10 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
               child: Container(
                 width: 40, height: 40,
                 decoration: BoxDecoration(
-                  color: ShunShiColors.surfaceContainerLow,
+                  color: AppColors.surfaceContainerLow(context),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(Icons.menu, size: 20, color: ShunShiColors.textPrimary),
+                child: Icon(Icons.menu, size: 20, color: AppColors.textPrimary(context)),
               ),
             ),
             const SizedBox(width: 12),
@@ -461,7 +463,7 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
                 fontFamily: ShunShiTypography.serifFamily,
                 fontWeight: FontWeight.w700,
                 letterSpacing: -0.5,
-              ),
+              ).themed(context),
             ),
           ]),
           // Right: Avatar
@@ -471,11 +473,11 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
               width: 40, height: 40,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: ShunShiColors.borderGhost, width: 1.5),
+                border: Border.all(color: AppColors.borderGhost(context), width: 1.5),
               ),
-              child: const CircleAvatar(
-                backgroundColor: ShunShiColors.surfaceContainerLow,
-                child: Icon(Icons.person, size: 20, color: ShunShiColors.secondary),
+              child: CircleAvatar(
+                backgroundColor: AppColors.surfaceContainerLow(context),
+                child: Icon(Icons.person, size: 20, color: AppColors.secondary(context)),
               ),
             ),
           ),
@@ -493,7 +495,7 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
         Text(
           timeDisplay,
           style: ShunShiTypography.labelMedium.copyWith(
-            color: ShunShiColors.secondary,
+            color: AppColors.secondary(context),
             letterSpacing: 1.5,
           ),
         ),
@@ -506,12 +508,12 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
               fontWeight: FontWeight.w900,
               height: 1.15,
               letterSpacing: -0.5,
-            ),
+            ).themed(context),
             children: [
               TextSpan(text: '${sc.name} · '),
               TextSpan(
                 text: '${sc.meridian}当令',
-                style: TextStyle(color: ShunShiColors.secondary),
+                style: TextStyle(color: AppColors.secondary(context)),
               ),
             ],
           ),
@@ -521,13 +523,13 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
           decoration: BoxDecoration(
-            color: ShunShiColors.secondary.withValues(alpha: 0.1),
+            color: AppColors.secondary(context).withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(999),
           ),
           child: Text(
             _solarTermInfo,
             style: ShunShiTypography.caption.copyWith(
-              color: ShunShiColors.secondary,
+              color: AppColors.secondary(context),
               fontWeight: FontWeight.w600,
               letterSpacing: 0.5,
             ),
@@ -539,7 +541,7 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
 
   // ─── Hero 水墨意境区 ───
   Widget _buildHeroImage(ShiChenData sc) {
-    final bg = Theme.of(context).brightness == Brightness.dark ? ShunShiColors.darkBackground : ShunShiColors.background;
+    final bg = Theme.of(context).brightness == Brightness.dark ? ShunShiColors.darkBackground : AppColors.background(context);
     return Container(
       height: 280,
       width: double.infinity,
@@ -619,7 +621,7 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
                   Text(
                     '养生精要',
                     style: ShunShiTypography.caption.copyWith(
-                      color: ShunShiColors.secondary,
+                      color: AppColors.secondary(context),
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -628,7 +630,7 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
                     sc.wellnessPrinciple,
                     style: ShunShiTypography.serifTitle.copyWith(
                       fontSize: 18,
-                      color: ShunShiColors.primary,
+                      color: AppColors.primary(context),
                     ),
                   ),
                 ],
@@ -652,7 +654,7 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: ShunShiColors.surfaceContainerLowest,
+        color: AppColors.surfaceContainerLowest(context),
         borderRadius: BorderRadius.circular(16),
         boxShadow: ShunShiShadows.sm,
       ),
@@ -662,10 +664,10 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
           Container(
             width: 48, height: 48,
             decoration: BoxDecoration(
-              color: ShunShiColors.primary.withValues(alpha: 0.06),
+              color: AppColors.primary(context).withValues(alpha: 0.06),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(action.icon, size: 24, color: ShunShiColors.primary),
+            child: Icon(action.icon, size: 24, color: AppColors.primary(context)),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -677,14 +679,14 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
                   style: ShunShiTypography.titleLarge.copyWith(
                     fontFamily: ShunShiTypography.serifFamily,
                     fontSize: 17,
-                  ),
+                  ).themed(context),
                 ),
                 const SizedBox(height: 6),
                 Text(
                   action.description,
                   style: ShunShiTypography.bodySmall.copyWith(
                     height: 1.6,
-                    color: ShunShiColors.textSecondary,
+                    color: AppColors.textSecondary(context),
                   ),
                 ),
               ],
@@ -697,13 +699,13 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
 
   // ─── AI 助手模块 ───
   Widget _buildAIModule(ShiChenData sc) {
-    final bg = Theme.of(context).brightness == Brightness.dark ? ShunShiColors.darkBackground : ShunShiColors.background;
+    final bg = Theme.of(context).brightness == Brightness.dark ? ShunShiColors.darkBackground : AppColors.background(context);
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: ShunShiColors.surfaceContainerLow,
+        color: AppColors.surfaceContainerLow(context),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: ShunShiColors.borderGhost),
+        border: Border.all(color: AppColors.borderGhost(context)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -715,8 +717,8 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
               children: [
                 Container(
                   width: 52, height: 52,
-                  decoration: const BoxDecoration(
-                    color: ShunShiColors.primary,
+                  decoration: BoxDecoration(
+                    color: AppColors.primary(context),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
@@ -760,14 +762,14 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
                   style: ShunShiTypography.titleMedium.copyWith(
                     fontFamily: ShunShiTypography.serifFamily,
                     fontSize: 16,
-                  ),
+                  ).themed(context),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   '"${sc.aiQuote}"',
                   style: ShunShiTypography.bodyMedium.copyWith(
                     fontStyle: FontStyle.italic,
-                    color: ShunShiColors.textSecondary,
+                    color: AppColors.textSecondary(context),
                     height: 1.7,
                   ),
                 ),
@@ -787,7 +789,7 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            ShunShiColors.primary,
+            AppColors.primary(context),
             ShunShiColors.primaryContainer,
           ],
         ),
@@ -821,19 +823,19 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: ShunShiColors.primary.withValues(alpha: 0.06),
+        color: AppColors.primary(context).withValues(alpha: 0.06),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: ShunShiColors.primary.withValues(alpha: 0.1)),
+        border: Border.all(color: AppColors.primary(context).withValues(alpha: 0.1)),
       ),
       child: Row(
         children: [
           Container(
             width: 36, height: 36,
             decoration: BoxDecoration(
-              color: ShunShiColors.primary.withValues(alpha: 0.1),
+              color: AppColors.primary(context).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: const Icon(Icons.notifications_active, color: ShunShiColors.primary, size: 18),
+            child: Icon(Icons.notifications_active, color: AppColors.primary(context), size: 18),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -841,18 +843,18 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('顺时提醒', style: ShunShiTypography.labelMedium.copyWith(
-                  color: ShunShiColors.primary, fontWeight: FontWeight.w600,
+                  color: AppColors.primary(context), fontWeight: FontWeight.w600,
                 )),
                 const SizedBox(height: 2),
                 Text(
                   _followUp['title']?.toString() ?? _followUp['description']?.toString() ?? '',
-                  style: ShunShiTypography.bodySmall,
+                  style: ShunShiTypography.bodySmall.themed(context),
                   maxLines: 2, overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
           ),
-          Icon(Icons.chevron_right, color: ShunShiColors.textTertiary, size: 18),
+          Icon(Icons.chevron_right, color: AppColors.textTertiary(context), size: 18),
         ],
       ),
     );
@@ -867,7 +869,7 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
         icon: const Icon(Icons.arrow_forward, size: 20),
         label: const Text('查看完整时辰养生表'),
         style: ElevatedButton.styleFrom(
-          backgroundColor: ShunShiColors.primary,
+          backgroundColor: AppColors.primary(context),
           foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
