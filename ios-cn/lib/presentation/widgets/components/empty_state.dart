@@ -4,6 +4,8 @@ import '../../../core/theme/shunshi_spacing.dart';
 import '../../../core/theme/shunshi_text_styles.dart';
 import 'breathing_animation.dart';
 import 'gentle_button.dart';
+import '../../../design_system/app_colors.dart';
+import '../../../design_system/style_theming.dart';
 
 /// 空状态组件 — 居中、轻量、无压迫感
 class EmptyState extends StatelessWidget {
@@ -30,7 +32,7 @@ class EmptyState extends StatelessWidget {
     final isDark = _isDark(context);
     final iconColor = isDark
         ? ShunshiDarkColors.textHint
-        : ShunshiColors.textHint;
+        : AppColors.textTertiary(context);
 
     return Center(
       child: Padding(
@@ -56,7 +58,7 @@ class EmptyState extends StatelessWidget {
               style: ShunshiTextStyles.body.copyWith(
                 color: isDark
                     ? ShunshiDarkColors.textSecondary
-                    : ShunshiColors.textSecondary,
+                    : AppColors.textSecondary(context),
               ),
               textAlign: TextAlign.center,
             ),
@@ -64,7 +66,7 @@ class EmptyState extends StatelessWidget {
               const SizedBox(height: ShunshiSpacing.sm),
               Text(
                 subtitle!,
-                style: ShunshiTextStyles.caption,
+                style: ShunshiTextStyles.caption.themed(context),
                 textAlign: TextAlign.center,
               ),
             ],

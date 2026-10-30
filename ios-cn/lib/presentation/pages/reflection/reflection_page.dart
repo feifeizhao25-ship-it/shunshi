@@ -10,14 +10,16 @@ import '../../../core/theme/shunshi_colors.dart';
 import '../../../core/theme/shunshi_spacing.dart';
 import '../../../core/theme/shunshi_text_styles.dart';
 import '../../widgets/components/gentle_button.dart';
+import '../../../design_system/app_colors.dart';
+import '../../../design_system/style_theming.dart';
 
 // ── 情绪定义 ──────────────────────────────────────────
 
 enum _ReflectionMood {
-  happy,     // 开心 😊
-  calm,      // 平静 😌
-  sad,       // 难过 😢
-  anxious,   // 焦虑 😰
+  happy, // 开心 😊
+  calm, // 平静 😌
+  sad, // 难过 😢
+  anxious, // 焦虑 😰
 }
 
 class _MoodOption {
@@ -66,9 +68,9 @@ class _ReflectionPageState extends State<ReflectionPage> {
 
   /// 根据日期取固定问题
   String get _todayQuestion {
-    final dayOfYear = DateTime.now().difference(
-      DateTime(DateTime.now().year),
-    ).inDays;
+    final dayOfYear = DateTime.now()
+        .difference(DateTime(DateTime.now().year))
+        .inDays;
     return _questions[dayOfYear % _questions.length];
   }
 
@@ -116,154 +118,162 @@ class _ReflectionPageState extends State<ReflectionPage> {
         if (!didPop) context.go('/home');
       },
       child: Scaffold(
-      backgroundColor: ShunshiColors.background,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(
-            horizontal: ShunshiSpacing.pagePadding,
-          ),
-          child: Column(
-            children: [
-              // ── 大留白顶部 ──
-              const SizedBox(height: 80),
+        backgroundColor: AppColors.background(context),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(
+              horizontal: ShunshiSpacing.pagePadding,
+            ),
+            child: Column(
+              children: [
+                // ── 大留白顶部 ──
+                const SizedBox(height: 80),
 
-              // ── 问题居中 22sp insight样式 ──
-              Text(
-                _todayQuestion,
-                style: ShunshiTextStyles.insight.copyWith(fontSize: 22),
-                textAlign: TextAlign.center,
-              ),
+                // ── 问题居中 22sp insight样式 ──
+                Text(
+                  _todayQuestion,
+                  style: ShunshiTextStyles.insight
+                      .copyWith(fontSize: 22)
+                      .themed(context),
+                  textAlign: TextAlign.center,
+                ),
 
-              // ── 思考空间 ──
-              const SizedBox(height: 60),
+                // ── 思考空间 ──
+                const SizedBox(height: 60),
 
-              // ── 情绪选择：4个大圆圈emoji（😊😌😢😰）──
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: _moodOptions.map((opt) {
-                  final isSelected = _selectedMood == opt.mood;
-                  return GestureDetector(
-                    onTap: () => setState(() => _selectedMood = opt.mood),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      width: 72,
-                      height: 72,
-                      margin: const EdgeInsets.symmetric(horizontal: 10),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: isSelected
-                            ? ShunshiColors.primaryLight.withValues(alpha: 0.3)
-                            : ShunshiColors.surface,
-                        border: Border.all(
-                          color: isSelected
-                              ? ShunshiColors.primary
-                              : ShunshiColors.divider,
-                          width: isSelected ? 2 : 1,
-                        ),
-                      ),
-                      child: Center(
-                        child: Text(
-                          opt.emoji,
-                          style: TextStyle(
-                            fontSize: isSelected ? 28 : 24,
+                // ── 情绪选择：4个大圆圈emoji（😊😌😢😰）──
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: _moodOptions.map((opt) {
+                      final isSelected = _selectedMood == opt.mood;
+                      return GestureDetector(
+                        onTap: () => setState(() => _selectedMood = opt.mood),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          width: 72,
+                          height: 72,
+                          margin: const EdgeInsets.symmetric(horizontal: 6),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: isSelected
+                                ? AppColors.primaryLight(
+                                    context,
+                                  ).withValues(alpha: 0.3)
+                                : AppColors.surface(context),
+                            border: Border.all(
+                              color: isSelected
+                                  ? AppColors.primary(context)
+                                  : AppColors.divider(context),
+                              width: isSelected ? 2 : 1,
+                            ),
+                          ),
+                          child: Center(
+                            child: Text(
+                              opt.emoji,
+                              style: TextStyle(fontSize: isSelected ? 28 : 24),
+                            ),
                           ),
                         ),
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ),
+                      );
+                    }).toList(),
+                  ),
+                ),
 
-              // ── 情绪标签 ──
-              const SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: _moodOptions.map((opt) {
-                  final isSelected = _selectedMood == opt.mood;
-                  return SizedBox(
-                    width: 72,
-                    child: Center(
-                      child: Text(
-                        opt.label,
-                        style: ShunshiTextStyles.caption.copyWith(
-                          color: isSelected
-                              ? ShunshiColors.primary
-                              : ShunshiColors.textHint,
+                // ── 情绪标签 ──
+                const SizedBox(height: 12),
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: _moodOptions.map((opt) {
+                      final isSelected = _selectedMood == opt.mood;
+                      return SizedBox(
+                        width: 84,
+                        child: Center(
+                          child: Text(
+                            opt.label,
+                            style: ShunshiTextStyles.caption.copyWith(
+                              color: isSelected
+                                  ? AppColors.primary(context)
+                                  : AppColors.textTertiary(context),
+                            ),
+                          ),
                         ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+
+                // ── 可选文字输入框，大圆角 ──
+                const SizedBox(height: 40),
+                TextField(
+                  controller: _notesController,
+                  maxLines: 3,
+                  style: ShunshiTextStyles.body.themed(context),
+                  decoration: InputDecoration(
+                    hintText: '写点什么...',
+                    hintStyle: ShunshiTextStyles.hint.themed(context),
+                    filled: true,
+                    fillColor: AppColors.surface(context),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(
+                        ShunshiSpacing.radiusXL,
+                      ),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(
+                        ShunshiSpacing.radiusXL,
+                      ),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(
+                        ShunshiSpacing.radiusXL,
+                      ),
+                      borderSide: BorderSide(
+                        color: AppColors.primary(context),
+                        width: 1.5,
                       ),
                     ),
-                  );
-                }).toList(),
-              ),
-
-              // ── 可选文字输入框，大圆角 ──
-              const SizedBox(height: 40),
-              TextField(
-                controller: _notesController,
-                maxLines: 3,
-                style: ShunshiTextStyles.body,
-                decoration: InputDecoration(
-                  hintText: '写点什么...',
-                  hintStyle: ShunshiTextStyles.hint,
-                  filled: true,
-                  fillColor: ShunshiColors.surface,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(
-                      ShunshiSpacing.radiusXL,
-                    ),
-                    borderSide: BorderSide.none,
+                    contentPadding: const EdgeInsets.all(20),
                   ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(
-                      ShunshiSpacing.radiusXL,
-                    ),
-                    borderSide: BorderSide.none,
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(
-                      ShunshiSpacing.radiusXL,
-                    ),
-                    borderSide: BorderSide(
-                      color: ShunshiColors.primary,
-                      width: 1.5,
-                    ),
-                  ),
-                  contentPadding: const EdgeInsets.all(20),
                 ),
-              ),
 
-              // ── "记录下来" GentleButton ──
-              const SizedBox(height: 28),
-              SizedBox(
-                width: double.infinity,
-                child: GentleButton(
-                  text: '记录下来',
-                  isPrimary: _selectedMood != null,
-                  onPressed: _selectedMood != null ? _submit : null,
-                  horizontalPadding: ShunshiSpacing.lg,
+                // ── "记录下来" GentleButton ──
+                const SizedBox(height: 28),
+                SizedBox(
+                  width: double.infinity,
+                  child: GentleButton(
+                    text: '记录下来',
+                    isPrimary: _selectedMood != null,
+                    onPressed: _selectedMood != null ? _submit : null,
+                    horizontalPadding: ShunshiSpacing.lg,
+                  ),
                 ),
-              ),
 
-              // ── "跳过今天" textSecondary色文字链接 ──
-              const SizedBox(height: 20),
-              GestureDetector(
-                onTap: _skip,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Text(
-                    '跳过今天',
-                    style: ShunshiTextStyles.caption.copyWith(
-                      color: ShunshiColors.textSecondary,
+                // ── "跳过今天" textSecondary色文字链接 ──
+                const SizedBox(height: 20),
+                GestureDetector(
+                  onTap: _skip,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: Text(
+                      '跳过今天',
+                      style: ShunshiTextStyles.caption.copyWith(
+                        color: AppColors.textSecondary(context),
+                      ),
                     ),
                   ),
                 ),
-              ),
 
-              const SizedBox(height: 40),
-            ],
+                const SizedBox(height: 40),
+              ],
+            ),
           ),
         ),
-      ),
       ),
     );
   }
@@ -277,24 +287,23 @@ class _SuccessView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ShunshiColors.background,
+      backgroundColor: AppColors.background(context),
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              '🌿',
-              style: TextStyle(fontSize: 56),
-            ),
+            const Text('🌿', style: TextStyle(fontSize: 56)),
             const SizedBox(height: 20),
             Text(
               '已记录',
-              style: ShunshiTextStyles.insight.copyWith(fontSize: 22),
+              style: ShunshiTextStyles.insight
+                  .copyWith(fontSize: 22)
+                  .themed(context),
             ),
             const SizedBox(height: 8),
             Text(
               '愿今天的你，温柔而坚定',
-              style: ShunshiTextStyles.bodySecondary,
+              style: ShunshiTextStyles.bodySecondary.themed(context),
             ),
           ],
         ),

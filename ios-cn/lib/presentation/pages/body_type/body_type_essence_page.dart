@@ -11,6 +11,7 @@ library;
 
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
+import '../../../design_system/app_colors.dart';
 
 class BodyTypeEssencePage extends StatelessWidget {
   final String? bodyType;
@@ -28,14 +29,14 @@ class BodyTypeEssencePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       body: CustomScrollView(
         slivers: [
           // ── Header ──
           SliverAppBar(
             expandedHeight: 200,
             pinned: true,
-            backgroundColor: ShunShiColors.primary,
+            backgroundColor: AppColors.primary(context),
             leading: IconButton(
               icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
               onPressed: () => Navigator.pop(context),
@@ -48,8 +49,8 @@ class BodyTypeEssencePage extends StatelessWidget {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      ShunShiColors.primaryDark ?? ShunShiColors.primary,
-                      ShunShiColors.primary,
+                      ShunShiColors.primaryDark ?? AppColors.primary(context),
+                      AppColors.primary(context),
                     ],
                   ),
                 ),
@@ -99,28 +100,28 @@ class BodyTypeEssencePage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // ── 平时可以留意 Metrics ──
-                  _sectionTitle('filter_vintage', '平时可以留意'),
+                  _sectionTitle(context, 'filter_vintage', '平时可以留意'),
                   const SizedBox(height: 12),
                   ..._metrics.map((m) => Padding(
                     padding: const EdgeInsets.only(bottom: 14),
-                    child: _metricBar(m),
+                    child: _metricBar(context, m),
                   )),
                   const SizedBox(height: 8),
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: ShunShiColors.surfaceContainerLow,
+                      color: AppColors.surfaceContainerLow(context),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(children: [
-                      const Icon(Icons.format_quote, size: 20, color: ShunShiColors.primary),
+                      Icon(Icons.format_quote, size: 20, color: AppColors.primary(context)),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
                           '"Harmony in Flux"',
                           style: TextStyle(
                             fontSize: 16, fontWeight: FontWeight.w600,
-                            color: ShunShiColors.primary,
+                            color: AppColors.primary(context),
                             fontFamily: ShunShiTypography.serifFamily, fontStyle: FontStyle.italic,
                           ),
                         ),
@@ -135,14 +136,14 @@ class BodyTypeEssencePage extends StatelessWidget {
                     const SizedBox(width: 8),
                     Text('Solar Dominance', style: TextStyle(
                       fontSize: 16, fontWeight: FontWeight.w700,
-                      color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.serifFamily,
+                      color: AppColors.textPrimary(context), fontFamily: ShunShiTypography.serifFamily,
                     )),
                   ]),
                   const SizedBox(height: 8),
                   Text(
                     '早晨是比较适合活动的时候，可以安排散步或拉伸。',
                     style: TextStyle(
-                      fontSize: 14, color: ShunShiColors.textSecondary,
+                      fontSize: 14, color: AppColors.textSecondary(context),
                       height: 1.6, fontFamily: ShunShiTypography.sansFamily,
                     ),
                   ),
@@ -150,66 +151,66 @@ class BodyTypeEssencePage extends StatelessWidget {
 
                   // ── Terrene Stability ──
                   Row(children: [
-                    const Icon(Icons.spa, size: 20, color: ShunShiColors.primary),
+                    Icon(Icons.spa, size: 20, color: AppColors.primary(context)),
                     const SizedBox(width: 8),
                     Text('Terrene Stability', style: TextStyle(
                       fontSize: 16, fontWeight: FontWeight.w700,
-                      color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.serifFamily,
+                      color: AppColors.textPrimary(context), fontFamily: ShunShiTypography.serifFamily,
                     )),
                   ]),
                   const SizedBox(height: 8),
                   Text(
                     '累了就停下来休息，饮食以温软为主。',
                     style: TextStyle(
-                      fontSize: 14, color: ShunShiColors.textSecondary,
+                      fontSize: 14, color: AppColors.textSecondary(context),
                       height: 1.6, fontFamily: ShunShiTypography.sansFamily,
                     ),
                   ),
                   const SizedBox(height: 28),
 
                   // ── Natural Rhythm ──
-                  _sectionTitle('auto_awesome', '你的自然节律'),
+                  _sectionTitle(context, 'auto_awesome', '你的自然节律'),
                   const SizedBox(height: 12),
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: ShunShiColors.surfaceContainerLowest,
+                      color: AppColors.surfaceContainerLowest(context),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           '平和质的人平时起伏不大，换季时仍要注意作息。',
                           style: TextStyle(
-                            fontSize: 14, color: ShunShiColors.textSecondary,
+                            fontSize: 14, color: AppColors.textSecondary(context),
                             height: 1.7, fontFamily: ShunShiTypography.sansFamily,
                           ),
                         ),
                         const SizedBox(height: 16),
-                        _checkItem('傍晚宜安静，不必再安排剧烈活动。'),
+                        _checkItem(context, '傍晚宜安静，不必再安排剧烈活动。'),
                         const SizedBox(height: 8),
-                        _checkItem('午饭前后把正餐吃好。'),
+                        _checkItem(context, '午饭前后把正餐吃好。'),
                         const SizedBox(height: 8),
-                        _checkItem('起床后先活动一下再开始忙碌。'),
+                        _checkItem(context, '起床后先活动一下再开始忙碌。'),
                       ],
                     ),
                   ),
                   const SizedBox(height: 28),
 
                   // ── Seasonal Adjustments ──
-                  _sectionTitle('eco', 'Seasonal Adjustments'),
+                  _sectionTitle(context, 'eco', 'Seasonal Adjustments'),
                   const SizedBox(height: 12),
-                  _seasonCard('Active Season', 'Spring · Wood Element',
+                  _seasonCard(context, 'Active Season', 'Spring · Wood Element',
                     '春季适合早起走动，别一下安排太满。',
-                    ShunShiColors.primary),
+                    AppColors.primary(context)),
                   const SizedBox(height: 12),
-                  _seasonCard('Rest Season', 'Late Summer · Earth Element',
+                  _seasonCard(context, 'Rest Season', 'Late Summer · Earth Element',
                     '长夏注意少吃生冷，把觉睡够。',
                     const Color(0xFFF59E0B)),
                   const SizedBox(height: 12),
-                  _seasonCard('Challenge Season', 'Winter · Water Element',
+                  _seasonCard(context, 'Challenge Season', 'Winter · Water Element',
                     '冬季多休息，喝温热的水，应酬可以少一些。',
                     const Color(0xFF3B82F6)),
 
@@ -223,46 +224,46 @@ class BodyTypeEssencePage extends StatelessWidget {
     );
   }
 
-  Widget _sectionTitle(String icon, String title) {
+  Widget _sectionTitle(BuildContext context, String icon, String title) {
     return Row(children: [
       Icon(Icons.format_quote, size: 0), // spacer trick
       Text(title, style: TextStyle(
         fontSize: 18, fontWeight: FontWeight.w700,
-        color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.serifFamily,
+        color: AppColors.textPrimary(context), fontFamily: ShunShiTypography.serifFamily,
       )),
     ]);
   }
 
-  Widget _metricBar(_Metric m) {
+  Widget _metricBar(BuildContext context, _Metric m) {
     return Row(children: [
-      Icon(m.icon, size: 18, color: ShunShiColors.primary),
+      Icon(m.icon, size: 18, color: AppColors.primary(context)),
       const SizedBox(width: 10),
       Expanded(child: Text(m.name, style: TextStyle(
-        fontSize: 14, color: ShunShiColors.textSecondary,
+        fontSize: 14, color: AppColors.textSecondary(context),
         fontFamily: ShunShiTypography.sansFamily,
       ))),
     ]);
   }
 
-  Widget _checkItem(String text) {
+  Widget _checkItem(BuildContext context, String text) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Icon(Icons.check_circle, size: 18, color: ShunShiColors.primary),
+        Icon(Icons.check_circle, size: 18, color: AppColors.primary(context)),
         const SizedBox(width: 10),
         Expanded(child: Text(text, style: TextStyle(
-          fontSize: 13, color: ShunShiColors.textSecondary,
+          fontSize: 13, color: AppColors.textSecondary(context),
           height: 1.5, fontFamily: ShunShiTypography.sansFamily,
         ))),
       ],
     );
   }
 
-  Widget _seasonCard(String title, String subtitle, String desc, Color color) {
+  Widget _seasonCard(BuildContext context, String title, String subtitle, String desc, Color color) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: ShunShiColors.surfaceContainerLowest,
+        color: AppColors.surfaceContainerLowest(context),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -282,7 +283,7 @@ class BodyTypeEssencePage extends StatelessWidget {
               children: [
                 Text(title, style: TextStyle(
                   fontSize: 15, fontWeight: FontWeight.w600,
-                  color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.sansFamily,
+                  color: AppColors.textPrimary(context), fontFamily: ShunShiTypography.sansFamily,
                 )),
                 const SizedBox(height: 2),
                 Text(subtitle, style: TextStyle(
@@ -290,7 +291,7 @@ class BodyTypeEssencePage extends StatelessWidget {
                 )),
                 const SizedBox(height: 6),
                 Text(desc, style: TextStyle(
-                  fontSize: 13, color: ShunShiColors.textSecondary,
+                  fontSize: 13, color: AppColors.textSecondary(context),
                   height: 1.5, fontFamily: ShunShiTypography.sansFamily,
                 )),
               ],

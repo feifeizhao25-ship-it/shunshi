@@ -2,6 +2,7 @@ import '../../../core/router/safe_pop.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
+import '../../../design_system/app_colors.dart';
 
 /// 日记周报页 — 7 天趋势 + 观察建议
 class DiaryReportPage extends StatefulWidget {
@@ -76,9 +77,9 @@ class _DiaryReportPageState extends State<DiaryReportPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       appBar: AppBar(
-        backgroundColor: ShunShiColors.background,
+        backgroundColor: AppColors.background(context),
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, size: 20),
@@ -88,7 +89,7 @@ class _DiaryReportPageState extends State<DiaryReportPage> {
             style: TextStyle(fontFamily: ShunShiTypography.serifFamily)),
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator(color: ShunShiColors.primary))
+          ? Center(child: CircularProgressIndicator(color: AppColors.primary(context)))
           : SingleChildScrollView(
               padding: const EdgeInsets.all(20),
               child: Column(
@@ -106,12 +107,12 @@ class _DiaryReportPageState extends State<DiaryReportPage> {
                   Container(
                     width: double.infinity, padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: ShunShiColors.surfaceContainerLowest,
+                      color: AppColors.surfaceContainerLowest(context),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: ShunShiColors.borderGhost),
+                      border: Border.all(color: AppColors.borderGhost(context)),
                     ),
                     child: Text(_generateObservation(),
-                        style: const TextStyle(fontSize: 14, color: ShunShiColors.textSecondary, height: 1.7)),
+                        style: TextStyle(fontSize: 14, color: AppColors.textSecondary(context), height: 1.7)),
                   ),
                   const SizedBox(height: 24),
 
@@ -122,14 +123,14 @@ class _DiaryReportPageState extends State<DiaryReportPage> {
                     margin: const EdgeInsets.only(bottom: 10),
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: ShunShiColors.primary.withValues(alpha: 0.05),
+                      color: AppColors.primary(context).withValues(alpha: 0.05),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       const Text('💡', style: TextStyle(fontSize: 18)),
                       const SizedBox(width: 10),
                       Expanded(child: Text(s,
-                          style: const TextStyle(fontSize: 14, color: ShunShiColors.textPrimary, height: 1.5))),
+                          style: TextStyle(fontSize: 14, color: AppColors.textPrimary(context), height: 1.5))),
                     ]),
                   )),
                   const SizedBox(height: 32),
@@ -140,32 +141,32 @@ class _DiaryReportPageState extends State<DiaryReportPage> {
   }
 
   Widget _sectionTitle(String t) => Text(t,
-      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700,
-          fontFamily: ShunShiTypography.serifFamily, color: ShunShiColors.textPrimary));
+      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700,
+          fontFamily: ShunShiTypography.serifFamily, color: AppColors.textPrimary(context)));
 
   Widget _buildTrendChart() {
     if (_trends.isEmpty) {
-      return const Center(child: Padding(
+      return Center(child: Padding(
         padding: EdgeInsets.all(24),
-        child: Text('暂无数据', style: TextStyle(color: ShunShiColors.textTertiary)),
+        child: Text('暂无数据', style: TextStyle(color: AppColors.textTertiary(context))),
       ));
     }
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: ShunShiColors.surfaceContainerLowest,
+        color: AppColors.surfaceContainerLowest(context),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: ShunShiColors.borderGhost),
+        border: Border.all(color: AppColors.borderGhost(context)),
       ),
       child: Column(
         children: [
           // Legend
           Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            _legendDot(ShunShiColors.primary, '心情'),
+            _legendDot(AppColors.primary(context), '心情'),
             const SizedBox(width: 16),
             _legendDot(ShunShiColors.blue, '睡眠'),
             const SizedBox(width: 16),
-            _legendDot(ShunShiColors.secondary, '精力'),
+            _legendDot(AppColors.secondary(context), '精力'),
           ]),
           const SizedBox(height: 16),
           // Bar chart
@@ -185,7 +186,7 @@ class _DiaryReportPageState extends State<DiaryReportPage> {
                       children: [
                         // Mood bar
                         Container(width: 6, height: mood * 20,
-                            decoration: BoxDecoration(color: ShunShiColors.primary, borderRadius: BorderRadius.circular(3))),
+                            decoration: BoxDecoration(color: AppColors.primary(context), borderRadius: BorderRadius.circular(3))),
                         const SizedBox(height: 2),
                         // Sleep bar
                         Container(width: 6, height: sleep * 20,
@@ -193,10 +194,10 @@ class _DiaryReportPageState extends State<DiaryReportPage> {
                         const SizedBox(height: 2),
                         // Energy bar
                         Container(width: 6, height: energy * 20,
-                            decoration: BoxDecoration(color: ShunShiColors.secondary, borderRadius: BorderRadius.circular(3))),
+                            decoration: BoxDecoration(color: AppColors.secondary(context), borderRadius: BorderRadius.circular(3))),
                         const SizedBox(height: 4),
                         Text(d['date']?.toString() ?? '',
-                            style: const TextStyle(fontSize: 9, color: ShunShiColors.textTertiary)),
+                            style: TextStyle(fontSize: 9, color: AppColors.textTertiary(context))),
                       ],
                     ),
                   ),
@@ -213,6 +214,6 @@ class _DiaryReportPageState extends State<DiaryReportPage> {
     Container(width: 8, height: 8,
         decoration: BoxDecoration(shape: BoxShape.circle, color: color)),
     const SizedBox(width: 4),
-    Text(label, style: const TextStyle(fontSize: 11, color: ShunShiColors.textTertiary)),
+    Text(label, style: TextStyle(fontSize: 11, color: AppColors.textTertiary(context))),
   ]);
 }

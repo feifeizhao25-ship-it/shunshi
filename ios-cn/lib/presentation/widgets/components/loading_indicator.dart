@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import '../../../core/theme/shunshi_animations.dart';
+import '../../../design_system/app_colors.dart';
 
 /// 加载指示器 — 呼吸圆点，不是spinner
 class LoadingIndicator extends StatefulWidget {
@@ -43,7 +44,7 @@ class _LoadingIndicatorState extends State<LoadingIndicator>
   Color _dotColor(BuildContext context) {
     return _isDark(context)
         ? ShunshiDarkColors.primary
-        : ShunshiColors.primary;
+        : AppColors.primary(context);
   }
 
   @override

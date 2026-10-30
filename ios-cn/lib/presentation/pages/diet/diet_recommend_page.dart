@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
 import '../../../data/network/api_client.dart';
 import '../../widgets/state_view.dart';
+import '../../../design_system/app_colors.dart';
 
 class DietRecommendPage extends StatefulWidget {
   final String? constitutionType;
@@ -102,7 +103,7 @@ class _DietRecommendPageState extends State<DietRecommendPage> {
       case 'tea': return const Color(0xFF8D6E63);
       case 'recipe': return const Color(0xFFFF9800);
       case 'herb': return const Color(0xFF9C27B0);
-      default: return ShunShiColors.primary;
+      default: return AppColors.primary(context);
     }
   }
 
@@ -120,9 +121,9 @@ class _DietRecommendPageState extends State<DietRecommendPage> {
   Widget build(BuildContext context) {
     final items = _filteredItems;
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       appBar: AppBar(
-        backgroundColor: ShunShiColors.background,
+        backgroundColor: AppColors.background(context),
         leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
         title: Text('饮食推荐', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18, fontWeight: FontWeight.w600)),
       ),
@@ -139,11 +140,11 @@ class _DietRecommendPageState extends State<DietRecommendPage> {
               final f = _filters[i];
               final active = _activeFilter == f['key'];
               return ChoiceChip(
-                avatar: Icon(f['icon'] as IconData, size: 16, color: active ? Colors.white : ShunShiColors.textSecondary),
+                avatar: Icon(f['icon'] as IconData, size: 16, color: active ? Colors.white : AppColors.textSecondary(context)),
                 label: Text(f['label'] as String),
                 selected: active,
-                selectedColor: ShunShiColors.primary,
-                labelStyle: TextStyle(color: active ? Colors.white : ShunShiColors.textPrimary, fontSize: 13),
+                selectedColor: AppColors.primary(context),
+                labelStyle: TextStyle(color: active ? Colors.white : AppColors.textPrimary(context), fontSize: 13),
                 onSelected: (_) => _onFilterChanged(f['key'] as String),
               );
             },
@@ -179,7 +180,7 @@ class _DietRecommendPageState extends State<DietRecommendPage> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: ShunShiColors.surface,
+        color: AppColors.surface(context),
         borderRadius: BorderRadius.circular(14),
       ),
       child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -200,23 +201,23 @@ class _DietRecommendPageState extends State<DietRecommendPage> {
               child: Text(_typeLabel(type), style: TextStyle(fontSize: 10, color: color, fontWeight: FontWeight.w500)),
             ),
             const Spacer(),
-            Text('查看', style: TextStyle(fontSize: 12, color: ShunShiColors.primary)),
+            Text('查看', style: TextStyle(fontSize: 12, color: AppColors.primary(context))),
             GestureDetector(
           onTap: () {
             final id = item['id'];
             if (id != null) context.push('/content-detail', extra: {'contentId': id});
           },
           child: Row(children: [
-            Text('查看', style: TextStyle(fontSize: 12, color: ShunShiColors.primary)),
-            Icon(Icons.arrow_forward, size: 14, color: ShunShiColors.primary),
+            Text('查看', style: TextStyle(fontSize: 12, color: AppColors.primary(context))),
+            Icon(Icons.arrow_forward, size: 14, color: AppColors.primary(context)),
           ]),
         ),
           ]),
           const SizedBox(height: 6),
-          Text(item['title'] ?? '', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+          Text(item['title'] ?? '', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
           const SizedBox(height: 4),
           Text(item['content'] ?? '', maxLines: 2, overflow: TextOverflow.ellipsis,
-            style: TextStyle(fontSize: 13, color: ShunShiColors.textSecondary, height: 1.5)),
+            style: TextStyle(fontSize: 13, color: AppColors.textSecondary(context), height: 1.5)),
         ])),
       ]),
     );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import '../../../core/theme/shunshi_animations.dart';
+import '../../../design_system/app_colors.dart';
 
 /// 加载状态组件 — 3个圆点呼吸动画
 ///
@@ -48,7 +49,7 @@ class _LoadingStateState extends State<LoadingState>
   Color _dotColor(BuildContext context) {
     return _isDark(context)
         ? ShunshiDarkColors.primary
-        : ShunshiColors.primary;
+        : AppColors.primary(context);
   }
 
   @override
@@ -70,7 +71,7 @@ class _LoadingStateState extends State<LoadingState>
                       fontWeight: FontWeight.w400,
                       color: _isDark(context)
                           ? ShunshiDarkColors.textSecondary
-                          : ShunshiColors.textSecondary,
+                          : AppColors.textSecondary(context),
                     ),
                   ),
                 ],

@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/config/app_config.dart';
+import '../../../design_system/app_colors.dart';
 
 class RecordsPageV2 extends StatefulWidget {
   const RecordsPageV2({super.key});
@@ -86,19 +87,19 @@ class _RecordsPageV2State extends State<RecordsPageV2> {
 
   @override
   Widget build(BuildContext context) {
-    if (_loading) return Scaffold(backgroundColor: ShunShiColors.background, body: const LoadingSkeleton());
+    if (_loading) return Scaffold(backgroundColor: AppColors.background(context), body: const LoadingSkeleton());
 
     final progress = _todayTotal > 0 ? _todayDone / _todayTotal : 0.0;
 
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       appBar: AppBar(
-        backgroundColor: ShunShiColors.background,
+        backgroundColor: AppColors.background(context),
         leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
         title: Text('养生记录', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18, fontWeight: FontWeight.w600)),
       ),
       body: RefreshIndicator(
-        color: ShunShiColors.primary,
+        color: AppColors.primary(context),
         onRefresh: _fetchData,
         child: ListView(
           padding: const EdgeInsets.all(20),
@@ -118,46 +119,46 @@ class _RecordsPageV2State extends State<RecordsPageV2> {
             const SizedBox(height: 16),
 
             // Today progress
-            Text('今日进度', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+            Text('今日进度', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
             const SizedBox(height: 12),
             Container(
               padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(14)),
+              decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(14)),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Row(children: [
-                  Icon(progress >= 1.0 ? Icons.celebration : Icons.wb_sunny, color: ShunShiColors.primary, size: 18),
+                  Icon(progress >= 1.0 ? Icons.celebration : Icons.wb_sunny, color: AppColors.primary(context), size: 18),
                   const SizedBox(width: 8),
-                  Text('今天', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+                  Text('今天', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
                   const Spacer(),
-                  Text('${(progress * 100).toInt()}%', style: TextStyle(fontSize: 13, color: ShunShiColors.primary, fontWeight: FontWeight.w500)),
+                  Text('${(progress * 100).toInt()}%', style: TextStyle(fontSize: 13, color: AppColors.primary(context), fontWeight: FontWeight.w500)),
                 ]),
                 const SizedBox(height: 8),
                 Text(progress >= 1.0 ? '已完成全部习惯！' : '已完成 $_todayDone/$_todayTotal 项习惯',
-                  style: TextStyle(fontSize: 13, color: ShunShiColors.textSecondary)),
+                  style: TextStyle(fontSize: 13, color: AppColors.textSecondary(context))),
                 const SizedBox(height: 8),
                 ClipRRect(borderRadius: BorderRadius.circular(3),
-                  child: LinearProgressIndicator(value: progress, backgroundColor: ShunShiColors.surfaceContainerLow, color: ShunShiColors.primary, minHeight: 4)),
+                  child: LinearProgressIndicator(value: progress, backgroundColor: AppColors.surfaceContainerLow(context), color: AppColors.primary(context), minHeight: 4)),
               ]),
             ),
             const SizedBox(height: 16),
 
             // Sleep stats
             if (_sleepStats.isNotEmpty) ...[
-              Text('睡眠统计', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+              Text('睡眠统计', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
               const SizedBox(height: 12),
               Container(
                 padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(14)),
+                decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(14)),
                 child: Row(children: [
-                  Icon(Icons.bedtime, color: ShunShiColors.primary, size: 20),
+                  Icon(Icons.bedtime, color: AppColors.primary(context), size: 20),
                   const SizedBox(width: 10),
                   Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text('平均睡眠', style: TextStyle(fontSize: 13, color: ShunShiColors.textTertiary)),
-                    Text('${_sleepStats['avg_hours'] ?? '-'}小时', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: ShunShiColors.textPrimary)),
+                    Text('平均睡眠', style: TextStyle(fontSize: 13, color: AppColors.textTertiary(context))),
+                    Text('${_sleepStats['avg_hours'] ?? '-'}小时', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.textPrimary(context))),
                   ])),
                   Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text('质量评分', style: TextStyle(fontSize: 13, color: ShunShiColors.textTertiary)),
-                    Text('${_sleepStats['avg_quality'] ?? '-'}/5', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: ShunShiColors.textPrimary)),
+                    Text('质量评分', style: TextStyle(fontSize: 13, color: AppColors.textTertiary(context))),
+                    Text('${_sleepStats['avg_quality'] ?? '-'}/5', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.textPrimary(context))),
                   ])),
                 ]),
               ),
@@ -166,19 +167,19 @@ class _RecordsPageV2State extends State<RecordsPageV2> {
 
             // Emotion trends
             if (_emotionTrends.isNotEmpty) ...[
-              Text('情绪趋势', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+              Text('情绪趋势', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
               const SizedBox(height: 12),
               ..._emotionTrends.take(5).map((e) => Padding(
                 padding: const EdgeInsets.only(bottom: 8),
                 child: Container(
                   padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(12)),
+                  decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(12)),
                   child: Row(children: [
-                    Icon(_emotionIcon(e['avg_mood'] as int? ?? 3), color: ShunShiColors.primary, size: 18),
+                    Icon(_emotionIcon(e['avg_mood'] as int? ?? 3), color: AppColors.primary(context), size: 18),
                     const SizedBox(width: 10),
-                    Text(e['date']?.toString().substring(5, 10) ?? '', style: TextStyle(fontSize: 13, color: ShunShiColors.textSecondary)),
+                    Text(e['date']?.toString().substring(5, 10) ?? '', style: TextStyle(fontSize: 13, color: AppColors.textSecondary(context))),
                     const Spacer(),
-                    Text(_emotionLabel(e['avg_mood'] as int? ?? 3), style: TextStyle(fontSize: 13, color: ShunShiColors.textPrimary)),
+                    Text(_emotionLabel(e['avg_mood'] as int? ?? 3), style: TextStyle(fontSize: 13, color: AppColors.textPrimary(context))),
                   ]),
                 ),
               )),

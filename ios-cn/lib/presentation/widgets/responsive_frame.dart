@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../design_system/theme.dart';
+import '../../design_system/app_colors.dart';
 
 /// 平板和大屏不再收成 480 宽的手机条。
 /// 内容加宽、字号放大，两侧用页面同色，避免米色空带。
@@ -18,7 +19,7 @@ class ResponsiveFrame extends StatelessWidget {
     final used = width < frameWidth ? width : frameWidth;
     final typeScale = width >= 1100 ? 1.28 : 1.16;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final background = isDark ? ShunShiColors.darkBackground : ShunShiColors.background;
+    final background = isDark ? ShunShiColors.darkBackground : AppColors.background(context);
 
     return ColoredBox(
       color: background,

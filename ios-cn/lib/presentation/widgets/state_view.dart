@@ -3,6 +3,7 @@ library;
 
 import 'package:flutter/material.dart';
 import '../../design_system/theme.dart';
+import '../../design_system/app_colors.dart';
 
 /// 通用错误页面
 class ErrorView extends StatelessWidget {
@@ -25,16 +26,16 @@ class ErrorView extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 48, color: ShunShiColors.textTertiary),
+            Icon(icon, size: 48, color: AppColors.textTertiary(context)),
             const SizedBox(height: 16),
             Text(message,
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 14, color: ShunShiColors.textSecondary, height: 1.6)),
+              style: TextStyle(fontSize: 14, color: AppColors.textSecondary(context), height: 1.6)),
             if (onRetry != null) ...[
               const SizedBox(height: 20),
               TextButton(
                 onPressed: onRetry,
-                style: TextButton.styleFrom(foregroundColor: ShunShiColors.primary),
+                style: TextButton.styleFrom(foregroundColor: AppColors.primary(context)),
                 child: const Text('重试'),
               ),
             ],

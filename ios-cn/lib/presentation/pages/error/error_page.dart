@@ -5,6 +5,7 @@ import '../../../core/theme/shunshi_colors.dart';
 import '../../../core/theme/shunshi_spacing.dart';
 import '../../../core/theme/shunshi_text_styles.dart';
 import '../../widgets/components/gentle_button.dart';
+import '../../../design_system/app_colors.dart';
 
 /// 全局错误页面 — 路由不存在 / 意外异常
 ///
@@ -43,12 +44,12 @@ class ErrorPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = _isDark(context);
-    final bg = isDark ? ShunshiDarkColors.background : ShunshiColors.background;
+    final bg = isDark ? ShunshiDarkColors.background : AppColors.background(context);
     final textPrimary =
-        isDark ? ShunshiDarkColors.textPrimary : ShunshiColors.textPrimary;
+        isDark ? ShunshiDarkColors.textPrimary : AppColors.textPrimary(context);
     final textSecondary =
-        isDark ? ShunshiDarkColors.textSecondary : ShunshiColors.textSecondary;
-    final errorColor = isDark ? ShunshiDarkColors.error : ShunshiColors.error;
+        isDark ? ShunshiDarkColors.textSecondary : AppColors.textSecondary(context);
+    final errorColor = isDark ? ShunshiDarkColors.error : AppColors.error(context);
 
     return Scaffold(
       backgroundColor: bg,
@@ -168,10 +169,10 @@ class _DebugErrorCardState extends State<_DebugErrorCard> {
         width: double.infinity,
         padding: const EdgeInsets.all(ShunshiSpacing.md),
         decoration: BoxDecoration(
-          color: (isDark ? ShunshiDarkColors.surfaceDim : ShunshiColors.surfaceDim),
+          color: (isDark ? ShunshiDarkColors.surfaceDim : AppColors.surfaceContainerLow(context)),
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: (isDark ? ShunshiDarkColors.border : ShunshiColors.border),
+            color: (isDark ? ShunshiDarkColors.border : AppColors.border(context)),
           ),
         ),
         child: Column(
@@ -184,14 +185,14 @@ class _DebugErrorCardState extends State<_DebugErrorCard> {
                   size: 14,
                   color: isDark
                       ? ShunshiDarkColors.textHint
-                      : ShunshiColors.textHint,
+                      : AppColors.textTertiary(context),
                 ),
                 const SizedBox(width: 4),
                 Text(
                   'Debug 信息 (点击${_expanded ? '收起' : '展开'})',
                   style: ShunshiTextStyles.caption.copyWith(
                     color:
-                        isDark ? ShunshiDarkColors.textHint : ShunshiColors.textHint,
+                        isDark ? ShunshiDarkColors.textHint : AppColors.textTertiary(context),
                   ),
                 ),
               ],
@@ -205,7 +206,7 @@ class _DebugErrorCardState extends State<_DebugErrorCard> {
                   fontSize: 11,
                   color: isDark
                       ? ShunshiDarkColors.textSecondary
-                      : ShunshiColors.textSecondary,
+                      : AppColors.textSecondary(context),
                 ),
               ),
             ],

@@ -13,6 +13,8 @@ import '../../../core/theme/shunshi_text_styles.dart';
 
 import 'widgets/constitution_data.dart';
 import 'widgets/constitution_widgets.dart';
+import '../../../design_system/app_colors.dart';
+import '../../../design_system/style_theming.dart';
 
 // Models imported from constitution_data.dart
 
@@ -295,11 +297,11 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
         }
       },
       child: Scaffold(
-      backgroundColor: ShunshiColors.background,
+      backgroundColor: AppColors.background(context),
       appBar: AppBar(
-        title: Text(_view == 'home' ? '体质测试' : _view == 'quiz' ? '体质测试 (${_currentIndex + 1}/${_questions.length})' : _view == 'result' ? '测试结果' : '体质详情', style: ShunshiTextStyles.heading),
-        backgroundColor: ShunshiColors.surface, foregroundColor: ShunshiColors.textPrimary, elevation: 0,
-        leading: IconButton(icon: Icon(Icons.chevron_left, color: ShunshiColors.textPrimary), onPressed: () {
+        title: Text(_view == 'home' ? '体质测试' : _view == 'quiz' ? '体质测试 (${_currentIndex + 1}/${_questions.length})' : _view == 'result' ? '测试结果' : '体质详情', style: ShunshiTextStyles.heading.themed(context)),
+        backgroundColor: AppColors.surface(context), foregroundColor: AppColors.textPrimary(context), elevation: 0,
+        leading: IconButton(icon: Icon(Icons.chevron_left, color: AppColors.textPrimary(context)), onPressed: () {
           if (_view == 'quiz') { if (_currentIndex > 0) {
             setState(() => _currentIndex--);
           } else {
@@ -310,7 +312,7 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
         }),
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator(color: ShunshiColors.primary))
+          ? Center(child: CircularProgressIndicator(color: AppColors.primary(context)))
           : AnimatedSwitcher(duration: const Duration(milliseconds: 300), child: KeyedSubtree(key: ValueKey(_view), child: switch (_view) { 'quiz' => _buildQuiz(), 'result' => _buildResult(), 'detail' => _buildDetailView(), _ => _buildHome(), })),
       ),
     );
@@ -322,28 +324,28 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text('了解你的体质', style: ShunshiTextStyles.greeting),
+        Text('了解你的体质', style: ShunshiTextStyles.greeting.themed(context)),
         const SizedBox(height: 8),
-        Text('中医体质辨识，找到最适合你的养生之道', style: ShunshiTextStyles.bodySecondary),
+        Text('中医体质辨识，找到最适合你的养生之道', style: ShunshiTextStyles.bodySecondary.themed(context)),
         const SizedBox(height: 24),
         SizedBox(width: double.infinity, height: 56, child: ElevatedButton(
           onPressed: _startQuiz,
-          style: ElevatedButton.styleFrom(backgroundColor: ShunshiColors.primary, foregroundColor: Colors.white, elevation: 0, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))),
+          style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary(context), foregroundColor: Colors.white, elevation: 0, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))),
           child: const Text('开始测试', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
         )),
         const SizedBox(height: 32),
-        Text('九种体质', style: ShunshiTextStyles.heading),
+        Text('九种体质', style: ShunshiTextStyles.heading.themed(context)),
         const SizedBox(height: 16),
         GridView.builder(shrinkWrap: true, physics: const NeverScrollableScrollPhysics(), gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3, childAspectRatio: 0.72, crossAxisSpacing: 12, mainAxisSpacing: 12), itemCount: _types.length, itemBuilder: (context, index) {
           final type = _types[index];
           return GestureDetector(
             onTap: () => _showDetail(type.key),
-            child: Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: ShunshiColors.surface, borderRadius: BorderRadius.circular(16), border: Border.all(color: ShunshiColors.divider)), child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Container(width: 48, height: 48, decoration: BoxDecoration(color: ShunshiColors.primaryLight.withValues(alpha: 0.15), shape: BoxShape.circle), child: Center(child: Text(type.emoji, style: const TextStyle(fontSize: 26)))),
+            child: Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(16), border: Border.all(color: AppColors.divider(context))), child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Container(width: 48, height: 48, decoration: BoxDecoration(color: AppColors.primaryLight(context).withValues(alpha: 0.15), shape: BoxShape.circle), child: Center(child: Text(type.emoji, style: const TextStyle(fontSize: 26)))),
               const SizedBox(height: 8),
-              Text(type.name, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: ShunshiColors.textPrimary)),
+              Text(type.name, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
               const SizedBox(height: 4),
-              Text(type.description, style: ShunshiTextStyles.labelSmall, textAlign: TextAlign.center, maxLines: 2, overflow: TextOverflow.ellipsis),
+              Text(type.description, style: ShunshiTextStyles.labelSmall.themed(context), textAlign: TextAlign.center, maxLines: 2, overflow: TextOverflow.ellipsis),
             ])),
           );
         }),
@@ -369,14 +371,14 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('第 ${_currentIndex + 1} 题 / ${_questions.length}', style: ShunshiTextStyles.caption),
-                  Text('${(progress * 100).toInt()}%', style: ShunshiTextStyles.caption.copyWith(color: ShunshiColors.primary, fontWeight: FontWeight.w600)),
+                  Text('第 ${_currentIndex + 1} 题 / ${_questions.length}', style: ShunshiTextStyles.caption.themed(context)),
+                  Text('${(progress * 100).toInt()}%', style: ShunshiTextStyles.caption.copyWith(color: AppColors.primary(context), fontWeight: FontWeight.w600)),
                 ],
               ),
               const SizedBox(height: 8),
               ClipRRect(
                 borderRadius: BorderRadius.circular(4),
-                child: LinearProgressIndicator(value: progress, minHeight: 6, backgroundColor: ShunshiColors.divider, valueColor: const AlwaysStoppedAnimation(ShunshiColors.primary)),
+                child: LinearProgressIndicator(value: progress, minHeight: 6, backgroundColor: AppColors.divider(context), valueColor: AlwaysStoppedAnimation(AppColors.primary(context))),
               ),
             ],
           ),
@@ -393,7 +395,7 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 16),
-                    Text(question.text, style: ShunshiTextStyles.heading),
+                    Text(question.text, style: ShunshiTextStyles.heading.themed(context)),
                     const SizedBox(height: 24),
                     ...question.options.asMap().entries.map((entry) {
                       final isSelected = _answers[question.id] == entry.key;
@@ -415,7 +417,7 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
                   Expanded(
                     child: OutlinedButton(
                       onPressed: () => setState(() => _currentIndex--),
-                      style: OutlinedButton.styleFrom(foregroundColor: ShunshiColors.textSecondary, side: const BorderSide(color: ShunshiColors.divider), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), padding: const EdgeInsets.symmetric(vertical: 14)),
+                      style: OutlinedButton.styleFrom(foregroundColor: AppColors.textSecondary(context), side: BorderSide(color: AppColors.divider(context)), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), padding: const EdgeInsets.symmetric(vertical: 14)),
                       child: const Text('上一题', style: TextStyle(fontSize: 15)),
                     ),
                   ),
@@ -426,7 +428,7 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
                     onPressed: _answers.containsKey(question.id) && _currentIndex < _questions.length - 1
                         ? () => setState(() => _currentIndex++)
                         : _answers.length == _questions.length ? _submitQuiz : null,
-                    style: ElevatedButton.styleFrom(backgroundColor: ShunshiColors.primary, foregroundColor: Colors.white, disabledBackgroundColor: ShunshiColors.divider, disabledForegroundColor: ShunshiColors.textHint, elevation: 0, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), padding: const EdgeInsets.symmetric(vertical: 14)),
+                    style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary(context), foregroundColor: Colors.white, disabledBackgroundColor: AppColors.divider(context), disabledForegroundColor: AppColors.textTertiary(context), elevation: 0, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), padding: const EdgeInsets.symmetric(vertical: 14)),
                     child: Text(_currentIndex == _questions.length - 1 && _answers.length == _questions.length ? '提交答卷' : '下一题', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
                   ),
                 ),
@@ -453,9 +455,9 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
 
         // ── 免费部分：体质概述 + 分数条 ──
         _buildSection('体质概述', '📋', [
-          Text(r.description, style: const TextStyle(fontSize: 14, color: ShunshiColors.textSecondary, height: 1.7)),
+          Text(r.description, style: TextStyle(fontSize: 14, color: AppColors.textSecondary(context), height: 1.7)),
           const SizedBox(height: 12),
-          Wrap(spacing: 8, runSpacing: 8, children: r.characteristics.map((c) => Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), decoration: BoxDecoration(color: ShunshiColors.primaryLight.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(20)), child: Text(c, style: const TextStyle(fontSize: 12, color: ShunshiColors.primaryDark, fontWeight: FontWeight.w500)))).toList()),
+          Wrap(spacing: 8, runSpacing: 8, children: r.characteristics.map((c) => Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), decoration: BoxDecoration(color: AppColors.primaryLight(context).withValues(alpha: 0.15), borderRadius: BorderRadius.circular(20)), child: Text(c, style: const TextStyle(fontSize: 12, color: ShunshiColors.primaryDark, fontWeight: FontWeight.w500)))).toList()),
         ]),
         _buildScoreBars(r),
         const SizedBox(height: 20),
@@ -478,7 +480,7 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
 
   Widget _buildResultHero(ConstitutionResult r) {
     return Container(width: double.infinity, padding: const EdgeInsets.fromLTRB(24, 32, 24, 28),
-      decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [ShunshiColors.primary, ShunshiColors.primaryDark]), borderRadius: const BorderRadius.vertical(bottom: Radius.circular(24))),
+      decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [AppColors.primary(context), ShunshiColors.primaryDark]), borderRadius: const BorderRadius.vertical(bottom: Radius.circular(24))),
       child: Column(children: [
         Text(r.emoji, style: const TextStyle(fontSize: 56)),
         const SizedBox(height: 8),
@@ -496,7 +498,7 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
   Widget _buildSection(String title, String icon, List<Widget> children) {
     return Container(margin: const EdgeInsets.fromLTRB(20, 0, 20, 0), padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [Text(icon, style: const TextStyle(fontSize: 18)), const SizedBox(width: 8), Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: ShunshiColors.textPrimary))]),
+        Row(children: [Text(icon, style: const TextStyle(fontSize: 18)), const SizedBox(width: 8), Text(title, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context)))]),
         const SizedBox(height: 14),
         ...children,
       ]),
@@ -506,7 +508,7 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
   Widget _buildScoreBars(ConstitutionResult r) {
     return Container(margin: const EdgeInsets.fromLTRB(20, 0, 20, 0), padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Row(children: [Text('📊', style: TextStyle(fontSize: 18)), SizedBox(width: 8), Text('体质分数', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: ShunshiColors.textPrimary))]),
+        Row(children: [Text('📊', style: TextStyle(fontSize: 18)), SizedBox(width: 8), Text('体质分数', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context)))]),
         const SizedBox(height: 14),
         ...r.scores.map((s) {
           final name = s['name'] as String? ?? '';
@@ -515,12 +517,12 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
           final maxScore = 60.0;
           final ratio = (score / maxScore).clamp(0.0, 1.0);
           final isPrimary = name == r.typeName;
-          final barColor = isPrimary ? ShunshiColors.primary : (ratio > 0.5 ? ShunshiColors.earth : ShunshiColors.primaryLight);
+          final barColor = isPrimary ? AppColors.primary(context) : (ratio > 0.5 ? ShunshiColors.earth : AppColors.primaryLight(context));
           return Padding(padding: const EdgeInsets.only(bottom: 10), child: Row(children: [
-            SizedBox(width: 60, child: Text(name, style: TextStyle(fontSize: 12, color: isPrimary ? ShunshiColors.primaryDark : ShunshiColors.textSecondary, fontWeight: isPrimary ? FontWeight.w700 : FontWeight.w400))),
-            Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: ratio, minHeight: 8, backgroundColor: ShunshiColors.divider, valueColor: AlwaysStoppedAnimation(barColor)))),
+            SizedBox(width: 60, child: Text(name, style: TextStyle(fontSize: 12, color: isPrimary ? ShunshiColors.primaryDark : AppColors.textSecondary(context), fontWeight: isPrimary ? FontWeight.w700 : FontWeight.w400))),
+            Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: ratio, minHeight: 8, backgroundColor: AppColors.divider(context), valueColor: AlwaysStoppedAnimation(barColor)))),
             const SizedBox(width: 8),
-            SizedBox(width: 28, child: Text(score.toStringAsFixed(0), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: isPrimary ? ShunshiColors.primaryDark : ShunshiColors.textPrimary))),
+            SizedBox(width: 28, child: Text(score.toStringAsFixed(0), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: isPrimary ? ShunshiColors.primaryDark : AppColors.textPrimary(context)))),
             const SizedBox(width: 4),
             if (level == 'obvious') const Text('偏颇', style: TextStyle(fontSize: 10, color: ShunshiColors.earth)) else if (level == 'tendency') const Text('倾向', style: TextStyle(fontSize: 10, color: Color(0xFFD4956A))),
           ]));
@@ -537,9 +539,9 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
       decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
       child: ClipRRect(borderRadius: BorderRadius.circular(8), child: Stack(children: [
         Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [Text(adv.icon, style: const TextStyle(fontSize: 18)), const SizedBox(width: 8), Text(adv.category, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: ShunshiColors.textPrimary))]),
+          Row(children: [Text(adv.icon, style: const TextStyle(fontSize: 18)), const SizedBox(width: 8), Text(adv.category, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context)))]),
           const SizedBox(height: 14),
-          ...adv.items.take(2).map((item) => Padding(padding: const EdgeInsets.only(bottom: 8), child: Text(item, style: const TextStyle(fontSize: 14, color: ShunshiColors.textSecondary, height: 1.6)))),
+          ...adv.items.take(2).map((item) => Padding(padding: const EdgeInsets.only(bottom: 8), child: Text(item, style: TextStyle(fontSize: 14, color: AppColors.textSecondary(context), height: 1.6)))),
         ]),
         Positioned.fill(child: BackdropFilter(filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6), child: Container(color: Colors.white.withValues(alpha: 0.3)))),
       ])),
@@ -551,9 +553,9 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
     return [
       ...r.advice.map((adv) => _buildSection(adv.category, adv.icon, [
         ...adv.items.map((item) => Padding(padding: const EdgeInsets.only(bottom: 8), child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Container(width: 6, height: 6, margin: const EdgeInsets.only(top: 8), decoration: const BoxDecoration(color: ShunshiColors.primary, shape: BoxShape.circle)),
+          Container(width: 6, height: 6, margin: const EdgeInsets.only(top: 8), decoration: BoxDecoration(color: AppColors.primary(context), shape: BoxShape.circle)),
           const SizedBox(width: 10),
-          Expanded(child: Text(item, style: const TextStyle(fontSize: 14, color: ShunshiColors.textSecondary, height: 1.7))),
+          Expanded(child: Text(item, style: TextStyle(fontSize: 14, color: AppColors.textSecondary(context), height: 1.7))),
         ]))),
       ])),
       if (r.avoidList.isNotEmpty) Container(margin: const EdgeInsets.fromLTRB(20, 12, 20, 0), padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: const Color(0xFFFFFBF0), borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0xFFFDE68A).withValues(alpha: 0.5))),
@@ -576,14 +578,14 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
               onPressed: () { setState(() { _view = 'home'; _questions.clear(); _answers.clear(); _result = null; }); },
               icon: const Icon(Icons.refresh, size: 18),
               label: const Text('重新测试', style: TextStyle(fontSize: 14)),
-              style: OutlinedButton.styleFrom(foregroundColor: ShunshiColors.primary, side: const BorderSide(color: ShunshiColors.primary), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), padding: const EdgeInsets.symmetric(vertical: 13)),
+              style: OutlinedButton.styleFrom(foregroundColor: AppColors.primary(context), side: BorderSide(color: AppColors.primary(context)), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), padding: const EdgeInsets.symmetric(vertical: 13)),
             )),
             const SizedBox(width: 12),
             Expanded(child: ElevatedButton.icon(
               onPressed: () => _shareResult(r),
               icon: const Icon(Icons.share, size: 18),
               label: const Text('分享结果', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-              style: ElevatedButton.styleFrom(backgroundColor: ShunshiColors.primary, foregroundColor: Colors.white, elevation: 0, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), padding: const EdgeInsets.symmetric(vertical: 13)),
+              style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary(context), foregroundColor: Colors.white, elevation: 0, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), padding: const EdgeInsets.symmetric(vertical: 13)),
             )),
           ]),
           const SizedBox(height: 10),
@@ -591,7 +593,7 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
             onPressed: () => _downloadReport(r),
             icon: const Icon(Icons.download, size: 16),
             label: const Text('下载报告', style: TextStyle(fontSize: 13)),
-            style: OutlinedButton.styleFrom(foregroundColor: ShunshiColors.textSecondary, side: const BorderSide(color: ShunshiColors.divider), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+            style: OutlinedButton.styleFrom(foregroundColor: AppColors.textSecondary(context), side: BorderSide(color: AppColors.divider(context)), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
           )),
       ])),
     );

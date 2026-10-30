@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../design_system/theme.dart';
+import '../../design_system/app_colors.dart';
 
 /// 首页会员权益卡片 — 仅 free tier 展示
 class MembershipCard extends StatefulWidget {
@@ -160,12 +161,12 @@ class TokenBalanceBar extends StatelessWidget {
         decoration: BoxDecoration(
           color: isLow
               ? Colors.orange.withValues(alpha: 0.1)
-              : ShunShiColors.primary.withValues(alpha: 0.06),
+              : AppColors.primary(context).withValues(alpha: 0.06),
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
             color: isLow
                 ? Colors.orange.withValues(alpha: 0.2)
-                : ShunShiColors.primary.withValues(alpha: 0.1),
+                : AppColors.primary(context).withValues(alpha: 0.1),
           ),
         ),
         child: Row(
@@ -173,7 +174,7 @@ class TokenBalanceBar extends StatelessWidget {
             Icon(
               isLow ? Icons.warning_amber_rounded : Icons.chat_bubble_outline_rounded,
               size: 16,
-              color: isLow ? Colors.orange : ShunShiColors.primary,
+              color: isLow ? Colors.orange : AppColors.primary(context),
             ),
             const SizedBox(width: 8),
             Expanded(
@@ -184,7 +185,7 @@ class TokenBalanceBar extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
-                  color: isLow ? Colors.orange : ShunShiColors.primary,
+                  color: isLow ? Colors.orange : AppColors.primary(context),
                   fontFamily: ShunShiTypography.sansFamily,
                 ),
               ),

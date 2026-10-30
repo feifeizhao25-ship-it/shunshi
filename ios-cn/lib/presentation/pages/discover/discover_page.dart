@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/config/app_config.dart';
+import '../../../design_system/app_colors.dart';
 
 class DiscoverPage extends StatefulWidget {
   const DiscoverPage({super.key});
@@ -88,9 +89,9 @@ class _DiscoverPageState extends State<DiscoverPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       body: RefreshIndicator(
-        color: ShunShiColors.primary,
+        color: AppColors.primary(context),
         onRefresh: _fetchArticles,
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
@@ -98,16 +99,16 @@ class _DiscoverPageState extends State<DiscoverPage> {
           // ── App Bar ──
           SliverAppBar(
             pinned: true,
-            backgroundColor: ShunShiColors.background,
+            backgroundColor: AppColors.background(context),
             title: Text('养生馆', style: TextStyle(
               fontSize: 22, fontWeight: FontWeight.w700,
               fontFamily: ShunShiTypography.serifFamily,
-              color: ShunShiColors.textPrimary,
+              color: AppColors.textPrimary(context),
             )),
             actions: [
               IconButton(
                 icon: const Icon(Icons.notifications_outlined, size: 24),
-                color: ShunShiColors.textSecondary,
+                color: AppColors.textSecondary(context),
                 onPressed: () => context.push('/notifications'),
               ),
             ],
@@ -121,7 +122,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
                 height: 44,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 decoration: BoxDecoration(
-                  color: ShunShiColors.surfaceContainerLow,
+                  color: AppColors.surfaceContainerLow(context),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: TextField(
@@ -129,15 +130,15 @@ class _DiscoverPageState extends State<DiscoverPage> {
                   onChanged: (v) => _search(v),
                   decoration: InputDecoration(
                     hintText: '搜索食谱、茶饮、功法...',
-                    hintStyle: TextStyle(fontSize: 14, color: ShunShiColors.textTertiary),
+                    hintStyle: TextStyle(fontSize: 14, color: AppColors.textTertiary(context)),
                     border: InputBorder.none,
-                    icon: Icon(Icons.search, size: 20, color: ShunShiColors.textTertiary),
+                    icon: Icon(Icons.search, size: 20, color: AppColors.textTertiary(context)),
                     suffixIcon: _searchController.text.isNotEmpty ? IconButton(
-                      icon: Icon(Icons.clear, size: 18, color: ShunShiColors.textTertiary),
+                      icon: Icon(Icons.clear, size: 18, color: AppColors.textTertiary(context)),
                       onPressed: () { _searchController.clear(); setState(() { _searchResults = []; _searching = false; }); },
                     ) : null,
                   ),
-                  style: TextStyle(fontSize: 14, color: ShunShiColors.textPrimary),
+                  style: TextStyle(fontSize: 14, color: AppColors.textPrimary(context)),
                 ),
               ),
             ),
@@ -148,7 +149,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
-                child: Text('搜索结果 (${_searchResults.length})', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+                child: Text('搜索结果 (${_searchResults.length})', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
               ),
             ),
             SliverList(
@@ -158,13 +159,13 @@ class _DiscoverPageState extends State<DiscoverPage> {
                   padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
                   child: Container(
                     padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(12)),
+                    decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(12)),
                     child: Row(children: [
-                      Icon(Icons.article, color: ShunShiColors.primary, size: 20),
+                      Icon(Icons.article, color: AppColors.primary(context), size: 20),
                       const SizedBox(width: 10),
                       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Text(item['title']?.toString() ?? '', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: ShunShiColors.textPrimary)),
-                        if (item['description'] != null) Text(item['description'].toString(), style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary), maxLines: 1, overflow: TextOverflow.ellipsis),
+                        Text(item['title']?.toString() ?? '', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.textPrimary(context))),
+                        if (item['description'] != null) Text(item['description'].toString(), style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context)), maxLines: 1, overflow: TextOverflow.ellipsis),
                       ])),
                     ]),
                   ),
@@ -172,7 +173,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
               }, childCount: _searchResults.length),
             ),
           ] else if (_searching && _searchResults.isEmpty && _searchController.text.isNotEmpty) ...[
-            SliverToBoxAdapter(child: Padding(padding: const EdgeInsets.all(20), child: Center(child: Text('未找到相关内容', style: TextStyle(color: ShunShiColors.textTertiary))))),
+            SliverToBoxAdapter(child: Padding(padding: const EdgeInsets.all(20), child: Center(child: Text('未找到相关内容', style: TextStyle(color: AppColors.textTertiary(context)))))),
           ],
 
           // ── Category Grid (hide when searching) ──
@@ -200,11 +201,11 @@ class _DiscoverPageState extends State<DiscoverPage> {
               child: Row(children: [
                 Text('精选编辑', style: TextStyle(
                   fontSize: 18, fontWeight: FontWeight.w700,
-                  color: ShunShiColors.textPrimary,
+                  color: AppColors.textPrimary(context),
                   fontFamily: ShunShiTypography.serifFamily,
                 )),
                 Text("Editor's Choice", style: TextStyle(
-                  fontSize: 12, color: ShunShiColors.textTertiary,
+                  fontSize: 12, color: AppColors.textTertiary(context),
                   fontFamily: ShunShiTypography.sansFamily,
                 )),
                 const Spacer(),
@@ -214,10 +215,10 @@ class _DiscoverPageState extends State<DiscoverPage> {
                   },
                   child: Row(children: [
                     Text('查看全部', style: TextStyle(
-                      fontSize: 13, color: ShunShiColors.primary,
+                      fontSize: 13, color: AppColors.primary(context),
                       fontFamily: ShunShiTypography.sansFamily,
                     )),
-                    const Icon(Icons.chevron_right, size: 18, color: ShunShiColors.primary),
+                    Icon(Icons.chevron_right, size: 18, color: AppColors.primary(context)),
                   ]),
                 ),
               ]),
@@ -229,9 +230,9 @@ class _DiscoverPageState extends State<DiscoverPage> {
             delegate: SliverChildBuilderDelegate(
               (context, index) {
                 if (_loading && index == 0) {
-                  return const Padding(
+                  return Padding(
                     padding: EdgeInsets.all(40),
-                    child: Center(child: CircularProgressIndicator(color: ShunShiColors.primary)),
+                    child: Center(child: CircularProgressIndicator(color: AppColors.primary(context))),
                   );
                 }
                 if (index >= _articles.length) return const SizedBox.shrink();
@@ -267,7 +268,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
       },
       child: Container(
         decoration: BoxDecoration(
-          color: ShunShiColors.surfaceContainerLowest,
+          color: AppColors.surfaceContainerLowest(context),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Column(
@@ -279,12 +280,12 @@ class _DiscoverPageState extends State<DiscoverPage> {
                 color: cat.bgColor,
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: Icon(cat.icon, size: 24, color: ShunShiColors.primary),
+              child: Icon(cat.icon, size: 24, color: AppColors.primary(context)),
             ),
             const SizedBox(height: 8),
             Text(cat.title, style: TextStyle(
               fontSize: 13, fontWeight: FontWeight.w600,
-              color: ShunShiColors.textPrimary,
+              color: AppColors.textPrimary(context),
               fontFamily: ShunShiTypography.sansFamily,
             )),
           ],
@@ -304,7 +305,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
       child: Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: ShunShiColors.surfaceContainerLowest,
+        color: AppColors.surfaceContainerLowest(context),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -314,17 +315,17 @@ class _DiscoverPageState extends State<DiscoverPage> {
             _articleTag(item['category']?.toString() ?? type),
             if (item['duration'] != null) ...[
               const SizedBox(width: 8),
-              Text(item['duration'].toString(), style: TextStyle(fontSize: 11, color: ShunShiColors.textTertiary)),
+              Text(item['duration'].toString(), style: TextStyle(fontSize: 11, color: AppColors.textTertiary(context))),
             ],
           ]),
           const SizedBox(height: 8),
           Text(item['title']?.toString() ?? '', style: TextStyle(
-            fontSize: 16, fontWeight: FontWeight.w700, color: ShunShiColors.textPrimary,
+            fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textPrimary(context),
             fontFamily: ShunShiTypography.serifFamily,
           )),
           const SizedBox(height: 6),
           Text(item['description']?.toString() ?? '', maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(
-            fontSize: 13, color: ShunShiColors.textSecondary, height: 1.5,
+            fontSize: 13, color: AppColors.textSecondary(context), height: 1.5,
           )),
           if (tags.isNotEmpty) ...[
             const SizedBox(height: 8),
@@ -339,12 +340,12 @@ class _DiscoverPageState extends State<DiscoverPage> {
   Widget _articleTag(String text) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
     decoration: BoxDecoration(
-      color: ShunShiColors.primary.withValues(alpha: 0.08),
+      color: AppColors.primary(context).withValues(alpha: 0.08),
       borderRadius: BorderRadius.circular(4),
     ),
     child: Text(text, style: TextStyle(
       fontSize: 11, fontWeight: FontWeight.w500,
-      color: ShunShiColors.primary, fontFamily: ShunShiTypography.sansFamily,
+      color: AppColors.primary(context), fontFamily: ShunShiTypography.sansFamily,
     )),
   );
 }

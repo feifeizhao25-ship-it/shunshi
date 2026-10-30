@@ -14,7 +14,7 @@ class AIBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(padding: const EdgeInsets.only(bottom: 20), child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Container(width: 36, height: 36, decoration: const BoxDecoration(color: ShunShiColors.primary, shape: BoxShape.circle), child: const Center(child: Text('🌱', style: TextStyle(fontSize: 18)))),
+      Container(width: 36, height: 36, decoration: BoxDecoration(color: AppColors.primary(context), shape: BoxShape.circle), child: const Center(child: Text('🌱', style: TextStyle(fontSize: 18)))),
       const SizedBox(width: 12),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Container(padding: const EdgeInsets.all(14), decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(16), border: Border.all(color: AppColors.border(context))),
@@ -24,11 +24,11 @@ class AIBubble extends StatelessWidget {
           Padding(padding: const EdgeInsets.only(top: 10), child: _SourcesWrap(sources: message.sources!)),
         const SizedBox(height: 4),
         Row(children: [
-          Text(message.time, style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 11, color: ShunShiColors.textTertiary)),
+          Text(message.time, style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 11, color: AppColors.textTertiary(context))),
           const SizedBox(width: 8),
           IconButton(tooltip: onSpeak == null ? '语音播报尚未接通' : '朗读回复', onPressed: onSpeak, icon: const Icon(Icons.volume_up, size: 16)),
           const SizedBox(width: 8),
-          if (onFeedback != null) GestureDetector(onTap: onFeedback, child: Icon(Icons.thumb_up_outlined, size: 16, color: ShunShiColors.textTertiary)),
+          if (onFeedback != null) GestureDetector(onTap: onFeedback, child: Icon(Icons.thumb_up_outlined, size: 16, color: AppColors.textTertiary(context))),
         ]),
       ])),
     ]));
@@ -44,10 +44,10 @@ class UserBubble extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(padding: const EdgeInsets.only(bottom: 20), child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-        Container(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12), decoration: BoxDecoration(color: ShunShiColors.primary, borderRadius: BorderRadius.circular(ShunShiRadius.lg)),
+        Container(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12), decoration: BoxDecoration(color: AppColors.primary(context), borderRadius: BorderRadius.circular(ShunShiRadius.lg)),
           child: Text(message.text, style: const TextStyle(fontSize: 15, color: Colors.white, height: 1.5))),
         const SizedBox(height: 4),
-        Text(message.time, style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 11, color: ShunShiColors.textTertiary)),
+        Text(message.time, style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 11, color: AppColors.textTertiary(context))),
       ])),
     ]));
   }
@@ -60,10 +60,10 @@ class TypingIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(padding: const EdgeInsets.only(bottom: 20), child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Container(width: 36, height: 36, decoration: const BoxDecoration(color: ShunShiColors.primary, shape: BoxShape.circle), child: const Center(child: Text('🌱', style: TextStyle(fontSize: 18)))),
+      Container(width: 36, height: 36, decoration: BoxDecoration(color: AppColors.primary(context), shape: BoxShape.circle), child: const Center(child: Text('🌱', style: TextStyle(fontSize: 18)))),
       const SizedBox(width: 12),
       Container(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12), decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(16), border: Border.all(color: AppColors.border(context))),
-        child: Row(mainAxisSize: MainAxisSize.min, children: List.generate(3, (i) => Padding(padding: EdgeInsets.only(left: i > 0 ? 4 : 0), child: Container(width: 8, height: 8, decoration: BoxDecoration(shape: BoxShape.circle, color: ShunShiColors.primary.withValues(alpha: 0.4))))))),
+        child: Row(mainAxisSize: MainAxisSize.min, children: List.generate(3, (i) => Padding(padding: EdgeInsets.only(left: i > 0 ? 4 : 0), child: Container(width: 8, height: 8, decoration: BoxDecoration(shape: BoxShape.circle, color: AppColors.primary(context).withValues(alpha: 0.4))))))),
     ]));
   }
 }
@@ -77,13 +77,13 @@ class SkeletonMessage extends StatelessWidget {
   Widget build(BuildContext context) {
     if (isAI) {
       return Padding(padding: const EdgeInsets.only(bottom: 20), child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Container(width: 36, height: 36, decoration: BoxDecoration(color: ShunShiColors.primary.withValues(alpha: 0.3), shape: BoxShape.circle)),
+        Container(width: 36, height: 36, decoration: BoxDecoration(color: AppColors.primary(context).withValues(alpha: 0.3), shape: BoxShape.circle)),
         const SizedBox(width: 12),
-        Expanded(child: Container(height: 60, decoration: BoxDecoration(color: ShunShiColors.borderGhost.withValues(alpha: 0.3), borderRadius: BorderRadius.circular(16)))),
+        Expanded(child: Container(height: 60, decoration: BoxDecoration(color: AppColors.borderGhost(context).withValues(alpha: 0.3), borderRadius: BorderRadius.circular(16)))),
       ]));
     }
     return Padding(padding: const EdgeInsets.only(bottom: 20), child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-      Container(width: 200, height: 40, decoration: BoxDecoration(color: ShunShiColors.borderGhost.withValues(alpha: 0.3), borderRadius: BorderRadius.circular(12))),
+      Container(width: 200, height: 40, decoration: BoxDecoration(color: AppColors.borderGhost(context).withValues(alpha: 0.3), borderRadius: BorderRadius.circular(12))),
     ]));
   }
 }
@@ -97,7 +97,7 @@ class UpgradeNudge extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(onTap: onTap, child: Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      decoration: BoxDecoration(gradient: LinearGradient(colors: [ShunShiColors.gold.withValues(alpha: 0.08), ShunShiColors.primary.withValues(alpha: 0.06)]), borderRadius: BorderRadius.circular(12), border: Border.all(color: ShunShiColors.gold.withValues(alpha: 0.2))),
+      decoration: BoxDecoration(gradient: LinearGradient(colors: [ShunShiColors.gold.withValues(alpha: 0.08), AppColors.primary(context).withValues(alpha: 0.06)]), borderRadius: BorderRadius.circular(12), border: Border.all(color: ShunShiColors.gold.withValues(alpha: 0.2))),
       child: Row(children: [
         Icon(Icons.auto_awesome, size: 18, color: ShunShiColors.gold),
         const SizedBox(width: 10),
@@ -118,11 +118,11 @@ class _SuggestionCardWidget extends StatelessWidget {
     return GestureDetector(
       onTap: tappable ? () => context.push('/diet-recommend', extra: {'constitutionType': null}) : null,
       child: Container(padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: ShunShiColors.primary.withValues(alpha: 0.04), borderRadius: BorderRadius.circular(14), border: Border.all(color: ShunShiColors.primary.withValues(alpha: 0.1))),
+      decoration: BoxDecoration(color: AppColors.primary(context).withValues(alpha: 0.04), borderRadius: BorderRadius.circular(14), border: Border.all(color: AppColors.primary(context).withValues(alpha: 0.1))),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [Icon(card.icon ?? Icons.auto_awesome, size: 16, color: ShunShiColors.primary), const SizedBox(width: 8), Expanded(child: Text(card.title, style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 13, fontWeight: FontWeight.w600, color: ShunShiColors.primary))), if (tappable) Icon(Icons.chevron_right, size: 16, color: ShunShiColors.primary)]),
+        Row(children: [Icon(card.icon ?? Icons.auto_awesome, size: 16, color: AppColors.primary(context)), const SizedBox(width: 8), Expanded(child: Text(card.title, style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.primary(context)))), if (tappable) Icon(Icons.chevron_right, size: 16, color: AppColors.primary(context))]),
         const SizedBox(height: 6),
-        Text(card.subtitle, style: TextStyle(fontSize: 13, color: ShunShiColors.textSecondary, height: 1.5)),
+        Text(card.subtitle, style: TextStyle(fontSize: 13, color: AppColors.textSecondary(context), height: 1.5)),
       ]),
     ));
   }
@@ -136,11 +136,11 @@ class _SourcesWrap extends StatelessWidget {
   Widget build(BuildContext context) {
     return Wrap(spacing: 8, runSpacing: 6, children: sources.map((s) => GestureDetector(
       onTap: () { ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('参考来源：$s'), duration: const Duration(seconds: 2))); },
-      child: Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5), decoration: BoxDecoration(color: ShunShiColors.primary.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(12), border: Border.all(color: ShunShiColors.primary.withValues(alpha: 0.15))),
+      child: Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5), decoration: BoxDecoration(color: AppColors.primary(context).withValues(alpha: 0.08), borderRadius: BorderRadius.circular(12), border: Border.all(color: AppColors.primary(context).withValues(alpha: 0.15))),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
           const Text('📚', style: TextStyle(fontSize: 12)),
           const SizedBox(width: 4),
-          Text(s, style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 11, color: ShunShiColors.primary, fontWeight: FontWeight.w500)),
+          Text(s, style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 11, color: AppColors.primary(context), fontWeight: FontWeight.w500)),
         ]),
       ),
     )).toList());

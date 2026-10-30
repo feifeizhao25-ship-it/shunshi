@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
 import '../../../data/network/api_client.dart';
 import '../../widgets/state_view.dart';
+import '../../../design_system/app_colors.dart';
 
 class FavoritesPage extends StatefulWidget {
   const FavoritesPage({super.key});
@@ -57,9 +58,9 @@ class _FavoritesPageState extends State<FavoritesPage> {
       case 'tea': return const Color(0xFF8D6E63);
       case 'recipe': return const Color(0xFFFF9800);
       case 'herb': return const Color(0xFF9C27B0);
-      case 'meridian': return ShunShiColors.primary;
+      case 'meridian': return AppColors.primary(context);
       case 'exercise': return const Color(0xFF2196F3);
-      default: return ShunShiColors.primary;
+      default: return AppColors.primary(context);
     }
   }
 
@@ -85,9 +86,9 @@ class _FavoritesPageState extends State<FavoritesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       appBar: AppBar(
-        backgroundColor: ShunShiColors.background,
+        backgroundColor: AppColors.background(context),
         leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
         title: Text('我的收藏 (${_items.length})',
           style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18, fontWeight: FontWeight.w600)),
@@ -123,7 +124,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
                   child: Container(
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: ShunShiColors.surface,
+                      color: AppColors.surface(context),
                       borderRadius: BorderRadius.circular(14),
                     ),
                     child: Row(children: [
@@ -141,10 +142,10 @@ class _FavoritesPageState extends State<FavoritesPage> {
                             child: Text(_typeLabel(type), style: TextStyle(fontSize: 10, color: color, fontWeight: FontWeight.w500)),
                           ),
                           const Spacer(),
-                          Icon(Icons.chevron_right, size: 16, color: ShunShiColors.textTertiary),
+                          Icon(Icons.chevron_right, size: 16, color: AppColors.textTertiary(context)),
                         ]),
                         const SizedBox(height: 6),
-                        Text(item['content_id'] ?? '', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: ShunShiColors.textPrimary)),
+                        Text(item['content_id'] ?? '', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.textPrimary(context))),
                       ])),
                     ]),
                   ),

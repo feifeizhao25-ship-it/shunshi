@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/config/app_config.dart';
+import '../../../design_system/app_colors.dart';
 
 /// 家庭成员详情页 — 仅显示状态级别信息（隐私优先）
 class FamilyMemberDetailPage extends StatefulWidget {
@@ -72,7 +73,7 @@ class _FamilyMemberDetailPageState extends State<FamilyMemberDetailPage> {
     switch (status) {
       case 'stable': return ShunShiColors.success;
       case 'tired': return ShunShiColors.warning;
-      case 'attention': return ShunShiColors.error;
+      case 'attention': return AppColors.error(context);
       default: return ShunShiColors.success;
     }
   }
@@ -80,9 +81,9 @@ class _FamilyMemberDetailPageState extends State<FamilyMemberDetailPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       appBar: AppBar(
-        backgroundColor: ShunShiColors.background,
+        backgroundColor: AppColors.background(context),
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, size: 20),
@@ -92,7 +93,7 @@ class _FamilyMemberDetailPageState extends State<FamilyMemberDetailPage> {
             style: const TextStyle(fontFamily: ShunShiTypography.serifFamily)),
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator(color: ShunShiColors.primary))
+          ? Center(child: CircularProgressIndicator(color: AppColors.primary(context)))
           : SingleChildScrollView(
               padding: const EdgeInsets.all(20),
               child: Column(children: [
@@ -101,9 +102,9 @@ class _FamilyMemberDetailPageState extends State<FamilyMemberDetailPage> {
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 24),
                   decoration: BoxDecoration(
-                    color: ShunShiColors.surfaceContainerLowest,
+                    color: AppColors.surfaceContainerLowest(context),
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: ShunShiColors.borderGhost),
+                    border: Border.all(color: AppColors.borderGhost(context)),
                   ),
                   child: Column(children: [
                     Text(_member?['avatar'] ?? '👤', style: const TextStyle(fontSize: 48)),
@@ -111,7 +112,7 @@ class _FamilyMemberDetailPageState extends State<FamilyMemberDetailPage> {
                     Text(_member?['name'] ?? '', style: const TextStyle(
                         fontSize: 22, fontWeight: FontWeight.w600, fontFamily: ShunShiTypography.serifFamily)),
                     const SizedBox(height: 4),
-                    Text(_member?['relation'] ?? '', style: const TextStyle(fontSize: 14, color: ShunShiColors.textTertiary)),
+                    Text(_member?['relation'] ?? '', style: TextStyle(fontSize: 14, color: AppColors.textTertiary(context))),
                   ]),
                 ),
                 const SizedBox(height: 20),
@@ -121,9 +122,9 @@ class _FamilyMemberDetailPageState extends State<FamilyMemberDetailPage> {
                   width: double.infinity,
                   padding: const EdgeInsets.all(18),
                   decoration: BoxDecoration(
-                    color: ShunShiColors.surfaceContainerLowest,
+                    color: AppColors.surfaceContainerLowest(context),
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: ShunShiColors.borderGhost),
+                    border: Border.all(color: AppColors.borderGhost(context)),
                   ),
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     const Text('状态信息', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600,
@@ -133,9 +134,9 @@ class _FamilyMemberDetailPageState extends State<FamilyMemberDetailPage> {
                         '${_statusEmoji(_member?['status'] ?? 'stable')} ${_statusText(_member?['status'] ?? 'stable')}',
                         _statusColor(_member?['status'] ?? 'stable')),
                     const SizedBox(height: 12),
-                    _infoRow('最近活跃', _member?['lastActive'] ?? '未知', ShunShiColors.textSecondary),
+                    _infoRow('最近活跃', _member?['lastActive'] ?? '未知', AppColors.textSecondary(context)),
                     const SizedBox(height: 12),
-                    _infoRow('上次打卡', _member?['lastCheckin'] ?? '未知', ShunShiColors.textSecondary),
+                    _infoRow('上次打卡', _member?['lastCheckin'] ?? '未知', AppColors.textSecondary(context)),
                   ]),
                 ),
                 const SizedBox(height: 20),
@@ -144,14 +145,14 @@ class _FamilyMemberDetailPageState extends State<FamilyMemberDetailPage> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: ShunShiColors.surfaceContainerLow,
+                    color: AppColors.surfaceContainerLow(context),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Row(children: [
-                    Icon(Icons.lock_outline, size: 16, color: ShunShiColors.textTertiary),
+                  child: Row(children: [
+                    Icon(Icons.lock_outline, size: 16, color: AppColors.textTertiary(context)),
                     SizedBox(width: 8),
                     Expanded(child: Text('隐私保护：你只能看到状态级别信息',
-                        style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary))),
+                        style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context)))),
                   ]),
                 ),
                 const SizedBox(height: 24),
@@ -167,7 +168,7 @@ class _FamilyMemberDetailPageState extends State<FamilyMemberDetailPage> {
                     icon: const Icon(Icons.favorite_border, size: 18),
                     label: const Text('发送关怀提醒'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: ShunShiColors.primary,
+                      backgroundColor: AppColors.primary(context),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                     ),
                   ),
@@ -185,7 +186,7 @@ class _FamilyMemberDetailPageState extends State<FamilyMemberDetailPage> {
                     icon: const Icon(Icons.visibility_outlined, size: 18),
                     label: const Text('查看我的状态（对方视角）'),
                     style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: ShunShiColors.border),
+                      side: BorderSide(color: AppColors.border(context)),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                     ),
                   ),
@@ -198,7 +199,7 @@ class _FamilyMemberDetailPageState extends State<FamilyMemberDetailPage> {
 
   Widget _infoRow(String label, String value, Color valueColor) {
     return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-      Text(label, style: const TextStyle(fontSize: 14, color: ShunShiColors.textTertiary)),
+      Text(label, style: TextStyle(fontSize: 14, color: AppColors.textTertiary(context))),
       Text(value, style: TextStyle(fontSize: 14, color: valueColor, fontWeight: FontWeight.w500)),
     ]);
   }

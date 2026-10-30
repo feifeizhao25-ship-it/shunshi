@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/router/safe_pop.dart';
+import '../../../design_system/app_colors.dart';
 
 class TermsPage extends StatelessWidget {
   const TermsPage({super.key});
@@ -8,8 +9,8 @@ class TermsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? ShunShiColors.darkBackground : ShunShiColors.background;
-    final textColor = isDark ? ShunShiColors.textPrimary : ShunShiColors.textSecondary;
+    final bg = isDark ? ShunShiColors.darkBackground : AppColors.background(context);
+    final textColor = isDark ? AppColors.textPrimary(context) : AppColors.textSecondary(context);
 
     return Scaffold(
       backgroundColor: bg,
@@ -26,14 +27,14 @@ class TermsPage extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         children: [
-          _sectionTitle('顺时（ShunShi）用户协议'),
+          _sectionTitle(context, '顺时（ShunShi）用户协议'),
           _body(
             '最后更新日期：2026年10月23日\n'
             '运营者：北京艾瑞见时科技有限公司。律师定稿前，这是按产品事实改过的稿子。',
             textColor,
           ),
           const SizedBox(height: 12),
-          _sectionTitle('一、服务描述'),
+          _sectionTitle(context, '一、服务描述'),
           _body(
             '1.1 顺时是节气作息陪伴工具，由人工智能生成内容，不是真人，不提供医疗、诊断或治疗。应用提供：\n'
             '• 按二十四节气安排作息的提示\n'
@@ -46,7 +47,7 @@ class TermsPage extends StatelessWidget {
             textColor,
           ),
           const SizedBox(height: 12),
-          _sectionTitle('二、用户行为规范'),
+          _sectionTitle(context, '二、用户行为规范'),
           _body(
             '2.1 您同意不会利用本应用进行以下行为：\n'
             '• 发布违法、虚假、侵权或不当内容\n'
@@ -64,7 +65,7 @@ class TermsPage extends StatelessWidget {
             textColor,
           ),
           const SizedBox(height: 12),
-          _sectionTitle('三、知识产权'),
+          _sectionTitle(context, '三、知识产权'),
           _body(
             '3.1 所有权利归属\n'
             '本应用的所有内容，包括但不限于文字、图片、图标、界面设计、算法、AI 模型输出、音视频内容，均受中华人民共和国著作权法及相关国际知识产权条约保护。\n\n'
@@ -78,7 +79,7 @@ class TermsPage extends StatelessWidget {
             textColor,
           ),
           const SizedBox(height: 12),
-          _sectionTitle('四、免责声明'),
+          _sectionTitle(context, '四、免责声明'),
           _body(
             '4.1 本应用提供的所有内容（包括但不限于养生建议、节气调养方案、体质分析、AI 对话回答）均基于传统中医理论和 AI 算法生成，仅供健康养生参考，不构成医疗诊断、治疗或处方建议。\n\n'
             '4.2 本应用不是医疗机构，不提供医疗服务。对于因使用本应用内容而导致的任何健康问题或损失，开发者不承担直接或间接责任。\n\n'
@@ -87,7 +88,7 @@ class TermsPage extends StatelessWidget {
             textColor,
           ),
           const SizedBox(height: 12),
-          _sectionTitle('五、服务变更与终止'),
+          _sectionTitle(context, '五、服务变更与终止'),
           _body(
             '5.1 我们有权根据业务需要调整服务内容、功能或定价，并通过应用内公告、推送通知等方式告知用户。\n\n'
             '5.2 您可以随时注销账户以终止使用服务。注销后：\n'
@@ -100,14 +101,14 @@ class TermsPage extends StatelessWidget {
             textColor,
           ),
           const SizedBox(height: 12),
-          _sectionTitle('六、争议解决'),
+          _sectionTitle(context, '六、争议解决'),
           _body(
             '6.1 本协议适用中华人民共和国法律。\n\n'
             '6.2 因本协议产生的争议，双方应首先友好协商。协商不成的，任何一方均可向开发者所在地有管辖权的人民法院提起诉讼。',
             textColor,
           ),
           const SizedBox(height: 12),
-          _sectionTitle('七、其他'),
+          _sectionTitle(context, '七、其他'),
           _body(
             '7.1 本协议构成您与开发者之间关于使用本应用的完整协议。\n\n'
             '7.2 本协议的任何条款如被认定为无效或不可执行，不影响其他条款的效力。\n\n'
@@ -121,16 +122,16 @@ class TermsPage extends StatelessWidget {
     );
   }
 
-  Widget _sectionTitle(String text) {
+  Widget _sectionTitle(BuildContext context, String text) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Text(
         text,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 17,
           fontWeight: FontWeight.w700,
           fontFamily: ShunShiTypography.serifFamily,
-          color: ShunShiColors.textPrimary,
+          color: AppColors.textPrimary(context),
         ),
       ),
     );

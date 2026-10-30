@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../design_system/theme.dart';
 import '../../core/config/app_config.dart';
+import '../../design_system/app_colors.dart';
 
 /// 底部弹出反馈卡片: "这条建议对你有帮助吗?" 👍👎
 class FeedbackSheet extends StatefulWidget {
@@ -73,16 +74,16 @@ class _FeedbackSheetState extends State<FeedbackSheet> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: ShunShiColors.surfaceContainerLowest,
+        backgroundColor: AppColors.surfaceContainerLowest(context),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('感谢你的反馈！',
-            style: TextStyle(fontFamily: ShunShiTypography.serifFamily, color: ShunShiColors.primary, fontSize: 18)),
-        content: const Text('你的每一条反馈都在帮助我们变得更好，为用户提供更优质的养生体验。',
-            style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 14, color: ShunShiColors.textSecondary)),
+        title: Text('感谢你的反馈！',
+            style: TextStyle(fontFamily: ShunShiTypography.serifFamily, color: AppColors.primary(context), fontSize: 18)),
+        content: Text('你的每一条反馈都在帮助我们变得更好，为用户提供更优质的养生体验。',
+            style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 14, color: AppColors.textSecondary(context))),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('很高兴能帮忙！', style: TextStyle(color: ShunShiColors.primary)),
+            child: Text('很高兴能帮忙！', style: TextStyle(color: AppColors.primary(context))),
           ),
         ],
       ),
@@ -92,8 +93,8 @@ class _FeedbackSheetState extends State<FeedbackSheet> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        color: ShunShiColors.surfaceContainerLowest,
+      decoration: BoxDecoration(
+        color: AppColors.surfaceContainerLowest(context),
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: EdgeInsets.only(
@@ -106,12 +107,12 @@ class _FeedbackSheetState extends State<FeedbackSheet> {
         children: [
           Center(child: Container(
             width: 40, height: 4,
-            decoration: BoxDecoration(color: ShunShiColors.border, borderRadius: BorderRadius.circular(2)),
+            decoration: BoxDecoration(color: AppColors.border(context), borderRadius: BorderRadius.circular(2)),
           )),
           const SizedBox(height: 20),
-          const Text('这条建议对你有帮助吗？',
+          Text('这条建议对你有帮助吗？',
               style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 20,
-                  fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+                  fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
           const SizedBox(height: 16),
           Row(children: [
             _thumbButton(Icons.thumb_up_outlined, 1),
@@ -124,9 +125,9 @@ class _FeedbackSheetState extends State<FeedbackSheet> {
             maxLines: 3,
             decoration: InputDecoration(
               hintText: '补充建议（可选）',
-              hintStyle: const TextStyle(color: ShunShiColors.textTertiary, fontSize: 14),
+              hintStyle: TextStyle(color: AppColors.textTertiary(context), fontSize: 14),
               filled: true,
-              fillColor: ShunShiColors.surfaceContainerLow,
+              fillColor: AppColors.surfaceContainerLow(context),
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
             ),
           ),
@@ -136,9 +137,9 @@ class _FeedbackSheetState extends State<FeedbackSheet> {
             child: ElevatedButton(
               onPressed: _rating == null || _submitting ? null : _submit,
               style: ElevatedButton.styleFrom(
-                backgroundColor: ShunShiColors.primary,
+                backgroundColor: AppColors.primary(context),
                 foregroundColor: Colors.white,
-                disabledBackgroundColor: ShunShiColors.primary.withValues(alpha: 0.3),
+                disabledBackgroundColor: AppColors.primary(context).withValues(alpha: 0.3),
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
@@ -159,11 +160,11 @@ class _FeedbackSheetState extends State<FeedbackSheet> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         decoration: BoxDecoration(
-          color: selected ? ShunShiColors.primary.withValues(alpha: 0.1) : ShunShiColors.surfaceContainerLow,
+          color: selected ? AppColors.primary(context).withValues(alpha: 0.1) : AppColors.surfaceContainerLow(context),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: selected ? ShunShiColors.primary : ShunShiColors.border),
+          border: Border.all(color: selected ? AppColors.primary(context) : AppColors.border(context)),
         ),
-        child: Icon(icon, color: selected ? ShunShiColors.primary : ShunShiColors.textTertiary, size: 28),
+        child: Icon(icon, color: selected ? AppColors.primary(context) : AppColors.textTertiary(context), size: 28),
       ),
     );
   }

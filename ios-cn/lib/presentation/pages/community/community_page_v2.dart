@@ -3,6 +3,7 @@ library;
 
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
+import '../../../design_system/app_colors.dart';
 
 class CommunityPageV2 extends StatelessWidget {
   const CommunityPageV2({super.key});
@@ -10,7 +11,7 @@ class CommunityPageV2 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
@@ -22,10 +23,10 @@ class CommunityPageV2 extends StatelessWidget {
                 child: Row(children: [
                   Text('顺时', style: TextStyle(
                     fontFamily: ShunShiTypography.serifFamily,
-                    fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.primary,
+                    fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.primary(context),
                   )),
                   const Spacer(),
-                  const Icon(Icons.menu, color: ShunShiColors.textSecondary),
+                  Icon(Icons.menu, color: AppColors.textSecondary(context)),
                 ]),
               ),
             ),
@@ -37,7 +38,7 @@ class CommunityPageV2 extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
               child: Text('养生圈', style: TextStyle(
                 fontFamily: ShunShiTypography.serifFamily,
-                fontSize: 32, fontWeight: FontWeight.bold, color: ShunShiColors.textPrimary,
+                fontSize: 32, fontWeight: FontWeight.bold, color: AppColors.textPrimary(context),
               )),
             ),
           ),
@@ -49,12 +50,12 @@ class CommunityPageV2 extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
-                  color: ShunShiColors.surfaceContainerLow, borderRadius: BorderRadius.circular(12),
+                  color: AppColors.surfaceContainerLow(context), borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(children: [
-                  Icon(Icons.search, color: ShunShiColors.textTertiary, size: 20),
+                  Icon(Icons.search, color: AppColors.textTertiary(context), size: 20),
                   const SizedBox(width: 8),
-                  Text('搜索养生内容...', style: TextStyle(fontSize: 14, color: ShunShiColors.textTertiary)),
+                  Text('搜索养生内容...', style: TextStyle(fontSize: 14, color: AppColors.textTertiary(context))),
                 ]),
               ),
             ),
@@ -65,13 +66,13 @@ class CommunityPageV2 extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
               child: Row(children: [
-                _buildTab('精选', true),
+                _buildTab(context, '精选', true),
                 const SizedBox(width: 16),
-                _buildTab('动态', false),
+                _buildTab(context, '动态', false),
                 const SizedBox(width: 16),
-                _buildTab('挑战打卡', false),
+                _buildTab(context, '挑战打卡', false),
                 const SizedBox(width: 16),
-                _buildTab('食疗分享', false),
+                _buildTab(context, '食疗分享', false),
               ]),
             ),
           ),
@@ -80,7 +81,7 @@ class CommunityPageV2 extends StatelessWidget {
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
-              child: _buildPost(
+              child: _buildPost(context: context, 
                 name: '云水禅心',
                 type: '气虚质',
                 content: '今日立春，晨起尝试了黄芪炖鸡，加入了几枚大枣。温补而不燥，感觉精神确实好多了。',
@@ -126,7 +127,7 @@ class CommunityPageV2 extends StatelessWidget {
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
-              child: _buildPost(
+              child: _buildPost(context: context, 
                 name: '松风听泉',
                 type: '阳虚质',
                 badge: Icons.emoji_events,
@@ -148,18 +149,18 @@ class CommunityPageV2 extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: const LinearGradient(colors: [Color(0xFF144227), Color(0xFF2D7A4A)]),
           shape: BoxShape.circle,
-          boxShadow: [BoxShadow(color: ShunShiColors.primary.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 4))],
+          boxShadow: [BoxShadow(color: AppColors.primary(context).withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 4))],
         ),
         child: const Icon(Icons.add, color: Colors.white, size: 28),
       ),
     );
   }
 
-  Widget _buildTab(String label, bool active) {
+  Widget _buildTab(BuildContext context, String label, bool active) {
     return Text(label, style: TextStyle(
       fontSize: 15,
       fontWeight: active ? FontWeight.w600 : FontWeight.normal,
-      color: active ? ShunShiColors.primary : ShunShiColors.textTertiary,
+      color: active ? AppColors.primary(context) : AppColors.textTertiary(context),
     ));
   }
 
@@ -171,30 +172,30 @@ class CommunityPageV2 extends StatelessWidget {
     );
   }
 
-  Widget _buildPost({
+  Widget _buildPost({required BuildContext context, 
     required String name, required String type, required String content,
     required int likes, required int comments,
     IconData? badge, String? badgeText,
   }) {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(14)),
+      decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(14)),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         // User row
         Row(children: [
           Container(width: 36, height: 36, decoration: BoxDecoration(
             shape: BoxShape.circle, color: ShunShiColors.primaryContainer,
-          ), child: Icon(Icons.person, color: ShunShiColors.primary, size: 18)),
+          ), child: Icon(Icons.person, color: AppColors.primary(context), size: 18)),
           const SizedBox(width: 10),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(name, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+            Text(name, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
               decoration: BoxDecoration(color: Colors.orange.withOpacity(0.1), borderRadius: BorderRadius.circular(4)),
               child: Text(type, style: TextStyle(fontSize: 10, color: Colors.orange)),
             ),
           ])),
-          Icon(Icons.more_horiz, color: ShunShiColors.textTertiary, size: 18),
+          Icon(Icons.more_horiz, color: AppColors.textTertiary(context), size: 18),
         ]),
 
         // Badge
@@ -203,28 +204,28 @@ class CommunityPageV2 extends StatelessWidget {
           Row(children: [
             Icon(badge, color: Color(0xFFFFD700), size: 16),
             const SizedBox(width: 6),
-            Text(badgeText, style: TextStyle(fontSize: 12, color: ShunShiColors.textSecondary, fontWeight: FontWeight.w500)),
+            Text(badgeText, style: TextStyle(fontSize: 12, color: AppColors.textSecondary(context), fontWeight: FontWeight.w500)),
           ]),
         ],
 
         // Content
         const SizedBox(height: 10),
-        Text(content, style: TextStyle(fontSize: 14, color: ShunShiColors.textSecondary, height: 1.6)),
+        Text(content, style: TextStyle(fontSize: 14, color: AppColors.textSecondary(context), height: 1.6)),
 
         // Actions
         const SizedBox(height: 12),
         Row(children: [
-          Icon(Icons.favorite_border, size: 18, color: ShunShiColors.textTertiary),
+          Icon(Icons.favorite_border, size: 18, color: AppColors.textTertiary(context)),
           const SizedBox(width: 4),
-          Text('$likes', style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
+          Text('$likes', style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context))),
           const SizedBox(width: 20),
-          Icon(Icons.chat_bubble_outline, size: 18, color: ShunShiColors.textTertiary),
+          Icon(Icons.chat_bubble_outline, size: 18, color: AppColors.textTertiary(context)),
           const SizedBox(width: 4),
-          Text('$comments', style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
+          Text('$comments', style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context))),
           const Spacer(),
-          Icon(Icons.share, size: 18, color: ShunShiColors.textTertiary),
+          Icon(Icons.share, size: 18, color: AppColors.textTertiary(context)),
           const SizedBox(width: 4),
-          Text('分享', style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
+          Text('分享', style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context))),
         ]),
       ]),
     );

@@ -51,6 +51,16 @@ class AppColors {
   static Color primary(BuildContext context) =>
       isDark(context) ? ShunShiColors.darkPrimary : ShunShiColors.primary;
 
+  /// 主色填充上的文字/图标色（浅色白，深色近黑），避免深色下白字落在浅绿底上。
+  static Color onPrimary(BuildContext context) => Theme.of(context).colorScheme.onPrimary;
+
+  static Color secondary(BuildContext context) =>
+      isDark(context) ? ShunShiColors.darkSecondary : ShunShiColors.secondary;
+
+  /// 会员卡等深绿色大面积填充；深色下略压暗，白字仍清晰。
+  static Color primaryContainerDeep(BuildContext context) =>
+      isDark(context) ? const Color(0xFF2D5A3D) : const Color(0xFF205C44);
+
   static Color primaryLight(BuildContext context) =>
       isDark(context) ? ShunShiColors.primaryLight : ShunShiColors.primaryLight;
 

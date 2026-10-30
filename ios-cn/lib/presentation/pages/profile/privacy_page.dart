@@ -8,6 +8,7 @@ import '../../../core/router/safe_pop.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
+import '../../../design_system/app_colors.dart';
 
 /// 隐私数据页 — 导出/删除/清空
 class PrivacyPage extends StatefulWidget {
@@ -168,9 +169,9 @@ class _PrivacyPageState extends State<PrivacyPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       appBar: AppBar(
-        backgroundColor: ShunShiColors.background,
+        backgroundColor: AppColors.background(context),
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, size: 20),
@@ -185,13 +186,13 @@ class _PrivacyPageState extends State<PrivacyPage> {
         padding: const EdgeInsets.all(20),
         children: [
           // Your data section
-          const Text(
+          Text(
             '你的数据',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w700,
               fontFamily: ShunShiTypography.serifFamily,
-              color: ShunShiColors.textPrimary,
+              color: AppColors.textPrimary(context),
             ),
           ),
           const SizedBox(height: 12),
@@ -201,12 +202,12 @@ class _PrivacyPageState extends State<PrivacyPage> {
             subtitle: '查看账户数据及国内付款、退款申请记录，可复制 JSON',
             onTap: (_exporting || _deleting) ? null : _exportData,
             trailing: _exporting
-                ? const SizedBox(
+                ? SizedBox(
                     width: 16,
                     height: 16,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      color: ShunShiColors.primary,
+                      color: AppColors.primary(context),
                     ),
                   )
                 : null,
@@ -217,7 +218,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
             title: '注销账号',
             subtitle: '删除核心账号资料；支付记录保留，退款不自动执行',
             onTap: (_deleting || _exporting) ? null : _deleteAllData,
-            titleColor: ShunShiColors.error,
+            titleColor: AppColors.error(context),
           ),
           const SizedBox(height: 8),
           _buildTile(
@@ -229,13 +230,13 @@ class _PrivacyPageState extends State<PrivacyPage> {
           const SizedBox(height: 32),
 
           // Privacy policy
-          const Text(
+          Text(
             '数据操作说明',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w700,
               fontFamily: ShunShiTypography.serifFamily,
-              color: ShunShiColors.textPrimary,
+              color: AppColors.textPrimary(context),
             ),
           ),
           const SizedBox(height: 12),
@@ -243,18 +244,18 @@ class _PrivacyPageState extends State<PrivacyPage> {
             width: double.infinity,
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: ShunShiColors.surfaceContainerLowest,
+              color: AppColors.surfaceContainerLowest(context),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: ShunShiColors.borderGhost),
+              border: Border.all(color: AppColors.borderGhost(context)),
             ),
-            child: const Text(
+            child: Text(
               '顺时尊重并保护你的个人隐私。\n\n'
               '• 导出提供核心账户数据及国内支付、退款申请记录\n'
               '• 注销不会自动完成退款，支付与退款申请记录仍保留\n'
               '• 清空记忆需要服务端确认，操作失败可重试',
               style: TextStyle(
                 fontSize: 13,
-                color: ShunShiColors.textSecondary,
+                color: AppColors.textSecondary(context),
                 height: 1.7,
               ),
             ),
@@ -265,11 +266,11 @@ class _PrivacyPageState extends State<PrivacyPage> {
           Center(
             child: Column(
               children: [
-                const Text(
+                Text(
                   '数据相关问题？',
                   style: TextStyle(
                     fontSize: 13,
-                    color: ShunShiColors.textTertiary,
+                    color: AppColors.textTertiary(context),
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -277,7 +278,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
                   '联系邮箱待公司开通后填写',
                   style: TextStyle(
                     fontSize: 13,
-                    color: ShunShiColors.primary,
+                    color: AppColors.primary(context),
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -303,16 +304,16 @@ class _PrivacyPageState extends State<PrivacyPage> {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: ShunShiColors.surfaceContainerLowest,
+          color: AppColors.surfaceContainerLowest(context),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: ShunShiColors.borderGhost),
+          border: Border.all(color: AppColors.borderGhost(context)),
         ),
         child: Row(
           children: [
             Icon(
               icon,
               size: 22,
-              color: titleColor ?? ShunShiColors.textSecondary,
+              color: titleColor ?? AppColors.textSecondary(context),
             ),
             const SizedBox(width: 14),
             Expanded(
@@ -324,16 +325,16 @@ class _PrivacyPageState extends State<PrivacyPage> {
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w500,
-                      color: titleColor ?? ShunShiColors.textPrimary,
+                      color: titleColor ?? AppColors.textPrimary(context),
                     ),
                   ),
                   if (subtitle != null) ...[
                     const SizedBox(height: 2),
                     Text(
                       subtitle,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
-                        color: ShunShiColors.textTertiary,
+                        color: AppColors.textTertiary(context),
                       ),
                     ),
                   ],
@@ -341,10 +342,10 @@ class _PrivacyPageState extends State<PrivacyPage> {
               ),
             ),
             trailing ??
-                const Icon(
+                Icon(
                   Icons.chevron_right,
                   size: 18,
-                  color: ShunShiColors.textTertiary,
+                  color: AppColors.textTertiary(context),
                 ),
           ],
         ),

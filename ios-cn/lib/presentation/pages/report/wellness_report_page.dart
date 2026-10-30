@@ -4,6 +4,7 @@ library;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
+import '../../../design_system/app_colors.dart';
 
 class WellnessReportPage extends StatelessWidget {
   const WellnessReportPage({super.key});
@@ -11,10 +12,10 @@ class WellnessReportPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? ShunShiColors.darkBackground : ShunShiColors.background;
-    final card = isDark ? ShunShiColors.darkSurface : ShunShiColors.surfaceContainerLowest;
-    final title = isDark ? ShunShiColors.darkTextPrimary : ShunShiColors.textPrimary;
-    final body = isDark ? ShunShiColors.darkTextSecondary : ShunShiColors.textSecondary;
+    final bg = isDark ? ShunShiColors.darkBackground : AppColors.background(context);
+    final card = isDark ? ShunShiColors.darkSurface : AppColors.surfaceContainerLowest(context);
+    final title = isDark ? ShunShiColors.darkTextPrimary : AppColors.textPrimary(context);
+    final body = isDark ? ShunShiColors.darkTextSecondary : AppColors.textSecondary(context);
 
     return Scaffold(
       backgroundColor: bg,
@@ -72,7 +73,7 @@ class WellnessReportPage extends StatelessWidget {
             child: ElevatedButton(
               onPressed: () => context.go('/today'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: ShunShiColors.primary,
+                backgroundColor: AppColors.primary(context),
                 foregroundColor: Colors.white,
                 elevation: 0,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

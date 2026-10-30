@@ -3,6 +3,8 @@ import '../../../core/theme/shunshi_colors.dart';
 import '../../../core/theme/shunshi_spacing.dart';
 import '../../../core/theme/shunshi_text_styles.dart';
 import 'gentle_button.dart';
+import '../../../design_system/app_colors.dart';
+import '../../../design_system/style_theming.dart';
 
 /// 错误状态组件 — 温和提示，重试按钮
 class ErrorState extends StatelessWidget {
@@ -25,7 +27,7 @@ class ErrorState extends StatelessWidget {
     final isDark = _isDark(context);
     final iconColor = isDark
         ? ShunshiDarkColors.error
-        : ShunshiColors.error;
+        : AppColors.error(context);
 
     return Center(
       child: Padding(
@@ -47,7 +49,7 @@ class ErrorState extends StatelessWidget {
               style: ShunshiTextStyles.body.copyWith(
                 color: isDark
                     ? ShunshiDarkColors.textSecondary
-                    : ShunshiColors.textSecondary,
+                    : AppColors.textSecondary(context),
               ),
               textAlign: TextAlign.center,
             ),
@@ -55,7 +57,7 @@ class ErrorState extends StatelessWidget {
               const SizedBox(height: ShunshiSpacing.sm),
               Text(
                 subtitle!,
-                style: ShunshiTextStyles.caption,
+                style: ShunshiTextStyles.caption.themed(context),
                 textAlign: TextAlign.center,
               ),
             ],

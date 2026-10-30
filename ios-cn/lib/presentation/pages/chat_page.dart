@@ -411,8 +411,8 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
       backgroundColor: Colors.transparent,
       builder: (_) => Container(
         padding: const EdgeInsets.all(24),
-        decoration: const BoxDecoration(
-          color: ShunShiColors.surface,
+        decoration: BoxDecoration(
+          color: AppColors.surface(context),
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
         child: Column(
@@ -422,7 +422,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: ShunShiColors.border,
+                color: AppColors.border(context),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -440,21 +440,21 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
               ),
             ),
             const SizedBox(height: 16),
-            const Text(
+            Text(
               '查看会员权益',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
-                color: ShunShiColors.textPrimary,
+                color: AppColors.textPrimary(context),
               ),
             ),
             const SizedBox(height: 8),
             Text(
               '查看各档会员的对话、养生建议与家庭功能\n具体权益以套餐页面为准',
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
-                color: ShunShiColors.textSecondary,
+                color: AppColors.textSecondary(context),
                 height: 1.6,
               ),
             ),
@@ -463,7 +463,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
               width: double.infinity,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: ShunShiColors.primary,
+                  backgroundColor: AppColors.primary(context),
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
@@ -483,9 +483,9 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
             const SizedBox(height: 10),
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text(
+              child: Text(
                 '稍后再说',
-                style: TextStyle(color: ShunShiColors.textTertiary),
+                style: TextStyle(color: AppColors.textTertiary(context)),
               ),
             ),
             const SizedBox(height: 8),
@@ -499,7 +499,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: ShunShiColors.surface,
+        backgroundColor: AppColors.surface(context),
         title: Row(
           children: [
             Icon(
@@ -508,35 +508,35 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
               size: 28,
             ),
             const SizedBox(width: 8),
-            const Text(
+            Text(
               '健康安全提示',
               style: TextStyle(
                 fontFamily: ShunShiTypography.sansFamily,
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
-                color: ShunShiColors.textPrimary,
+                color: AppColors.textPrimary(context),
               ),
             ),
           ],
         ),
-        content: const Text(
+        content: Text(
           '您提到的内容涉及健康安全风险。请您立即联系专业医疗机构或拨打：\n\n'
           '• 全国统一心理援助热线：12356\n'
           '• 急救电话：120，报警电话：110\n\n'
           '顺时AI不能替代专业医疗诊断。',
           style: TextStyle(
             fontSize: 15,
-            color: ShunShiColors.textSecondary,
+            color: AppColors.textSecondary(context),
             height: 1.6,
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text(
+            child: Text(
               '我知道了',
               style: TextStyle(
-                color: ShunShiColors.primary,
+                color: AppColors.primary(context),
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -593,7 +593,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
   void _showQuickTopics() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -612,19 +612,19 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
                 width: 36,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: ShunShiColors.borderGhost,
+                  color: AppColors.borderGhost(context),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
             ),
             const SizedBox(height: 16),
-            const Text(
+            Text(
               '快捷话题',
               style: TextStyle(
                 fontFamily: ShunShiTypography.serifFamily,
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
-                color: ShunShiColors.textPrimary,
+                color: AppColors.textPrimary(context),
               ),
             ),
             const SizedBox(height: 14),
@@ -648,10 +648,10 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
                           labelStyle: TextStyle(
                             fontFamily: ShunShiTypography.sansFamily,
                             fontSize: 13,
-                            color: ShunShiColors.textPrimary,
+                            color: AppColors.textPrimary(context),
                           ),
-                          backgroundColor: ShunShiColors.surface,
-                          side: BorderSide(color: ShunShiColors.border),
+                          backgroundColor: AppColors.surface(context),
+                          side: BorderSide(color: AppColors.border(context)),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20),
                           ),
@@ -734,8 +734,8 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
               Container(
                 width: 36,
                 height: 36,
-                decoration: const BoxDecoration(
-                  color: ShunShiColors.primary,
+                decoration: BoxDecoration(
+                  color: AppColors.primary(context),
                   shape: BoxShape.circle,
                 ),
                 child: const Center(
@@ -907,7 +907,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
     final field = AppColors.surface(context);
     final ink = AppColors.textPrimary(context);
     final muted = AppColors.textTertiary(context);
-    final sendBg = isDark ? ShunShiColors.darkPrimary : ShunShiColors.primary;
+    final sendBg = isDark ? ShunShiColors.darkPrimary : AppColors.primary(context);
     final sendFg = isDark ? const Color(0xFF121212) : Colors.white;
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
@@ -993,7 +993,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
               height: 44,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: _isRecording ? Colors.red : ShunShiColors.secondary,
+                color: _isRecording ? Colors.red : AppColors.secondary(context),
               ),
               child: Icon(
                 _isRecording ? Icons.stop : Icons.mic,
