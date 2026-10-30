@@ -4,16 +4,21 @@
 """
 
 import json
+import logging
 import os
 import re
 
 import httpx
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Request
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict
 
 from ..aigc import ai_disclosure
+from ..llm import cost_cap
 from ..llm.domestic_gateway import host_allowed, llm_timeout
+from ..llm.guardrail import moderate_image, moderate_text
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/v1/ingredient-scan", tags=["ai-ingredient-scan"])
 
@@ -89,15 +94,29 @@ def _find_ingredient(name: str) -> Optional[dict]:
     return None
 
 
-# 国内视觉模型（百炼 OpenAI 兼容接口）。只用顺时自己的密钥变量，不用境外供应商。
-# 模型名待核实：缺省值取官方文档里的 id，上线前可用 SHUNSHI_VISION_MODEL 覆盖。
-VISION_ENDPOINT = "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions"
-DEFAULT_VISION_MODEL = "qwen-vl-plus"
+# 国内视觉模型：MiniMax 开放平台（境内）OpenAI 兼容 Chat Completions，图片用 image_url 内容块。
+# 官方文档：https://platform.minimaxi.com/docs/api-reference/text-openai-api （多模态输入）
+#           https://platform.minimaxi.com/docs/api-reference/text-chat-openai （POST /v1/chat/completions）
+# 文档只在 MiniMax-M3 / MiniMax-M3.1-Flash 上列出图片输入；MiniMax-VL-01 不在官方模型列表里，所以缺省用 MiniMax-M3。
+# 模型名可用 SHUNSHI_VISION_MODEL 覆盖。密钥只读环境变量，不写进代码、不进日志。
+VISION_ENDPOINT = "https://api.minimax.cn/v1/chat/completions"
+DEFAULT_VISION_MODEL = "MiniMax-M3"
+VISION_KEY_VARS = ("SHUNSHI_MINIMAX_API_KEY", "MINIMAX_API_KEY")
 VISION_PROMPT = (
     "识别图片中最主要的可食用食材。只返回JSON："
     "{\"ingredient_name_cn\":\"名称或未知\",\"confidence\":0到1}。"
     "不确定时必须返回未知，禁止猜测。"
 )
+
+MSG_UNCONFIGURED = "图片识别服务暂未配置，请改为输入食材名称"
+MSG_OVER_CAP = "今日图片识别次数已达上限，请明天再试，或直接输入食材名称"
+MSG_REJECTED = "图片未通过内容安全审核，请换一张食材图片，或直接输入食材名称"
+MSG_MODERATION_DOWN = "图片内容安全审核暂时不可用，请稍后再试，或直接输入食材名称"
+
+# 视觉调用的费用估算（元）：输入 token 取单张低清图加提示词的保守值，输出取 max token。
+_EST_TOKENS_IN = 800
+_EST_TOKENS_OUT = 120
+_TRANSPORT_LABELS = ("transport", "json", "unreadable")
 
 
 def _vision_model(env: dict | None = None) -> str:
@@ -105,72 +124,165 @@ def _vision_model(env: dict | None = None) -> str:
     return (source.get("SHUNSHI_VISION_MODEL") or "").strip() or DEFAULT_VISION_MODEL
 
 
+def _vision_api_key(source: dict) -> str:
+    for name in VISION_KEY_VARS:
+        value = (source.get(name) or "").strip()
+        if value:
+            return value
+    return ""
+
+
+def _vision_caps(user_id: str, env: dict) -> list[tuple[str, float]]:
+    uid = user_id or "anonymous"
+    return [
+        (f"vision:user:{uid}", cost_cap.vision_user_daily_cap_cny(env)),
+        ("vision:product", cost_cap.vision_product_daily_cap_cny(env)),
+        (f"user:{uid}", cost_cap.user_daily_cap_cny(env)),
+        ("product", cost_cap.product_daily_cap_cny(env)),
+    ]
+
+
+def _vision_over_cap(user_id: str, model: str, env: dict) -> bool:
+    amount = cost_cap.estimate_cost_cny(model, _EST_TOKENS_IN, _EST_TOKENS_OUT, env)
+    amount += cost_cap.guardrail_cost_cny(2, env)  # 图片审核一次 + 结果文字审核一次
+    return any(cost_cap.would_exceed(scope, amount, cap) for scope, cap in _vision_caps(user_id, env))
+
+
+def _vision_charge(user_id: str, amount: float, env: dict) -> None:
+    for scope, _cap in _vision_caps(user_id, env):
+        cost_cap.record(scope, amount)
+
+
+def _text_moderation_unavailable(verdict) -> bool:
+    """文字审核没真正跑成（没配、网络错、返回异常）一律按不可用处理，不放行。"""
+    if not verdict.checked:
+        return True
+    return verdict.hit and (verdict.labels in _TRANSPORT_LABELS or verdict.labels.startswith(("http-", "code-")))
+
+
+def _vision_detail(source: dict) -> str:
+    value = (source.get("SHUNSHI_VISION_IMAGE_DETAIL") or "low").strip().lower()
+    return value if value in {"low", "default", "high"} else "low"
+
+
 async def _recognize_ingredient_image(
     image_url: str,
     *,
+    user_id: str = "anonymous",
     client: httpx.AsyncClient | None = None,
     env: dict | None = None,
 ) -> tuple[str, float, str]:
-    """用境内视觉模型识别食材图片。没配密钥或模型无把握时不编造结果。"""
+    """用境内视觉模型识别食材图片。没配密钥或模型无把握时不编造结果。
+
+    顺序：密钥 → 日费用上限（429）→ 图片内容安全审核（不过 422，审核不可用 503，都不调用模型）
+    → 视觉模型 → 记费用 → 识别结果文字审核。任何一步不确定都按拒绝处理。
+    """
     if not image_url.startswith("https://"):
         raise HTTPException(status_code=400, detail="食材图片必须使用可公开访问的 HTTPS 地址")
     source = os.environ if env is None else env
-    api_key = (source.get("SHUNSHI_DASHSCOPE_API_KEY") or "").strip()
+    api_key = _vision_api_key(source)
     if not api_key:
-        raise HTTPException(status_code=503, detail="图片识别服务暂未配置，请改为输入食材名称")
+        raise HTTPException(status_code=503, detail=MSG_UNCONFIGURED)
     if not host_allowed(httpx.URL(VISION_ENDPOINT).host):
-        raise HTTPException(status_code=503, detail="图片识别服务暂未配置，请改为输入食材名称")
+        raise HTTPException(status_code=503, detail=MSG_UNCONFIGURED)
     model = _vision_model(source)
-    payload = {
-        "model": model,
-        "temperature": 0,
-        "max_tokens": 120,
-        "messages": [{
-            "role": "user",
-            "content": [
-                {"type": "text", "text": VISION_PROMPT},
-                {"type": "image_url", "image_url": {"url": image_url}},
-            ],
-        }],
-    }
+
+    if _vision_over_cap(user_id, model, source):
+        logger.info("vision cost cap: user=%s model=%s", user_id or "anonymous", model)
+        raise HTTPException(status_code=429, detail=MSG_OVER_CAP)
+
     owns_client = client is None
     client = client or httpx.AsyncClient()
     try:
-        response = await client.post(
-            VISION_ENDPOINT,
-            json=payload,
-            headers={"Authorization": f"Bearer {api_key}"},
-            timeout=llm_timeout(source),
-        )
-    except httpx.HTTPError as exc:
-        raise HTTPException(status_code=502, detail="图片识别服务连接失败") from exc
+        moderation = await moderate_image(image_url, client=client, env=source)
+        if moderation.requested:
+            _vision_charge(user_id, cost_cap.guardrail_cost_cny(1, source), source)
+        if moderation.status == "unavailable":
+            raise HTTPException(status_code=503, detail=MSG_MODERATION_DOWN)
+        if moderation.status == "reject":
+            logger.info("vision image rejected by moderation: user=%s labels=%s", user_id or "anonymous", moderation.labels)
+            raise HTTPException(status_code=422, detail=MSG_REJECTED)
+
+        image_part: dict = {"url": image_url, "detail": _vision_detail(source)}
+        payload: dict = {
+            "model": model,
+            "max_completion_tokens": _EST_TOKENS_OUT,
+            "messages": [{
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": VISION_PROMPT},
+                    {"type": "image_url", "image_url": image_part},
+                ],
+            }],
+        }
+        if "flash" in model.lower():
+            # M3.1-Flash 的思考无法关闭，思考 token 也计入上限，给足额度并用最低档。
+            payload["reasoning_effort"] = "low"
+            payload["max_completion_tokens"] = 1024
+        else:
+            payload["thinking"] = {"type": "disabled"}
+        try:
+            response = await client.post(
+                VISION_ENDPOINT,
+                json=payload,
+                headers={"Authorization": f"Bearer {api_key}"},
+                timeout=llm_timeout(source),
+            )
+        except httpx.HTTPError as exc:
+            raise HTTPException(status_code=502, detail="图片识别服务连接失败") from exc
+        if response.status_code != 200:
+            raise HTTPException(status_code=502, detail="图片识别服务暂时不可用")
+
+        try:
+            body = response.json()
+        except ValueError as exc:
+            raise HTTPException(status_code=502, detail="图片识别服务返回格式无效") from exc
+        usage = body.get("usage") if isinstance(body, dict) else None
+        tokens_in, tokens_out = _EST_TOKENS_IN, _EST_TOKENS_OUT
+        if isinstance(usage, dict):
+            if isinstance(usage.get("prompt_tokens"), int):
+                tokens_in = usage["prompt_tokens"]
+            if isinstance(usage.get("completion_tokens"), int):
+                tokens_out = usage["completion_tokens"]
+        _vision_charge(user_id, cost_cap.estimate_cost_cny(model, tokens_in, tokens_out, source), source)
+
+        try:
+            content = body["choices"][0]["message"]["content"]
+            content = re.sub(r"<think>.*?</think>", "", content, flags=re.DOTALL)
+            content = re.sub(r"^```(?:json)?\s*|\s*```$", "", content.strip())
+            parsed = json.loads(content)
+            name = str(parsed["ingredient_name_cn"]).strip()
+            confidence = max(0.0, min(1.0, float(parsed["confidence"])))
+        except (KeyError, IndexError, TypeError, ValueError, json.JSONDecodeError) as exc:
+            raise HTTPException(status_code=502, detail="图片识别服务返回格式无效") from exc
+        # 低把握一律按「未知」处理，由调用方提示用户核对或手动输入。
+        if not name or name == "未知" or confidence < 0.6:
+            return "未知", confidence, model
+
+        verdict = await moderate_text(name, client=client, env=source)
+        if verdict.checked:
+            _vision_charge(user_id, cost_cap.guardrail_cost_cny(1, source), source)
+        if _text_moderation_unavailable(verdict):
+            raise HTTPException(status_code=503, detail=MSG_MODERATION_DOWN)
+        if verdict.hit:
+            logger.info("vision output rejected by moderation: user=%s labels=%s", user_id or "anonymous", verdict.labels)
+            raise HTTPException(status_code=422, detail=MSG_REJECTED)
+        return name, confidence, model
     finally:
         if owns_client:
             await client.aclose()
-    if response.status_code != 200:
-        raise HTTPException(status_code=502, detail="图片识别服务暂时不可用")
-
-    try:
-        content = response.json()["choices"][0]["message"]["content"]
-        content = re.sub(r"^```(?:json)?\s*|\s*```$", "", content.strip())
-        parsed = json.loads(content)
-        name = str(parsed["ingredient_name_cn"]).strip()
-        confidence = max(0.0, min(1.0, float(parsed["confidence"])))
-    except (KeyError, IndexError, TypeError, ValueError, json.JSONDecodeError) as exc:
-        raise HTTPException(status_code=502, detail="图片识别服务返回格式无效") from exc
-    # 低把握一律按「未知」处理，由调用方提示用户核对或手动输入。
-    if not name or name == "未知" or confidence < 0.6:
-        name = "未知"
-    return name, confidence, model
 
 
 @router.post("/scan", summary="扫描/识别食材")
-async def scan_ingredient(request: ScanResultRequest):
+async def scan_ingredient(request: ScanResultRequest, http_request: Request):
     if not request.ingredient_name and not request.image_url:
         raise HTTPException(status_code=400, detail="请提供食材图片或名称")
 
     if request.image_url and not request.ingredient_name:
-        recognized_name, confidence, recognition_model = await _recognize_ingredient_image(request.image_url)
+        recognized_name, confidence, recognition_model = await _recognize_ingredient_image(
+            request.image_url,
+            user_id=getattr(http_request.state, "user_id", "") or "anonymous",
+        )
     else:
         recognized_name = request.ingredient_name
         confidence = 1.0
