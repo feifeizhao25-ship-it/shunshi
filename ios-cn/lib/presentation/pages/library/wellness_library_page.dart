@@ -4,6 +4,7 @@ library;
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
+import '../../../design_system/app_colors.dart';
 import '../../../core/config/app_config.dart';
 
 class WellnessLibraryPage extends StatefulWidget {
@@ -98,21 +99,21 @@ class _WellnessLibraryPageState extends State<WellnessLibraryPage> {
     switch (category) {
       case 'sleep': return const Color(0xFF3F51B5);
       case 'nutrition': return const Color(0xFF4CAF50);
-      case 'movement': return ShunShiColors.primary;
+      case 'movement': return AppColors.primary(context);
       case 'mindfulness': return const Color(0xFF00BCD4);
       case 'seasonal': return const Color(0xFFFF9800);
-      default: return ShunShiColors.primary;
+      default: return AppColors.primary(context);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       body: _loading
-          ? const Center(child: CircularProgressIndicator(color: ShunShiColors.primary))
+          ? Center(child: CircularProgressIndicator(color: AppColors.primary(context)))
           : RefreshIndicator(
-              color: ShunShiColors.primary,
+              color: AppColors.primary(context),
               onRefresh: _fetchContents,
               child: CustomScrollView(
                 physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
@@ -126,13 +127,13 @@ class _WellnessLibraryPageState extends State<WellnessLibraryPage> {
                           IconButton(
                             padding: EdgeInsets.zero,
                             constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-                            icon: const Icon(Icons.arrow_back_ios_new, color: ShunShiColors.primary, size: 18),
+                            icon: Icon(Icons.arrow_back_ios_new, color: AppColors.primary(context), size: 18),
                             onPressed: () => Navigator.of(context).maybePop(),
                           ),
                           const Spacer(),
                           Text('顺时', style: TextStyle(
                             fontFamily: ShunShiTypography.serifFamily,
-                            fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.primary,
+                            fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.primary(context),
                           )),
                           const Spacer(),
                           const SizedBox(width: 24),
@@ -147,7 +148,7 @@ class _WellnessLibraryPageState extends State<WellnessLibraryPage> {
                       padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
                       child: Text('养生文库', style: TextStyle(
                         fontFamily: ShunShiTypography.serifFamily,
-                        fontSize: 28, fontWeight: FontWeight.bold, color: ShunShiColors.textPrimary,
+                        fontSize: 28, fontWeight: FontWeight.bold, color: AppColors.textPrimary(context),
                       )),
                     ),
                   ),
@@ -159,22 +160,22 @@ class _WellnessLibraryPageState extends State<WellnessLibraryPage> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         decoration: BoxDecoration(
-                          color: ShunShiColors.surfaceContainerLow, borderRadius: BorderRadius.circular(12),
+                          color: AppColors.surfaceContainerLow(context), borderRadius: BorderRadius.circular(12),
                         ),
                         child: TextField(
                           controller: _searchController,
                           onChanged: (v) => _search(v),
                           decoration: InputDecoration(
                             hintText: '搜索养生内容',
-                            hintStyle: TextStyle(fontSize: 16, color: ShunShiColors.textTertiary),
+                            hintStyle: TextStyle(fontSize: 16, color: AppColors.textTertiary(context)),
                             border: InputBorder.none,
-                            icon: Icon(Icons.search, color: ShunShiColors.textTertiary, size: 20),
+                            icon: Icon(Icons.search, color: AppColors.textTertiary(context), size: 20),
                             suffixIcon: _searchController.text.isNotEmpty ? IconButton(
-                              icon: Icon(Icons.clear, size: 18, color: ShunShiColors.textTertiary),
+                              icon: Icon(Icons.clear, size: 18, color: AppColors.textTertiary(context)),
                               onPressed: () { _searchController.clear(); _search(''); },
                             ) : null,
                           ),
-                          style: const TextStyle(fontSize: 16, color: ShunShiColors.textPrimary),
+                          style: TextStyle(fontSize: 16, color: AppColors.textPrimary(context)),
                         ),
                       ),
                     ),
@@ -198,7 +199,7 @@ class _WellnessLibraryPageState extends State<WellnessLibraryPage> {
                       child: _filtered.isEmpty
                           ? Center(child: Padding(
                               padding: const EdgeInsets.all(40),
-                              child: Text('这个分类下还没有内容', style: TextStyle(color: ShunShiColors.textTertiary)),
+                              child: Text('这个分类下还没有内容', style: TextStyle(color: AppColors.textTertiary(context))),
                             ))
                           : Column(
                               children: _filtered.map((item) => Padding(
@@ -228,13 +229,13 @@ class _WellnessLibraryPageState extends State<WellnessLibraryPage> {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
           decoration: BoxDecoration(
-            color: active ? ShunShiColors.primary : ShunShiColors.surface,
+            color: active ? AppColors.primary(context) : AppColors.surface(context),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: active ? ShunShiColors.primary : ShunShiColors.borderGhost),
+            border: Border.all(color: active ? AppColors.primary(context) : AppColors.borderGhost(context)),
           ),
           child: Text(label, style: TextStyle(
             fontSize: 12, fontWeight: FontWeight.w500,
-            color: active ? Colors.white : ShunShiColors.textSecondary,
+            color: active ? Colors.white : AppColors.textSecondary(context),
           )),
         ),
       ),
@@ -247,7 +248,7 @@ class _WellnessLibraryPageState extends State<WellnessLibraryPage> {
   }) {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(14)),
+      decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(14)),
       child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Container(
           width: 48, height: 48,
@@ -258,11 +259,11 @@ class _WellnessLibraryPageState extends State<WellnessLibraryPage> {
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(category, style: TextStyle(fontSize: 11, color: color, fontWeight: FontWeight.w500)),
           const SizedBox(height: 2),
-          Text(title, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+          Text(title, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
           const SizedBox(height: 2),
-          Text(desc, style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary, height: 1.4)),
+          Text(desc, style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context), height: 1.4)),
         ])),
-        Icon(Icons.chevron_right, color: ShunShiColors.textTertiary, size: 18),
+        Icon(Icons.chevron_right, color: AppColors.textTertiary(context), size: 18),
       ]),
     );
   }
