@@ -47,6 +47,10 @@ Future<ChatReply> sendChat(Dio client, String token, String text) async {
   );
 }
 
+/// 设备没有网络、请求根本没发出去（区别于超时：超时时服务端可能已处理）。
+bool isOfflineFailure(Object error) =>
+    error is DioException && error.type == DioExceptionType.connectionError;
+
 String chatFailureMessage(Object error) {
   if (error is DioException) {
     switch (error.response?.statusCode) {

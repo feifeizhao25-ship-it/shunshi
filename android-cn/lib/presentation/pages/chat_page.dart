@@ -19,6 +19,9 @@ import '../../core/solar_term/solar_term_table.dart';
 
 final String _baseUrl = AppConfig.apiBaseUrl.replaceAll('/api/v1', '');
 
+/// 没有网络时的唯一提示：不生成、不缓存任何本地「健康建议」，输入原样保留。
+const _offlineChatNotice = '当前处于离线状态。离线状态不生成健康建议，输入已保留，请联网后重试。';
+
 class ChatPage extends StatefulWidget {
   final String? conversationId;
   final Dio? client;
@@ -402,7 +405,9 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
       final prefs = await SharedPreferences.getInstance();
       if (!mounted || prefs.getString('auth_token') != requestToken) return;
       setState(() {
-        _chatError = chatFailureMessage(error);
+        _chatError = isOfflineFailure(error)
+            ? _offlineChatNotice
+            : chatFailureMessage(error);
         if (_controller.text.isEmpty) _controller.text = text;
       });
       await _saveConversation();
