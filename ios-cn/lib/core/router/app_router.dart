@@ -52,6 +52,7 @@ import '../../presentation/pages/growth/growth_milestones_page.dart';
 import '../../presentation/pages/report/wellness_report_page.dart';
 import '../../presentation/pages/seasons/seasons_page.dart';
 import '../../presentation/pages/meditation/meditation_focus_page.dart';
+import '../../presentation/pages/meditation/meditation_library_page.dart';
 import '../../presentation/pages/body_type/body_type_essence_page.dart';
 import '../../presentation/pages/wellness/mood_page.dart';
 import '../../presentation/pages/wellness/tea_page.dart';
@@ -143,7 +144,8 @@ class AppRouter {
       GoRoute(path: '/growth', builder: (context, state) => const GrowthMilestonesPage()),
       GoRoute(path: '/wellness-report', builder: (context, state) => const WellnessReportPage()),
       GoRoute(path: '/seasons', builder: (context, state) => const SeasonsPage()),
-      GoRoute(path: '/meditation', builder: (context, state) => const MeditationFocusPage()),
+      GoRoute(path: '/meditation', builder: (context, state) => const MeditationLibraryPage()),
+      GoRoute(path: '/meditation/focus', builder: (context, state) => const MeditationFocusPage()),
       GoRoute(path: '/body-type-essence', builder: (context, state) => const BodyTypeEssencePage()),
       GoRoute(path: '/mood', builder: (context, state) => const MoodPage()),
       GoRoute(path: '/tea', builder: (context, state) => const TeaPage()),

@@ -91,7 +91,7 @@ class _WellnessHomePageState extends State<WellnessHomePage>
       subtitle: '静心凝神',
       lightGradient: [Color(0xFF3B5998), Color(0xFF5A7ABF)],
       darkGradient: [Color(0xFF25365A), Color(0xFF35466A)],
-      route: '/mood',
+      route: '/meditation',
       backgroundImage: 'assets/images/meditation.jpg',
     ),
     _WellnessCategory(
