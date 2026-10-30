@@ -22,8 +22,9 @@ class _DiaryPageV2State extends State<DiaryPageV2> {
   final _noteController = TextEditingController();
   
   String _selectedMood = '平和';
-  String _sleepTime = '22:45';
-  String _wakeTime = '06:30';
+  // 入睡/醒来时间由用户自己选择；没选就是空，不预填示例时间，也不会提交。
+  String? _sleepTime;
+  String? _wakeTime;
   bool _teaDone = false;
   bool _meditationDone = false;
   bool _exerciseDone = false;
@@ -73,8 +74,8 @@ class _DiaryPageV2State extends State<DiaryPageV2> {
       await _dio.post('/api/v1/journal/entry', data: {
         'user_id': 'user-001',
         'mood': _selectedMood,
-        'sleep_time': _sleepTime,
-        'wake_time': _wakeTime,
+        if (_sleepTime != null) 'sleep_time': _sleepTime,
+        if (_wakeTime != null) 'wake_time': _wakeTime,
         'note': _noteController.text.trim(),
         'rituals': {
           'tea': _teaDone,
@@ -159,9 +160,9 @@ class _DiaryPageV2State extends State<DiaryPageV2> {
                     ]),
                     const SizedBox(height: 16),
                     Row(children: [
-                      Expanded(child: _buildTimeInput('入睡时间', _sleepTime, (v) => setState(() => _sleepTime = v))),
+                      Expanded(child: _buildTimeInput('入睡时间', _sleepTime, 22, 30, (v) => setState(() => _sleepTime = v))),
                       const SizedBox(width: 16),
-                      Expanded(child: _buildTimeInput('醒来时间', _wakeTime, (v) => setState(() => _wakeTime = v))),
+                      Expanded(child: _buildTimeInput('醒来时间', _wakeTime, 7, 0, (v) => setState(() => _wakeTime = v))),
                     ]),
                   ]),
                 ),
@@ -327,7 +328,7 @@ class _DiaryPageV2State extends State<DiaryPageV2> {
     );
   }
 
-  Widget _buildTimeInput(String label, String value, ValueChanged<String> onChanged) {
+  Widget _buildTimeInput(String label, String? value, int defaultHour, int defaultMinute, ValueChanged<String> onChanged) {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(color: AppColors.surfaceContainerLow(context), borderRadius: BorderRadius.circular(12)),
@@ -336,12 +337,18 @@ class _DiaryPageV2State extends State<DiaryPageV2> {
         const SizedBox(height: 4),
         GestureDetector(
           onTap: () async {
-            final parts = value.split(':');
-            final time = await showTimePicker(context: context, 
-              initialTime: TimeOfDay(hour: int.tryParse(parts[0]) ?? 22, minute: int.tryParse(parts[1]) ?? 0));
+            final parts = (value ?? '').split(':');
+            final time = await showTimePicker(context: context,
+              initialTime: parts.length == 2
+                  ? TimeOfDay(hour: int.tryParse(parts[0]) ?? defaultHour, minute: int.tryParse(parts[1]) ?? defaultMinute)
+                  : TimeOfDay(hour: defaultHour, minute: defaultMinute));
             if (time != null) onChanged('${time.hour.toString().padLeft(2,'0')}:${time.minute.toString().padLeft(2,'0')}');
           },
-          child: Text(value, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textPrimary(context))),
+          child: Text(value ?? '点击选择', style: TextStyle(
+            fontSize: value == null ? 16 : 24,
+            fontWeight: value == null ? FontWeight.w400 : FontWeight.bold,
+            color: value == null ? AppColors.textTertiary(context) : AppColors.textPrimary(context),
+          )),
         ),
       ]),
     );

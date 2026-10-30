@@ -207,23 +207,21 @@ class FoodDetailPage extends StatelessWidget {
                   // ── 营养与能量 ──
                   _sectionTitle('营养与能量'),
                   const SizedBox(height: 8),
-                  const Text(
-                    '本食谱含优质蛋白质，口味温和，适合换季时的日常餐桌。'
-                    '每百毫升含热量约为 85kcal。',
-                    style: TextStyle(
-                      fontSize: 13, color: ShunShiColors.textSecondary,
-                      height: 1.6, fontFamily: ShunShiTypography.sansFamily,
+                  // 营养数值必须来自《中国食物成分表》等权威来源；未接入前不展示任何数值。
+                  Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: ShunShiColors.surfaceContainerLow,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Text(
+                      '暂未提供营养成分数据。具体热量与营养素会因食材品种和用量不同而变化，请以食材包装标注或《中国食物成分表》为准。',
+                      style: TextStyle(
+                        fontSize: 13, color: ShunShiColors.textSecondary,
+                        height: 1.6, fontFamily: ShunShiTypography.sansFamily,
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 12),
-                  // Nutrition bars
-                  _nutritionBar('蛋白质', '28g', 0.7, ShunShiColors.primary),
-                  const SizedBox(height: 8),
-                  _nutritionBar('脂肪', '12g', 0.3, ShunShiColors.gold),
-                  const SizedBox(height: 8),
-                  _nutritionBar('碳水化合物', '8g', 0.2, ShunShiColors.apricot),
-                  const SizedBox(height: 8),
-                  _nutritionBar('膳食纤维', '3g', 0.15, ShunShiColors.calm),
                   const SizedBox(height: 24),
 
                   // ── 适宜人群 ──
@@ -379,45 +377,6 @@ class FoodDetailPage extends StatelessWidget {
         ))),
       ],
     ),
-  );
-
-  Widget _nutritionBar(String label, String value, double percent, Color color) => Row(
-    children: [
-      SizedBox(
-        width: 60,
-        child: Text(label, style: TextStyle(
-          fontSize: 12, color: ShunShiColors.textTertiary, fontFamily: ShunShiTypography.sansFamily,
-        )),
-      ),
-      Expanded(
-        child: Stack(children: [
-          Container(
-            height: 6,
-            decoration: BoxDecoration(
-              color: ShunShiColors.surfaceContainerLow,
-              borderRadius: BorderRadius.circular(3),
-            ),
-          ),
-          FractionallySizedBox(
-            widthFactor: percent,
-            child: Container(
-              height: 6,
-              decoration: BoxDecoration(
-                color: color,
-                borderRadius: BorderRadius.circular(3),
-              ),
-            ),
-          ),
-        ]),
-      ),
-      const SizedBox(width: 8),
-      SizedBox(
-        width: 36,
-        child: Text(value, style: TextStyle(
-          fontSize: 12, fontWeight: FontWeight.w600, color: color, fontFamily: ShunShiTypography.sansFamily,
-        ), textAlign: TextAlign.right),
-      ),
-    ],
   );
 
   Widget _tagList(List<String> tags, {bool isWarning = false}) => Wrap(
