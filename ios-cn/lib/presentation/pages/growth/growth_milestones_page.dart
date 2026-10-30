@@ -10,6 +10,7 @@ library;
 
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
+import '../../../design_system/app_colors.dart';
 
 class GrowthMilestonesPage extends StatelessWidget {
   const GrowthMilestonesPage({super.key});
@@ -32,7 +33,7 @@ class GrowthMilestonesPage extends StatelessWidget {
     final totalXp = unlocked.fold<int>(0, (sum, m) => sum + m.xp);
 
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, size: 20),
@@ -41,9 +42,9 @@ class GrowthMilestonesPage extends StatelessWidget {
         title: Text('Growth Milestones', style: TextStyle(
           fontSize: 20, fontWeight: FontWeight.w700,
           fontFamily: ShunShiTypography.serifFamily,
-          color: ShunShiColors.textPrimary,
+          color: AppColors.textPrimary(context),
         )),
-        backgroundColor: ShunShiColors.background,
+        backgroundColor: AppColors.background(context),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -54,7 +55,7 @@ class GrowthMilestonesPage extends StatelessWidget {
             Text(
               '完成打卡以后，这里才会记下你做到的事',
               style: TextStyle(
-                fontSize: 14, color: ShunShiColors.textSecondary,
+                fontSize: 14, color: AppColors.textSecondary(context),
                 fontFamily: ShunShiTypography.sansFamily,
               ),
             ),
@@ -69,8 +70,8 @@ class GrowthMilestonesPage extends StatelessWidget {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    ShunShiColors.primary.withValues(alpha: 0.12),
-                    ShunShiColors.primary.withValues(alpha: 0.04),
+                    AppColors.primary(context).withValues(alpha: 0.12),
+                    AppColors.primary(context).withValues(alpha: 0.04),
                   ],
                 ),
                 borderRadius: BorderRadius.circular(20),
@@ -81,7 +82,7 @@ class GrowthMilestonesPage extends StatelessWidget {
                     '$totalXp',
                     style: TextStyle(
                       fontSize: 48, fontWeight: FontWeight.w700,
-                      color: ShunShiColors.primary,
+                      color: AppColors.primary(context),
                       fontFamily: ShunShiTypography.serifFamily,
                       height: 1,
                     ),
@@ -90,7 +91,7 @@ class GrowthMilestonesPage extends StatelessWidget {
                   Text(
                     '练习记录',
                     style: TextStyle(
-                      fontSize: 14, color: ShunShiColors.textSecondary,
+                      fontSize: 14, color: AppColors.textSecondary(context),
                       fontFamily: ShunShiTypography.sansFamily,
                     ),
                   ),
@@ -99,7 +100,7 @@ class GrowthMilestonesPage extends StatelessWidget {
                     '完成后才会记在这里',
                     style: TextStyle(
                       fontSize: 14, fontWeight: FontWeight.w600,
-                      color: ShunShiColors.textPrimary,
+                      color: AppColors.textPrimary(context),
                       fontFamily: ShunShiTypography.sansFamily,
                     ),
                   ),
@@ -107,7 +108,7 @@ class GrowthMilestonesPage extends StatelessWidget {
                   Text(
                     '目前没有打卡记录，不显示分数',
                     style: TextStyle(
-                      fontSize: 12, color: ShunShiColors.textTertiary,
+                      fontSize: 12, color: AppColors.textTertiary(context),
                       fontFamily: ShunShiTypography.sansFamily,
                     ),
                   ),
@@ -116,7 +117,7 @@ class GrowthMilestonesPage extends StatelessWidget {
                     Container(
                       height: 6,
                       decoration: BoxDecoration(
-                        color: ShunShiColors.surfaceContainerLow,
+                        color: AppColors.surfaceContainerLow(context),
                         borderRadius: BorderRadius.circular(3),
                       ),
                     ),
@@ -125,7 +126,7 @@ class GrowthMilestonesPage extends StatelessWidget {
                       child: Container(
                         height: 6,
                         decoration: BoxDecoration(
-                          color: ShunShiColors.primary,
+                          color: AppColors.primary(context),
                           borderRadius: BorderRadius.circular(3),
                         ),
                       ),
@@ -139,29 +140,29 @@ class GrowthMilestonesPage extends StatelessWidget {
             // ── Unlocked ──
             Text('Unlocked', style: TextStyle(
               fontSize: 16, fontWeight: FontWeight.w700,
-              color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.serifFamily,
+              color: AppColors.textPrimary(context), fontFamily: ShunShiTypography.serifFamily,
             )),
             const SizedBox(height: 4),
             Text('已完成 ${unlocked.length} / ${_milestones.length}', style: TextStyle(
-              fontSize: 13, color: ShunShiColors.textTertiary,
+              fontSize: 13, color: AppColors.textTertiary(context),
               fontFamily: ShunShiTypography.sansFamily,
             )),
             const SizedBox(height: 16),
             ...unlocked.map((m) => Padding(
               padding: const EdgeInsets.only(bottom: 12),
-              child: _milestoneCard(m),
+              child: _milestoneCard(context, m),
             )),
             const SizedBox(height: 24),
 
             // ── Locked ──
             Text('Journey Ahead', style: TextStyle(
               fontSize: 16, fontWeight: FontWeight.w700,
-              color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.serifFamily,
+              color: AppColors.textPrimary(context), fontFamily: ShunShiTypography.serifFamily,
             )),
             const SizedBox(height: 16),
             ...locked.map((m) => Padding(
               padding: const EdgeInsets.only(bottom: 12),
-              child: _lockedCard(m),
+              child: _lockedCard(context, m),
             )),
 
             const SizedBox(height: 40),
@@ -171,18 +172,18 @@ class GrowthMilestonesPage extends StatelessWidget {
     );
   }
 
-  Widget _milestoneCard(_Milestone m) {
+  Widget _milestoneCard(BuildContext context, _Milestone m) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: ShunShiColors.surfaceContainerLowest,
+        color: AppColors.surfaceContainerLowest(context),
         borderRadius: BorderRadius.circular(14),
       ),
       child: Row(children: [
         Container(
           width: 48, height: 48,
           decoration: BoxDecoration(
-            color: (m.color ?? ShunShiColors.primary).withValues(alpha: 0.12),
+            color: (m.color ?? AppColors.primary(context)).withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Center(child: Text(m.icon, style: const TextStyle(fontSize: 24))),
@@ -192,11 +193,11 @@ class GrowthMilestonesPage extends StatelessWidget {
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(m.title, style: TextStyle(
               fontSize: 15, fontWeight: FontWeight.w600,
-              color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.sansFamily,
+              color: AppColors.textPrimary(context), fontFamily: ShunShiTypography.sansFamily,
             )),
             const SizedBox(height: 2),
             Text(m.desc, style: TextStyle(
-              fontSize: 12, color: ShunShiColors.textSecondary,
+              fontSize: 12, color: AppColors.textSecondary(context),
               fontFamily: ShunShiTypography.sansFamily,
             )),
           ]),
@@ -204,12 +205,12 @@ class GrowthMilestonesPage extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
           decoration: BoxDecoration(
-            color: (m.color ?? ShunShiColors.primary).withValues(alpha: 0.1),
+            color: (m.color ?? AppColors.primary(context)).withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Text('+${m.xp}', style: TextStyle(
             fontSize: 12, fontWeight: FontWeight.w600,
-            color: m.color ?? ShunShiColors.primary,
+            color: m.color ?? AppColors.primary(context),
             fontFamily: ShunShiTypography.sansFamily,
           )),
         ),
@@ -217,22 +218,22 @@ class GrowthMilestonesPage extends StatelessWidget {
     );
   }
 
-  Widget _lockedCard(_Milestone m) {
+  Widget _lockedCard(BuildContext context, _Milestone m) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: ShunShiColors.surfaceContainerLow,
+        color: AppColors.surfaceContainerLow(context),
         borderRadius: BorderRadius.circular(14),
       ),
       child: Row(children: [
         Container(
           width: 48, height: 48,
           decoration: BoxDecoration(
-            color: ShunShiColors.surfaceContainerLow,
+            color: AppColors.surfaceContainerLow(context),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Center(child: Text(m.icon, style: TextStyle(
-            fontSize: 24, color: ShunShiColors.textTertiary.withValues(alpha: 0.4),
+            fontSize: 24, color: AppColors.textTertiary(context).withValues(alpha: 0.4),
           ))),
         ),
         const SizedBox(width: 14),
@@ -240,17 +241,17 @@ class GrowthMilestonesPage extends StatelessWidget {
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(m.title, style: TextStyle(
               fontSize: 15, fontWeight: FontWeight.w600,
-              color: ShunShiColors.textTertiary, fontFamily: ShunShiTypography.sansFamily,
+              color: AppColors.textTertiary(context), fontFamily: ShunShiTypography.sansFamily,
             )),
             const SizedBox(height: 2),
             Text(m.desc, style: TextStyle(
-              fontSize: 12, color: ShunShiColors.textTertiary,
+              fontSize: 12, color: AppColors.textTertiary(context),
               fontFamily: ShunShiTypography.sansFamily,
             )),
           ]),
         ),
         Text('未开始', style: TextStyle(
-          fontSize: 12, color: ShunShiColors.textTertiary,
+          fontSize: 12, color: AppColors.textTertiary(context),
           fontFamily: ShunShiTypography.sansFamily,
         )),
       ]),
