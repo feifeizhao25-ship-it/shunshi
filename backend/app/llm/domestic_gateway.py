@@ -78,6 +78,9 @@ DOMESTIC_HOSTS = frozenset({
     "api.siliconflow.cn",
     "ark.cn-beijing.volces.com",
     "dashscope.aliyuncs.com",
+    # MiniMax 开放平台（境内）：官方文档域名 api.minimax.cn，旧域名 api.minimaxi.com 同样在境内。
+    "api.minimax.cn",
+    "api.minimaxi.com",
     "green-cip.cn-beijing.aliyuncs.com",
     "green-cip-vpc.cn-beijing.aliyuncs.com",
 })

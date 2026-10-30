@@ -139,3 +139,96 @@ async def moderate_text(
     if code not in (200, "200", None):
         return ModerationResult(checked=True, hit=True, labels=f"code-{code}")
     return _hit(body)
+
+
+DEFAULT_IMAGE_SERVICE = "baselineCheck"
+
+
+@dataclass(frozen=True)
+class ImageModerationResult:
+    """status：pass 放行；reject 命中风险；unavailable 没能完成审核（没配密钥、网络或返回异常），调用方要按拒绝处理。"""
+
+    status: str
+    labels: str = ""
+    requested: bool = False
+
+
+def _image_verdict(payload: dict) -> ImageModerationResult:
+    data = payload.get("Data") or payload.get("data") or {}
+    if isinstance(data, str):
+        try:
+            data = json.loads(data)
+        except ValueError:
+            data = {}
+    if not isinstance(data, dict):
+        return ImageModerationResult("unavailable", "unreadable", True)
+    results = data.get("Result") or data.get("result") or []
+    labels = ",".join(
+        str(item.get("Label") or item.get("label") or "")
+        for item in results
+        if isinstance(item, dict) and str(item.get("Label") or item.get("label") or "") not in ("", "nonLabel")
+    )
+    risk = str(data.get("RiskLevel") or data.get("riskLevel") or "").lower()
+    # 官方说明：high / medium 处置，low / none 放行。风险等级缺失时只在「明确全是 nonLabel」时放行。
+    if risk in ("high", "medium"):
+        return ImageModerationResult("reject", labels or risk, True)
+    if risk in ("low", "none"):
+        return ImageModerationResult("pass", labels, True)
+    if not risk and isinstance(results, list) and results and not labels:
+        return ImageModerationResult("pass", "", True)
+    return ImageModerationResult("unavailable", "unreadable", True)
+
+
+async def moderate_image(
+    image_url: str,
+    *,
+    client: httpx.AsyncClient | None = None,
+    env: dict | None = None,
+) -> ImageModerationResult:
+    """阿里云内容安全图片审核（ImageModeration，同一套密钥和签名）。服务名、端点都可用环境变量改，文档 12 待核实。
+
+    只把图片 URL 交给审核服务，由它自己去取图，本服务不下载图片。fail closed：除了明确放行都不是 pass。
+    """
+    source = _source(env)
+    if not configured(source):
+        return ImageModerationResult("unavailable", "not-configured", False)
+    endpoint = _endpoint(source)
+    if endpoint is None:
+        return ImageModerationResult("unavailable", "endpoint", False)
+    secret = source["SHUNSHI_GUARDRAIL_AK_SECRET"].strip()
+    service = (source.get("SHUNSHI_GUARDRAIL_IMAGE_SERVICE") or DEFAULT_IMAGE_SERVICE).strip() or DEFAULT_IMAGE_SERVICE
+    params = {
+        "Action": "ImageModeration",
+        "Version": "2022-03-02",
+        "Format": "JSON",
+        "AccessKeyId": source["SHUNSHI_GUARDRAIL_AK_ID"].strip(),
+        "SignatureMethod": "HMAC-SHA1",
+        "SignatureVersion": "1.0",
+        "SignatureNonce": uuid.uuid4().hex,
+        "Timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "RegionId": "cn-beijing",
+        "Service": service,
+        "ServiceParameters": json.dumps({"imageUrl": image_url, "dataId": uuid.uuid4().hex}, ensure_ascii=False),
+    }
+    params["Signature"] = sign({key: value for key, value in params.items() if key != "Signature"}, secret)
+    owns = client is None
+    client = client or httpx.AsyncClient(timeout=llm_timeout(source))
+    try:
+        response = await client.post(endpoint, params=params, timeout=llm_timeout(source))
+    except httpx.HTTPError:
+        return ImageModerationResult("unavailable", "transport", True)
+    finally:
+        if owns:
+            await client.aclose()
+    if response.status_code != 200:
+        return ImageModerationResult("unavailable", f"http-{response.status_code}", True)
+    try:
+        body = response.json()
+    except ValueError:
+        return ImageModerationResult("unavailable", "json", True)
+    if not isinstance(body, dict):
+        return ImageModerationResult("unavailable", "json", True)
+    code = body.get("Code", body.get("code"))
+    if code not in (200, "200"):
+        return ImageModerationResult("unavailable", f"code-{code}", True)
+    return _image_verdict(body)

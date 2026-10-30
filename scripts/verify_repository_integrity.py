@@ -54,12 +54,18 @@ ingredient_scan = (ROOT / "backend/app/router/ai_ingredient_scan.py").read_text(
 for forbidden in ('recognized_name = "枸杞"', "模拟识别结果"):
     if forbidden in ingredient_scan:
         errors.append(f"backend/app/router/ai_ingredient_scan.py: fabricated vision result remains {forbidden!r}")
-# 国内版只用境内视觉模型（百炼）：OpenRouter 等境外供应商已停用，出现即报错。
-for required in ("SHUNSHI_VISION_MODEL", "SHUNSHI_DASHSCOPE_API_KEY", "host_allowed", '"type": "image_url"', "confidence < 0.6"):
+# 国内版只用境内视觉模型（MiniMax 开放平台）：OpenRouter 等境外供应商已停用，出现即报错；
+# 视觉调用必须经过日费用上限和阿里云内容安全审核，且审核不可用时不放行。
+for required in (
+    "SHUNSHI_VISION_MODEL", "SHUNSHI_MINIMAX_API_KEY", "MINIMAX_API_KEY", "https://api.minimax.cn/v1/chat/completions",
+    "host_allowed", '"type": "image_url"', "confidence < 0.6",
+    "cost_cap.would_exceed", "moderate_image", "moderate_text", "status_code=429", "status_code=422",
+):
     if required not in ingredient_scan:
         errors.append(f"backend/app/router/ai_ingredient_scan.py: verified vision flow missing {required!r}")
-if "openrouter" in ingredient_scan.lower():
-    errors.append("backend/app/router/ai_ingredient_scan.py: offshore vision provider must not be used")
+for forbidden_provider in ("openrouter", "dashscope"):
+    if forbidden_provider in ingredient_scan.lower():
+        errors.append(f"backend/app/router/ai_ingredient_scan.py: unapproved vision provider {forbidden_provider!r} must not be used")
 
 admin_manifest = json.loads((ROOT / "admin/package.json").read_text(encoding="utf-8"))
 if not admin_manifest.get("scripts", {}).get("test"):

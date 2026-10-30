@@ -24,6 +24,9 @@ _DEFAULT_PRICES: dict[str, tuple[float, float]] = {
     "qwen-plus": (0.8, 2.0),
     "qwen-flash": (0.16, 1.55),
     "doubao-seed-2-0-lite-260428": (0.6, 3.6),
+    # MiniMax 视觉识别（食材拍照）。官方定价页未能自动读取，先取保守值，待核实后用环境变量覆盖。
+    "MiniMax-M3": (4.0, 16.0),
+    "MiniMax-M3.1-Flash": (2.0, 8.0),
     "text-embedding-v4": (0.5, 0.0),
     "qwen3-rerank": (0.5, 0.0),
 }
@@ -73,6 +76,16 @@ def product_daily_cap_cny(env: dict | None = None) -> float:
     # 文档 12：启动期顺时月上限 500 元。按 30 天摊到日帽，仍可用环境变量整段覆盖。
     monthly = _float_env(_env(env), "SHUNSHI_MONTHLY_BUDGET_CNY", 500.0)
     return _float_env(_env(env), "SHUNSHI_DAILY_BUDGET_CNY", round(monthly / 30, 4))
+
+
+def vision_user_daily_cap_cny(env: dict | None = None) -> float:
+    # 拍照识别单人日帽，缺省 0.2 元（低清图约几分钱一次，约 50 次）。
+    return _float_env(_env(env), "SHUNSHI_VISION_USER_DAILY_CAP_CNY", 0.2)
+
+
+def vision_product_daily_cap_cny(env: dict | None = None) -> float:
+    # 拍照识别全产品日帽，缺省 20 元。
+    return _float_env(_env(env), "SHUNSHI_VISION_DAILY_BUDGET_CNY", 20.0)
 
 
 def _today() -> str:
