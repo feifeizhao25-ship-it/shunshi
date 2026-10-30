@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "note": "只登记官方/权威来源的列表页或栏目页。抓取只用于发现「有更新」，入库内容必须由人整理成条目放进 inbox/ 并经企业微信审批。",
+  "sources": [
+    {"id": "nhc-home", "name": "国家卫生健康委员会", "url": "https://www.nhc.gov.cn/", "tier": "official", "license": "gov-public", "freshness_days": 30, "topics": ["膳食", "食养", "心理援助"], "note": "部分网络环境返回 412，需在可访问的环境运行"},
+    {"id": "ndcpa-home", "name": "国家疾病预防控制局", "url": "https://www.ndcpa.gov.cn/", "tier": "official", "license": "gov-public", "freshness_days": 30, "topics": ["健康提示", "传染病防控"]},
+    {"id": "chinacdc-home", "name": "中国疾病预防控制中心", "url": "https://www.chinacdc.cn/", "tier": "official", "license": "gov-public", "freshness_days": 30, "topics": ["膳食指南", "营养"]},
+    {"id": "natcm-home", "name": "国家中医药管理局", "url": "https://www.natcm.gov.cn/", "tier": "official", "license": "gov-public", "freshness_days": 30, "topics": ["中医药", "治未病"], "note": "部分网络环境不可达"},
+    {"id": "cnsoc-home", "name": "中国营养学会", "url": "https://www.cnsoc.org/", "tier": "standard", "license": "gov-public", "freshness_days": 60, "topics": ["膳食指南", "营养"]},
+    {"id": "cac-home", "name": "国家互联网信息办公室", "url": "https://www.cac.gov.cn/", "tier": "official", "license": "gov-public", "freshness_days": 30, "topics": ["拟人化互动服务", "AIGC标识"]},
+    {"id": "gov-zhengce", "name": "中国政府网·政策", "url": "https://www.gov.cn/zhengce/", "tier": "official", "license": "gov-public", "freshness_days": 30, "topics": ["政策"]}
+  ],
+  "allowed_domains": ["nhc.gov.cn", "ndcpa.gov.cn", "chinacdc.cn", "natcm.gov.cn", "cnsoc.org", "cac.gov.cn", "gov.cn"]
+}

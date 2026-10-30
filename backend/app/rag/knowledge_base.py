@@ -8,6 +8,7 @@ import re
 import os
 import logging
 import json
+from datetime import date
 from pathlib import Path
 from typing import Optional
 from dataclasses import dataclass, field
@@ -28,6 +29,8 @@ _CN_SUPP_PATH = _DATA_DIR / "顺时知识库_补充篇_中文版.md"
 _GL_SUPP_PATH = _DATA_DIR / "SEASONS_Knowledge_Base_Supplement_English.md"
 _CN_VERIFIED_PATH = Path(__file__).with_name("verified_cn.md")
 _SOURCE_MANIFEST_PATH = Path(__file__).with_name("source_manifest.json")
+# 自改进批准入库目录。生产里 backend 与 self-improve 两个容器共用 /app/data 卷，所以可用环境变量指过去。
+_APPROVED_DIR = Path(os.environ.get("SHUNSHI_APPROVED_KB_DIR") or Path(__file__).with_name("approved"))
 
 
 def _source_metadata(path: str | Path) -> dict:
@@ -36,7 +39,13 @@ def _source_metadata(path: str | Path) -> dict:
     entry = manifest.get("documents", {}).get(filename)
     if not entry:
         raise RuntimeError(f"RAG 来源清单缺少文档: {filename}")
-    return {"source_file": filename, **entry}
+    meta = {"source_file": filename, **entry}
+    # 过期来源不删除，但打上 stale 标记：检索降权，且不得作为事实陈述（见 retriever）。
+    try:
+        meta["stale"] = date.fromisoformat(entry["valid_until"]) < date.today()
+    except (KeyError, ValueError):
+        meta["stale"] = True
+    return meta
 
 # 中文知识库标题 → 分类/季节/节气的映射
 _CN_SEASON_MAP = {
@@ -415,6 +424,44 @@ class KnowledgeBase:
         self.chunks.extend(new_chunks)
         logger.info(f"[KB] {self.lang} 补充篇加载完成: {len(new_chunks)} chunks, 总计: {len(self.chunks)}")
 
+    def load_approved(self, directory: Optional[Path] = None) -> int:
+        """加载自改进闭环经企业微信批准入库的条目（approved/ 目录 + approved_manifest.json）。
+
+        只加载清单里存在、字段齐全、未过期、未被取代的条目；其余一律忽略。
+        没有 approved/ 目录或清单时什么都不做，因此对现有部署零影响。
+        """
+        directory = Path(directory) if directory else _APPROVED_DIR
+        manifest_path = directory / "approved_manifest.json"
+        if not manifest_path.exists():
+            return 0
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        loaded = 0
+        today = date.today()
+        for entry_id, meta in manifest.get("entries", {}).items():
+            md = directory / f"{entry_id}.md"
+            required = ("reviewed_at", "valid_until", "reviewer", "url", "content_hash")
+            if not md.exists() or any(not meta.get(k) for k in required) or meta.get("superseded_by"):
+                continue
+            if date.fromisoformat(meta["valid_until"]) < today:
+                continue
+            chunks = _parse_markdown_into_chunks(md.read_text(encoding="utf-8"), self.lang, source="approved")
+            for chunk in chunks:
+                chunk.metadata.update({
+                    "source_file": f"approved/{entry_id}.md",
+                    "evidence_status": "verified_official",
+                    "high_risk_allowed": False,
+                    "locale": "zh-CN", "region": "CN",
+                    "reviewed_at": meta["reviewed_at"],
+                    "valid_until": meta["valid_until"],
+                    "reviewer": meta["reviewer"],
+                    "url": meta["url"],
+                })
+            self.chunks.extend(chunks)
+            loaded += len(chunks)
+        if loaded:
+            logger.info(f"[KB] {self.lang} 自改进已批准条目加载: {loaded} chunks")
+        return loaded
+
     def get_all_content(self) -> str:
         """获取所有内容（用于 TF-IDF 训练）"""
         return "\n\n".join([c.content for c in self.chunks])
@@ -485,6 +532,7 @@ def load_knowledge_bases(force: bool = False):
     cn_kb.load()
     cn_kb.load_supplement()
     cn_kb.load(_CN_VERIFIED_PATH)
+    cn_kb.load_approved()
     gl_kb.load()
     gl_kb.load_supplement()
     from .embedder import init_embedders

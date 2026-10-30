@@ -111,6 +111,7 @@ services:
       SHUNSHI_DATABASE_URL: postgresql+psycopg://${DB_USER:-shunshi}:${DB_PASSWORD:?DB_PASSWORD is required}@postgres:5432/${DB_NAME:-shunshi}
       # Redis 现在要口令，连接串必须一起带上，否则后端一连就 NOAUTH。
       SHUNSHI_KNOWLEDGE_DIR: /app/knowledge
+      SHUNSHI_APPROVED_KB_DIR: /app/data/self_improve/approved
       SHUNSHI_REDIS_URL: redis://:${REDIS_PASSWORD:?REDIS_PASSWORD is required}@redis:6379/0
     depends_on:
       postgres:
@@ -141,6 +142,41 @@ services:
         limits:
           memory: 512M
           cpus: "1.0"
+
+  # ─── 持续自改进调度（默认不启动：docker compose --profile self-improve up -d）───
+  # 每周日 03:00 / 每日 02:00 / 每月 1 日 04:00（Asia/Shanghai）。SIL_ENABLED 缺省为 0，
+  # 即使启动了容器也什么都不会改；用户可见改动必须经企业微信批准，超时作废。
+  # 批准入库的条目写进 backend_data 卷，由 backend 读取（SHUNSHI_APPROVED_KB_DIR）。
+  self-improve:
+    profiles: ["self-improve"]
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: shunshi-self-improve
+    restart: unless-stopped
+    command: ["python", "-m", "app.self_improve.run", "serve"]
+    env_file:
+      - ./backend/.env
+    environment:
+      SIL_ENABLED: ${SIL_ENABLED:-0}
+      SIL_AUTO_PROMOTE_INTERNAL: ${SIL_AUTO_PROMOTE_INTERNAL:-0}
+      SIL_DATA_DIR: /app/data/self_improve/state
+      SHUNSHI_APPROVED_KB_DIR: /app/data/self_improve/approved
+      SHUNSHI_KNOWLEDGE_DIR: /app/knowledge
+      # TODO(owner): 填写企业微信审批人 userid（逗号分隔）。为空 = 没人能批准，提案超时作废。
+      POLICY_REVIEWERS: ${POLICY_REVIEWERS:-}
+      SIL_BULK_MODEL: ${SIL_BULK_MODEL:-deepseek-chat}
+      SIL_JUDGE_MODEL: ${SIL_JUDGE_MODEL:-qwen-plus}
+    volumes:
+      - backend_data:/app/data
+      - ./参考文档，知识库:/app/knowledge:ro
+    networks:
+      - backend-net
+    deploy:
+      resources:
+        limits:
+          memory: 384M
+          cpus: "0.5"
 
   # ─── Admin Panel (Next.js) ───
   admin:
