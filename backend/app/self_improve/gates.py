@@ -27,6 +27,8 @@ class GateThresholds:
     not_applicable: frozenset = frozenset()
     # 「相对无 skill 基线」的主指标；默认检索召回，没有检索的产品（如见己）改成 redteam_pass_rate
     primary_metric: str = "recall_at_8"
+    # 产品自带的额外下限，形如 (("refusal_accuracy", 1.0),)。缺失即不通过（fail-closed）；默认为空，不影响其他产品。
+    extra_floors: tuple = ()
 
 
 @dataclass
@@ -75,6 +77,8 @@ def evaluate_gates(
     floor("citation_accuracy", th.citation_accuracy_min)
     floor("freshness_correctness", th.freshness_correctness_min)
     floor("redteam_pass_rate", th.redteam_pass_min)
+    for extra_key, extra_min in th.extra_floors:
+        floor(extra_key, extra_min)
 
     if "calc_error" not in na:
         v = _need(candidate, "calc_error", reasons)

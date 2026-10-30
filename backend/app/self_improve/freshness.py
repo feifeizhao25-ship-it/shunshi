@@ -25,6 +25,12 @@ REQUIRED_FIELDS = (
 # 这些层级可作「事实陈述」；legacy_unverified 只能当参考，并须显式标注。
 FACT_TIERS = frozenset({"official", "standard", "academic", "internal"})
 
+# 条目状态（可选字段，缺省按 in_force 处理）。
+# draft_consultation = 征求意见稿：可以被检索到，但绝不能当现行规则回答，回答必须带 DRAFT_NOTICE_ZH。
+STATUSES = ("in_force", "draft_consultation", "superseded", "expired")
+DRAFT_NOTICE_ZH = "（征求意见稿，尚未生效，仅供参考，以官方正式文件为准）"
+_TIER_RANK = {"official": 4, "standard": 3, "academic": 2, "internal": 1, "legacy_unverified": 0}
+
 
 def parse_day(value: str | date | None) -> date | None:
     if value is None or value == "":
@@ -54,6 +60,11 @@ def validate_entry(entry: Mapping) -> list[str]:
         problems.append("bad_date")
     if entry.get("origin") == "generated":
         problems.append("origin_generated_not_indexable")
+    st = entry.get("status")
+    if st and st not in STATUSES:
+        problems.append(f"bad_status:{st}")
+    if st == "draft_consultation" and not entry.get("url"):
+        problems.append("missing:url")
     if tier in ("official", "standard") and not entry.get("url"):
         problems.append("missing:url")
     return problems
@@ -63,8 +74,13 @@ def retrievable(entry: Mapping, today: date) -> tuple[bool, str]:
     """能否进入检索。返回 (是否, 原因)。过期、被取代、系统生成、字段缺失一律否。"""
     if entry.get("origin") == "generated":
         return False, "origin_generated"
-    if entry.get("superseded_by"):
+    if entry.get("superseded_by") or entry.get("status") == "superseded":
         return False, "superseded"
+    if entry.get("status") == "expired":
+        return False, "expired"
+    if entry.get("status") == "draft_consultation":
+        # 征求意见稿：可检索、可引用，但必须带 DRAFT_NOTICE_ZH，且 fact_allowed 为 False
+        return True, "draft_consultation"
     try:
         vf, vu = parse_day(entry.get("valid_from")), parse_day(entry.get("valid_until"))
     except ValueError:
@@ -80,7 +96,48 @@ def retrievable(entry: Mapping, today: date) -> tuple[bool, str]:
 
 def fact_allowed(entry: Mapping) -> bool:
     """能否作为事实陈述引用（legacy_unverified 只能作参考）。"""
+    if entry.get("status") in ("draft_consultation", "superseded", "expired"):
+        return False
     return entry.get("source_tier") in FACT_TIERS and not entry.get("superseded_by")
+
+
+def entry_status(entry: Mapping, today: date) -> str:
+    """推导当前状态：被取代 > 过期 > 征求意见稿 > 现行。"""
+    if entry.get("superseded_by") or entry.get("status") == "superseded":
+        return "superseded"
+    vu = parse_day(entry.get("valid_until")) if entry.get("valid_until") else None
+    if entry.get("status") == "expired" or (vu and today > vu):
+        return "expired"
+    if entry.get("status") == "draft_consultation":
+        return "draft_consultation"
+    return "in_force"
+
+
+def answer_notice(entry: Mapping) -> str:
+    """回答里必须附带的状态提示；现行条目为空串。"""
+    return DRAFT_NOTICE_ZH if entry.get("status") == "draft_consultation" else ""
+
+
+def resolve_conflict(a: Mapping, b: Mapping) -> dict:
+    """两条互相矛盾的证据（常见于中英文来源）如何取舍。只给结论与规则，不改条目。
+
+    顺序：现行 > 征求意见稿 > 被取代/过期；其次来源层级（official > standard > academic > internal）；
+    同层级时中文来源优先于英文来源并标注；仍无法区分 → escalate_human（交人工）。
+    """
+    def rank_status(e: Mapping) -> int:
+        st = e.get("status") or ("superseded" if e.get("superseded_by") else "in_force")
+        return {"in_force": 2, "draft_consultation": 1}.get(st, 0)
+    for rule, key in (("status", rank_status), ("source_tier", lambda e: _TIER_RANK.get(e.get("source_tier"), -1))):
+        ka, kb = key(a), key(b)
+        if ka != kb:
+            w = a if ka > kb else b
+            return {"winner": w.get("id"), "rule": rule, "annotate": True}
+    def is_zh(e: Mapping) -> bool:
+        return str(e.get("lang", "")).lower()[:2] in ("zh", "cn")
+    if is_zh(a) != is_zh(b):
+        w = a if is_zh(a) else b
+        return {"winner": w.get("id"), "rule": "prefer_zh_official", "annotate": True}
+    return {"winner": None, "rule": "escalate_human", "annotate": True}
 
 
 @dataclass
