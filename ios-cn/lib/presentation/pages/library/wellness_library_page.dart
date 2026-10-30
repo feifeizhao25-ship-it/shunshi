@@ -235,7 +235,7 @@ class _WellnessLibraryPageState extends State<WellnessLibraryPage> {
           ),
           child: Text(label, style: TextStyle(
             fontSize: 12, fontWeight: FontWeight.w500,
-            color: active ? Colors.white : AppColors.textSecondary(context),
+            color: active ? AppColors.onPrimary(context) : AppColors.textSecondary(context),
           )),
         ),
       ),

@@ -51,6 +51,9 @@ class AppColors {
   static Color primary(BuildContext context) =>
       isDark(context) ? ShunShiColors.darkPrimary : ShunShiColors.primary;
 
+  /// 主色填充上的文字/图标色（浅色白，深色近黑），避免深色下白字落在浅绿底上。
+  static Color onPrimary(BuildContext context) => Theme.of(context).colorScheme.onPrimary;
+
   static Color primaryLight(BuildContext context) =>
       isDark(context) ? ShunShiColors.primaryLight : ShunShiColors.primaryLight;
 

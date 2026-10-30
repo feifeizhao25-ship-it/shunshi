@@ -174,7 +174,7 @@ class _MeditationFocusPageState extends State<MeditationFocusPage>
                     ),
                     child: Icon(
                       _isPlaying ? Icons.pause : Icons.play_arrow,
-                      size: 36, color: Colors.white,
+                      size: 36, color: AppColors.onPrimary(context),
                     ),
                   ),
                 ),
