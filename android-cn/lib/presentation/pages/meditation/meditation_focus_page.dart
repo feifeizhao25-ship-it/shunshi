@@ -10,6 +10,7 @@ library;
 
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import '../../../design_system/theme.dart';
 
 class MeditationFocusPage extends StatefulWidget {
@@ -79,9 +80,8 @@ class _MeditationFocusPageState extends State<MeditationFocusPage>
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? ShunShiColors.darkBackground : ShunShiColors.background;
-    final surfaceLow = isDark ? ShunShiColors.darkSurfaceContainerLow : ShunShiColors.surfaceContainerLow;
+    final bg = AppColors.background(context);
+    final surfaceLow = AppColors.surfaceContainerLow(context);
 
     return Scaffold(
   appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
@@ -98,12 +98,12 @@ class _MeditationFocusPageState extends State<MeditationFocusPage>
                   Row(children: [
                     Text('顺时', style: TextStyle(
                       fontSize: 16, fontWeight: FontWeight.w700,
-                      color: ShunShiColors.primary, fontFamily: ShunShiTypography.serifFamily,
+                      color: AppColors.primary(context), fontFamily: ShunShiTypography.serifFamily,
                     )),
                   ]),
                   IconButton(
                     icon: const Icon(Icons.settings_outlined, size: 22),
-                    color: ShunShiColors.textSecondary,
+                    color: AppColors.textSecondary(context),
                     onPressed: () {},
                   ),
                 ],
@@ -114,11 +114,11 @@ class _MeditationFocusPageState extends State<MeditationFocusPage>
             // ── Title ──
             Text('呼吸·变化', style: TextStyle(
               fontSize: 24, fontWeight: FontWeight.w700,
-              color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.serifFamily,
+              color: AppColors.textPrimary(context), fontFamily: ShunShiTypography.serifFamily,
             )),
             const SizedBox(height: 4),
             Text('十分钟 · 静心', style: TextStyle(
-              fontSize: 14, color: ShunShiColors.textSecondary,
+              fontSize: 14, color: AppColors.textSecondary(context),
               fontFamily: ShunShiTypography.sansFamily,
             )),
             const SizedBox(height: 40),
@@ -135,7 +135,7 @@ class _MeditationFocusPageState extends State<MeditationFocusPage>
                       value: _progressController.value,
                       strokeWidth: 4,
                       backgroundColor: surfaceLow,
-                      color: ShunShiColors.primary,
+                      color: AppColors.primary(context),
                     ),
                   ),
                   Column(
@@ -143,11 +143,11 @@ class _MeditationFocusPageState extends State<MeditationFocusPage>
                     children: [
                       Text(_formatTime(_elapsedSeconds), style: TextStyle(
                         fontSize: 36, fontWeight: FontWeight.w300,
-                        color: ShunShiColors.textPrimary,
+                        color: AppColors.textPrimary(context),
                         fontFamily: ShunShiTypography.sansFamily,
                       )),
                       Text(_formatTime(_totalSeconds), style: TextStyle(
-                        fontSize: 14, color: ShunShiColors.textTertiary,
+                        fontSize: 14, color: AppColors.textTertiary(context),
                         fontFamily: ShunShiTypography.sansFamily,
                       )),
                     ],
@@ -173,12 +173,12 @@ class _MeditationFocusPageState extends State<MeditationFocusPage>
                   child: Container(
                     width: 64, height: 64,
                     decoration: BoxDecoration(
-                      color: ShunShiColors.primary,
+                      color: AppColors.primary(context),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       _isPlaying ? Icons.pause : Icons.play_arrow,
-                      size: 36, color: Colors.white,
+                      size: 36, color: AppColors.onPrimary(context),
                     ),
                   ),
                 ),
@@ -201,7 +201,7 @@ class _MeditationFocusPageState extends State<MeditationFocusPage>
                 children: [
                   Text('氛围层', style: TextStyle(
                     fontSize: 13, fontWeight: FontWeight.w600,
-                    color: ShunShiColors.textSecondary,
+                    color: AppColors.textSecondary(context),
                     fontFamily: ShunShiTypography.sansFamily,
                   )),
                   const SizedBox(height: 12),
@@ -227,8 +227,8 @@ class _MeditationFocusPageState extends State<MeditationFocusPage>
                     fontSize: 15, fontWeight: FontWeight.w600, fontFamily: ShunShiTypography.sansFamily,
                   )),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: ShunShiColors.primary,
-                    side: BorderSide(color: ShunShiColors.primary.withValues(alpha: 0.3)),
+                    foregroundColor: AppColors.primary(context),
+                    side: BorderSide(color: AppColors.primary(context).withValues(alpha: 0.3)),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                 ),
@@ -246,10 +246,10 @@ class _MeditationFocusPageState extends State<MeditationFocusPage>
       child: Container(
         width: 48, height: 48,
         decoration: BoxDecoration(
-          color: ShunShiColors.surfaceContainerLow,
+          color: AppColors.surfaceContainerLow(context),
           shape: BoxShape.circle,
         ),
-        child: Icon(icon, size: 24, color: ShunShiColors.textSecondary),
+        child: Icon(icon, size: 24, color: AppColors.textSecondary(context)),
       ),
     );
   }
@@ -265,18 +265,18 @@ class _MeditationFocusPageState extends State<MeditationFocusPage>
             width: 48, height: 48,
             decoration: BoxDecoration(
               color: selected
-                  ? ShunShiColors.primary.withValues(alpha: 0.12)
-                  : ShunShiColors.surfaceContainerLow,
+                  ? AppColors.primary(context).withValues(alpha: 0.12)
+                  : AppColors.surfaceContainerLow(context),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(a.icon, size: 22,
-              color: selected ? ShunShiColors.primary : ShunShiColors.textTertiary,
+              color: selected ? AppColors.primary(context) : AppColors.textTertiary(context),
             ),
           ),
           const SizedBox(height: 4),
           Text(a.name, style: TextStyle(
             fontSize: 10,
-            color: selected ? ShunShiColors.primary : ShunShiColors.textTertiary,
+            color: selected ? AppColors.primary(context) : AppColors.textTertiary(context),
             fontFamily: ShunShiTypography.sansFamily,
           )),
         ],
