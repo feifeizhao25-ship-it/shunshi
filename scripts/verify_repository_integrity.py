@@ -54,9 +54,12 @@ ingredient_scan = (ROOT / "backend/app/router/ai_ingredient_scan.py").read_text(
 for forbidden in ('recognized_name = "枸杞"', "模拟识别结果"):
     if forbidden in ingredient_scan:
         errors.append(f"backend/app/router/ai_ingredient_scan.py: fabricated vision result remains {forbidden!r}")
-for required in ("OPENROUTER_VISION_MODEL", '"type": "image_url"', "confidence < 0.6"):
+# 国内版只用境内视觉模型（百炼）：OpenRouter 等境外供应商已停用，出现即报错。
+for required in ("SHUNSHI_VISION_MODEL", "SHUNSHI_DASHSCOPE_API_KEY", "host_allowed", '"type": "image_url"', "confidence < 0.6"):
     if required not in ingredient_scan:
         errors.append(f"backend/app/router/ai_ingredient_scan.py: verified vision flow missing {required!r}")
+if "openrouter" in ingredient_scan.lower():
+    errors.append("backend/app/router/ai_ingredient_scan.py: offshore vision provider must not be used")
 
 admin_manifest = json.loads((ROOT / "admin/package.json").read_text(encoding="utf-8"))
 if not admin_manifest.get("scripts", {}).get("test"):
@@ -135,16 +138,29 @@ for required in ("WechatPayClient.pay", "QrImageView", "pollOrderStatus", "statu
         errors.append(f"android-cn/lib/presentation/pages/subscription/subscription_page_v2.dart: real payment flow is missing {required!r}")
 
 ios_payment_ui = (ROOT / "ios-cn/lib/presentation/pages/subscription/subscription_page_v2.dart").read_text(encoding="utf-8")
-for required in ("StoreService", "purchase('yiyang_yearly')", "服务端验证收据"):
+# 0S3 定价后在售商品只有 content_yearly / member_yearly；旧的 yiyang_* 已停售，不得再作为购买入口。
+for required in ("StoreService", "'content_yearly'", "'member_yearly'", "服务端核验结果"):
     if required not in ios_payment_ui:
         errors.append(f"ios-cn/lib/presentation/pages/subscription/subscription_page_v2.dart: App Store flow is missing {required!r}")
+if "yiyang_" in ios_payment_ui:
+    errors.append("ios-cn/lib/presentation/pages/subscription/subscription_page_v2.dart: retired yiyang_* product id must not be purchasable")
 
 for relative in (
     "android-cn/lib/data/services/store_service.dart",
     "ios-cn/lib/data/services/store_service.dart",
 ):
     source = (ROOT / relative).read_text(encoding="utf-8")
-    if "return true; // 模拟模式" in source or "pendingCompletePurchase && platformVerified" not in source:
+    # 两种写法都算数：就地判断 platformVerified，或交给 PurchaseUpdateProcessor——
+    # 后者只在服务端验证通过（readyToComplete）后才 completePurchase。
+    inline_gate = "pendingCompletePurchase && platformVerified" in source
+    processor_path = (ROOT / relative).parent / "purchase_update_processor.dart"
+    processor_gate = (
+        "PurchaseUpdateProcessor(" in source
+        and "verifyPurchase: _handleSuccessfulPurchase" in source
+        and processor_path.exists()
+        and "readyToComplete && purchase.pendingCompletePurchase" in processor_path.read_text(encoding="utf-8")
+    )
+    if "return true; // 模拟模式" in source or not (inline_gate or processor_gate):
         errors.append(f"{relative}: store receipt validation must fail closed before completing a purchase")
 
 for relative in (

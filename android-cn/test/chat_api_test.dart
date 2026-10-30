@@ -47,7 +47,85 @@ class ChatAdapter implements HttpClientAdapter {
   void close({bool force = false}) {}
 }
 
+class OfflineAdapter implements HttpClientAdapter {
+  final requests = <RequestOptions>[];
+  @override
+  Future<ResponseBody> fetch(
+    RequestOptions options,
+    Stream<Uint8List>? requestStream,
+    Future<void>? cancelFuture,
+  ) async {
+    requests.add(options);
+    if (options.path.endsWith('guest-login')) {
+      return ResponseBody.fromString(
+        jsonEncode({'access_token': 'guest-test-token'}),
+        200,
+        headers: {
+          Headers.contentTypeHeader: ['application/json'],
+        },
+      );
+    }
+    throw DioException.connectionError(
+      requestOptions: options,
+      reason: 'offline',
+    );
+  }
+
+  @override
+  void close({bool force = false}) {}
+}
+
 void main() {
+  test('only a connection error counts as offline; timeouts do not', () {
+    final options = RequestOptions(path: '/x');
+    expect(
+      isOfflineFailure(
+        DioException.connectionError(requestOptions: options, reason: 'x'),
+      ),
+      isTrue,
+    );
+    expect(
+      isOfflineFailure(
+        DioException.receiveTimeout(
+          timeout: const Duration(seconds: 1),
+          requestOptions: options,
+        ),
+      ),
+      isFalse,
+    );
+    expect(isOfflineFailure(StateError('x')), isFalse);
+  });
+  testWidgets(
+    'offline shows a fail-closed notice, keeps input and invents no health advice',
+    (tester) async {
+      SharedPreferences.setMockInitialValues({'auth_token': 'local-test'});
+      final adapter = OfflineAdapter();
+      final dio = Dio(BaseOptions(baseUrl: 'https://local.test'))
+        ..httpClientAdapter = adapter;
+      await tester.pumpWidget(MaterialApp(home: ChatPage(client: dio)));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField), '今天想安排散步');
+      await tester.testTextInput.receiveAction(TextInputAction.send);
+      await tester.pumpAndSettle();
+      final error = tester
+          .widget<Text>(find.byKey(const ValueKey('chat-error')))
+          .data!;
+      expect(error, contains('离线状态不生成健康建议'));
+      expect(
+        tester.widget<TextField>(find.byType(TextField)).controller!.text,
+        '今天想安排散步',
+      );
+      expect(
+        (await SharedPreferences.getInstance()).getInt('chat_count'),
+        isNull,
+      );
+      for (final fabricated in ['银耳', '百合', '黄帝内经', '本草纲目']) {
+        expect(find.textContaining(fabricated), findsNothing);
+      }
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox());
+    },
+  );
   test(
     'guest reads actual top-level access_token and rejects missing token',
     () {

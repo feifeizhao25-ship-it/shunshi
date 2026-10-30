@@ -3,11 +3,17 @@
 扫描食材识别、营养分析、中医属性查询
 """
 
+import json
+import os
+import re
+
+import httpx
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict
 
 from ..aigc import ai_disclosure
+from ..llm.domestic_gateway import host_allowed, llm_timeout
 
 router = APIRouter(prefix="/api/v1/ingredient-scan", tags=["ai-ingredient-scan"])
 
@@ -83,11 +89,79 @@ def _find_ingredient(name: str) -> Optional[dict]:
     return None
 
 
-async def _recognize_ingredient_image(image_url: str) -> tuple[str, float, str]:
-    """境外视觉模型已停用。国内视觉模型未接入前，图片识别不可用。"""
+# 国内视觉模型（百炼 OpenAI 兼容接口）。只用顺时自己的密钥变量，不用境外供应商。
+# 模型名待核实：缺省值取官方文档里的 id，上线前可用 SHUNSHI_VISION_MODEL 覆盖。
+VISION_ENDPOINT = "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions"
+DEFAULT_VISION_MODEL = "qwen-vl-plus"
+VISION_PROMPT = (
+    "识别图片中最主要的可食用食材。只返回JSON："
+    "{\"ingredient_name_cn\":\"名称或未知\",\"confidence\":0到1}。"
+    "不确定时必须返回未知，禁止猜测。"
+)
+
+
+def _vision_model(env: dict | None = None) -> str:
+    source = os.environ if env is None else env
+    return (source.get("SHUNSHI_VISION_MODEL") or "").strip() or DEFAULT_VISION_MODEL
+
+
+async def _recognize_ingredient_image(
+    image_url: str,
+    *,
+    client: httpx.AsyncClient | None = None,
+    env: dict | None = None,
+) -> tuple[str, float, str]:
+    """用境内视觉模型识别食材图片。没配密钥或模型无把握时不编造结果。"""
     if not image_url.startswith("https://"):
         raise HTTPException(status_code=400, detail="食材图片必须使用可公开访问的 HTTPS 地址")
-    raise HTTPException(status_code=503, detail="图片识别服务暂未配置，请改为输入食材名称")
+    source = os.environ if env is None else env
+    api_key = (source.get("SHUNSHI_DASHSCOPE_API_KEY") or "").strip()
+    if not api_key:
+        raise HTTPException(status_code=503, detail="图片识别服务暂未配置，请改为输入食材名称")
+    if not host_allowed(httpx.URL(VISION_ENDPOINT).host):
+        raise HTTPException(status_code=503, detail="图片识别服务暂未配置，请改为输入食材名称")
+    model = _vision_model(source)
+    payload = {
+        "model": model,
+        "temperature": 0,
+        "max_tokens": 120,
+        "messages": [{
+            "role": "user",
+            "content": [
+                {"type": "text", "text": VISION_PROMPT},
+                {"type": "image_url", "image_url": {"url": image_url}},
+            ],
+        }],
+    }
+    owns_client = client is None
+    client = client or httpx.AsyncClient()
+    try:
+        response = await client.post(
+            VISION_ENDPOINT,
+            json=payload,
+            headers={"Authorization": f"Bearer {api_key}"},
+            timeout=llm_timeout(source),
+        )
+    except httpx.HTTPError as exc:
+        raise HTTPException(status_code=502, detail="图片识别服务连接失败") from exc
+    finally:
+        if owns_client:
+            await client.aclose()
+    if response.status_code != 200:
+        raise HTTPException(status_code=502, detail="图片识别服务暂时不可用")
+
+    try:
+        content = response.json()["choices"][0]["message"]["content"]
+        content = re.sub(r"^```(?:json)?\s*|\s*```$", "", content.strip())
+        parsed = json.loads(content)
+        name = str(parsed["ingredient_name_cn"]).strip()
+        confidence = max(0.0, min(1.0, float(parsed["confidence"])))
+    except (KeyError, IndexError, TypeError, ValueError, json.JSONDecodeError) as exc:
+        raise HTTPException(status_code=502, detail="图片识别服务返回格式无效") from exc
+    # 低把握一律按「未知」处理，由调用方提示用户核对或手动输入。
+    if not name or name == "未知" or confidence < 0.6:
+        name = "未知"
+    return name, confidence, model
 
 
 @router.post("/scan", summary="扫描/识别食材")
