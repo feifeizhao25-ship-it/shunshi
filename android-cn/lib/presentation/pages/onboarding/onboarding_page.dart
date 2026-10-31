@@ -271,18 +271,18 @@ class _OnboardingPageState extends State<OnboardingPage> {
           children: [
             _mockBubble('你好，顺时', isUser: true, color: primaryColor),
             const SizedBox(height: 8),
-            _mockBubble('清明时节，推荐疏肝理气…', isUser: false, color: primaryColor),
+            _mockBubble('我会按今天的节气，给你作息和饮食的建议', isUser: false, color: primaryColor),
           ],
         );
       case _IllustrationType.diary:
         return Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _mockMiniCard('😴', '睡眠', '7.5h', primaryColor),
+            _mockMiniCard('😴', '睡眠', '每晚一记', primaryColor),
             const SizedBox(width: 8),
-            _mockMiniCard('😊', '心情', '良好', primaryColor),
+            _mockMiniCard('😊', '心情', '随手一笔', primaryColor),
             const SizedBox(width: 8),
-            _mockMiniCard('💧', '饮水', '6杯', primaryColor),
+            _mockMiniCard('💧', '饮水', '日常提醒', primaryColor),
           ],
         );
       case _IllustrationType.family:

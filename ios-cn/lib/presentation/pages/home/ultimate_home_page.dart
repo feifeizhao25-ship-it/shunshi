@@ -451,14 +451,14 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
           // Left: Menu + Brand
           Row(children: [
             GestureDetector(
-              onTap: () {},
+              onTap: () => context.push('/notifications'),
               child: Container(
                 width: 40, height: 40,
                 decoration: BoxDecoration(
                   color: AppColors.surfaceContainerLow(context),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(Icons.menu, size: 20, color: AppColors.textPrimary(context)),
+                child: Icon(Icons.notifications_none, size: 20, color: AppColors.textPrimary(context)),
               ),
             ),
             const SizedBox(width: 12),

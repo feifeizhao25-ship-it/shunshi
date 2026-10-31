@@ -113,21 +113,21 @@ class AppRouter {
       }),
       GoRoute(path: '/solar-wellness', builder: (context, state) => const SolarDetailPage()),
       GoRoute(path: '/family', builder: (context, state) => const FamilyPageV2()),
-      GoRoute(path: '/food-detail', builder: (context, state) => const FoodDetailPage()),
+      GoRoute(path: '/food-detail', redirect: (context, state) => '/wellness-category/food_therapy'),
       GoRoute(path: '/exercise-detail', builder: (context, state) => const ExerciseDetailPage()),
       GoRoute(path: '/constitution-test', builder: (context, state) => const ConstitutionTestV2()),
       GoRoute(path: '/diary', builder: (context, state) => const DiaryPageV2()),
       GoRoute(path: '/diary-report', builder: (context, state) => const DiaryReportPage()),
       GoRoute(path: '/sleep-report', builder: (context, state) => const SleepReportPage()),
-      GoRoute(path: '/family-home', builder: (context, state) => const FamilyHomePage()),
+      GoRoute(path: '/family-home', redirect: (context, state) => '/family'),
       GoRoute(path: '/family-invite', builder: (context, state) => const FamilyInvitePage()),
       GoRoute(path: '/family-member/:id', builder: (context, state) {
         return FamilyMemberDetailPage(memberId: state.pathParameters['id']!);
       }),
       GoRoute(path: '/privacy', builder: (context, state) => const PrivacyPage()),
       GoRoute(path: '/daily-checkin', builder: (context, state) => const DailyCheckinPage()),
-      GoRoute(path: '/wellness-dashboard', builder: (context, state) => const WellnessDashboardPage()),
-      GoRoute(path: '/community', builder: (context, state) => const CommunityPageV2()),
+      GoRoute(path: '/wellness-dashboard', redirect: (context, state) => '/today'),
+      GoRoute(path: '/community', redirect: (context, state) => '/today'),
       GoRoute(path: '/achievement', builder: (context, state) => const AchievementPageV2()),
       GoRoute(path: '/constitution-report', builder: (context, state) {
         final extra = state.extra as Map<String, dynamic>?;
@@ -178,7 +178,7 @@ class AppRouter {
       GoRoute(path: '/body-type-essence', builder: (context, state) => const BodyTypeEssencePage()),
       GoRoute(path: '/wellness-diary', builder: (context, state) => const WellnessDiaryPage()),
       GoRoute(path: '/solar-ai/:name', builder: (context, state) => SolarTermAIDetailPage(termName: state.pathParameters['name'] ?? '')),
-      GoRoute(path: '/constitution-result', builder: (context, state) => const ConstitutionResultPage()),
+      GoRoute(path: '/constitution-result', redirect: (context, state) => '/constitution'),
       GoRoute(path: '/audio-player', builder: (context, state) => const AudioPlayerPage()),
 
       // Main Shell — 5 Tab: 聊天/今日/节气/养生/我的

@@ -296,31 +296,7 @@ class _ExerciseDetailPageState extends State<ExerciseDetailPage>
                   ),
                   const SizedBox(height: 24),
 
-                  // ── CTA ──
-                  SizedBox(
-                    width: double.infinity,
-                    height: 52,
-                    child: ElevatedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: ShunShiColors.primary,
-                        foregroundColor: Colors.white,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.fullscreen, size: 20),
-                          const SizedBox(width: 8),
-                          Text('开始全屏教学', style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.w600, fontFamily: ShunShiTypography.sansFamily,
-                          )),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 28),
+                  const SizedBox(height: 4),
 
                   // ── 中医原理 ──
                   _infoCard(

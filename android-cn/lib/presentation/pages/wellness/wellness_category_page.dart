@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../data/network/api_client.dart';
+import '../../../core/solar_term/solar_term_table.dart';
 import '../../../design_system/theme.dart';
 
 /// 养生馆 - 分类详情页
@@ -84,7 +85,7 @@ class _WellnessCategoryPageState extends State<WellnessCategoryPage> {
 
   void _useFallback() {
     setState(() {
-      _items = _fallbackItems[widget.type] ?? [];
+      _items = widget.type == 'food_therapy' ? _seasonalFoodFallback() : (_fallbackItems[widget.type] ?? []);
       _isLoading = false;
     });
   }
@@ -366,3 +367,64 @@ const _fallbackItems = <String, List<_Item>>{
     _Item(name: '森林溪流', desc: '溪水潺潺，鸟鸣悠扬。', tip: '适合午休或夜间使用。'),
   ],
 };
+
+/// 节气食谱离线备用内容，按当前节气所在的季节显示
+List<_Item> _seasonalFoodFallback() {
+  switch (_seasonOfTerm(currentSolarTermName())) {
+    case 'spring':
+      return const [
+        _Item(name: '青团', desc: '清明前后的时令糕点，用艾草汁和糯米粉做皮，外软内甜。', tip: '艾草汁拌入糯米粉，包入豆沙馅，蒸约 15 分钟。', image: 'assets/images/foods/qingtuan.png'),
+        _Item(name: '艾草', desc: '春季常见的野菜，也是端午的传统植物，可做艾草粑粑、艾草鸡蛋汤。', tip: '食用前先焯水去苦味；对菊科植物过敏者不宜。', image: 'assets/images/foods/aicao.png'),
+        _Item(name: '河虾', desc: '春季河虾个头适中、肉质鲜嫩，富含蛋白质。', tip: '清炒或做河虾豆腐汤；对海鲜过敏者避免。', image: 'assets/images/foods/hexia.png'),
+        _Item(name: '螺蛳', desc: '江南有「清明螺蛳赛肥鹅」的说法，春季的螺蛳肉质较肥。', tip: '充分吐沙、煮熟透后再吃，每次不宜过量。', image: 'assets/images/foods/luosi.png'),
+        _Item(name: '荠菜', desc: '早春常见的野菜，可包饺子、做馄饨或煮汤。', tip: '洗净焯水后拌馅；野菜请从可靠渠道购买，不要自行采摘不认识的植物。'),
+        _Item(name: '香椿', desc: '春季的时令嫩芽，常见做法是香椿炒蛋、凉拌香椿。', tip: '食用前焯水，现采现吃，不宜久放；一次不宜吃太多。'),
+      ];
+    case 'summer':
+      return const [
+        _Item(name: '绿豆汤', desc: '夏季常见的解暑饮品，煮好后放凉饮用，口味清淡。', tip: '绿豆洗净，加水煮至开花，可加少量冰糖；脾胃虚寒者不宜多喝。'),
+        _Item(name: '冬瓜海带汤', desc: '冬瓜水分多、热量低，与海带同煮，是夏天常见的清淡汤品。', tip: '冬瓜去皮切块，与泡发的海带同煮约 20 分钟，少放盐。'),
+        _Item(name: '苦瓜', desc: '夏季常见的时令蔬菜，味苦，可清炒、凉拌或煮汤。', tip: '切片后用盐略腌或焯水可减轻苦味；腹泻时不宜多吃。'),
+        _Item(name: '莲藕', desc: '夏季上市的时令食材，可凉拌、炖汤或清炒，口感脆甜。', tip: '藕片焯水后凉拌；与排骨炖汤约 1 小时。'),
+        _Item(name: '西瓜', desc: '夏季解渴的水果，水分充足；不宜冰镇过度，一次不宜吃太多。', tip: '常温或微凉食用即可；糖尿病患者请遵医嘱控制量。'),
+        _Item(name: '薏米红豆粥', desc: '夏季常见的粥品，口感软糯，常搭配红豆一起煮。', tip: '薏米和红豆提前浸泡 2 小时，煮约 40 分钟。'),
+      ];
+    case 'autumn':
+      return const [
+        _Item(name: '银耳雪梨羹', desc: '秋季干燥时常见的甜汤，口感润滑，做法简单。', tip: '银耳泡发撕小朵，与雪梨块同煮约 40 分钟，可加少量冰糖。'),
+        _Item(name: '百合', desc: '秋季上市的鲜百合，可清炒、煮粥或做甜汤，口感清甜。', tip: '鲜百合掰开洗净，与西芹清炒或加入粥中；注意不要煮得过烂。'),
+        _Item(name: '莲子', desc: '常用于煮粥、煲汤的传统食材，口感软糯。', tip: '莲子提前泡软，去芯后与米同煮约 40 分钟；莲心味苦，可去除。'),
+        _Item(name: '山药', desc: '秋冬常见的根茎蔬菜，可蒸、炒或炖汤，口感绵软。', tip: '削皮时注意戴手套，避免手痒；蒸熟蘸少量糖或清炒。'),
+        _Item(name: '柿子', desc: '霜降前后上市，民间有「霜降吃柿子」的习俗。', tip: '要吃完全成熟的柿子；不要空腹吃，也不要与大量螃蟹同食。'),
+        _Item(name: '板栗', desc: '秋季的坚果，可煮、炒或炖鸡，口感粉糯。', tip: '在壳上划口后再煮或烤；一次不宜吃太多，容易胀气。'),
+      ];
+    case 'winter':
+      return const [
+        _Item(name: '白萝卜', desc: '冬季常见的蔬菜，可炖汤、清炒或腌制，口感清甜。', tip: '与排骨或羊肉同炖约 1 小时；切块后先焯水可减轻辛味。'),
+        _Item(name: '羊肉汤', desc: '北方不少地方有立冬、冬至前后吃羊肉的习惯。', tip: '羊肉先焯水去腥，加姜片慢炖约 1.5 小时；高血压、上火者适量。'),
+        _Item(name: '烤红薯', desc: '冬季常见的小吃，香甜软糯，含有膳食纤维。', tip: '带皮烤约 40 分钟；不要吃烤焦的部分，一次不宜多吃。'),
+        _Item(name: '核桃', desc: '常见的坚果，可直接吃或加入粥、点心，口感香脆。', tip: '每天一小把即可，注意控制总量；对坚果过敏者避免。'),
+        _Item(name: '黑芝麻糊', desc: '冬季常见的热饮甜点，香味浓郁，口感细腻。', tip: '熟黑芝麻与糯米粉加水煮成糊，少放糖。'),
+        _Item(name: '腊八粥', desc: '农历腊月初八的传统食俗，用多种谷物和干果煮成。', tip: '米、豆、干果提前浸泡，小火慢煮约 1 小时。'),
+      ];
+  }
+  return const [];
+}
+
+
+String _seasonOfTerm(String? term) {
+  const spring = ['立春', '雨水', '惊蛰', '春分', '清明', '谷雨'];
+  const summer = ['立夏', '小满', '芒种', '夏至', '小暑', '大暑'];
+  const autumn = ['立秋', '处暑', '白露', '秋分', '寒露', '霜降'];
+  if (term != null) {
+    if (spring.contains(term)) return 'spring';
+    if (summer.contains(term)) return 'summer';
+    if (autumn.contains(term)) return 'autumn';
+    return 'winter';
+  }
+  final m = DateTime.now().month;
+  if (m >= 3 && m <= 5) return 'spring';
+  if (m >= 6 && m <= 8) return 'summer';
+  if (m >= 9 && m <= 11) return 'autumn';
+  return 'winter';
+}

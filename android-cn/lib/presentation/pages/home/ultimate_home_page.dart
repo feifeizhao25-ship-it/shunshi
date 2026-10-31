@@ -652,14 +652,14 @@ class _UltimateHomePageState extends State<UltimateHomePage>
         children: [
           Row(children: [
             GestureDetector(
-              onTap: () { ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('菜单功能开发中'), duration: Duration(seconds: 1))); },
+              onTap: () => context.push('/notifications'),
               child: Container(
                 width: 40, height: 40,
                 decoration: BoxDecoration(
                   color: ShunShiColors.surfaceContainerLow,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(Icons.menu, size: 20, color: isDark ? ShunShiColors.darkTextPrimary : ShunShiColors.textPrimary),
+                child: Icon(Icons.notifications_none, size: 20, color: isDark ? ShunShiColors.darkTextPrimary : ShunShiColors.textPrimary),
               ),
             ),
             const SizedBox(width: 12),

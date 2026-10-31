@@ -203,7 +203,7 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      '预览效果：现在是 寅时 · 肺经当令\n早起呼吸训练',
+                      '预览效果：字号会像这样放大，页面也会更简洁\n今日节气提示',
                       style: TextStyle(
                         fontSize: 20,
                         color: primaryColor,
@@ -242,7 +242,7 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
               _buildNavTile(context, Icons.info_outline, '关于顺时',
                   const [Color(0xFF90A4AE), Color(0xFFB0BEC5)],
                   trailing: Row(mainAxisSize: MainAxisSize.min, children: [
-                Text('版本 2.4.0',
+                Text('版本 1.0.0',
                     style: TextStyle(fontSize: 13, color: textTertiary)),
                 const SizedBox(width: 4),
                 Icon(Icons.chevron_right,
