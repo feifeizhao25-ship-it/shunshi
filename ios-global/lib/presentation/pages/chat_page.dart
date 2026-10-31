@@ -11,6 +11,7 @@ import '../../../design_system/theme_helper.dart';
 import '../widgets/feedback_sheet.dart';
 import '../widgets/membership_widgets.dart';
 import 'chat/chat_models.dart';
+import '../widgets/chat_sources.dart';
 import 'chat/chat_widgets.dart';
 
 const _baseUrl = 'https://api.seasonsapp.com';
@@ -203,14 +204,14 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
     });
     _scrollToBottom();
 
-    void handleAIReply(String aiText, {List<SuggestionCard>? cards, List<String>? sources, String? convId}) {
+    void handleAIReply(String aiText, {List<SuggestionCard>? cards, List<String>? sources, List<ChatSource>? sourceDetails, String? convId}) {
       var reply = aiText;
       final c = cards ?? [SuggestionCard(type: 'insight', title: 'Seasonal care tips', subtitle: 'Live with the seasons, balance body and mind')];
       if (hasRisk) reply = '⚠️ The suggestions below are for reference only and do not replace a doctor\'s diagnosis. If you feel unwell, please seek medical care.\n\n$reply';
       reply = '$reply\n\n💡 The above is based on traditional wellness ideas and is for reference only';
       if (convId != null) _conversationId = convId;
       setState(() {
-        _messages.add(ChatMessage(role: 'ai', text: reply, cards: c, sources: sources ?? [], time: _fmt(DateTime.now())));
+        _messages.add(ChatMessage(role: 'ai', text: reply, cards: c, sources: sources ?? [], sourceDetails: sourceDetails, time: _fmt(DateTime.now())));
         _isLoading = false;
         if (!_isVip) _quotaRemaining--;
         _incrementChatCount();
@@ -229,7 +230,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
         }
       }
       final sources = (res.data?['sources'] as List?)?.cast<String>() ?? [];
-      handleAIReply(aiText, cards: cards, sources: sources, convId: res.data?['conversation_id']);
+      handleAIReply(aiText, cards: cards, sources: sources, sourceDetails: ChatSource.parseAll(res.data?['source_details']), convId: res.data?['conversation_id']);
     } catch (_) {
       try {
         final v2Dio = Dio(BaseOptions(baseUrl: 'https://api.seasonsapp.com', connectTimeout: const Duration(seconds: 10), receiveTimeout: const Duration(seconds: 60)));
@@ -260,7 +261,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
             SuggestionCard(type: 'diet', title: 'Eating well', subtitle: 'Moistening foods such as tremella and lily bulb are good choices', icon: Icons.restaurant),
             SuggestionCard(type: 'rest', title: 'Daily routine', subtitle: 'Sleep early, rise early, follow the season', icon: Icons.bedtime),
           ],
-          sources: const ['Huangdi Neijing · Suwen', 'Compendium of Materia Medica'],
+          sources: const <String>[], // an offline fallback must never cite sources it did not use
         );
       }
     }

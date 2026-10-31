@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../widgets/chat_sources.dart';
 
 /// 聊天消息模型
 class ChatMessage {
@@ -6,8 +7,11 @@ class ChatMessage {
   final String text;
   final List<SuggestionCard>? cards;
   final List<String>? sources;
+
+  /// Structured sources (title, last verified date, freshness, link) when the backend sends `source_details`.
+  final List<ChatSource>? sourceDetails;
   final String time;
-  ChatMessage({required this.role, required this.text, this.cards, this.sources, required this.time});
+  ChatMessage({required this.role, required this.text, this.cards, this.sources, this.sourceDetails, required this.time});
 }
 
 /// AI 建议卡片

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
 import '../../../design_system/theme_helper.dart';
+import '../../widgets/chat_sources.dart';
 import 'chat_models.dart';
 
 // ── AI 头像：墨绿渐变 + eco 图标 ──
@@ -75,7 +76,11 @@ class AIBubble extends StatelessWidget {
                   ...message.cards!.map((c) => Padding(
                       padding: const EdgeInsets.only(top: 10),
                       child: _SuggestionCardWidget(card: c))),
-                if (message.sources != null && message.sources!.isNotEmpty)
+                if (message.sourceDetails != null && message.sourceDetails!.isNotEmpty)
+                  Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: ChatSourcesBar(sources: message.sourceDetails!))
+                else if (message.sources != null && message.sources!.isNotEmpty)
                   Padding(
                       padding: const EdgeInsets.only(top: 10),
                       child: _SourcesWrap(sources: message.sources!)),

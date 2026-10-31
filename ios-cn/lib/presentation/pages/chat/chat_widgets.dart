@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
 import '../../../design_system/theme_helper.dart';
+import '../../widgets/chat_sources.dart';
 import 'chat_models.dart';
 
 /// AI 消息气泡
@@ -20,7 +21,9 @@ class AIBubble extends StatelessWidget {
         Container(padding: const EdgeInsets.all(14), decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(16), border: Border.all(color: AppColors.border(context))),
           child: Text(message.text, style: TextStyle(fontSize: 15, color: AppColors.textPrimary(context), height: 1.6))),
         if (message.cards != null) ...message.cards!.map((c) => Padding(padding: const EdgeInsets.only(top: 10), child: _SuggestionCardWidget(card: c))),
-        if (message.sources != null && message.sources!.isNotEmpty)
+        if (message.sourceDetails != null && message.sourceDetails!.isNotEmpty)
+          Padding(padding: const EdgeInsets.only(top: 10), child: ChatSourcesBar(sources: message.sourceDetails!))
+        else if (message.sources != null && message.sources!.isNotEmpty)
           Padding(padding: const EdgeInsets.only(top: 10), child: _SourcesWrap(sources: message.sources!)),
         const SizedBox(height: 4),
         Row(children: [

@@ -30,6 +30,12 @@ class _S {
   static const emptyTitle = 'No new suggestions for today';
   static const emptyBody = 'Check back a little later.';
   static const saveFailed = 'Could not save your setting. Please try again.';
+  static const weekHeading = 'This week';
+  static const weekdays = 'MTWTFSS';
+  static String weekDone(String d) => '$d: took a small action';
+  static String weekNone(String d) => '$d: nothing recorded';
+  static const recallDismiss = 'Got it';
+  static const recallLabel = 'Welcome back';
   static String minutes(int n) => '$n min';
   static String days(int n) => '$n days in a row';
 }
@@ -57,8 +63,38 @@ class PersonalHomeCard {
   final String? href;
 }
 
+class WeekDay {
+  const WeekDay({required this.date, required this.done, required this.today});
+  final DateTime date;
+  final bool done;
+  final bool today;
+}
+
 class PersonalHomeData {
-  const PersonalHomeData({required this.enabled, required this.greeting, required this.headline, required this.streakText, required this.note, required this.cards});
+  const PersonalHomeData({
+    required this.enabled,
+    required this.greeting,
+    required this.headline,
+    required this.streakText,
+    required this.note,
+    required this.cards,
+    this.week = const [],
+    this.milestoneText = '',
+    this.milestoneDay = 0,
+    this.recallText = '',
+    this.recallTier = '',
+  });
+
+  /// Last seven days, oldest first (from the backend; empty when it sends none).
+  final List<WeekDay> week;
+
+  /// Day-3 / day-7 message, only when the user really has that streak. [milestoneDay] is 3 or 7, else 0.
+  final String milestoneText;
+  final int milestoneDay;
+
+  /// Gentle comeback message for someone away 3+ days. Shown inside the app only.
+  final String recallText;
+  final String recallTier;
 
   final bool enabled;
   final String greeting;
@@ -106,7 +142,23 @@ class PersonalHomeData {
       streakText = _S.days(st.toInt());
     }
     final energyHeadline = _s(hero['headline']);
+    final week = <WeekDay>[];
+    if (root['week'] is List) {
+      for (final w in root['week'] as List) {
+        if (w is! Map) continue;
+        final d = DateTime.tryParse(_s(w['date']));
+        if (d != null) week.add(WeekDay(date: d, done: w['done'] == true, today: w['today'] == true));
+      }
+    }
+    final ms = root['milestone'] is Map ? Map<String, dynamic>.from(root['milestone'] as Map) : const <String, dynamic>{};
+    final rc = root['recall'] is Map ? Map<String, dynamic>.from(root['recall'] as Map) : const <String, dynamic>{};
+    final reached = ms['reached'] is num ? (ms['reached'] as num).toInt() : 0;
     return PersonalHomeData(
+      week: week.length == 7 ? week : const [],
+      milestoneText: _s(ms['text']),
+      milestoneDay: reached,
+      recallText: _s(rc['text']),
+      recallTier: _s(rc['tier']),
       enabled: enabled,
       greeting: _s(root['greeting']).isNotEmpty ? _s(root['greeting']) : _s(hero['greeting']),
       headline: energyHeadline,
@@ -138,6 +190,7 @@ class _PersonalHomeSectionState extends State<PersonalHomeSection> {
   _Phase _phase = _Phase.loading;
   PersonalHomeData? _data;
   bool _saving = false;
+  bool _recallDismissed = false;
 
   @override
   void initState() {
@@ -261,9 +314,20 @@ class _PersonalHomeSectionState extends State<PersonalHomeSection> {
           const SizedBox(height: 4),
           Text(d.headline, key: const Key('personal-home-headline'), style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant)),
         ],
-        if (d.streakText.isNotEmpty) ...[
+        if (d.recallText.isNotEmpty && !_recallDismissed) ...[
+          const SizedBox(height: 10),
+          _RecallCard(text: d.recallText, onDismiss: () => setState(() => _recallDismissed = true)),
+        ] else if (d.streakText.isNotEmpty) ...[
           const SizedBox(height: 8),
           _StreakChip(text: d.streakText),
+        ],
+        if (d.milestoneDay > 0 && d.milestoneText.isNotEmpty) ...[
+          const SizedBox(height: 6),
+          _MilestoneChip(day: d.milestoneDay, text: d.milestoneText),
+        ],
+        if (d.week.any((w) => w.done)) ...[
+          const SizedBox(height: 10),
+          _WeekStrip(days: d.week),
         ],
         const SizedBox(height: 12),
         for (var i = 0; i < d.cards.length; i++) ...[
@@ -278,6 +342,94 @@ class _PersonalHomeSectionState extends State<PersonalHomeSection> {
           ),
         Align(alignment: AlignmentDirectional.centerEnd, child: _offButton()),
       ],
+    );
+  }
+}
+
+class _MilestoneChip extends StatelessWidget {
+  const _MilestoneChip({required this.day, required this.text});
+  final int day;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      key: const Key('personal-home-milestone'),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(color: scheme.tertiaryContainer.withValues(alpha: 0.7), borderRadius: BorderRadius.circular(12)),
+      child: Row(mainAxisSize: MainAxisSize.min, children: [
+        Icon(day >= 7 ? Icons.emoji_events_outlined : Icons.star_outline_rounded, size: 16, color: scheme.onTertiaryContainer),
+        const SizedBox(width: 6),
+        Flexible(child: Text(text, maxLines: 2, overflow: TextOverflow.ellipsis, style: Theme.of(context).textTheme.labelLarge?.copyWith(color: scheme.onTertiaryContainer))),
+      ]),
+    );
+  }
+}
+
+class _WeekStrip extends StatelessWidget {
+  const _WeekStrip({required this.days});
+  final List<WeekDay> days;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final text = Theme.of(context).textTheme;
+    String fmt(DateTime d) => '${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+    return Column(key: const Key('personal-home-week'), crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text(_S.weekHeading, style: text.labelSmall?.copyWith(color: scheme.onSurfaceVariant)),
+      const SizedBox(height: 4),
+      Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+        for (final d in days)
+          Semantics(
+            label: d.done ? _S.weekDone(fmt(d.date)) : _S.weekNone(fmt(d.date)),
+            excludeSemantics: true,
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              Container(
+                key: Key('personal-home-week-${fmt(d.date)}'),
+                width: 26,
+                height: 26,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: d.done ? scheme.primary : Colors.transparent,
+                  border: Border.all(color: d.today ? scheme.primary : scheme.outlineVariant, width: d.today ? 2 : 1),
+                ),
+                child: d.done ? Icon(Icons.check_rounded, size: 16, color: scheme.onPrimary) : null,
+              ),
+              const SizedBox(height: 2),
+              Text(_S.weekdays[(d.date.weekday - 1) % 7], style: text.labelSmall?.copyWith(color: scheme.onSurfaceVariant)),
+            ]),
+          ),
+      ]),
+    ]);
+  }
+}
+
+class _RecallCard extends StatelessWidget {
+  const _RecallCard({required this.text, required this.onDismiss});
+  final String text;
+  final VoidCallback onDismiss;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final t = Theme.of(context).textTheme;
+    return Container(
+      key: const Key('personal-home-recall'),
+      padding: const EdgeInsets.fromLTRB(12, 10, 4, 10),
+      decoration: BoxDecoration(color: scheme.secondaryContainer.withValues(alpha: 0.55), borderRadius: BorderRadius.circular(16)),
+      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Icon(Icons.waving_hand_outlined, size: 18, color: scheme.onSecondaryContainer),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(_S.recallLabel, style: t.labelMedium?.copyWith(color: scheme.onSecondaryContainer, fontWeight: FontWeight.w700)),
+            const SizedBox(height: 2),
+            Text(text, style: t.bodyMedium?.copyWith(color: scheme.onSecondaryContainer, height: 1.3)),
+          ]),
+        ),
+        TextButton(key: const Key('personal-home-recall-dismiss'), onPressed: onDismiss, child: const Text(_S.recallDismiss)),
+      ]),
     );
   }
 }
