@@ -33,7 +33,8 @@ class PrivacyPolicyPage extends StatelessWidget {
             '4. Sharing\nWe do not sell or share your personal data with third parties, except:\n• With your explicit consent\n• Where required by law\n\n'
             '5. Your rights\nUnder data-protection laws such as the GDPR, you have the right to:\n• Access your personal data\n• Export your data\n• Delete your data\n• Withdraw consent\n\n'
             '6. Retention\nAfter an account is deleted, we remove all related data within 30 days.\n\n'
-            '7. Contact us\nData protection questions: privacy@shunshi.app',
+            '7. Minimum age\nYou must be at least 16 to use SEASONS. We do not knowingly collect personal data from anyone under 16. If we learn that we have, we delete it promptly.\n\n'
+            '8. Contact us\nData protection questions: privacy@shunshi.app',
             style: TextStyle(fontSize: 14, color: ShunShiColors.textSecondary, height: 1.8),
           ),
         ],

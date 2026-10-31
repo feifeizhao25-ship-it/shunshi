@@ -118,3 +118,72 @@ def test_clean_helper_dedupes_and_validates():
     assert cp.clean({"diet": ["halal", "halal"], "units": "imperial"})["diet"] == ["halal"]
     with pytest.raises(cp.CultureError):
         cp.clean({"diet": "halal"})
+
+
+# ── device hints: auto-detected hemisphere / time zone with user override ──────────────────────────────
+
+def _device(client, h, **body):
+    r = client.put("/api/v1/profile/culture/device", headers=h, json=body)
+    assert r.status_code == 200, r.text
+    return r.json()
+
+
+def test_device_hemisphere_fills_an_empty_profile_and_is_marked_device(api):
+    client, h, _ = api
+    d = _device(client, h, hemisphere="south", utc_offset_minutes=600)
+    assert (d["hemisphere"], d["hemisphere_source"], d["utc_offset_minutes"], d["applied"]) == ("south", "device", 600, True)
+    d = client.get("/api/v1/profile/culture", headers=h).json()
+    assert d["hemisphere"] == "south" and d["hemisphere_source"] == "device" and d["auto_detect"] is True
+    home = client.get("/api/v1/seasons/home/dashboard", headers={**h, **GLOBAL}).json()
+    assert (home["hemisphere"], home["hemisphere_source"]) == ("south", "profile")
+
+
+def test_user_choice_is_never_replaced_by_the_device(api):
+    client, h, _ = api
+    client.put("/api/v1/profile/culture", headers=h, json={"hemisphere": "north"})
+    d = _device(client, h, hemisphere="south", utc_offset_minutes=600)
+    assert d["hemisphere"] == "north" and d["hemisphere_source"] == "user"
+    assert d["utc_offset_minutes"] == 600  # the time zone is not a preference, it still updates
+
+
+def test_saving_other_preferences_keeps_a_device_hemisphere_a_device_value(api):
+    client, h, _ = api
+    _device(client, h, hemisphere="south")
+    saved = client.put("/api/v1/profile/culture", headers=h, json={"diet": ["halal"], "hemisphere": "south", "hemisphere_source": "device"}).json()
+    assert saved["hemisphere_source"] == "device" and saved["diet"] == ["halal"]
+    # picking the same value in the UI is the user's choice
+    saved = client.put("/api/v1/profile/culture", headers=h, json={"diet": ["halal"], "hemisphere": "south"}).json()
+    assert saved["hemisphere_source"] == "user"
+    assert _device(client, h, hemisphere="north")["hemisphere"] == "south"
+
+
+def test_removing_the_hemisphere_or_clearing_stops_auto_detect_until_forced(api):
+    client, h, _ = api
+    _device(client, h, hemisphere="south", utc_offset_minutes=600)
+    cleared = client.put("/api/v1/profile/culture", headers=h, json={}).json()
+    assert cleared["hemisphere"] is None and cleared["auto_detect"] is False
+    d = _device(client, h, hemisphere="south", utc_offset_minutes=600)
+    assert d["applied"] is False and d["hemisphere"] is None
+    d = _device(client, h, hemisphere="south", force=True)
+    assert d["applied"] is True and d["hemisphere"] == "south" and d["hemisphere_source"] == "device" and d["auto_detect"] is True
+
+
+def test_device_hints_never_touch_diet_observances_units(api):
+    client, h, _ = api
+    client.put("/api/v1/profile/culture", headers=h, json={"diet": ["vegan"], "observances": ["lent_fasting"], "units": "imperial"})
+    d = _device(client, h, hemisphere="south", utc_offset_minutes=-180)
+    assert d["diet"] == ["vegan"] and d["observances"] == ["lent_fasting"] and d["units"] == "imperial" and d["hemisphere"] == "south"
+
+
+def test_device_hints_validation(api):
+    client, h, _ = api
+    for body in ({"hemisphere": "east"}, {"utc_offset_minutes": 900}, {"utc_offset_minutes": -721}):
+        assert client.put("/api/v1/profile/culture/device", headers=h, json=body).status_code == 422, body
+
+
+def test_chat_date_uses_the_device_time_zone_when_known(api):
+    client, h, cap = api
+    _device(client, h, hemisphere="south", utc_offset_minutes=840)
+    client.post("/api/v1/chat/send", headers={**h, **GLOBAL}, json={"message": "What season is it?"})
+    s = _system(cap)
+    assert "from their device time zone" in s and "southern hemisphere" in s

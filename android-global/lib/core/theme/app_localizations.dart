@@ -396,7 +396,7 @@ class AppLocalizations {
       'bodytype_your_seasonal_essence_balanced': 'Your Seasonal Essence: Balanced',
       'chat_now_broadcasting': 'Now broadcasting...',
       'chat_unlock': 'Unlock',
-      'chatpagedart_4001619995_24h_mental_health_helpline': '400-161-9995 · 24h Mental Health Helpline',
+      'chatpagedart_crisis_support_subtitle': 'Call your local crisis line · findahelpline.com',
       'chatpagedart_clear_chat': 'Clear Chat',
       'chatpagedart_crisis_hotline': 'Crisis Hotline',
       'chatpagedart_daily_free_messages_used_up': 'Daily free messages used up',

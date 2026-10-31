@@ -6,6 +6,7 @@ import '../../presentation/pages/splash/splash_page.dart';
 import '../../presentation/pages/onboarding/onboarding_page.dart';
 import '../../presentation/pages/onboarding/wellness_onboarding_page.dart';
 import '../../presentation/pages/login/login_page.dart';
+import '../../presentation/pages/library/shunshi_reference_library.dart';
 import '../../presentation/pages/home/ultimate_home_page.dart';
 import '../../presentation/pages/home/daily_checkin_page.dart';
 import '../../presentation/pages/home/wellness_dashboard_page.dart';
@@ -55,6 +56,7 @@ import '../../presentation/pages/achievements/achievements_page.dart';
 import '../../presentation/pages/report/wellness_report_page.dart';
 import '../../presentation/pages/wellness/tea_page.dart';
 import '../../presentation/pages/meditation/meditation_focus_page.dart';
+import '../../presentation/pages/meditation/meditation_library_page.dart';
 import '../../presentation/pages/growth/growth_milestones_page.dart';
 import '../../presentation/pages/library/wellness_library_page.dart';
 import '../../presentation/pages/seasons/seasons_page.dart';
@@ -164,8 +166,10 @@ class AppRouter {
       // Newly registered pages
       GoRoute(path: '/achievements', builder: (context, state) => const AchievementsPage()),
       GoRoute(path: '/wellness-report', builder: (context, state) => const WellnessReportPage()),
+      GoRoute(path: '/reference-library', builder: (context, state) => const ShunshiReferenceLibraryPage()),
       GoRoute(path: '/tea', builder: (context, state) => const TeaPage()),
-      GoRoute(path: '/meditation', redirect: (context, state) => '/wellness-category/sleep'),
+      GoRoute(path: '/meditation', builder: (context, state) => const MeditationLibraryPage()),
+      GoRoute(path: '/meditation/focus', builder: (context, state) => const MeditationFocusPage()),
       GoRoute(path: '/growth', builder: (context, state) => const GrowthMilestonesPage()),
       GoRoute(path: '/library', builder: (context, state) => const WellnessLibraryPage()),
       GoRoute(path: '/seasons', builder: (context, state) => const SeasonsPage()),

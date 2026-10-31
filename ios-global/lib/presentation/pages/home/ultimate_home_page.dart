@@ -10,200 +10,19 @@ import '../../../data/storage/storage_manager.dart';
 import '../../../design_system/theme.dart';
 import 'package:go_router/go_router.dart';
 import 'widgets/home_skeleton.dart';
+import '../../../core/culture/device_hints.dart';
+import '../../../core/culture/opening_greeting.dart';
+import '../../../core/day_part/day_part.dart';
+import '../settings/culture_binding.dart';
 import 'widgets/personal_home_binding.dart';
 import '../../widgets/personal_home_section.dart';
 import '../../../data/services/offline_cache.dart';
 
 // ═══════════════════════════════════════════════════════════════
-// Twelve ShiChen Data Model (local computation)
-// ═══════════════════════════════════════════════════════════════
-
-class ShiChenData {
-  final String name;
-  final String timeRange;
-  final String meridian;
-  final String principle;       // e.g. "Stillness · Nourish Gallbladder Qi"
-  final String principleShort;  // e.g. "Nourish Gallbladder Qi" (for titles)
-  final String wellnessPrinciple; // Wellness essence e.g. "Nourish Yin, Tonify Kidney"
-    final String aiQuote;         // AI quote
-  final IconData icon;           // Material icon
-  final List<BentoAction> actions;
-
-  const ShiChenData({
-    required this.name,
-    required this.timeRange,
-    required this.meridian,
-    required this.principle,
-    required this.principleShort,
-    required this.wellnessPrinciple,
-    required this.aiQuote,
-    required this.icon,
-    required this.actions,
-  });
-}
-
-class BentoAction {
-  final IconData icon;
-  final String title;
-  final String description;
-  const BentoAction({required this.icon, required this.title, required this.description});
-}
-
-ShiChenData getCurrentShiChen() {
-  final hour = DateTime.now().hour;
-  for (final sc in _shiChenList) {
-    final parts = sc.timeRange.split('-');
-    final start = int.parse(parts[0]);
-    final end = int.parse(parts[1]);
-    if (start <= end) {
-      if (hour >= start && hour < end) return sc;
-    } else {
-      if (hour >= start || hour < end) return sc;
-    }
-  }
-  return _shiChenList[0];
-}
-
-const _shiChenList = <ShiChenData>[
-  ShiChenData(
-    name: 'Zi', timeRange: '23-1', meridian: 'Gallbladder',
-    principle: 'Stillness', principleShort: 'Nourish Gallbladder Qi',
-    wellnessPrinciple: 'Calm the mind, warm and nourish Gallbladder Qi',
-    aiQuote: 'The Zi hour marks the birth of Yang Qi, when all is still. Sleep deeply now to let the Gallbladder meridian restore, laying the foundation for tomorrow\'s vitality.',
-    icon: Icons.dark_mode,
-    actions: [
-      BentoAction(icon: Icons.nightlight_round, title: 'Deep Sleep', description: 'Deep sleep during Zi hour supports bile metabolism and nighttime repair.'),
-      BentoAction(icon: Icons.air, title: 'Rest Quietly', description: 'Stay still and calm, avoid disturbing the newborn Yang Qi. Lie on your right side.'),
-    ],
-  ),
-  ShiChenData(
-    name: 'Chou', timeRange: '1-3', meridian: 'Liver',
-    principle: 'Liver Blood Storage', principleShort: 'Nourish Liver Yin',
-    wellnessPrinciple: 'Nourish blood, soothe the Liver, moisten Yin',
-    aiQuote: 'The Chou hour activates the Liver meridian, a critical time for detox and blood storage. Deep sleep helps the liver complete metabolic repair for a healthy complexion.',
-    icon: Icons.night_shelter,
-    actions: [
-      BentoAction(icon: Icons.bedtime, title: 'Deep Sleep', description: 'Liver meridian peaks at Chou hour. Deep sleep nourishes Liver blood.'),
-      BentoAction(icon: Icons.local_florist, title: 'Protect Liver', description: 'Avoid staying up late to let the liver fully rest and detoxify.'),
-    ],
-  ),
-  ShiChenData(
-    name: 'Yin', timeRange: '3-5', meridian: 'Lung',
-    principle: 'Qi Distribution', principleShort: 'Nourish Lung Qi',
-    wellnessPrinciple: 'Moisten Lungs, boost Qi, harmonize defenses',
-    aiQuote: 'The Yin hour is when the Lung meridian distributes Qi and blood throughout the body. Stay asleep to let the Lungs complete their distribution to all meridians.',
-    icon: Icons.cloud,
-    actions: [
-      BentoAction(icon: Icons.air, title: 'Deep Breathing', description: 'Lung meridian peaks at Yin hour. Maintain slow, deep breaths.'),
-      BentoAction(icon: Icons.spa, title: 'Peaceful Sleep', description: 'Let the Lungs complete Qi distribution. Avoid waking abruptly.'),
-    ],
-  ),
-  ShiChenData(
-    name: 'Mao', timeRange: '5-7', meridian: 'Large Intestine',
-    principle: 'Dawn Elimination', principleShort: 'Clear Intestines',
-    wellnessPrinciple: 'Moisten intestines, clear stagnation',
-    aiQuote: 'The Mao hour activates the Large Intestine meridian — the best time for elimination. Drink a cup of warm water and move gently to help your body detox and refresh.',
-    icon: Icons.light_mode,
-    actions: [
-      BentoAction(icon: Icons.water_drop, title: 'Warm Water', description: 'A cup of warm water wakes the digestive system and promotes elimination.'),
-      BentoAction(icon: Icons.directions_walk, title: 'Morning Activity', description: 'Light movement promotes intestinal motility and clears the bowels.'),
-    ],
-  ),
-  ShiChenData(
-    name: 'Chen', timeRange: '7-9', meridian: 'Stomach',
-    principle: 'Morning Nourishment', principleShort: 'Boost Qi & Blood',
-    wellnessPrinciple: 'Warm the Stomach, strengthen Spleen, boost Qi',
-    aiQuote: 'The Chen hour peaks the Stomach meridian — golden time for breakfast. A warm, nutritious breakfast provides ample energy for the whole day and nourishes Qi and blood.',
-    icon: Icons.breakfast_dining,
-    actions: [
-      BentoAction(icon: Icons.rice_bowl, title: 'Warm Breakfast', description: 'Eat warm, easily digestible food to nourish Stomach Qi.'),
-      BentoAction(icon: Icons.local_cafe, title: 'Ginger Jujube Tea', description: 'Ginger and jujube tea warms the stomach, dispels cold, and harmonizes Spleen and Stomach.'),
-    ],
-  ),
-  ShiChenData(
-    name: 'Si', timeRange: '9-11', meridian: 'Spleen',
-    principle: 'Transform & Transport', principleShort: 'Strengthen Spleen',
-    wellnessPrinciple: 'Strengthen Spleen, boost Qi, resolve dampness',
-    aiQuote: 'The Si hour activates the Spleen meridian — optimal time for digestion and absorption. Energy is abundant, ideal for productive work. The Spleen is the foundation of postnatal health.',
-    icon: Icons.psychology,
-    actions: [
-      BentoAction(icon: Icons.work, title: 'Productive Work', description: 'Energy peaks at Si hour. Ideal for handling important tasks.'),
-      BentoAction(icon: Icons.emoji_food_beverage, title: 'Spleen Tea', description: 'Aged tangerine peel and Pu-erh tea strengthens the Spleen and aids digestion.'),
-    ],
-  ),
-  ShiChenData(
-    name: 'Wu', timeRange: '11-13', meridian: 'Heart',
-    principle: 'Midday Heart Care', principleShort: 'Balance Yin & Yang',
-    wellnessPrinciple: 'Nourish Heart, calm Spirit, harmonize Heart & Kidney',
-    aiQuote: 'The Wu hour peaks the Heart meridian, the transition between Yin and Yang. A short nap after lunch nourishes the Heart and calms the spirit for greater afternoon vitality.',
-    icon: Icons.wb_sunny,
-    actions: [
-      BentoAction(icon: Icons.hotel, title: 'Midday Nap', description: 'A 15-30 minute nap at Wu hour nourishes the Heart and calms the spirit.'),
-      BentoAction(icon: Icons.favorite, title: 'Quiet Meditation', description: 'Close your eyes and meditate to calm the Heart and settle Heart Fire.'),
-    ],
-  ),
-  ShiChenData(
-    name: 'Wei', timeRange: '13-15', meridian: 'Small Intestine',
-    principle: 'Separate & Absorb', principleShort: 'Aid Digestion',
-    wellnessPrinciple: 'Clear the heart, guide out turbidity, harmonize intestines',
-    aiQuote: 'The Wei hour activates the Small Intestine meridian, responsible for absorbing nutrients and separating waste. Moderate activity and hydration support digestion.',
-    icon: Icons.filter_alt,
-    actions: [
-      BentoAction(icon: Icons.directions_walk, title: 'Afternoon Walk', description: 'Light activity aids digestion and absorption after lunch.'),
-      BentoAction(icon: Icons.water_drop, title: 'Stay Hydrated', description: 'Drink plenty of water during Wei hour to support metabolism and detox.'),
-    ],
-  ),
-  ShiChenData(
-    name: 'Shen', timeRange: '15-17', meridian: 'Bladder',
-    principle: 'Detox & Drain', principleShort: 'Clear Heat',
-    wellnessPrinciple: 'Open water passages, clear heat and toxins',
-    aiQuote: 'The Shen hour peaks the Bladder meridian — the best time for detox. Drink water and exercise moderately to sweat out metabolic waste for a refreshed body and mind.',
-    icon: Icons.wb_cloudy,
-    actions: [
-      BentoAction(icon: Icons.directions_run, title: 'Moderate Exercise', description: 'Physical stamina is good at Shen hour. Ideal for exercise to sweat out toxins.'),
-      BentoAction(icon: Icons.water_drop, title: 'Drink Warm Water', description: 'Supports Bladder meridian detox, promotes urination and reduces swelling.'),
-    ],
-  ),
-  ShiChenData(
-    name: 'You', timeRange: '17-19', meridian: 'Kidney',
-    principle: 'Store Essence', principleShort: 'Nourish Kidney Yuan',
-    wellnessPrinciple: 'Nourish Yin, tonify Kidney, clear heat and fire',
-    aiQuote: 'The You hour activates the Kidney meridian, the time to store essence. Best to gather your spirit and let the body complete a deep self-repair in stillness.',
-    icon: Icons.auto_awesome,
-    actions: [
-      BentoAction(icon: Icons.water_drop, title: 'Hydrate', description: 'Kidney detox peaks at You hour. Drink warm water to support metabolism.'),
-      BentoAction(icon: Icons.accessibility_new, title: 'Tap Heels', description: 'The Kidney meridian starts at the soles. Tap your heels gently to stimulate Kidney Qi.'),
-    ],
-  ),
-  ShiChenData(
-    name: 'Xu', timeRange: '19-21', meridian: 'Pericardium',
-    principle: 'Heart Protection', principleShort: 'Ease Emotions',
-    wellnessPrinciple: 'Open the chest, regulate Qi, relieve stagnation',
-    aiQuote: 'The Xu hour activates the Pericardium meridian, the time to protect the Heart and relieve stress. Enjoy leisure, connect with family, and let your heart be light and open.',
-    icon: Icons.music_note,
-    actions: [
-      BentoAction(icon: Icons.music_note, title: 'Listen to Music', description: 'Relax your mood during Xu hour and ease the day\'s stress.'),
-      BentoAction(icon: Icons.local_cafe, title: 'Floral Tea', description: 'Rose tea soothes the Liver, regulates Qi, and calms the spirit.'),
-    ],
-  ),
-  ShiChenData(
-    name: 'Hai', timeRange: '21-23', meridian: 'Triple Burner',
-    principle: 'All Meridians Harmonize', principleShort: 'Prepare for Sleep',
-    wellnessPrinciple: 'Regulate Triple Burner, calm spirit, aid sleep',
-    aiQuote: 'The Hai hour activates the Triple Burner meridian, when all meridians harmonize. Soak your feet in warm water, read quietly, let go of the day\'s rush, and prepare for restful sleep.',
-    icon: Icons.nights_stay,
-    actions: [
-      BentoAction(icon: Icons.spa, title: 'Foot Soak', description: 'Soaking feet at Hai hour draws fire back to its source and warms the meridians for better sleep.'),
-      BentoAction(icon: Icons.menu_book, title: 'Quiet Reading', description: 'Put down your phone, read quietly, and prepare for sleep to nourish all meridians.'),
-    ],
-  ),
-];
-
-// ═══════════════════════════════════════════════════════════════
 // Solar Term Mapping (approximate by month)
 // ═══════════════════════════════════════════════════════════════
 
-String _getCurrentSolarTermInfo() {
+(String, String) _currentTermAndNorthSeason() {
   final now = DateTime.now();
   final month = now.month;
   final day = now.day;
@@ -229,7 +48,7 @@ String _getCurrentSolarTermInfo() {
     termName = t.$3;
     season = t.$4;
   }
-  return '$termName \u00b7 $season';
+  return (termName, season);
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -251,7 +70,7 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
     receiveTimeout: const Duration(seconds: 15),
   ));
 
-  late ShiChenData _currentShiChen;
+  late DayPartData _dayPart;
   String _solarTermInfo = '';
   String _dailyInsight = '';
   // ignore: unused_field
@@ -264,9 +83,23 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
   @override
   void initState() {
     super.initState();
-    _currentShiChen = getCurrentShiChen();
-    _solarTermInfo = _getCurrentSolarTermInfo();
+    _dayPart = getCurrentDayPart();
+    _solarTermInfo = _pill();
+    _syncDevice();
     _fetchDashboard();
+  }
+
+  /// "Frost Descent · Late Autumn" in the north; the local season and its stage in the south.
+  String _pill() {
+    final (term, season) = _currentTermAndNorthSeason();
+    return homeSeasonPill(termName: term, northSeasonLabel: season, hemisphere: HemisphereResolver.current());
+  }
+
+  /// Tell the server what this device detected (once per session; it never replaces a hemisphere the user chose),
+  /// then redraw the season line with the hemisphere the server settled on.
+  Future<void> _syncDevice() async {
+    await CultureBinding.syncDeviceOnce();
+    if (mounted) setState(() => _solarTermInfo = _pill());
   }
 
   Future<void> _fetchDashboard() async {
@@ -328,8 +161,8 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final sc = _currentShiChen;
-    final timeDisplay = '${sc.timeRange.replaceAll('-', ':00 - ')}:00';
+    final sc = _dayPart;
+    final timeDisplay = sc.timeDisplay;
 
     if (_loading) return const HomeSkeleton();
 
@@ -355,7 +188,7 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
 
             const SliverToBoxAdapter(child: SizedBox(height: 28)),
             // ═══════════════ Picked for you ═══════════════
-            SliverToBoxAdapter(child: PersonalHomeSection(api: PersonalHomeBinding.api())),
+            SliverToBoxAdapter(child: PersonalHomeSection(api: PersonalHomeBinding.api(), strings: PersonalHomeBinding.strings)),
             const SliverToBoxAdapter(child: SizedBox(height: 20)),
 
             // ═══════════════ Hero 经络意境区 ═══════════════
@@ -425,7 +258,7 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
   }
 
   // ─── TopAppBar ───
-  Widget _buildTopBar(ShiChenData sc) {
+  Widget _buildTopBar(DayPartData sc) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
       child: Row(
@@ -475,7 +308,7 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
   }
 
   // ─── 时辰大标题 + 节气胶囊 ───
-  Widget _buildHeroTitle(ShiChenData sc, String timeDisplay) {
+  Widget _buildHeroTitle(DayPartData sc, String timeDisplay) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -500,7 +333,7 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
             children: [
               TextSpan(text: '${sc.name} · '),
               TextSpan(
-                text: '${sc.meridian} Meridian Active',
+                text: sc.focus,
                 style: TextStyle(color: ShunShiColors.secondary),
               ),
             ],
@@ -528,7 +361,7 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
   }
 
   // ─── Hero 经络意境区 ───
-  Widget _buildHeroImage(ShiChenData sc) {
+  Widget _buildHeroImage(DayPartData sc) {
     return Container(
       height: 280,
       width: double.infinity,
@@ -635,7 +468,7 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
   }
 
   // ─── Bento Action Suggestions (vertical list) ───
-  Widget _buildBentoGrid(ShiChenData sc) {
+  Widget _buildBentoGrid(DayPartData sc) {
     return Column(
       children: sc.actions.map((action) => _buildBentoCard(action)).toList()
         ..insert(1, const SizedBox(height: 16)),
@@ -690,7 +523,7 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
   }
 
   // ─── AI Assistant Module ───
-  Widget _buildAIModule(ShiChenData sc) {
+  Widget _buildAIModule(DayPartData sc) {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(

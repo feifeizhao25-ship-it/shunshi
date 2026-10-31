@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 /// "Plan & usage": what the plan includes and how much was used today.
 /// Everything comes from the backend ([load]); an unreadable counter is shown as unavailable, never as zero.
@@ -12,6 +13,21 @@ class PlanUsagePage extends StatefulWidget {
 
   @override
   State<PlanUsagePage> createState() => _PlanUsagePageState();
+}
+
+/// "Daily limits reset today at 11:00 PM." in the device's own time zone (English only). The server counts days in
+/// Beijing time, so it sends the exact reset instant (`resets_at`, UTC) and the app shows when that is *for you*.
+/// Returns null when the instant is missing or unreadable (the caller then falls back to the server's note).
+@visibleForTesting
+String? planResetLine(Object? resetsAt, {DateTime? now}) {
+  final at = DateTime.tryParse('${resetsAt ?? ''}')?.toLocal();
+  if (at == null) return null;
+  final today = (now ?? DateTime.now()).toLocal();
+  final time = DateFormat.jm('en_US').format(at);
+  final dayDiff = DateTime(at.year, at.month, at.day).difference(DateTime(today.year, today.month, today.day)).inDays;
+  if (dayDiff <= 0) return 'Daily limits reset today at $time.';
+  if (dayDiff == 1) return 'Daily limits reset tomorrow at $time.';
+  return 'Daily limits reset on ${DateFormat.MMMd('en_US').format(at)} at $time.';
 }
 
 class _S {
@@ -141,9 +157,9 @@ class _PlanUsagePageState extends State<PlanUsagePage> {
           Text(_S.today, style: text.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
           const SizedBox(height: 8),
           for (final it in items) _UsageRow(item: Map<String, dynamic>.from(it)),
-          if ('${d['reset_note'] ?? ''}'.isNotEmpty) ...[
+          if ((planResetLine(d['resets_at']) ?? '${d['reset_note'] ?? ''}').isNotEmpty) ...[
             const SizedBox(height: 8),
-            Text('${d['reset_note']}', key: const Key('plan-usage-reset'), style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+            Text(planResetLine(d['resets_at']) ?? '${d['reset_note']}', key: const Key('plan-usage-reset'), style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
           ],
         ],
       ),

@@ -66,7 +66,7 @@ def test_undeclared_age_is_reported_so_the_client_can_ask(env):
         "declared": False, "age_group": "unknown"}
 
 
-def test_under_14_cannot_chat_without_guardian_consent(env):
+def test_under_16_cannot_chat_even_with_a_guardian(env):
     client, headers, declare, send, calls = env
     assert declare(10).json()["age_group"] == "child"
     response = send()
@@ -75,7 +75,7 @@ def test_under_14_cannot_chat_without_guardian_consent(env):
     assert calls == []  # 模型一次也没调
 
 
-def test_14_to_17_chats_in_minor_mode_without_intimate_roleplay(env):
+def test_16_to_17_chats_in_minor_mode_without_intimate_roleplay(env):
     client, headers, declare, send, calls = env
     assert declare(16).json()["age_group"] == "minor"
     body = send().json()
@@ -115,3 +115,51 @@ def test_future_birth_date_is_rejected_in_chinese(env):
     response = client.post("/api/v1/settings/age-profile", headers=headers, json={"birth_date": tomorrow})
     assert response.status_code == 422
     assert "出生日期" in str(response.json()["detail"])
+
+
+def test_15_is_still_blocked_and_16_is_the_minimum_everywhere(env):
+    """2026-10-31：最低使用年龄统一 16（所有产品、国内国际）。15 岁拒绝，16 岁进未成年人模式。"""
+    from app.router.subscription_local import REGION_COMPLIANCE
+    from app.services.age_policy import MIN_AGE
+    assert MIN_AGE == 16
+    assert {c["age_minimum"] for c in REGION_COMPLIANCE.values()} == {16}
+    client, headers, declare, send, calls = env
+    assert declare(15).json()["age_group"] == "child"
+    assert send().status_code == 403 and calls == []
+
+
+GLOBAL_HEADERS = {"X-App-Market": "global", "Accept-Language": "en-US"}
+
+
+def test_under_16_block_message_is_english_for_the_international_edition(env):
+    """2026-10-31：拒绝文案按版本 / 请求语言本地化——国际版全英文，国内版仍是中文。"""
+    client, headers, declare, send, calls = env
+    assert declare(10).json()["age_group"] == "child"
+    zh = send()
+    assert zh.status_code == 403 and "监护人" in zh.json()["detail"]
+    en = client.post("/api/v1/chat/send", headers={**headers, **GLOBAL_HEADERS}, json={"message": "I want to sleep earlier"})
+    assert en.status_code == 403
+    text = en.json()["detail"]
+    assert "16" in text and "guardian" in text
+    assert not any("\u4e00" <= ch <= "\u9fff" for ch in text), text
+    assert calls == []  # 模型一次也没调
+
+
+def test_age_profile_errors_are_english_for_the_international_edition(env):
+    client, headers, declare, send, calls = env
+    tomorrow = (date.today() + timedelta(days=1)).isoformat()
+    bad = client.post("/api/v1/settings/age-profile", headers={**headers, **GLOBAL_HEADERS}, json={"birth_date": tomorrow})
+    assert bad.status_code == 422
+    assert "date of birth" in str(bad.json()), bad.json()
+    assert declare(16).json()["age_group"] == "minor"
+    locked = client.post("/api/v1/settings/age-profile", headers={**headers, **GLOBAL_HEADERS}, json={"birth_date": _birth(30)})
+    assert locked.status_code == 409
+    assert "support" in locked.json()["detail"]
+    assert not any("\u4e00" <= ch <= "\u9fff" for ch in locked.json()["detail"])
+
+
+def test_age_policy_helpers_pick_the_language():
+    from app.services.age_policy import CHILD_BLOCK_TEXT, CHILD_BLOCK_TEXT_EN, child_block_text
+
+    assert child_block_text("en") == CHILD_BLOCK_TEXT_EN and child_block_text("zh") == CHILD_BLOCK_TEXT
+    assert child_block_text() == CHILD_BLOCK_TEXT  # old callers keep the Chinese text

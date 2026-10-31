@@ -87,7 +87,7 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
                 Text('Push notifications', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
                 const SizedBox(height: 12),
                 _buildSwitchTile('Solar term reminder', 'Follow the 24 solar terms for wellness tips', Icons.eco, _solarReminder, (v) { setState(() => _solarReminder = v); _savePref('solar_reminder', v); }),
-                _buildSwitchTile('Daily rhythm reminders', 'Timed reminders for the twelve two-hour periods', Icons.schedule, _shichenReminder, (v) { setState(() => _shichenReminder = v); _savePref('shichen_reminder', v); }),
+                _buildSwitchTile('Daily rhythm reminders', 'Gentle reminders through the day', Icons.schedule, _shichenReminder, (v) { setState(() => _shichenReminder = v); _savePref('shichen_reminder', v); }),
                 _buildSwitchTile('Check-in reminder', 'Daily wellness task reminder', Icons.done_all, _checkinReminder, (v) { setState(() => _checkinReminder = v); _savePref('checkin_reminder', v); }),
               ],
             ),

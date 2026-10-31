@@ -161,7 +161,7 @@ class AppRouter {
       }),
       GoRoute(path: '/favorites', builder: (context, state) => const FavoritesPage()),
       GoRoute(path: '/plan-usage', builder: (context, state) => PlanUsagePage(load: PlanUsageBinding.load, onUpgrade: () => context.push('/subscription'))),
-      GoRoute(path: '/culture-settings', builder: (context, state) => const CultureSettingsPage(load: CultureBinding.load, save: CultureBinding.save)),
+      GoRoute(path: '/culture-settings', builder: (context, state) => const CultureSettingsPage(load: CultureBinding.load, save: CultureBinding.save, useDevice: CultureBinding.useDevice)),
       GoRoute(path: '/about', builder: (context, state) => const AboutPage()),
       GoRoute(path: '/search', builder: (context, state) => const GlobalSearchPage()),
       GoRoute(path: '/feedback', builder: (context, state) => const fb.FeedbackPage()),

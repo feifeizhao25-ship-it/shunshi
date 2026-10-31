@@ -50,7 +50,7 @@ class AboutPage extends StatelessWidget {
             child: Column(children: [
               _featureRow(Icons.eco, 'Solar Term Wellness', 'Follow the 24 Solar Terms for Wellness'),
               const Divider(height: 20),
-              _featureRow(Icons.schedule, 'ShiChen Reminders', '12 ShiChen Meridian Reminders'),
+              _featureRow(Icons.schedule, 'Daily rhythm reminders', 'Gentle reminders through the day'),
               const Divider(height: 20),
               _featureRow(Icons.health_and_safety, 'Body Type Identification', '9 Body Types with Smart Scoring'),
               const Divider(height: 20),

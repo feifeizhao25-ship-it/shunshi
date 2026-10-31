@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/router/safe_pop.dart';
-import '../../../core/network/api_singleton.dart';
 
 class MedicalDisclaimerPage extends StatelessWidget {
   const MedicalDisclaimerPage({super.key});
@@ -69,15 +68,15 @@ class MedicalDisclaimerPage extends StatelessWidget {
             '3.3 Post-Surgery Recovery\n'
             '• Post-surgery users should strictly follow their doctor\'s orders\n'
             '• Exercise and diet recommendations should be confirmed with your treating physician before execution\n\n'
-            '3.4 Children\n'
-            '• This app is not intended for children under 14 years of age\n'
-            '• Adolescents should use the app under the supervision and guidance of a guardian',
+            '3.4 Age\n'
+            '• You must be at least 16 years old to use this app; it is not intended for anyone under 16\n'
+            '• Users aged 16–17 should use the app with the knowledge and guidance of a parent or guardian',
             textColor,
           ),
           const SizedBox(height: 12),
           _sectionTitle('4. Emergency Situations'),
           _body(
-            'If you experience any of the following, please call emergency services (911 or your local emergency number) or go to the nearest medical facility immediately:\n\n'
+            'If you experience any of the following, please call emergency services (your local emergency number) or go to the nearest medical facility immediately:\n\n'
             '• Chest pain, difficulty breathing\n'
             '• Severe bleeding or trauma\n'
             '• Sudden severe headache, confusion\n'

@@ -1,5 +1,6 @@
 import '../../../../data/network/api_client.dart';
 import '../../../widgets/personal_home_section.dart';
+import '../../../widgets/personal_home_strings_en.dart';
 
 /// Connects the personalised-home block to this app's authenticated API client.
 class PersonalHomeBinding {
@@ -12,6 +13,9 @@ class PersonalHomeBinding {
     final sign = o.isNegative ? '-' : '+';
     return 'UTC$sign${(m ~/ 60).toString().padLeft(2, '0')}:${(m % 60).toString().padLeft(2, '0')}';
   }
+
+  /// This edition's text; the shared widget carries no language of its own.
+  static const PersonalHomeStrings strings = kPersonalHomeStringsEn;
 
   static PersonalHomeApi api() => PersonalHomeApi(
         load: () async {
