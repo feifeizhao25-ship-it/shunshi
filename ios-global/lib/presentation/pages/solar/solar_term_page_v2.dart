@@ -10,6 +10,7 @@ import '../../widgets/seasons_visual.dart';
 import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/config/app_config.dart';
+import '../../../core/solar_term/solar_term_en.dart';
 
 class SolarTermPageV2 extends StatefulWidget {
   final String? termName;
@@ -120,12 +121,9 @@ class _SolarTermPageV2State extends State<SolarTermPageV2> {
                       Row(children: [
                         
                         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                          Text(_term['name']?.toString() ?? 'Solar term', style: TextStyle(
+                          Text(solarTermEnglish(_term).isEmpty ? 'Solar term' : solarTermEnglish(_term), style: TextStyle(
                             fontFamily: ShunShiTypography.serifFamily,
                             fontSize: 32, fontWeight: FontWeight.bold, color: ShunShiColors.textPrimary,
-                          )),
-                          Text(_term['name_en']?.toString() ?? '', style: TextStyle(
-                            fontSize: 14, color: ShunShiColors.textTertiary,
                           )),
                         ])),
                       ]),
@@ -154,8 +152,8 @@ class _SolarTermPageV2State extends State<SolarTermPageV2> {
                           const Icon(Icons.event_outlined, size: 26, color: Color(0xFF144227)),
                           const SizedBox(width: 12),
                           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                            Text('Next: ${_next['name']}', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
-                            Text('${_next['name_en'] ?? ''} · ${_next['countdown_days'] != null ? '${_next['countdown_days']} days' : _next['date'] ?? ''}',
+                            Text('Next: ${solarTermEnglish(_next)}', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+                            Text(_next['countdown_days'] != null ? '${_next['countdown_days']} days' : _next['date']?.toString() ?? '',
                               style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
                           ])),
                         ]),

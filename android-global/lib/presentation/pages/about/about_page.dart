@@ -72,7 +72,7 @@ class AboutPage extends StatelessWidget {
           const SizedBox(height: 24),
 
           // Footer
-          Center(child: Text("© 2026 ShunShi Health Tech\n\"The finest doctor treats before illness\" — Huangdi Neijing (Yellow Emperor's Inner Classic)",
+          Center(child: Text("© 2026 SEASONS\n\"The finest doctor treats before illness\" — Huangdi Neijing (Yellow Emperor's Inner Classic)",
             textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary, height: 1.8))),
           const SizedBox(height: 32),
         ],

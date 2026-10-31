@@ -17,9 +17,9 @@ class ProfilePageV2 extends StatefulWidget {
 
 class _ProfilePageV2State extends State<ProfilePageV2> {
   int _favoriteCount = 0;
-  String _userName = '\u987a\u65f6\u5c0f\u53cb';
+  String _userName = 'SEASONS';
 
-  final String _subscriptionTier = '\u514d\u8d39\u7528\u6237';
+  final String _subscriptionTier = 'Free Plan';
 
   @override
   void initState() {
@@ -68,7 +68,7 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
                 padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
                 child: Row(
                   children: [
-                    Text('ShunShi AI', style: TextStyle(
+                    Text('SEASONS AI', style: TextStyle(
                       fontFamily: ShunShiTypography.serifFamily,
                       fontSize: 18, fontWeight: FontWeight.w600,
                       color: ShunShiColors.primary,

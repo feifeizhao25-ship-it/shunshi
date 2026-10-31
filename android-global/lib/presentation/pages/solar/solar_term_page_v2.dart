@@ -197,9 +197,6 @@ class _SolarTermPageV2State extends State<SolarTermPageV2> {
                             fontFamily: ShunShiTypography.serifFamily,
                             fontSize: 32, fontWeight: FontWeight.bold, color: ShunShiColors.textPrimary,
                           )),
-                          Text(ZhEnMapper.isChinese(_term['name']?.toString()) ? _term['name']?.toString() ?? '' : '', style: TextStyle(
-                            fontSize: 14, color: ShunShiColors.textTertiary,
-                          )),
                         ])),
                       ]),
                       const SizedBox(height: 8),
@@ -228,7 +225,7 @@ class _SolarTermPageV2State extends State<SolarTermPageV2> {
                           const SizedBox(width: 12),
                           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                             Text('${AppLocalizations.of(context).t('solar_next').replaceAll('{name}', ZhEnMapper.solarTermFromApi(_next))}', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
-                            Text('${ZhEnMapper.isChinese(_next['name']?.toString()) ? _next['name'] ?? '' : ''} · ${_next['countdown_days'] != null ? '${_next['countdown_days']}d away' : _next['date'] ?? ''}',
+                            Text(_next['countdown_days'] != null ? '${_next['countdown_days']}d away' : _next['date']?.toString() ?? '',
                               style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
                           ])),
                         ]),

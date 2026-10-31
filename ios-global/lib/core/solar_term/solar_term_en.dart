@@ -34,3 +34,18 @@ const Map<String, (String, String)> kSolarTermEn = {
   final zh = currentSolarTermName();
   return zh == null ? null : kSolarTermEn[zh];
 }
+
+bool _hasCjk(String s) => RegExp(r'[\u3400-\u9fff]').hasMatch(s);
+
+/// English display name of a solar term from an API map (`name`, `name_en`).
+/// Without an `X-Region` header the API answers in Chinese, so never show `name` directly:
+/// prefer a non-Chinese `name_en`, then the table above, then a non-Chinese `name`; otherwise empty.
+String solarTermEnglish(Map? term) {
+  if (term == null) return '';
+  final en = term['name_en']?.toString().trim() ?? '';
+  if (en.isNotEmpty && !_hasCjk(en)) return en;
+  final name = term['name']?.toString().trim() ?? '';
+  final mapped = kSolarTermEn[name]?.$1;
+  if (mapped != null) return mapped;
+  return _hasCjk(name) ? '' : name;
+}
