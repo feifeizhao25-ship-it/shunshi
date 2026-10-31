@@ -92,9 +92,7 @@ class SeasonsPage extends StatefulWidget {
 
 class _SeasonsPageState extends State<SeasonsPage> {
   Widget build(BuildContext context) {
-    final seasonsState = <String, dynamic>{}; // TODO: integrate with solar_wellness_service
     final currentSeason = _getCurrentSeason();
-    final currentInsight = null; // TODO: integrate seasons insights
     return Scaffold(
   appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
       backgroundColor: SeasonsColors.background,
@@ -104,20 +102,6 @@ class _SeasonsPageState extends State<SeasonsPage> {
           children: [
             //
             _HeroSection(season: currentSeason),
-
-            //
-            if (currentInsight != null)
-              _InsightSection(
-                insight: currentInsight.value,
-                season: currentSeason,
-              ),
-
-            //
-            if (currentInsight != null)
-              _GentleSuggestions(
-                insight: currentInsight.value,
-                season: currentSeason,
-              ),
 
             //
             _OtherSeasons(current: currentSeason),

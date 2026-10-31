@@ -92,9 +92,7 @@ class SeasonsPage extends StatefulWidget {
 
 class _SeasonsPageState extends State<SeasonsPage> {
   Widget build(BuildContext context) {
-    final seasonsState = <String, dynamic>{}; // TODO: integrate with solar_wellness_service
     final currentSeason = _getCurrentSeason();
-    final currentInsight = null; // TODO: integrate seasons insights
     return Scaffold(
       backgroundColor: SeasonsColors.background,
       body: SingleChildScrollView(
@@ -103,20 +101,6 @@ class _SeasonsPageState extends State<SeasonsPage> {
           children: [
             // ── 顶部大视觉区域 (50%) ──
             _HeroSection(season: currentSeason),
-
-            // ── 季节感悟 ──
-            if (currentInsight != null)
-              _InsightSection(
-                insight: currentInsight.value,
-                season: currentSeason,
-              ),
-
-            // ── 生活suggestion:  ──
-            if (currentInsight != null)
-              _GentleSuggestions(
-                insight: currentInsight.value,
-                season: currentSeason,
-              ),
 
             // ── Other季节快速导航 ──
             _OtherSeasons(current: currentSeason),

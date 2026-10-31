@@ -2,6 +2,7 @@ import '../../../core/router/safe_pop.dart';
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
 import '../../../design_system/app_colors.dart';
+import '../../../core/solar_term/solar_term_table.dart';
 
 /// 养生馆 - 分类详情页
 /// 根据 type 展示具体内容列表
@@ -29,14 +30,6 @@ class WellnessCategoryPage extends StatelessWidget {
       _Item('血瘀质', '血行不畅，肤色晦暗，易出现瘀斑。唇色暗紫，眼眶暗黑。', '宜食山楂、黑豆、醋等活血化瘀之物。'),
       _Item('气郁质', '气机郁滞，神情抑郁，忧虑脆弱。形体瘦者居多。', '宜食玫瑰花、陈皮、佛手等疏肝解郁之物。'),
       _Item('特禀质', '先天禀赋不足，过敏体质。对季节适应能力差，易引发宿疾。', '宜食清淡均衡之物，避免过敏原。'),
-    ],
-    'food_therapy': [
-      _Item('菊花茶', '清热明目，疏风散热。适合春季饮用，缓解眼部疲劳。', '取杭白菊5-6朵，沸水冲泡5分钟即可饮用。', image: 'assets/images/foods/juhua.png'),
-      _Item('青团', '清明时令糕点，艾草与糯米融合，清香软糯。', '艾草汁拌入糯米粉，包入豆沙馅，蒸制15分钟。', image: 'assets/images/foods/qingtuan.png'),
-      _Item('艾草', '温经止血，散寒除湿。春季采摘鲜嫩艾草食用。', '可制作艾草粑粑、艾草鸡蛋汤等。', image: 'assets/images/foods/aicao.png'),
-      _Item('河虾', '高蛋白低脂肪，补肾壮阳。春季河虾最为肥美。', '清炒河虾或河虾豆腐汤，鲜美营养。', image: 'assets/images/foods/hexia.png'),
-      _Item('螺蛳', '清明螺蛳赛肥鹅。清热利水，明目退黄。', '葱姜爆炒或酱爆螺蛳，鲜美可口。', image: 'assets/images/foods/luosi.png'),
-      _Item('红枣桂圆粥', '补血养心，安神助眠。适合气血不足、失眠者。', '红枣10枚，桂圆肉15g，大米100g，同煮成粥。'),
     ],
     'tea': [
       _Item('玫瑰花茶', '疏肝解郁，活血散瘀。适合情绪低落、胸闷者。', '取干玫瑰花5-8朵，沸水冲泡，可加蜂蜜调味。'),
@@ -70,6 +63,49 @@ class WellnessCategoryPage extends StatelessWidget {
     ],
   };
 
+  /// 节气食谱按当前节气所在的季节显示（不再全年显示春季食材）
+  static List<_Item> _seasonalFood() {
+    switch (_seasonOfTerm(currentSolarTermName())) {
+      case 'spring':
+        return const [
+          _Item('青团', '清明前后的时令糕点，用艾草汁和糯米粉做皮，外软内甜。', '艾草汁拌入糯米粉，包入豆沙馅，蒸约 15 分钟。', image: 'assets/images/foods/qingtuan.png'),
+          _Item('艾草', '春季常见的野菜，也是端午的传统植物，可做艾草粑粑、艾草鸡蛋汤。', '食用前先焯水去苦味；对菊科植物过敏者不宜。', image: 'assets/images/foods/aicao.png'),
+          _Item('河虾', '春季河虾个头适中、肉质鲜嫩，富含蛋白质。', '清炒或做河虾豆腐汤；对海鲜过敏者避免。', image: 'assets/images/foods/hexia.png'),
+          _Item('螺蛳', '江南有「清明螺蛳赛肥鹅」的说法，春季的螺蛳肉质较肥。', '充分吐沙、煮熟透后再吃，每次不宜过量。', image: 'assets/images/foods/luosi.png'),
+          _Item('荠菜', '早春常见的野菜，可包饺子、做馄饨或煮汤。', '洗净焯水后拌馅；野菜请从可靠渠道购买，不要自行采摘不认识的植物。'),
+          _Item('香椿', '春季的时令嫩芽，常见做法是香椿炒蛋、凉拌香椿。', '食用前焯水，现采现吃，不宜久放；一次不宜吃太多。'),
+        ];
+      case 'summer':
+        return const [
+          _Item('绿豆汤', '夏季常见的解暑饮品，煮好后放凉饮用，口味清淡。', '绿豆洗净，加水煮至开花，可加少量冰糖；脾胃虚寒者不宜多喝。'),
+          _Item('冬瓜海带汤', '冬瓜水分多、热量低，与海带同煮，是夏天常见的清淡汤品。', '冬瓜去皮切块，与泡发的海带同煮约 20 分钟，少放盐。'),
+          _Item('苦瓜', '夏季常见的时令蔬菜，味苦，可清炒、凉拌或煮汤。', '切片后用盐略腌或焯水可减轻苦味；腹泻时不宜多吃。'),
+          _Item('莲藕', '夏季上市的时令食材，可凉拌、炖汤或清炒，口感脆甜。', '藕片焯水后凉拌；与排骨炖汤约 1 小时。'),
+          _Item('西瓜', '夏季解渴的水果，水分充足；不宜冰镇过度，一次不宜吃太多。', '常温或微凉食用即可；糖尿病患者请遵医嘱控制量。'),
+          _Item('薏米红豆粥', '夏季常见的粥品，口感软糯，常搭配红豆一起煮。', '薏米和红豆提前浸泡 2 小时，煮约 40 分钟。'),
+        ];
+      case 'autumn':
+        return const [
+          _Item('银耳雪梨羹', '秋季干燥时常见的甜汤，口感润滑，做法简单。', '银耳泡发撕小朵，与雪梨块同煮约 40 分钟，可加少量冰糖。'),
+          _Item('百合', '秋季上市的鲜百合，可清炒、煮粥或做甜汤，口感清甜。', '鲜百合掰开洗净，与西芹清炒或加入粥中；注意不要煮得过烂。'),
+          _Item('莲子', '常用于煮粥、煲汤的传统食材，口感软糯。', '莲子提前泡软，去芯后与米同煮约 40 分钟；莲心味苦，可去除。'),
+          _Item('山药', '秋冬常见的根茎蔬菜，可蒸、炒或炖汤，口感绵软。', '削皮时注意戴手套，避免手痒；蒸熟蘸少量糖或清炒。'),
+          _Item('柿子', '霜降前后上市，民间有「霜降吃柿子」的习俗。', '要吃完全成熟的柿子；不要空腹吃，也不要与大量螃蟹同食。'),
+          _Item('板栗', '秋季的坚果，可煮、炒或炖鸡，口感粉糯。', '在壳上划口后再煮或烤；一次不宜吃太多，容易胀气。'),
+        ];
+      case 'winter':
+        return const [
+          _Item('白萝卜', '冬季常见的蔬菜，可炖汤、清炒或腌制，口感清甜。', '与排骨或羊肉同炖约 1 小时；切块后先焯水可减轻辛味。'),
+          _Item('羊肉汤', '北方不少地方有立冬、冬至前后吃羊肉的习惯。', '羊肉先焯水去腥，加姜片慢炖约 1.5 小时；高血压、上火者适量。'),
+          _Item('烤红薯', '冬季常见的小吃，香甜软糯，含有膳食纤维。', '带皮烤约 40 分钟；不要吃烤焦的部分，一次不宜多吃。'),
+          _Item('核桃', '常见的坚果，可直接吃或加入粥、点心，口感香脆。', '每天一小把即可，注意控制总量；对坚果过敏者避免。'),
+          _Item('黑芝麻糊', '冬季常见的热饮甜点，香味浓郁，口感细腻。', '熟黑芝麻与糯米粉加水煮成糊，少放糖。'),
+          _Item('腊八粥', '农历腊月初八的传统食俗，用多种谷物和干果煮成。', '米、豆、干果提前浸泡，小火慢煮约 1 小时。'),
+        ];
+    }
+    return const [];
+  }
+
   void _showDetail(BuildContext context, _Item item) {
     showDialog(context: context, builder: (_) => AlertDialog(
       backgroundColor: AppColors.surface(context),
@@ -92,7 +128,7 @@ class WellnessCategoryPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final meta = _categoryMeta[type] ?? _categoryMeta['food_therapy']!;
-    final items = _items[type] ?? [];
+    final items = type == 'food_therapy' ? _seasonalFood() : (_items[type] ?? const <_Item>[]);
     return Scaffold(
       backgroundColor: AppColors.background(context),
       appBar: AppBar(
@@ -159,4 +195,21 @@ class _Item {
   final String tip;
   final String? image;
   const _Item(this.name, this.desc, this.tip, {this.image});
+}
+
+String _seasonOfTerm(String? term) {
+  const spring = ['立春', '雨水', '惊蛰', '春分', '清明', '谷雨'];
+  const summer = ['立夏', '小满', '芒种', '夏至', '小暑', '大暑'];
+  const autumn = ['立秋', '处暑', '白露', '秋分', '寒露', '霜降'];
+  if (term != null) {
+    if (spring.contains(term)) return 'spring';
+    if (summer.contains(term)) return 'summer';
+    if (autumn.contains(term)) return 'autumn';
+    return 'winter';
+  }
+  final m = DateTime.now().month;
+  if (m >= 3 && m <= 5) return 'spring';
+  if (m >= 6 && m <= 8) return 'summer';
+  if (m >= 9 && m <= 11) return 'autumn';
+  return 'winter';
 }

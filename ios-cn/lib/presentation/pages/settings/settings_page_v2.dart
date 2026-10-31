@@ -73,8 +73,8 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
 
           // 账号安全
           _buildSectionCard([
-            _buildNavTile(Icons.shield, '账号安全中心'),
-            _buildNavTile(Icons.lock, '隐私设置'),
+            
+            _buildNavTile(Icons.lock, '隐私与数据', '/privacy'),
           ]),
           const SizedBox(height: 16),
 
@@ -116,7 +116,7 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
                 child: Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(color: AppColors.primary(context).withOpacity(0.06), borderRadius: BorderRadius.circular(10)),
-                  child: Text('预览效果：现在是 寅时 · 肺经当令\n早起呼吸训练', style: TextStyle(fontSize: 18, color: AppColors.primary(context), fontWeight: FontWeight.w500)),
+                  child: Text('预览效果：字号会像这样放大，页面也会更简洁\n今日节气提示', style: TextStyle(fontSize: 18, color: AppColors.primary(context), fontWeight: FontWeight.w500)),
                 ),
               ),
             ]),
@@ -139,14 +139,17 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
             ListTile(
               leading: Icon(Icons.cleaning_services, color: AppColors.primary(context), size: 20),
               title: Text('清除缓存', style: TextStyle(fontSize: 15, color: AppColors.textPrimary(context))),
-              trailing: Text('124.5 MB', style: TextStyle(fontSize: 13, color: AppColors.textTertiary(context))),
-              onTap: () {},
+              onTap: () {
+                PaintingBinding.instance.imageCache.clear();
+                PaintingBinding.instance.imageCache.clearLiveImages();
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('已清除图片缓存')));
+              },
             ),
             ListTile(
               leading: Icon(Icons.info_outline, color: AppColors.primary(context), size: 20),
               title: Text('关于顺时', style: TextStyle(fontSize: 15, color: AppColors.textPrimary(context))),
               trailing: Row(mainAxisSize: MainAxisSize.min, children: [
-                Text('版本 2.4.0', style: TextStyle(fontSize: 13, color: AppColors.textTertiary(context))),
+                Text('版本 1.0.0', style: TextStyle(fontSize: 13, color: AppColors.textTertiary(context))),
                 Icon(Icons.chevron_right, color: AppColors.textTertiary(context), size: 18),
               ]),
               onTap: () => context.push('/about'),
@@ -176,12 +179,12 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
     );
   }
 
-  Widget _buildNavTile(IconData icon, String title) {
+  Widget _buildNavTile(IconData icon, String title, String route) {
     return ListTile(
       leading: Icon(icon, color: AppColors.primary(context), size: 20),
       title: Text(title, style: TextStyle(fontSize: 15, color: AppColors.textPrimary(context))),
       trailing: Icon(Icons.chevron_right, color: AppColors.textTertiary(context), size: 18),
-      onTap: () {},
+      onTap: () => context.push(route),
     );
   }
 

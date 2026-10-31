@@ -47,6 +47,7 @@ class _WellnessHomePageState extends State<WellnessHomePage>
   String _bannerDesc = '心经当令，适合闭目养神 15 分钟，配合深呼吸舒缓心火。';
   String _bannerTag = currentSolarTermName() ?? '今日建议';
   String _bannerEmoji = '🧘';
+  bool _bannerReady = false; // 接口没返回今天的建议前不显示横幅，避免显示和当前时间不符的默认文案
 
   static const _categories = [
     _WellnessCategory(
@@ -156,13 +157,6 @@ class _WellnessHomePageState extends State<WellnessHomePage>
     final bg = isDark ? ShunShiColors.darkBackground : ShunShiColors.background;
 
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        elevation: 0,
-      ),
       backgroundColor: bg,
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
@@ -231,8 +225,10 @@ class _WellnessHomePageState extends State<WellnessHomePage>
                       color: ShunShiColors.surfaceContainerLow,
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const TextField(
-                      decoration: InputDecoration(
+                    child: TextField(
+                      readOnly: true,
+                      onTap: () => context.push('/search'),
+                      decoration: const InputDecoration(
                         hintText: '搜索调理方案、节气食谱...',
                         hintStyle: TextStyle(
                           color: ShunShiColors.textTertiary,
@@ -251,11 +247,13 @@ class _WellnessHomePageState extends State<WellnessHomePage>
                   const SizedBox(height: 28),
 
                   // ── 今日养生建议横幅 ──
-                  FadeTransition(
-                    opacity: _bannerFade,
-                    child: _buildDailyTipBanner(isDark),
-                  ),
-                  const SizedBox(height: 32),
+                  if (_bannerReady) ...[
+                    FadeTransition(
+                      opacity: _bannerFade,
+                      child: _buildDailyTipBanner(isDark),
+                    ),
+                    const SizedBox(height: 32),
+                  ],
 
                   // ── 2x3 渐变卡片网格 ──
                   GridView.builder(
@@ -299,7 +297,7 @@ class _WellnessHomePageState extends State<WellnessHomePage>
                               ),
                               const SizedBox(height: 8),
                               const Text(
-                                '精选编辑',
+                                '时令精选',
                                 style: TextStyle(
                                   fontSize: 28,
                                   fontWeight: FontWeight.w700,
@@ -309,7 +307,7 @@ class _WellnessHomePageState extends State<WellnessHomePage>
                                 ),
                               ),
                               Text(
-                                '编辑推荐',
+                                '按当前节气',
                                 style: TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w500,
@@ -319,60 +317,36 @@ class _WellnessHomePageState extends State<WellnessHomePage>
                               ),
                             ],
                           ),
-                          GestureDetector(
-                            onTap: () => context.push('/wellness-report'),
-                            child: const Row(
-                              children: [
-                                Text(
-                                  '查看全部',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    color: ShunShiColors.primary,
-                                  ),
-                                ),
-                                SizedBox(width: 2),
-                                Icon(
-                                  Icons.chevron_right,
-                                  size: 18,
-                                  color: ShunShiColors.primary,
-                                ),
-                              ],
-                            ),
-                          ),
                         ],
                       ),
                       const SizedBox(height: 24),
 
                       // 3 Editor Cards
       _editorCard(
-                        tag: '惊蛰',
-                        readTime: '5分钟阅读',
-                        title: '春季养生：从调理肝气开始',
-                        desc: '惊蛰时节，阳气初动。本期编辑精选为您带来春季护肝的三个关键穴位与食疗方案。',
-                        likes: '1,208',
+                        tag: currentSolarTermName() ?? '时令',
+                        title: '时令食谱：当下吃什么',
+                        desc: '按节气整理的食材与做法，点开能看到每一道的用料和步骤。',
+                        icon: Icons.restaurant_menu,
                         gradient: [ShunShiColors.apricotLight, ShunShiColors.secondary],
                         route: '/wellness-category/food_therapy',
                       ),
                       const SizedBox(height: 16),
                       _editorCard(
                         tag: '功法',
-                        readTime: '8分钟阅读',
-                        title: '八段锦：唤醒身体的经络能量',
-                        desc: '简单易学的传统健身功法，每天十分钟，改善久坐带来的肩颈僵硬。',
-                        likes: '3,450',
+                        title: '传统功法：八段锦、太极拳等',
+                        desc: '动作舒缓的传统功法，附每次练习的时长和注意事项。',
+                        icon: Icons.self_improvement,
                         gradient: [ShunShiColors.primaryContainer, ShunShiColors.primaryLight],
                         route: '/wellness-category/exercise',
                       ),
                       const SizedBox(height: 16),
                       _editorCard(
-                        tag: '食补',
-                        readTime: '4分钟阅读',
-                        title: '五味入五脏：平衡你的日常膳食',
-                        desc: '酸入肝、辛入肺。理解食物的味道，就是理解身体的需求。',
-                        likes: '892',
+                        tag: '茶饮',
+                        title: '养生茶饮：材料与冲泡方法',
+                        desc: '常见茶饮的材料、用量和冲泡时间，一看就能照着做。',
+                        icon: Icons.emoji_food_beverage,
                         gradient: [ShunShiColors.apricotLight, ShunShiColors.apricot],
-                        route: '/wellness-category/food_therapy',
+                        route: '/wellness-category/tea',
                       ),
                     ],
                   ),
@@ -413,6 +387,8 @@ class _WellnessHomePageState extends State<WellnessHomePage>
         final d = res.data as Map<String, dynamic>;
         if (mounted) {
           setState(() {
+            final t = d['title'];
+            _bannerReady = t is String && t.trim().isNotEmpty;
             _bannerTitle = d['title'] as String? ?? _bannerTitle;
             _bannerDesc = d['description'] as String? ?? d['content'] as String? ?? _bannerDesc;
             _bannerEmoji = d['emoji'] as String? ?? _bannerEmoji;
@@ -563,10 +539,9 @@ class _WellnessHomePageState extends State<WellnessHomePage>
   // ── 精选编辑卡片（保持原有逻辑） ──
   Widget _editorCard({
     required String tag,
-    required String readTime,
     required String title,
     required String desc,
-    required String likes,
+    required IconData icon,
     required List<Color> gradient,
     required String route,
   }) {
@@ -583,7 +558,7 @@ class _WellnessHomePageState extends State<WellnessHomePage>
         ),
         child: Row(
           children: [
-            // Left image placeholder
+            // 左侧色块 + 图标
             Container(
               width: 110,
               height: 140,
@@ -598,9 +573,9 @@ class _WellnessHomePageState extends State<WellnessHomePage>
               ),
               child: Center(
                 child: Icon(
-                  Icons.article,
-                  size: 32,
-                  color: Colors.white.withValues(alpha: 0.6),
+                  icon,
+                  size: 36,
+                  color: Colors.white.withValues(alpha: 0.85),
                 ),
               ),
             ),
@@ -633,14 +608,6 @@ class _WellnessHomePageState extends State<WellnessHomePage>
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 8),
-                            Text(
-                              readTime,
-                              style: const TextStyle(
-                                fontSize: 10,
-                                color: ShunShiColors.textTertiary,
-                              ),
-                            ),
                           ],
                         ),
                         const SizedBox(height: 8),
@@ -667,22 +634,17 @@ class _WellnessHomePageState extends State<WellnessHomePage>
                         ),
                       ],
                     ),
-                    Row(
+                    const Row(
                       children: [
-                        const Icon(
-                          Icons.favorite,
-                          size: 14,
-                          color: ShunShiColors.secondary,
-                        ),
-                        const SizedBox(width: 4),
                         Text(
-                          '$likes 收藏',
-                          style: const TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w500,
+                          '去看看',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
                             color: ShunShiColors.secondary,
                           ),
                         ),
+                        Icon(Icons.chevron_right, size: 16, color: ShunShiColors.secondary),
                       ],
                     ),
                   ],

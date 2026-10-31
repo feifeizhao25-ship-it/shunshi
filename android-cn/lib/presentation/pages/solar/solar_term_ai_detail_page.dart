@@ -3,6 +3,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../../design_system/theme.dart';
 
 class SolarTermAIDetailPage extends StatelessWidget {
@@ -113,7 +114,7 @@ class SolarTermAIDetailPage extends StatelessWidget {
             left: 0, right: 0,
             child: Center(
               child: GestureDetector(
-                onTap: () { ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('分享功能开发中'), duration: Duration(seconds: 1))); },
+                onTap: () => SharePlus.instance.share(ShareParams(text: '${_data.season}\n${_data.quote}\n${_data.description}\n—— 来自顺时')),
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
                   decoration: BoxDecoration(
@@ -176,7 +177,7 @@ class SolarTermAIDetailPage extends StatelessWidget {
                   color: ShunShiColors.primary,
                 )),
                 GestureDetector(
-                  onTap: () { ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('分享功能开发中'), duration: Duration(seconds: 1))); },
+                  onTap: () => SharePlus.instance.share(ShareParams(text: '${_data.season}\n${_data.quote}\n${_data.description}\n—— 来自顺时')),
                   child: Container(
                     width: 40, height: 40,
                     decoration: BoxDecoration(
@@ -494,17 +495,13 @@ class SolarTermAIDetailPage extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(Icons.graphic_eq, size: 20, color: ShunShiColors.primary),
+                    Icon(Icons.self_improvement, size: 20, color: ShunShiColors.primary),
                     const SizedBox(width: 8),
                     Text('静心冥想', style: TextStyle(
                       fontSize: 11, letterSpacing: 2, color: ShunShiColors.primary,
                     )),
                   ],
                 ),
-                Text(d.meditationDuration, style: TextStyle(
-                  fontSize: 10,
-                  color: ShunShiColors.textSecondary.withValues(alpha: 0.6),
-                )),
               ],
             ),
             const SizedBox(height: 16),
@@ -516,70 +513,6 @@ class SolarTermAIDetailPage extends StatelessWidget {
             Text(d.meditationDesc, style: TextStyle(
               fontSize: 13, height: 1.7, color: ShunShiColors.textSecondary,
             )),
-            const SizedBox(height: 24),
-            // Audio player row
-            Row(
-              children: [
-                // Play button
-                GestureDetector(
-                  onTap: () { ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('音频播放功能开发中'), duration: Duration(seconds: 1))); },
-                  child: Container(
-                    width: 52, height: 52,
-                    decoration: BoxDecoration(
-                      color: ShunShiColors.primary,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: ShunShiColors.primary.withValues(alpha: 0.3),
-                          blurRadius: 12, offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: const Icon(Icons.play_arrow, size: 28, color: Colors.white),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                // Progress bar
-                Expanded(
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      return SizedBox(
-                        height: 4,
-                        child: Stack(
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                color: ShunShiColors.textTertiary.withValues(alpha: 0.3),
-                                borderRadius: BorderRadius.circular(2),
-                              ),
-                            ),
-                            FractionallySizedBox(
-                              widthFactor: 0.33,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: ShunShiColors.primary,
-                                  borderRadius: BorderRadius.circular(2),
-                                ),
-                              ),
-                            ),
-                            Positioned(
-                              left: constraints.maxWidth * 0.33 - 4,
-                              top: -2,
-                              child: Container(
-                                width: 8, height: 8,
-                                decoration: const BoxDecoration(
-                                  color: ShunShiColors.primary, shape: BoxShape.circle,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
           ],
         ),
       ),
