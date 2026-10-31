@@ -39,21 +39,47 @@ def keys_for(user_id: str, now: datetime | None = None):
     return counter, f"{counter}:{uuid.uuid4().hex}", expires
 
 
-async def reserve(redis_url: str, user_id: str, tier: str):
+MESSAGES = {
+    "unavailable": ("对话额度服务暂不可用，请稍后重试", "The chat quota service is temporarily unavailable. Please try again shortly."),
+    "misconfigured": ("对话额度配置异常，请稍后重试", "The chat quota is misconfigured. Please try again later."),
+    "exhausted": ("今日对话次数已达上限，将于北京时间零点重置", "You have used today's chat messages. The limit resets at 00:00 Beijing time (16:00 UTC)."),
+}
+
+
+def message(kind: str, lang: str = "zh") -> str:
+    zh, en = MESSAGES[kind]
+    return en if lang == "en" else zh
+
+
+async def used_today(redis_url: str, user_id: str):
+    """Read-only count of today's chat messages, or None when the counter cannot be read (never a guess)."""
     if not redis_url:
-        raise HTTPException(503, detail="对话额度服务暂不可用，请稍后重试")
+        return None
+    counter, _, _ = keys_for(user_id)
+    try:
+        async with redis.from_url(redis_url, socket_timeout=3, socket_connect_timeout=3) as client:
+            value = await client.get(counter)
+    except Exception as exc:
+        logger.error('Quota read unavailable (%s)', type(exc).__name__)
+        return None
+    return int(value or 0)
+
+
+async def reserve(redis_url: str, user_id: str, tier: str, lang: str = "zh"):
+    if not redis_url:
+        raise HTTPException(503, detail=message("unavailable", lang))
     limit = get_registry()['tiers'][tier]['quotas']['ai_daily_messages']
     if isinstance(limit, bool) or not isinstance(limit, int) or limit < -1:
-        raise HTTPException(503, detail="对话额度配置异常，请稍后重试")
+        raise HTTPException(503, detail=message("misconfigured", lang))
     counter, token, expires = keys_for(user_id)
     try:
         async with redis.from_url(redis_url, socket_timeout=3, socket_connect_timeout=3) as client:
             accepted = await client.eval(RESERVE, 2, counter, token, limit, expires)
     except Exception as exc:
         logger.error('Quota reservation unavailable (%s)', type(exc).__name__)
-        raise HTTPException(503, detail="对话额度服务暂不可用，请稍后重试") from None
+        raise HTTPException(503, detail=message("unavailable", lang)) from None
     if accepted != 1:
-        raise HTTPException(429, detail="今日对话次数已达上限，将于北京时间零点重置")
+        raise HTTPException(429, detail=message("exhausted", lang))
     return counter, token
 
 

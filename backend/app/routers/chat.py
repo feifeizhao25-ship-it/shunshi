@@ -12,6 +12,7 @@
 - 网关 429/503 原样透传状态码，其余错误归并为 502，绝不退化成无信息的 500。
 """
 
+from datetime import datetime, timedelta, timezone
 from typing import Any
 import json
 import time
@@ -242,13 +243,13 @@ async def chat(
         }
     if is_global:
         saved_units = culture.read(session, user_id)["units"]
-        messages = [{"role": "system", "content": system_prompt_en(locale, _profile_lines_en(session, user_id) + culture.prompt_lines_en(session, user_id), saved_units) + _age_rules_en(age.group)}]
+        messages = [{"role": "system", "content": system_prompt_en(locale, _profile_lines_en(session, user_id) + culture.prompt_lines_en(session, user_id) + culture.date_line_en(session, user_id, datetime.now(timezone.utc)), saved_units) + _age_rules_en(age.group)}]
     else:
         from ..services.personal_profile import profile_prompt_lines_zh
 
         messages = [
             {"role": "system", "content": SYSTEM_PROMPT + "".join(age.system_rules) + profile_prompt_lines_zh(session, user_id)
-             + culture.prompt_lines_zh(session, user_id)}
+             + culture.prompt_lines_zh(session, user_id) + culture.date_line_zh(datetime.now(timezone(timedelta(hours=8))))}
         ]
     # 情绪困扰 / 敏感：安全守卫给出的共情指令要真正交给模型（原来只在危机时才看守卫结果，
     # 困扰等级的前缀被算出来又丢掉）。依赖倾向的后缀属于回答末尾，不属于给模型的指令。
@@ -299,7 +300,7 @@ async def chat(
     messages.extend(_recent_history(session, user_id))
     messages.append({"role": "user", "content": message})
     from ..services.chat_quota import reserve, refund
-    reservation = await reserve(settings.redis_url, user_id, tier)
+    reservation = await reserve(settings.redis_url, user_id, tier, **({"lang": "en"} if is_global else {}))
     try:
         if settings.model_router_url:
             answer = await request_gateway(

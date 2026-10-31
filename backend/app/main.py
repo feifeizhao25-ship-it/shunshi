@@ -175,6 +175,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     from .services.membership_status import bind_session_factory
     bind_session_factory(app.state.session_factory)
 
+    from .services.language_guard import LanguageGuardMiddleware
+
+    app.add_middleware(LanguageGuardMiddleware)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origin_list() or ["http://localhost:3000"],

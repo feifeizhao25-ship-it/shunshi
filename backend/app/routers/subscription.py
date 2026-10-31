@@ -17,6 +17,7 @@ from sqlalchemy.orm import Session
 from ..config import Settings
 from ..deps import current_user, get_session, get_settings
 from ..entitlements import get_registry
+from ..locale_context import RequestLocale, request_locale
 from ..simple_models import Entitlement
 
 router = APIRouter(prefix="/api/v1", tags=["subscription"])
@@ -45,6 +46,19 @@ def subscription_status(
 ):
     from ..services.membership_status import membership_status
     return membership_status(session, user_id)
+
+
+@router.get("/subscription/plan-usage")
+async def subscription_usage(
+    locale: RequestLocale = Depends(request_locale),
+    user_id: str = Depends(current_user),
+    session: Session = Depends(get_session),
+    settings: Settings = Depends(get_settings),
+):
+    """Plan, limits and today's real usage for the plan & usage page (English for the international edition)."""
+    from ..services.usage_report import build
+
+    return await build(session, settings.redis_url, user_id, "en" if locale.is_global else "zh")
 
 
 @router.post("/billing/callback")
