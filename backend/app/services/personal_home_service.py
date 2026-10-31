@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from datetime import date, datetime, timedelta, timezone
 from typing import Optional
 from zoneinfo import ZoneInfo
@@ -55,12 +56,23 @@ def preferences(session: Session, user_id: str) -> dict:
             "constitution_options": list(ph.CONSTITUTIONS)}
 
 
+_FIXED_OFFSET = re.compile(r"^UTC([+-])(\d{2}):(\d{2})$")
+
+
 def local_now(is_global: bool, tz_name: Optional[str], now_utc: Optional[datetime] = None) -> datetime:
     now_utc = now_utc or datetime.now(timezone.utc)
     if not is_global:
         return now_utc.astimezone(CN_TZ)
+    if not tz_name:
+        return now_utc
+    fixed = _FIXED_OFFSET.match(tz_name.strip())
+    if fixed:  # apps without an IANA name send their UTC offset, e.g. "UTC+05:30"
+        minutes = int(fixed.group(2)) * 60 + int(fixed.group(3))
+        if minutes <= 14 * 60:
+            return now_utc.astimezone(timezone(timedelta(minutes=minutes if fixed.group(1) == "+" else -minutes)))
+        return now_utc
     try:
-        return now_utc.astimezone(ZoneInfo(tz_name)) if tz_name else now_utc
+        return now_utc.astimezone(ZoneInfo(tz_name))
     except Exception:
         return now_utc
 

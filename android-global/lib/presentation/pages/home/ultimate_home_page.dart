@@ -10,6 +10,8 @@ import '../../../data/storage/storage_manager.dart';
 import '../../../design_system/theme.dart';
 import 'package:go_router/go_router.dart';
 import 'widgets/home_skeleton.dart';
+import 'widgets/personal_home_binding.dart';
+import '../../widgets/personal_home_section.dart';
 import '../../../data/services/offline_cache.dart';
 import '../../../core/theme/app_localizations.dart';
 import '../../../core/network/api_singleton.dart';
@@ -359,6 +361,9 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
             ),
 
             const SliverToBoxAdapter(child: SizedBox(height: 28)),
+            // ═══════════════ Picked for you ═══════════════
+            SliverToBoxAdapter(child: PersonalHomeSection(api: PersonalHomeBinding.api())),
+            const SliverToBoxAdapter(child: SizedBox(height: 20)),
 
             // ═══════════════ Hero 经络意境区 ═══════════════
             SliverToBoxAdapter(
