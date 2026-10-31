@@ -13,6 +13,9 @@ import '../widgets/membership_widgets.dart';
 import 'chat/chat_models.dart';
 import '../widgets/chat_sources.dart';
 import '../../core/solar_term/solar_term_en.dart';
+import '../../core/culture/device_hints.dart';
+import '../../core/culture/opening_greeting.dart';
+import 'settings/culture_binding.dart';
 import 'chat/chat_widgets.dart';
 
 const _baseUrl = 'https://api.seasonsapp.com';
@@ -94,12 +97,24 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
       } catch (_) {}
     }
     await _loadConversation(prefs);
+    if (_messages.isEmpty) {
+      // The opening card names the user's own season: ask the server which hemisphere applies (their choice, or the
+      // device guess) before writing it; fall back to the device guess if the call fails.
+      try {
+        HemisphereResolver.rememberFromProfile(await CultureBinding.load().timeout(const Duration(seconds: 4)));
+      } catch (_) {}
+    }
     if (_messages.isEmpty && mounted) {
       setState(() {
+        final greeting = openingGreeting(
+          termName: _currentSolarTerm,
+          termDesc: _solarTermDesc,
+          hemisphere: HemisphereResolver.current(),
+        );
         _messages.add(ChatMessage(
           role: 'ai',
-          text: 'It\'s $_currentSolarTerm, and the energy of the earth is shifting. How have you been feeling lately, body and mind?',
-          cards: [SuggestionCard(type: 'greeting', title: 'Now: $_currentSolarTerm', subtitle: _solarTermDesc)],
+          text: greeting.text,
+          cards: [SuggestionCard(type: 'greeting', title: greeting.cardTitle, subtitle: greeting.cardSubtitle)],
           time: _fmt(DateTime.now()),
         ));
       });

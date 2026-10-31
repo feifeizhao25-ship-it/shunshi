@@ -17,6 +17,9 @@ import '../../../core/theme/app_localizations.dart';
 import '../../../core/network/api_singleton.dart';
 import '../../core/config/app_config.dart';
 import '../../core/solar_term/solar_term_en.dart';
+import '../../core/culture/device_hints.dart';
+import '../../core/culture/opening_greeting.dart';
+import 'settings/culture_binding.dart';
 class ChatPage extends StatefulWidget {
   final String? conversationId;
   const ChatPage({super.key, this.conversationId});
@@ -108,12 +111,24 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
       } catch (_) {}
     }
     await _loadConversation(prefs);
+    if (_messages.isEmpty) {
+      // The opening card names the user's own season: ask the server which hemisphere applies (their choice, or the
+      // device guess) before writing it; fall back to the device guess if the call fails.
+      try {
+        HemisphereResolver.rememberFromProfile(await CultureBinding.load().timeout(const Duration(seconds: 4)));
+      } catch (_) {}
+    }
     if (_messages.isEmpty && mounted) {
       setState(() {
+        final greeting = openingGreeting(
+          termName: _currentSolarTerm,
+          termDesc: _solarTermDesc,
+          hemisphere: HemisphereResolver.current(),
+        );
         _messages.add(ChatMessage(
           role: 'ai',
-          text: 'During $_currentSolarTerm, the energy between heaven and earth is shifting. How have you been feeling lately?',
-          cards: [SuggestionCard(type: 'greeting', title: 'Current: $_currentSolarTerm', subtitle: _solarTermDesc)],
+          text: greeting.text,
+          cards: [SuggestionCard(type: 'greeting', title: greeting.cardTitle, subtitle: greeting.cardSubtitle)],
           time: _fmt(DateTime.now()),
         ));
       });

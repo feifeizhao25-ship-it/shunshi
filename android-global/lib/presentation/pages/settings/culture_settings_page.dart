@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/culture/device_hints.dart';
 
 /// Optional "Culture & units" preferences for the international edition.
 ///
@@ -7,13 +8,16 @@ import 'package:flutter/material.dart';
 /// (for example no snacking suggestions during daylight hours when fasting), and uses the hemisphere for the seasons
 /// on the home page. All of it can be cleared with one button.
 class CultureSettingsPage extends StatefulWidget {
-  const CultureSettingsPage({super.key, required this.load, required this.save});
+  const CultureSettingsPage({super.key, required this.load, required this.save, this.useDevice});
 
   /// GET /api/v1/profile/culture
   final Future<Map<String, dynamic>> Function() load;
 
   /// PUT /api/v1/profile/culture with {diet, observances, units, hemisphere}; returns the saved profile.
   final Future<Map<String, dynamic>> Function(Map<String, dynamic> body) save;
+
+  /// Re-detect the hemisphere from this device and apply it (replaces the user's own choice). Null hides the button.
+  final Future<Map<String, dynamic>> Function()? useDevice;
 
   @override
   State<CultureSettingsPage> createState() => _CultureSettingsPageState();
@@ -43,6 +47,7 @@ class _CultureSettingsPageState extends State<CultureSettingsPage> {
   Set<String> _observances = {};
   String? _units;
   String? _hemisphere;
+  String? _hemisphereSource; // 'user' | 'device' | null
   bool _dirty = false;
 
   @override
@@ -56,6 +61,8 @@ class _CultureSettingsPageState extends State<CultureSettingsPage> {
     _observances = {for (final v in (d['observances'] is List ? d['observances'] as List : const [])) '$v'}.intersection(_observanceLabels.keys.toSet());
     _units = d['units'] == 'metric' || d['units'] == 'imperial' ? d['units'] as String : null;
     _hemisphere = d['hemisphere'] == 'north' || d['hemisphere'] == 'south' ? d['hemisphere'] as String : null;
+    _hemisphereSource = _hemisphere == null ? null : (d['hemisphere_source'] == 'device' ? 'device' : 'user');
+    HemisphereResolver.rememberFromProfile(d);
     _dirty = false;
   }
 
@@ -85,6 +92,8 @@ class _CultureSettingsPageState extends State<CultureSettingsPage> {
         'observances': _observances.toList()..sort(),
         'units': _units,
         'hemisphere': _hemisphere,
+        // an unchanged device-detected value stays a device value; picking one in the UI makes it the user's
+        if (_hemisphereSource == 'device') 'hemisphere_source': 'device',
       };
 
   Future<void> _submit(Map<String, dynamic> body, String done) async {
@@ -223,10 +232,49 @@ class _CultureSettingsPageState extends State<CultureSettingsPage> {
             selected: {if (_hemisphere != null) _hemisphere!},
             onSelectionChanged: (s) => setState(() {
               _hemisphere = s.isEmpty ? null : s.first;
+              _hemisphereSource = _hemisphere == null ? null : 'user';
               _dirty = true;
             }),
           ),
         ),
+        if (_hemisphere != null || widget.useDevice != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(
+                key: const Key('culture-hemisphere-source'),
+                _hemisphereSource == 'device'
+                    ? 'Detected from this device\'s time zone. Choose one above to set it yourself.'
+                    : _hemisphere != null
+                        ? 'You chose this. It is never changed automatically.'
+                        : 'Not set. Your device will fill it in automatically unless you choose.',
+                style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant, height: 1.35),
+              ),
+              if (widget.useDevice != null && _hemisphereSource != 'device')
+                TextButton(
+                  key: const Key('culture-use-device'),
+                  onPressed: _saving
+                      ? null
+                      : () async {
+                          setState(() => _saving = true);
+                          try {
+                            final saved = await widget.useDevice!();
+                            if (!mounted) return;
+                            setState(() {
+                              _apply(saved);
+                              _saving = false;
+                            });
+                            ScaffoldMessenger.maybeOf(context)?.showSnackBar(const SnackBar(content: Text('Using your device setting')));
+                          } catch (_) {
+                            if (!mounted) return;
+                            setState(() => _saving = false);
+                            ScaffoldMessenger.maybeOf(context)?.showSnackBar(const SnackBar(content: Text('Could not read your device setting.')));
+                          }
+                        },
+                  child: const Text('Use my device setting'),
+                ),
+            ]),
+          ),
         const SizedBox(height: 24),
         FilledButton(
           key: const Key('culture-save'),
