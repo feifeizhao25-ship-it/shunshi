@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shunshi/presentation/widgets/personal_home_section.dart';
+import 'package:shunshi/presentation/widgets/personal_home_strings_zh.dart';
 
 const bool zh = true;
 final cjk = RegExp(r'[\u3400-\u9fff]');
@@ -34,7 +35,7 @@ Widget host(Map<String, dynamic> json) => MaterialApp(
       theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.teal),
       home: Scaffold(
         body: SingleChildScrollView(
-          child: PersonalHomeSection(key: UniqueKey(), api: PersonalHomeApi(load: () async => json, setEnabled: (_) async {})),
+          child: PersonalHomeSection(key: UniqueKey(), strings: kPersonalHomeStringsZh, api: PersonalHomeApi(load: () async => json, setEnabled: (_) async {})),
         ),
       ),
     );
