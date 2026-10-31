@@ -80,7 +80,7 @@ void main() {
       );
       await tester.tap(find.text('内容订阅·年付'));
       await tester.pump();
-      await tester.ensureVisible(find.text('前往商店确认购买'));
+      await tester.scrollUntilVisible(find.text('前往商店确认购买'), 300);
       await tester.tap(find.text('前往商店确认购买'));
       await tester.pumpAndSettle();
       expect(selected, 'content_yearly');
@@ -100,7 +100,7 @@ void main() {
         ),
       );
       expect(find.text('商店价格暂不可用'), findsNWidgets(2));  // 0S3 在售 2 个年付 SKU
-      await tester.ensureVisible(find.byType(FilledButton));
+      await tester.scrollUntilVisible(find.widgetWithText(FilledButton, '前往商店确认购买'), 300);
       expect(
         tester.widget<FilledButton>(find.byType(FilledButton)).onPressed,
         isNull,
@@ -122,7 +122,7 @@ void main() {
         },
       ),
     );
-    await tester.ensureVisible(find.text('恢复购买'));
+    await tester.scrollUntilVisible(find.text('恢复购买'), 300);
     await tester.tap(find.text('恢复购买'));
     await tester.pumpAndSettle();
     await tester.scrollUntilVisible(find.text('家和版'), -300);
@@ -167,10 +167,10 @@ void main() {
         ),
       ),
     );
-    await tester.ensureVisible(find.text('恢复购买'));
+    await tester.scrollUntilVisible(find.text('恢复购买'), 300);
     await tester.tap(find.text('恢复购买'));
     await tester.pumpAndSettle();
-    await tester.ensureVisible(find.text('暂未确认，请稍后刷新'));
+    await tester.scrollUntilVisible(find.text('暂未确认，请稍后刷新'), 300);
     expect(find.text('暂未确认，请稍后刷新'), findsOneWidget);
     expect(
       tester
