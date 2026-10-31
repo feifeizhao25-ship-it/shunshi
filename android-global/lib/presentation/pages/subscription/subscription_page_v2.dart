@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../widgets/seasons_visual.dart';
 import '../../../core/theme/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -167,6 +168,13 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    const SgHeroBanner(
+                      asset: 'assets/images/sg_hero_member.webp',
+                      title: 'SEASONS Premium',
+                      subtitle: 'Unlock the full library and unlimited conversations.',
+                      height: 150,
+                    ),
+                    const SizedBox(height: 14),
                     _buildCurrentPlanBanner(),
                     const SizedBox(height: 20),
                     _buildPlans(),
@@ -410,26 +418,22 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text('Member Benefits', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
       const SizedBox(height: 12),
-      _buildBenefit(Icons.auto_awesome, 'AI Personalized Plans', 'Wellness suggestions based on 24 solar terms and your constitution.'),
-      _buildBenefit(Icons.restaurant_menu, 'All Recipes', '5,000+ food therapy recipes with nutrition info and seasonal pairing.'),
-      _buildBenefit(Icons.headphones, 'Hi-Fi Audio', 'Immersive meditation guides and TCM expert interviews.'),
-      _buildBenefit(Icons.family_restroom, 'Family Health', 'One subscription, whole family protected.'),
-      _buildBenefit(Icons.military_tech, 'Member Badge', 'Exclusive badge celebrating your wellness milestones.'),
+      _buildBenefit('assets/images/wellness/wellness_seasonal.jpg', 'AI Personalized Plans', 'Wellness suggestions based on 24 solar terms and your constitution.'),
+      _buildBenefit('assets/images/wellness/food_lotus_soup.jpg', 'All Recipes', '5,000+ food therapy recipes with nutrition info and seasonal pairing.'),
+      _buildBenefit('assets/images/meditation.jpg', 'Hi-Fi Audio', 'Immersive meditation guides and TCM expert interviews.'),
+      _buildBenefit('assets/images/sg_badge_family.webp', 'Family Health', 'One subscription, whole family protected.'),
+      _buildBenefit('assets/images/sg_badge_lotus.webp', 'Member Badge', 'Exclusive badge celebrating your wellness milestones.'),
     ]);
   }
 
-  Widget _buildBenefit(IconData icon, String title, String desc) {
+  Widget _buildBenefit(String asset, String title, String desc) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(12)),
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Container(
-            width: 36, height: 36,
-            decoration: BoxDecoration(color: ShunShiColors.primary.withOpacity(0.08), borderRadius: BorderRadius.circular(10)),
-            child: Icon(icon, color: ShunShiColors.primary, size: 18),
-          ),
+          SgThumb(asset: asset, size: 44),
           const SizedBox(width: 12),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),

@@ -3,6 +3,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../widgets/seasons_visual.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../design_system/theme.dart';
@@ -39,6 +40,53 @@ class _AchievementPageV2State extends State<AchievementPageV2> {
   }
 
 
+  /// Every badge is earned from the counters this page already reads; nothing is pre-unlocked.
+  List<(String, String, String, bool)> _badges() => [
+        ('sg_badge_pioneer', 'First Steps', 'Chat, journal or save once', _chatCount + _diaryCount + _favoriteCount > 0),
+        ('sg_badge_curious', 'Curious Mind', 'Start a chat', _chatCount >= 1),
+        ('sg_badge_journal', 'Journal Keeper', 'Write a diary entry', _diaryCount >= 1),
+        ('sg_badge_collector', 'Collector', 'Save a favorite', _favoriteCount >= 1),
+        ('sg_badge_streak7', 'Week Streak', 'Check in 7 days in a row', _checkinStreak >= 7),
+        ('sg_badge_streak30', 'Moon Cycle', 'Check in 30 days in a row', _checkinStreak >= 30),
+        ('sg_badge_hundred', '100-Day Master', 'Check in 100 days in a row', _checkinStreak >= 100),
+      ];
+
+  Widget _badgeGrid(List<(String, String, String, bool)> items) => GridView.count(
+        crossAxisCount: 2,
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        mainAxisSpacing: 12,
+        crossAxisSpacing: 12,
+        childAspectRatio: 0.95,
+        children: [for (final b in items) SgBadge(asset: 'assets/images/${b.$1}.webp', title: b.$2, subtitle: b.$3, unlocked: b.$4)],
+      );
+
+  List<Widget> _badgeSections() {
+    final all = _badges();
+    final earned = all.where((b) => b.$4).toList();
+    final locked = all.where((b) => !b.$4).toList();
+    final head = TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 20, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary);
+    return [
+      Text('Earned · ${earned.length} of ${all.length}', style: head),
+      const SizedBox(height: 12),
+      if (earned.isEmpty)
+        const SgEmptyState(
+          asset: 'assets/images/sg_empty.webp',
+          title: 'No badges yet',
+          message: 'Your first one is a single chat, diary entry or favorite away.',
+        )
+      else
+        _badgeGrid(earned),
+      if (locked.isNotEmpty) ...[
+        const SizedBox(height: 24),
+        Text('Still to earn', style: head),
+        const SizedBox(height: 12),
+        _badgeGrid(locked),
+      ],
+      const SizedBox(height: 20),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -61,92 +109,23 @@ class _AchievementPageV2State extends State<AchievementPageV2> {
             ),
             const SizedBox(height: 16),
 
-            // 积分和等级
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(colors: [Color(0xFF144227), Color(0xFF2D7A4A)]),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Column(
-                children: [
-                  Text('2560', style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold, color: Colors.white)),
-                  Text('Points', style: TextStyle(fontSize: 14, color: Colors.white70)),
-                  const SizedBox(height: 8),
-                  Text('Current Level: Beginner', style: TextStyle(fontSize: 14, color: Color(0xFFE4C285))),
-                  const SizedBox(height: 4),
-                  Text('Next: Intermediate', style: TextStyle(fontSize: 12, color: Colors.white60)),
-                  const SizedBox(height: 8),
-                  // Progress bar
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(4),
-                    child: LinearProgressIndicator(
-                      value: 2560 / 3000, backgroundColor: Colors.white24,
-                      color: Color(0xFFE4C285), minHeight: 6,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text('440 points to next level', style: TextStyle(fontSize: 11, color: Colors.white54)),
-                ],
-              ),
+            const SgHeroBanner(
+              asset: 'assets/images/sg_hero_achieve.webp',
+              title: 'Your wellness journey',
+              subtitle: 'Badges unlock as you chat, journal and check in.',
             ),
-            const SizedBox(height: 20),
-
-            // Earned Glory
+            const SizedBox(height: 16),
             Row(children: [
-              Text('Earned Glory', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w300, fontFamily: ShunShiTypography.serifFamily, color: ShunShiColors.textPrimary)),
-              const Spacer(),
-              Text('3 / 8 Unlocked', style: TextStyle(fontSize: 13, color: ShunShiColors.textTertiary)),
+              SgStatChip(icon: Icons.local_fire_department, label: 'Streak', value: '$_checkinStreak'),
+              const SizedBox(width: 10),
+              SgStatChip(icon: Icons.menu_book_outlined, label: 'Diary', value: '$_diaryCount'),
+              const SizedBox(width: 10),
+              SgStatChip(icon: Icons.chat_bubble_outline, label: 'Chats', value: '$_chatCount'),
+              const SizedBox(width: 10),
+              SgStatChip(icon: Icons.favorite_border, label: 'Saved', value: '$_favoriteCount'),
             ]),
-            const SizedBox(height: 12),
-
-            // Unlocked badges
-            GridView.count(
-              crossAxisCount: 2, shrinkWrap: true, physics: const NeverScrollableScrollPhysics(),
-              mainAxisSpacing: 12, crossAxisSpacing: 12, childAspectRatio: 1.1,
-              children: [
-                _buildBadgeCard(Icons.wb_sunny, 'Early Riser', '10 days done', true, ShunShiColors.primary),
-                _buildBadgeCard(Icons.eco, 'Solar Envoy', 'Seasonal wellness', true, Color(0xFF2D7A4A)),
-                _buildBadgeCard(Icons.storm, 'Wellness Pioneer', 'First steps', true, Color(0xFF74593C)),
-              ],
-            ),
-            const SizedBox(height: 24),
-
-            // Path to Mastery
-            Row(children: [
-              Text('Path to Mastery', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w300, fontFamily: ShunShiTypography.serifFamily, color: ShunShiColors.textPrimary)),
-            ]),
-            const SizedBox(height: 12),
-
-            // Locked badges
-            GridView.count(
-              crossAxisCount: 2, shrinkWrap: true, physics: const NeverScrollableScrollPhysics(),
-              mainAxisSpacing: 12, crossAxisSpacing: 12, childAspectRatio: 1.1,
-              children: [
-                _buildBadgeCard(Icons.history_edu, '100-Day Master', 'Advanced', false, null),
-                _buildBadgeCard(Icons.family_restroom, 'Family Wellness', 'Together', false, null),
-                _buildBadgeCard(Icons.lock, 'Coming Soon', '', false, null),
-                _buildBadgeCard(Icons.lock, 'Coming Soon', '', false, null),
-                _buildBadgeCard(Icons.lock, 'Coming Soon', '', false, null),
-              ],
-            ),
-            const SizedBox(height: 20),
-
-            // AI 小贴士
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: ShunShiColors.primary.withOpacity(0.06),
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: ShunShiColors.primary.withOpacity(0.15)),
-              ),
-              child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Icon(Icons.auto_awesome, color: ShunShiColors.primary, size: 20),
-                const SizedBox(width: 10),
-                Expanded(child: Text('Keep waking early for 3 more days to earn the "Dawn Awakening" hidden badge.', style: TextStyle(fontSize: 14, color: ShunShiColors.textSecondary, height: 1.5))),
-              ]),
-            ),
+            const SizedBox(height: 22),
+            ..._badgeSections(),
             const SizedBox(height: 40),
           ],
         ),
@@ -154,31 +133,4 @@ class _AchievementPageV2State extends State<AchievementPageV2> {
     );
   }
 
-  Widget _buildBadgeCard(IconData icon, String title, String subtitle, bool unlocked, Color? color) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: unlocked ? ShunShiColors.surface : ShunShiColors.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(16),
-        border: unlocked && color != null ? Border.all(color: color.withOpacity(0.3)) : null,
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, size: 32,
-            color: unlocked ? (color ?? ShunShiColors.primary) : ShunShiColors.textTertiary,
-          ),
-          const SizedBox(height: 8),
-          Text(title, style: TextStyle(
-            fontSize: 14, fontWeight: FontWeight.w600,
-            color: unlocked ? ShunShiColors.textPrimary : ShunShiColors.textTertiary,
-          )),
-          if (subtitle.isNotEmpty) ...[
-            const SizedBox(height: 2),
-            Text(subtitle, style: TextStyle(fontSize: 11, color: ShunShiColors.textTertiary)),
-          ],
-        ],
-      ),
-    );
-  }
 }

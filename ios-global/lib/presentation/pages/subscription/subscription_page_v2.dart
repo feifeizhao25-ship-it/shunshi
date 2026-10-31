@@ -6,6 +6,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../widgets/seasons_visual.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../data/services/store_pricing.dart';
@@ -41,26 +42,11 @@ class SubscriptionPageV2 extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
         children: [
-          Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF144227), Color(0xFF2D7A4A)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('SEASONS Premium',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: ShunShiColors.surface)),
-                const SizedBox(height: 4),
-                const Text('Unlock the full library and unlimited conversations.',
-                    style: TextStyle(fontSize: 14, color: Colors.white70)),
-              ],
-            ),
+          const SgHeroBanner(
+            asset: 'assets/images/sg_hero_member.webp',
+            title: 'SEASONS Premium',
+            subtitle: 'Unlock the full library and unlimited conversations.',
+            height: 160,
           ),
           const SizedBox(height: 16),
           for (final product in _paid) _PlanTile(product: product),
