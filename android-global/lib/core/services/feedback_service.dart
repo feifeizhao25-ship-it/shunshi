@@ -1,15 +1,16 @@
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../config/app_config.dart';
+import '../../data/network/session.dart';
 
 class FeedbackService {
   static final _dio =
-      Dio(
+      withSessionAuth(Dio(
           BaseOptions(
             baseUrl: '${AppConfig.apiBaseUrl}/api/v1',
             connectTimeout: Duration(seconds: 10),
           ),
-        )
+        ))
         ..interceptors.add(
           InterceptorsWrapper(
             onRequest: (o, h) {
@@ -106,6 +107,6 @@ class FeedbackService {
 
   static Future<String> _getUserId() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('user_id') ?? 'guest';
+    return currentUserId() ?? '';
   }
 }

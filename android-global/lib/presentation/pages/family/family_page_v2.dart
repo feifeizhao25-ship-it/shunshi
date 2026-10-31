@@ -10,6 +10,7 @@ import '../../../core/theme/shunshi_colors.dart';
 import '../../../core/theme/app_localizations.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/network/api_singleton.dart';
+import '../../../data/network/session.dart';
 
 class FamilyPageV2 extends StatefulWidget {
   const FamilyPageV2({super.key});
@@ -38,13 +39,8 @@ class _FamilyPageV2State extends State<FamilyPageV2> {
   }
 
   Future<void> _getToken() async {
-    _token = StorageManager.user.getToken();
-    if (_token != null) return;
-    try {
-      final res = await _dio.post('/api/v1/auth/guest-login', data: {});
-      final data = res.data;
-      _token = data is Map ? (data['data'] ?? data)['token'] : null;
-    } catch (_) {}
+    // 用本机已有的登录令牌；没有才建一个游客会话并保存（不再每次打开页面都换一个空账号）。
+    _token = await ensureSessionToken(_dio);
   }
 
   Map<String, dynamic> get _authHeaders => {'Authorization': 'Bearer $_token'};

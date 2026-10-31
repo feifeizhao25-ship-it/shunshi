@@ -1,10 +1,11 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'config/app_config.dart';
+import '../data/network/session.dart';
 
 /// Feedback Service
 class FeedbackService {
-  static final _dio = Dio(BaseOptions(baseUrl: AppConfig.baseUrl, connectTimeout: const Duration(seconds: 8)));
+  static final _dio = withSessionAuth(Dio(BaseOptions(baseUrl: AppConfig.baseUrl, connectTimeout: const Duration(seconds: 8))));
 
   /// Submit feedback
   static Future<bool> submitFeedback({
@@ -14,7 +15,7 @@ class FeedbackService {
   }) async {
     try {
       final res = await _dio.post('/api/v1/feedback/submit', data: {
-        'user_id': 'guest',
+        ...userIdParam(),
         'content': content,
         'contact': contact,
         'type': 'suggestion',
@@ -30,7 +31,7 @@ class FeedbackService {
   static Future<bool> rateApp({required int rating, String? comment}) async {
     try {
       await _dio.post('/api/v1/feedback/submit', data: {
-        'user_id': 'guest',
+        ...userIdParam(),
         'content': 'Rating: $rating/5 ${comment ?? ""}',
         'type': 'rating',
       });

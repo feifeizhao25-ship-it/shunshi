@@ -12,6 +12,7 @@ import '../../../core/theme/seasons_text_styles.dart';
 import '../../widgets/components/soft_card.dart';
 import '../../../core/theme/app_localizations.dart';
 import '../../../core/network/api_singleton.dart';
+import '../../../data/network/session.dart';
 
 /// Settings / Privacy Page — SEASONS Global
 /// Includes: memory control, data export, delete account, AI disclosure
@@ -28,16 +29,16 @@ class _SettingsPageState extends State<SettingsPage> {
   bool _notificationsEnabled = true;
   bool _exportLoading = false;
   // _deleteLoading used for future loading indicator in delete button
-  String _userId = 'seasons-user';
+  String _userId = '';
   late Dio _dio;
 
   @override
   void initState() {
     super.initState();
-    _dio = Dio(BaseOptions(
+    _dio = withSessionAuth(Dio(BaseOptions(
       baseUrl: AppConfig.baseUrl,
       connectTimeout: const Duration(seconds: 15),
-    ));
+    )));
     _loadUserId();
     _loadMemoryPreference();
   }
@@ -46,7 +47,7 @@ class _SettingsPageState extends State<SettingsPage> {
     try {
       final prefs = await SharedPreferences.getInstance();
       setState(() {
-        _userId = prefs.getString('user_id') ?? 'seasons-user';
+        _userId = currentUserId() ?? '';
       });
     } catch (_) {}
   }

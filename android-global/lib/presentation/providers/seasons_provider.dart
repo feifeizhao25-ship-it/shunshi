@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../domain/entities/content.dart';
 import '../../../domain/entities/ai_response.dart';
 import '../../../core/constants/app_constants.dart';
+import '../../data/network/session.dart';
 
 class SeasonsState {
   final Map<Season, SeasonInsight> seasonInsights;
@@ -33,11 +34,11 @@ class SeasonsNotifier extends StateNotifier<SeasonsState> {
   final Dio _dio;
   
   SeasonsNotifier()
-      : _dio = Dio(BaseOptions(
+      : _dio = withSessionAuth(Dio(BaseOptions(
           baseUrl: AppConstants.baseUrl,
           connectTimeout: const Duration(seconds: 10),
           receiveTimeout: const Duration(seconds: 10),
-        )),
+        ))),
         super(const SeasonsState()) {
     loadSeasonInsights();
   }
@@ -56,7 +57,7 @@ class SeasonsNotifier extends StateNotifier<SeasonsState> {
         final seasonResp = await _dio.get(
           '/api/v1/solar-terms/current',
           queryParameters: {
-            'user_id': 'seasons-user',
+            ...userIdParam(),
             'hemisphere': hemisphere,
             'locale': 'en-US',
           },

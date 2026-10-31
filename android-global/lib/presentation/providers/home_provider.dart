@@ -3,6 +3,7 @@ import '../../core/constants/app_constants.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../domain/entities/ai_response.dart';
+import '../../data/network/session.dart';
 
 final apiBaseUrlProvider = Provider<String>((ref) {
   return AppConstants.baseUrl;
@@ -95,11 +96,11 @@ class HomeNotifier extends StateNotifier<HomeState> {
   final Dio _dio;
   final String _baseUrl;
 
-  HomeNotifier(this._baseUrl) : _dio = Dio(BaseOptions(
+  HomeNotifier(this._baseUrl) : _dio = withSessionAuth(Dio(BaseOptions(
     baseUrl: _baseUrl,
     connectTimeout: const Duration(seconds: 10),
     receiveTimeout: const Duration(seconds: 10),
-  )), super(const HomeState()) {
+  ))), super(const HomeState()) {
     loadData();
   }
 
@@ -108,7 +109,7 @@ class HomeNotifier extends StateNotifier<HomeState> {
 
     // Read user_id and hemisphere from SharedPreferences
     final prefs = await SharedPreferences.getInstance();
-    final userId = prefs.getString('user_id') ?? 'seasons-user';
+    final userId = currentUserId() ?? '';
     final hemisphere = prefs.getString('hemisphere') ?? 'north';
 
     try {

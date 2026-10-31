@@ -9,6 +9,7 @@ import '../../../design_system/theme.dart';
 import '../../../data/network/api_client.dart';
 import '../../widgets/state_view.dart';
 import '../../../core/network/api_singleton.dart';
+import '../../../data/network/session.dart';
 
 class NotificationsPage extends StatefulWidget {
   const NotificationsPage({super.key});
@@ -32,7 +33,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
     setState(() { _loading = true; _error = null; });
     try {
       final resp = await ApiClient().get('/api/v1/notifications/',
-        queryParameters: {'user_id': 'guest', 'limit': 50});
+        queryParameters: {...userIdParam(), 'limit': 50});
       if (resp.data?['success'] == true) {
         final items = resp.data['data']['items'] as List<dynamic>? ?? [];
         if (mounted) setState(() { _items = items; _loading = false; });

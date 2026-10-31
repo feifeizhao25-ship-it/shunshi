@@ -59,12 +59,12 @@ class FollowUpService {
     return null;
   }
 
-  /// 获取到期跟进列表 - GET /api/v1/followup/due
+  /// 获取到期跟进列表 - GET /api/v1/followup/check-due（/followup/due 是管理员接口）
   Future<List<FollowUpTask>> getDueFollowUps(String userId) async {
     try {
-      final res = await _dio.get('/api/v1/followup/due', queryParameters: {'user_id': userId});
+      final res = await _dio.get('/api/v1/followup/check-due', queryParameters: {'user_id': userId});
       if (res.data?['success'] == true) {
-        final List data = res.data['data'];
+        final List data = res.data['due_followups'] ?? res.data['data'] ?? [];
         return data.map((t) => FollowUpTask.fromJson(t)).toList();
       }
     } catch (_) {}
