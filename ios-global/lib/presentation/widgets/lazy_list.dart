@@ -131,7 +131,7 @@ class PaginationController<T> {
     try {
       final newItems = await _fetchPage!(_page);
       items = newItems;
-      _hasMore = newItems.length >= 20; // 假设每页20条
+      _hasMore = newItems.length >= 20; // assumes a page size of 20
       _page++;
     } finally {
       _isLoading = false;

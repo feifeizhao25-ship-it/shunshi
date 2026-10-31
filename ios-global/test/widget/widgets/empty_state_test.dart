@@ -8,12 +8,12 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: EmptyState(icon: Icons.inbox_outlined, title: '暂无内容'),
+            body: EmptyState(icon: Icons.inbox_outlined, title: 'Nothing here yet'),
           ),
         ),
       );
 
-      expect(find.text('暂无内容'), findsOneWidget);
+      expect(find.text('Nothing here yet'), findsOneWidget);
     });
 
     testWidgets('renders icon', (tester) async {
@@ -35,16 +35,16 @@ void main() {
           home: Scaffold(
             body: EmptyState(
               icon: Icons.inbox_outlined,
-              title: '暂无数据',
-              actionLabel: '刷新',
+              title: 'No data yet',
+              actionLabel: 'Refresh',
               onAction: () => pressed = true,
             ),
           ),
         ),
       );
 
-      expect(find.text('刷新'), findsOneWidget);
-      await tester.tap(find.text('刷新'));
+      expect(find.text('Refresh'), findsOneWidget);
+      await tester.tap(find.text('Refresh'));
       await tester.pump();
       expect(pressed, isTrue);
     });
