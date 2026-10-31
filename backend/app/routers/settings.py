@@ -176,3 +176,37 @@ def set_age_profile(
 
     group = declare_birth_date(session, user_id, body.birth_date)
     return {"declared": True, "age_group": group}
+
+
+# ── Culture & locale preferences (optional, user-chosen, clearable) ──────────────────────────────────────
+class CultureBody(BaseModel):
+    diet: list[str] = Field(default_factory=list)
+    observances: list[str] = Field(default_factory=list)
+    units: str | None = None
+    hemisphere: str | None = None
+
+
+@router.get("/profile/culture")
+def get_culture_profile(user_id: str = Depends(current_user), session: Session = Depends(get_session)):
+    from ..services import culture_profile as cp
+
+    return {
+        **cp.read(session, user_id),
+        "options": {
+            "diet": list(cp.DIETS),
+            "observances": list(cp.OBSERVANCES),
+            "units": list(cp.UNITS),
+            "hemisphere": list(cp.HEMISPHERES),
+        },
+    }
+
+
+@router.put("/profile/culture")
+def put_culture_profile(body: CultureBody, user_id: str = Depends(current_user), session: Session = Depends(get_session)):
+    """Save or clear (send empty lists / nulls) the preferences. Values outside the fixed lists are refused."""
+    from ..services import culture_profile as cp
+
+    try:
+        return cp.save(session, user_id, body.model_dump())
+    except cp.CultureError as error:
+        raise HTTPException(status_code=422, detail=str(error)) from error

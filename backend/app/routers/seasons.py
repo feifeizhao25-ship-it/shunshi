@@ -43,7 +43,7 @@ def _greeting(now: float | None = None) -> str:
 
 @router.get("/home/dashboard")
 def home_dashboard(
-    hemisphere: str = "north",
+    hemisphere: str | None = None,
     tz: str | None = None,
     locale: RequestLocale = Depends(request_locale),
     user_id: str = Depends(current_user),
@@ -55,7 +55,9 @@ def home_dashboard(
     from ..services.home_cards import build_dashboard
 
     is_global = locale.is_global
-    hemi = "south" if hemisphere == "south" else "north"
+    from ..services.culture_profile import effective_hemisphere
+
+    hemi, hemi_source = effective_hemisphere(session, user_id, hemisphere)
     board = phs.build(session, user_id, lang="en" if is_global else "zh", is_global=is_global, hemisphere=hemi, tz_name=tz)
     out = {
         "greeting": board["greeting"],
@@ -67,6 +69,7 @@ def home_dashboard(
         "date": board["date"],
         "time_of_day": board["time_of_day"],
         "hemisphere": hemi,
+        "hemisphere_source": hemi_source,
         "updated_at": int(time.time()),
     }
     if not is_global:

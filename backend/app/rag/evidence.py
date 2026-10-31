@@ -39,10 +39,22 @@ def _verified_chunks(lang: str, query: str, top_k: int) -> list[tuple[object, fl
     return picked
 
 
-def _details(picked, default_title: str) -> list[dict]:
+REVIEW_DUE_DAYS = 30  # shown as "review due" once the source expires within this many days
+
+
+def freshness(valid_until: str, today: date | None = None) -> tuple[str, int]:
+    """("current" | "review_due" | "expired", days left). Expired sources are never picked; this keeps the label honest."""
+    days = (date.fromisoformat(valid_until) - (today or date.today())).days
+    if days < 0:
+        return "expired", days
+    return ("review_due" if days <= REVIEW_DUE_DAYS else "current"), days
+
+
+def _details(picked, default_title: str, today: date | None = None) -> list[dict]:
     out = []
     for chunk, score in picked:
         meta = chunk.metadata
+        state, days_left = freshness(meta["valid_until"], today)
         out.append(
             {
                 "chunk_id": chunk.chunk_id,
@@ -51,6 +63,9 @@ def _details(picked, default_title: str) -> list[dict]:
                 "evidence_status": meta["evidence_status"],
                 "reviewed_at": meta["reviewed_at"],
                 "valid_until": meta["valid_until"],
+                "last_verified_at": meta["reviewed_at"],
+                "freshness": state,
+                "days_until_expiry": days_left,
                 "relevance": round(score, 4),
                 "url": _first_link(chunk.content),
             }
@@ -66,14 +81,25 @@ def _first_link(content: str) -> str | None:
     return None
 
 
+def _label_cn(item: dict) -> str:
+    text = f"{item['title']}｜官方资料已核验｜复核日期 {item['reviewed_at']}"
+    if item["freshness"] == "review_due":
+        text += f"｜即将到期，需重新复核（有效期至 {item['valid_until']}）"
+    return text
+
+
+def _label_en(item: dict) -> str:
+    text = f"{item['title']} | Official source, verified | Reviewed {item['reviewed_at']}"
+    if item["freshness"] == "review_due":
+        text += f" | Review due soon (valid until {item['valid_until']})"
+    return text
+
+
 def verified_cn_context(query: str, top_k: int = 3) -> tuple[str, list[str], list[dict]]:
     picked = _verified_chunks("cn", query, top_k)
     context = "\n\n".join(chunk.content[:900] for chunk, _ in picked)
     details = _details(picked, "官方健康资料")
-    labels = [
-        f"{item['title']}｜官方资料已核验｜复核日期 {item['reviewed_at']}"
-        for item in details
-    ]
+    labels = [_label_cn(item) for item in details]
     return context, labels, details
 
 
@@ -81,8 +107,5 @@ def verified_global_context(query: str, top_k: int = 3) -> tuple[str, list[str],
     picked = _verified_chunks("gl", query, top_k)
     context = "\n\n".join(chunk.content[:900] for chunk, _ in picked)
     details = _details(picked, "Official health information")
-    labels = [
-        f"{item['title']} | Official source, verified | Reviewed {item['reviewed_at']}"
-        for item in details
-    ]
+    labels = [_label_en(item) for item in details]
     return context, labels, details
