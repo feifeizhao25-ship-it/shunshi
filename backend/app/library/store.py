@@ -32,6 +32,22 @@ def load_document() -> dict:
     return json.loads(entries_path().read_text("utf-8"))
 
 
+def load_staged() -> list[dict]:
+    """暂存区：研究员/雷达整理出来、还没人审核的候选条目（data/staged_entries_*.json + 数据目录 staged_entries.json）。
+    永远不会出现在 annotated()/find() 里，用户看不到；人工用 review_cli promote 才会进入工作文档（仍是“待审核”）。"""
+    files = sorted((HERE / "data").glob("staged_entries_*.json"))
+    extra = data_dir() / "staged_entries.json"
+    if extra.exists():
+        files.append(extra)
+    out, seen = [], set()
+    for f in files:
+        for e in json.loads(f.read_text("utf-8")).get("entries", []):
+            if e.get("id") not in seen:
+                seen.add(e["id"])
+                out.append(e)
+    return out
+
+
 def load_state() -> dict:
     p = data_dir() / "library_state.json"
     return json.loads(p.read_text("utf-8")) if p.exists() else {"entries": {}, "candidates": []}

@@ -50,7 +50,8 @@ def test_digest_written_only_under_radar_and_nothing_else(tmp_path):
     calls = []
     res = radar.run_radar("jianji", tmp_path, http=fake_http(calls), now=NOW)
     assert Path(res["path"]).name == "digest_20261104.md"
-    assert files(tmp_path) == ["radar/digest_20261104.md", "radar/seen.json"]
+    assert files(tmp_path) == ["radar/digest_20261104.md", "radar/items_20261104.json", "radar/seen.json"]
+    assert "Evil" not in (tmp_path / "radar" / "items_20261104.json").read_text("utf-8")  # 注入条目也不进结构化线索
     assert all(__import__("urllib.parse").parse.urlparse(u).hostname in radar.ALLOWED_HOSTS for u in calls)
     text = Path(res["path"]).read_text("utf-8")
     assert "线索（未核）" in text and "没有入库" in text and "没有发任何消息" in text

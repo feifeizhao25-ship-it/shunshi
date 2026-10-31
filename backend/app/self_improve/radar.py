@@ -211,6 +211,8 @@ def run_radar(product: str, out_dir, *, http: Optional[Callable[[str, float], by
                 items.append(it)
     path = root / f"digest_{now:%Y%m%d}.md"
     path.write_text(render_digest(product, now, items, errors), "utf-8")
+    # 结构化线索（已通过白名单与注入过滤）：供 radar_stage 暂存资料库候选用；仍然只是线索，不入库
+    (root / f"items_{now:%Y%m%d}.json").write_text(json.dumps(items, ensure_ascii=False, indent=1), "utf-8")
     seen_path.write_text(json.dumps(sorted(seen | new_keys)), "utf-8")
     return {"path": str(path), "new": len(items), "errors": errors}
 
