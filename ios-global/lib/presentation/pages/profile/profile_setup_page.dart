@@ -12,27 +12,27 @@ import '../../../data/network/api_client.dart';
 
 /// 中医九种体质
 const _constitutionTypes = [
-  '平和质',
-  '气虚质',
-  '阳虚质',
-  '阴虚质',
-  '痰湿质',
-  '湿热质',
-  '血瘀质',
-  '气郁质',
-  '特禀质',
+  'Balanced',
+  'Qi Deficiency',
+  'Yang Deficiency',
+  'Yin Deficiency',
+  'Phlegm-Dampness',
+  'Damp-Heat',
+  'Blood Stasis',
+  'Qi Stagnation',
+  'Special Constitution',
 ];
 
 /// 健康关注选项
 const _healthConcerns = [
-  '睡眠',
-  '消化',
-  '情绪',
-  '免疫力',
-  '体重',
-  '皮肤',
-  '月经',
-  '其他',
+  'Sleep',
+  'Digestion',
+  'Emotions',
+  'Immunity',
+  'Weight',
+  'Skin',
+  'Menstruation',
+  'Other',
 ];
 
 class ProfileSetupPage extends StatefulWidget {
@@ -245,7 +245,7 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
                           strokeWidth: 2, color: Colors.white),
                     )
                   : Text(
-                      _currentStep == 3 ? '完成' : '下一步',
+                      _currentStep == 3 ? 'Done' : 'Next',
                       style: ShunshiTextStyles.button
                           .copyWith(color: Colors.white),
                     ),
@@ -261,7 +261,7 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
                 );
                 setState(() => _currentStep--);
               },
-              child: Text('返回',
+              child: Text('Back',
                   style: ShunshiTextStyles.caption
                       .copyWith(color: ShunshiColors.textHint)),
             ),
@@ -275,8 +275,8 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
   Widget _buildNicknameStep() {
     return _stepWrapper(
       icon: '👋',
-      title: '你好，怎么称呼你？',
-      subtitle: '我们会用这个名字和你打招呼',
+      title: 'Hi, what should we call you?',
+      subtitle: 'We\'ll use this name to greet you',
       child: Column(
         children: [
           const SizedBox(height: 32),
@@ -293,7 +293,7 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
               style: ShunshiTextStyles.heading,
               textAlign: TextAlign.center,
               decoration: InputDecoration(
-                hintText: '输入你的昵称',
+                hintText: 'Enter your nickname',
                 hintStyle: ShunshiTextStyles.bodySecondary,
                 border: InputBorder.none,
                 contentPadding:
@@ -312,19 +312,19 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
   Widget _buildGenderStep() {
     return _stepWrapper(
       icon: '✨',
-      title: '你的性别是？',
-      subtitle: '用于个性化养生建议',
+      title: 'What is your gender?',
+      subtitle: 'Used for personalised wellness suggestions',
       child: Column(
         children: [
           const SizedBox(height: 32),
           Row(
             children: [
               Expanded(
-                child: _genderOption('男', Icons.male, '👨'),
+                child: _genderOption('Male', Icons.male, '👨'),
               ),
               const SizedBox(width: 16),
               Expanded(
-                child: _genderOption('女', Icons.female, '👩'),
+                child: _genderOption('Female', Icons.female, '👩'),
               ),
             ],
           ),
@@ -374,8 +374,8 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
   Widget _buildBirthYearStep() {
     return _stepWrapper(
       icon: '🎂',
-      title: '你出生在哪一年？',
-      subtitle: '用于推荐适合你年龄的养生方案',
+      title: 'What year were you born?',
+      subtitle: 'Used to recommend wellness plans suited to your age',
       child: Column(
         children: [
           const SizedBox(height: 40),
@@ -385,7 +385,7 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
                   fontWeight: FontWeight.w200,
                   color: ShunshiColors.textPrimary)),
           const SizedBox(height: 8),
-          Text('${_currentYear - _birthYear}岁',
+          Text('${_currentYear - _birthYear} yrs',
               style: ShunshiTextStyles.bodySecondary),
           const SizedBox(height: 32),
           SliderTheme(
@@ -420,7 +420,7 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
           const SizedBox(height: 16),
           Align(
             alignment: Alignment.centerLeft,
-            child: Text('主要健康关注（选填）',
+            child: Text('Main health interest (optional)',
                 style: ShunshiTextStyles.heading.copyWith(fontSize: 15)),
           ),
           const SizedBox(height: 12),
@@ -473,8 +473,8 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
   Widget _buildConstitutionStep() {
     return _stepWrapper(
       icon: '🌿',
-      title: '了解你的体质类型',
-      subtitle: '选择你的中医体质，获得个性化养生建议',
+      title: 'Know your constitution type',
+      subtitle: 'Choose your constitution to get personalised wellness suggestions',
       child: Column(
         children: [
           const SizedBox(height: 16),
@@ -517,7 +517,7 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
               context.push('/constitution-test');
             },
             icon: const Icon(Icons.quiz_outlined, size: 18),
-            label: const Text('不知道，帮我测'),
+            label: const Text('Not sure, help me find out'),
             style: OutlinedButton.styleFrom(
               foregroundColor: ShunshiColors.primary,
               side: const BorderSide(color: ShunshiColors.primary),
@@ -529,7 +529,7 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
           // 身体描述（选填）
           Align(
             alignment: Alignment.centerLeft,
-            child: Text('描述你的身体状况（选填）',
+            child: Text('Describe how your body feels (optional)',
                 style: ShunshiTextStyles.heading.copyWith(fontSize: 15)),
           ),
           const SizedBox(height: 8),
@@ -546,7 +546,7 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
               maxLines: 3,
               style: ShunshiTextStyles.bodyMedium,
               decoration: InputDecoration(
-                hintText: '比如：容易疲劳、睡眠不好、容易感冒...',
+                hintText: 'For example: easily tired, sleeping badly, catching colds easily...',
                 hintStyle: ShunshiTextStyles.caption
                     .copyWith(color: ShunshiColors.textHint),
                 border: InputBorder.none,

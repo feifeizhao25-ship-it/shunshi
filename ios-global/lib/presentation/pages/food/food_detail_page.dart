@@ -80,13 +80,13 @@ class FoodDetailPage extends StatelessWidget {
                       children: [
                         // Season tag
                         Row(children: [
-                          _heroTag('SPRING · 春'),
+                          _heroTag('SPRING'),
                           const SizedBox(width: 8),
-                          _heroTag('MEAL · 食疗'),
+                          _heroTag('MEAL · FOOD THERAPY'),
                         ]),
                         const SizedBox(height: 12),
                         Text(
-                          foodName ?? '黄芪炖鸡汤',
+                          foodName ?? 'Astragalus chicken soup',
                           style: const TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.w700,
@@ -96,7 +96,7 @@ class FoodDetailPage extends StatelessWidget {
                         ),
                         const SizedBox(height: 6),
                         const Text(
-                          '益气固表，温中补虚',
+                          'Boosts qi, supports immunity, warms the middle',
                           style: TextStyle(
                             fontSize: 15,
                             color: Colors.white70,
@@ -106,9 +106,9 @@ class FoodDetailPage extends StatelessWidget {
                         const SizedBox(height: 12),
                         // Quick info
                         Row(children: [
-                          _infoChip('适合体质', '气虚质'),
+                          _infoChip('Suited constitution', 'Qi Deficiency'),
                           const SizedBox(width: 16),
-                          _infoChip('烹饪时长', '120 分钟'),
+                          _infoChip('Cooking time', '120 min'),
                         ]),
                       ],
                     ),
@@ -138,15 +138,15 @@ class FoodDetailPage extends StatelessWidget {
                         Row(children: [
                           const Icon(Icons.auto_awesome, size: 18, color: ShunShiColors.gold),
                           const SizedBox(width: 8),
-                          Text('康养洞察', style: TextStyle(
+                          Text('Wellness insight', style: TextStyle(
                             fontSize: 14, fontWeight: FontWeight.w700,
                             color: ShunShiColors.gold, fontFamily: ShunShiTypography.sansFamily,
                           )),
                         ]),
                         const SizedBox(height: 12),
                         const Text(
-                          '基于您近期的步数下降及心率监测，我们察觉到您可能处于"气虚"状态。'
-                          '此方中黄芪为补气圣药，配合温中的母鸡，能从根源固本。建议在辰时（早7-9点）饮用，效果最佳。',
+                          'Based on your recent drop in steps and heart-rate readings, we notice you may be in a "qi-deficient" state.'
+                          'Astragalus is a classic qi tonic; paired with warming hen, it strengthens you from the root. Best taken in the morning (7–9 a.m.).',
                           style: TextStyle(
                             fontSize: 13, color: ShunShiColors.textSecondary,
                             height: 1.7, fontFamily: ShunShiTypography.sansFamily,
@@ -162,7 +162,7 @@ class FoodDetailPage extends StatelessWidget {
                           child: Row(children: [
                             const Icon(Icons.auto_awesome, size: 14, color: ShunShiColors.gold),
                             const SizedBox(width: 6),
-                            Text('AI 指点："春季多风，固表防感。"', style: TextStyle(
+                            Text('AI tip: "Spring is windy — protect against colds."', style: TextStyle(
                               fontSize: 12, color: ShunShiColors.gold,
                               fontFamily: ShunShiTypography.sansFamily, fontStyle: FontStyle.italic,
                             )),
@@ -174,15 +174,15 @@ class FoodDetailPage extends StatelessWidget {
                   const SizedBox(height: 24),
 
                   // ── 食材配比 ──
-                  _sectionTitle('食材配比'),
+                  _sectionTitle('Ingredients'),
                   const SizedBox(height: 12),
-                  _ingredientRow('老母鸡', '1 只'),
-                  _ingredientRow('黄芪', '30g'),
-                  _ingredientRow('红枣', '5 枚'),
-                  _ingredientRow('生姜', '3 片'),
+                  _ingredientRow('Hen', '1'),
+                  _ingredientRow('Astragalus', '30g'),
+                  _ingredientRow('Red dates', '5'),
+                  _ingredientRow('Fresh ginger', '3 slices'),
                   const SizedBox(height: 8),
                   Text(
-                    '* 请选用一年以上老母鸡，药效更佳。黄芪建议提前浸泡15分钟。',
+                    '* Use a hen over one year old for better effect. Soak the astragalus for 15 minutes beforehand.',
                     style: TextStyle(
                       fontSize: 12, color: ShunShiColors.textTertiary,
                       fontFamily: ShunShiTypography.sansFamily, fontStyle: FontStyle.italic,
@@ -191,20 +191,20 @@ class FoodDetailPage extends StatelessWidget {
                   const SizedBox(height: 24),
 
                   // ── 烹饪步骤 ──
-                  _sectionTitle('烹饪步骤'),
+                  _sectionTitle('Method'),
                   const SizedBox(height: 12),
-                  _cookingStep(1, '鸡肉切成适口块状，冷水入锅焯水，捞出洗净。'),
-                  _cookingStep(2, '放入砂锅，加入足量清水，投入黄芪、红枣与姜片。'),
-                  _cookingStep(3, '大火烧开，撇去浮沫，转极小火慢炖2小时。'),
-                  _cookingStep(4, '关火前加入少许盐调味即可，保持汤品原味清甜。'),
+                  _cookingStep(1, 'Cut the chicken into bite-size pieces, blanch in cold water, then rinse.'),
+                  _cookingStep(2, 'Place in a clay pot, add plenty of water, then the astragalus, red dates and ginger.'),
+                  _cookingStep(3, 'Bring to a boil, skim off foam, then simmer on very low heat for 2 hours.'),
+                  _cookingStep(4, 'Add a little salt just before turning off the heat; keep the soup\'s natural sweetness.'),
                   const SizedBox(height: 24),
 
                   // ── 营养与能量 ──
-                  _sectionTitle('营养与能量'),
+                  _sectionTitle('Nutrition and energy'),
                   const SizedBox(height: 8),
                   const Text(
-                    '本食谱富含优质蛋白质与多种微量元素，特有的黄芪多糖能显著增强免疫应答。'
-                    '每百毫升含热量约为 85kcal。',
+                    'Rich in high-quality protein and trace elements; astragalus polysaccharides can noticeably support immune response.'
+                    'About 85 kcal per 100 ml.',
                     style: TextStyle(
                       fontSize: 13, color: ShunShiColors.textSecondary,
                       height: 1.6, fontFamily: ShunShiTypography.sansFamily,
@@ -222,15 +222,15 @@ class FoodDetailPage extends StatelessWidget {
                   const SizedBox(height: 24),
 
                   // ── 适宜人群 ──
-                  _sectionTitle('适宜人群'),
+                  _sectionTitle('Good for'),
                   const SizedBox(height: 8),
-                  _tagList(['气虚质', '阳虚质', '易感冒', '免疫力低下', '疲劳乏力']),
+                  _tagList(['Qi Deficiency', 'Yang Deficiency', 'Frequent colds', 'Low immunity', 'Fatigue']),
                   const SizedBox(height: 16),
 
                   // ── 不宜人群 ──
-                  _sectionTitle('不宜人群'),
+                  _sectionTitle('Not suitable for'),
                   const SizedBox(height: 8),
-                  _tagList(['阴虚火旺', '感冒发热', '高血压急症'], isWarning: true),
+                  _tagList(['Yin deficiency with heat signs', 'Cold with fever', 'Hypertensive emergency'], isWarning: true),
                   const SizedBox(height: 24),
 
                   // ── CTA ──
@@ -250,7 +250,7 @@ class FoodDetailPage extends StatelessWidget {
                         children: [
                           const Icon(Icons.restaurant_menu, size: 20),
                           const SizedBox(width: 8),
-                          Text('开始烹饪', style: TextStyle(
+                          Text('Start cooking', style: TextStyle(
                             fontSize: 16, fontWeight: FontWeight.w600, fontFamily: ShunShiTypography.sansFamily,
                           )),
                         ],
@@ -274,12 +274,12 @@ class FoodDetailPage extends StatelessWidget {
                         const SizedBox(width: 12),
                         Expanded(
                           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                            Text('想了解更多？', style: TextStyle(
+                            Text('Want to know more?', style: TextStyle(
                               fontSize: 14, fontWeight: FontWeight.w600,
                               color: ShunShiColors.primary, fontFamily: ShunShiTypography.sansFamily,
                             )),
                             const SizedBox(height: 2),
-                            const Text('向AI顺时助手咨询个性化饮食建议', style: TextStyle(
+                            const Text('Ask the SEASONS AI companion for personalised diet tips', style: TextStyle(
                               fontSize: 12, color: ShunShiColors.textSecondary, fontFamily: ShunShiTypography.sansFamily,
                             )),
                           ]),

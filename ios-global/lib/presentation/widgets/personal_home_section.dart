@@ -14,26 +14,24 @@ const bool _zh = false;
 
 class _S {
   const _S._();
-  static const heading = _zh ? '今天为你准备的' : 'Picked for you today';
-  static const why = _zh ? '为什么看到这个' : 'Why you see this';
-  static const turnOff = _zh ? '关闭个性化' : 'Turn off personalisation';
-  static const turnOn = _zh ? '重新打开' : 'Turn on';
-  static const offTitle = _zh ? '个性化已关闭' : 'Personalisation is off';
-  static const offBody = _zh ? '现在显示的是通用内容，你的记录没有被删除。' : 'You are seeing general content. Your records are not deleted.';
-  static const confirmTitle = _zh ? '关闭个性化推荐？' : 'Turn off personalised suggestions?';
-  static const confirmBody = _zh
-      ? '关闭后首页只显示通用内容，之前的记录不会被删除，随时可以重新打开。'
-      : 'The home page will show general content only. Nothing is deleted and you can turn it back on any time.';
-  static const cancel = _zh ? '取消' : 'Cancel';
-  static const confirm = _zh ? '关闭' : 'Turn off';
-  static const errorTitle = _zh ? '暂时没能加载' : 'Could not load right now';
-  static const errorBody = _zh ? '请检查网络后再试一次。' : 'Check your connection and try again.';
-  static const retry = _zh ? '重试' : 'Try again';
-  static const emptyTitle = _zh ? '今天暂时没有新的建议' : 'No new suggestions for today';
-  static const emptyBody = _zh ? '晚点再来看看。' : 'Check back a little later.';
-  static const saveFailed = _zh ? '没能保存设置，请稍后再试' : 'Could not save your setting. Please try again.';
-  static String minutes(int n) => _zh ? '$n 分钟' : '$n min';
-  static String days(int n) => _zh ? '已连续 $n 天打开' : '$n days in a row';
+  static const heading = 'Picked for you today';
+  static const why = 'Why you see this';
+  static const turnOff = 'Turn off personalisation';
+  static const turnOn = 'Turn on';
+  static const offTitle = 'Personalisation is off';
+  static const offBody = 'You are seeing general content. Your records are not deleted.';
+  static const confirmTitle = 'Turn off personalised suggestions?';
+  static const confirmBody = 'The home page will show general content only. Nothing is deleted and you can turn it back on any time.';
+  static const cancel = 'Cancel';
+  static const confirm = 'Turn off';
+  static const errorTitle = 'Could not load right now';
+  static const errorBody = 'Check your connection and try again.';
+  static const retry = 'Try again';
+  static const emptyTitle = 'No new suggestions for today';
+  static const emptyBody = 'Check back a little later.';
+  static const saveFailed = 'Could not save your setting. Please try again.';
+  static String minutes(int n) => '$n min';
+  static String days(int n) => '$n days in a row';
 }
 
 /// What the screen needs from the network; the page supplies the real calls, tests supply fakes.
@@ -438,7 +436,7 @@ class _Skeleton extends StatelessWidget {
     final c = Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.7);
     Widget bar(double w, double h) => Container(width: w, height: h, decoration: BoxDecoration(color: c, borderRadius: BorderRadius.circular(8)));
     return Semantics(
-      label: _zh ? '加载中' : 'Loading',
+      label: 'Loading',
       child: Column(key: const Key('personal-home-loading'), crossAxisAlignment: CrossAxisAlignment.start, children: [
         bar(96, 12),
         const SizedBox(height: 10),

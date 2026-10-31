@@ -33,7 +33,7 @@ class WellnessHomePage extends StatelessWidget {
                       child: const Icon(Icons.person, size: 20, color: ShunShiColors.textSecondary),
                     ),
                     const SizedBox(width: 12),
-                    const Text('养生馆', style: TextStyle(
+                    const Text('Wellness hall', style: TextStyle(
                       fontSize: 20, fontWeight: FontWeight.w300, letterSpacing: -0.3,
                       color: ShunShiColors.primary,
                       fontFamily: ShunShiTypography.serifFamily,
@@ -62,7 +62,7 @@ class WellnessHomePage extends StatelessWidget {
                     ),
                     child: const TextField(
                       decoration: InputDecoration(
-                        hintText: '搜索调理方案、节气食谱...',
+                        hintText: 'Search plans, seasonal recipes...',
                         hintStyle: TextStyle(color: ShunShiColors.textTertiary, fontSize: 14),
                         prefixIcon: Icon(Icons.search, color: ShunShiColors.textTertiary, size: 22),
                         border: InputBorder.none,
@@ -81,12 +81,12 @@ class WellnessHomePage extends StatelessWidget {
                     crossAxisSpacing: 16,
                     childAspectRatio: 0.75,
                     children: [
-                      _gridIcon(Icons.health_and_safety, '体质调养', () => context.push('/wellness/constitution')),
-                      _gridIcon(Icons.restaurant_menu, '节气食谱', () => context.push('/wellness/food_therapy')),
-                      _gridIcon(Icons.emoji_food_beverage, '养生茶饮', () => context.push('/wellness/tea')),
-                      _gridIcon(Icons.architecture, '经络穴位', () => context.push('/wellness/acupressure')),
-                      _gridIcon(Icons.self_improvement, '传统功法', () => context.push('/wellness/exercise')),
-                      _gridIcon(Icons.graphic_eq, '助眠音频', () => context.push('/wellness/sleep')),
+                      _gridIcon(Icons.health_and_safety, 'Constitution care', () => context.push('/wellness/constitution')),
+                      _gridIcon(Icons.restaurant_menu, 'Seasonal recipes', () => context.push('/wellness/food_therapy')),
+                      _gridIcon(Icons.emoji_food_beverage, 'Wellness teas', () => context.push('/wellness/tea')),
+                      _gridIcon(Icons.architecture, 'Meridians & acupoints', () => context.push('/wellness/acupressure')),
+                      _gridIcon(Icons.self_improvement, 'Traditional practices', () => context.push('/wellness/exercise')),
+                      _gridIcon(Icons.graphic_eq, 'Sleep audio', () => context.push('/wellness/sleep')),
                     ],
                   ),
                   const SizedBox(height: 48),
@@ -108,7 +108,7 @@ class WellnessHomePage extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(height: 8),
-                              const Text('精选编辑', style: TextStyle(
+                              const Text('Editor\'s picks', style: TextStyle(
                                 fontSize: 28, fontWeight: FontWeight.w700,
                                 fontFamily: ShunShiTypography.serifFamily,
                                 color: ShunShiColors.primary, letterSpacing: -0.5,
@@ -123,7 +123,7 @@ class WellnessHomePage extends StatelessWidget {
                             onTap: () {},
                             child: Row(
                               children: const [
-                                Text('查看全部', style: TextStyle(
+                                Text('View all', style: TextStyle(
                                   fontSize: 14, fontWeight: FontWeight.w600, color: ShunShiColors.primary,
                                 )),
                                 SizedBox(width: 2),
@@ -137,28 +137,28 @@ class WellnessHomePage extends StatelessWidget {
 
                       // 3 Editor Cards
                       _editorCard(
-                        tag: '惊蛰',
-                        readTime: '5分钟阅读',
-                        title: '春季养生：从调理肝气开始',
-                        desc: '惊蛰时节，阳气初动。本期编辑精选为您带来春季护肝的三个关键穴位与食疗方案。',
+                        tag: 'Awakening of Insects',
+                        readTime: '5 min read',
+                        title: 'Spring wellness: start by caring for the liver',
+                        desc: 'At Awakening of Insects, yang energy begins to stir. This editor\'s pick brings three key acupoints and food-therapy ideas for protecting the liver in spring.',
                         likes: '1,208',
                         gradient: [ShunShiColors.apricotLight, ShunShiColors.secondary],
                       ),
                       const SizedBox(height: 16),
                       _editorCard(
-                        tag: '功法',
-                        readTime: '8分钟阅读',
-                        title: '八段锦：唤醒身体的经络能量',
-                        desc: '简单易学的传统健身功法，每天十分钟，改善久坐带来的肩颈僵硬。',
+                        tag: 'Practice',
+                        readTime: '8 min read',
+                        title: 'Baduanjin: awaken the body\'s meridian energy',
+                        desc: 'A simple traditional practice — ten minutes a day to ease neck and shoulder stiffness from sitting.',
                         likes: '3,450',
                         gradient: [ShunShiColors.primaryContainer, ShunShiColors.primaryLight],
                       ),
                       const SizedBox(height: 16),
                       _editorCard(
-                        tag: '食补',
-                        readTime: '4分钟阅读',
-                        title: '五味入五脏：平衡你的日常膳食',
-                        desc: '酸入肝、辛入肺。理解食物的味道，就是理解身体的需求。',
+                        tag: 'Food',
+                        readTime: '4 min read',
+                        title: 'The five flavours and the five organs: balance your daily meals',
+                        desc: 'Sour enters the liver, pungent the lungs. Understanding a food\'s flavour is understanding what your body needs.',
                         likes: '892',
                         gradient: [ShunShiColors.apricotLight, ShunShiColors.apricot],
                       ),
@@ -279,7 +279,7 @@ class WellnessHomePage extends StatelessWidget {
                       children: [
                         Icon(Icons.favorite, size: 14, color: ShunShiColors.secondary),
                         const SizedBox(width: 4),
-                        Text('$likes 收藏', style: TextStyle(
+                        Text('$likes saved', style: TextStyle(
                           fontSize: 11, fontWeight: FontWeight.w500,
                           color: ShunShiColors.secondary,
                         )),

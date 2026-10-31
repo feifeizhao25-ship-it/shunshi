@@ -38,7 +38,7 @@ class WellnessDashboardPage extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('早安，顺时小伙伴', style: ShunShiTypography.headlineSmall.copyWith(
+                          Text('Good morning, SEASONS friend', style: ShunShiTypography.headlineSmall.copyWith(
                             fontSize: 20, fontWeight: FontWeight.w300, letterSpacing: -0.3,
                           )),
                           const SizedBox(height: 2),
@@ -91,14 +91,14 @@ class WellnessDashboardPage extends StatelessWidget {
                         color: ShunShiColors.primaryLight.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(999),
                       ),
-                      child: const Text('节气提醒', style: TextStyle(
+                      child: const Text('Solar term reminder', style: TextStyle(
                         fontSize: 12, fontWeight: FontWeight.w500, color: ShunShiColors.primary,
                         letterSpacing: 0.5,
                       )),
                     ),
                     const SizedBox(height: 16),
                     // Title
-                    const Text('春分', style: TextStyle(
+                    const Text('Spring Equinox', style: TextStyle(
                       fontSize: 42, fontWeight: FontWeight.w300, color: ShunShiColors.primary,
                       height: 1.1, letterSpacing: -1, fontFamily: ShunShiTypography.serifFamily,
                     )),
@@ -108,7 +108,7 @@ class WellnessDashboardPage extends StatelessWidget {
                     )),
                     const SizedBox(height: 12),
                     // Description
-                    const Text('阴阳平衡，万物复苏。感受大地觉醒时的温润暖意。', style: TextStyle(
+                    const Text('Yin and yang in balance, everything reviving. Feel the gentle warmth of the awakening earth.', style: TextStyle(
                       fontSize: 16, color: ShunShiColors.secondary, height: 1.6,
                     )),
                     const SizedBox(height: 16),
@@ -117,7 +117,7 @@ class WellnessDashboardPage extends StatelessWidget {
                       children: [
                         Container(width: 48, height: 1, color: ShunShiColors.textTertiary),
                         const SizedBox(width: 12),
-                        const Text('距离 清明 还有 12 天', style: TextStyle(
+                        const Text('12 days until Qingming', style: TextStyle(
                           fontSize: 13, fontWeight: FontWeight.w600,
                           color: ShunShiColors.textTertiary, letterSpacing: 1,
                         )),
@@ -137,13 +137,13 @@ class WellnessDashboardPage extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('时令仪式', style: TextStyle(
+                  const Text('Seasonal rituals', style: TextStyle(
                     fontSize: 24, fontWeight: FontWeight.w300, color: ShunShiColors.primary,
                     letterSpacing: -0.5, fontFamily: ShunShiTypography.serifFamily,
                   )),
                   GestureDetector(
                     onTap: () {},
-                    child: const Text('查看全部', style: TextStyle(
+                    child: const Text('View all', style: TextStyle(
                       fontSize: 13, fontWeight: FontWeight.w500, color: ShunShiColors.secondary,
                     )),
                   ),
@@ -161,30 +161,30 @@ class WellnessDashboardPage extends StatelessWidget {
                 children: const [
                   _RitualCard(
                     icon: Icons.restaurant,
-                    title: '饮食之道',
-                    desc: '多食豆芽与韭菜，在此能量转换之际护养肝气。',
-                    cta: '食谱',
+                    title: 'Eating well',
+                    desc: 'Eat more bean sprouts and chives to nourish the liver during this shift of energy.',
+                    cta: 'Recipes',
                   ),
                   SizedBox(width: 16),
                   _RitualCard(
                     icon: Icons.emoji_food_beverage,
-                    title: '时令茶饮',
-                    desc: '茉莉花茶可舒缓情绪，化解冬日留存的陈郁之气。',
-                    cta: '购买',
+                    title: 'Seasonal tea',
+                    desc: 'Jasmine tea can ease the mood and clear the stagnation left over from winter.',
+                    cta: 'Buy',
                   ),
                   SizedBox(width: 16),
                   _RitualCard(
                     icon: Icons.self_improvement,
-                    title: '经络通导',
-                    desc: '按揉太冲穴 5 分钟，帮助宣泄情绪压力。',
-                    cta: '教程',
+                    title: 'Meridian care',
+                    desc: 'Press Taichong (LV3) for 5 minutes to release emotional stress.',
+                    cta: 'Tutorial',
                   ),
                   SizedBox(width: 16),
                   _RitualCard(
                     icon: Icons.directions_walk,
-                    title: '功法运动',
-                    desc: '清晨漫步，顺应日光节律，吐故纳新。',
-                    cta: '记录',
+                    title: 'Movement',
+                    desc: 'A morning walk in step with the sun\'s rhythm; breathe out the old, breathe in the new.',
+                    cta: 'Log',
                   ),
                 ],
               ),
@@ -205,17 +205,17 @@ class WellnessDashboardPage extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    const Text('今日进度', style: TextStyle(
+                    const Text('Today\'s progress', style: TextStyle(
                       fontSize: 12, fontWeight: FontWeight.w700, letterSpacing: 2,
                       color: ShunShiColors.primary,
                     )),
                     const SizedBox(height: 8),
-                    const Text('今日已完成 3 项习惯', style: TextStyle(
+                    const Text('3 habits completed today', style: TextStyle(
                       fontSize: 32, fontWeight: FontWeight.w300, color: ShunShiColors.primary,
                       letterSpacing: -0.5, fontFamily: ShunShiTypography.serifFamily,
                     )),
                     const SizedBox(height: 8),
-                    const Text('持之以恒是连接心愿与健康的桥梁。继续加油。', style: TextStyle(
+                    const Text('Consistency connects your intentions to your health. Keep going.', style: TextStyle(
                       fontSize: 14, color: ShunShiColors.secondary,
                     )),
                     const SizedBox(height: 20),
@@ -229,7 +229,7 @@ class WellnessDashboardPage extends StatelessWidget {
                           elevation: 0,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         ),
-                        child: const Text('打卡', style: TextStyle(
+                        child: const Text('Check in', style: TextStyle(
                           fontSize: 15, fontWeight: FontWeight.w700, letterSpacing: 2,
                         )),
                       ),
@@ -253,7 +253,7 @@ class WellnessDashboardPage extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('为您推荐', style: TextStyle(
+                        const Text('Recommended for you', style: TextStyle(
                           fontSize: 20, fontWeight: FontWeight.w300, color: ShunShiColors.primary,
                           fontFamily: ShunShiTypography.serifFamily,
                         )),
@@ -294,19 +294,19 @@ class WellnessDashboardPage extends StatelessWidget {
                                           color: ShunShiColors.surfaceContainerLow,
                                           borderRadius: BorderRadius.circular(6),
                                         ),
-                                        child: const Text('食谱', style: TextStyle(
+                                        child: const Text('Recipes', style: TextStyle(
                                           fontSize: 11, fontWeight: FontWeight.w700,
                                           color: ShunShiColors.primary, letterSpacing: 0.5,
                                         )),
                                       ),
                                       const SizedBox(height: 8),
-                                      const Text('春季鲜蔬粥', style: TextStyle(
+                                      const Text('Spring vegetable congee', style: TextStyle(
                                         fontSize: 18, fontWeight: FontWeight.w700,
                                         fontFamily: ShunShiTypography.serifFamily,
                                         color: ShunShiColors.textPrimary,
                                       )),
                                       const SizedBox(height: 4),
-                                      const Text('清淡温润的一餐，旨在为冬日后的身体进行轻盈排毒。', style: TextStyle(
+                                      const Text('A light, soothing meal to gently cleanse the body after winter.', style: TextStyle(
                                         fontSize: 13, color: ShunShiColors.textTertiary, height: 1.5,
                                       )),
                                     ],
@@ -325,7 +325,7 @@ class WellnessDashboardPage extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('今日阅读', style: TextStyle(
+                        const Text('Today\'s reading', style: TextStyle(
                           fontSize: 20, fontWeight: FontWeight.w300, color: ShunShiColors.primary,
                           fontFamily: ShunShiTypography.serifFamily,
                         )),
@@ -340,12 +340,12 @@ class WellnessDashboardPage extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Text('哲学与平衡', style: TextStyle(
+                              const Text('Philosophy and balance', style: TextStyle(
                                 fontSize: 11, fontWeight: FontWeight.w700,
                                 color: ShunShiColors.secondary, letterSpacing: 1.5,
                               )),
                               const SizedBox(height: 12),
-                              const Text('寻回新时节的平衡：春分生活指南', style: TextStyle(
+                              const Text('Finding balance in the new season: a Spring Equinox guide', style: TextStyle(
                                 fontSize: 20, fontWeight: FontWeight.w400,
                                 fontFamily: ShunShiTypography.serifFamily,
                                 color: ShunShiColors.textPrimary, height: 1.3,
@@ -353,13 +353,13 @@ class WellnessDashboardPage extends StatelessWidget {
                               const SizedBox(height: 12),
                               Row(
                                 children: [
-                                  Text('阅读需8分钟', style: TextStyle(
+                                  Text('8 min read', style: TextStyle(
                                     fontSize: 12, color: ShunShiColors.textTertiary,
                                   )),
                                   Container(width: 4, height: 4, margin: const EdgeInsets.symmetric(horizontal: 8),
                                     decoration: BoxDecoration(color: ShunShiColors.textTertiary, shape: BoxShape.circle),
                                   ),
-                                  Text('传统养生艺术', style: TextStyle(
+                                  Text('The traditional art of wellness', style: TextStyle(
                                     fontSize: 12, color: ShunShiColors.textTertiary,
                                   )),
                                 ],
@@ -372,7 +372,7 @@ class WellnessDashboardPage extends StatelessWidget {
                                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                                 ),
-                                child: const Text('阅读全文', style: TextStyle(
+                                child: const Text('Read the full article', style: TextStyle(
                                   fontSize: 12, fontWeight: FontWeight.w700, letterSpacing: 1.5,
                                   color: ShunShiColors.primary,
                                 )),
@@ -423,12 +423,12 @@ class WellnessDashboardPage extends StatelessWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text('疗愈之声', style: TextStyle(
+                                const Text('Healing sounds', style: TextStyle(
                                   fontSize: 11, fontWeight: FontWeight.w700,
                                   color: ShunShiColors.secondary, letterSpacing: 1.5,
                                 )),
                                 const SizedBox(height: 4),
-                                const Text('山涧流泉与墨竹', style: TextStyle(
+                                const Text('Mountain stream and ink bamboo', style: TextStyle(
                                   fontSize: 18, fontFamily: ShunShiTypography.serifFamily,
                                   color: ShunShiColors.primary,
                                 )),
@@ -497,7 +497,7 @@ class WellnessDashboardPage extends StatelessWidget {
                           Icon(Icons.format_quote, size: 28,
                             color: ShunShiColors.primary.withValues(alpha: 0.3)),
                           const SizedBox(height: 12),
-                          const Text('"春夏养阳，\n秋冬养阴。"', textAlign: TextAlign.center,
+                          const Text('"Nourish yang in spring and summer,\nnourish yin in autumn and winter."', textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 17, fontFamily: ShunShiTypography.serifFamily,
                               fontStyle: FontStyle.italic, color: ShunShiColors.primary,
@@ -505,7 +505,7 @@ class WellnessDashboardPage extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 12),
-                          const Text('《黄帝内经》', style: TextStyle(
+                          const Text('Huangdi Neijing', style: TextStyle(
                             fontSize: 11, fontWeight: FontWeight.w700,
                             color: ShunShiColors.secondary, letterSpacing: 2,
                           )),
@@ -526,16 +526,16 @@ class WellnessDashboardPage extends StatelessWidget {
   String _currentShiChenLabel() {
     final hour = DateTime.now().hour;
     const data = [
-      (0, '子时 · 胆经当令'), (1, '丑时 · 肝经当令'), (3, '寅时 · 肺经当令'),
-      (5, '卯时 · 大肠经当令'), (7, '辰时 · 胃经当令'), (9, '巳时 · 脾经当令'),
-      (11, '午时 · 心经当令'), (13, '未时 · 小肠经当令'), (15, '申时 · 膀胱经当令'),
-      (17, '酉时 · 肾经当令'), (19, '戌时 · 心包经当令'), (21, '亥时 · 三焦经当令'),
-      (23, '子时 · 胆经当令'),
+      (0, '11 p.m.–1 a.m. · Gallbladder meridian'), (1, '1–3 a.m. · Liver meridian'), (3, '3–5 a.m. · Lung meridian'),
+      (5, '5–7 a.m. · Large Intestine meridian'), (7, '7–9 a.m. · Stomach meridian'), (9, '9–11 a.m. · Spleen meridian'),
+      (11, '11 a.m.–1 p.m. · Heart meridian'), (13, '1–3 p.m. · Small Intestine meridian'), (15, '3–5 p.m. · Bladder meridian'),
+      (17, '5–7 p.m. · Kidney meridian'), (19, '7–9 p.m. · Pericardium meridian'), (21, '9–11 p.m. · Triple Burner meridian'),
+      (23, '11 p.m.–1 a.m. · Gallbladder meridian'),
     ];
     for (final (h, label) in data) {
       if (hour < h) return data[data.indexOf((h, label)) - 1].$2;
     }
-    return '亥时 · 三焦经当令';
+    return '9–11 p.m. · Triple Burner meridian';
   }
 }
 

@@ -45,9 +45,9 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
   Future<String> _getConstitution() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      return prefs.getString('constitution_type') ?? '平和质';
+      return prefs.getString('constitution_type') ?? 'Balanced';
     } catch (_) {
-      return '平和质';
+      return 'Balanced';
     }
   }
 
@@ -179,11 +179,11 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
                 ),
                 child: Row(
                   children: [
-                    _buildStat('积分', '2560'),
+                    _buildStat('Points', '2560'),
                     Container(width: 1, height: 32, color: ShunShiColors.borderGhost),
-                    _buildStat('优惠券', '3 张'),
+                    _buildStat('Coupons', '3'),
                     Container(width: 1, height: 32, color: ShunShiColors.borderGhost),
-                    _buildStat('收藏', '$_favoriteCount'),
+                    _buildStat('Favourites', '$_favoriteCount'),
                   ],
                 ),
               ),
@@ -203,13 +203,13 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
                   ],
                 ),
                 child: Column(children: [
-                  _buildMenuTile(Icons.family_restroom, '家庭养生管理', () => context.push('/family')),
+                  _buildMenuTile(Icons.family_restroom, 'Family wellness', () => context.push('/family')),
                   _buildDivider(),
-                  _buildMenuTile(Icons.military_tech, '我的成就勋章', () => context.push('/achievement')),
+                  _buildMenuTile(Icons.military_tech, 'My achievement badges', () => context.push('/achievement')),
                   _buildDivider(),
-                  _buildMenuTile(Icons.health_and_safety, '体质报告', () => context.push('/constitution-report')),
+                  _buildMenuTile(Icons.health_and_safety, 'Constitution report', () => context.push('/constitution-report')),
                   _buildDivider(),
-                  _buildMenuTile(Icons.auto_awesome, '养生日记', () => context.push('/diary')),
+                  _buildMenuTile(Icons.auto_awesome, 'Wellness diary', () => context.push('/diary')),
                 ]),
               ),
             ),
@@ -231,12 +231,12 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('邀请好友领会员', style: TextStyle(
+                    Text('Invite friends, earn premium', style: TextStyle(
                       fontSize: 17, fontWeight: FontWeight.w600,
                       color: ShunShiColors.surface,
                     )),
                     const SizedBox(height: 4),
-                    Text('与友偕行，共享颐养时光', style: TextStyle(
+                    Text('Walk together and share the time to nourish yourselves', style: TextStyle(
                       fontSize: 13, color: Colors.white70,
                     )),
                     const SizedBox(height: 14),
@@ -246,7 +246,7 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
                         color: Colors.white.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: Text('立即邀请', style: TextStyle(
+                      child: Text('Invite now', style: TextStyle(
                         fontSize: 13, color: ShunShiColors.surface, fontWeight: FontWeight.w500,
                       )),
                     ),
@@ -269,17 +269,17 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
                   ],
                 ),
                 child: Column(children: [
-                  _buildMenuTile(Icons.park, '订阅管理', () => context.push('/subscription')),
+                  _buildMenuTile(Icons.park, 'Manage subscription', () => context.push('/subscription')),
                   _buildDivider(),
-                  _buildMenuTile(Icons.favorite_border, '我的收藏', () => context.push('/favorites')),
+                  _buildMenuTile(Icons.favorite_border, 'My favourites', () => context.push('/favorites')),
                   _buildDivider(),
-                  _buildMenuTile(Icons.emoji_events_outlined, '养生成就', () => context.push('/achievement')),
+                  _buildMenuTile(Icons.emoji_events_outlined, 'Wellness achievements', () => context.push('/achievement')),
                   _buildDivider(),
-                  _buildMenuTile(Icons.settings, '设置', () => context.push('/settings')),
+                  _buildMenuTile(Icons.settings, 'Settings', () => context.push('/settings')),
                   _buildDivider(),
-                  _buildMenuTile(Icons.info_outline, '关于顺时', () => context.push('/about')),
+                  _buildMenuTile(Icons.info_outline, 'About SEASONS', () => context.push('/about')),
                   _buildDivider(),
-                  _buildMenuTile(Icons.headset_mic, '意见反馈', () => context.push('/feedback')),
+                  _buildMenuTile(Icons.headset_mic, 'Feedback', () => context.push('/feedback')),
                 ]),
               ),
             ),
@@ -290,7 +290,7 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
             child: Padding(
               padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
               child: Center(
-                child: Text('顺应天时，颐养身心', style: TextStyle(
+                child: Text('Live in rhythm with the seasons', style: TextStyle(
                   fontFamily: ShunShiTypography.serifFamily,
                   fontSize: 14, color: ShunShiColors.textTertiary,
                   fontStyle: FontStyle.italic,

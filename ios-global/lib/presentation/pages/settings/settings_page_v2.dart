@@ -48,7 +48,7 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
       appBar: AppBar(
         backgroundColor: ShunShiColors.background,
         leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
-        title: Text('设置', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18, fontWeight: FontWeight.w600)),
+        title: Text('Settings', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18, fontWeight: FontWeight.w600)),
       ),
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
@@ -63,8 +63,8 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
               ), child: const Icon(Icons.person, color: ShunShiColors.primary)),
               const SizedBox(width: 12),
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('云水禅心', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
-                Text('账号：shunshi_2024', style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
+                Text('CloudWater', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+                Text('Account: seasons_2024', style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
               ]),
             ]),
           ),
@@ -72,8 +72,8 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
 
           // 账号安全
           _buildSectionCard([
-            _buildNavTile(Icons.shield, '账号安全中心'),
-            _buildNavTile(Icons.lock, '隐私设置'),
+            _buildNavTile(Icons.shield, 'Account security'),
+            _buildNavTile(Icons.lock, 'Privacy settings'),
           ]),
           const SizedBox(height: 16),
 
@@ -84,11 +84,11 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('消息推送', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+                Text('Push notifications', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
                 const SizedBox(height: 12),
-                _buildSwitchTile('节气提醒', '跟随二十四节气，获取养生建议', Icons.eco, _solarReminder, (v) { setState(() => _solarReminder = v); _savePref('solar_reminder', v); }),
-                _buildSwitchTile('时辰提醒', '按中医十二时辰定时提醒', Icons.schedule, _shichenReminder, (v) { setState(() => _shichenReminder = v); _savePref('shichen_reminder', v); }),
-                _buildSwitchTile('打卡提醒', '每日养生任务完成提醒', Icons.done_all, _checkinReminder, (v) { setState(() => _checkinReminder = v); _savePref('checkin_reminder', v); }),
+                _buildSwitchTile('Solar term reminder', 'Follow the 24 solar terms for wellness tips', Icons.eco, _solarReminder, (v) { setState(() => _solarReminder = v); _savePref('solar_reminder', v); }),
+                _buildSwitchTile('Daily rhythm reminders', 'Timed reminders for the twelve two-hour periods', Icons.schedule, _shichenReminder, (v) { setState(() => _shichenReminder = v); _savePref('shichen_reminder', v); }),
+                _buildSwitchTile('Check-in reminder', 'Daily wellness task reminder', Icons.done_all, _checkinReminder, (v) { setState(() => _checkinReminder = v); _savePref('checkin_reminder', v); }),
               ],
             ),
           ),
@@ -105,9 +105,9 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
                 title: Row(children: [
                   Icon(Icons.family_restroom, color: ShunShiColors.primary, size: 20),
                   const SizedBox(width: 8),
-                  Text('老年人模式', style: TextStyle(fontSize: 15, color: ShunShiColors.textPrimary)),
+                  Text('Senior mode', style: TextStyle(fontSize: 15, color: ShunShiColors.textPrimary)),
                 ]),
-                subtitle: Text('提供更大字体与简洁界面', style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
+                subtitle: Text('Larger text and a simpler interface', style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
                 activeThumbColor: ShunShiColors.primary,
               ),
               if (_elderMode) Padding(
@@ -115,7 +115,7 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
                 child: Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(color: ShunShiColors.primary.withOpacity(0.06), borderRadius: BorderRadius.circular(10)),
-                  child: Text('预览效果：现在是 寅时 · 肺经当令\n早起呼吸训练', style: TextStyle(fontSize: 18, color: ShunShiColors.primary, fontWeight: FontWeight.w500)),
+                  child: Text('Preview: it\'s 3–5 a.m. · Lung meridian time\nMorning breathing practice', style: TextStyle(fontSize: 18, color: ShunShiColors.primary, fontWeight: FontWeight.w500)),
                 ),
               ),
             ]),
@@ -126,15 +126,15 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
           _buildSectionCard([
             ListTile(
               leading: Icon(Icons.cleaning_services, color: ShunShiColors.primary, size: 20),
-              title: Text('清除缓存', style: TextStyle(fontSize: 15, color: ShunShiColors.textPrimary)),
+              title: Text('Clear cache', style: TextStyle(fontSize: 15, color: ShunShiColors.textPrimary)),
               trailing: Text('124.5 MB', style: TextStyle(fontSize: 13, color: ShunShiColors.textTertiary)),
               onTap: () {},
             ),
             ListTile(
               leading: Icon(Icons.info_outline, color: ShunShiColors.primary, size: 20),
-              title: Text('关于顺时', style: TextStyle(fontSize: 15, color: ShunShiColors.textPrimary)),
+              title: Text('About SEASONS', style: TextStyle(fontSize: 15, color: ShunShiColors.textPrimary)),
               trailing: Row(mainAxisSize: MainAxisSize.min, children: [
-                Text('版本 2.4.0', style: TextStyle(fontSize: 13, color: ShunShiColors.textTertiary)),
+                Text('Version 2.4.0', style: TextStyle(fontSize: 13, color: ShunShiColors.textTertiary)),
                 const Icon(Icons.chevron_right, color: ShunShiColors.textTertiary, size: 18),
               ]),
               onTap: () => context.push('/about'),
@@ -146,11 +146,11 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
           Center(
             child: GestureDetector(
               onTap: () => context.go('/login'),
-              child: Text('退出登录', style: TextStyle(fontSize: 15, color: Colors.red[400])),
+              child: Text('Log out', style: TextStyle(fontSize: 15, color: Colors.red[400])),
             ),
           ),
           const SizedBox(height: 16),
-          Center(child: Text('DESIGNED BY SHUNSHI · 顺时养生', style: TextStyle(fontSize: 10, color: ShunShiColors.textTertiary, letterSpacing: 1))),
+          Center(child: Text('DESIGNED BY SEASONS · WELLNESS IN RHYTHM', style: TextStyle(fontSize: 10, color: ShunShiColors.textTertiary, letterSpacing: 1))),
           const SizedBox(height: 32),
         ],
       ),

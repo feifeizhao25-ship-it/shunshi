@@ -45,7 +45,7 @@ class ConstitutionQuizWidget extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('第 ${currentIndex + 1} 题 / ${questions.length}',
+                  Text('Question ${currentIndex + 1} of ${questions.length}',
                       style: ShunshiTextStyles.caption),
                   Text('${(progress * 100).toInt()}%',
                       style: ShunshiTextStyles.caption
@@ -110,7 +110,7 @@ class ConstitutionQuizWidget extends StatelessWidget {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
-                      child: const Text('上一题', style: TextStyle(fontSize: 15)),
+                      child: const Text('Previous', style: TextStyle(fontSize: 15)),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -130,7 +130,7 @@ class ConstitutionQuizWidget extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(vertical: 14),
                     ),
                     child: Text(
-                      isLast && allAnswered ? '提交答卷' : '下一题',
+                      isLast && allAnswered ? 'Submit answers' : 'Next question',
                       style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
                     ),
                   ),

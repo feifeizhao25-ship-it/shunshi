@@ -183,7 +183,7 @@ class _SolarTermDetailPageState extends State<SolarTermDetailPage> {
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text('Solar Term Essence', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 16, fontWeight: FontWeight.w600, color: ShunShiColors.primary)),
                 const SizedBox(height: 10),
-                Text('「${info.quote}」', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 15, color: ShunShiColors.textSecondary, height: 1.8)),
+                Text('"${info.quote}"', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 15, color: ShunShiColors.textSecondary, height: 1.8)),
               ]),
             ),
             const SizedBox(height: 24),
@@ -193,11 +193,11 @@ class _SolarTermDetailPageState extends State<SolarTermDetailPage> {
             const SizedBox(height: 14),
 
             // 饮食（推荐食物）
-            _sectionCard('Diet', recommendedFoods.join('、'), Icons.restaurant_rounded),
+            _sectionCard('Diet', recommendedFoods.join(', '), Icons.restaurant_rounded),
             const SizedBox(height: 10),
 
             // 运动（真实数据）
-            _sectionCard('Exercise', exercises.join('、'), Icons.self_improvement_rounded),
+            _sectionCard('Exercise', exercises.join(', '), Icons.self_improvement_rounded),
             const SizedBox(height: 10),
 
             // 穴位调理（真实数据，点击展开穴位列表）
@@ -205,11 +205,11 @@ class _SolarTermDetailPageState extends State<SolarTermDetailPage> {
             const SizedBox(height: 10),
 
             // 情志调养（真实数据）
-            _sectionCard('Emotional Care', emotionalCare.join('、'), Icons.spa_rounded),
+            _sectionCard('Emotional Care', emotionalCare.join(', '), Icons.spa_rounded),
             const SizedBox(height: 10),
 
             // 养生提示
-            _sectionCard('Wellness Tips', healthTips.join('、'), Icons.favorite_rounded),
+            _sectionCard('Wellness Tips', healthTips.join(', '), Icons.favorite_rounded),
             const SizedBox(height: 20),
 
             // AI推荐卡片

@@ -25,7 +25,7 @@ class AIBubble extends StatelessWidget {
         Row(children: [
           Text(message.time, style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 11, color: ShunShiColors.textTertiary)),
           const SizedBox(width: 8),
-          GestureDetector(onTap: () { ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('正在播报...'), duration: Duration(seconds: 2))); }, child: Icon(Icons.volume_up, size: 16, color: ShunShiColors.textTertiary)),
+          GestureDetector(onTap: () { ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Speaking...'), duration: Duration(seconds: 2))); }, child: Icon(Icons.volume_up, size: 16, color: ShunShiColors.textTertiary)),
           const SizedBox(width: 8),
           if (onFeedback != null) GestureDetector(onTap: onFeedback, child: Icon(Icons.thumb_up_outlined, size: 16, color: ShunShiColors.textTertiary)),
         ]),
@@ -100,8 +100,8 @@ class UpgradeNudge extends StatelessWidget {
       child: Row(children: [
         Icon(Icons.auto_awesome, size: 18, color: ShunShiColors.gold),
         const SizedBox(width: 10),
-        Expanded(child: Text('继续深度对话，养心版一键解锁', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: ShunShiColors.gold, fontFamily: ShunShiTypography.sansFamily))),
-        Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: ShunShiColors.gold, borderRadius: BorderRadius.circular(10)), child: const Text('解锁', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Colors.white))),
+        Expanded(child: Text('Keep the conversation going — unlock the premium plan', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: ShunShiColors.gold, fontFamily: ShunShiTypography.sansFamily))),
+        Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: ShunShiColors.gold, borderRadius: BorderRadius.circular(10)), child: const Text('Unlock', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Colors.white))),
       ]),
     ));
   }
@@ -134,7 +134,7 @@ class _SourcesWrap extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Wrap(spacing: 8, runSpacing: 6, children: sources.map((s) => GestureDetector(
-      onTap: () { ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('参考来源：$s'), duration: const Duration(seconds: 2))); },
+      onTap: () { ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Sources: $s'), duration: const Duration(seconds: 2))); },
       child: Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5), decoration: BoxDecoration(color: ShunShiColors.primary.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(12), border: Border.all(color: ShunShiColors.primary.withValues(alpha: 0.15))),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
           const Text('📚', style: TextStyle(fontSize: 12)),

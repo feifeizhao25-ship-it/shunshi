@@ -198,7 +198,7 @@ class _SolarTermDetailPageState extends State<SolarTermDetailPage> {
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(AppLocalizations.of(context).t('solar_solar_term_essence'), style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 16, fontWeight: FontWeight.w600, color: ShunShiColors.primary)),
                 const SizedBox(height: 10),
-                Text('「${info.quote}」', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 15, color: ShunShiColors.textSecondary, height: 1.8)),
+                Text('"${info.quote}"', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 15, color: ShunShiColors.textSecondary, height: 1.8)),
               ]),
             ),
             const SizedBox(height: 24),

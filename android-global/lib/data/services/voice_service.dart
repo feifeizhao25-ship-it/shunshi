@@ -1,6 +1,6 @@
 // ignore_for_file: unused_field
-// 语音输入服务 (国内版 - SiliconFlow ASR)
-// 不依赖 Google 服务，兼容华为/小米等国产手机
+// Voice input service (international edition, server-side ASR)
+// The locale headers make the backend recognise English and answer in English
 
 import 'dart:async';
 import 'dart:io';
@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:record/record.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:dio/dio.dart';
+import '../../core/network/locale_headers.dart';
 import '../../core/config/app_config.dart';
 
 class VoiceService {
@@ -21,7 +22,7 @@ class VoiceService {
     baseUrl: _baseUrl,
     connectTimeout: const Duration(seconds: 10),
     receiveTimeout: const Duration(seconds: 30),
-    headers: {'ngrok-skip-browser-warning': 'true'},
+    headers: {'ngrok-skip-browser-warning': 'true', ...LocaleHeaders.values},
   ));
 
   bool _isListening = false;
@@ -109,7 +110,7 @@ class VoiceService {
         baseUrl: _baseUrl,
         connectTimeout: const Duration(seconds: 10),
         receiveTimeout: const Duration(seconds: 30),
-        headers: {'ngrok-skip-browser-warning': 'true'},
+        headers: {'ngrok-skip-browser-warning': 'true', ...LocaleHeaders.values},
       )).post(
         '/api/v1/speech/asr',
         data: formData,

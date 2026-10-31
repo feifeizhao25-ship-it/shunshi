@@ -63,6 +63,81 @@ _VALIDATION_MSG = (
 )
 
 
+GENERIC_BY_STATUS_EN = {
+    400: "The request looks wrong. Please check it and try again.",
+    401: "Please sign in first.",
+    403: "You don't have permission to do this.",
+    404: "We couldn't find what you were looking for.",
+    405: "That action isn't supported.",
+    409: "This can't be done in the current state. Please refresh and try again.",
+    413: "The content you submitted is too large.",
+    422: "Some of the information isn't valid. Please check it and try again.",
+    429: "Too many requests. Please try again shortly.",
+}
+SERVER_GENERIC_EN = "The service is unavailable right now. Please try again later."
+
+_VALIDATION_MSG_EN = (
+    ("missing", "This field is required"),
+    ("date", "Invalid date; use YYYY-MM-DD"),
+    ("time", "Invalid time"),
+    ("too_short", "Too short"),
+    ("too_long", "Too long"),
+    ("string_too", "Length is not allowed"),
+    ("greater", "Value is too small"),
+    ("less", "Value is too large"),
+    ("literal", "Invalid choice"),
+    ("enum", "Invalid choice"),
+    ("json", "Invalid data format"),
+    ("int", "A whole number is required"),
+    ("float", "A number is required"),
+    ("bool", "Choose yes or no"),
+    ("string_pattern", "Invalid format"),
+)
+
+
+def _is_global(request: Request) -> bool:
+    """International edition requests (X-App-Market: global, or a non-Chinese Accept-Language)."""
+    from app.locale_context import resolve_locale
+
+    h = request.headers
+    return resolve_locale(h.get("accept-language"), h.get("x-app-market"), h.get("x-region")).is_global
+
+
+def _generic_en(status: int) -> str:
+    return GENERIC_BY_STATUS_EN.get(status, SERVER_GENERIC_EN if status >= 500 else "The request couldn't be completed. Please try again later.")
+
+
+_BARE_HTTP_PHRASES = {
+    "not found", "method not allowed", "forbidden", "unauthorized", "bad request", "not authenticated",
+    "internal server error", "conflict", "unprocessable entity", "too many requests", "payload too large",
+}
+
+
+def _needs_replacing_en(text: str) -> bool:
+    return bool(_CJK.search(text)) or bool(_TECH.search(text)) or text.strip().rstrip(".").lower() in _BARE_HTTP_PHRASES
+
+
+def _clean_en(value: Any, status: int) -> Any:
+    """International edition: never show Chinese or operator text; keep plain English messages."""
+    if isinstance(value, str):
+        if _needs_replacing_en(value):
+            logger.info("replaced a user-visible Chinese/technical error (status=%s): %s", status, value[:300])
+            return _generic_en(status)
+        return value
+    if isinstance(value, dict):
+        return {k: (_clean_en(v, status) if k in ("detail", "message", "msg", "error") else v) for k, v in value.items()}
+    if isinstance(value, list):
+        return [_clean_en(v, status) for v in value]
+    return value
+
+
+def _validation_message_en(error_type: str) -> str:
+    for key, text in _VALIDATION_MSG_EN:
+        if key in error_type:
+            return text
+    return "Invalid format"
+
+
 def _generic(status: int) -> str:
     return GENERIC_BY_STATUS.get(status, SERVER_GENERIC if status >= 500 else "请求未能完成，请稍后再试")
 
@@ -94,16 +169,18 @@ def _validation_message(error_type: str) -> str:
 def install_chinese_error_handlers(app: FastAPI) -> None:
     @app.exception_handler(StarletteHTTPException)
     async def http_exception_handler(request: Request, exc: StarletteHTTPException):
+        clean = _clean_en if _is_global(request) else _clean
         return JSONResponse(
-            {"detail": _clean(exc.detail, exc.status_code)},
+            {"detail": clean(exc.detail, exc.status_code)},
             status_code=exc.status_code,
             headers=getattr(exc, "headers", None),
         )
 
     @app.exception_handler(RequestValidationError)
     async def validation_handler(request: Request, exc: RequestValidationError):
+        message = _validation_message_en if _is_global(request) else _validation_message
         items = [
-            {"loc": list(err.get("loc", ())), "type": err.get("type", ""), "msg": _validation_message(err.get("type", ""))}
+            {"loc": list(err.get("loc", ())), "type": err.get("type", ""), "msg": message(err.get("type", ""))}
             for err in exc.errors()
         ]
         return JSONResponse({"detail": items}, status_code=422)
@@ -111,4 +188,4 @@ def install_chinese_error_handlers(app: FastAPI) -> None:
     @app.exception_handler(Exception)
     async def unhandled_handler(request: Request, exc: Exception):
         logger.exception("未处理的异常: %s %s", request.method, request.url.path)
-        return JSONResponse({"detail": SERVER_GENERIC}, status_code=500)
+        return JSONResponse({"detail": SERVER_GENERIC_EN if _is_global(request) else SERVER_GENERIC}, status_code=500)
