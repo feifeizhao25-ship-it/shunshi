@@ -474,7 +474,9 @@ def test_backend_copy_of_the_library_matches_the_app_asset():
     if not app_copy.exists():  # 只在整个仓库里跑时检查（后端镜像单独跑时跳过）
         pytest.skip("android-cn assets not present")
     ios_copy = app_copy.parents[3] / "ios-cn" / "assets" / "library" / "reference_entries_v1.json"
+    # 后端文件里热线号用占位符 {crisis_hotline}（读取时换成 safety/config 的号码）；App 资源里是展开后的号码
     mine = json.loads((pathlib.Path(store.__file__).parent / "data" / "reference_entries_v1.json").read_text("utf-8"))
+    mine = store._resolve(mine)
     assert json.loads(app_copy.read_text("utf-8")) == mine
     if ios_copy.exists():
         assert json.loads(ios_copy.read_text("utf-8")) == mine
