@@ -60,6 +60,8 @@ def home_dashboard(
 
     hemi, hemi_source = effective_hemisphere(session, user_id, hemisphere)
     board = phs.build(session, user_id, lang="en" if is_global else "zh", is_global=is_global, hemisphere=hemi, tz_name=tz)
+    if not is_global:  # 官方资料库只在国内版；国际版没有这张卡
+        board = phs.with_library_card(session, user_id, board)
     out = {
         "greeting": board["greeting"],
         "hero": board["hero"],

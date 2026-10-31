@@ -153,3 +153,27 @@ def build(session: Session, user_id: str, *, lang: str, is_global: bool, hemisph
     board["date"] = day.isoformat()
     board["time_of_day"] = ph.time_bucket(now.hour)
     return board
+
+
+def with_library_card(session: Session, user_id: str, board: dict) -> dict:
+    """国内版个性化首页：资料库有「新增/更新」或匹配度很高的一篇时，在首页多放一张卡（紧跟在第一张日历/节气卡之后）。
+
+    不改变 hero、不重复记录「已展示」；用户关了首页个性化、关了资料库推荐、或资料库里没有已审核的条目时，原样返回。
+    资料库出任何问题都不能影响首页，所以吞掉异常并记日志。
+    """
+    if not (board.get("personalization") or {}).get("enabled"):
+        return board
+    try:
+        from ..library import service as library_service
+
+        card = library_service.home_card(session, user_id, date.fromisoformat(board["date"]), "zh")
+    except Exception:  # noqa: BLE001
+        import logging
+
+        logging.getLogger(__name__).warning("library home card skipped", exc_info=True)
+        return board
+    if not card:
+        return board
+    cards = [c for c in board["cards"] if c.get("id") != card["id"]]
+    cards.insert(min(1, len(cards)), card)
+    return dict(board, cards=cards)

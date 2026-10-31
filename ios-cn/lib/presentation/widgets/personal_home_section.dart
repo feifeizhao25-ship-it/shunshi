@@ -473,6 +473,7 @@ IconData _iconFor(String kind) {
     'alarm': Icons.notifications_active_outlined,
     'pipeline': Icons.timeline_rounded,
     'learn': Icons.menu_book_outlined,
+    'library': Icons.local_library_outlined,
     'policy': Icons.gavel_rounded,
     'market': Icons.public_rounded,
     'rhythm': Icons.schedule_rounded,
