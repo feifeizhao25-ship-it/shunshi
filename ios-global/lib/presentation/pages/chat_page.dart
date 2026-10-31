@@ -1,4 +1,5 @@
 // ignore_for_file: unused_field
+import '../../core/network/locale_headers.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -42,7 +43,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
   final _scrollController = ScrollController();
   final _focusNode = FocusNode();
   final List<ChatMessage> _messages = [];
-  final _dio = Dio(BaseOptions(baseUrl: _baseUrl));
+  final _dio = Dio(BaseOptions(baseUrl: _baseUrl, headers: LocaleHeaders.values));
   bool _isLoading = false;
   bool _isRecording = false;
   int _quotaRemaining = 10;

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../data/services/store_pricing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/seasons_colors.dart';
 import '../../../core/theme/seasons_text_styles.dart';
@@ -125,27 +126,27 @@ class SubscriptionPage extends ConsumerWidget {
     );
   }
 
-  /// Fallback plan cards — Free/$0, Serenity/$9.99, Harmony/$19.99, Family/$29.99
+  /// Fallback plan cards. Amounts come from the app store (StorePricing), never hard-coded.
   List<Widget> _fallbackPlanCards(
       SubscriptionState state, WidgetRef ref, bool isDark,
       Color textPrimary, Color textSecondary, Color textHint,
       Color border, Color surfaceDim) {
     final tiers = [
       (SubscriptionTier.free, 'Free', '\$0', null, false, <String>[]),
-      (SubscriptionTier.serenity, 'Serenity', '\$9.99', 'month', true, [
+      (SubscriptionTier.serenity, 'Serenity', StorePricing.price('serenity'), StorePricing.price('serenity') == StorePricing.pending ? null : 'month', true, [
         'Unlimited AI companion',
         'All content library',
         'Seasonal insights',
         'Unlimited reflections',
         'Sleep audio & stories',
       ]),
-      (SubscriptionTier.harmony, 'Harmony', '\$19.99', 'month', false, [
+      (SubscriptionTier.harmony, 'Harmony', StorePricing.price('harmony'), StorePricing.price('harmony') == StorePricing.pending ? null : 'month', false, [
         'Everything in Serenity',
         'Family features',
         'Priority support',
         'Weekly AI insights',
       ]),
-      (SubscriptionTier.family, 'Family', '\$29.99', 'month', false, [
+      (SubscriptionTier.family, 'Family', StorePricing.price('family'), StorePricing.price('family') == StorePricing.pending ? null : 'month', false, [
         'Everything in Harmony',
         'Up to 5 family members',
         'Shared insights',

@@ -28,6 +28,7 @@ _GL_PATH = _DATA_DIR / "SEASONS_Knowledge_Base_English.md"
 _CN_SUPP_PATH = _DATA_DIR / "顺时知识库_补充篇_中文版.md"
 _GL_SUPP_PATH = _DATA_DIR / "SEASONS_Knowledge_Base_Supplement_English.md"
 _CN_VERIFIED_PATH = Path(__file__).with_name("verified_cn.md")
+_GL_VERIFIED_PATH = Path(__file__).with_name("verified_global.md")
 _SOURCE_MANIFEST_PATH = Path(__file__).with_name("source_manifest.json")
 # 自改进批准入库目录。生产里 backend 与 self-improve 两个容器共用 /app/data 卷，所以可用环境变量指过去。
 _APPROVED_DIR = Path(os.environ.get("SHUNSHI_APPROVED_KB_DIR") or Path(__file__).with_name("approved"))
@@ -535,6 +536,7 @@ def load_knowledge_bases(force: bool = False):
     cn_kb.load_approved()
     gl_kb.load()
     gl_kb.load_supplement()
+    gl_kb.load(_GL_VERIFIED_PATH)
     from .embedder import init_embedders
 
     init_embedders()

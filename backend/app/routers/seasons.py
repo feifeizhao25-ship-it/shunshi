@@ -17,6 +17,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from ..deps import current_user, get_session
+from ..locale_context import RequestLocale, request_locale
 from ..simple_models import AudioProgress, UserSetting
 
 router = APIRouter(prefix="/api/v1/seasons", tags=["seasons"])
@@ -43,19 +44,65 @@ def _greeting(now: float | None = None) -> str:
 @router.get("/home/dashboard")
 def home_dashboard(
     hemisphere: str = "north",
+    tz: str | None = None,
+    locale: RequestLocale = Depends(request_locale),
     user_id: str = Depends(current_user),
     session: Session = Depends(get_session),
 ):
+    """Personalised home. Domestic (no locale headers) stays Chinese on Beijing time with the solar-term / holiday anchors;
+    the international edition (Accept-Language / X-App-Market) is English, local time from ``tz`` and the hemisphere."""
+    from ..services import personal_home_service as phs
     from ..services.home_cards import build_dashboard
 
-    board = build_dashboard(session, user_id)
-    return {
-        "greeting": _greeting(),
-        **board,
-        "gentle_suggestions": board["suggestions"],
-        "hemisphere": hemisphere,
+    is_global = locale.is_global
+    hemi = "south" if hemisphere == "south" else "north"
+    board = phs.build(session, user_id, lang="en" if is_global else "zh", is_global=is_global, hemisphere=hemi, tz_name=tz)
+    out = {
+        "greeting": board["greeting"],
+        "hero": board["hero"],
+        "streak": board["streak"],
+        "personalization": board["personalization"],
+        "suggestions": board["cards"],
+        "gentle_suggestions": board["cards"],
+        "date": board["date"],
+        "time_of_day": board["time_of_day"],
+        "hemisphere": hemi,
         "updated_at": int(time.time()),
     }
+    if not is_global:
+        legacy = build_dashboard(session, user_id)
+        out["solar_term"] = legacy["solar_term"]
+        out["day_type"] = legacy["day_type"]
+        out["daily_insight"] = legacy["daily_insight"]
+    else:
+        out["daily_insight"] = {"text": board["hero"]["title"] if board["hero"] else "", "reason": board["hero"]["reason"] if board["hero"] else ""}
+    return out
+
+
+class PreferencesBody(BaseModel):
+    personalization_enabled: bool | None = None
+    constitution: str | None = Field(default=None, max_length=8)
+    clear_constitution: bool = False
+
+
+@router.get("/profile/preferences")
+def get_preferences(user_id: str = Depends(current_user), session: Session = Depends(get_session)):
+    from ..services import personal_home_service as phs
+
+    return phs.preferences(session, user_id)
+
+
+@router.post("/profile/preferences")
+def set_preferences(body: PreferencesBody, user_id: str = Depends(current_user), session: Session = Depends(get_session)):
+    from fastapi import HTTPException
+
+    from ..services import personal_home_service as phs
+
+    try:
+        return phs.set_preferences(session, user_id, enabled=body.personalization_enabled, constitution=body.constitution,
+                                   clear_constitution=body.clear_constitution)
+    except ValueError as err:
+        raise HTTPException(status_code=422, detail=str(err)) from err
 
 
 class OnboardingBody(BaseModel):

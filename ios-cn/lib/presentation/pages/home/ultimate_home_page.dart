@@ -9,6 +9,8 @@ import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
 import 'package:go_router/go_router.dart';
 import 'widgets/home_skeleton.dart';
+import 'widgets/personal_home_binding.dart';
+import '../../widgets/personal_home_section.dart';
 import '../../../core/solar_term/solar_term_table.dart';
 import '../../../data/services/offline_cache.dart';
 import '../../../core/config/app_config.dart';
@@ -369,6 +371,9 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
             ),
 
             const SliverToBoxAdapter(child: SizedBox(height: 28)),
+            // ═══════════════ 今天为你准备的 ═══════════════
+            SliverToBoxAdapter(child: PersonalHomeSection(api: PersonalHomeBinding.api())),
+            const SliverToBoxAdapter(child: SizedBox(height: 20)),
 
             // ═══════════════ Hero 经络意境区 ═══════════════
             SliverToBoxAdapter(

@@ -1,8 +1,8 @@
 // lib/presentation/pages/seasons/seasons_page.dart
 //
-// Seasons 页面 — 更极简、顶部视觉占比50%
-// 国际版：Season名称32sp w200，内容更少，间距更大
-// 背景渐变更柔和，SingleChildScrollView滚动
+// Seasons page: minimal layout, top visual takes about 50%
+// International edition: season name 32sp w200, less content, more spacing
+// Softer background gradient, scrolls in a SingleChildScrollView
 
 import 'package:flutter/material.dart';
 import '../../../core/theme/shunshi_colors.dart';
@@ -13,7 +13,7 @@ import '../../../core/theme/seasons_text_styles.dart';
 import '../../providers/seasons_provider.dart';
 import '../../../core/network/api_singleton.dart';
 
-// ── 季节配色 — 更柔和的渐变 ──────────────────────────
+// ── Season colours: softer gradients ──────────────────────────
 
 Color _seasonBgStart(String season) {
   switch (season) {
@@ -64,7 +64,7 @@ String _seasonDisplayName(String season) {
   return season[0].toUpperCase() + season.substring(1);
 }
 
-// ── Current Season辅助 ──────────────────────────────────────
+// ── Current Season ──
 
 String _getCurrentSeason() {
   final month = DateTime.now().month;
@@ -74,7 +74,7 @@ String _getCurrentSeason() {
   return 'winter';
 }
 
-// ── 主页面 ────────────────────────────────────────────
+// ── Main page ────────────────────────────────────────────
 
 class SeasonsPage extends ConsumerWidget {
   const SeasonsPage({super.key});
@@ -94,24 +94,24 @@ class SeasonsPage extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── 顶部大视觉区域 (50%) ──
+            // ── Top hero area (50%) ──
             _HeroSection(season: currentSeason),
 
-            // ── 季节感悟 ──
+            // ── Season reflection ──
             if (currentInsight != null)
               _InsightSection(
                 insight: currentInsight.value,
                 season: currentSeason,
               ),
 
-            // ── 生活suggestion:  ──
+            // ── suggestion ──
             if (currentInsight != null)
               _GentleSuggestions(
                 insight: currentInsight.value,
                 season: currentSeason,
               ),
 
-            // ── Other季节快速导航 ──
+            // ── Other ──
             _OtherSeasons(current: currentSeason),
 
             const SizedBox(height: 48),
@@ -122,7 +122,7 @@ class SeasonsPage extends ConsumerWidget {
   }
 }
 
-// ── 顶部大视觉区域 — 50%，更柔和渐变 ──
+// ── Top hero area: 50%, softer gradient ──
 
 class _HeroSection extends StatelessWidget {
   final String season;
@@ -206,7 +206,7 @@ class _HeroSection extends StatelessWidget {
   }
 }
 
-// ── 季节感悟 ──
+// ── Season reflection ──
 
 class _InsightSection extends StatelessWidget {
   final dynamic insight;
@@ -237,7 +237,7 @@ class _InsightSection extends StatelessWidget {
   }
 }
 
-// ── 生活suggestion: （极简版，只取前3条）───────────────────────
+// ── suggestion: 3 ──
 
 class _GentleSuggestions extends StatelessWidget {
   final dynamic insight;
@@ -301,7 +301,7 @@ class _GentleSuggestions extends StatelessWidget {
   }
 }
 
-// ── 极简suggestion: 卡片 ──
+// ── suggestion ──
 
 class _GentleCard extends StatelessWidget {
   final String emoji;
@@ -339,7 +339,7 @@ class _GentleCard extends StatelessWidget {
   }
 }
 
-// ── Other季节导航 ──
+// ── Other ──
 
 class _OtherSeasons extends StatelessWidget {
   final String current;

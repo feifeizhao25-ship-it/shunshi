@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'store_pricing.dart';
 import '../../core/config/app_config.dart';
 
 // ── Subscription Tier ──────────────────────────────────
@@ -141,21 +142,21 @@ class SubscriptionProducts {
         SubscriptionPlan(
           id: 'serenity',
           name: 'Serenity',
-          priceDisplay: '\$9.99',
+          priceDisplay: StorePricing.price('serenity'),
           period: 'month',
           features: serenity.features,
         ),
         SubscriptionPlan(
           id: 'harmony',
           name: 'Harmony',
-          priceDisplay: '\$14.99',
+          priceDisplay: StorePricing.price('harmony'),
           period: 'month',
           features: harmony.features,
         ),
         SubscriptionPlan(
           id: 'family',
           name: 'Family',
-          priceDisplay: '\$19.99',
+          priceDisplay: StorePricing.price('family'),
           period: 'month',
           features: family.features,
         ),
