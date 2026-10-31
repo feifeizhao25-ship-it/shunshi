@@ -16,7 +16,8 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
-from ..deps import current_user, get_session
+from ..config import Settings
+from ..deps import current_user, get_session, get_settings
 from ..locale_context import RequestLocale, request_locale
 from ..simple_models import AudioProgress, UserSetting
 
@@ -140,13 +141,17 @@ class AudioProgressBody(BaseModel):
     audio_id: str = Field(min_length=1, max_length=64)
     progress_seconds: int = Field(ge=0)
     completed: bool = False
+    # Seconds of audio that actually played since the last report; this is what the daily audio-minutes quota counts
+    # (progress_seconds is the position in the track, which a seek changes without anyone listening).
+    listened_seconds: int = Field(default=0, ge=0, le=86400)
 
 
 @router.post("/audio/progress")
-def report_audio_progress(
+async def report_audio_progress(
     body: AudioProgressBody,
     user_id: str = Depends(current_user),
     session: Session = Depends(get_session),
+    settings: Settings = Depends(get_settings),
 ):
     session.merge(
         AudioProgress(
@@ -157,4 +162,10 @@ def report_audio_progress(
             updated_at=int(time.time()),
         )
     )
-    return {"saved": True}
+    out: dict = {"saved": True}
+    if body.listened_seconds:
+        from ..services import audio_quota
+        from ..services.membership_status import membership_status
+
+        out.update(await audio_quota.add_listened(settings.redis_url, user_id, membership_status(session, user_id)["tier"], body.listened_seconds))
+    return out
