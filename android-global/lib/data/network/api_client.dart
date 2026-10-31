@@ -1,3 +1,4 @@
+import '../../core/network/locale_headers.dart';
 import 'package:dio/dio.dart';
 import 'dart:io';
 import '../storage/storage_manager.dart';
@@ -55,7 +56,7 @@ class ApiClient {
       baseUrl: baseUrl,
       connectTimeout: const Duration(seconds: 10),
       receiveTimeout: const Duration(seconds: 30),
-      headers: {'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true'},
+      headers: {'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true', ...LocaleHeaders.values},
     ));
     
     // 添加拦截器

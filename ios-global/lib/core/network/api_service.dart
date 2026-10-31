@@ -1,3 +1,4 @@
+import 'locale_headers.dart';
 import '../config/app_config.dart';
 import '../constants/app_constants.dart';
 import 'package:dio/dio.dart';
@@ -23,6 +24,7 @@ class ApiService {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
+          ...LocaleHeaders.values,
           if (authToken != null) 'Authorization': 'Bearer $authToken',
         },
       ),

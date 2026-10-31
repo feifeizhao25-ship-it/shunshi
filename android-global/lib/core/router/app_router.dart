@@ -29,7 +29,6 @@ import '../../presentation/pages/wellness/constitution_page.dart';
 import '../../presentation/pages/wellness/boundaries_page.dart';
 import '../../presentation/pages/records/records_page_v2.dart';
 import '../../presentation/pages/subscription/subscription_page_v2.dart';
-import '../../presentation/pages/subscription/membership_center_page.dart';
 import '../../presentation/pages/reflection/reflection_page.dart';
 import '../../presentation/pages/community/community_page_v2.dart';
 import '../../presentation/pages/achievement/achievement_page_v2.dart';
@@ -57,6 +56,14 @@ import '../../presentation/pages/subscription/stripe_checkout_page.dart';
 import '../../presentation/pages/about/about_page.dart';
 import '../../presentation/pages/legal/terms_page.dart';
 import '../../presentation/pages/legal/privacy_policy_page.dart';
+import '../../presentation/pages/seasons/seasons_page.dart';
+import '../../presentation/pages/report/wellness_report_page.dart';
+import '../../presentation/pages/meditation/meditation_focus_page.dart';
+import '../../presentation/pages/wellness/mood_page.dart';
+import '../../presentation/pages/wellness/tea_page.dart';
+import '../../presentation/pages/growth/growth_milestones_page.dart';
+import '../../presentation/pages/skills/skills_page.dart';
+import '../../presentation/pages/profile/gdpr_page.dart';
 import '../../presentation/widgets/shell/main_shell.dart';
 import '../../presentation/pages/error/error_page.dart';
 
@@ -84,7 +91,8 @@ class AppRouter {
       // 全屏子页面
       GoRoute(path: '/reflection', builder: (context, state) => const ReflectionPage()),
       GoRoute(path: '/subscription', builder: (context, state) => const SubscriptionPageV2()),
-      GoRoute(path: '/membership', builder: (context, state) => const MembershipCenterPage()),
+      // The old static membership page showed made-up CNY prices; the live plans page replaces it.
+      GoRoute(path: '/membership', redirect: (context, state) => '/subscription'),
       GoRoute(path: '/stripe-checkout', builder: (context, state) {
         final plan = state.uri.queryParameters['plan'] ?? 'premium';
         return StripeCheckoutPage(plan: plan);
@@ -161,6 +169,31 @@ class AppRouter {
       GoRoute(path: '/feedback', builder: (context, state) => const fb.FeedbackPage()),
       GoRoute(path: '/terms-and-conditions', builder: (context, state) => const TermsPage()),
       GoRoute(path: '/privacy-policy', builder: (context, state) => const PrivacyPolicyPage()),
+
+      // Routes the UI test found missing ("Page not found"): every one of these has a page.
+      GoRoute(path: '/seasons', builder: (context, state) => const SeasonsPage()),
+      GoRoute(path: '/wellness-report', builder: (context, state) => const WellnessReportPage()),
+      GoRoute(path: '/meditation', builder: (context, state) => const MeditationFocusPage()),
+      GoRoute(path: '/mood', builder: (context, state) => const MoodPage()),
+      GoRoute(path: '/tea', builder: (context, state) => const TeaPage()),
+      GoRoute(path: '/growth', builder: (context, state) => const GrowthMilestonesPage()),
+      GoRoute(path: '/journal', builder: (context, state) => const JournalReflectionPage()),
+
+      // Aliases for links that used to dead-end (found by test/global_fixes/route_integrity_test.dart).
+      GoRoute(path: '/subscribe', redirect: (context, state) => '/subscription'),
+      GoRoute(path: '/wellness-hub', redirect: (context, state) => '/wellness'),
+      GoRoute(path: '/gdpr', builder: (context, state) => const GdprPage()),
+      GoRoute(path: '/skills', builder: (context, state) => const SkillsPage()),
+      GoRoute(path: '/wellness/constitution', redirect: (context, state) => '/constitution'),
+      GoRoute(path: '/wellness/tea', redirect: (context, state) => '/tea'),
+      GoRoute(path: '/wellness/food_therapy', redirect: (context, state) => '/wellness-category/food_therapy'),
+      GoRoute(path: '/wellness/acupressure', redirect: (context, state) => '/wellness-category/acupressure'),
+      GoRoute(path: '/wellness/exercise', redirect: (context, state) => '/wellness-category/exercise'),
+      GoRoute(path: '/sleep', redirect: (context, state) => '/sleep-sanctuary'),
+      GoRoute(path: '/legal/terms', redirect: (context, state) => '/terms-and-conditions'),
+      GoRoute(path: '/legal/medical-disclaimer', redirect: (context, state) => '/boundaries'),
+      GoRoute(path: '/help', redirect: (context, state) => '/feedback'),
+      GoRoute(path: '/wellness/sleep', redirect: (context, state) => '/sleep-sanctuary'),
 
       // Main Shell — 5 Tab: Chat / Today / Solar / Wellness / Profile
       ShellRoute(
