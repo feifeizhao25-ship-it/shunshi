@@ -6,6 +6,7 @@ import 'package:dio/dio.dart';
 import '../../../data/storage/storage_manager.dart';
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
+import '../../../core/config/app_config.dart';
 
 class ConstitutionTestV2 extends StatefulWidget {
   const ConstitutionTestV2({super.key});
@@ -15,7 +16,7 @@ class ConstitutionTestV2 extends StatefulWidget {
 }
 
 class _ConstitutionTestV2State extends State<ConstitutionTestV2> {
-  static const _baseUrl = 'https://api.seasonsapp.com';
+  static const _baseUrl = AppConfig.apiBaseUrl;
   final _dio = Dio(BaseOptions(baseUrl: _baseUrl, connectTimeout: const Duration(seconds: 8)));
 
   List<Map<String, dynamic>> _questions = [];

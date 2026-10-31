@@ -9,6 +9,7 @@ import '../../../core/theme/seasons_colors.dart';
 import '../../../core/theme/seasons_spacing.dart';
 import '../../../core/theme/seasons_text_styles.dart';
 import '../../widgets/components/soft_card.dart';
+import '../../../core/config/app_config.dart';
 
 /// Settings / Privacy Page — SEASONS Global
 /// Includes: memory control, data export, delete account, AI disclosure
@@ -32,7 +33,7 @@ class _SettingsPageState extends State<SettingsPage> {
   void initState() {
     super.initState();
     _dio = Dio(BaseOptions(
-      baseUrl: 'https://api.seasonsapp.com',
+      baseUrl: AppConfig.apiBaseUrl,
       connectTimeout: const Duration(seconds: 15),
     ));
     _loadUserId();

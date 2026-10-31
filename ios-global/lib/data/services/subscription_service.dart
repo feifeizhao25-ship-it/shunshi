@@ -1,5 +1,6 @@
 import 'store_pricing.dart';
 import 'package:dio/dio.dart';
+import '../../core/config/app_config.dart';
 
 // ── Subscription Tier ──────────────────────────────────
 
@@ -223,7 +224,7 @@ class SubscriptionService {
   final String _userId;
 
   SubscriptionService({
-    String baseUrl = 'https://api.seasonsapp.com',
+    String baseUrl = AppConfig.apiBaseUrl,
     required String userId,
   })  : _baseUrl = baseUrl,
         _userId = userId,

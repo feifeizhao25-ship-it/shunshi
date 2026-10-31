@@ -3,6 +3,7 @@ import '../../../core/router/safe_pop.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
+import '../../../core/config/app_config.dart';
 
 /// 隐私数据页 — 导出/删除/清空
 class PrivacyPage extends StatefulWidget {
@@ -50,7 +51,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
             Navigator.pop(ctx);
             try {
               final dio = Dio();
-              await dio.delete('https://api.seasonsapp.com/api/v1/user/data');
+              await dio.delete('${AppConfig.apiBaseUrl}/api/v1/user/data');
               if (mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('All data deleted'), duration: Duration(seconds: 2)));
