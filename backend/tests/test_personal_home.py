@@ -286,3 +286,17 @@ def test_fixed_utc_offset_timezone_for_apps_without_an_iana_name():
     assert phs.local_now(True, "UTC+99:00", now).hour == 20  # nonsense falls back to UTC
     assert phs.local_now(True, "Europe/Berlin", now).hour == 21
     assert phs.local_now(False, "UTC+05:30", now).hour == 4  # domestic stays on Beijing time
+
+
+def test_api_global_market_header_alone_is_enough_for_english_home(client, monkeypatch):
+    """The international app sends Accept-Language and X-App-Market; a client that only sends the market header
+    must still get an all-English board (greeting, hero, cards, personalization note), including after some activity."""
+    h = _guest(client)
+    client.post("/api/v1/seasons/onboarding/complete", json={"help_goal": "sleep better", "support_time": "night"}, headers=h)
+    client.post("/api/v1/user/daily-checkin", json={}, headers=h)
+    when = datetime(2026, 11, 3, 14, 0, tzinfo=timezone.utc)
+    monkeypatch.setattr(phs, "local_now", lambda is_global, tz, now_utc=None: when)
+    for extra in ({"X-App-Market": "global"}, {"X-App-Market": "global", "Accept-Language": "en-US"}):
+        data = client.get("/api/v1/seasons/home/dashboard?tz=America/New_York", headers={**extra, **h}).json()
+        assert not CJK.search(str(data)), (extra, data)
+        assert data["greeting"] and data["personalization"]["note"]
