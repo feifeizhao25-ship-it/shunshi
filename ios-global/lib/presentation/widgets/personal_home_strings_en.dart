@@ -3,6 +3,8 @@ import 'personal_home_section.dart';
 
 String _minutes(int n) => '$n min';
 String _days(int n) => '$n days in a row';
+String _weekDone(String d) => '$d: took a small action';
+String _weekNone(String d) => '$d: nothing recorded';
 
 const PersonalHomeStrings kPersonalHomeStringsEn = PersonalHomeStrings(
   heading: 'Picked for you today',
@@ -25,4 +27,10 @@ const PersonalHomeStrings kPersonalHomeStringsEn = PersonalHomeStrings(
   letterSpacing: 0.4,
   minutes: _minutes,
   days: _days,
+  weekHeading: 'This week',
+  weekdays: 'MTWTFSS',
+  weekDone: _weekDone,
+  weekNone: _weekNone,
+  recallDismiss: 'Got it',
+  recallLabel: 'Welcome back',
 );

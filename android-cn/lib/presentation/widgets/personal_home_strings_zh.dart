@@ -3,6 +3,8 @@ import 'personal_home_section.dart';
 
 String _minutes(int n) => '$n 分钟';
 String _days(int n) => '已连续 $n 天打开';
+String _weekDone(String d) => '$d 做了小行动';
+String _weekNone(String d) => '$d 没有记录';
 
 const PersonalHomeStrings kPersonalHomeStringsZh = PersonalHomeStrings(
   heading: '今天为你准备的',
@@ -25,4 +27,10 @@ const PersonalHomeStrings kPersonalHomeStringsZh = PersonalHomeStrings(
   letterSpacing: 1,
   minutes: _minutes,
   days: _days,
+  weekHeading: '本周',
+  weekdays: '一二三四五六日',
+  weekDone: _weekDone,
+  weekNone: _weekNone,
+  recallDismiss: '知道了',
+  recallLabel: '欢迎回来',
 );
