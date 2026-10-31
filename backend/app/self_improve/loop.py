@@ -19,6 +19,7 @@ from .freshness import retirement_scan
 from .gates import GateResult, check_set_separation, edit_budget, evaluate_gates
 from .sources import SourcePolicy, lint_source, scan_injection
 from .store import Candidate, CandidateStore, IllegalTransition
+from .utility import UtilityLedger
 
 
 @dataclass
@@ -56,6 +57,7 @@ class CycleReport:
     blocked: list = field(default_factory=list)  # [(id, reason)] 如缺专家签字
     warnings: list = field(default_factory=list)
     problems: list = field(default_factory=list)
+    metrics: dict = field(default_factory=dict)  # 可观测：各类拒绝原因计数、账本规模等（不含任何用户数据）
 
 
 def _parse(now) -> datetime:
@@ -82,6 +84,7 @@ class SelfImprovementLoop:
         self.store = store or CandidateStore(cfg.data_dir)
         self.extra_literals, self.extra_patterns = extra_literals, extra_patterns
         self._hist_path = Path(cfg.data_dir) / "weekly_history.json"
+        self.utility = UtilityLedger(cfg.data_dir)
 
     # ---------- 工具 ----------
     def _history(self) -> list:
@@ -138,10 +141,51 @@ class SelfImprovementLoop:
             rep.proposed.append(c.id)
             self._evaluate_one(c, rep)
 
+        rep.metrics = self._metrics(rep)
         net = len(rep.promoted)  # 本周净收益；回滚会在 monitor 里扣减
         self._save_history(hist + [{"week": now.date().isoformat(), "net_gain": net}])
         self._write_report(rep, now, "weekly")
         return rep
+
+    def _self_cited(self, c: Candidate) -> bool:
+        own = str(Path(self.cfg.data_dir).as_posix()).rstrip("/")
+        for ev in c.evidence or []:
+            url = str((ev or {}).get("url", ""))
+            if url.startswith("file://") or (own and own in url) or "var/self_improve" in url:
+                return True
+        return False
+
+    def retire(self, name: str, reason: str, today=None) -> None:
+        """把名字放进退役名单（调用方应已完成审批）。写入哈希链日志。"""
+        day = _parse(today).date().isoformat() if today is not None else None
+        self.utility.bury(name, reason, day)
+        self.store.ledger.append({"t": day or "", "retired": name, "reason": reason})
+
+    def unretire(self, name: str, reviewer: str) -> bool:
+        """名单内的名字只有审批人名单内的人才能移出；名单为空时无人可移出。"""
+        ok = self.utility.unbury(name, reviewer, self.approval.can_approve)
+        if ok:
+            self.store.ledger.append({"t": "", "unretired": name, "reviewer": reviewer})
+        return ok
+
+    def _metrics(self, rep: CycleReport) -> dict:
+        by_reason: dict[str, int] = {}
+        for _id, reasons in rep.rejected:
+            for r in reasons:
+                key = str(r).split(":")[0]
+                by_reason[key] = by_reason.get(key, 0) + 1
+        return {
+            "sources_seen": rep.sources_seen,
+            "sources_rejected": len(rep.sources_rejected),
+            "proposed": len(rep.proposed),
+            "rejected": len(rep.rejected),
+            "rejected_by_reason": by_reason,
+            "pending_approval": len(rep.pending_approval),
+            "promoted": len(rep.promoted),
+            "expired": len(rep.expired),
+            "blocked": len(rep.blocked),
+            "graveyard_size": len(self.utility.graveyard()),
+        }
 
     def _evaluate_one(self, c: Candidate, rep: CycleReport) -> None:
         reasons: list[str] = []
@@ -152,6 +196,10 @@ class SelfImprovementLoop:
             reasons += [f"compliance:{f}" for f in res.families]
         if scan_injection(" ".join([c.summary, str(c.payload.get("text", ""))])):
             reasons.append("injection_suspected")
+        if self.utility.is_buried(c.target):
+            reasons.append("graveyard")  # 名字级退役名单：不得同名复活，需有权限的审批人手动移出
+        if self._self_cited(c):
+            reasons.append("self_citation")  # 证据不能来自本系统自己的输出（防自我投毒）
         if reasons:
             self.store.transition(c.id, "rejected", reasons=reasons)
             rep.rejected.append((c.id, reasons))
@@ -224,7 +272,9 @@ class SelfImprovementLoop:
         if regress:
             self.hooks.rollback(c)
             self.store.transition(cid, "rolled_back", reasons=regress)
+            self.utility.record(c.target, 0.0)
             return True
+        self.utility.record(c.target, 1.0)  # 7 天观察期内线上指标没有退步 → 记一次有用
         return False
 
     def rollback(self, cid: str, reason: str = "manual") -> Candidate:
