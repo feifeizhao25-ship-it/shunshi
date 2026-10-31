@@ -311,3 +311,141 @@ String libraryCategoryCover(String? c) {
     default: return 'assets/images/wellness/cover_constitution.webp';
   }
 }
+
+/// 页面顶部横幅：整幅水彩图 + 渐变遮罩 + 标题/副标题。
+class PageHeroBanner extends StatelessWidget {
+  final String asset;
+  final String title;
+  final String subtitle;
+  final double height;
+  const PageHeroBanner({super.key, required this.asset, required this.title, required this.subtitle, this.height = 150});
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: SizedBox(
+        height: height,
+        width: double.infinity,
+        child: Stack(fit: StackFit.expand, children: [
+          const DecoratedBox(decoration: BoxDecoration(color: ShunShiColors.primaryContainer)),
+          Image.asset(asset, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const SizedBox.shrink()),
+          const DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter, end: Alignment.bottomCenter,
+                colors: [Color(0x00000000), Color(0xB3000000)], stops: [0.3, 1.0]),
+            ),
+          ),
+          Positioned(
+            left: 18, right: 18, bottom: 14,
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+              Text(title, style: const TextStyle(
+                fontSize: 22, height: 1.25, color: Colors.white, fontWeight: FontWeight.w600,
+                fontFamily: ShunShiTypography.serifFamily,
+                shadows: [Shadow(color: Color(0x66000000), blurRadius: 8)])),
+              const SizedBox(height: 2),
+              Text(subtitle, style: TextStyle(fontSize: 14, height: 1.4, color: Colors.white.withValues(alpha: 0.92))),
+            ]),
+          ),
+        ]),
+      ),
+    );
+  }
+}
+
+/// 圆形徽章图；未解锁时置灰。
+class BadgeImage extends StatelessWidget {
+  final String asset;
+  final bool unlocked;
+  final double size;
+  const BadgeImage({super.key, required this.asset, required this.unlocked, this.size = 72});
+
+  static const _gray = ColorFilter.matrix(<double>[
+    0.2126, 0.7152, 0.0722, 0, 0,
+    0.2126, 0.7152, 0.0722, 0, 0,
+    0.2126, 0.7152, 0.0722, 0, 0,
+    0, 0, 0, 0.55, 0,
+  ]);
+
+  @override
+  Widget build(BuildContext context) {
+    final img = ClipOval(
+      child: Image.asset(asset, width: size, height: size, fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) => SizedBox(width: size, height: size)),
+    );
+    return SizedBox(
+      width: size, height: size,
+      child: unlocked ? img : ColorFiltered(colorFilter: _gray, child: img),
+    );
+  }
+}
+
+/// 图文权益卡：左侧 64px 水彩图，右侧标题 + 说明。
+class ImageBenefitTile extends StatelessWidget {
+  final String asset;
+  final String title;
+  final String desc;
+  const ImageBenefitTile({super.key, required this.asset, required this.title, required this.desc});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(14)),
+      clipBehavior: Clip.antiAlias,
+      child: Row(children: [
+        Image.asset(asset, width: 84, height: 84, fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) => const SizedBox(width: 84, height: 84)),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(title, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+              const SizedBox(height: 3),
+              Text(desc, style: TextStyle(fontSize: 13.5, height: 1.5, color: ShunShiColors.textSecondary)),
+            ]),
+          ),
+        ),
+        const SizedBox(width: 12),
+      ]),
+    );
+  }
+}
+
+/// 简易柱状图：values 取 0..max，labels 为底部标注。
+class MiniBarChart extends StatelessWidget {
+  final List<double> values;
+  final List<String> labels;
+  final double max;
+  final double height;
+  const MiniBarChart({super.key, required this.values, required this.labels, this.max = 5, this.height = 96});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: height + 24,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          for (var i = 0; i < values.length; i++)
+            Expanded(
+              child: Column(mainAxisAlignment: MainAxisAlignment.end, children: [
+                Container(
+                  width: 18,
+                  height: (values[i] / max).clamp(0.04, 1.0) * height,
+                  decoration: BoxDecoration(
+                    color: ShunShiColors.primary.withValues(alpha: 0.25 + 0.6 * (values[i] / max).clamp(0.0, 1.0)),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(labels[i], style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
+              ]),
+            ),
+        ],
+      ),
+    );
+  }
+}

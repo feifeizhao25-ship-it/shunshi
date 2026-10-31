@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
 import '../../../data/network/api_client.dart';
 import '../../widgets/state_view.dart';
+import '../../widgets/illustrated_widgets.dart';
 import '../../../design_system/app_colors.dart';
 
 class DietRecommendPage extends StatefulWidget {
@@ -97,6 +98,15 @@ class _DietRecommendPageState extends State<DietRecommendPage> {
     }
   }
 
+  String _typeAsset(String? type) {
+    switch (type) {
+      case 'tea': return 'assets/images/wellness/cover_tea.webp';
+      case 'recipe': return 'assets/images/wellness/cover_food_therapy.webp';
+      case 'herb': return 'assets/images/wellness/ss_ben_library.webp';
+      default: return 'assets/images/wellness/cover_food_therapy.webp';
+    }
+  }
+
   Color _typeColor(String? type) {
     switch (type) {
       case 'diet': return const Color(0xFF4CAF50);
@@ -128,6 +138,15 @@ class _DietRecommendPageState extends State<DietRecommendPage> {
         title: Text('饮食推荐', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18, fontWeight: FontWeight.w600)),
       ),
       body: Column(children: [
+        const Padding(
+          padding: EdgeInsets.fromLTRB(20, 4, 20, 12),
+          child: PageHeroBanner(
+            asset: 'assets/images/wellness/cover_food_therapy.webp',
+            title: '时令饮食灵感',
+            subtitle: '食疗、茶饮、食谱，按分类慢慢看',
+            height: 120,
+          ),
+        ),
         // Filter chips
         SizedBox(
           height: 48,
@@ -159,7 +178,14 @@ class _DietRecommendPageState extends State<DietRecommendPage> {
               : _error != null
                   ? ErrorView(message: '加载失败，请重试', onRetry: _loadContent)
                   : items.isEmpty
-                      ? const ErrorView(message: '暂无推荐内容', icon: Icons.search_off)
+                      ? const SingleChildScrollView(
+                          padding: EdgeInsets.symmetric(horizontal: 28, vertical: 12),
+                          child: IllustratedEmptyState(
+                            title: '暂无推荐内容',
+                            message: '换一个分类看看，或稍后再来。内容会随节气持续更新。',
+                            asset: 'assets/images/wellness/ss_empty_diet.webp',
+                          ),
+                        )
                       : RefreshIndicator(
                       onRefresh: _loadContent,
                       child: ListView.separated(
@@ -184,13 +210,12 @@ class _DietRecommendPageState extends State<DietRecommendPage> {
         borderRadius: BorderRadius.circular(14),
       ),
       child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Container(
-          width: 48, height: 48,
-          decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Icon(_typeIcon(type), color: color, size: 22),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: Image.asset(_typeAsset(type), width: 76, height: 76, fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) => Container(
+              width: 76, height: 76, color: color.withOpacity(0.1),
+              child: Icon(_typeIcon(type), color: color, size: 26))),
         ),
         const SizedBox(width: 12),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -198,7 +223,7 @@ class _DietRecommendPageState extends State<DietRecommendPage> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(4)),
-              child: Text(_typeLabel(type), style: TextStyle(fontSize: 10, color: color, fontWeight: FontWeight.w500)),
+              child: Text(_typeLabel(type), style: TextStyle(fontSize: 12, color: color, fontWeight: FontWeight.w500)),
             ),
             const Spacer(),
             Text('查看', style: TextStyle(fontSize: 12, color: AppColors.primary(context))),
@@ -217,7 +242,7 @@ class _DietRecommendPageState extends State<DietRecommendPage> {
           Text(item['title'] ?? '', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
           const SizedBox(height: 4),
           Text(item['content'] ?? '', maxLines: 2, overflow: TextOverflow.ellipsis,
-            style: TextStyle(fontSize: 13, color: AppColors.textSecondary(context), height: 1.5)),
+            style: TextStyle(fontSize: 14, color: AppColors.textSecondary(context), height: 1.5)),
         ])),
       ]),
     );
