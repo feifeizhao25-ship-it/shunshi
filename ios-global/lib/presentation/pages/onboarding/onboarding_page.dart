@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../design_system/theme.dart';
+import '../../../core/config/app_config.dart';
 
 class OnboardingPage extends StatefulWidget {
   const OnboardingPage({super.key});
@@ -111,7 +112,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
 
     // Post to backend
     try {
-      final dio = Dio(BaseOptions(baseUrl: 'https://api.seasonsapp.com'));
+      final dio = Dio(BaseOptions(baseUrl: AppConfig.apiBaseUrl));
       await dio.post('/api/v1/user/profile', data: {
         'feeling': _feeling?.toLowerCase(),
         'help_goal': _helpWith.toList(),

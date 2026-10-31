@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import '../../../design_system/theme.dart';
+import '../../../core/config/app_config.dart';
 
 /// 家庭养生管理页 - API wired with local fallback
 class FamilyPage extends StatefulWidget {
@@ -33,7 +34,7 @@ class _FamilyPageState extends State<FamilyPage> {
     try {
       final prefs = await _getPrefs();
       final userId = prefs.getString('user_id') ?? '';
-      final dio = Dio(BaseOptions(baseUrl: 'https://api.seasonsapp.com'));
+      final dio = Dio(BaseOptions(baseUrl: AppConfig.apiBaseUrl));
       final res = await dio.get('/api/v1/family/members', queryParameters: {'user_id': userId});
       final data = res.data;
       if (data is Map && data['members'] != null) {
@@ -69,7 +70,7 @@ class _FamilyPageState extends State<FamilyPage> {
     try {
       final prefs = await _getPrefs();
       final userId = prefs.getString('user_id') ?? '';
-      final dio = Dio(BaseOptions(baseUrl: 'https://api.seasonsapp.com'));
+      final dio = Dio(BaseOptions(baseUrl: AppConfig.apiBaseUrl));
       final res = await dio.post('/api/v1/family/create', data: {'user_id': userId});
       final data = res.data;
       setState(() {
@@ -105,7 +106,7 @@ class _FamilyPageState extends State<FamilyPage> {
     try {
       final prefs = await _getPrefs();
       final userId = prefs.getString('user_id') ?? '';
-      final dio = Dio(BaseOptions(baseUrl: 'https://api.seasonsapp.com'));
+      final dio = Dio(BaseOptions(baseUrl: AppConfig.apiBaseUrl));
       final res = await dio.post('/api/v1/family/join', data: {'user_id': userId, 'invite_code': code});
       final data = res.data;
       setState(() {
@@ -128,7 +129,7 @@ class _FamilyPageState extends State<FamilyPage> {
 
   Future<void> _removeMember(String memberId) async {
     try {
-      final dio = Dio(BaseOptions(baseUrl: 'https://api.seasonsapp.com'));
+      final dio = Dio(BaseOptions(baseUrl: AppConfig.apiBaseUrl));
       await dio.delete('/api/v1/family/member/$memberId');
       setState(() => _members.removeWhere((m) => m['id'] == memberId));
       if (mounted) {

@@ -2,9 +2,10 @@
 library;
 
 import 'package:dio/dio.dart';
+import '../../core/config/app_config.dart';
 
 class SolarWellnessService {
-  static const _baseUrl = 'https://api.seasonsapp.com';
+  static const _baseUrl = AppConfig.apiBaseUrl;
   final _dio = Dio(BaseOptions(
     baseUrl: _baseUrl,
     connectTimeout: const Duration(seconds: 8),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../design_system/theme.dart';
+import '../../../core/config/app_config.dart';
 
 /// 体质测试页 — 20 题 5 选项问卷 + 结果页
 class ConstitutionTestFlowPage extends StatefulWidget {
@@ -69,7 +70,7 @@ class _ConstitutionTestFlowPageState extends State<ConstitutionTestFlowPage> {
     try {
       final prefs = await SharedPreferences.getInstance();
       final userId = prefs.getString('user_id') ?? '';
-      final dio = Dio(BaseOptions(baseUrl: 'https://api.seasonsapp.com'));
+      final dio = Dio(BaseOptions(baseUrl: AppConfig.apiBaseUrl));
       await dio.post('/api/v1/constitution/submit', data: {
         'user_id': userId,
         'primary_type': primary,

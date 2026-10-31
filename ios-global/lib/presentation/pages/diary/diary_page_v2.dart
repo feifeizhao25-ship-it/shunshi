@@ -6,6 +6,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import '../../../data/storage/storage_manager.dart';
 import '../../../design_system/theme.dart';
+import '../../../core/config/app_config.dart';
 
 class DiaryPageV2 extends StatefulWidget {
   const DiaryPageV2({super.key});
@@ -15,7 +16,7 @@ class DiaryPageV2 extends StatefulWidget {
 }
 
 class _DiaryPageV2State extends State<DiaryPageV2> {
-  static const _baseUrl = 'https://api.seasonsapp.com';
+  static const _baseUrl = AppConfig.apiBaseUrl;
   String? _userId;
   final _dio = Dio(BaseOptions(baseUrl: _baseUrl, connectTimeout: const Duration(seconds: 8)));
   final _noteController = TextEditingController();
