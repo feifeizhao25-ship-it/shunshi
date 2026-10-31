@@ -1,0 +1,9 @@
+export SHUNSHI_ENV=development
+export SHUNSHI_DATABASE_URL=sqlite:////workspace/ui_full_test/data/ss.db
+export SHUNSHI_REDIS_URL=redis://127.0.0.1:16379/0
+export SHUNSHI_JWT_SECRET=$(python3 -c "import secrets;print(secrets.token_hex(24))")
+export SHUNSHI_MODEL_ROUTER_URL=http://127.0.0.1:9100
+export SHUNSHI_CORS_ORIGINS="*"
+export SHUNSHI_MINIMAX_API_KEY="$MINIMAX_CN_API_KEY"
+export ADMIN_PASSWORD_HASH=$(python3 -c "import hashlib,secrets;print(hashlib.sha256(secrets.token_bytes(16)).hexdigest())")
+export ADMIN_JWT_SECRET=$(python3 -c "import secrets;print(secrets.token_hex(24))")

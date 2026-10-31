@@ -12,6 +12,7 @@
 - 网关 429/503 原样透传状态码，其余错误归并为 502，绝不退化成无信息的 500。
 """
 
+from datetime import datetime, timedelta, timezone
 from typing import Any
 import json
 import time
@@ -25,6 +26,7 @@ from ..aigc import ai_disclosure
 from ..locale_context import RequestLocale, request_locale
 from ..config import Settings
 from ..deps import current_user, get_session, get_settings
+from ..services import culture_profile as culture
 from ..services.age_policy import policy_for
 from ..services.continuous_use import usage_reminder
 from ..safety.config import CRISIS_HOTLINE_TEXT
@@ -70,10 +72,11 @@ SYSTEM_PROMPT = (
 )  # 面向所有人的身份规则（不是真人、不扮演亲密关系）与年龄相关规则由 age_policy 追加
 
 
-def system_prompt_en(locale: RequestLocale, profile_lines: str = "") -> str:
-    """International edition system prompt: English only, locale-aware, no diagnosis."""
+def system_prompt_en(locale: RequestLocale, profile_lines: str = "", units: str | None = None) -> str:
+    """International edition system prompt: English only, locale-aware, no diagnosis. ``units`` is the user's saved choice."""
     region = locale.region or "an unknown region"
-    imperial = "°F, miles and pounds" if (locale.region or "") in ("US", "LR", "MM") else "°C, kilometres and kilograms"
+    imperial = {"imperial": "°F, miles and pounds", "metric": "°C, kilometres and kilograms"}.get(units or "") or (
+        "°F, miles and pounds" if (locale.region or "") in ("US", "LR", "MM") else "°C, kilometres and kilograms")
     return (
         "You are ShunShi (SEASONS), a seasonal wellness companion. You are an AI, not a doctor and not a person. "
         "Always answer in clear, plain English, whatever language the user writes in. "
@@ -239,12 +242,14 @@ async def chat(
             **extra,
         }
     if is_global:
-        messages = [{"role": "system", "content": system_prompt_en(locale, _profile_lines_en(session, user_id)) + _age_rules_en(age.group)}]
+        saved_units = culture.read(session, user_id)["units"]
+        messages = [{"role": "system", "content": system_prompt_en(locale, _profile_lines_en(session, user_id) + culture.prompt_lines_en(session, user_id) + culture.date_line_en(session, user_id, datetime.now(timezone.utc)), saved_units) + _age_rules_en(age.group)}]
     else:
         from ..services.personal_profile import profile_prompt_lines_zh
 
         messages = [
-            {"role": "system", "content": SYSTEM_PROMPT + "".join(age.system_rules) + profile_prompt_lines_zh(session, user_id)}
+            {"role": "system", "content": SYSTEM_PROMPT + "".join(age.system_rules) + profile_prompt_lines_zh(session, user_id)
+             + culture.prompt_lines_zh(session, user_id) + culture.date_line_zh(datetime.now(timezone(timedelta(hours=8))))}
         ]
     # 情绪困扰 / 敏感：安全守卫给出的共情指令要真正交给模型（原来只在危机时才看守卫结果，
     # 困扰等级的前缀被算出来又丢掉）。依赖倾向的后缀属于回答末尾，不属于给模型的指令。
@@ -295,7 +300,7 @@ async def chat(
     messages.extend(_recent_history(session, user_id))
     messages.append({"role": "user", "content": message})
     from ..services.chat_quota import reserve, refund
-    reservation = await reserve(settings.redis_url, user_id, tier)
+    reservation = await reserve(settings.redis_url, user_id, tier, **({"lang": "en"} if is_global else {}))
     try:
         if settings.model_router_url:
             answer = await request_gateway(

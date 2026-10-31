@@ -65,11 +65,11 @@ class _SleepReportPageState extends State<SleepReportPage> {
             _entries = list.take(7).toList();
             _insight = {
               'insight': list.length < 3
-                  ? '再记录几天，就能解锁专属睡眠分析 ✨'
-                  : '睡眠分析加载中，请联网获取完整报告',
-              'trend': '数据收集中',
+                  ? 'Log a few more days to unlock your personalised sleep analysis ✨'
+                  : 'Sleep analysis is loading — go online for the full report',
+              'trend': 'Collecting data',
               'score': 0,
-              'suggestions': ['坚持每天记录睡眠质量'],
+              'suggestions': ['Log your sleep quality every day'],
               'source_references': [],
               'data_days': list.length,
             };
@@ -119,7 +119,7 @@ class _SleepReportPageState extends State<SleepReportPage> {
           icon: const Icon(Icons.arrow_back_ios_new, size: 20),
           onPressed: () => safePop(context),
         ),
-        title: const Text('睡眠报告',
+        title: const Text('Sleep report',
             style: TextStyle(fontFamily: ShunShiTypography.serifFamily)),
       ),
       body: _loading
@@ -136,14 +136,14 @@ class _SleepReportPageState extends State<SleepReportPage> {
                   ],
 
                   // Bar chart
-                  _sectionTitle('7天睡眠质量'),
+                  _sectionTitle('7-day sleep quality'),
                   const SizedBox(height: 12),
                   _entries.length >= 3 ? _buildChart() : _buildEmptyState(),
                   const SizedBox(height: 24),
 
                   // AI Insight
                   if (_insight != null) ...[
-                    _sectionTitle('AI 睡眠分析'),
+                    _sectionTitle('AI sleep analysis'),
                     const SizedBox(height: 8),
                     Container(
                       width: double.infinity,
@@ -168,7 +168,7 @@ class _SleepReportPageState extends State<SleepReportPage> {
 
                     // Suggestions
                     if ((_insight!['suggestions'] as List?)?.isNotEmpty == true) ...[
-                      _sectionTitle('个性化建议'),
+                      _sectionTitle('Personalised tips'),
                       const SizedBox(height: 8),
                       ...(_insight!['suggestions'] as List).map((s) => Container(
                         margin: const EdgeInsets.only(bottom: 10),
@@ -196,13 +196,13 @@ class _SleepReportPageState extends State<SleepReportPage> {
                           child: ElevatedButton(
                             onPressed: () {
                               final first = (_insight!['suggestions'] as List).first.toString();
-                              context.push('/chat?prefill=${Uri.encodeComponent("我昨晚试了这个建议：$first，感觉如何？")}');
+                              context.push('/chat?prefill=${Uri.encodeComponent("I tried this tip last night: $first. How do you think it went?")}');
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: ShunShiColors.primary,
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                             ),
-                            child: const Text('今晚试试这个建议',
+                            child: const Text('Try this tonight',
                                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white)),
                           ),
                         ),
@@ -235,7 +235,7 @@ class _SleepReportPageState extends State<SleepReportPage> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('睡眠评分', style: TextStyle(fontSize: 13, color: ShunShiColors.textTertiary)),
+              Text('Sleep score', style: TextStyle(fontSize: 13, color: ShunShiColors.textTertiary)),
               const SizedBox(height: 4),
               Text('$score', style: TextStyle(fontSize: 36, fontWeight: FontWeight.w700, color: color)),
             ],
@@ -323,7 +323,7 @@ class _SleepReportPageState extends State<SleepReportPage> {
         children: [
           Text('🌙', style: TextStyle(fontSize: 40)),
           SizedBox(height: 12),
-          Text('再记录几天，就能解锁专属睡眠分析 ✨',
+          Text('Log a few more days to unlock your personalised sleep analysis ✨',
               style: TextStyle(fontSize: 15, color: ShunShiColors.textTertiary),
               textAlign: TextAlign.center),
         ],

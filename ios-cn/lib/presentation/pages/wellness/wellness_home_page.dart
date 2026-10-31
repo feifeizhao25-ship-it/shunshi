@@ -81,7 +81,7 @@ class WellnessHomePage extends StatelessWidget {
                   ),
                   const SizedBox(height: 36),
 
-                  // ── 6宫格导航 ──
+                  // ── 7宫格导航 ──
                   GridView.count(
                     crossAxisCount: 3,
                     shrinkWrap: true,
@@ -96,6 +96,7 @@ class WellnessHomePage extends StatelessWidget {
                       _gridIcon(context, Icons.architecture, '经络穴位', () => context.push('/wellness/acupressure')),
                       _gridIcon(context, Icons.self_improvement, '传统功法', () => context.push('/wellness/exercise')),
                       _gridIcon(context, Icons.graphic_eq, '助眠音频', () => context.push('/wellness/sleep')),
+                      _gridIcon(context, Icons.spa_outlined, '冥想音频', () => context.push('/meditation')),
                     ],
                   ),
                   const SizedBox(height: 16),

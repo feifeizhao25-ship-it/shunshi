@@ -20,6 +20,8 @@ import '../../presentation/pages/profile/profile_setup_page.dart';
 import '../../presentation/pages/profile/privacy_page.dart';
 import '../../presentation/pages/profile/family_invite_page.dart';
 import '../../presentation/pages/settings/settings_page_v2.dart';
+import '../../presentation/pages/settings/plan_usage_page.dart';
+import '../../presentation/pages/settings/plan_usage_binding.dart';
 import '../../presentation/pages/settings/notification_settings_page.dart';
 import '../../presentation/pages/constitution/constitution_test_v2.dart';
 import '../../presentation/pages/constitution_report/constitution_report_page_v3.dart';
@@ -54,6 +56,7 @@ import '../../presentation/pages/achievements/achievements_page.dart';
 import '../../presentation/pages/report/wellness_report_page.dart';
 import '../../presentation/pages/wellness/tea_page.dart';
 import '../../presentation/pages/meditation/meditation_focus_page.dart';
+import '../../presentation/pages/meditation/meditation_library_page.dart';
 import '../../presentation/pages/growth/growth_milestones_page.dart';
 import '../../presentation/pages/library/wellness_library_page.dart';
 import '../../presentation/pages/seasons/seasons_page.dart';
@@ -145,6 +148,7 @@ class AppRouter {
         return ContentDetailPage(contentId: extra?['contentId'] as String? ?? '');
       }),
       GoRoute(path: '/favorites', builder: (context, state) => const FavoritesPage()),
+      GoRoute(path: '/plan-usage', builder: (context, state) => PlanUsagePage(load: PlanUsageBinding.load, onUpgrade: () => context.push('/subscription'))),
       GoRoute(path: '/about', builder: (context, state) => const AboutPage()),
       GoRoute(path: '/search', builder: (context, state) => const GlobalSearchPage()),
       GoRoute(path: '/feedback', builder: (context, state) => const fb.FeedbackPage()),
@@ -164,7 +168,8 @@ class AppRouter {
       GoRoute(path: '/wellness-report', builder: (context, state) => const WellnessReportPage()),
       GoRoute(path: '/reference-library', builder: (context, state) => const ShunshiReferenceLibraryPage()),
       GoRoute(path: '/tea', builder: (context, state) => const TeaPage()),
-      GoRoute(path: '/meditation', builder: (context, state) => const MeditationFocusPage()),
+      GoRoute(path: '/meditation', builder: (context, state) => const MeditationLibraryPage()),
+      GoRoute(path: '/meditation/focus', builder: (context, state) => const MeditationFocusPage()),
       GoRoute(path: '/growth', builder: (context, state) => const GrowthMilestonesPage()),
       GoRoute(path: '/library', builder: (context, state) => const WellnessLibraryPage()),
       GoRoute(path: '/seasons', builder: (context, state) => const SeasonsPage()),

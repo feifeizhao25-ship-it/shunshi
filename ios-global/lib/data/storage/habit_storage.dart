@@ -25,10 +25,10 @@ class HabitStorage {
   
   /// 默认习惯
   List<Map<String, dynamic>> get _defaultHabits => [
-    {'id': 'habit_1', 'name': '喝水', 'icon': 'water', 'target': 8, 'unit': '杯', 'enabled': true},
-    {'id': 'habit_2', 'name': '运动', 'icon': 'run', 'target': 30, 'unit': '分钟', 'enabled': true},
-    {'id': 'habit_3', 'name': '早睡', 'icon': 'sleep', 'target': 22, 'unit': '点', 'enabled': true},
-    {'id': 'habit_4', 'name': '泡脚', 'icon': 'foot', 'target': 15, 'unit': '分钟', 'enabled': true},
+    {'id': 'habit_1', 'name': 'Drink water', 'icon': 'water', 'target': 8, 'unit': 'cups', 'enabled': true},
+    {'id': 'habit_2', 'name': 'Exercise', 'icon': 'run', 'target': 30, 'unit': 'min', 'enabled': true},
+    {'id': 'habit_3', 'name': 'Early bedtime', 'icon': 'sleep', 'target': 22, 'unit': ':00', 'enabled': true},
+    {'id': 'habit_4', 'name': 'Foot soak', 'icon': 'foot', 'target': 15, 'unit': 'min', 'enabled': true},
   ];
   
   /// 添加习惯

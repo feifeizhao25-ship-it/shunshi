@@ -59,7 +59,7 @@ class _FamilyInvitePageState extends State<FamilyInvitePage> {
         backgroundColor: ShunShiColors.background,
         elevation: 0,
         leading: IconButton(icon: const Icon(Icons.arrow_back, color: ShunShiColors.textPrimary), onPressed: () => safePop(context)),
-        title: const Text('家人管理', style: TextStyle(color: ShunShiColors.textPrimary, fontSize: 18, fontWeight: FontWeight.w600)),
+        title: const Text('Family', style: TextStyle(color: ShunShiColors.textPrimary, fontSize: 18, fontWeight: FontWeight.w600)),
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator(color: ShunShiColors.primary))
@@ -80,9 +80,9 @@ class _FamilyInvitePageState extends State<FamilyInvitePage> {
                       children: [
                         const Icon(Icons.family_restroom, color: Colors.white, size: 48),
                         const SizedBox(height: 16),
-                        const Text('邀请家人一起养生', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600)),
+                        const Text('Invite family to practise wellness together', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600)),
                         const SizedBox(height: 8),
-                        const Text('分享邀请码，让家人也能获得个性化健康建议', style: TextStyle(color: Colors.white70, fontSize: 13), textAlign: TextAlign.center),
+                        const Text('Share an invite code so your family can get personalised health tips too', style: TextStyle(color: Colors.white70, fontSize: 13), textAlign: TextAlign.center),
                         const SizedBox(height: 20),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
@@ -97,7 +97,7 @@ class _FamilyInvitePageState extends State<FamilyInvitePage> {
                         ElevatedButton.icon(
                           onPressed: _copyCode,
                           icon: const Icon(Icons.share, size: 18),
-                          label: const Text('复制邀请码分享给家人'),
+                          label: const Text('Copy the invite code and share it with your family'),
                           style: ElevatedButton.styleFrom(backgroundColor: Colors.white, foregroundColor: ShunShiColors.primary, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12)),
                         ),
                       ],
@@ -105,7 +105,7 @@ class _FamilyInvitePageState extends State<FamilyInvitePage> {
                   ),
                   const SizedBox(height: 32),
                   // Family members list
-                  const Text('已添加的家人', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+                  const Text('Family members added', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
                   const SizedBox(height: 16),
                   if (_members.isEmpty)
                     Container(
@@ -115,9 +115,9 @@ class _FamilyInvitePageState extends State<FamilyInvitePage> {
                       child: Column(children: [
                         Icon(Icons.people_outline, size: 48, color: ShunShiColors.textTertiary),
                         const SizedBox(height: 12),
-                        Text('还没有添加家人', style: TextStyle(color: ShunShiColors.textTertiary, fontSize: 15)),
+                        Text('No family members added yet', style: TextStyle(color: ShunShiColors.textTertiary, fontSize: 15)),
                         const SizedBox(height: 4),
-                        Text('分享邀请码邀请家人加入', style: TextStyle(color: ShunShiColors.textTertiary, fontSize: 13)),
+                        Text('Share the invite code to invite family', style: TextStyle(color: ShunShiColors.textTertiary, fontSize: 13)),
                       ]),
                     )
                   else
@@ -143,7 +143,7 @@ class _FamilyInvitePageState extends State<FamilyInvitePage> {
                     child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       const Icon(Icons.info_outline, color: ShunShiColors.primary, size: 20),
                       const SizedBox(width: 12),
-                      Expanded(child: Text('家人只能看到您的健康状态概览（平稳/有点累/需要关心），不会看到具体日记内容，保护您的隐私。', style: TextStyle(fontSize: 13, color: ShunShiColors.textSecondary, height: 1.5))),
+                      Expanded(child: Text('Family members only see an overview of your health status (steady / a bit tired / needs care) — never your diary entries. Your privacy is protected.', style: TextStyle(fontSize: 13, color: ShunShiColors.textSecondary, height: 1.5))),
                     ]),
                   ),
                 ],
@@ -155,7 +155,7 @@ class _FamilyInvitePageState extends State<FamilyInvitePage> {
   void _copyCode() {
     Clipboard.setData(ClipboardData(text: _inviteCode));
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('邀请码已复制'), duration: Duration(seconds: 2)),
+      const SnackBar(content: Text('Invite code copied'), duration: Duration(seconds: 2)),
     );
   }
 }

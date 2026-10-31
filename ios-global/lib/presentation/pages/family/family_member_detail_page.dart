@@ -38,12 +38,12 @@ class _FamilyMemberDetailPageState extends State<FamilyMemberDetailPage> {
     setState(() {
       _member = {
         'id': widget.memberId,
-        'name': '妈妈',
+        'name': 'Mom',
         'avatar': '👩',
-        'relation': '母亲',
+        'relation': 'Mother',
         'status': 'stable',
-        'lastActive': '今天 08:30',
-        'lastCheckin': '3小时前',
+        'lastActive': 'Today 08:30',
+        'lastCheckin': '3 hours ago',
       };
       _loading = false;
     });
@@ -60,10 +60,10 @@ class _FamilyMemberDetailPageState extends State<FamilyMemberDetailPage> {
 
   String _statusText(String status) {
     switch (status) {
-      case 'stable': return '平稳';
-      case 'tired': return '有点累';
-      case 'attention': return '建议联系';
-      default: return '平稳';
+      case 'stable': return 'Steady';
+      case 'tired': return 'A bit tired';
+      case 'attention': return 'Reach out';
+      default: return 'Steady';
     }
   }
 
@@ -87,7 +87,7 @@ class _FamilyMemberDetailPageState extends State<FamilyMemberDetailPage> {
           icon: const Icon(Icons.arrow_back_ios_new, size: 20),
           onPressed: () => safePop(context),
         ),
-        title: Text(_member?['name'] ?? '家人详情',
+        title: Text(_member?['name'] ?? 'Family details',
             style: const TextStyle(fontFamily: ShunShiTypography.serifFamily)),
       ),
       body: _loading
@@ -125,16 +125,16 @@ class _FamilyMemberDetailPageState extends State<FamilyMemberDetailPage> {
                     border: Border.all(color: ShunShiColors.borderGhost),
                   ),
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    const Text('状态信息', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600,
+                    const Text('Status', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600,
                         fontFamily: ShunShiTypography.serifFamily)),
                     const SizedBox(height: 16),
-                    _infoRow('当前状态',
+                    _infoRow('Current status',
                         '${_statusEmoji(_member?['status'] ?? 'stable')} ${_statusText(_member?['status'] ?? 'stable')}',
                         _statusColor(_member?['status'] ?? 'stable')),
                     const SizedBox(height: 12),
-                    _infoRow('最近活跃', _member?['lastActive'] ?? '未知', ShunShiColors.textSecondary),
+                    _infoRow('Last active', _member?['lastActive'] ?? 'Unknown', ShunShiColors.textSecondary),
                     const SizedBox(height: 12),
-                    _infoRow('上次打卡', _member?['lastCheckin'] ?? '未知', ShunShiColors.textSecondary),
+                    _infoRow('Last check-in', _member?['lastCheckin'] ?? 'Unknown', ShunShiColors.textSecondary),
                   ]),
                 ),
                 const SizedBox(height: 20),
@@ -149,7 +149,7 @@ class _FamilyMemberDetailPageState extends State<FamilyMemberDetailPage> {
                   child: const Row(children: [
                     Icon(Icons.lock_outline, size: 16, color: ShunShiColors.textTertiary),
                     SizedBox(width: 8),
-                    Expanded(child: Text('隐私保护：你只能看到状态级别信息',
+                    Expanded(child: Text('Privacy: you can only see a status level',
                         style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary))),
                   ]),
                 ),
@@ -161,10 +161,10 @@ class _FamilyMemberDetailPageState extends State<FamilyMemberDetailPage> {
                   child: ElevatedButton.icon(
                     onPressed: () {
                       ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('已发送关怀提醒'), duration: Duration(seconds: 1)));
+                          const SnackBar(content: Text('Care reminder sent'), duration: Duration(seconds: 1)));
                     },
                     icon: const Icon(Icons.favorite_border, size: 18),
-                    label: const Text('发送关怀提醒'),
+                    label: const Text('Send a care reminder'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: ShunShiColors.primary,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
@@ -179,10 +179,10 @@ class _FamilyMemberDetailPageState extends State<FamilyMemberDetailPage> {
                   child: OutlinedButton.icon(
                     onPressed: () {
                       ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('对方看到的是同样的状态卡片'), duration: Duration(seconds: 2)));
+                          const SnackBar(content: Text('They see the same status card'), duration: Duration(seconds: 2)));
                     },
                     icon: const Icon(Icons.visibility_outlined, size: 18),
-                    label: const Text('查看我的状态（对方视角）'),
+                    label: const Text('View my status (their view)'),
                     style: OutlinedButton.styleFrom(
                       side: const BorderSide(color: ShunShiColors.border),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),

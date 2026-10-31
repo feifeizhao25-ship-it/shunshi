@@ -26,12 +26,12 @@ class _PrivacyPageState extends State<PrivacyPage> {
       // In production, save to file. Here just show success.
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('数据导出成功，已保存'), duration: Duration(seconds: 2)));
+            const SnackBar(content: Text('Data exported and saved'), duration: Duration(seconds: 2)));
       }
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('导出失败，请稍后重试'), duration: Duration(seconds: 2)));
+            const SnackBar(content: Text('Export failed, please try again later'), duration: Duration(seconds: 2)));
       }
     }
     setState(() => _exporting = false);
@@ -40,11 +40,11 @@ class _PrivacyPageState extends State<PrivacyPage> {
   void _deleteAllData() {
     showDialog(context: context, builder: (ctx) => AlertDialog(
       backgroundColor: ShunShiColors.surface,
-      title: const Text('确认删除所有数据？', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-      content: const Text('此操作不可恢复。你的所有养生记录、日记、体质数据都将被永久删除。',
+      title: const Text('Delete all data?', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+      content: const Text('This cannot be undone. All your wellness records, diary entries and constitution data will be permanently deleted.',
           style: TextStyle(fontSize: 14, color: ShunShiColors.textSecondary, height: 1.6)),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('取消')),
+        TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
         TextButton(
           onPressed: () async {
             Navigator.pop(ctx);
@@ -53,16 +53,16 @@ class _PrivacyPageState extends State<PrivacyPage> {
               await dio.delete('https://api.seasonsapp.com/api/v1/user/data');
               if (mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('所有数据已删除'), duration: Duration(seconds: 2)));
+                    const SnackBar(content: Text('All data deleted'), duration: Duration(seconds: 2)));
               }
             } catch (_) {
               if (mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('删除失败'), duration: Duration(seconds: 2)));
+                    const SnackBar(content: Text('Delete failed'), duration: Duration(seconds: 2)));
               }
             }
           },
-          child: Text('确认删除', style: TextStyle(color: ShunShiColors.error)),
+          child: Text('Confirm delete', style: TextStyle(color: ShunShiColors.error)),
         ),
       ],
     ));
@@ -71,18 +71,18 @@ class _PrivacyPageState extends State<PrivacyPage> {
   void _clearAiMemory() {
     showDialog(context: context, builder: (ctx) => AlertDialog(
       backgroundColor: ShunShiColors.surface,
-      title: const Text('清空 AI 记忆？', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-      content: const Text('AI 助手将不再记住你的历史对话内容。体质测试结果不会被删除。',
+      title: const Text('Clear AI memory?', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+      content: const Text('The AI companion will no longer remember your past conversations. Your constitution check results are not deleted.',
           style: TextStyle(fontSize: 14, color: ShunShiColors.textSecondary, height: 1.6)),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('取消')),
+        TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
         TextButton(
           onPressed: () {
             Navigator.pop(ctx);
             ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('AI 记忆已清空'), duration: Duration(seconds: 2)));
+                const SnackBar(content: Text('AI memory cleared'), duration: Duration(seconds: 2)));
           },
-          child: Text('确认清空', style: TextStyle(color: ShunShiColors.error)),
+          child: Text('Confirm clear', style: TextStyle(color: ShunShiColors.error)),
         ),
       ],
     ));
@@ -99,20 +99,20 @@ class _PrivacyPageState extends State<PrivacyPage> {
           icon: const Icon(Icons.arrow_back_ios_new, size: 20),
           onPressed: () => safePop(context),
         ),
-        title: const Text('数据与隐私',
+        title: const Text('Data & privacy',
             style: TextStyle(fontFamily: ShunShiTypography.serifFamily)),
       ),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
           // Your data section
-          const Text('你的数据', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700,
+          const Text('Your data', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700,
               fontFamily: ShunShiTypography.serifFamily, color: ShunShiColors.textPrimary)),
           const SizedBox(height: 12),
           _buildTile(
             icon: Icons.download_outlined,
-            title: '导出我的数据',
-            subtitle: '下载你的所有个人数据（JSON 格式）',
+            title: 'Export my data',
+            subtitle: 'Download all your personal data (JSON format)',
             onTap: _exporting ? null : _exportData,
             trailing: _exporting
                 ? const SizedBox(width: 16, height: 16,
@@ -122,22 +122,22 @@ class _PrivacyPageState extends State<PrivacyPage> {
           const SizedBox(height: 8),
           _buildTile(
             icon: Icons.delete_forever_outlined,
-            title: '删除所有数据',
-            subtitle: '永久删除你的所有数据，不可恢复',
+            title: 'Delete all data',
+            subtitle: 'Permanently delete all your data. This cannot be undone',
             onTap: _deleteAllData,
             titleColor: ShunShiColors.error,
           ),
           const SizedBox(height: 8),
           _buildTile(
             icon: Icons.psychology_outlined,
-            title: '清空 AI 记忆',
-            subtitle: '清除 AI 助手的对话记忆',
+            title: 'Clear AI memory',
+            subtitle: 'Clear the AI companion\'s conversation memory',
             onTap: _clearAiMemory,
           ),
           const SizedBox(height: 32),
 
           // Privacy policy
-          const Text('隐私政策', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700,
+          const Text('Privacy Policy', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700,
               fontFamily: ShunShiTypography.serifFamily, color: ShunShiColors.textPrimary)),
           const SizedBox(height: 12),
           Container(
@@ -148,13 +148,13 @@ class _PrivacyPageState extends State<PrivacyPage> {
               border: Border.all(color: ShunShiColors.borderGhost),
             ),
             child: const Text(
-              '顺时尊重并保护你的个人隐私。\n\n'
-              '• 你的健康数据仅用于提供个性化养生建议\n'
-              '• 家庭成员只能看到你的状态级别信息（平稳/有点累/建议联系）\n'
-              '• 不会向第三方出售或共享你的个人数据\n'
-              '• 你可以随时导出或删除你的所有数据\n'
-              '• AI 对话记录加密存储，你可以随时清空\n'
-              '• 家庭功能中，聊天内容、情绪详情、体质信息、日记内容不会被共享',
+              'SEASONS respects and protects your privacy.\n\n'
+              '• Your health data is used only to provide personalised wellness suggestions\n'
+              '• Family members only see your status level (steady / a bit tired / reach out)\n'
+              '• We never sell or share your personal data with third parties\n'
+              '• You can export or delete all your data at any time\n'
+              '• AI conversation history is stored encrypted and you can clear it at any time\n'
+              '• In family features, chats, mood details, constitution information and diary entries are never shared',
               style: TextStyle(fontSize: 13, color: ShunShiColors.textSecondary, height: 1.7),
             ),
           ),
@@ -162,7 +162,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
 
           // Contact
           Center(child: Column(children: [
-            const Text('数据相关问题？', style: TextStyle(fontSize: 13, color: ShunShiColors.textTertiary)),
+            const Text('Questions about your data?', style: TextStyle(fontSize: 13, color: ShunShiColors.textTertiary)),
             const SizedBox(height: 4),
             Text('privacy@shunshi.app', style: TextStyle(fontSize: 13, color: ShunShiColors.primary,
                 fontWeight: FontWeight.w500)),

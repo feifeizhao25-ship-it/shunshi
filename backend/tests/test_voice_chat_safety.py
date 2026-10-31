@@ -18,8 +18,10 @@ class FakeSpeech:
     def __init__(self, transcript):
         self.transcript = transcript
         self.spoken = []
+        self.languages = []
 
-    async def speech_to_text(self, audio_data, model, filename):
+    async def speech_to_text(self, audio_data, model, filename, language=None):
+        self.languages.append(language)
         return SimpleNamespace(text=self.transcript, latency_ms=1)
 
     async def text_to_speech(self, text, model, voice):
@@ -43,10 +45,10 @@ def env(settings, monkeypatch, chat_redis_url):
         login = client.post("/api/v1/auth/guest-login")
         headers = {"Authorization": f"Bearer {login.json()['access_token']}"}
 
-        def talk(transcript):
+        def talk(transcript, extra=None):
             state["speech"] = FakeSpeech(transcript)
             return client.post(
-                "/api/v1/speech/chat-voice", headers=headers,
+                "/api/v1/speech/chat-voice", headers={**headers, **(extra or {})},
                 files={"file": ("a.wav", b"RIFFxxxx", "audio/wav")},
             )
 
@@ -110,3 +112,47 @@ def test_model_failure_does_not_leak_raw_error_text(env, monkeypatch):
     assert response.status_code >= 500
     text = response.text
     assert "401" not in text and "sk-secret" not in text and "RuntimeError" not in text
+
+
+GLOBAL = {"X-App-Market": "global", "Accept-Language": "en-GB", "X-Region": "GB"}
+
+
+def test_international_voice_chat_is_english_with_local_crisis_line(env):
+    """The voice route used to drop the locale and answer international users in Chinese with 12356."""
+    client, headers, talk, state = env
+    body = talk("I don't want to live anymore", GLOBAL).json()
+    assert "12356" not in body["reply_text"] and "120" not in body["reply_text"].replace("116 123", "")
+    assert "116 123" in body["reply_text"] or "Samaritans" in body["reply_text"]
+    assert not any("\u4e00" <= ch <= "\u9fff" for ch in body["reply_text"])
+    assert state["calls"] == []
+    assert state["speech"].languages == ["en"]
+
+
+def test_international_voice_chat_reaches_the_model_in_english(env):
+    client, headers, talk, state = env
+    state["answer"] = "A warm bath and an early night would help."
+    body = talk("I would like to sleep better", GLOBAL).json()
+    assert body["reply_text"].startswith("A warm bath")
+    system = state["calls"][0]["messages"][0]["content"]
+    assert "English" in system and "12356" not in system
+    assert not any("\u4e00" <= ch <= "\u9fff" for ch in body["ai_label"] + body.get("ai_notice", ""))
+
+
+def test_domestic_voice_chat_keeps_auto_language(env):
+    client, headers, talk, state = env
+    talk("我今晚想早点睡")
+    assert state["speech"].languages == [None]
+
+
+def test_international_voice_errors_are_english(env):
+    client, headers, talk, state = env
+    state["speech"] = SimpleNamespace(speech_to_text=None)
+
+    async def boom(*a, **k):
+        raise speech_module.ASRError("upstream")
+
+    state["speech"] = SimpleNamespace(speech_to_text=boom, text_to_speech=boom)
+    r = client.post("/api/v1/speech/chat-voice", headers={**headers, **GLOBAL},
+                    files={"file": ("a.wav", b"RIFFxxxx", "audio/wav")})
+    assert r.status_code == 400
+    assert not any("\u4e00" <= ch <= "\u9fff" for ch in r.json()["detail"])

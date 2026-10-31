@@ -50,26 +50,26 @@ class _DiaryReportPageState extends State<DiaryReportPage> {
   }
 
   String _generateObservation() {
-    if (_trends.isEmpty) return '本周暂无数据。';
+    if (_trends.isEmpty) return 'No data for this week yet.';
     final avgMood = _trends.map((e) => (e['mood'] ?? 0) as num).reduce((a, b) => a + b) / _trends.length;
     final avgSleep = _trends.map((e) => (e['sleep'] ?? 0) as num).reduce((a, b) => a + b) / _trends.length;
     final parts = <String>[];
     if (avgMood >= 3.5) {
-      parts.add('你的心情这周保持得不错 ✨');
-    } else if (avgMood >= 2.5) parts.add('情绪起伏正常，保持觉察就是好的开始 🌿');
-    else parts.add('这周情绪偏低，记得给自己一些温柔 🤗');
+      parts.add('Your mood has held up well this week ✨');
+    } else if (avgMood >= 2.5) parts.add('Ups and downs are normal — noticing them is a good start 🌿');
+    else parts.add('Your mood has been low this week; be gentle with yourself 🤗');
     if (avgSleep >= 4) {
-      parts.add('睡眠质量这周稳步提升 🌙');
-    } else if (avgSleep < 3) parts.add('睡眠质量需要关注，试试睡前泡脚 💤');
+      parts.add('Your sleep quality has been improving steadily this week 🌙');
+    } else if (avgSleep < 3) parts.add('Your sleep needs attention — try a foot soak before bed 💤');
     return parts.join('\n');
   }
 
   List<String> _generateSuggestions() {
-    if (_trends.isEmpty) return ['开始记录每天的养生日记吧！'];
+    if (_trends.isEmpty) return ['Start keeping a daily wellness diary!'];
     final avgEnergy = _trends.map((e) => (e['energy'] ?? 0) as num).reduce((a, b) => a + b) / _trends.length;
     final s = <String>[];
-    if (avgEnergy < 3) s.add('本周精力偏低，建议午间小憩 20 分钟，配合八段锦恢复元气。');
-    s.add('下周尝试每天记录一条养生小习惯，观察变化。');
+    if (avgEnergy < 3) s.add('Energy was low this week. Try a 20-minute midday nap, plus some Baduanjin to recover.');
+    s.add('Next week, try logging one small wellness habit a day and watch what changes.');
     return s;
   }
 
@@ -84,7 +84,7 @@ class _DiaryReportPageState extends State<DiaryReportPage> {
           icon: const Icon(Icons.arrow_back_ios_new, size: 20),
           onPressed: () => safePop(context),
         ),
-        title: const Text('周报',
+        title: const Text('Weekly report',
             style: TextStyle(fontFamily: ShunShiTypography.serifFamily)),
       ),
       body: _loading
@@ -95,13 +95,13 @@ class _DiaryReportPageState extends State<DiaryReportPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Trend chart
-                  _sectionTitle('7 天趋势'),
+                  _sectionTitle('7-day trend'),
                   const SizedBox(height: 16),
                   _buildTrendChart(),
                   const SizedBox(height: 24),
 
                   // Observations
-                  _sectionTitle('本周观察'),
+                  _sectionTitle('This week\'s observations'),
                   const SizedBox(height: 8),
                   Container(
                     width: double.infinity, padding: const EdgeInsets.all(16),
@@ -116,7 +116,7 @@ class _DiaryReportPageState extends State<DiaryReportPage> {
                   const SizedBox(height: 24),
 
                   // Suggestions
-                  _sectionTitle('下周建议'),
+                  _sectionTitle('Next week\'s suggestions'),
                   const SizedBox(height: 8),
                   ..._generateSuggestions().map((s) => Container(
                     margin: const EdgeInsets.only(bottom: 10),
@@ -147,7 +147,7 @@ class _DiaryReportPageState extends State<DiaryReportPage> {
     if (_trends.isEmpty) {
       return const Center(child: Padding(
         padding: EdgeInsets.all(24),
-        child: Text('暂无数据', style: TextStyle(color: ShunShiColors.textTertiary)),
+        child: Text('No data yet', style: TextStyle(color: ShunShiColors.textTertiary)),
       ));
     }
     return Container(
@@ -161,11 +161,11 @@ class _DiaryReportPageState extends State<DiaryReportPage> {
         children: [
           // Legend
           Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            _legendDot(ShunShiColors.primary, '心情'),
+            _legendDot(ShunShiColors.primary, 'Mood'),
             const SizedBox(width: 16),
-            _legendDot(ShunShiColors.blue, '睡眠'),
+            _legendDot(ShunShiColors.blue, 'Sleep'),
             const SizedBox(width: 16),
-            _legendDot(ShunShiColors.secondary, '精力'),
+            _legendDot(ShunShiColors.secondary, 'Energy'),
           ]),
           const SizedBox(height: 16),
           // Bar chart

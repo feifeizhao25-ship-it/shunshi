@@ -9,6 +9,7 @@ library;
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../design_system/theme.dart';
 
@@ -117,13 +118,11 @@ class _OnboardingPageState extends State<OnboardingPage> {
         'life_stage': _lifeStage?.toLowerCase(),
         'support_time': _supportTime?.toLowerCase(),
         'style_preference': _feelStyle?.toLowerCase(),
-        'hemisphere': 'north',
-        'timezone': 'Asia/Shanghai',
       });
     } catch (_) {}
     
     if (mounted) {
-      Navigator.of(context).pushReplacementNamed('/home');
+      context.go('/home');
     }
   }
 

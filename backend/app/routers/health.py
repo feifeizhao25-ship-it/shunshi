@@ -6,6 +6,8 @@ from fastapi.responses import JSONResponse
 
 from ..db import ping as db_ping
 
+from ..services.language_guard import snapshot as language_guard_snapshot
+
 router = APIRouter()
 
 
@@ -70,6 +72,8 @@ def health(request: Request):
         "status": "ok" if healthy else "degraded",
         "service": "shunshi-api",
         "components": components,
+        # share of international JSON responses that contained Chinese characters (counts only, never content)
+        "language_guard": language_guard_snapshot(),
     }
     return JSONResponse(body, status_code=200 if healthy else 503)
 

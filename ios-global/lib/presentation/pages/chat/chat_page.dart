@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../design_system/theme.dart';
 import '../../widgets/membership_widgets.dart';
+import '../../../core/solar_term/solar_term_en.dart';
 
 const _baseUrl = 'https://api.seasonsapp.com';
 
@@ -46,7 +47,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
   bool _isVip = false;
   String _userName = '';
   String _token = '';
-  final String _currentSolarTerm = 'Qingming';
+  String _currentSolarTerm = currentSolarTermEn()?.$1 ?? 'this season';
   final String _solarTermDesc = 'Spring deepens, all things clean and bright. A time for outdoor activities and expansive moods.';
   String? _conversationId;
 

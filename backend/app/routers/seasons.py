@@ -16,7 +16,8 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
-from ..deps import current_user, get_session
+from ..config import Settings
+from ..deps import current_user, get_session, get_settings
 from ..locale_context import RequestLocale, request_locale
 from ..simple_models import AudioProgress, UserSetting
 
@@ -43,7 +44,7 @@ def _greeting(now: float | None = None) -> str:
 
 @router.get("/home/dashboard")
 def home_dashboard(
-    hemisphere: str = "north",
+    hemisphere: str | None = None,
     tz: str | None = None,
     locale: RequestLocale = Depends(request_locale),
     user_id: str = Depends(current_user),
@@ -55,7 +56,9 @@ def home_dashboard(
     from ..services.home_cards import build_dashboard
 
     is_global = locale.is_global
-    hemi = "south" if hemisphere == "south" else "north"
+    from ..services.culture_profile import effective_hemisphere
+
+    hemi, hemi_source = effective_hemisphere(session, user_id, hemisphere)
     board = phs.build(session, user_id, lang="en" if is_global else "zh", is_global=is_global, hemisphere=hemi, tz_name=tz)
     if not is_global:  # 官方资料库只在国内版；国际版没有这张卡
         board = phs.with_library_card(session, user_id, board)
@@ -63,12 +66,16 @@ def home_dashboard(
         "greeting": board["greeting"],
         "hero": board["hero"],
         "streak": board["streak"],
+        "week": board.get("week"),
+        "milestone": board.get("milestone"),
+        "recall": board.get("recall"),
         "personalization": board["personalization"],
         "suggestions": board["cards"],
         "gentle_suggestions": board["cards"],
         "date": board["date"],
         "time_of_day": board["time_of_day"],
         "hemisphere": hemi,
+        "hemisphere_source": hemi_source,
         "updated_at": int(time.time()),
     }
     if not is_global:
@@ -136,13 +143,17 @@ class AudioProgressBody(BaseModel):
     audio_id: str = Field(min_length=1, max_length=64)
     progress_seconds: int = Field(ge=0)
     completed: bool = False
+    # Seconds of audio that actually played since the last report; this is what the daily audio-minutes quota counts
+    # (progress_seconds is the position in the track, which a seek changes without anyone listening).
+    listened_seconds: int = Field(default=0, ge=0, le=86400)
 
 
 @router.post("/audio/progress")
-def report_audio_progress(
+async def report_audio_progress(
     body: AudioProgressBody,
     user_id: str = Depends(current_user),
     session: Session = Depends(get_session),
+    settings: Settings = Depends(get_settings),
 ):
     session.merge(
         AudioProgress(
@@ -153,4 +164,10 @@ def report_audio_progress(
             updated_at=int(time.time()),
         )
     )
-    return {"saved": True}
+    out: dict = {"saved": True}
+    if body.listened_seconds:
+        from ..services import audio_quota
+        from ..services.membership_status import membership_status
+
+        out.update(await audio_quota.add_listened(settings.redis_url, user_id, membership_status(session, user_id)["tier"], body.listened_seconds))
+    return out

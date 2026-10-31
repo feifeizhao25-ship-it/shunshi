@@ -16,10 +16,10 @@ class _FeedbackPageState extends State<FeedbackPage> {
   bool _submitting = false;
 
   static const _categories = [
-    ('general', '综合反馈'),
-    ('bug', 'Bug 报告'),
-    ('feature', '功能建议'),
-    ('content', '内容建议'),
+    ('general', 'General feedback'),
+    ('bug', 'Bug report'),
+    ('feature', 'Feature request'),
+    ('content', 'Content suggestion'),
   ];
 
   @override
@@ -40,14 +40,14 @@ class _FeedbackPageState extends State<FeedbackPage> {
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('感谢您的反馈！'), duration: Duration(seconds: 2)),
+          const SnackBar(content: Text('Thank you for your feedback!'), duration: Duration(seconds: 2)),
         );
         Navigator.pop(context);
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('提交失败: $e'), duration: const Duration(seconds: 2)),
+          SnackBar(content: Text('Submission failed: $e'), duration: const Duration(seconds: 2)),
         );
       }
     } finally {
@@ -60,7 +60,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
     return Scaffold(
       backgroundColor: ShunShiColors.background,
       appBar: AppBar(
-        title: const Text('意见反馈', style: TextStyle(color: ShunShiColors.textPrimary, fontWeight: FontWeight.w700)),
+        title: const Text('Feedback', style: TextStyle(color: ShunShiColors.textPrimary, fontWeight: FontWeight.w700)),
         backgroundColor: ShunShiColors.background,
         elevation: 0,
         iconTheme: const IconThemeData(color: ShunShiColors.textPrimary),
@@ -68,7 +68,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('反馈类型', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+          Text('Feedback type', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
           const SizedBox(height: 8),
           Wrap(spacing: 8, children: _categories.map((c) => ChoiceChip(
             label: Text(c.$2),
@@ -79,7 +79,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
             side: BorderSide.none,
           )).toList()),
           const SizedBox(height: 20),
-          Text('评分', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+          Text('Rating', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
           const SizedBox(height: 8),
           Row(children: List.generate(5, (i) => GestureDetector(
             onTap: () => setState(() => _rating = i + 1),
@@ -87,13 +87,13 @@ class _FeedbackPageState extends State<FeedbackPage> {
               color: i < _rating ? Colors.amber : ShunShiColors.textTertiary, size: 32),
           ))),
           const SizedBox(height: 20),
-          Text('反馈内容', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+          Text('Your feedback', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
           const SizedBox(height: 8),
           TextField(
             controller: _msgCtrl,
             maxLines: 5,
             decoration: InputDecoration(
-              hintText: '请描述您的问题或建议...',
+              hintText: 'Describe your problem or suggestion...',
               hintStyle: TextStyle(color: ShunShiColors.textTertiary),
               filled: true,
               fillColor: ShunShiColors.surfaceContainerLowest,
@@ -110,7 +110,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
               ),
               child: _submitting
                 ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                : const Text('提交反馈', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white)),
+                : const Text('Send feedback', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white)),
             ),
           ),
         ]),
