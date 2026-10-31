@@ -277,3 +277,12 @@ def test_api_actions_drive_the_streak(client, monkeypatch):
     data = client.get("/api/v1/seasons/home/dashboard", headers=h).json()
     assert data["streak"]["kind"] in ("steady", "streak")
     assert "activity" in data["personalization"]["used"]
+
+
+def test_fixed_utc_offset_timezone_for_apps_without_an_iana_name():
+    now = datetime(2026, 11, 2, 20, 0, tzinfo=timezone.utc)
+    assert phs.local_now(True, "UTC+05:30", now).hour == 1
+    assert phs.local_now(True, "UTC-08:00", now).hour == 12
+    assert phs.local_now(True, "UTC+99:00", now).hour == 20  # nonsense falls back to UTC
+    assert phs.local_now(True, "Europe/Berlin", now).hour == 21
+    assert phs.local_now(False, "UTC+05:30", now).hour == 4  # domestic stays on Beijing time
