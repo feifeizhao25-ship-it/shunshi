@@ -6,7 +6,7 @@ import '../../../data/en_content.dart';
 import '../../widgets/skeleton_loading.dart';
 import '../../../core/theme/app_localizations.dart';
 
-/// Tearecommended 页面
+/// Seasonal tea recommendations page
 class TeaPage extends StatefulWidget {
   const TeaPage({super.key});
 

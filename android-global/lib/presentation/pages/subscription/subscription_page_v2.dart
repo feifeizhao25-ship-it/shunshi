@@ -6,6 +6,7 @@ import '../../../design_system/theme.dart';
 import '../../../data/datasources/subscription_service.dart';
 import '../../../data/models/subscription.dart';
 import '../../../core/network/api_singleton.dart';
+import '../../../data/services/store_pricing.dart';
 
 class SubscriptionPageV2 extends StatefulWidget {
   const SubscriptionPageV2({super.key});
@@ -44,6 +45,19 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
     } catch (e) {
       if (mounted) setState(() => _loading = false);
     }
+  }
+
+  /// The store's own localised price when the store has loaded it; otherwise what the
+  /// API gave (shown only when it carries a currency) or "Price shown at checkout".
+  String _storeOr(SubscriptionPlan plan, {bool yearly = false}) {
+    final fromStore = StorePricing.price(plan.id, yearly: yearly);
+    if (fromStore != StorePricing.pending) return fromStore;
+    return yearly ? plan.priceYearlyDisplay : plan.priceDisplay;
+  }
+
+  String _planPriceLine(SubscriptionPlan plan) {
+    final price = _storeOr(plan);
+    return price == SubscriptionPlan.pricePending ? price : '$price/${plan.periodName ?? "mo"}';
   }
 
   Future<void> _purchase(SubscriptionPlan plan) async {
@@ -315,7 +329,7 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
                 Text('${recommended.periodName ?? ""}', style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
                 const SizedBox(height: 8),
                 Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                  Text(recommended.priceYearlyDisplay, style: TextStyle(fontSize: 34, fontWeight: FontWeight.bold, color: ShunShiColors.primary)),
+                  Text(_storeOr(recommended, yearly: true), style: TextStyle(fontSize: 34, fontWeight: FontWeight.bold, color: ShunShiColors.primary)),
                   const SizedBox(width: 6),
                   Padding(padding: const EdgeInsets.only(bottom: 6), child: Text(AppLocalizations.of(context).get('subscription_per_year'), style: TextStyle(fontSize: 13, color: ShunShiColors.textTertiary))),
                   const Spacer(),
@@ -356,7 +370,7 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
           Text(plan.name, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
           const SizedBox(height: 6),
           Text(
-            plan.priceCents > 0 ? (plan.priceDisplay == SubscriptionPlan.pricePending ? plan.priceDisplay : '${plan.priceDisplay}/${plan.periodName ?? "mo"}') : 'Free',
+            plan.priceCents > 0 ? _planPriceLine(plan) : 'Free',
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: ShunShiColors.primary),
           ),
           const SizedBox(height: 4),

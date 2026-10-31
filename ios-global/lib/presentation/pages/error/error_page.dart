@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
 
 class ErrorPage extends StatelessWidget {
@@ -19,8 +20,8 @@ class ErrorPage extends StatelessWidget {
             Text('Page not found', style: TextStyle(color: ShunShiColors.textSecondary)),
             const SizedBox(height: 24),
             ElevatedButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Go Back'),
+              onPressed: () => context.go('/today'),
+              child: const Text('Back to Today'),
             ),
           ],
         ),
