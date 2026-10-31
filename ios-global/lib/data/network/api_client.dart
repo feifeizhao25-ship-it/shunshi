@@ -1,6 +1,7 @@
 import '../../core/network/locale_headers.dart';
 import 'package:dio/dio.dart';
 import 'dart:io';
+import '../../core/config/app_config.dart';
 import '../storage/storage_manager.dart';
 
 /// API 错误类型
@@ -29,7 +30,8 @@ class ApiClient {
   // 模拟器地址（Android emulator → host localhost）
   static const _emulatorUrl = 'http://10.0.2.2:4000';
   // 真机：优先公网直连
-  static const _realDeviceUrl = 'https://api.seasonsapp.com';
+  // Comes from the build-time config (--dart-define=API_BASE_URL=...), not a hard-coded host.
+  static const _realDeviceUrl = AppConfig.apiBaseUrl;
 
   static String baseUrl = _realDeviceUrl;
   static bool _detected = true; // Use the device IP by default; no detection needed
@@ -48,6 +50,9 @@ class ApiClient {
   }
   
   late final Dio _dio;
+
+  /// The underlying client, for pages that need Dio-level control (e.g. error status codes).
+  Dio get dio => _dio;
   
   ApiClient() {
     // baseUrl 可能在 main() 中已通过 detectBaseUrl() 设置
