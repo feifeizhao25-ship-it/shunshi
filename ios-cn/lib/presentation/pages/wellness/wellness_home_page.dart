@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
 import '../../../design_system/app_colors.dart';
+import '../library/shunshi_reference_library.dart';
 
 class WellnessHomePage extends StatelessWidget {
   const WellnessHomePage({super.key});
@@ -98,7 +99,9 @@ class WellnessHomePage extends StatelessWidget {
                       _gridIcon(context, Icons.spa_outlined, '冥想音频', () => context.push('/meditation')),
                     ],
                   ),
-                  const SizedBox(height: 48),
+                  const SizedBox(height: 16),
+                  ShunshiReferenceLibraryTile(onTap: () => context.push('/reference-library')),
+                  const SizedBox(height: 32),
 
                   // ── 精选编辑 ──
                   Column(
