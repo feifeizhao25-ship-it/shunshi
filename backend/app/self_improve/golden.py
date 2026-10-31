@@ -76,7 +76,8 @@ def validate_case(case: Mapping, edition: str = "zh") -> list[str]:
         if not srcs:
             p.append("answer_case_without_sources")
         for s in srcs:
-            if urlparse(str(s.get("url", ""))).scheme != "https":
+            u = urlparse(str(s.get("url", "")))
+            if not (u.scheme == "https" or (u.scheme == "http" and (u.hostname or "").endswith(".gov.cn"))):  # 个别政府网站只给 http，其余必须 https
                 p.append("source_url_not_https")
             for k in ("title", "issuer", "retrieved_at"):
                 if not s.get(k):
