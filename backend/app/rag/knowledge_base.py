@@ -444,11 +444,18 @@ class KnowledgeBase:
                 continue
             if date.fromisoformat(meta["valid_until"]) < today:
                 continue
+            # 状态：缺省按现行；已废止/被替代的不加载；征求意见稿可被检索，但不算「已核验现行」，
+            # evidence.verified_cn_context 只取 verified_official，所以不会被当成现行规则回答。
+            status = meta.get("status", "in_force")
+            if status in ("expired", "superseded"):
+                continue
+            evidence = "verified_official" if status == "in_force" else "draft_consultation"
             chunks = _parse_markdown_into_chunks(md.read_text(encoding="utf-8"), self.lang, source="approved")
             for chunk in chunks:
                 chunk.metadata.update({
                     "source_file": f"approved/{entry_id}.md",
-                    "evidence_status": "verified_official",
+                    "evidence_status": evidence,
+                    "kb_status": status,
                     "high_risk_allowed": False,
                     "locale": "zh-CN", "region": "CN",
                     "reviewed_at": meta["reviewed_at"],
