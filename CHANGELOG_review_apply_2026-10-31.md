@@ -29,3 +29,12 @@
 ## 3. 没有改的（需要后续人工决定）
 - Flutter 页面无法在这里构建，字符串改动由测试扫描保证，未在模拟器里看过。
 - 国内版仍只有 12356（未加入 800-810-1117、希望24 等）：后端单一来源测试明确只允许 12356。
+
+## Follow-up (2026-10-31): under-16 block message follows the edition / request locale
+
+*Assistant's choice on the user's delegation — pending expert review (待专家复核).*
+
+- `age_policy.child_block_text(lang)`: Chinese for the domestic edition (unchanged, still mentions 监护人), English for the international edition (`X-App-Market: global`, or a non-Chinese `Accept-Language`) — resolved by the existing `locale_context`, not by message text.
+- Applied on every path that can return the under-16 refusal: `/chat/send` (and voice, which reuses it), `get_skill_access` (all skills / core-skills endpoints), and the two `age-profile` errors (invalid date, minor-cannot-become-adult) via `declare_birth_date(lang=…)`.
+- Old callers (`policy_for(session, user_id)`) keep the Chinese text. Model still isn't called for under-16 users.
+- Tests: `test_age_policy.py` (+3), `test_skills_compliance.py` (+1): English with no CJK for international, "监护人" kept for domestic.
