@@ -299,7 +299,7 @@ async def chat(
     messages.extend(_recent_history(session, user_id))
     messages.append({"role": "user", "content": message})
     from ..services.chat_quota import reserve, refund
-    reservation = await reserve(settings.redis_url, user_id, tier)
+    reservation = await reserve(settings.redis_url, user_id, tier, **({"lang": "en"} if is_global else {}))
     try:
         if settings.model_router_url:
             answer = await request_gateway(

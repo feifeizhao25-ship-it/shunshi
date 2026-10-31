@@ -324,14 +324,75 @@ def compose(profile: Profile, activity: Activity, user_key: str, now: datetime, 
     cards = anchors + picked[: max(1, 5 - len(anchors))]
     hero = next((c for c in cards if str(c.get("id", "")).startswith("day_")), picked[0] if picked else (cards[0] if cards else None))
     streak_card = _streak_card(streak, activity, day, lang)
+    lightest = min(picked, key=lambda c: (c["duration_min"], c["id"])) if picked else None
     used = sorted({b for c in cards for b in c.get("bases", [c.get("basis")])} | ({"activity"} if (activity.completed or activity.seen) else set()))
     return {
         "greeting": greeting(bucket, lang),
         "hero": hero,
         "cards": cards,
         "streak": streak_card,
+        "week": week_strip(activity.completed, day),
+        "milestone": milestone(streak, lang),
+        "recall": recall(activity, day, lang, lightest),
         "personalization": {"enabled": True, "used": used, "note": _on_note(lang)},
     }
+
+
+MILESTONE_DAYS = (3, 7)
+
+
+def week_strip(completed: Sequence, today: date) -> list:
+    """The last seven days, oldest first, with whether the user did at least one action - from real activity only."""
+    done = {at.date() for _, at in completed}
+    return [{"date": (today - timedelta(days=i)).isoformat(), "done": (today - timedelta(days=i)) in done,
+             "today": i == 0} for i in range(6, -1, -1)]
+
+
+def milestone(streak: int, lang: str) -> dict:
+    """Day-3 and day-7 moments. Only a streak the user really has reaches one; no streak means no milestone.
+
+    ``reached`` is the highest milestone the current streak has passed (3 or 7), ``just_reached`` is true on the exact
+    day, ``next`` is the next one with the number of days left. Wording is calm: no pressure, no loss language.
+    """
+    reached = max((m for m in MILESTONE_DAYS if streak >= m), default=0)
+    nxt = next((m for m in MILESTONE_DAYS if streak < m), None)
+    if reached == 3:
+        text = ("连续 3 天了，好习惯已经起步" if lang == "zh" else "Three days in a row. A habit is getting started.")
+    elif reached >= 7:
+        text = ("连续 7 天，一整周的小行动，辛苦了" if lang == "zh" else "Seven days in a row, a full week of small actions.")
+    elif streak >= 1 and nxt:
+        left = nxt - streak
+        text = (f"再坚持 {left} 天就是第 {nxt} 天" if lang == "zh" else f"{left} more day{'s' if left != 1 else ''} to reach day {nxt}.")
+    else:
+        text = ""
+    return {"reached": reached, "just_reached": streak in MILESTONE_DAYS, "streak": streak,
+            "next": ({"day": nxt, "days_left": nxt - streak} if nxt else None), "text": text}
+
+
+RECALL_TIERS = ((14, "long"), (7, "week"), (3, "short"))
+
+
+def recall(activity: Activity, day: date, lang: str, lightest: Optional[dict]) -> Optional[dict]:
+    """Gentle in-app comeback card for a user who has been away 3+ days; None for someone active or brand new.
+
+    It is shown only inside the app when the user opens it (``delivery: in_app_only``). This module never sends a push
+    notification, SMS or email, and a test checks that. It offers the lightest card on the board, never a catch-up
+    target, and never counts what was missed.
+    """
+    if not activity.completed:
+        return None
+    gap = (day - max(at.date() for _, at in activity.completed)).days
+    tier = next((name for floor, name in RECALL_TIERS if gap >= floor), None)
+    if tier is None:
+        return None
+    text = {
+        "short": ("好几天没见了，今天只做一件最轻的就好", "A few days away is fine. Today, just the lightest one."),
+        "week": ("隔了一周，没关系。从 1 分钟的小事重新开始", "A week away is okay. Restart with a one-minute thing."),
+        "long": ("欢迎回来。不用补回之前的，今天从一件最小的开始", "Welcome back. No need to catch up; begin with the smallest one today."),
+    }[tier]
+    return {"kind": "recall", "tier": tier, "days_away": gap, "text": text[0] if lang == "zh" else text[1],
+            "suggested_card_id": lightest["id"] if lightest else None,
+            "delivery": "in_app_only", "dismissible": True}
 
 
 def _streak_card(streak: int, activity: Activity, day: date, lang: str) -> dict:
