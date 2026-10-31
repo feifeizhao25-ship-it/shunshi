@@ -9,6 +9,7 @@ import '../../widgets/illustrated_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
+import '../../../data/network/session.dart';
 
 class RecordsPageV2 extends StatefulWidget {
   const RecordsPageV2({super.key});
@@ -41,11 +42,8 @@ class _RecordsPageV2State extends State<RecordsPageV2> {
   }
 
   Future<void> _getToken() async {
-    try {
-      final res = await _dio.post('/api/v1/auth/guest-login', data: {});
-      final d = res.data;
-      _token = (d is Map ? (d['access_token'] ?? (d['data'] is Map ? d['data']['token'] : null)) : null)?.toString();
-    } catch (_) {}
+    // 用本机已有的登录令牌；没有才建一个游客会话并保存（不再每次打开页面都换一个空账号）。
+    _token = await ensureSessionToken(_dio);
   }
 
   Future<void> _fetchData() async {

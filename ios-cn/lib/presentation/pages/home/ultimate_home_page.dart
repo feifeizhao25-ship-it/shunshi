@@ -16,6 +16,7 @@ import '../../../data/services/offline_cache.dart';
 import '../../../core/config/app_config.dart';
 import '../../../design_system/app_colors.dart';
 import '../../../design_system/style_theming.dart';
+import '../../../data/network/session.dart';
 
 // ═══════════════════════════════════════════════════════════════
 // 十二时辰数据模型（本地计算）
@@ -259,11 +260,11 @@ class UltimateHomePage extends StatefulWidget {
 
 class _UltimateHomePageState extends State<UltimateHomePage> {
   static const _baseUrl = AppConfig.apiBaseUrl;
-  final _dio = Dio(BaseOptions(
+  final _dio = withSessionAuth(Dio(BaseOptions(
     baseUrl: _baseUrl,
     connectTimeout: const Duration(seconds: 8),
     receiveTimeout: const Duration(seconds: 15),
-  ));
+  )));
 
   late ShiChenData _currentShiChen;
   String _solarTermInfo = '';
@@ -283,6 +284,20 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
     _fetchDashboard();
   }
 
+  /// 到期随访只查「我自己」的：`/followup/check-due`（用户接口）。
+  /// 以前调的 `/followup/due` 是管理员接口（列出所有人的任务），普通用户一律 403，
+  /// 而且 Future.wait 里任何一个请求失败，整个首页数据都会被丢掉——所以这里吞掉失败，只当「没有到期随访」。
+  Future<Response<dynamic>> _dueFollowups() async {
+    try {
+      return await _dio.get('/api/v1/followup/check-due', queryParameters: {...userIdParam()});
+    } catch (_) {
+      return Response<dynamic>(
+        requestOptions: RequestOptions(path: '/api/v1/followup/check-due'),
+        data: const {'due_followups': []},
+      );
+    }
+  }
+
   Future<void> _fetchDashboard() async {
     // Try offline cache first
     try {
@@ -297,7 +312,7 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
       final results = await Future.wait([
         _dio.get('/api/v1/seasons/home/dashboard?locale=zh-CN'),
         _dio.get('/api/v1/solar-terms/current'),
-        _dio.get('/api/v1/followup/due', queryParameters: {'user_id': 'user-001', 'limit': 1}),
+        _dueFollowups(),
       ]);
 
       if (!mounted) return;

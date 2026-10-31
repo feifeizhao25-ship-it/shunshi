@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../design_system/theme.dart';
 import '../../core/config/app_config.dart';
+import '../../data/network/session.dart';
 
 /// 底部弹出反馈卡片: "这条建议对你有帮助吗?" 👍👎
 class FeedbackSheet extends StatefulWidget {
@@ -40,8 +41,8 @@ class _FeedbackSheetState extends State<FeedbackSheet> {
     setState(() => _submitting = true);
     try {
       final prefs = await SharedPreferences.getInstance();
-      final userId = prefs.getString('user_id') ?? 'guest';
-      await Dio().post(
+      final userId = currentUserId() ?? '';
+      await withSessionAuth(Dio()).post(
         '${AppConfig.apiBaseUrl}/api/v1/feedback/submit',
         data: {
           'user_id': userId,

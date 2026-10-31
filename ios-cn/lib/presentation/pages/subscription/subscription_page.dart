@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../design_system/theme.dart';
 import '../../../design_system/theme_helper.dart';
 import '../../../core/config/app_config.dart';
+import '../../../data/network/session.dart';
 
 const _baseUrl = AppConfig.apiBaseUrl;
 
@@ -21,7 +22,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> with SingleTickerPr
   bool _hasError = false;
   late AnimationController _animController;
   late Animation<double> _scaleAnim;
-  final _dio = Dio(BaseOptions(baseUrl: _baseUrl));
+  final _dio = withSessionAuth(Dio(BaseOptions(baseUrl: _baseUrl)));
 
   static const _plans = [
     _Plan('月度会员', '¥28', '/月'),
@@ -50,7 +51,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> with SingleTickerPr
     try {
       _dio.options.headers['Authorization'] = 'Bearer $token';
       final res = await _dio.get('/api/v1/subscription/status',
-          queryParameters: {'user_id': token.isNotEmpty ? token : 'guest'});
+          queryParameters: {...userIdParam()});
       if (res.data != null) {
         final isActive = res.data['is_active'] as bool? ??
             (res.data['state'] != null && res.data['state'] != 'free');
