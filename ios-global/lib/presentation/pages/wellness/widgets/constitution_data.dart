@@ -57,15 +57,15 @@ class ConstitutionDetail {
 }
 
 const List<ConstitutionType> kConstitutionTypes = [
-  ConstitutionType(key: 'qixu', name: '气虚质', emoji: '😰', description: '元气不足，易疲乏气短'),
-  ConstitutionType(key: 'yangxu', name: '阳虚质', emoji: '🥶', description: '阳气不足，畏寒怕冷'),
-  ConstitutionType(key: 'yinxu', name: '阴虚质', emoji: '🔥', description: '阴液亏少，口燥咽干'),
-  ConstitutionType(key: 'tanshi', name: '痰湿质', emoji: '😪', description: '痰湿凝聚，体形肥胖'),
-  ConstitutionType(key: 'shire', name: '湿热质', emoji: '🤢', description: '湿热内蕴，面垢油光'),
-  ConstitutionType(key: 'xueyu', name: '血瘀质', emoji: '😣', description: '血行不畅，肤色晦暗'),
-  ConstitutionType(key: 'qiyu', name: '气郁质', emoji: '😔', description: '气机郁滞，神情抑郁'),
-  ConstitutionType(key: 'tebing', name: '特禀质', emoji: '🤧', description: '先天失常，易过敏'),
-  ConstitutionType(key: 'pinghe', name: '平和质', emoji: '😊', description: '阴阳调和，体态适中'),
+  ConstitutionType(key: 'qixu', name: 'Qi Deficiency', emoji: '😰', description: 'Low vital energy, easily tired and short of breath'),
+  ConstitutionType(key: 'yangxu', name: 'Yang Deficiency', emoji: '🥶', description: 'Insufficient yang, cold-prone'),
+  ConstitutionType(key: 'yinxu', name: 'Yin Deficiency', emoji: '🔥', description: 'Low yin fluids, dry mouth and throat'),
+  ConstitutionType(key: 'tanshi', name: 'Phlegm-Dampness', emoji: '😪', description: 'Phlegm and dampness gather, heavier build'),
+  ConstitutionType(key: 'shire', name: 'Damp-Heat', emoji: '🤢', description: 'Damp-heat inside, oily face'),
+  ConstitutionType(key: 'xueyu', name: 'Blood Stasis', emoji: '😣', description: 'Blood flows poorly, dull complexion'),
+  ConstitutionType(key: 'qiyu', name: 'Qi Stagnation', emoji: '😔', description: 'Qi flow stuck, low mood'),
+  ConstitutionType(key: 'tebing', name: 'Special Constitution', emoji: '🤧', description: 'Inherited irregularity, allergy-prone'),
+  ConstitutionType(key: 'pinghe', name: 'Balanced', emoji: '😊', description: 'Yin and yang in harmony, moderate build'),
 ];
 
 const Map<String, String> kConstitutionEmoji = {
@@ -74,48 +74,48 @@ const Map<String, String> kConstitutionEmoji = {
 };
 
 const Map<String, String> kConstitutionDesc = {
-  'pinghe': '阴阳气血调和，体态适中，面色润泽，精力充沛，睡眠良好',
-  'qixu': '元气不足，易疲乏，气短懒言，易出汗，易感冒',
-  'yangxu': '阳气不足，手脚发凉，畏寒怕冷，精神不振',
-  'yinxu': '体内阴液亏少，口燥咽干，手足心热，盗汗',
-  'tanshi': '痰湿凝聚，形体肥胖，腹部肥满松软，口黏腻',
-  'shire': '湿热内蕴，面垢油光，口苦口干，身重困倦',
-  'xueyu': '血行不畅，肤色晦暗，容易出现瘀斑',
-  'qiyu': '气机郁滞，神情抑郁，忧虑脆弱',
-  'tebing': '先天禀赋不足或过敏体质，易过敏',
+  'pinghe': 'Yin and yang, qi and blood in harmony; moderate build, glowing complexion, plenty of energy, good sleep',
+  'qixu': 'Low vital energy, easily tired, short of breath and reluctant to talk, sweats easily, catches colds easily',
+  'yangxu': 'Insufficient yang, cold hands and feet, dislikes cold, low spirits',
+  'yinxu': 'Low yin fluids in the body, dry mouth and throat, warm palms and soles, night sweats',
+  'tanshi': 'Phlegm and dampness gather, heavier build, soft full abdomen, sticky mouth',
+  'shire': 'Damp-heat inside, oily face, bitter dry mouth, heavy and sleepy',
+  'xueyu': 'Blood flows poorly, dull complexion, bruises easily',
+  'qiyu': 'Qi flow stuck, low mood, anxious and fragile',
+  'tebing': 'Inherited weakness or allergic constitution, allergy-prone',
 };
 
 const Map<String, List<String>> kConstitutionChars = {
-  'pinghe': ['体形匀称健壮', '面色润泽红润', '精力充沛', '睡眠良好', '食欲正常', '二便调畅'],
-  'qixu': ['容易疲乏', '气短懒言', '容易出汗', '容易感冒', '声音低弱', '舌淡红，舌体胖大'],
-  'yangxu': ['手足不温', '畏寒怕冷', '精神不振', '面色柔白', '喜热饮食', '舌淡胖嫩'],
-  'yinxu': ['口燥咽干', '手足心热', '鼻微干', '喜冷饮', '大便干燥', '面色潮红'],
-  'tanshi': ['体形肥胖', '面部油脂较多', '多汗且黏', '口黏腻', '身重不爽', '嗜食肥甘'],
-  'shire': ['面垢油光', '易生痤疮', '口苦口干', '身重困倦', '大便黏滞不畅', '小便短黄'],
-  'xueyu': ['肤色晦暗', '色素沉着', '容易出现瘀斑', '口唇暗淡', '眼眶暗黑', '舌暗有瘀点'],
-  'qiyu': ['神情抑郁', '情感脆弱', '烦闷不乐', '多愁善感', '胸胁胀满', '善太息'],
-  'tebing': ['过敏体质', '易患哮喘', '容易打喷嚏', '鼻塞流涕', '皮肤易起荨麻疹'],
+  'pinghe': ['Well-proportioned and strong', 'Rosy, glowing complexion', 'Plenty of energy', 'Sleeps well', 'Normal appetite', 'Regular bowel and bladder'],
+  'qixu': ['Easily tired', 'Short of breath, reluctant to talk', 'Sweats easily', 'Catches colds easily', 'Weak voice', 'Pale red, swollen tongue'],
+  'yangxu': ['Cold hands and feet', 'Dislikes cold', 'Low spirits', 'Soft, pale complexion', 'Prefers warm food and drink', 'Pale, tender, swollen tongue'],
+  'yinxu': ['Dry mouth and throat', 'Warm palms and soles', 'Slightly dry nose', 'Prefers cold drinks', 'Dry stools', 'Flushed face'],
+  'tanshi': ['Heavier build', 'Oily face', 'Sweats a lot, sticky', 'Sticky mouth', 'Body feels heavy', 'Fond of rich, fatty food'],
+  'shire': ['Oily face', 'Prone to acne', 'Bitter, dry mouth', 'Heavy and sleepy', 'Sticky, sluggish stools', 'Scanty, dark urine'],
+  'xueyu': ['Dull complexion', 'Pigmentation', 'Bruises easily', 'Dull lips', 'Dark circles', 'Dark tongue with spots'],
+  'qiyu': ['Low mood', 'Emotionally fragile', 'Restless and unhappy', 'Sentimental', 'Fullness in the chest and ribs', 'Frequent sighing'],
+  'tebing': ['Allergic constitution', 'Prone to asthma', 'Sneezes easily', 'Stuffy, runny nose', 'Skin prone to hives'],
 };
 
 const Map<String, Map<String, String>> kConstitutionAdvice = {
-  'pinghe': {'饮食': '饮食有节，不偏食偏嗜，粗细搭配，荤素均衡', '茶饮': '四季均可饮用绿茶、菊花茶等平和茶饮', '运动': '适度运动，散步、太极拳、游泳均可'},
-  'qixu': {'饮食': '多食益气健脾食物：黄芪、人参、山药、大枣、小米、糯米、扁豆', '茶饮': '黄芪红枣茶、人参茶、党参茶', '运动': '舒缓运动为主：散步、太极拳、八段锦，避免剧烈运动'},
-  'yangxu': {'饮食': '多食温阳散寒食物：羊肉、生姜、桂圆、韭菜、核桃、栗子、红枣', '茶饮': '姜枣茶、桂圆红茶、肉桂茶', '运动': '多晒太阳，适合户外运动，太极拳、艾灸足三里'},
-  'yinxu': {'饮食': '多食滋阴润燥食物：银耳、百合、雪梨、枸杞、黑芝麻、鸭肉、甲鱼', '茶饮': '百合银耳茶、枸杞菊花茶、麦冬茶', '运动': '中小强度运动，游泳、瑜伽、慢跑，避免大汗'},
-  'tanshi': {'饮食': '少食肥甘厚腻，多食健脾利湿食物：薏米、赤小豆、冬瓜、荷叶、陈皮', '茶饮': '荷叶茶、薏米红豆茶、陈皮茶、山楂茶', '运动': '加强有氧运动，快走、慢跑、游泳，控制体重'},
-  'shire': {'饮食': '多食清热利湿食物：绿豆、苦瓜、冬瓜、黄瓜、薏米、莲藕', '茶饮': '金银花茶、菊花茶、荷叶茶、绿豆汤', '运动': '中等强度有氧运动，游泳最佳，适合夏季户外活动'},
-  'xueyu': {'饮食': '多食活血化瘀食物：山楂、红花、玫瑰花、黑豆、醋、黑木耳', '茶饮': '玫瑰花茶、山楂茶、红花茶、三七茶', '运动': '适当运动促进气血运行，太极拳、瑜伽、舞蹈'},
-  'qiyu': {'饮食': '多食疏肝理气食物：玫瑰花、佛手、柑橘、萝卜、荞麦、金针菇', '茶饮': '玫瑰花茶、茉莉花茶、佛手茶、合欢花茶', '运动': '多参加户外运动和社交活动，跑步、登山、唱歌、舞蹈'},
-  'tebing': {'饮食': '饮食清淡，避免过敏源。多食益气固表食物：黄芪、大枣、山药、灵芝', '茶饮': '黄芪红枣茶、灵芝茶、防风茶', '运动': '适度运动增强体质，游泳、散步、太极拳'},
+  'pinghe': {'Diet': 'Eat in moderation, no picky eating, mix coarse and fine grains, balance meat and vegetables', 'Tea': 'Mild teas such as green tea or chrysanthemum tea are fine in all seasons', 'Exercise': 'Moderate exercise — walking, tai chi or swimming'},
+  'qixu': {'Diet': 'Eat more qi-tonifying, spleen-supporting foods: astragalus, ginseng, Chinese yam, red dates, millet, glutinous rice, hyacinth bean', 'Tea': 'Astragalus and red date tea, ginseng tea, codonopsis tea', 'Exercise': 'Favour gentle exercise: walking, tai chi, Baduanjin; avoid strenuous exercise'},
+  'yangxu': {'Diet': 'Eat more warming foods: lamb, ginger, longan, chives, walnuts, chestnuts, red dates', 'Tea': 'Ginger-date tea, longan black tea, cinnamon tea', 'Exercise': 'Get more sun; outdoor exercise, tai chi, moxibustion at Zusanli suit you'},
+  'yinxu': {'Diet': 'Eat more yin-nourishing, moistening foods: tremella, lily bulb, pear, goji, black sesame, duck, soft-shelled turtle', 'Tea': 'Lily bulb and tremella tea, goji and chrysanthemum tea, ophiopogon tea', 'Exercise': 'Light to moderate exercise — swimming, yoga, jogging; avoid heavy sweating'},
+  'tanshi': {'Diet': 'Eat less rich, fatty food; eat more spleen-supporting, dampness-draining foods: coix seed, adzuki bean, winter melon, lotus leaf, tangerine peel', 'Tea': 'Lotus leaf tea, coix and adzuki tea, tangerine peel tea, hawthorn tea', 'Exercise': 'Do more aerobic exercise — brisk walking, jogging, swimming; manage weight'},
+  'shire': {'Diet': 'Eat more heat-clearing, dampness-draining foods: mung bean, bitter melon, winter melon, cucumber, coix seed, lotus root', 'Tea': 'Honeysuckle tea, chrysanthemum tea, lotus leaf tea, mung bean soup', 'Exercise': 'Moderate aerobic exercise, swimming is best; good for summer outdoor activity'},
+  'xueyu': {'Diet': 'Eat more blood-moving foods: hawthorn, safflower, rose, black beans, vinegar, wood ear', 'Tea': 'Rose tea, hawthorn tea, safflower tea, notoginseng tea', 'Exercise': 'Moderate exercise to keep qi and blood moving — tai chi, yoga, dance'},
+  'qiyu': {'Diet': 'Eat more liver-soothing, qi-regulating foods: rose, finger citron, citrus, radish, buckwheat, enoki', 'Tea': 'Rose tea, jasmine tea, finger citron tea, silk-tree flower tea', 'Exercise': 'Take part in outdoor exercise and social activities — running, hiking, singing, dancing'},
+  'tebing': {'Diet': 'Eat light food and avoid allergens. Eat more qi-securing foods: astragalus, red dates, Chinese yam, reishi', 'Tea': 'Astragalus and red date tea, reishi tea, saposhnikovia tea', 'Exercise': 'Moderate exercise to build resistance — swimming, walking, tai chi'},
 };
 
 const Map<String, List<String>> kConstitutionAvoid = {
-  'pinghe': [], 'qixu': ['过度劳累', '大汗淋漓', '生冷食物', '熬夜', '剧烈运动'],
-  'yangxu': ['生冷食物', '寒凉环境', '过度吹空调', '冰饮', '寒性水果'],
-  'yinxu': ['辛辣食物', '煎炸食物', '熬夜', '过度运动', '羊肉等温热食物'],
-  'tanshi': ['肥甘厚腻', '甜食', '酒类', '久坐不动', '生冷食物'],
-  'shire': ['辛辣食物', '油腻食物', '酒类', '煎炸食物', '熬夜'],
-  'xueyu': ['久坐不动', '寒凉环境', '情绪压抑', '过度安逸'],
-  'qiyu': ['长期压抑情绪', '过度思虑', '久坐不动', '独处寡言'],
-  'tebing': ['已知过敏食物', '花粉环境', '冷空气', '新装修环境', '宠物毛发'],
+  'pinghe': [], 'qixu': ['Overwork', 'Heavy sweating', 'Raw, cold food', 'Staying up late', 'Strenuous exercise'],
+  'yangxu': ['Raw, cold food', 'Cold environments', 'Too much air conditioning', 'Iced drinks', 'Cold-natured fruits'],
+  'yinxu': ['Spicy food', 'Fried food', 'Staying up late', 'Overexercise', 'Warming foods such as lamb'],
+  'tanshi': ['Rich, fatty food', 'Sweets', 'Alcohol', 'Sitting for long periods', 'Raw, cold food'],
+  'shire': ['Spicy food', 'Greasy food', 'Alcohol', 'Fried food', 'Staying up late'],
+  'xueyu': ['Sitting for long periods', 'Cold environments', 'Suppressed emotions', 'Too much idleness'],
+  'qiyu': ['Long-term suppressed emotions', 'Overthinking', 'Sitting for long periods', 'Being alone and silent'],
+  'tebing': ['Known food allergens', 'Pollen', 'Cold air', 'Newly renovated spaces', 'Pet hair'],
 };

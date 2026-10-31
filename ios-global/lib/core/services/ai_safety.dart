@@ -81,8 +81,8 @@ class AISafetyService {
 
   // 危机关键词 — 需要立即干预
   static const List<String> _crisisKeywords = [
-    '自杀', '想死', '不想活', '自残', '割腕', '跳楼', '上吊',
-    '结束生命', '活着没意思',
+    'suicide', 'want to die', 'don\'t want to live', 'self-harm', 'cut my wrists', 'jump off a building', 'hang myself',
+    'end my life', 'no point in living',
   ];
 
   static const List<String> _crisisKeywordsEn = [
@@ -93,9 +93,9 @@ class AISafetyService {
 
   // 高风险关键词 — 需要强烈警告
   static const List<String> _highRiskKeywords = [
-    '抑郁症', '心脏病发作', '心肌梗塞', '脑溢血', '中风',
-    '癌症', '肿瘤', '大出血', '窒息', '昏迷', '休克',
-    '过敏休克', '呼吸困难', '胸痛', '剧烈头痛',
+    'depression', 'heart attack', 'myocardial infarction', 'cerebral hemorrhage', 'stroke',
+    'cancer', 'tumor', 'severe bleeding', 'choking', 'unconscious', 'shock',
+    'anaphylaxis', 'trouble breathing', 'chest pain', 'severe headache',
   ];
 
   static const List<String> _highRiskKeywordsEn = [
@@ -106,9 +106,9 @@ class AISafetyService {
 
   // 中等风险关键词 — 添加免责声明
   static const List<String> _mediumRiskKeywords = [
-    '发烧', '咳嗽', '头痛', '腹痛', '腹泻', '呕吐', '皮疹', '出血',
-    '高血压', '糖尿病', '心脏病', '肝病', '肾病',
-    '吃药', '用药', '停药', '药物', '手术', '怀孕', '流产',
+    'fever', 'cough', 'headache', 'stomach pain', 'diarrhea', 'vomiting', 'rash', 'bleeding',
+    'high blood pressure', 'diabetes', 'heart disease', 'liver disease', 'kidney disease',
+    'take medicine', 'medication', 'stop medication', 'drugs', 'surgery', 'pregnant', 'miscarriage',
   ];
 
   static const List<String> _mediumRiskKeywordsEn = [
@@ -159,16 +159,16 @@ class AISafetyService {
   static String _getCrisisResponseCn(RiskLevel level) {
     switch (level) {
       case RiskLevel.crisis:
-        return '⚠️ 您提到的内容让我们非常担心您的安全。请您立即联系专业帮助：\n\n'
-            '• 24小时心理援助热线：400-161-9995\n'
-            '• 北京心理危机研究与干预中心：010-82951332\n'
-            '• 急救电话：120\n\n'
-            '您的生命安全和身心健康是最重要的。顺时AI不能替代专业医疗诊断，请务必寻求专业人士的帮助。';
+        return '⚠️ What you shared worries us about your safety. Please contact professional help right away:\n\n'
+            '• Call or text your local crisis line (US: 988 · UK & ROI: 116 123 · Canada: 988 · Australia: 13 11 14)\n'
+            '• Or find a crisis line in your country at findahelpline.com\n'
+            '• Emergency services: your local emergency number (US/CA: 911 · UK: 999 · EU: 112 · AU: 000)\n\n'
+            'Your life and wellbeing matter most. SEASONS AI cannot replace professional medical diagnosis — please reach out to a professional.';
       case RiskLevel.high:
-        return '⚠️ 您提到的健康问题需要专业医疗关注。建议您尽快咨询专业医师，进行详细检查。\n\n'
-            '顺时AI提供的养生建议仅供参考，不能替代医生诊断。如有不适，请及时就医。';
+        return '⚠️ The health issue you mention needs professional medical attention. Please see a qualified clinician soon for a proper check.\n\n'
+            'The wellness suggestions from SEASONS AI are for reference only and do not replace a doctor\'s diagnosis. If you feel unwell, please seek medical care.';
       case RiskLevel.medium:
-        return '📌 温馨提示：以下建议基于中医养生理论，仅供参考。如有持续不适，请咨询专业医师。';
+        return '📌 Gentle reminder: the suggestions below are based on traditional wellness ideas and are for reference only. If discomfort persists, please consult a qualified professional.';
       case RiskLevel.low:
         return '';
     }

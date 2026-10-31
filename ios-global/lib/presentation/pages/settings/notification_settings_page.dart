@@ -65,7 +65,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
           icon: const Icon(Icons.arrow_back_ios_new, size: 20),
           onPressed: () => context.pop(),
         ),
-        title: const Text('通知设置',
+        title: const Text('Notification settings',
             style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18)),
       ),
       body: ListView(
@@ -73,15 +73,15 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
         children: [
           _buildSwitchTile(
             icon: Icons.eco_outlined,
-            title: '节气提醒',
-            subtitle: '每个节气到来时通知你',
+            title: 'Solar term reminder',
+            subtitle: 'Notify you as each solar term arrives',
             value: _jieqiReminder,
             onChanged: (v) { setState(() => _jieqiReminder = v); _save(); },
           ),
           _buildTimeTile(
             icon: Icons.check_circle_outline,
-            title: '每日打卡提醒',
-            subtitle: '每天提醒你完成养生打卡',
+            title: 'Daily check-in reminder',
+            subtitle: 'Remind you to complete your daily wellness check-in',
             value: _dailyCheckin,
             time: _dailyCheckinTime,
             onToggle: (v) { setState(() => _dailyCheckin = v); _save(); },
@@ -89,15 +89,15 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
           ),
           _buildSwitchTile(
             icon: Icons.fitness_center_outlined,
-            title: '运动提醒',
-            subtitle: '提醒你完成每日运动',
+            title: 'Exercise reminder',
+            subtitle: 'Remind you to finish your daily exercise',
             value: _exerciseReminder,
             onChanged: (v) { setState(() => _exerciseReminder = v); _save(); },
           ),
           _buildTimeTile(
             icon: Icons.bedtime_outlined,
-            title: '睡眠提醒',
-            subtitle: '提醒你按时休息',
+            title: 'Sleep reminder',
+            subtitle: 'Remind you to rest on time',
             value: _sleepReminder,
             time: _sleepReminderTime,
             onToggle: (v) { setState(() => _sleepReminder = v); _save(); },
@@ -105,8 +105,8 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
           ),
           _buildSwitchTile(
             icon: Icons.article_outlined,
-            title: '健康资讯推送',
-            subtitle: '推送养生知识与节气资讯',
+            title: 'Health news',
+            subtitle: 'Wellness knowledge and solar-term news',
             value: _healthNews,
             onChanged: (v) { setState(() => _healthNews = v); _save(); },
           ),
@@ -183,7 +183,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text('提醒时间', style: TextStyle(fontSize: 13, color: ShunShiColors.textSecondary)),
+                      const Text('Reminder time', style: TextStyle(fontSize: 13, color: ShunShiColors.textSecondary)),
                       Row(children: [
                         Text(time.format(context),
                             style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: ShunShiColors.primary)),

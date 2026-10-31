@@ -1,4 +1,5 @@
 import 'dart:convert';
+import '../../widgets/chat_sources.dart';
 import 'chat_models.dart';
 
 String encodeChatHistory(List<ChatMessage> messages) => jsonEncode({
@@ -10,6 +11,8 @@ String encodeChatHistory(List<ChatMessage> messages) => jsonEncode({
           'text': m.text,
           'time': m.time,
           'sources': m.sources,
+          if (m.sourceDetails != null && m.sourceDetails!.isNotEmpty)
+            'source_details': m.sourceDetails!.map((e) => e.toJson()).toList(),
           'cards': m.cards
               ?.map(
                 (c) => {
@@ -39,6 +42,7 @@ List<ChatMessage> decodeChatHistory(String? saved) {
           text: m['text'] as String,
           time: m['time'] as String,
           sources: (m['sources'] as List?)?.cast<String>(),
+          sourceDetails: ChatSource.parseAll(m['source_details']),
           cards: (m['cards'] as List?)
               ?.map(
                 (c) => SuggestionCard(

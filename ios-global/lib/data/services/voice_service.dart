@@ -1,6 +1,6 @@
 // ignore_for_file: unused_field
-// 语音输入服务 (国内版 - SiliconFlow ASR)
-// 不依赖 Google 服务，兼容华为/小米等国产手机
+// Voice input service (international edition, server-side ASR)
+// The locale headers make the backend recognise English and answer in English
 
 import 'dart:async';
 import 'dart:io';
@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:record/record.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:dio/dio.dart';
+import '../../core/network/locale_headers.dart';
 
 /// 语音输入服务
 class VoiceService {
@@ -21,7 +22,7 @@ class VoiceService {
     baseUrl: _baseUrl,
     connectTimeout: const Duration(seconds: 10),
     receiveTimeout: const Duration(seconds: 30),
-    headers: {'ngrok-skip-browser-warning': 'true'},
+    headers: {'ngrok-skip-browser-warning': 'true', ...LocaleHeaders.values},
   ));
 
   bool _isListening = false;
@@ -42,7 +43,7 @@ class VoiceService {
   Future<bool> _checkPermission() async {
     final has = await _recorder.hasPermission();
     if (!has) {
-      _errorMsg = '请授予麦克风权限';
+      _errorMsg = 'Please allow microphone access';
     }
     return has;
   }
@@ -64,7 +65,7 @@ class VoiceService {
       _errorMsg = '';
       return true;
     } catch (e) {
-      _errorMsg = '录音启动失败: $e';
+      _errorMsg = 'Couldn\'t start recording: $e';
       debugPrint('[VoiceService] startRecording error: $e');
       return false;
     }
@@ -79,19 +80,19 @@ class VoiceService {
 
       final path = await _recorder.stop();
       if (path == null || path.isEmpty) {
-        _errorMsg = '录音保存失败';
+        _errorMsg = 'Couldn\'t save the recording';
         return null;
       }
 
       final file = File(path);
       if (!await file.exists() || await file.length() < 500) {
-        _errorMsg = '录音太短，请按住说话';
+        _errorMsg = 'Recording too short — press and hold to speak';
         return null;
       }
 
       return await _recognizeFile(file);
     } catch (e) {
-      _errorMsg = '语音识别失败: $e';
+      _errorMsg = 'Speech recognition failed: $e';
       debugPrint('[VoiceService] stopAndRecognize error: $e');
       return null;
     }
@@ -109,7 +110,7 @@ class VoiceService {
         baseUrl: _baseUrl,
         connectTimeout: const Duration(seconds: 10),
         receiveTimeout: const Duration(seconds: 30),
-        headers: {'ngrok-skip-browser-warning': 'true'},
+        headers: {'ngrok-skip-browser-warning': 'true', ...LocaleHeaders.values},
       )).post(
         '/api/v1/speech/asr',
         data: formData,
@@ -123,22 +124,22 @@ class VoiceService {
           _lastWords = text;
           return text;
         }
-        _errorMsg = '未识别到语音内容';
+        _errorMsg = 'No speech detected';
         return null;
       } else {
-        _errorMsg = '识别失败 (${response.statusCode})';
+        _errorMsg = 'Recognition failed (${response.statusCode})';
         return null;
       }
     } on DioException catch (e) {
       if (e.type == DioExceptionType.connectionError || e.type == DioExceptionType.connectionTimeout) {
-        _errorMsg = '网络连接失败，请检查网络';
+        _errorMsg = 'Network connection failed, please check your network';
       } else {
-        _errorMsg = '识别服务异常';
+        _errorMsg = 'Recognition service error';
       }
       debugPrint('[VoiceService] _recognizeFile error: ${e.message}');
       return null;
     } catch (e) {
-      _errorMsg = '识别失败: $e';
+      _errorMsg = 'Recognition failed: $e';
       debugPrint('[VoiceService] _recognizeFile error: $e');
       return null;
     } finally {
@@ -177,7 +178,7 @@ class VoiceService {
   }
 
   /// 旧接口兼容
-  @Deprecated('使用 startRecording + stopAndRecognize')
+  @Deprecated('Use startRecording + stopAndRecognize')
   Future<bool> startListening({Function(String)? onResult}) async {
     final ok = await _checkPermission();
     if (!ok) return false;

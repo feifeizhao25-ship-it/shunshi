@@ -33,7 +33,7 @@ class ApiClient {
   static final String _realDeviceUrl = AppConfig.baseUrl;
 
   static String baseUrl = _realDeviceUrl;
-  static bool _detected = true; // 默认用真机IP，不需要检测
+  static bool _detected = true; // Use the device IP by default; no detection needed
 
   /// 自动检测网络环境（仅模拟器需要）
   static Future<void> detectBaseUrl() async {

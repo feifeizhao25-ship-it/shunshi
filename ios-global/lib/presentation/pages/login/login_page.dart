@@ -8,13 +8,18 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/seasons_colors.dart';
 import '../../../core/theme/seasons_spacing.dart';
 import '../../../core/theme/seasons_text_styles.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/network/api_client.dart';
+import '../../../data/storage/storage_manager.dart';
 
 /// Login mode
 enum _LoginMode { password, register }
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+  const LoginPage({super.key, this.clientFactory});
+
+  /// Test hook: build the API client (defaults to the app client).
+  final ApiClient Function()? clientFactory;
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -50,13 +55,12 @@ class _LoginPageState extends State<LoginPage> {
     _errorMessage = null;
 
     try {
-      final client = ApiClient();
+      final client = widget.clientFactory?.call() ?? ApiClient();
       final response = await client.post('/api/v1/auth/login', data: {
         'email': email,
         'password': password,
       });
-      final data = response.data as Map<String, dynamic>;
-      _handleLoginSuccess(data);
+      await _handleLoginSuccess(_unwrap(response.data));
     } catch (_) {
       setState(() {
         _errorMessage = 'Login failed. Please check your credentials.';
@@ -79,14 +83,13 @@ class _LoginPageState extends State<LoginPage> {
     _errorMessage = null;
 
     try {
-      final client = ApiClient();
+      final client = widget.clientFactory?.call() ?? ApiClient();
       final response = await client.post('/api/v1/auth/register', data: {
         'email': email,
         'password': password,
         'name': name,
       });
-      final data = response.data as Map<String, dynamic>;
-      _handleLoginSuccess(data);
+      await _handleLoginSuccess(_unwrap(response.data));
     } catch (_) {
       setState(() {
         _errorMessage = 'Registration failed. Please try again.';
@@ -99,10 +102,9 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _guestLogin() async {
     setState(() => _isLoading = true);
     try {
-      final client = ApiClient();
-      final response = await client.post('/api/v1/intl/auth/guest-login');
-      final data = response.data as Map<String, dynamic>;
-      _handleLoginSuccess(data);
+      final client = widget.clientFactory?.call() ?? ApiClient();
+      final response = await client.post('/api/v1/auth/guest-login', data: {'platform': 'ios'});
+      await _handleLoginSuccess(_unwrap(response.data));
     } catch (_) {
       setState(() {
         _errorMessage = 'Guest login failed. Please try again.';
@@ -135,12 +137,29 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  void _handleLoginSuccess(Map<String, dynamic> data) {
-    // Store token if available
-    final token = data['token'] as String?;
-    if (token != null) {
-      // Save token — adjust based on GL storage implementation
+  /// The server answers either `{access_token, ...}` or `{data: {access_token, ...}}`.
+  Map<String, dynamic> _unwrap(dynamic body) {
+    final map = body as Map<String, dynamic>;
+    final inner = map['data'];
+    return inner is Map<String, dynamic> ? inner : map;
+  }
+
+  /// Keep the session: without the token every later request (home, chat, plan & usage) is anonymous.
+  Future<void> _handleLoginSuccess(Map<String, dynamic> data) async {
+    final token = (data['token'] ?? data['access_token']) as String?;
+    final refreshToken = data['refresh_token'] as String?;
+    final user = data['user'] as Map<String, dynamic>?;
+    if (token != null) await StorageManager.user.saveToken(token);
+    if (refreshToken != null) await StorageManager.user.saveRefreshToken(refreshToken);
+    if (user != null) {
+      await StorageManager.user.saveUserInfo(user);
+      final userId = user['id'] as String?;
+      if (userId != null) {
+        final sp = await SharedPreferences.getInstance();
+        await sp.setString('user_id', userId);
+      }
     }
+    await StorageManager.user.setLoggedIn(token != null);
     if (!mounted) return;
     context.go('/home');
   }

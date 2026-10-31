@@ -11,11 +11,15 @@ import '../../../design_system/theme_helper.dart';
 import '../widgets/feedback_sheet.dart';
 import '../widgets/membership_widgets.dart';
 import 'chat/chat_models.dart';
+import '../widgets/chat_sources.dart';
 import 'chat/chat_widgets.dart';
 import '../../../core/theme/app_localizations.dart';
 import '../../../core/network/api_singleton.dart';
 import '../../core/config/app_config.dart';
 import '../../core/solar_term/solar_term_en.dart';
+import '../../core/culture/device_hints.dart';
+import '../../core/culture/opening_greeting.dart';
+import 'settings/culture_binding.dart';
 class ChatPage extends StatefulWidget {
   final String? conversationId;
   const ChatPage({super.key, this.conversationId});
@@ -26,15 +30,15 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
   static const _blockedKeywords = [
-    '自杀', '自残', '死亡', '想死', '不想活', '抑郁症', 'depression', 'suicide', 'kill',
-    '手术', '开刀', '癌症', '肿瘤', 'cancer', 'tumor',
-    '怀孕', '流产', '堕胎', 'pregnancy', 'abortion',
-    '过敏休克', '呼吸困难', '胸痛', '昏迷',
+    'suicide', 'self-harm', 'death', 'want to die', 'don\'t want to live', 'depression', 'depression', 'suicide', 'kill',
+    'surgery', 'operation', 'cancer', 'tumor', 'cancer', 'tumor',
+    'pregnant', 'miscarriage', 'abortion', 'pregnancy', 'abortion',
+    'anaphylaxis', 'trouble breathing', 'chest pain', 'unconscious',
   ];
   static const _riskKeywords = [
-    '发烧', '咳嗽', '头痛', '腹痛', '腹泻', '呕吐', '皮疹', '出血',
-    '高血压', '糖尿病', '心脏病', '肝病', '肾病',
-    '吃药', '用药', '停药', '药物',
+    'fever', 'cough', 'headache', 'stomach pain', 'diarrhea', 'vomiting', 'rash', 'bleeding',
+    'high blood pressure', 'diabetes', 'heart disease', 'liver disease', 'kidney disease',
+    'take medicine', 'medication', 'stop medication', 'drugs',
   ];
 
   bool _containsBlocked(String text) => _blockedKeywords.any((k) => text.contains(k));
@@ -107,12 +111,24 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
       } catch (_) {}
     }
     await _loadConversation(prefs);
+    if (_messages.isEmpty) {
+      // The opening card names the user's own season: ask the server which hemisphere applies (their choice, or the
+      // device guess) before writing it; fall back to the device guess if the call fails.
+      try {
+        HemisphereResolver.rememberFromProfile(await CultureBinding.load().timeout(const Duration(seconds: 4)));
+      } catch (_) {}
+    }
     if (_messages.isEmpty && mounted) {
       setState(() {
+        final greeting = openingGreeting(
+          termName: _currentSolarTerm,
+          termDesc: _solarTermDesc,
+          hemisphere: HemisphereResolver.current(),
+        );
         _messages.add(ChatMessage(
           role: 'ai',
-          text: 'During $_currentSolarTerm, the energy between heaven and earth is shifting. How have you been feeling lately?',
-          cards: [SuggestionCard(type: 'greeting', title: 'Current: $_currentSolarTerm', subtitle: _solarTermDesc)],
+          text: greeting.text,
+          cards: [SuggestionCard(type: 'greeting', title: greeting.cardTitle, subtitle: greeting.cardSubtitle)],
           time: _fmt(DateTime.now()),
         ));
       });
@@ -218,14 +234,14 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
     });
     _scrollToBottom();
 
-    void handleAIReply(String aiText, {List<SuggestionCard>? cards, List<String>? sources, String? convId}) {
+    void handleAIReply(String aiText, {List<SuggestionCard>? cards, List<String>? sources, List<ChatSource>? sourceDetails, String? convId}) {
       var reply = aiText;
       final c = cards ?? [SuggestionCard(type: 'insight', title: AppLocalizations.of(context).t('chatpagedart_solar_term_care_tips'), subtitle: AppLocalizations.of(context).t('chatpagedart_follow_natural_rhythms_harmonize_body_and_min'))];
       if (hasRisk) reply = '⚠️ The following suggestions are for reference only and do not replace medical diagnosis. Please see a doctor if you feel unwell.\n\n$reply';
       reply = '$reply\n\n💡 The above is based on TCM wellness principles, for reference only';
       if (convId != null) _conversationId = convId;
       setState(() {
-        _messages.add(ChatMessage(role: 'ai', text: reply, cards: c, sources: sources ?? [], time: _fmt(DateTime.now())));
+        _messages.add(ChatMessage(role: 'ai', text: reply, cards: c, sources: sources ?? [], sourceDetails: sourceDetails, time: _fmt(DateTime.now())));
         _isLoading = false;
         if (!_isVip) _quotaRemaining--;
         _incrementChatCount();
@@ -244,7 +260,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
         }
       }
       final sources = (res.data?['sources'] as List?)?.cast<String>() ?? [];
-      handleAIReply(aiText, cards: cards, sources: sources, convId: res.data?['conversation_id']);
+      handleAIReply(aiText, cards: cards, sources: sources, sourceDetails: ChatSource.parseAll(res.data?['source_details']), convId: res.data?['conversation_id']);
     } catch (_) {
       try {
         final v2Dio = Dio(BaseOptions(baseUrl: AppConfig.baseUrl, connectTimeout: const Duration(seconds: 10), receiveTimeout: const Duration(seconds: 60)));
@@ -275,7 +291,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
             SuggestionCard(type: 'diet', title: AppLocalizations.of(context).t('solar_dietary_care'), subtitle: AppLocalizations.of(context).t('chatpagedart_try_snow_fungus_and_lily_bulb_to_moisten_dryn'), icon: Icons.restaurant),
             SuggestionCard(type: 'rest', title: AppLocalizations.of(context).t('chatpagedart_rest_routine'), subtitle: AppLocalizations.of(context).t('chatpagedart_sleep_early_rise_early_follow_natural_rhythms'), icon: Icons.bedtime),
           ],
-          sources: const ['Huangdi Neijing · Suwen', 'Bencao Gangmu'],
+          sources: const <String>[], // an offline fallback must never cite sources it did not use
         );
       }
     }

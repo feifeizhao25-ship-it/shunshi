@@ -11,6 +11,11 @@ import '../../../design_system/theme_helper.dart';
 import '../widgets/feedback_sheet.dart';
 import '../widgets/membership_widgets.dart';
 import 'chat/chat_models.dart';
+import '../widgets/chat_sources.dart';
+import '../../core/solar_term/solar_term_en.dart';
+import '../../core/culture/device_hints.dart';
+import '../../core/culture/opening_greeting.dart';
+import 'settings/culture_binding.dart';
 import 'chat/chat_widgets.dart';
 
 const _baseUrl = 'https://api.seasonsapp.com';
@@ -25,15 +30,15 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
   static const _blockedKeywords = [
-    '自杀', '自残', '死亡', '想死', '不想活', '抑郁症', 'depression', 'suicide', 'kill',
-    '手术', '开刀', '癌症', '肿瘤', 'cancer', 'tumor',
-    '怀孕', '流产', '堕胎', 'pregnancy', 'abortion',
-    '过敏休克', '呼吸困难', '胸痛', '昏迷',
+    'suicide', 'self-harm', 'death', 'want to die', 'don\'t want to live', 'depression', 'depression', 'suicide', 'kill',
+    'surgery', 'operation', 'cancer', 'tumor', 'cancer', 'tumor',
+    'pregnant', 'miscarriage', 'abortion', 'pregnancy', 'abortion',
+    'anaphylaxis', 'trouble breathing', 'chest pain', 'unconscious',
   ];
   static const _riskKeywords = [
-    '发烧', '咳嗽', '头痛', '腹痛', '腹泻', '呕吐', '皮疹', '出血',
-    '高血压', '糖尿病', '心脏病', '肝病', '肾病',
-    '吃药', '用药', '停药', '药物',
+    'fever', 'cough', 'headache', 'stomach pain', 'diarrhea', 'vomiting', 'rash', 'bleeding',
+    'high blood pressure', 'diabetes', 'heart disease', 'liver disease', 'kidney disease',
+    'take medicine', 'medication', 'stop medication', 'drugs',
   ];
 
   bool _containsBlocked(String text) => _blockedKeywords.any((k) => text.contains(k));
@@ -52,8 +57,8 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
 
   String _userName = '';
   String _token = '';
-  final String _currentSolarTerm = '清明';
-  final String _solarTermDesc = '春意渐深，万物清洁而明净。适合踏青、放风筝，心情也该舒展。';
+  final String _currentSolarTerm = currentSolarTermEn()?.$1 ?? 'this season';
+  final String _solarTermDesc = currentSolarTermEn()?.$2 ?? 'Seasonal guidance is loading.';
   String? _conversationId;
 
   @override
@@ -78,7 +83,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
     if (!mounted) return;
     setState(() {
       _token = prefs.getString('auth_token') ?? '';
-      _userName = prefs.getString('user_name') ?? '朋友';
+      _userName = prefs.getString('user_name') ?? 'Friend';
     });
     if (_token.isEmpty) {
       try {
@@ -92,12 +97,24 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
       } catch (_) {}
     }
     await _loadConversation(prefs);
+    if (_messages.isEmpty) {
+      // The opening card names the user's own season: ask the server which hemisphere applies (their choice, or the
+      // device guess) before writing it; fall back to the device guess if the call fails.
+      try {
+        HemisphereResolver.rememberFromProfile(await CultureBinding.load().timeout(const Duration(seconds: 4)));
+      } catch (_) {}
+    }
     if (_messages.isEmpty && mounted) {
       setState(() {
+        final greeting = openingGreeting(
+          termName: _currentSolarTerm,
+          termDesc: _solarTermDesc,
+          hemisphere: HemisphereResolver.current(),
+        );
         _messages.add(ChatMessage(
           role: 'ai',
-          text: '$_currentSolarTerm时节，大地之气正在变化。你近来身心感觉如何？',
-          cards: [SuggestionCard(type: 'greeting', title: '当前：$_currentSolarTerm', subtitle: _solarTermDesc)],
+          text: greeting.text,
+          cards: [SuggestionCard(type: 'greeting', title: greeting.cardTitle, subtitle: greeting.cardSubtitle)],
           time: _fmt(DateTime.now()),
         ));
       });
@@ -168,7 +185,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
     if (AISafetyService.isPromptInjection(text)) {
       setState(() {
         _messages.add(ChatMessage(role: 'user', text: text, time: _fmt(DateTime.now())));
-        _messages.add(ChatMessage(role: 'ai', text: '检测到异常输入，请重新描述您的问题。', time: _fmt(DateTime.now())));
+        _messages.add(ChatMessage(role: 'ai', text: 'We detected unusual input. Please describe your question again.', time: _fmt(DateTime.now())));
       });
       _saveConversation(); _scrollToBottom(); return;
     }
@@ -182,8 +199,8 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
         _messages.add(ChatMessage(
           role: 'ai', text: crisisResponse,
           cards: riskLevel == RiskLevel.crisis
-              ? [SuggestionCard(type: 'crisis', title: '紧急求助热线', subtitle: '400-161-9995 · 24小时心理援助', icon: Icons.phone_in_talk)]
-              : [SuggestionCard(type: 'health', title: '建议就医', subtitle: '请及时咨询专业医师', icon: Icons.local_hospital)],
+              ? [SuggestionCard(type: 'crisis', title: 'Crisis support', subtitle: 'Call your local emergency number, or a crisis line in your country (US: 988, UK: 116 123)', icon: Icons.phone_in_talk)]
+              : [SuggestionCard(type: 'health', title: 'See a doctor', subtitle: 'Please consult a qualified professional', icon: Icons.local_hospital)],
           time: _fmt(DateTime.now()),
         ));
       });
@@ -203,14 +220,14 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
     });
     _scrollToBottom();
 
-    void handleAIReply(String aiText, {List<SuggestionCard>? cards, List<String>? sources, String? convId}) {
+    void handleAIReply(String aiText, {List<SuggestionCard>? cards, List<String>? sources, List<ChatSource>? sourceDetails, String? convId}) {
       var reply = aiText;
-      final c = cards ?? [SuggestionCard(type: 'insight', title: '节气调护建议', subtitle: '顺应天时，调和身心')];
-      if (hasRisk) reply = '⚠️ 以下建议仅供参考，不能替代医生诊断。如有不适请及时就医。\n\n$reply';
-      reply = '$reply\n\n💡 以上建议基于中医养生理论，仅供参考';
+      final c = cards ?? [SuggestionCard(type: 'insight', title: 'Seasonal care tips', subtitle: 'Live with the seasons, balance body and mind')];
+      if (hasRisk) reply = '⚠️ The suggestions below are for reference only and do not replace a doctor\'s diagnosis. If you feel unwell, please seek medical care.\n\n$reply';
+      reply = '$reply\n\n💡 The above is based on traditional wellness ideas and is for reference only';
       if (convId != null) _conversationId = convId;
       setState(() {
-        _messages.add(ChatMessage(role: 'ai', text: reply, cards: c, sources: sources ?? [], time: _fmt(DateTime.now())));
+        _messages.add(ChatMessage(role: 'ai', text: reply, cards: c, sources: sources ?? [], sourceDetails: sourceDetails, time: _fmt(DateTime.now())));
         _isLoading = false;
         if (!_isVip) _quotaRemaining--;
         _incrementChatCount();
@@ -221,7 +238,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
     try {
       _dio.options.headers['Authorization'] = 'Bearer $_token';
       final res = await _dio.post('/ai/chat', data: {'message': text, 'solar_term': _currentSolarTerm, 'conversation_id': _conversationId});
-      var aiText = res.data?['text'] ?? '抱歉，暂时无法回应。';
+      var aiText = res.data?['text'] ?? 'Sorry, I can\'t respond right now.';
       List<SuggestionCard> cards = [];
       if (res.data?['suggestions'] != null) {
         for (var s in res.data['suggestions']) {
@@ -229,38 +246,38 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
         }
       }
       final sources = (res.data?['sources'] as List?)?.cast<String>() ?? [];
-      handleAIReply(aiText, cards: cards, sources: sources, convId: res.data?['conversation_id']);
+      handleAIReply(aiText, cards: cards, sources: sources, sourceDetails: ChatSource.parseAll(res.data?['source_details']), convId: res.data?['conversation_id']);
     } catch (_) {
       try {
         final v2Dio = Dio(BaseOptions(baseUrl: 'https://api.seasonsapp.com', connectTimeout: const Duration(seconds: 10), receiveTimeout: const Duration(seconds: 60)));
         v2Dio.options.headers['Authorization'] = 'Bearer $_token';
         final v2Res = await v2Dio.post('/api/v1/chat', data: {'message': text, 'context': {'solar_term': _currentSolarTerm}, 'conversation_id': _conversationId});  // CN uses Chinese endpoint
-        final aiText = v2Res.data?['reply'] ?? '抱歉，暂时无法回应。';
+        final aiText = v2Res.data?['reply'] ?? 'Sorry, I can\'t respond right now.';
         List<SuggestionCard> v2Cards = [];
         final so = v2Res.data?['structured_output'];
         if (so != null) {
           final actions = so['actions'] as List?;
           if (actions != null) {
             for (var a in actions) {
-              final duration = a['duration_min'] != null ? '约${a['duration_min']}分钟' : '';
+              final duration = a['duration_min'] != null ? 'about ${a['duration_min']} min' : '';
               v2Cards.add(SuggestionCard(type: a['type'] ?? 'tip', title: a['title'] ?? '', subtitle: '${a['description'] ?? ''} $duration'.trim(), icon: iconForType(a['type'])));
             }
           }
           if (v2Cards.isEmpty) {
-            v2Cards.add(SuggestionCard(type: 'insight', title: so['title'] ?? '养生建议', subtitle: so['insight'] ?? aiText, icon: iconForType('insight')));
+            v2Cards.add(SuggestionCard(type: 'insight', title: so['title'] ?? 'Wellness tips', subtitle: so['insight'] ?? aiText, icon: iconForType('insight')));
           }
         } else {
-          v2Cards.add(SuggestionCard(type: 'insight', title: '节气调护建议', subtitle: '顺应天时，调和身心'));
+          v2Cards.add(SuggestionCard(type: 'insight', title: 'Seasonal care tips', subtitle: 'Live with the seasons, balance body and mind'));
         }
         final v2Sources = (so?['disclaimer'] != null) ? ['⚠️ ${so?["disclaimer"]}'] : <String>[];
         handleAIReply(aiText, cards: v2Cards, sources: v2Sources, convId: v2Res.data?['conversation_id']);
       } catch (_) {
         handleAIReply(_offlineReply(text),
           cards: [
-            SuggestionCard(type: 'diet', title: '饮食调养', subtitle: '宜食银耳、百合润燥之物', icon: Icons.restaurant),
-            SuggestionCard(type: 'rest', title: '起居建议', subtitle: '早睡早起，顺应天时', icon: Icons.bedtime),
+            SuggestionCard(type: 'diet', title: 'Eating well', subtitle: 'Moistening foods such as tremella and lily bulb are good choices', icon: Icons.restaurant),
+            SuggestionCard(type: 'rest', title: 'Daily routine', subtitle: 'Sleep early, rise early, follow the season', icon: Icons.bedtime),
           ],
-          sources: const ['《黄帝内经·素问》', '《本草纲目》'],
+          sources: const <String>[], // an offline fallback must never cite sources it did not use
         );
       }
     }
@@ -268,9 +285,9 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
   }
 
   String _offlineReply(String msg) {
-    if (msg.contains('睡') || msg.contains('失眠')) return '睡眠问题往往与心神不宁有关。$_currentSolarTerm时节，建议睡前用温水泡脚15分钟，放下手机，让心慢慢安静下来。';
-    if (msg.contains('累') || msg.contains('疲倦')) return '换季时感到疲倦是正常的身体反应。建议适当减少工作强度，多食温补之物。晨起一杯姜枣茶，能帮助恢复元气。';
-    return '感受到了你的倾诉。$_currentSolarTerm时节，天地之气正在转换。想聊聊具体哪方面的困扰吗？';
+    if (msg.contains('sleep') || msg.contains('insomnia')) return 'Sleep trouble often goes with a restless mind. It\'s $_currentSolarTerm: try a 15-minute warm foot soak before bed, put the phone down and let your mind settle.';
+    if (msg.contains('tired') || msg.contains('exhausted')) return 'Feeling tired when the season changes is a normal response. Ease off the workload a little and eat warming foods. A cup of ginger and red date tea in the morning can help you recover.';
+    return 'I hear you. It\'s $_currentSolarTerm and the energy between heaven and earth is shifting. Would you like to talk about what is troubling you?';
   }
 
   String _fmt(DateTime dt) => '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
@@ -294,13 +311,13 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
         const SizedBox(height: 20),
         Container(padding: const EdgeInsets.all(14), decoration: BoxDecoration(color: ShunShiColors.gold.withValues(alpha: 0.1), shape: BoxShape.circle), child: const Icon(Icons.star_rounded, size: 36, color: ShunShiColors.gold)),
         const SizedBox(height: 16),
-        const Text('今日免费消息已用完', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+        const Text('Today\'s free messages are used up', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
         const SizedBox(height: 8),
-        Text('升级会员，每天 $_quotaLimit 条专属AI养生建议\n解锁全部体质测试 + 家庭成员管理', textAlign: TextAlign.center, style: const TextStyle(fontSize: 14, color: ShunShiColors.textSecondary, height: 1.6)),
+        Text('Upgrade to get $_quotaLimit personalised AI wellness messages a day\nUnlock all constitution tests + family members', textAlign: TextAlign.center, style: const TextStyle(fontSize: 14, color: ShunShiColors.textSecondary, height: 1.6)),
         const SizedBox(height: 20),
-        SizedBox(width: double.infinity, child: ElevatedButton(style: ElevatedButton.styleFrom(backgroundColor: ShunShiColors.primary, foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), onPressed: () { Navigator.pop(context); context.push('/subscription'); }, child: const Text('立即升级', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)))),
+        SizedBox(width: double.infinity, child: ElevatedButton(style: ElevatedButton.styleFrom(backgroundColor: ShunShiColors.primary, foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), onPressed: () { Navigator.pop(context); context.push('/subscription'); }, child: const Text('Upgrade now', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)))),
         const SizedBox(height: 10),
-        TextButton(onPressed: () => Navigator.pop(context), child: const Text('稍后再说', style: TextStyle(color: ShunShiColors.textTertiary))),
+        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Maybe later', style: TextStyle(color: ShunShiColors.textTertiary))),
         const SizedBox(height: 8),
       ]),
     ));
@@ -312,16 +329,16 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
       title: Row(children: [
         Icon(Icons.warning_amber_rounded, color: Colors.orange.shade700, size: 28),
         const SizedBox(width: 8),
-        const Text('健康安全提示', style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+        const Text('Health safety notice', style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
       ]),
       content: const Text(
-        '您提到的内容涉及健康安全风险。请您立即联系专业医疗机构或拨打：\n\n'
-        '• 24小时心理援助热线：400-161-9995\n'
-        '• 急救电话：120\n\n'
-        '顺时AI不能替代专业医疗诊断。',
+        'What you mentioned may involve a health or safety risk. Please contact a medical professional or your local emergency services right away:\n\n'
+        '• Crisis line: call your local crisis line (US 988, UK 116 123)\n'
+        '• Emergency: your local emergency number (US 911, UK 999, EU 112)\n\n'
+        'SEASONS AI cannot replace professional medical diagnosis.',
         style: TextStyle(fontSize: 15, color: ShunShiColors.textSecondary, height: 1.6),
       ),
-      actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('我知道了', style: TextStyle(color: ShunShiColors.primary, fontWeight: FontWeight.w600)))],
+      actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('Got it', style: TextStyle(color: ShunShiColors.primary, fontWeight: FontWeight.w600)))],
     ));
   }
 
@@ -337,7 +354,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
           setState(() => _controller.text = text);
         }
       } catch (e) {
-        if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('语音识别失败: $e'), duration: const Duration(seconds: 2)));
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Speech recognition failed: $e'), duration: const Duration(seconds: 2)));
       }
       return;
     }
@@ -345,12 +362,12 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
       final voice = VoiceService();
       final started = await voice.startRecording();
       if (!started) {
-        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('录音启动失败，请检查麦克风权限'), duration: Duration(seconds: 2)));
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Couldn\'t start recording. Please check microphone permission'), duration: Duration(seconds: 2)));
         return;
       }
       setState(() => _isRecording = true);
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('录音失败: $e'), duration: const Duration(seconds: 2)));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Recording failed: $e'), duration: const Duration(seconds: 2)));
     }
   }
 
@@ -362,9 +379,9 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
           children: [
             Center(child: Container(width: 36, height: 4, decoration: BoxDecoration(color: ShunShiColors.borderGhost, borderRadius: BorderRadius.circular(2)))),
             const SizedBox(height: 16),
-            const Text('快捷话题', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+            const Text('Quick topics', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
             const SizedBox(height: 14),
-            Wrap(spacing: 10, runSpacing: 10, children: ['最近睡眠不好', '换季怎么调理', '推荐节气食谱', '适合什么运动', '情绪低落怎么办', '想学八段锦', '推荐养生茶饮', '体质测试'].map((t) => ActionChip(
+            Wrap(spacing: 10, runSpacing: 10, children: ['I haven\'t been sleeping well', 'How to adjust for the change of season', 'Recommend seasonal recipes', 'What exercise suits me', 'What to do when I feel low', 'I\'d like to learn Baduanjin', 'Recommend wellness teas', 'Constitution check'].map((t) => ActionChip(
               label: Text(t), labelStyle: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 13, color: ShunShiColors.textPrimary),
               backgroundColor: ShunShiColors.surface, side: BorderSide(color: ShunShiColors.border), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
               onPressed: () { Navigator.pop(context); _controller.text = t; _sendMessage(); },
@@ -384,7 +401,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
       body: SafeArea(child: Column(children: [
         _buildTopBar(),
         Expanded(child: _buildList()),
-        Padding(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4), child: Text('内容由AI生成，仅供健康养生参考，不构成医疗诊断建议。如有不适请及时就医。', style: TextStyle(fontSize: 11, color: Colors.grey[500]), textAlign: TextAlign.center)),
+        Padding(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4), child: Text('AI-generated content, for general wellness reference only. It is not medical advice. If you feel unwell, please seek medical care.', style: TextStyle(fontSize: 11, color: Colors.grey[500]), textAlign: TextAlign.center)),
         _buildInput(),
       ])),
     );
@@ -400,18 +417,18 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
           Container(width: 36, height: 36, decoration: const BoxDecoration(color: ShunShiColors.primary, shape: BoxShape.circle), child: const Center(child: Text('🌱', style: TextStyle(fontSize: 18)))),
           const SizedBox(width: 12),
           const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text('顺时 AI 助手', style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 16, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
-            Text('温暖陪伴', style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 12, color: ShunShiColors.textTertiary)),
+            Text('SEASONS AI Companion', style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 16, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+            Text('Warm company', style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 12, color: ShunShiColors.textTertiary)),
           ])),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(color: _isVip ? ShunShiColors.gold.withValues(alpha: 0.15) : ShunShiColors.primary.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
             child: Row(mainAxisSize: MainAxisSize.min, children: [
-              if (_isVip) ...[const Icon(Icons.star_rounded, size: 14, color: ShunShiColors.gold), const SizedBox(width: 2), const Text('会员', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: ShunShiColors.gold))]
+              if (_isVip) ...[const Icon(Icons.star_rounded, size: 14, color: ShunShiColors.gold), const SizedBox(width: 2), const Text('Premium', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: ShunShiColors.gold))]
               else ...[Icon(_quotaRemaining > 3 ? Icons.chat_bubble_outline_rounded : Icons.chat_bubble_rounded, size: 13, color: _quotaRemaining > 3 ? ShunShiColors.primary : Colors.orange), const SizedBox(width: 3), Text('$_quotaRemaining/$_quotaLimit', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: _quotaRemaining > 3 ? ShunShiColors.primary : Colors.orange))],
             ]),
           ),
-          PopupMenuButton<String>(icon: const Icon(Icons.more_vert, size: 22, color: ShunShiColors.textTertiary), onSelected: (v) { if (v == 'clear') { setState(() => _messages.clear()); _saveConversation(); _initChat(); } }, itemBuilder: (_) => [const PopupMenuItem(value: 'clear', child: Text('清空对话'))]),
+          PopupMenuButton<String>(icon: const Icon(Icons.more_vert, size: 22, color: ShunShiColors.textTertiary), onSelected: (v) { if (v == 'clear') { setState(() => _messages.clear()); _saveConversation(); _initChat(); } }, itemBuilder: (_) => [const PopupMenuItem(value: 'clear', child: Text('Clear conversation'))]),
         ]),
       ]),
     );
@@ -448,7 +465,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
         GestureDetector(onTap: _showQuickTopics, child: Container(width: 40, height: 40, decoration: BoxDecoration(shape: BoxShape.circle, color: ShunShiColors.surface, border: Border.all(color: ShunShiColors.border)), child: Icon(Icons.add_circle_outline, size: 20, color: ShunShiColors.textTertiary))),
         const SizedBox(width: 8),
         Expanded(child: Container(constraints: const BoxConstraints(maxHeight: 120), child: TextField(controller: _controller, focusNode: _focusNode, maxLines: null, textInputAction: TextInputAction.send, onSubmitted: (_) => _sendMessage(),
-          decoration: InputDecoration(hintText: '输入想和顺时聊的...', hintStyle: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 15, color: ShunShiColors.textTertiary), filled: true, fillColor: ShunShiColors.surface, contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10), border: OutlineInputBorder(borderRadius: BorderRadius.circular(24), borderSide: BorderSide.none))))),
+          decoration: InputDecoration(hintText: 'Type what you\'d like to chat about...', hintStyle: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 15, color: ShunShiColors.textTertiary), filled: true, fillColor: ShunShiColors.surface, contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10), border: OutlineInputBorder(borderRadius: BorderRadius.circular(24), borderSide: BorderSide.none))))),
         const SizedBox(width: 8),
         InkWell(onTap: _showVoiceInput, borderRadius: BorderRadius.circular(20), child: Container(width: 44, height: 44, decoration: BoxDecoration(shape: BoxShape.circle, color: _isRecording ? Colors.red : ShunShiColors.secondary), child: Icon(_isRecording ? Icons.stop : Icons.mic, color: Colors.white, size: 22))),
         const SizedBox(width: 8),

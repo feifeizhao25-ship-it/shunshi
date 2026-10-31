@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
 import '../../../design_system/theme_helper.dart';
+import '../../widgets/bold_text.dart';
+import '../../widgets/chat_sources.dart';
 import 'chat_models.dart';
 
 /// AI 消息气泡
@@ -17,15 +19,17 @@ class AIBubble extends StatelessWidget {
       const SizedBox(width: 12),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Container(padding: const EdgeInsets.all(14), decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(16), border: Border.all(color: AppColors.border(context))),
-          child: Text(message.text, style: TextStyle(fontSize: 15, color: AppColors.textPrimary(context), height: 1.6))),
+          child: Text.rich(boldSpans(message.text, TextStyle(fontSize: 15, color: AppColors.textPrimary(context), height: 1.6)))),
         if (message.cards != null) ...message.cards!.map((c) => Padding(padding: const EdgeInsets.only(top: 10), child: _SuggestionCardWidget(card: c))),
-        if (message.sources != null && message.sources!.isNotEmpty)
+        if (message.sourceDetails != null && message.sourceDetails!.isNotEmpty)
+          Padding(padding: const EdgeInsets.only(top: 10), child: ChatSourcesBar(sources: message.sourceDetails!))
+        else if (message.sources != null && message.sources!.isNotEmpty)
           Padding(padding: const EdgeInsets.only(top: 10), child: _SourcesWrap(sources: message.sources!)),
         const SizedBox(height: 4),
         Row(children: [
           Text(message.time, style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 11, color: ShunShiColors.textTertiary)),
           const SizedBox(width: 8),
-          GestureDetector(onTap: () { ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('正在播报...'), duration: Duration(seconds: 2))); }, child: Icon(Icons.volume_up, size: 16, color: ShunShiColors.textTertiary)),
+          GestureDetector(onTap: () { ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Speaking...'), duration: Duration(seconds: 2))); }, child: Icon(Icons.volume_up, size: 16, color: ShunShiColors.textTertiary)),
           const SizedBox(width: 8),
           if (onFeedback != null) GestureDetector(onTap: onFeedback, child: Icon(Icons.thumb_up_outlined, size: 16, color: ShunShiColors.textTertiary)),
         ]),
@@ -100,8 +104,8 @@ class UpgradeNudge extends StatelessWidget {
       child: Row(children: [
         Icon(Icons.auto_awesome, size: 18, color: ShunShiColors.gold),
         const SizedBox(width: 10),
-        Expanded(child: Text('继续深度对话，养心版一键解锁', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: ShunShiColors.gold, fontFamily: ShunShiTypography.sansFamily))),
-        Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: ShunShiColors.gold, borderRadius: BorderRadius.circular(10)), child: const Text('解锁', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Colors.white))),
+        Expanded(child: Text('Keep the conversation going — unlock the premium plan', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: ShunShiColors.gold, fontFamily: ShunShiTypography.sansFamily))),
+        Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: ShunShiColors.gold, borderRadius: BorderRadius.circular(10)), child: const Text('Unlock', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Colors.white))),
       ]),
     ));
   }
@@ -134,7 +138,7 @@ class _SourcesWrap extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Wrap(spacing: 8, runSpacing: 6, children: sources.map((s) => GestureDetector(
-      onTap: () { ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('参考来源：$s'), duration: const Duration(seconds: 2))); },
+      onTap: () { ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Sources: $s'), duration: const Duration(seconds: 2))); },
       child: Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5), decoration: BoxDecoration(color: ShunShiColors.primary.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(12), border: Border.all(color: ShunShiColors.primary.withValues(alpha: 0.15))),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
           const Text('📚', style: TextStyle(fontSize: 12)),

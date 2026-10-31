@@ -57,7 +57,7 @@ class ScoreBar extends StatelessWidget {
     return Padding(padding: const EdgeInsets.only(bottom: 10), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
         Text(label, style: TextStyle(fontSize: 13, color: isPrimary ? ShunshiColors.primary : ShunshiColors.textSecondary, fontWeight: isPrimary ? FontWeight.w700 : FontWeight.w500)),
-        Text('$score分', style: TextStyle(fontSize: 13, color: isPrimary ? ShunshiColors.primary : ShunshiColors.textHint)),
+        Text('$score pts', style: TextStyle(fontSize: 13, color: isPrimary ? ShunshiColors.primary : ShunshiColors.textHint)),
       ]),
       const SizedBox(height: 5),
       ClipRRect(borderRadius: BorderRadius.circular(6), child: LinearProgressIndicator(value: pct, minHeight: 8, backgroundColor: ShunshiColors.divider, valueColor: AlwaysStoppedAnimation(isPrimary ? ShunshiColors.primary : ShunshiColors.accent))),
@@ -142,12 +142,12 @@ class ConstitutionDetailView extends StatelessWidget {
         ])),
       ]),
       const SizedBox(height: 24),
-      if (d.characteristics.isNotEmpty) ...[_detailSection('体质特点', d.characteristics), const SizedBox(height: 20)],
+      if (d.characteristics.isNotEmpty) ...[_detailSection('Characteristics', d.characteristics), const SizedBox(height: 20)],
       ...d.advice.expand((adv) => [_detailSection('${adv.icon} ${adv.category}', adv.items), const SizedBox(height: 20)]),
       if (d.avoidList.isNotEmpty) Container(width: double.infinity, padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: ShunshiColors.warning.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(16), border: Border.all(color: ShunshiColors.warning.withValues(alpha: 0.3))),
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Icon(Icons.info_outline, size: 18, color: ShunshiColors.earth), const SizedBox(width: 10),
-          Expanded(child: Text('注意事项: ${d.avoidList}', style: ShunshiTextStyles.bodySecondary.copyWith(color: ShunshiColors.textPrimary))),
+          Expanded(child: Text('Things to note: ${d.avoidList}', style: ShunshiTextStyles.bodySecondary.copyWith(color: ShunshiColors.textPrimary))),
         ])),
       const SizedBox(height: 32),
     ]));

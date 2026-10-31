@@ -35,7 +35,7 @@ class ErrorView extends StatelessWidget {
               TextButton(
                 onPressed: onRetry,
                 style: TextButton.styleFrom(foregroundColor: ShunShiColors.primary),
-                child: const Text('重试'),
+                child: const Text('Try again'),
               ),
             ],
           ],
@@ -177,7 +177,7 @@ class StateView<T> extends StatelessWidget {
       return ErrorView(message: error!, onRetry: onRetry);
     }
     if (data == null) {
-      return const ErrorView(message: '暂无数据');
+      return const ErrorView(message: 'No data yet');
     }
     return builder(data as T);
   }

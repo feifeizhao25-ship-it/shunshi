@@ -34,12 +34,12 @@ class _DiscoverPageState extends State<DiscoverPage> {
   final _searchController = TextEditingController();
 
   static final _categories = [
-    _Category(Icons.health_and_safety, '体质调养', const Color(0xFFE8F5E9), 'constitution'),
-    _Category(Icons.restaurant_menu, '节气食谱', const Color(0xFFFFF3E0), 'diet'),
-    _Category(Icons.emoji_food_beverage, '养生茶饮', const Color(0xFFE3F2FD), 'tea'),
-    _Category(Icons.architecture, '经络穴位', const Color(0xFFFCE4EC), 'meridian'),
-    _Category(Icons.self_improvement, '传统功法', const Color(0xFFE8EAF6), 'exercise'),
-    _Category(Icons.settings_voice, '助眠安神', const Color(0xFFE0F2F1), 'sleep'),
+    _Category(Icons.health_and_safety, 'Constitution care', const Color(0xFFE8F5E9), 'constitution'),
+    _Category(Icons.restaurant_menu, 'Seasonal recipes', const Color(0xFFFFF3E0), 'diet'),
+    _Category(Icons.emoji_food_beverage, 'Wellness teas', const Color(0xFFE3F2FD), 'tea'),
+    _Category(Icons.architecture, 'Meridians & acupoints', const Color(0xFFFCE4EC), 'meridian'),
+    _Category(Icons.self_improvement, 'Traditional practices', const Color(0xFFE8EAF6), 'exercise'),
+    _Category(Icons.settings_voice, 'Sleep & calm', const Color(0xFFE0F2F1), 'sleep'),
   ];
 
   Future<void> _search(String query) async {
@@ -98,7 +98,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
           SliverAppBar(
             pinned: true,
             backgroundColor: ShunShiColors.background,
-            title: Text('养生馆', style: TextStyle(
+            title: Text('Wellness hall', style: TextStyle(
               fontSize: 22, fontWeight: FontWeight.w700,
               fontFamily: ShunShiTypography.serifFamily,
               color: ShunShiColors.textPrimary,
@@ -127,7 +127,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
                   controller: _searchController,
                   onChanged: (v) => _search(v),
                   decoration: InputDecoration(
-                    hintText: '搜索食谱、茶饮、功法...',
+                    hintText: 'Search recipes, teas, practices...',
                     hintStyle: TextStyle(fontSize: 14, color: ShunShiColors.textTertiary),
                     border: InputBorder.none,
                     icon: Icon(Icons.search, size: 20, color: ShunShiColors.textTertiary),
@@ -147,7 +147,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
-                child: Text('搜索结果 (${_searchResults.length})', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+                child: Text('Search results (${_searchResults.length})', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
               ),
             ),
             SliverList(
@@ -171,7 +171,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
               }, childCount: _searchResults.length),
             ),
           ] else if (_searching && _searchResults.isEmpty && _searchController.text.isNotEmpty) ...[
-            SliverToBoxAdapter(child: Padding(padding: const EdgeInsets.all(20), child: Center(child: Text('未找到相关内容', style: TextStyle(color: ShunShiColors.textTertiary))))),
+            SliverToBoxAdapter(child: Padding(padding: const EdgeInsets.all(20), child: Center(child: Text('No related content found', style: TextStyle(color: ShunShiColors.textTertiary))))),
           ],
 
           // ── Category Grid (hide when searching) ──
@@ -197,7 +197,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 28, 20, 4),
               child: Row(children: [
-                Text('精选编辑', style: TextStyle(
+                Text('Editor\'s picks', style: TextStyle(
                   fontSize: 18, fontWeight: FontWeight.w700,
                   color: ShunShiColors.textPrimary,
                   fontFamily: ShunShiTypography.serifFamily,
@@ -212,7 +212,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
                     context.push('/wellness-category/food_therapy');
                   },
                   child: Row(children: [
-                    Text('查看全部', style: TextStyle(
+                    Text('View all', style: TextStyle(
                       fontSize: 13, color: ShunShiColors.primary,
                       fontFamily: ShunShiTypography.sansFamily,
                     )),

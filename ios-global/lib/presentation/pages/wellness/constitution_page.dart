@@ -36,7 +36,7 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
   List<ConstitutionType> _types = kConstitutionTypes;
   String _view = 'home'; // home / quiz / result / detail
   ConstitutionDetail? _detail;
-  bool _reportUnlocked = false; // 是否已解锁完整报告
+  bool _reportUnlocked = false; // whether the full report is unlocked
 
   @override
   void initState() {
@@ -98,7 +98,7 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
       if (res.statusCode == 200 && res.data is List) {
         final list = res.data as List;
         if (list.isEmpty) {
-          _showSnackBar('题目为空，请稍后重试');
+          _showSnackBar('No questions available, please try again later');
           return;
         }
         setState(() {
@@ -117,17 +117,17 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
           _view = 'quiz';
         });
       } else {
-        _showSnackBar('获取题目失败 (${res.statusCode})');
+        _showSnackBar('Failed to get questions (${res.statusCode})');
       }
     } on DioException catch (e) {
       final msg = e.type == DioExceptionType.connectionTimeout
-          ? '连接超时，请检查网络'
+          ? 'Connection timed out, please check your network'
           : e.type == DioExceptionType.connectionError
-              ? '无法连接服务器，请检查网络设置'
-              : '网络异常: ${e.message}';
+              ? 'Can\'t reach the server, please check your network settings'
+              : 'Network error: ${e.message}';
       _showSnackBar(msg);
     } catch (e) {
-      _showSnackBar('加载失败: $e');
+      _showSnackBar('Failed to load: $e');
     } finally {
       setState(() => _loading = false);
     }
@@ -147,7 +147,7 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
         } else if (res.data is Map<String, dynamic>) {
           data = res.data as Map<String, dynamic>;
         } else {
-          _showSnackBar('提交失败：返回数据格式异常');
+          _showSnackBar('Submission failed: unexpected response format');
           return;
         }
         final primaryType = data['primary_type'] as String? ?? '';
@@ -170,20 +170,20 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
           final adviceList = <HealthAdvice>[];
 
           // 按 **标题:** 拆分段落
-          final sectionRegex = RegExp(r'\*\*(.+?)[:：]\*\*\s*');
+          final sectionRegex = RegExp(r'\*\*(.+?)[:\uff1a]\*\*\s*');
           final splits = sectionRegex.allMatches(adviceText);
           final sectionTitles = splits.map((m) => m.group(1)!.trim()).toList();
           final sectionContents = adviceText.split(sectionRegex).where((s) => s.trim().isNotEmpty).toList();
 
           final sectionMeta = {
-            '体质特点': ('📝', '体质特点'),
-            '饮食建议': ('🥗', '饮食调养'),
-            '茶饮推荐': ('🍵', '茶饮推荐'),
-            '运动建议': ('🏃', '运动建议'),
-            '注意事项': ('⚠️', '注意事项'),
-            '起居建议': ('🌙', '起居建议'),
-            '情志调摄': ('🌿', '情志调摄'),
-            '穴位保健': ('✋', '穴位保健'),
+            'Characteristics': ('📝', 'Characteristics'),
+            'Diet tips': ('🥗', 'Eating well'),
+            'Recommended teas': ('🍵', 'Recommended teas'),
+            'Exercise tips': ('🏃', 'Exercise tips'),
+            'Things to note': ('⚠️', 'Things to note'),
+            'Daily routine': ('🌙', 'Daily routine'),
+            'Emotional care': ('🌿', 'Emotional care'),
+            'Acupoint care': ('✋', 'Acupoint care'),
           };
 
           for (var i = 0; i < sectionTitles.length && i < sectionContents.length; i++) {
@@ -201,15 +201,15 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
           // 如果后端没解析出内容，用本地常量兜底
           if (adviceList.isEmpty) {
             adviceList.addAll([
-              HealthAdvice(category: '饮食调养', icon: '🥗', items: [(kConstitutionAdvice[primaryType]?['饮食'] ?? '')]),
-              HealthAdvice(category: '茶饮推荐', icon: '🍵', items: [(kConstitutionAdvice[primaryType]?['茶饮'] ?? '')]),
-              HealthAdvice(category: '运动建议', icon: '🏃', items: [(kConstitutionAdvice[primaryType]?['运动'] ?? '')]),
+              HealthAdvice(category: 'Eating well', icon: '🥗', items: [(kConstitutionAdvice[primaryType]?['Diet'] ?? '')]),
+              HealthAdvice(category: 'Recommended teas', icon: '🍵', items: [(kConstitutionAdvice[primaryType]?['Tea'] ?? '')]),
+              HealthAdvice(category: 'Exercise tips', icon: '🏃', items: [(kConstitutionAdvice[primaryType]?['Exercise'] ?? '')]),
             ]);
           }
 
           // 兼有体质
           if (secondaryNames.isNotEmpty) {
-            adviceList.add(HealthAdvice(category: '兼有倾向', icon: '⚡', items: secondaryNames));
+            adviceList.add(HealthAdvice(category: 'Also leaning toward', icon: '⚡', items: secondaryNames));
           }
 
           _result = ConstitutionResult(
@@ -221,16 +221,16 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
             characteristics: kConstitutionChars[primaryType] ?? [],
             advice: adviceList,
             scores: scoreList,
-            avoidList: (kConstitutionAvoid[primaryType] ?? []).join('、'),
+            avoidList: (kConstitutionAvoid[primaryType] ?? []).join(', '),
             isPremium: _reportUnlocked,
           );
           _view = 'result';
         });
       } else {
-        _showSnackBar('提交失败，请稍后重试');
+        _showSnackBar('Submission failed, please try again later');
       }
     } catch (e) {
-      _showSnackBar('提交失败，请检查网络');
+      _showSnackBar('Submission failed, please check your network');
     } finally {
       setState(() => _loading = false);
     }
@@ -249,11 +249,11 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
             name: data['name'] as String? ?? '', emoji: kConstitutionEmoji[key] ?? '📋',
             description: data['description'] as String? ?? '', characteristics: chars,
             advice: [
-              HealthAdvice(category: '饮食建议', icon: '🥗', items: [(data['diet_advice'] as String? ?? '').split('：').last]),
-              HealthAdvice(category: '茶饮推荐', icon: '🍵', items: [(data['tea_advice'] as String? ?? '').split('：').last]),
-              HealthAdvice(category: '运动建议', icon: '🏃', items: [(data['exercise_advice'] as String? ?? '').split('：').last]),
+              HealthAdvice(category: 'Diet tips', icon: '🥗', items: [(data['diet_advice'] as String? ?? '').split(RegExp(r'[:\uff1a]\s*')).last]),
+              HealthAdvice(category: 'Recommended teas', icon: '🍵', items: [(data['tea_advice'] as String? ?? '').split(RegExp(r'[:\uff1a]\s*')).last]),
+              HealthAdvice(category: 'Exercise tips', icon: '🏃', items: [(data['exercise_advice'] as String? ?? '').split(RegExp(r'[:\uff1a]\s*')).last]),
             ],
-            avoidList: avoid.join('、'),
+            avoidList: avoid.join(', '),
           );
           _view = 'detail';
         });
@@ -275,11 +275,11 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
         name: local.name, emoji: local.emoji, description: local.description,
         characteristics: kConstitutionChars[key] ?? [],
         advice: [
-          HealthAdvice(category: '饮食建议', icon: '🥗', items: [adv['饮食'] ?? '']),
-          HealthAdvice(category: '茶饮推荐', icon: '🍵', items: [adv['茶饮'] ?? '']),
-          HealthAdvice(category: '运动建议', icon: '🏃', items: [adv['运动'] ?? '']),
+          HealthAdvice(category: 'Diet tips', icon: '🥗', items: [adv['Diet'] ?? '']),
+          HealthAdvice(category: 'Recommended teas', icon: '🍵', items: [adv['Tea'] ?? '']),
+          HealthAdvice(category: 'Exercise tips', icon: '🏃', items: [adv['Exercise'] ?? '']),
         ],
-        avoidList: (kConstitutionAvoid[key] ?? []).join('、'),
+        avoidList: (kConstitutionAvoid[key] ?? []).join(', '),
       );
       _view = 'detail';
     });
@@ -314,7 +314,7 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
       child: Scaffold(
       backgroundColor: ShunshiColors.background,
       appBar: AppBar(
-        title: Text(_view == 'home' ? '体质测试' : _view == 'quiz' ? '体质测试 (${_currentIndex + 1}/${_questions.length})' : _view == 'result' ? '测试结果' : '体质详情', style: ShunshiTextStyles.heading),
+        title: Text(_view == 'home' ? 'Constitution check' : _view == 'quiz' ? 'Constitution check (${_currentIndex + 1}/${_questions.length})' : _view == 'result' ? 'Results' : 'Constitution details', style: ShunshiTextStyles.heading),
         backgroundColor: ShunshiColors.surface, foregroundColor: ShunshiColors.textPrimary, elevation: 0,
         leading: IconButton(icon: Icon(Icons.chevron_left, color: ShunshiColors.textPrimary), onPressed: () {
           if (_view == 'quiz') { if (_currentIndex > 0) {
@@ -366,17 +366,17 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text('了解你的体质', style: ShunshiTextStyles.greeting),
+        Text('Know your constitution', style: ShunshiTextStyles.greeting),
         const SizedBox(height: 8),
-        Text('中医体质辨识，找到最适合你的养生之道', style: ShunshiTextStyles.bodySecondary),
+        Text('Find the wellness approach that suits you best', style: ShunshiTextStyles.bodySecondary),
         const SizedBox(height: 24),
         SizedBox(width: double.infinity, height: 56, child: ElevatedButton(
           onPressed: _startQuiz,
           style: ElevatedButton.styleFrom(backgroundColor: ShunshiColors.primary, foregroundColor: Colors.white, elevation: 0, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))),
-          child: const Text('开始测试', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
+          child: const Text('Start the check', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
         )),
         const SizedBox(height: 32),
-        Text('九种体质', style: ShunshiTextStyles.heading),
+        Text('The nine constitutions', style: ShunshiTextStyles.heading),
         const SizedBox(height: 16),
         GridView.builder(shrinkWrap: true, physics: const NeverScrollableScrollPhysics(), gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3, childAspectRatio: 0.72, crossAxisSpacing: 12, mainAxisSpacing: 12), itemCount: _types.length, itemBuilder: (context, index) {
           final type = _types[index];
@@ -413,7 +413,7 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('第 ${_currentIndex + 1} 题 / ${_questions.length}', style: ShunshiTextStyles.caption),
+                  Text('Question ${_currentIndex + 1} of ${_questions.length}', style: ShunshiTextStyles.caption),
                   Text('${(progress * 100).toInt()}%', style: ShunshiTextStyles.caption.copyWith(color: ShunshiColors.primary, fontWeight: FontWeight.w600)),
                 ],
               ),
@@ -460,7 +460,7 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
                     child: OutlinedButton(
                       onPressed: () => setState(() => _currentIndex--),
                       style: OutlinedButton.styleFrom(foregroundColor: ShunshiColors.textSecondary, side: const BorderSide(color: ShunshiColors.divider), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), padding: const EdgeInsets.symmetric(vertical: 14)),
-                      child: const Text('上一题', style: TextStyle(fontSize: 15)),
+                      child: const Text('Previous', style: TextStyle(fontSize: 15)),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -471,7 +471,7 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
                         ? () => setState(() => _currentIndex++)
                         : _answers.length == _questions.length ? _submitQuiz : null,
                     style: ElevatedButton.styleFrom(backgroundColor: ShunshiColors.primary, foregroundColor: Colors.white, disabledBackgroundColor: ShunshiColors.divider, disabledForegroundColor: ShunshiColors.textHint, elevation: 0, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), padding: const EdgeInsets.symmetric(vertical: 14)),
-                    child: Text(_currentIndex == _questions.length - 1 && _answers.length == _questions.length ? '提交答卷' : '下一题', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+                    child: Text(_currentIndex == _questions.length - 1 && _answers.length == _questions.length ? 'Submit answers' : 'Next question', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
                   ),
                 ),
               ],
@@ -496,7 +496,7 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
         const SizedBox(height: 20),
 
         // ── 免费部分：体质概述 + 分数条 ──
-        _buildSection('体质概述', '📋', [
+        _buildSection('Constitution overview', '📋', [
           Text(r.description, style: const TextStyle(fontSize: 14, color: ShunshiColors.textSecondary, height: 1.7)),
           const SizedBox(height: 12),
           Wrap(spacing: 8, runSpacing: 8, children: r.characteristics.map((c) => Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), decoration: BoxDecoration(color: ShunshiColors.primaryLight.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(20)), child: Text(c, style: const TextStyle(fontSize: 12, color: ShunshiColors.primaryDark, fontWeight: FontWeight.w500)))).toList()),
@@ -526,12 +526,12 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
       child: Column(children: [
         Text(r.emoji, style: const TextStyle(fontSize: 56)),
         const SizedBox(height: 8),
-        Text('你的体质是', style: TextStyle(fontSize: 14, color: Colors.white.withValues(alpha: 0.8))),
+        Text('Your constitution is', style: TextStyle(fontSize: 14, color: Colors.white.withValues(alpha: 0.8))),
         const SizedBox(height: 4),
         Text(r.typeName, style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w700, color: Colors.white, letterSpacing: 2)),
         const SizedBox(height: 12),
         Container(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8), decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(12)),
-          child: Text('测试时间: ${DateTime.now().toString().substring(0, 16)}', style: TextStyle(fontSize: 12, color: Colors.white.withValues(alpha: 0.7))),
+          child: Text('Taken: ${DateTime.now().toString().substring(0, 16)}', style: TextStyle(fontSize: 12, color: Colors.white.withValues(alpha: 0.7))),
         ),
       ]),
     );
@@ -550,7 +550,7 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
   Widget _buildScoreBars(ConstitutionResult r) {
     return Container(margin: const EdgeInsets.fromLTRB(20, 0, 20, 0), padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Row(children: [Text('📊', style: TextStyle(fontSize: 18)), SizedBox(width: 8), Text('体质分数', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: ShunshiColors.textPrimary))]),
+        const Row(children: [Text('📊', style: TextStyle(fontSize: 18)), SizedBox(width: 8), Text('Constitution scores', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: ShunshiColors.textPrimary))]),
         const SizedBox(height: 14),
         ...r.scores.map((s) {
           final name = s['name'] as String? ?? '';
@@ -566,7 +566,7 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
             const SizedBox(width: 8),
             SizedBox(width: 28, child: Text(score.toStringAsFixed(0), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: isPrimary ? ShunshiColors.primaryDark : ShunshiColors.textPrimary))),
             const SizedBox(width: 4),
-            if (level == 'obvious') const Text('偏颇', style: TextStyle(fontSize: 10, color: ShunshiColors.earth)) else if (level == 'tendency') const Text('倾向', style: TextStyle(fontSize: 10, color: Color(0xFFD4956A))),
+            if (level == 'obvious') const Text('Imbalanced', style: TextStyle(fontSize: 10, color: ShunshiColors.earth)) else if (level == 'tendency') const Text('Leaning', style: TextStyle(fontSize: 10, color: Color(0xFFD4956A))),
           ]));
         }),
       ]),
@@ -602,7 +602,7 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
       ])),
       if (r.avoidList.isNotEmpty) Container(margin: const EdgeInsets.fromLTRB(20, 12, 20, 0), padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: const Color(0xFFFFFBF0), borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0xFFFDE68A).withValues(alpha: 0.5))),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Row(children: [Text('⚠️', style: TextStyle(fontSize: 16)), SizedBox(width: 8), Text('注意事项', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Color(0xFF92400E)))]),
+          const Row(children: [Text('⚠️', style: TextStyle(fontSize: 16)), SizedBox(width: 8), Text('Things to note', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Color(0xFF92400E)))]),
           const SizedBox(height: 10),
           Text(r.avoidList, style: const TextStyle(fontSize: 13, color: Color(0xFF92400E), height: 1.7)),
         ])),
@@ -623,9 +623,9 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
               const Text('👑', style: TextStyle(fontSize: 20)),
               const SizedBox(width: 10),
               const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('解锁完整体质报告', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF92400E))),
+                Text('Unlock the full constitution report', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF92400E))),
                 SizedBox(height: 2),
-                Text('饮食·茶饮·运动·穴位·四季调理方案', style: TextStyle(fontSize: 11, color: Color(0xFFB07937))),
+                Text('Diet · tea · exercise · acupoints · four-season plan', style: TextStyle(fontSize: 11, color: Color(0xFFB07937))),
               ])),
               Icon(Icons.chevron_right, color: const Color(0xFFD4956A).withValues(alpha: 0.6)),
             ]),
@@ -634,7 +634,7 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
             Expanded(child: ElevatedButton.icon(
               onPressed: () { _unlockReport(); setState(() {}); },
               icon: const Icon(Icons.lock_open, size: 18),
-              label: const Text('解锁报告', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+              label: const Text('Unlock report', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
               style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFE5A84B), foregroundColor: Colors.white, elevation: 0, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), padding: const EdgeInsets.symmetric(vertical: 14)),
             )),
           ]),
@@ -643,14 +643,14 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
             Expanded(child: OutlinedButton.icon(
               onPressed: () { setState(() { _view = 'home'; _questions.clear(); _answers.clear(); _result = null; }); },
               icon: const Icon(Icons.refresh, size: 18),
-              label: const Text('重新测试', style: TextStyle(fontSize: 14)),
+              label: const Text('Retake', style: TextStyle(fontSize: 14)),
               style: OutlinedButton.styleFrom(foregroundColor: ShunshiColors.primary, side: const BorderSide(color: ShunshiColors.primary), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), padding: const EdgeInsets.symmetric(vertical: 13)),
             )),
             const SizedBox(width: 12),
             Expanded(child: ElevatedButton.icon(
               onPressed: () => _shareResult(r),
               icon: const Icon(Icons.share, size: 18),
-              label: const Text('分享结果', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+              label: const Text('Share result', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
               style: ElevatedButton.styleFrom(backgroundColor: ShunshiColors.primary, foregroundColor: Colors.white, elevation: 0, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), padding: const EdgeInsets.symmetric(vertical: 13)),
             )),
           ]),
@@ -658,7 +658,7 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
           SizedBox(width: double.infinity, height: 46, child: OutlinedButton.icon(
             onPressed: () => _downloadReport(r),
             icon: const Icon(Icons.download, size: 16),
-            label: const Text('下载报告', style: TextStyle(fontSize: 13)),
+            label: const Text('Download report', style: TextStyle(fontSize: 13)),
             style: OutlinedButton.styleFrom(foregroundColor: ShunshiColors.textSecondary, side: const BorderSide(color: ShunshiColors.divider), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
           )),
         ],
@@ -667,48 +667,48 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
   }
 
   Future<void> _shareResult(ConstitutionResult r) async {
-    final text = '【顺时·中医体质报告】\n\n'
-        '我的体质类型：${r.typeName} ${r.emoji}\n'
-        '体质概述：${r.description}\n\n'
-        '体质特点：\n${r.characteristics.map((c) => '  · $c').join('\n')}\n\n'
-        '—— 顺时App AI养生顾问';
+    final text = '[SEASONS · Constitution Report]\n\n'
+        'My constitution type: ${r.typeName} ${r.emoji}\n'
+        'Overview: ${r.description}\n\n'
+        'Characteristics:\n${r.characteristics.map((c) => '  · $c').join('\n')}\n\n'
+        '— SEASONS AI wellness companion';
     await Clipboard.setData(ClipboardData(text: text));
-    _showSnackBar('报告已复制到剪贴板');
+    _showSnackBar('Report copied to clipboard');
   }
 
   Future<void> _downloadReport(ConstitutionResult r) async {
     try {
       final buffer = StringBuffer();
       buffer.writeln('╔══════════════════════════════════════╗');
-      buffer.writeln('║        顺时·中医体质评估报告         ║');
+      buffer.writeln('║        SEASONS · Constitution Report         ║');
       buffer.writeln('╚══════════════════════════════════════╝');
       buffer.writeln();
-      buffer.writeln('报告编号：${r.resultId}');
-      buffer.writeln('测试时间：${DateTime.now().toString().substring(0, 19)}');
+      buffer.writeln('Report no.: ${r.resultId}');
+      buffer.writeln('Taken: ${DateTime.now().toString().substring(0, 19)}');
       buffer.writeln();
       buffer.writeln('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-      buffer.writeln('  你的体质类型');
+      buffer.writeln('  Your constitution type');
       buffer.writeln('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
       buffer.writeln();
       buffer.writeln('  ${r.emoji}  ${r.typeName}');
       buffer.writeln();
       buffer.writeln('  ${r.description}');
       buffer.writeln();
-      buffer.writeln('  体质特点：');
+      buffer.writeln('  Characteristics:');
       for (final c in r.characteristics) { buffer.writeln('    · $c'); }
       buffer.writeln();
       buffer.writeln('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-      buffer.writeln('  体质分数分析');
+      buffer.writeln('  Constitution score analysis');
       buffer.writeln('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
       buffer.writeln();
       for (final s in r.scores) {
         final name = s['name'] as String? ?? '';
         final score = (s['score'] as num?)?.toDouble() ?? 0;
         final level = s['level'] as String? ?? '';
-        final levelText = level == 'obvious' ? ' [偏颇]' : level == 'tendency' ? ' [倾向]' : '';
+        final levelText = level == 'obvious' ? ' [imbalanced]' : level == 'tendency' ? ' [leaning]' : '';
         final barLen = (score / 60 * 20).round();
         final bar = '█' * barLen + '░' * (20 - barLen);
-        buffer.writeln('  $name  $bar  ${score.toStringAsFixed(0)}分$levelText');
+        buffer.writeln('  $name  $bar  ${score.toStringAsFixed(0)} pts$levelText');
       }
       buffer.writeln();
       for (final adv in r.advice) {
@@ -721,7 +721,7 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
       }
       if (r.avoidList.isNotEmpty) {
         buffer.writeln('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        buffer.writeln('  ⚠️ 注意事项');
+        buffer.writeln('  ⚠️ Things to note');
         buffer.writeln('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
         buffer.writeln();
         buffer.writeln('  $r.avoidList');
@@ -729,18 +729,18 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
       }
       buffer.writeln('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
       buffer.writeln();
-      buffer.writeln('  本报告由「顺时」AI养生顾问生成');
-      buffer.writeln('  仅供参考，不构成医疗建议');
-      buffer.writeln('  如有健康问题请咨询专业中医师');
+      buffer.writeln('  This report was generated by the SEASONS AI companion');
+      buffer.writeln('  For reference only; not medical advice');
+      buffer.writeln('  If you have health concerns, please consult a qualified practitioner');
       buffer.writeln();
 
       final dir = await getApplicationDocumentsDirectory();
-      final file = File('${dir.path}/顺时体质报告_${r.typeName}.txt');
+      final file = File('${dir.path}/SEASONS_constitution_report_${r.typeName}.txt');
       await file.writeAsString(buffer.toString());
 
-      if (mounted) _showSnackBar('报告已保存：${file.path}');
+      if (mounted) _showSnackBar('Report saved: ${file.path}');
     } catch (e) {
-      if (mounted) _showSnackBar('保存失败');
+      if (mounted) _showSnackBar('Save failed');
     }
   }
 

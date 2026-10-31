@@ -35,7 +35,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
         if (mounted) setState(() { _items = items; _loading = false; });
       }
     } catch (e) {
-      if (mounted) setState(() { _loading = false; _error = '加载失败'; });
+      if (mounted) setState(() { _loading = false; _error = 'Failed to load'; });
     }
   }
 
@@ -57,7 +57,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
       appBar: AppBar(
         backgroundColor: ShunShiColors.background,
         leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
-        title: Text('通知', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18, fontWeight: FontWeight.w600)),
+        title: Text('Notifications', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18, fontWeight: FontWeight.w600)),
       ),
       body: StateView<List<dynamic>>(
         loading: _loading,
@@ -66,7 +66,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
         onRetry: _loadNotifications,
         loadingWidget: const LoadingSkeleton(itemCount: 4),
         builder: (items) => items.isEmpty
-          ? const ErrorView(message: '暂无通知', icon: Icons.notifications_none)
+          ? const ErrorView(message: 'No notifications', icon: Icons.notifications_none)
           : RefreshIndicator(
               onRefresh: _loadNotifications,
               child: ListView.separated(
@@ -93,7 +93,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                       ),
                       const SizedBox(width: 12),
                       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Text(item['title'] ?? '通知', style: TextStyle(fontSize: 15, fontWeight: isRead ? FontWeight.w400 : FontWeight.w600, color: ShunShiColors.textPrimary)),
+                        Text(item['title'] ?? 'Notifications', style: TextStyle(fontSize: 15, fontWeight: isRead ? FontWeight.w400 : FontWeight.w600, color: ShunShiColors.textPrimary)),
                         if (item['body'] != null && item['body'].toString().isNotEmpty) ...[
                           const SizedBox(height: 4),
                           Text(item['body'].toString(), style: TextStyle(fontSize: 13, color: ShunShiColors.textSecondary, height: 1.5)),

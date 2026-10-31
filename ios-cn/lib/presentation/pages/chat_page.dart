@@ -13,6 +13,7 @@ import 'chat/chat_models.dart';
 import 'chat/chat_history_store.dart';
 import 'chat/chat_membership.dart';
 import 'chat/chat_api.dart';
+import '../widgets/chat_sources.dart';
 import 'chat/chat_widgets.dart';
 import '../../core/solar_term/solar_term_table.dart';
 import '../../core/config/app_config.dart';
@@ -101,7 +102,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
   String _token = '';
   // 以前写死「清明」，全年对话开场都说「清明时节」；改为查节气表（与后端同一份数据）
   final String _currentSolarTerm = currentSolarTermName() ?? '清明';
-  final String _solarTermDesc = '春意渐深，万物清洁而明净。适合踏青、放风筝，心情也该舒展。';
+  final String _solarTermDesc = '按这个节气把作息放慢一点。';
   String? _conversationId;
 
   @override
@@ -330,6 +331,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
       String aiText, {
       List<SuggestionCard>? cards,
       List<String>? sources,
+      List<ChatSource>? sourceDetails,
       String? convId,
       String? usageReminder,
     }) {
@@ -361,6 +363,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
             text: reply,
             cards: c,
             sources: sources ?? [],
+            sourceDetails: sourceDetails,
             time: _fmt(DateTime.now()),
           ),
         );
@@ -379,6 +382,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
         reply.text,
         cards: [],
         sources: reply.sources,
+        sourceDetails: reply.sourceDetails,
         usageReminder: reply.usageReminder,
       );
     } catch (error) {

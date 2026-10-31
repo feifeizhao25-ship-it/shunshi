@@ -37,9 +37,9 @@ class _FamilyHomePageState extends State<FamilyHomePage> {
     // Demo
     setState(() {
       _members = [
-        {'id': '1', 'name': '妈妈', 'avatar': '👩', 'relation': '母亲', 'status': 'stable', 'lastActive': '今天 08:30', 'lastCheckin': '3小时前'},
-        {'id': '2', 'name': '爸爸', 'avatar': '👨', 'relation': '父亲', 'status': 'tired', 'lastActive': '今天 07:15', 'lastCheckin': '5小时前'},
-        {'id': '3', 'name': '奶奶', 'avatar': '👵', 'relation': '其他', 'status': 'attention', 'lastActive': '昨天 22:00', 'lastCheckin': '1天前'},
+        {'id': '1', 'name': 'Mom', 'avatar': '👩', 'relation': 'Mother', 'status': 'stable', 'lastActive': 'Today 08:30', 'lastCheckin': '3 hours ago'},
+        {'id': '2', 'name': 'Dad', 'avatar': '👨', 'relation': 'Father', 'status': 'tired', 'lastActive': 'Today 07:15', 'lastCheckin': '5 hours ago'},
+        {'id': '3', 'name': 'Grandma', 'avatar': '👵', 'relation': 'Other', 'status': 'attention', 'lastActive': 'Yesterday 22:00', 'lastCheckin': '1 day ago'},
       ];
       _loading = false;
     });
@@ -56,10 +56,10 @@ class _FamilyHomePageState extends State<FamilyHomePage> {
 
   String _statusText(String status) {
     switch (status) {
-      case 'stable': return '平稳';
-      case 'tired': return '有点累';
-      case 'attention': return '建议联系';
-      default: return '平稳';
+      case 'stable': return 'Steady';
+      case 'tired': return 'A bit tired';
+      case 'attention': return 'Reach out';
+      default: return 'Steady';
     }
   }
 
@@ -83,7 +83,7 @@ class _FamilyHomePageState extends State<FamilyHomePage> {
           icon: const Icon(Icons.arrow_back_ios_new, size: 20),
           onPressed: () => safePop(context),
         ),
-        title: const Text('我的家人',
+        title: const Text('My family',
             style: TextStyle(fontFamily: ShunShiTypography.serifFamily)),
         actions: [
           IconButton(
@@ -115,7 +115,7 @@ class _FamilyHomePageState extends State<FamilyHomePage> {
                       child: const Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                         Icon(Icons.person_add_rounded, size: 20, color: ShunShiColors.primary),
                         SizedBox(width: 8),
-                        Text('邀请家人加入', style: TextStyle(fontSize: 15,
+                        Text('Invite family', style: TextStyle(fontSize: 15,
                             color: ShunShiColors.primary, fontWeight: FontWeight.w500)),
                       ]),
                     ),
@@ -132,7 +132,7 @@ class _FamilyHomePageState extends State<FamilyHomePage> {
                     child: const Row(children: [
                       Icon(Icons.shield_outlined, size: 16, color: ShunShiColors.textTertiary),
                       SizedBox(width: 8),
-                      Expanded(child: Text('隐私保护：仅共享状态级别信息，不会暴露详细数据',
+                      Expanded(child: Text('Privacy: only a status level is shared — never detailed data',
                           style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary, height: 1.4))),
                     ]),
                   ),
@@ -141,7 +141,7 @@ class _FamilyHomePageState extends State<FamilyHomePage> {
                   if (_members.isEmpty)
                     const Center(child: Padding(
                       padding: EdgeInsets.symmetric(vertical: 48),
-                      child: Text('还没有家人加入', style: TextStyle(color: ShunShiColors.textTertiary, fontSize: 15)),
+                      child: Text('No family members yet', style: TextStyle(color: ShunShiColors.textTertiary, fontSize: 15)),
                     ))
                   else
                     ..._members.map((m) => _buildMemberCard(m)),

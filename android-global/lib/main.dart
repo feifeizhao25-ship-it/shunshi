@@ -53,7 +53,7 @@ class _ShunshiAppState extends State<ShunshiApp> {
           darkTheme: ShunShiTheme.darkTheme,
           themeMode: _themeNotifier.mode,
           localizationsDelegates: const [AppLocalizations.delegate],
-          supportedLocales: const [Locale('en'), Locale('ja'), Locale('zh')],
+          supportedLocales: const [Locale('en')],
           locale: const Locale('en'),
         );
       },

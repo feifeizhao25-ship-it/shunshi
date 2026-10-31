@@ -4,6 +4,7 @@ import '../../../core/router/safe_pop.dart';
 import 'package:just_audio/just_audio.dart';
 import '../../../data/network/api_client.dart';
 import 'dart:async';
+import '../../../core/audio/listen_clock.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import '../../../core/theme/shunshi_colors.dart';
@@ -63,6 +64,10 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
     connectTimeout: const Duration(seconds: 10),
   ));
 
+  final _clock = ListenClock();
+  StreamSubscription? _stateSub;
+  Timer? _listenTimer;
+  bool _limitShown = false;
   StreamSubscription<Duration>? _positionSub;
   StreamSubscription<Duration?>? _durationSub;
   StreamSubscription<PlayerState>? _completeSub;
@@ -83,6 +88,8 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
       ),
     );
     _breathController.repeat(reverse: true);
+    _stateSub = _player.playerStateStream.listen((s) => _clock.setPlaying(s.playing && s.processingState != ProcessingState.completed));
+    _listenTimer = Timer.periodic(const Duration(seconds: 60), (_) => _reportProgress());
 
     _positionSub = _player.positionStream.listen((pos) {
       if (mounted) setState(() => _position = pos);
@@ -153,31 +160,48 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
   }
 
   Future<void> _onCompleted() async {
+    final secs = _clock.takeSeconds();
     try {
-      await _dio.post(
+      final res = await ApiClient().post(
         '/api/v1/seasons/audio/progress',
         data: {
           'audio_id': widget.audioId ?? '',
           'user_id': StorageManager.user.getUserId() ?? 'anonymous',
           'progress_seconds': _duration.inSeconds,
           'completed': true,
+          'listened_seconds': secs,
         },
       );
-    } catch (_) {}
+      _handleListenResult(res.data);
+    } catch (_) {
+      _clock.giveBack(secs);
+    }
+  }
+
+  void _handleListenResult(dynamic data) {
+    if (data is! Map || data['limit_reached'] != true || _limitShown || !mounted) return;
+    _limitShown = true;
+    _player.pause();
+    ScaffoldMessenger.maybeOf(context)?.showSnackBar(const SnackBar(content: Text('今日音频时长已用完，明天再来听吧')));
   }
 
   Future<void> _reportProgress() async {
+    final secs = _clock.takeSeconds();
     try {
-      await _dio.post(
+      final res = await ApiClient().post(
         '/api/v1/seasons/audio/progress',
         data: {
           'audio_id': widget.audioId ?? '',
           'user_id': StorageManager.user.getUserId() ?? 'anonymous',
           'progress_seconds': _position.inSeconds,
           'completed': false,
+          'listened_seconds': secs,
         },
       );
-    } catch (_) {}
+      _handleListenResult(res.data);
+    } catch (_) {
+      _clock.giveBack(secs);
+    }
   }
 
   Future<void> _togglePlay() async {
@@ -219,6 +243,9 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
 
   @override
   void dispose() {
+    _clock.setPlaying(false);
+    _listenTimer?.cancel();
+    _stateSub?.cancel();
     _reportProgress();
     _positionSub?.cancel();
     _durationSub?.cancel();

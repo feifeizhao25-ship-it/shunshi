@@ -19,7 +19,7 @@ class BoundariesPage extends StatelessWidget {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go('/home'),
         ),
-        title: const Text('产品边界'),
+        title: const Text('Product boundaries'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
@@ -49,12 +49,12 @@ class BoundariesPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    '顺时不是什么',
+                    'What SEASONS is not',
                     style: ShunshiTextStyles.heading.copyWith(fontSize: 22),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '我们坚守的产品底线，为你的健康负责',
+                    'The lines we hold, for the sake of your health',
                     style: ShunshiTextStyles.body.copyWith(
                       color: ShunshiColors.textSecondary,
                     ),
@@ -68,48 +68,48 @@ class BoundariesPage extends StatelessWidget {
             // 顺时不提供
             _SectionTitle(
               emoji: '❌',
-              title: '顺时不提供',
-              subtitle: '以下内容超出产品范围，可能对你的健康造成风险',
+              title: 'SEASONS does not provide',
+              subtitle: 'The following is beyond the scope of the product and could put your health at risk',
               color: const Color(0xFFE57373),
             ),
             const SizedBox(height: 12),
             _BoundaryCard(
               emoji: '🏥',
-              title: '医疗诊断',
+              title: 'Medical diagnosis',
               description:
-                  '我们不提供任何疾病的诊断服务。身体不适时请及时就医，咨询专业医生。AI 不能替代医学检查和诊断。',
+                  'We do not diagnose any disease. If you feel unwell, please see a doctor. AI cannot replace medical examination and diagnosis.',
               color: const Color(0xFFE57373),
             ),
             const SizedBox(height: 12),
             _BoundaryCard(
               emoji: '💊',
-              title: '药物推荐',
+              title: 'Medication advice',
               description:
-                  '我们不推荐任何中西药物。用药需在医生指导下进行，擅自用药可能产生严重后果。',
+                  'We do not recommend any medication, Eastern or Western. Medication should be used under a doctor\'s guidance; self-medicating can have serious consequences.',
               color: const Color(0xFFE57373),
             ),
             const SizedBox(height: 12),
             _BoundaryCard(
               emoji: '🩺',
-              title: '症状分析',
+              title: 'Symptom analysis',
               description:
-                  '我们不解读体检报告中的异常指标，不提供"你可能有什么病"之类的推测。',
+                  'We do not interpret abnormal values in check-up reports or guess "what illness you might have".',
               color: const Color(0xFFE57373),
             ),
             const SizedBox(height: 12),
             _BoundaryCard(
               emoji: '📊',
-              title: '健康评分',
+              title: 'Health scores',
               description:
-                  '我们不给你打分。健康是多维度的，不应该用一个数字来衡量。',
+                  'We do not give you a score. Health is multi-dimensional and cannot be measured by a single number.',
               color: const Color(0xFFE57373),
             ),
             const SizedBox(height: 12),
             _BoundaryCard(
               emoji: '😰',
-              title: '情绪评分',
+              title: 'Mood scores',
               description:
-                  '我们不评价你的情绪状态。情绪没有好坏之分，每种感受都值得被尊重。',
+                  'We do not rate your emotional state. Feelings are neither good nor bad, and each deserves respect.',
               color: const Color(0xFFE57373),
             ),
 
@@ -118,48 +118,48 @@ class BoundariesPage extends StatelessWidget {
             // 顺时提供
             _SectionTitle(
               emoji: '✅',
-              title: '顺时提供',
-              subtitle: '我们专注于让你生活得更好的方面',
+              title: 'SEASONS provides',
+              subtitle: 'We focus on helping you live better',
               color: const Color(0xFF81C784),
             ),
             const SizedBox(height: 12),
             _BoundaryCard(
               emoji: '🍃',
-              title: '生活方式建议',
+              title: 'Lifestyle suggestions',
               description:
-                  '根据节气、体质和场景，提供饮食、运动、作息等生活方式建议，帮助你顺应自然节律。',
+                  'Based on the solar terms, your constitution and context, we suggest diet, exercise, routines and other lifestyle habits so you can live in step with natural rhythms.',
               color: const Color(0xFF81C784),
             ),
             const SizedBox(height: 12),
             _BoundaryCard(
               emoji: '🌱',
-              title: '节气养生指导',
+              title: 'Seasonal wellness guidance',
               description:
-                  '24节气的饮食调理、茶饮、运动导引、穴位保健和睡眠起居建议，与自然同步生活。',
+                  'Diet, teas, guided exercises, acupoint care and sleep and daily-routine tips for each of the 24 solar terms, so you live in sync with nature.',
               color: const Color(0xFF81C784),
             ),
             const SizedBox(height: 12),
             _BoundaryCard(
               emoji: '💬',
-              title: '情绪陪伴',
+              title: 'Emotional companionship',
               description:
-                  '在你需要倾听时陪伴你，用温暖的方式回应，不评判、不催促、不诊断。',
+                  'We keep you company when you need to be heard, responding warmly — without judging, rushing or diagnosing.',
               color: const Color(0xFF81C784),
             ),
             const SizedBox(height: 12),
             _BoundaryCard(
               emoji: '😴',
-              title: '睡眠改善建议',
+              title: 'Sleep suggestions',
               description:
-                  '基于中医理论和生活习惯，提供温和的睡眠改善方法，如泡脚、按摩、放松技巧等。',
+                  'Gentle sleep-improvement methods based on traditional wellness ideas and daily habits, such as foot soaks, massage and relaxation techniques.',
               color: const Color(0xFF81C784),
             ),
             const SizedBox(height: 12),
             _BoundaryCard(
               emoji: '🍵',
-              title: '食疗与茶饮',
+              title: 'Food therapy & teas',
               description:
-                  '根据体质推荐时令食材和食疗方案，适合日常养生的茶饮配方。',
+                  'Seasonal ingredients and food-therapy plans matched to your constitution, plus teas suited to everyday wellness.',
               color: const Color(0xFF81C784),
             ),
 
@@ -184,7 +184,7 @@ class BoundariesPage extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '如果你正在经历',
+                          'If you are experiencing',
                           style: ShunshiTextStyles.body.copyWith(
                             fontWeight: FontWeight.w600,
                             color: const Color(0xFFE65100),
@@ -192,10 +192,10 @@ class BoundariesPage extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          '持续的情绪低落、失眠、食欲不振、有自我伤害的想法，请立即寻求专业帮助：\n'
-                          '• 拨打心理援助热线：400-161-9995\n'
-                          '• 或前往就近医院精神科就医\n'
-                          '• 你不是一个人，寻求帮助是一种勇气',
+                          'persistent low mood, insomnia, loss of appetite or thoughts of harming yourself, please seek professional help right away:\n'
+                          '• Call your local crisis line (US 988, UK 116 123) or emergency number\n'
+                          '• Or go to your nearest hospital or mental-health service\n'
+                          '• You are not alone — asking for help takes courage',
                           style: ShunshiTextStyles.body.copyWith(
                             fontSize: 13,
                             color: const Color(0xFFBF360C),
@@ -214,7 +214,7 @@ class BoundariesPage extends StatelessWidget {
             // 底部
             Center(
               child: Text(
-                '顺时 · 祝你顺应自然，身心和谐',
+                'SEASONS · live in harmony with nature, body and mind',
                 style: ShunshiTextStyles.caption.copyWith(
                   color: ShunshiColors.textHint,
                 ),

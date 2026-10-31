@@ -28,6 +28,7 @@ from sqlalchemy.orm import Session
 
 from app.config import Settings
 from app.deps import current_user, get_session, get_settings
+from app.locale_context import RequestLocale, request_locale
 from app.services.speech_service import (
     SpeechService,
     get_speech_service,
@@ -38,6 +39,24 @@ from app.services.speech_service import (
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/v1/speech", tags=["speech"])
+
+_MESSAGES = {
+    "empty_audio": ("音频文件为空", "The audio file is empty."),
+    "no_speech": ("未能识别出语音内容", "No speech was detected. Please try again."),
+    "asr_failed": ("没有听清，请再说一遍", "Sorry, I didn't catch that. Please say it again."),
+    "tts_failed": ("语音播报暂时不可用，请稍后再试", "Voice playback is unavailable right now. Please try again later."),
+    "voice_failed": ("语音对话暂时不可用，请稍后再试", "Voice chat is unavailable right now. Please try again later."),
+}
+
+
+def _msg(locale: RequestLocale, key: str) -> str:
+    zh, en = _MESSAGES[key]
+    return en if locale.is_global else zh
+
+
+def _asr_language(locale: RequestLocale) -> Optional[str]:
+    """International users speak English; domestic keeps auto-detect (Chinese)."""
+    return "en" if locale.is_global else None
 
 # 文字对话响应里与合规有关的字段，语音对话原样带上（AI 标识、年龄提示、连续使用提醒、安全标记）。
 _CHAT_PASSTHROUGH_FIELDS = frozenset({
@@ -133,6 +152,7 @@ async def speech_to_text(
     file: UploadFile = File(..., description="音频文件 (wav, mp3, m4a, flac, ogg)"),
     model: str = Form(default="sensevoice", description="ASR 模型 (sensevoice, telespeech)"),
     language: Optional[str] = Form(default=None, description="指定语言 (zh, en, ja, ko, yue)"),
+    locale: RequestLocale = Depends(request_locale),
 ):
     """
     语音识别 (ASR)
@@ -149,14 +169,14 @@ async def speech_to_text(
         audio_data = await file.read()
         
         if not audio_data:
-            raise HTTPException(status_code=400, detail="音频文件为空")
+            raise HTTPException(status_code=400, detail=_msg(locale, "empty_audio"))
         
         service = get_speech_service()
         result = await service.speech_to_text(
             audio_data=audio_data,
             model=model,
             filename=file.filename or "audio.wav",
-            language=language,
+            language=language or _asr_language(locale),
         )
         
         return ASRResponse(
@@ -207,6 +227,7 @@ async def chat_voice(
     model: str = Form(default="sensevoice", description="ASR 模型"),
     tts_model: str = Form(default="fish-speech-1.5", description="TTS 模型"),
     voice: str = Form(default="benjamin", description="回复音色"),
+    locale: RequestLocale = Depends(request_locale),
     user_id: str = Depends(current_user),
     session: Session = Depends(get_session),
     settings: Settings = Depends(get_settings),
@@ -229,10 +250,11 @@ async def chat_voice(
             audio_data=audio_data,
             model=model,
             filename=file.filename or "audio.wav",
+            language=_asr_language(locale),
         )
         
         if not asr_result.text:
-            raise HTTPException(status_code=400, detail="未能识别出语音内容")
+            raise HTTPException(status_code=400, detail=_msg(locale, "no_speech"))
         
         # Step 2: AI 对话 —— 与文字对话走同一条链路（安全守卫、年龄保护、额度、境内模型、
         # 输出拦截、AI 标识、连续使用提醒、对话记录），不在这里另写一套。
@@ -240,7 +262,7 @@ async def chat_voice(
 
         result = await domestic_chat(
             body=ChatBody(message=asr_result.text), user_id=user_id,
-            session=session, settings=settings,
+            session=session, settings=settings, locale=locale,
         )
         reply_text = result["content"]
 
@@ -272,11 +294,11 @@ async def chat_voice(
         raise
     except ASRError as e:
         logger.warning("[Speech API] chat-voice 识别失败: %s", e)
-        raise HTTPException(status_code=400, detail="没有听清，请再说一遍")
+        raise HTTPException(status_code=400, detail=_msg(locale, "asr_failed"))
     except TTSError as e:
         logger.warning("[Speech API] chat-voice 合成失败: %s", e)
-        raise HTTPException(status_code=400, detail="语音播报暂时不可用，请稍后再试")
+        raise HTTPException(status_code=400, detail=_msg(locale, "tts_failed"))
     except Exception as e:
         # 原始异常只进日志，不放进响应（里面可能有接口地址、状态码、密钥片段）。
         logger.error("[Speech API] chat-voice 错误: %s", e)
-        raise HTTPException(status_code=500, detail="语音对话暂时不可用，请稍后再试")
+        raise HTTPException(status_code=500, detail=_msg(locale, "voice_failed"))

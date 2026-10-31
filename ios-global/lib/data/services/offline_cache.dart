@@ -63,7 +63,7 @@ class OfflineCache {
     if (wrapper == null) return null;
     final cachedAt = wrapper['cached_at'] as int? ?? 0;
     final age = DateTime.now().millisecondsSinceEpoch - cachedAt;
-    if (age > 5 * 60 * 1000) return null; // 5分钟过期
+    if (age > 5 * 60 * 1000) return null; // expires after 5 minutes
     return wrapper['data'] as Map<String, dynamic>;
   }
 
