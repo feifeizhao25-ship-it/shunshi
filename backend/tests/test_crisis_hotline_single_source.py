@@ -59,9 +59,6 @@ def test_12356_is_written_only_in_safety_config():
         str(path.relative_to(APP_DIR))
         for path in _app_files()
         if path != CONFIG_FILE
-        # 资料库条目是经审核的内容数据（不是代码）：其免责声明里的热线号码随内容保存，
-        # 不在这里强制走 config；代码文件仍然必须引用 app/safety/config.py。
-        and path.relative_to(APP_DIR).parts[:2] != ("library", "data")
         and CRISIS_HOTLINE in path.read_text(encoding="utf-8", errors="ignore")
     ]
     assert not hits, f"这些文件自己写死了 12356，应改为引用 app/safety/config.py：{hits}"
