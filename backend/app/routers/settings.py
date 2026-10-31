@@ -16,6 +16,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from ..deps import current_user, get_session
+from ..locale_context import RequestLocale, request_locale
 from ..simple_models import UserSetting
 
 router = APIRouter(prefix="/api/v1", tags=["settings"])
@@ -170,11 +171,12 @@ def set_age_profile(
     body: AgeProfile,
     user_id: str = Depends(current_user),
     session: Session = Depends(get_session),
+    locale: RequestLocale = Depends(request_locale),
 ):
     """填写出生日期（自报）。用于未成年人保护与老年用户的健康使用提示。"""
     from ..services.age_policy import declare_birth_date
 
-    group = declare_birth_date(session, user_id, body.birth_date)
+    group = declare_birth_date(session, user_id, body.birth_date, lang=locale.lang)
     return {"declared": True, "age_group": group}
 
 

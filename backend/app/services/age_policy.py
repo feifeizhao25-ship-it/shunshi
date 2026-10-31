@@ -29,6 +29,22 @@ UNKNOWN, CHILD, MINOR, ADULT, SENIOR = "unknown", "child", "minor", "adult", "se
 
 MIN_AGE = 16  # 所有产品、国内国际统一的最低使用年龄
 CHILD_BLOCK_TEXT = "顺时的最低使用年龄是 16 周岁，未满 16 周岁暂时无法使用对话功能，请让监护人协助你。"
+CHILD_BLOCK_TEXT_EN = (
+    "SEASONS is for people aged 16 and over, so chat isn't available yet. "
+    "Please ask a parent or guardian to help you."
+)
+BIRTHDATE_INVALID_EN = "That date of birth isn't valid. Please check it and try again."
+MINOR_LOCKED_EN = (
+    "Your account is already under youth protection, so the date of birth can't be changed to an adult one here. "
+    "If it was entered by mistake, please contact support to have it corrected."
+)
+
+
+def child_block_text(lang: str = "zh") -> str:
+    """未满 16 周岁的拒绝文案：国际版（lang=en）给英文，其余给中文。"""
+    return CHILD_BLOCK_TEXT_EN if lang == "en" else CHILD_BLOCK_TEXT
+
+
 MINOR_NOTICE = "你正在使用未成年人模式：这里只聊日常健康与作息，不提供恋人、亲人等亲密关系陪伴。有心事也可以多和家人、老师聊聊。"
 SENIOR_NOTICE = (
     "健康提示：这里的内容只是日常养生参考，不能替代医生。身体不舒服、正在吃药或有慢性病，请先问医生；"
@@ -94,17 +110,17 @@ def read_group(session: Session, user_id: str, today: date | None = None) -> str
     return group_for_age(age_on(birth, today or date.today()))
 
 
-def declare_birth_date(session: Session, user_id: str, birth: date, today: date | None = None) -> str:
+def declare_birth_date(session: Session, user_id: str, birth: date, today: date | None = None, lang: str = "zh") -> str:
     today = today or date.today()
     if birth > today or age_on(birth, today) > 120:
-        raise HTTPException(status_code=422, detail="出生日期不正确，请重新填写")
+        raise HTTPException(status_code=422, detail=BIRTHDATE_INVALID_EN if lang == "en" else "出生日期不正确，请重新填写")
     new_group = group_for_age(age_on(birth, today))
     current = read_group(session, user_id, today)
     if current in (CHILD, MINOR) and new_group not in (CHILD, MINOR):
         # 未成年人自己改成成年，等于绕过保护；更正需要人工核验（外部能力），这里不放行。
         raise HTTPException(
             status_code=409,
-            detail="你的账号已按未成年人保护，出生日期不能自行改成成年。如填写有误，请联系客服核实后更正。",
+            detail=MINOR_LOCKED_EN if lang == "en" else "你的账号已按未成年人保护，出生日期不能自行改成成年。如填写有误，请联系客服核实后更正。",
         )
     session.merge(
         UserSetting(
@@ -116,11 +132,11 @@ def declare_birth_date(session: Session, user_id: str, birth: date, today: date 
     return new_group
 
 
-def policy_for(session: Session, user_id: str) -> AgePolicy:
+def policy_for(session: Session, user_id: str, lang: str = "zh") -> AgePolicy:
     """取用户的对话策略；未满 16 周岁直接拒绝（不调模型）。"""
     group = read_group(session, user_id)
     if group == CHILD:
-        raise HTTPException(status_code=403, detail=CHILD_BLOCK_TEXT)
+        raise HTTPException(status_code=403, detail=child_block_text(lang))
     rules = [BASE_IDENTITY_RULES]
     if group == MINOR:
         rules.append(MINOR_RULES)
