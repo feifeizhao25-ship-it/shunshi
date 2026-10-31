@@ -2,7 +2,7 @@
 
 Every number comes from the entitlements registry (limits) or a real counter (chat messages in Redis, reflections in
 the database). A counter that cannot be read is reported as ``null`` with ``used_known: false``, never as 0 or a guess.
-Audio minutes have no server-side counter, so they are reported as limit only.
+Audio minutes come from the listening counter in ``audio_quota`` (reported by the players; null if unreadable).
 """
 from __future__ import annotations
 
@@ -15,7 +15,7 @@ from sqlalchemy.orm import Session
 
 from ..entitlements import get_registry
 from ..simple_models import Reflection
-from . import chat_quota
+from . import audio_quota, chat_quota
 from .membership_status import membership_status
 
 SH = ZoneInfo("Asia/Shanghai")
@@ -48,6 +48,7 @@ async def build(session: Session, redis_url: str, user_id: str, lang: str = "zh"
         select(func.count()).select_from(Reflection).where(Reflection.user_id == user_id, Reflection.created_at >= start)
     ).scalar_one()
     chat_used = await chat_quota.used_today(redis_url, user_id)
+    audio_seconds = await audio_quota.used_seconds(redis_url, user_id)
     reset = _reset_at(now)
     plan = status["plan"]
     return {
@@ -61,7 +62,7 @@ async def build(session: Session, redis_url: str, user_id: str, lang: str = "zh"
         "items": [
             _item("chat_messages", quotas["ai_daily_messages"], chat_used, "messages"),
             _item("reflections", quotas["reflections_per_day"], int(reflections), "entries"),
-            _item("audio_minutes", quotas["audio_daily_minutes"], None, "minutes"),
+            _item("audio_minutes", quotas["audio_daily_minutes"], None if audio_seconds is None else audio_seconds // 60, "minutes"),
         ],
         "generated_at": int(now.timestamp()),
     }

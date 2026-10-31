@@ -2,42 +2,61 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-/// Per-user personalised home block ("今天为你准备的" / "Picked for you today").
+/// Per-user personalised home block.
 ///
 /// One widget for every app of both products. It only draws what the backend sends:
 /// a greeting, a short headline, up to four suggestion cards each with the reason it is shown,
 /// and a one-tap switch to turn personalisation off (and back on). It has its own loading,
 /// error, empty and "off" states so a slow or failing request never breaks the page around it.
 ///
-/// Language is fixed per edition ([_zh]); nothing here is translated at run time.
-const bool _zh = false;
+/// Language is fixed per edition (the [PersonalHomeStrings] the page passes in); nothing here is translated at run time.
+/// Everything the block says, in one language. One instance per edition: `personal_home_strings_zh.dart`
+/// (domestic apps only) or `personal_home_strings_en.dart` (international apps only). This file holds no
+/// user-visible text of its own, so neither edition ships the other one's language.
+class PersonalHomeStrings {
+  const PersonalHomeStrings({
+    required this.heading,
+    required this.why,
+    required this.turnOff,
+    required this.turnOn,
+    required this.offTitle,
+    required this.offBody,
+    required this.confirmTitle,
+    required this.confirmBody,
+    required this.cancel,
+    required this.confirm,
+    required this.errorTitle,
+    required this.errorBody,
+    required this.retry,
+    required this.emptyTitle,
+    required this.emptyBody,
+    required this.saveFailed,
+    required this.loading,
+    required this.letterSpacing,
+    required this.minutes,
+    required this.days,
+  });
 
-class _S {
-  const _S._();
-  static const heading = 'Picked for you today';
-  static const why = 'Why you see this';
-  static const turnOff = 'Turn off personalisation';
-  static const turnOn = 'Turn on';
-  static const offTitle = 'Personalisation is off';
-  static const offBody = 'You are seeing general content. Your records are not deleted.';
-  static const confirmTitle = 'Turn off personalised suggestions?';
-  static const confirmBody = 'The home page will show general content only. Nothing is deleted and you can turn it back on any time.';
-  static const cancel = 'Cancel';
-  static const confirm = 'Turn off';
-  static const errorTitle = 'Could not load right now';
-  static const errorBody = 'Check your connection and try again.';
-  static const retry = 'Try again';
-  static const emptyTitle = 'No new suggestions for today';
-  static const emptyBody = 'Check back a little later.';
-  static const saveFailed = 'Could not save your setting. Please try again.';
-  static const weekHeading = 'This week';
-  static const weekdays = 'MTWTFSS';
-  static String weekDone(String d) => '$d: took a small action';
-  static String weekNone(String d) => '$d: nothing recorded';
-  static const recallDismiss = 'Got it';
-  static const recallLabel = 'Welcome back';
-  static String minutes(int n) => '$n min';
-  static String days(int n) => '$n days in a row';
+  final String heading;
+  final String why;
+  final String turnOff;
+  final String turnOn;
+  final String offTitle;
+  final String offBody;
+  final String confirmTitle;
+  final String confirmBody;
+  final String cancel;
+  final String confirm;
+  final String errorTitle;
+  final String errorBody;
+  final String retry;
+  final String emptyTitle;
+  final String emptyBody;
+  final String saveFailed;
+  final String loading;
+  final double letterSpacing;
+  final String Function(int n) minutes;
+  final String Function(int n) days;
 }
 
 /// What the screen needs from the network; the page supplies the real calls, tests supply fakes.
@@ -63,38 +82,8 @@ class PersonalHomeCard {
   final String? href;
 }
 
-class WeekDay {
-  const WeekDay({required this.date, required this.done, required this.today});
-  final DateTime date;
-  final bool done;
-  final bool today;
-}
-
 class PersonalHomeData {
-  const PersonalHomeData({
-    required this.enabled,
-    required this.greeting,
-    required this.headline,
-    required this.streakText,
-    required this.note,
-    required this.cards,
-    this.week = const [],
-    this.milestoneText = '',
-    this.milestoneDay = 0,
-    this.recallText = '',
-    this.recallTier = '',
-  });
-
-  /// Last seven days, oldest first (from the backend; empty when it sends none).
-  final List<WeekDay> week;
-
-  /// Day-3 / day-7 message, only when the user really has that streak. [milestoneDay] is 3 or 7, else 0.
-  final String milestoneText;
-  final int milestoneDay;
-
-  /// Gentle comeback message for someone away 3+ days. Shown inside the app only.
-  final String recallText;
-  final String recallTier;
+  const PersonalHomeData({required this.enabled, required this.greeting, required this.headline, required this.streakText, required this.note, required this.cards});
 
   final bool enabled;
   final String greeting;
@@ -105,9 +94,9 @@ class PersonalHomeData {
 
   static String _s(dynamic v) => v is String ? v : '';
 
-  /// Accepts both backends: 顺时 ({greeting, hero, suggestions, streak:{text}, personalization})
-  /// and 新能源 ({data:{hero:{greeting,headline,subtext}, cards, streak:int, note, personalized}}).
-  factory PersonalHomeData.fromJson(Map<String, dynamic> raw) {
+  /// Accepts both backends: the Shunshi / SEASONS one ({greeting, hero, suggestions, streak:{text}, personalization})
+  /// and the Energy Intelligence one ({data:{hero:{greeting,headline,subtext}, cards, streak:int, note, personalized}}).
+  factory PersonalHomeData.fromJson(Map<String, dynamic> raw, PersonalHomeStrings strings) {
     final root = raw['data'] is Map ? Map<String, dynamic>.from(raw['data'] as Map) : raw;
     final hero = root['hero'] is Map ? Map<String, dynamic>.from(root['hero'] as Map) : const <String, dynamic>{};
     final pers = root['personalization'] is Map ? Map<String, dynamic>.from(root['personalization'] as Map) : const <String, dynamic>{};
@@ -137,28 +126,12 @@ class PersonalHomeData {
     if (st is Map) {
       final days = st['days'] is num ? (st['days'] as num).toInt() : 0;
       streakText = _s(st['text']);
-      if (st['kind'] == 'streak' && days >= 2 && streakText.isEmpty) streakText = _S.days(days);
+      if (st['kind'] == 'streak' && days >= 2 && streakText.isEmpty) streakText = strings.days(days);
     } else if (st is num && st >= 2) {
-      streakText = _S.days(st.toInt());
+      streakText = strings.days(st.toInt());
     }
     final energyHeadline = _s(hero['headline']);
-    final week = <WeekDay>[];
-    if (root['week'] is List) {
-      for (final w in root['week'] as List) {
-        if (w is! Map) continue;
-        final d = DateTime.tryParse(_s(w['date']));
-        if (d != null) week.add(WeekDay(date: d, done: w['done'] == true, today: w['today'] == true));
-      }
-    }
-    final ms = root['milestone'] is Map ? Map<String, dynamic>.from(root['milestone'] as Map) : const <String, dynamic>{};
-    final rc = root['recall'] is Map ? Map<String, dynamic>.from(root['recall'] as Map) : const <String, dynamic>{};
-    final reached = ms['reached'] is num ? (ms['reached'] as num).toInt() : 0;
     return PersonalHomeData(
-      week: week.length == 7 ? week : const [],
-      milestoneText: _s(ms['text']),
-      milestoneDay: reached,
-      recallText: _s(rc['text']),
-      recallTier: _s(rc['tier']),
       enabled: enabled,
       greeting: _s(root['greeting']).isNotEmpty ? _s(root['greeting']) : _s(hero['greeting']),
       headline: energyHeadline,
@@ -172,14 +145,17 @@ class PersonalHomeData {
 enum _Phase { loading, ready, empty, off, error }
 
 class PersonalHomeSection extends StatefulWidget {
-  const PersonalHomeSection({super.key, required this.api, this.onOpen, this.margin = const EdgeInsets.symmetric(horizontal: 20, vertical: 8)});
+  const PersonalHomeSection({super.key, required this.api, required this.strings, this.onOpen, this.margin = const EdgeInsets.symmetric(horizontal: 20, vertical: 8)});
 
   final PersonalHomeApi api;
+
+  /// The edition's text (personal_home_strings_zh.dart or personal_home_strings_en.dart).
+  final PersonalHomeStrings strings;
 
   /// Outer spacing; pages that already pad their content pass [EdgeInsets.zero].
   final EdgeInsets margin;
 
-  /// Called with a card's in-app link (新能源 only) when the card is tapped.
+  /// Called with a card's in-app link (Energy Intelligence only) when the card is tapped.
   final void Function(PersonalHomeCard card)? onOpen;
 
   @override
@@ -187,10 +163,10 @@ class PersonalHomeSection extends StatefulWidget {
 }
 
 class _PersonalHomeSectionState extends State<PersonalHomeSection> {
+  PersonalHomeStrings get _t => widget.strings;
   _Phase _phase = _Phase.loading;
   PersonalHomeData? _data;
   bool _saving = false;
-  bool _recallDismissed = false;
 
   @override
   void initState() {
@@ -201,7 +177,7 @@ class _PersonalHomeSectionState extends State<PersonalHomeSection> {
   Future<void> _load() async {
     if (mounted) setState(() => _phase = _Phase.loading);
     try {
-      final data = PersonalHomeData.fromJson(await widget.api.load());
+      final data = PersonalHomeData.fromJson(await widget.api.load(), widget.strings);
       if (!mounted) return;
       setState(() {
         _data = data;
@@ -223,7 +199,7 @@ class _PersonalHomeSectionState extends State<PersonalHomeSection> {
     } catch (_) {
       if (!mounted) return;
       setState(() => _saving = false);
-      ScaffoldMessenger.maybeOf(context)?.showSnackBar(const SnackBar(content: Text(_S.saveFailed)));
+      ScaffoldMessenger.maybeOf(context)?.showSnackBar(SnackBar(content: Text(_t.saveFailed)));
     }
   }
 
@@ -231,11 +207,11 @@ class _PersonalHomeSectionState extends State<PersonalHomeSection> {
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text(_S.confirmTitle),
-        content: const Text(_S.confirmBody),
+        title: Text(_t.confirmTitle),
+        content: Text(_t.confirmBody),
         actions: [
-          TextButton(key: const Key('personal-home-cancel'), onPressed: () => Navigator.of(ctx).pop(false), child: const Text(_S.cancel)),
-          FilledButton(key: const Key('personal-home-confirm'), onPressed: () => Navigator.of(ctx).pop(true), child: const Text(_S.confirm)),
+          TextButton(key: const Key('personal-home-cancel'), onPressed: () => Navigator.of(ctx).pop(false), child: Text(_t.cancel)),
+          FilledButton(key: const Key('personal-home-confirm'), onPressed: () => Navigator.of(ctx).pop(true), child: Text(_t.confirm)),
         ],
       ),
     );
@@ -268,25 +244,25 @@ class _PersonalHomeSectionState extends State<PersonalHomeSection> {
   Widget _body(BuildContext context) {
     switch (_phase) {
       case _Phase.loading:
-        return const _Skeleton();
+        return _Skeleton(label: _t.loading);
       case _Phase.error:
         return _Message(
           key: const Key('personal-home-error'),
           icon: Icons.cloud_off_rounded,
-          title: _S.errorTitle,
-          body: _S.errorBody,
-          action: TextButton(key: const Key('personal-home-retry'), onPressed: _load, child: const Text(_S.retry)),
+          title: _t.errorTitle,
+          body: _t.errorBody,
+          action: TextButton(key: const Key('personal-home-retry'), onPressed: _load, child: Text(_t.retry)),
         );
       case _Phase.off:
         return _Message(
           key: const Key('personal-home-off'),
           icon: Icons.tune_rounded,
-          title: _S.offTitle,
-          body: _S.offBody,
-          action: FilledButton.tonal(key: const Key('personal-home-turn-on'), onPressed: _saving ? null : () => _toggle(true), child: const Text(_S.turnOn)),
+          title: _t.offTitle,
+          body: _t.offBody,
+          action: FilledButton.tonal(key: const Key('personal-home-turn-on'), onPressed: _saving ? null : () => _toggle(true), child: Text(_t.turnOn)),
         );
       case _Phase.empty:
-        return _Message(key: const Key('personal-home-empty'), icon: Icons.spa_outlined, title: _S.emptyTitle, body: _S.emptyBody, action: _offButton());
+        return _Message(key: const Key('personal-home-empty'), icon: Icons.spa_outlined, title: _t.emptyTitle, body: _t.emptyBody, action: _offButton());
       case _Phase.ready:
         return _content(context, _data!);
     }
@@ -296,7 +272,7 @@ class _PersonalHomeSectionState extends State<PersonalHomeSection> {
         key: const Key('personal-home-turn-off'),
         onPressed: _saving ? null : _askTurnOff,
         icon: const Icon(Icons.tune_rounded, size: 16),
-        label: const Text(_S.turnOff),
+        label: Text(_t.turnOff),
         style: TextButton.styleFrom(visualDensity: VisualDensity.compact),
       );
 
@@ -307,31 +283,20 @@ class _PersonalHomeSectionState extends State<PersonalHomeSection> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(_S.heading, style: text.labelMedium?.copyWith(color: scheme.primary, letterSpacing: _zh ? 1 : 0.4, fontWeight: FontWeight.w600)),
+        Text(_t.heading, style: text.labelMedium?.copyWith(color: scheme.primary, letterSpacing: _t.letterSpacing, fontWeight: FontWeight.w600)),
         const SizedBox(height: 6),
         if (d.greeting.isNotEmpty) Text(d.greeting, key: const Key('personal-home-greeting'), style: text.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
         if (d.headline.isNotEmpty) ...[
           const SizedBox(height: 4),
           Text(d.headline, key: const Key('personal-home-headline'), style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant)),
         ],
-        if (d.recallText.isNotEmpty && !_recallDismissed) ...[
-          const SizedBox(height: 10),
-          _RecallCard(text: d.recallText, onDismiss: () => setState(() => _recallDismissed = true)),
-        ] else if (d.streakText.isNotEmpty) ...[
+        if (d.streakText.isNotEmpty) ...[
           const SizedBox(height: 8),
           _StreakChip(text: d.streakText),
         ],
-        if (d.milestoneDay > 0 && d.milestoneText.isNotEmpty) ...[
-          const SizedBox(height: 6),
-          _MilestoneChip(day: d.milestoneDay, text: d.milestoneText),
-        ],
-        if (d.week.any((w) => w.done)) ...[
-          const SizedBox(height: 10),
-          _WeekStrip(days: d.week),
-        ],
         const SizedBox(height: 12),
         for (var i = 0; i < d.cards.length; i++) ...[
-          _CardTile(card: d.cards[i], featured: i == 0, onTap: widget.onOpen == null || d.cards[i].href == null ? null : () => widget.onOpen!(d.cards[i])),
+          _CardTile(card: d.cards[i], strings: _t, featured: i == 0, onTap: widget.onOpen == null || d.cards[i].href == null ? null : () => widget.onOpen!(d.cards[i])),
           const SizedBox(height: 8),
         ],
         const Divider(height: 16),
@@ -342,94 +307,6 @@ class _PersonalHomeSectionState extends State<PersonalHomeSection> {
           ),
         Align(alignment: AlignmentDirectional.centerEnd, child: _offButton()),
       ],
-    );
-  }
-}
-
-class _MilestoneChip extends StatelessWidget {
-  const _MilestoneChip({required this.day, required this.text});
-  final int day;
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Container(
-      key: const Key('personal-home-milestone'),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(color: scheme.tertiaryContainer.withValues(alpha: 0.7), borderRadius: BorderRadius.circular(12)),
-      child: Row(mainAxisSize: MainAxisSize.min, children: [
-        Icon(day >= 7 ? Icons.emoji_events_outlined : Icons.star_outline_rounded, size: 16, color: scheme.onTertiaryContainer),
-        const SizedBox(width: 6),
-        Flexible(child: Text(text, maxLines: 2, overflow: TextOverflow.ellipsis, style: Theme.of(context).textTheme.labelLarge?.copyWith(color: scheme.onTertiaryContainer))),
-      ]),
-    );
-  }
-}
-
-class _WeekStrip extends StatelessWidget {
-  const _WeekStrip({required this.days});
-  final List<WeekDay> days;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final text = Theme.of(context).textTheme;
-    String fmt(DateTime d) => '${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
-    return Column(key: const Key('personal-home-week'), crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(_S.weekHeading, style: text.labelSmall?.copyWith(color: scheme.onSurfaceVariant)),
-      const SizedBox(height: 4),
-      Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-        for (final d in days)
-          Semantics(
-            label: d.done ? _S.weekDone(fmt(d.date)) : _S.weekNone(fmt(d.date)),
-            excludeSemantics: true,
-            child: Column(mainAxisSize: MainAxisSize.min, children: [
-              Container(
-                key: Key('personal-home-week-${fmt(d.date)}'),
-                width: 26,
-                height: 26,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: d.done ? scheme.primary : Colors.transparent,
-                  border: Border.all(color: d.today ? scheme.primary : scheme.outlineVariant, width: d.today ? 2 : 1),
-                ),
-                child: d.done ? Icon(Icons.check_rounded, size: 16, color: scheme.onPrimary) : null,
-              ),
-              const SizedBox(height: 2),
-              Text(_S.weekdays[(d.date.weekday - 1) % 7], style: text.labelSmall?.copyWith(color: scheme.onSurfaceVariant)),
-            ]),
-          ),
-      ]),
-    ]);
-  }
-}
-
-class _RecallCard extends StatelessWidget {
-  const _RecallCard({required this.text, required this.onDismiss});
-  final String text;
-  final VoidCallback onDismiss;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final t = Theme.of(context).textTheme;
-    return Container(
-      key: const Key('personal-home-recall'),
-      padding: const EdgeInsets.fromLTRB(12, 10, 4, 10),
-      decoration: BoxDecoration(color: scheme.secondaryContainer.withValues(alpha: 0.55), borderRadius: BorderRadius.circular(16)),
-      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Icon(Icons.waving_hand_outlined, size: 18, color: scheme.onSecondaryContainer),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(_S.recallLabel, style: t.labelMedium?.copyWith(color: scheme.onSecondaryContainer, fontWeight: FontWeight.w700)),
-            const SizedBox(height: 2),
-            Text(text, style: t.bodyMedium?.copyWith(color: scheme.onSecondaryContainer, height: 1.3)),
-          ]),
-        ),
-        TextButton(key: const Key('personal-home-recall-dismiss'), onPressed: onDismiss, child: const Text(_S.recallDismiss)),
-      ]),
     );
   }
 }
@@ -486,8 +363,9 @@ IconData _iconFor(String kind) {
 }
 
 class _CardTile extends StatelessWidget {
-  const _CardTile({required this.card, required this.featured, this.onTap});
+  const _CardTile({required this.card, required this.strings, required this.featured, this.onTap});
   final PersonalHomeCard card;
+  final PersonalHomeStrings strings;
   final bool featured;
   final VoidCallback? onTap;
 
@@ -520,7 +398,7 @@ class _CardTile extends StatelessWidget {
             ],
             if (card.minutes != null) ...[
               const SizedBox(height: 6),
-              Text(_S.minutes(card.minutes!), style: text.labelSmall?.copyWith(color: scheme.primary, fontWeight: FontWeight.w600)),
+              Text(strings.minutes(card.minutes!), style: text.labelSmall?.copyWith(color: scheme.primary, fontWeight: FontWeight.w600)),
             ],
             if (card.reason.isNotEmpty) ...[
               const SizedBox(height: 8),
@@ -530,7 +408,7 @@ class _CardTile extends StatelessWidget {
                 Expanded(
                   child: Text.rich(
                     TextSpan(children: [
-                      TextSpan(text: '${_S.why}  ', style: const TextStyle(fontWeight: FontWeight.w600)),
+                      TextSpan(text: '${strings.why}  ', style: const TextStyle(fontWeight: FontWeight.w600)),
                       TextSpan(text: card.reason),
                     ]),
                     key: Key('personal-home-why-${card.id}'),
@@ -581,14 +459,15 @@ class _Message extends StatelessWidget {
 }
 
 class _Skeleton extends StatelessWidget {
-  const _Skeleton();
+  const _Skeleton({required this.label});
+  final String label;
 
   @override
   Widget build(BuildContext context) {
     final c = Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.7);
     Widget bar(double w, double h) => Container(width: w, height: h, decoration: BoxDecoration(color: c, borderRadius: BorderRadius.circular(8)));
     return Semantics(
-      label: 'Loading',
+      label: label,
       child: Column(key: const Key('personal-home-loading'), crossAxisAlignment: CrossAxisAlignment.start, children: [
         bar(96, 12),
         const SizedBox(height: 10),

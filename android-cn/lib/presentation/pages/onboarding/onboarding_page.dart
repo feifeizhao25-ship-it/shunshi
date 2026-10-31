@@ -256,6 +256,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
           const SizedBox(height: 20),
           // 模拟界面示意
           _buildMockUI(context, step.illustration),
+          const SizedBox(height: 8),
+          Text('界面示意（示例内容，非真实数据）', style: TextStyle(fontSize: 11, color: Theme.of(context).hintColor)),
         ],
       ),
     );

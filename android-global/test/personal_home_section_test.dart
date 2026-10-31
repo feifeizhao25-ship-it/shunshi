@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:seasons/presentation/widgets/personal_home_section.dart';
+import 'package:seasons/presentation/widgets/personal_home_strings_en.dart';
 
 const bool zh = false;
 final cjk = RegExp(r'[\u3400-\u9fff]');
@@ -60,35 +61,37 @@ String allText(WidgetTester t) => t
     .map((w) => w.data ?? w.textSpan?.toPlainText() ?? '')
     .join(' ');
 
+const strings = kPersonalHomeStringsEn;
+
 void main() {
   test('parses the 顺时 shape: hero, suggestions, streak, note, switch', () {
-    final d = PersonalHomeData.fromJson(shunshiJson());
+    final d = PersonalHomeData.fromJson(shunshiJson(), strings);
     expect(d.enabled, isTrue);
     expect(d.cards.length, 3);
     expect(d.cards.first.minutes, 3);
     expect(d.cards.first.kind, 'breathing');
     expect(d.cards.first.body, isEmpty, reason: 'description equal to title must not be shown twice');
     expect(d.streakText, isNotEmpty);
-    expect(PersonalHomeData.fromJson(shunshiJson(enabled: false)).enabled, isFalse);
+    expect(PersonalHomeData.fromJson(shunshiJson(enabled: false), strings).enabled, isFalse);
   });
 
   test('parses the 新能源 shape (wrapped in data) incl. links', () {
-    final d = PersonalHomeData.fromJson(energyJson());
+    final d = PersonalHomeData.fromJson(energyJson(), strings);
     expect(d.cards.first.href, '/calculator');
     expect(d.headline, isNotEmpty);
     expect(d.streakText, isNotEmpty);
     expect(d.note, contains(zh ? '不构成投资建议' : 'Not investment advice'), reason: 'the disclaimer must reach the screen');
-    expect(PersonalHomeData.fromJson(energyJson(personalized: false)).enabled, isFalse);
+    expect(PersonalHomeData.fromJson(energyJson(personalized: false), strings).enabled, isFalse);
   });
 
   test('ignores junk cards instead of crashing', () {
-    final d = PersonalHomeData.fromJson({'suggestions': [1, null, {'title': ''}, {'title': 'ok'}], 'streak': 'x'});
+    final d = PersonalHomeData.fromJson({'suggestions': [1, null, {'title': ''}, {'title': 'ok'}], 'streak': 'x'}, strings);
     expect(d.cards.length, 1);
   });
 
   testWidgets('shows a loading skeleton, then the cards with a why-line each', (tester) async {
     final c = Completer<Map<String, dynamic>>();
-    await tester.pumpWidget(host(PersonalHomeSection(api: fake(() => c.future))));
+    await tester.pumpWidget(host(PersonalHomeSection(strings: strings, api: fake(() => c.future))));
     expect(find.byKey(const Key('personal-home-loading')), findsOneWidget);
     c.complete(shunshiJson());
     await tester.pumpAndSettle();
@@ -104,7 +107,7 @@ void main() {
 
   testWidgets('error state offers retry and recovers', (tester) async {
     var calls = 0;
-    await tester.pumpWidget(host(PersonalHomeSection(api: fake(() async {
+    await tester.pumpWidget(host(PersonalHomeSection(strings: strings, api: fake(() async {
       if (++calls == 1) throw Exception('offline');
       return shunshiJson();
     }))));
@@ -118,7 +121,7 @@ void main() {
   });
 
   testWidgets('empty state when the backend has nothing to suggest', (tester) async {
-    await tester.pumpWidget(host(PersonalHomeSection(api: fake(() async => shunshiJson(cards: 0)))));
+    await tester.pumpWidget(host(PersonalHomeSection(strings: strings, api: fake(() async => shunshiJson(cards: 0)))));
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('personal-home-empty')), findsOneWidget);
   });
@@ -127,7 +130,7 @@ void main() {
     var enabled = true;
     final saved = <bool>[];
     await tester.pumpWidget(host(PersonalHomeSection(
-      api: fake(() async => shunshiJson(enabled: enabled), (v) async {
+      strings: strings, api: fake(() async => shunshiJson(enabled: enabled), (v) async {
         saved.add(v);
         enabled = v;
       }),
@@ -153,7 +156,7 @@ void main() {
   });
 
   testWidgets('a failed save keeps the page and tells the user', (tester) async {
-    await tester.pumpWidget(host(PersonalHomeSection(api: fake(() async => shunshiJson(), (_) async => throw Exception('500')))));
+    await tester.pumpWidget(host(PersonalHomeSection(strings: strings, api: fake(() async => shunshiJson(), (_) async => throw Exception('500')))));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('personal-home-turn-off')));
     await tester.pumpAndSettle();
@@ -165,7 +168,7 @@ void main() {
 
   testWidgets('cards with a link are tappable and report which card', (tester) async {
     PersonalHomeCard? opened;
-    await tester.pumpWidget(host(PersonalHomeSection(api: fake(() async => energyJson()), onOpen: (c) => opened = c)));
+    await tester.pumpWidget(host(PersonalHomeSection(strings: strings, api: fake(() async => energyJson()), onOpen: (c) => opened = c)));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('personal-home-card-e1')));
     expect(opened?.href, '/calculator');
@@ -174,7 +177,7 @@ void main() {
 
   testWidgets('language gate: every visible string matches the edition', (tester) async {
     for (final json in [shunshiJson(), energyJson()]) {
-      await tester.pumpWidget(host(PersonalHomeSection(api: fake(() async => json))));
+      await tester.pumpWidget(host(PersonalHomeSection(strings: strings, api: fake(() async => json))));
       await tester.pumpAndSettle();
       final t = allText(tester);
       expect(t.isNotEmpty, isTrue);
@@ -182,7 +185,7 @@ void main() {
     }
     // the non-content states too
     for (final api in [fake(() async => throw Exception('x')), fake(() async => shunshiJson(cards: 0)), fake(() async => shunshiJson(enabled: false))]) {
-      await tester.pumpWidget(host(PersonalHomeSection(api: api)));
+      await tester.pumpWidget(host(PersonalHomeSection(strings: strings, api: api)));
       await tester.pumpAndSettle();
       expect(cjk.hasMatch(allText(tester)), zh, reason: allText(tester));
     }
@@ -195,7 +198,7 @@ void main() {
     final j = shunshiJson();
     (j['suggestions'] as List)[0]['title'] = List.filled(40, zh ? '很长的标题' : 'a very long title').join(' ');
     (j['suggestions'] as List)[0]['reason'] = List.filled(40, zh ? '很长的原因' : 'a very long reason').join(' ');
-    await tester.pumpWidget(host(PersonalHomeSection(api: fake(() async => j))));
+    await tester.pumpWidget(host(PersonalHomeSection(strings: strings, api: fake(() async => j))));
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
   });

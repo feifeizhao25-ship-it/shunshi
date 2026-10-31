@@ -184,6 +184,7 @@ class CultureBody(BaseModel):
     observances: list[str] = Field(default_factory=list)
     units: str | None = None
     hemisphere: str | None = None
+    hemisphere_source: str | None = None  # "device" = the saved device-detected hemisphere, unchanged
 
 
 @router.get("/profile/culture")
@@ -199,6 +200,23 @@ def get_culture_profile(user_id: str = Depends(current_user), session: Session =
             "hemisphere": list(cp.HEMISPHERES),
         },
     }
+
+
+class CultureDeviceBody(BaseModel):
+    hemisphere: str | None = None
+    utc_offset_minutes: int | None = None
+    force: bool = False
+
+
+@router.put("/profile/culture/device")
+def put_culture_device_hints(body: CultureDeviceBody, user_id: str = Depends(current_user), session: Session = Depends(get_session)):
+    """What the app detected on the device (hemisphere, UTC offset). Never overrides a hemisphere the user chose."""
+    from ..services import culture_profile as cp
+
+    try:
+        return cp.save_device_hints(session, user_id, body.model_dump())
+    except cp.CultureError as error:
+        raise HTTPException(status_code=422, detail=str(error)) from error
 
 
 @router.put("/profile/culture")

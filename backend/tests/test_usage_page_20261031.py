@@ -37,7 +37,7 @@ def test_free_plan_limits_come_from_the_registry(api):
     assert d["plan"] == "free" and d["plan_name"] == "免费版" and d["active"] is False
     assert it["chat_messages"]["limit"] == 20 and it["chat_messages"]["used"] == 0 and it["chat_messages"]["remaining"] == 20
     assert it["reflections"]["limit"] == 3 and it["reflections"]["unlimited"] is False
-    assert it["audio_minutes"]["limit"] == 30 and it["audio_minutes"]["used"] is None and it["audio_minutes"]["used_known"] is False
+    assert it["audio_minutes"]["limit"] == 30 and it["audio_minutes"]["used"] == 0 and it["audio_minutes"]["used_known"] is True  # counted since the audio-minutes counter exists
     assert "北京时间" in d["reset_note"] and d["resets_at"].endswith("+00:00")
 
 

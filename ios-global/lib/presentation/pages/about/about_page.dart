@@ -48,7 +48,7 @@ class AboutPage extends StatelessWidget {
             child: Column(children: [
               _featureRow(Icons.eco, 'Seasonal wellness', 'Follow the 24 solar terms'),
               const Divider(height: 20),
-              _featureRow(Icons.schedule, 'Daily rhythm reminders', 'Reminders matched to the twelve two-hour periods of the day'),
+              _featureRow(Icons.schedule, 'Daily rhythm reminders', 'Gentle reminders through the day'),
               const Divider(height: 20),
               _featureRow(Icons.health_and_safety, 'Constitution check', 'Smart scoring across nine constitution types'),
               const Divider(height: 20),

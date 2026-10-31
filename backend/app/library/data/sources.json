@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "note": "资料库自动核对用的来源登记。只登记官方/权威来源；抓取只用于发现「有变化」，不改条目、不上线。",
+  "extra_allowed_domains": ["zgggws.com", "unesco.org", "nbphsp.org.cn"],
+  "http_upgrade_hosts": ["www.npc.gov.cn"],
+  "manual_hosts": {
+    "www.nhc.gov.cn": "该站点拒绝程序访问（HTTP 412），需人工用浏览器核对",
+    "www.npc.gov.cn": "盒子环境连不上该站，需人工用浏览器核对（生产环境可联网时删除本行）",
+    "www.nbphsp.org.cn": "该站返回 HTTP 500，需人工核对"
+  },
+  "watch": [
+    {"id": "nhc-sps", "name": "国家卫生健康委·食品安全标准与监测评估司", "publisher": "国家卫生健康委员会", "listing_url": "https://www.nhc.gov.cn/sps/new_index.shtml",
+     "title_include": ["食药物质", "食品药品", "药食同源", "按照传统既是食品又是中药材", "营养", "食养"], "license_note": "国家机关公文，不适用著作权保护（《著作权法》第五条）", "category_hint": "药食同源"},
+    {"id": "gov-zhengce", "name": "中国政府网·最新政策", "publisher": "国务院", "listing_url": "https://www.gov.cn/zhengce/index.htm",
+     "title_include": ["全民健身", "身体活动", "睡眠", "中医药", "食养", "养生"], "license_note": "国家机关公文，不适用著作权保护（《著作权法》第五条）", "category_hint": "运动健身"},
+    {"id": "samr-fdzdgknr", "name": "市场监管总局·虚假宣传与广告监管", "publisher": "国家市场监督管理总局", "listing_url": "https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/tssps/index.html",
+     "title_include": ["保健食品", "虚假宣传", "食品广告", "养生"], "license_note": "国家机关公文，不适用著作权保护（《著作权法》第五条）", "category_hint": "消费提醒"}
+  ]
+}
