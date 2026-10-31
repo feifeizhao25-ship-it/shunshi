@@ -4,6 +4,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../widgets/illustrated_widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../design_system/theme.dart';
@@ -101,10 +102,12 @@ class _AchievementPageV2State extends State<AchievementPageV2> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 8, bottom: 4),
-              child: Text('记录您的每一次健康修行',
-                style: TextStyle(fontSize: 14, color: AppColors.textTertiary(context))),
+            const SizedBox(height: 8),
+            const PageHeroBanner(
+              asset: 'assets/images/wellness/ss_hero_achievement.webp',
+              title: '登高有径，日积月累',
+              subtitle: '记录您的每一次健康修行',
+              height: 140,
             ),
             const SizedBox(height: 16),
 
@@ -124,7 +127,7 @@ class _AchievementPageV2State extends State<AchievementPageV2> {
                   Text('当前等级：$_levelTitle', style: TextStyle(fontSize: 14, color: Color(0xFFE4C285))),
                   if (_level < 5) ...[
                     const SizedBox(height: 4),
-                    Text('下一级：$_nextLevelTitle', style: TextStyle(fontSize: 12, color: Colors.white60)),
+                    Text('下一级：$_nextLevelTitle', style: TextStyle(fontSize: 13, color: Colors.white70)),
                     const SizedBox(height: 8),
                     ClipRRect(
                       borderRadius: BorderRadius.circular(4),
@@ -135,7 +138,7 @@ class _AchievementPageV2State extends State<AchievementPageV2> {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    Text('距离升级还需 $remaining 积分', style: TextStyle(fontSize: 11, color: Colors.white54)),
+                    Text('距离升级还需 $remaining 积分', style: TextStyle(fontSize: 13, color: Colors.white70)),
                   ],
                 ],
               ),
@@ -164,7 +167,7 @@ class _AchievementPageV2State extends State<AchievementPageV2> {
 
             if (unlocked.isNotEmpty) GridView.count(
               crossAxisCount: 2, shrinkWrap: true, physics: const NeverScrollableScrollPhysics(),
-              mainAxisSpacing: 12, crossAxisSpacing: 12, childAspectRatio: 1.1,
+              mainAxisSpacing: 12, crossAxisSpacing: 12, childAspectRatio: 0.95,
               children: unlocked.map((b) => _buildBadgeCard(b)).toList(),
             ),
 
@@ -176,7 +179,7 @@ class _AchievementPageV2State extends State<AchievementPageV2> {
               const SizedBox(height: 12),
               GridView.count(
                 crossAxisCount: 2, shrinkWrap: true, physics: const NeverScrollableScrollPhysics(),
-                mainAxisSpacing: 12, crossAxisSpacing: 12, childAspectRatio: 1.1,
+                mainAxisSpacing: 12, crossAxisSpacing: 12, childAspectRatio: 0.95,
                 children: locked.map((b) => _buildBadgeCard(b)).toList(),
               ),
             ],
@@ -222,10 +225,19 @@ class _AchievementPageV2State extends State<AchievementPageV2> {
           Icon(icon, size: 20, color: ShunShiColors.primary),
           const SizedBox(height: 4),
           Text('$value', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textPrimary(context))),
-          Text(label, style: TextStyle(fontSize: 11, color: AppColors.textTertiary(context))),
+          Text(label, style: TextStyle(fontSize: 12.5, color: AppColors.textTertiary(context))),
         ]),
       ),
     );
+  }
+
+  static String _badgeAsset(String title) {
+    const m = {
+      '早起达人': 'ss_badge_early', '节气使者': 'ss_badge_term', '养生先锋': 'ss_badge_pine',
+      '日记达人': 'ss_badge_diary', '冥想行者': 'ss_badge_meditate', '收藏家': 'ss_badge_collect',
+      '百日功成': 'ss_badge_hundred', '全家康泰': 'ss_badge_family',
+    };
+    return 'assets/images/wellness/${m[title] ?? 'ss_badge_lotus'}.webp';
   }
 
   Widget _buildBadgeCard(_Badge badge) {
@@ -239,16 +251,14 @@ class _AchievementPageV2State extends State<AchievementPageV2> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(badge.icon, size: 32,
-            color: badge.unlocked ? (badge.color ?? ShunShiColors.primary) : AppColors.textTertiary(context),
-          ),
+          BadgeImage(asset: _badgeAsset(badge.title), unlocked: badge.unlocked, size: 72),
           const SizedBox(height: 8),
           Text(badge.title, style: TextStyle(
             fontSize: 14, fontWeight: FontWeight.w600,
             color: badge.unlocked ? AppColors.textPrimary(context) : AppColors.textTertiary(context),
           )),
           const SizedBox(height: 2),
-          Text(badge.desc, style: TextStyle(fontSize: 11, color: AppColors.textTertiary(context))),
+          Text(badge.desc, style: TextStyle(fontSize: 12.5, color: AppColors.textTertiary(context))),
           if (!badge.unlocked && badge.progress > 0) ...[
             const SizedBox(height: 6),
             ClipRRect(

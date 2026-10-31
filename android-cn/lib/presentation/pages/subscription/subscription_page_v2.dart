@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../widgets/illustrated_widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -373,6 +374,13 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
+        image: DecorationImage(
+          image: const AssetImage('assets/images/wellness/ss_hero_member.webp'),
+          fit: BoxFit.cover,
+          colorFilter: ColorFilter.mode(
+            (planId == 'free' ? const Color(0xFF3F3328) : const Color(0xFF0F3320)).withValues(alpha: 0.62),
+            BlendMode.srcATop),
+        ),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
@@ -657,7 +665,7 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
             Text(
               plan.description,
               style: TextStyle(
-                fontSize: 10,
+                fontSize: 12.5,
                 color: ShunShiColors.textTertiary,
                 height: 1.4,
               ),
@@ -734,24 +742,28 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
           ),
         ),
         const SizedBox(height: 12),
-        _buildBenefit(
-          Icons.auto_awesome,
-          'AI 个性化方案',
-          '按二十四节气安排当天作息，不是诊疗方案。',
+        const ImageBenefitTile(
+          asset: 'assets/images/wellness/ss_ben_ai.webp',
+          title: 'AI 个性化方案',
+          desc: '按二十四节气安排当天作息，不是诊疗方案。',
         ),
-        _buildBenefit(
-          Icons.restaurant_menu,
-          '完整内容库',
-          '解锁当前已上架并持续更新的食养、作息与节气内容。',
+        const ImageBenefitTile(
+          asset: 'assets/images/wellness/ss_ben_library.webp',
+          title: '完整内容库',
+          desc: '解锁当前已上架并持续更新的食养、作息与节气内容。',
         ),
-        _buildBenefit(Icons.headphones, '已上架音频', '只播放当前已经上架的音频。'),
+        const ImageBenefitTile(
+          asset: 'assets/images/wellness/ss_ben_audio.webp',
+          title: '已上架音频',
+          desc: '只播放当前已经上架的音频。',
+        ),
         const SizedBox(height: 8),
         Text(
           '当前支付宝方案为单次购买，不自动续费；支付前会再次展示金额与订单信息。',
           style: TextStyle(
-            fontSize: 12,
+            fontSize: 13,
             color: ShunShiColors.textTertiary,
-            height: 1.5,
+            height: 1.6,
           ),
         ),
       ],

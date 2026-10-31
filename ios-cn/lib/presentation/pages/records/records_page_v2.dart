@@ -4,6 +4,7 @@ library;
 
 import 'package:dio/dio.dart';
 import '../../widgets/state_view.dart';
+import '../../widgets/illustrated_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
@@ -43,7 +44,8 @@ class _RecordsPageV2State extends State<RecordsPageV2> {
   Future<void> _getToken() async {
     try {
       final res = await _dio.post('/api/v1/auth/guest-login', data: {});
-      _token = res.data['data']['token'];
+      final d = res.data;
+      _token = (d is Map ? (d['access_token'] ?? (d['data'] is Map ? d['data']['token'] : null)) : null)?.toString();
     } catch (_) {}
   }
 
@@ -104,6 +106,13 @@ class _RecordsPageV2State extends State<RecordsPageV2> {
         child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
+            const PageHeroBanner(
+              asset: 'assets/images/wellness/ss_hero_records.webp',
+              title: '日日有记，心中有数',
+              subtitle: '习惯、睡眠与心情，都在这里',
+              height: 140,
+            ),
+            const SizedBox(height: 14),
             // Stats card
             Container(
               padding: const EdgeInsets.all(20),
@@ -130,11 +139,11 @@ class _RecordsPageV2State extends State<RecordsPageV2> {
                   const SizedBox(width: 8),
                   Text('今天', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
                   const Spacer(),
-                  Text('${(progress * 100).toInt()}%', style: TextStyle(fontSize: 13, color: AppColors.primary(context), fontWeight: FontWeight.w500)),
+                  Text('${(progress * 100).toInt()}%', style: TextStyle(fontSize: 14, color: AppColors.primary(context), fontWeight: FontWeight.w500)),
                 ]),
                 const SizedBox(height: 8),
                 Text(progress >= 1.0 ? '已完成全部习惯！' : '已完成 $_todayDone/$_todayTotal 项习惯',
-                  style: TextStyle(fontSize: 13, color: AppColors.textSecondary(context))),
+                  style: TextStyle(fontSize: 14, color: AppColors.textSecondary(context))),
                 const SizedBox(height: 8),
                 ClipRRect(borderRadius: BorderRadius.circular(3),
                   child: LinearProgressIndicator(value: progress, backgroundColor: AppColors.surfaceContainerLow(context), color: AppColors.primary(context), minHeight: 4)),
@@ -142,8 +151,16 @@ class _RecordsPageV2State extends State<RecordsPageV2> {
             ),
             const SizedBox(height: 16),
 
+            if (_sleepStats['avg_hours'] == null && _emotionTrends.isEmpty) ...[
+              const IllustratedEmptyState(
+                title: '还没有睡眠与心情记录',
+                message: '写一篇养生日记或记录睡眠后，这里会出现你的变化趋势。',
+                asset: 'assets/images/wellness/ss_empty_records.webp',
+              ),
+              const SizedBox(height: 16),
+            ],
             // Sleep stats
-            if (_sleepStats.isNotEmpty) ...[
+            if (_sleepStats['avg_hours'] != null) ...[
               Text('睡眠统计', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
               const SizedBox(height: 12),
               Container(
@@ -153,11 +170,11 @@ class _RecordsPageV2State extends State<RecordsPageV2> {
                   Icon(Icons.bedtime, color: AppColors.primary(context), size: 20),
                   const SizedBox(width: 10),
                   Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text('平均睡眠', style: TextStyle(fontSize: 13, color: AppColors.textTertiary(context))),
+                    Text('平均睡眠', style: TextStyle(fontSize: 14, color: AppColors.textTertiary(context))),
                     Text('${_sleepStats['avg_hours'] ?? '-'}小时', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.textPrimary(context))),
                   ])),
                   Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text('质量评分', style: TextStyle(fontSize: 13, color: AppColors.textTertiary(context))),
+                    Text('质量评分', style: TextStyle(fontSize: 14, color: AppColors.textTertiary(context))),
                     Text('${_sleepStats['avg_quality'] ?? '-'}/5', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.textPrimary(context))),
                   ])),
                 ]),
@@ -169,6 +186,15 @@ class _RecordsPageV2State extends State<RecordsPageV2> {
             if (_emotionTrends.isNotEmpty) ...[
               Text('情绪趋势', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
               const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+                margin: const EdgeInsets.only(bottom: 12),
+                decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(14)),
+                child: MiniBarChart(
+                  values: _emotionTrends.take(7).map((e) => ((e['avg_mood'] as num?) ?? 3).toDouble()).toList(),
+                  labels: _emotionTrends.take(7).map((e) => e['date']?.toString().substring(5, 10) ?? '').toList(),
+                ),
+              ),
               ..._emotionTrends.take(5).map((e) => Padding(
                 padding: const EdgeInsets.only(bottom: 8),
                 child: Container(
@@ -177,9 +203,9 @@ class _RecordsPageV2State extends State<RecordsPageV2> {
                   child: Row(children: [
                     Icon(_emotionIcon(e['avg_mood'] as int? ?? 3), color: AppColors.primary(context), size: 18),
                     const SizedBox(width: 10),
-                    Text(e['date']?.toString().substring(5, 10) ?? '', style: TextStyle(fontSize: 13, color: AppColors.textSecondary(context))),
+                    Text(e['date']?.toString().substring(5, 10) ?? '', style: TextStyle(fontSize: 14, color: AppColors.textSecondary(context))),
                     const Spacer(),
-                    Text(_emotionLabel(e['avg_mood'] as int? ?? 3), style: TextStyle(fontSize: 13, color: AppColors.textPrimary(context))),
+                    Text(_emotionLabel(e['avg_mood'] as int? ?? 3), style: TextStyle(fontSize: 14, color: AppColors.textPrimary(context))),
                   ]),
                 ),
               )),
@@ -193,7 +219,7 @@ class _RecordsPageV2State extends State<RecordsPageV2> {
   Widget _buildStat(String label, String value) {
     return Column(children: [
       Text(value, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
-      Text(label, style: TextStyle(fontSize: 12, color: Colors.white70)),
+      Text(label, style: TextStyle(fontSize: 13, color: Colors.white70)),
     ]);
   }
 

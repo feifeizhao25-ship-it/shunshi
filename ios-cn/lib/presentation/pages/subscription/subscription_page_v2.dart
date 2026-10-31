@@ -3,6 +3,7 @@ import '../../../data/network/api_client.dart';
 import '../../../data/models/subscription.dart';
 import '../../../data/services/store_service.dart';
 import '../../../design_system/app_colors.dart';
+import '../../widgets/illustrated_widgets.dart';
 
 class SubscriptionPageV2 extends StatefulWidget {
   const SubscriptionPageV2({
@@ -164,6 +165,11 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2>
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
               color: AppColors.primaryContainerDeep(context),
+              image: const DecorationImage(
+                image: AssetImage('assets/images/wellness/ss_hero_member.webp'),
+                fit: BoxFit.cover,
+                colorFilter: ColorFilter.mode(Color(0x9E0F3320), BlendMode.srcATop),
+              ),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Column(
@@ -228,6 +234,24 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2>
                     : () => setState(() => _selected = plan.key),
               ),
             ),
+          const SizedBox(height: 20),
+          const Text('会员权益', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
+          const SizedBox(height: 8),
+          const ImageBenefitTile(
+            asset: 'assets/images/wellness/ss_ben_ai.webp',
+            title: 'AI 个性化方案',
+            desc: '按二十四节气安排当天作息，不是诊疗方案。',
+          ),
+          const ImageBenefitTile(
+            asset: 'assets/images/wellness/ss_ben_library.webp',
+            title: '完整内容库',
+            desc: '解锁当前已上架并持续更新的食养、作息与节气内容。',
+          ),
+          const ImageBenefitTile(
+            asset: 'assets/images/wellness/ss_ben_audio.webp',
+            title: '已上架音频',
+            desc: '只播放当前已经上架的音频。',
+          ),
           const SizedBox(height: 12),
           Text(
             '价格由苹果商店提供，金额、订阅周期及续订条件请在购买确认页核对。您可在苹果账户的订阅设置中管理订阅。',
