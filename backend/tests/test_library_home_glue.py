@@ -8,6 +8,8 @@
 """
 
 import json
+import os
+import pathlib
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
@@ -47,6 +49,15 @@ def _pin(monkeypatch, day_offset):
     monkeypatch.setattr(lr, "_today", lambda: when.date())
 
 
+def _dump(edition, name, day, data):
+    """截图用：LIB_FIXTURE_DIR 设置时，把每个人每天首页接口的真实返回原样存下来（不是手写的）。"""
+    d = os.environ.get("LIB_FIXTURE_DIR")
+    if d:
+        out = pathlib.Path(d)
+        out.mkdir(parents=True, exist_ok=True)
+        (out / f"{edition}_{name}_d{day}.json").write_text(json.dumps(data, ensure_ascii=False), "utf-8")
+
+
 def _home(client, h):
     return client.get("/api/v1/seasons/home/dashboard", headers=h).json()
 
@@ -81,6 +92,7 @@ def test_five_users_seven_days_library_card_on_home(client, lib, monkeypatch):  
             data = _home(client, h)
             again = _home(client, h)
             assert [c["id"] for c in data["suggestions"]] == [c["id"] for c in again["suggestions"]], "刷新首页不能重排"
+            _dump("cn", n, i, data)
             cards = _lib_cards(data)
             assert len(cards) <= 1 and data["suggestions"] == data["gentle_suggestions"]
             if i < 1:
@@ -163,3 +175,21 @@ def test_with_library_card_is_a_noop_for_empty_library_and_keeps_hero(lib):  # n
 
     out = phs.with_library_card(S(), "u1", board)
     assert out["cards"] == board["cards"] and out["hero"] == board["hero"]
+
+
+def test_international_five_users_seven_days_home_is_english_and_has_no_library_card(client, lib, monkeypatch):  # noqa: F811
+    """国际版（SEASONS）5 个用户 × 7 天：首页区块全英文，没有资料库卡（这个资料库只属于国内版）。"""
+    users = {n: _user(client, n) for n in ONBOARD}
+    doc = store.load_document()
+    approve_all(doc, {"entries": {}, "candidates": []}, MON)
+    persist(doc, {"entries": {}, "candidates": []})
+    cjk = __import__("re").compile(r"[\u3400-\u9fff]")
+    for i in range(7):
+        _pin(monkeypatch, i)
+        for n, h in users.items():
+            en = {**h, "Accept-Language": "en", "X-App-Market": "global"}
+            data = client.get("/api/v1/seasons/home/dashboard", headers=en).json()
+            _dump("global", n, i, data)
+            assert not _lib_cards(data), (n, i)
+            blob = json.dumps(data, ensure_ascii=False)
+            assert not cjk.search(blob), (n, i, cjk.search(blob).group(0))
