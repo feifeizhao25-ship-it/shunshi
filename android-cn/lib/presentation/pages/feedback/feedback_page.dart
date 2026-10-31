@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
 import '../../../data/network/api_client.dart';
+import '../../../data/network/session.dart';
 
 /// 用户反馈页
 class FeedbackPage extends StatefulWidget {
@@ -33,7 +34,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
     setState(() => _submitting = true);
     try {
       await ApiClient().post('/api/v1/feedback/submit', data: {
-        'user_id': 'guest',
+        ...userIdParam(),
         'category': _category,
         'message': _msgCtrl.text.trim(),
         'rating': _rating > 0 ? _rating : null,

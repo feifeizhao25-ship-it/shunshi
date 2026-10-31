@@ -7,6 +7,7 @@ import 'package:dio/dio.dart';
 import '../../../core/config/app_config.dart';
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
+import '../../../data/network/session.dart';
 
 class CommunityPageV2 extends StatefulWidget {
   const CommunityPageV2({super.key});
@@ -16,7 +17,7 @@ class CommunityPageV2 extends StatefulWidget {
 }
 
 class _CommunityPageV2State extends State<CommunityPageV2> with SingleTickerProviderStateMixin {
-  final _dio = Dio(BaseOptions(baseUrl: AppConfig.apiBaseUrl.replaceAll('/api/v1', ''), connectTimeout: const Duration(seconds: 8)));
+  final _dio = withSessionAuth(Dio(BaseOptions(baseUrl: AppConfig.apiBaseUrl.replaceAll('/api/v1', ''), connectTimeout: const Duration(seconds: 8))));
   List<Map<String, dynamic>> _posts = [];
   bool _loading = true;
   String? _error;
@@ -291,7 +292,7 @@ class _CommunityPageV2State extends State<CommunityPageV2> with SingleTickerProv
           final text = controller.text.trim();
           if (text.isEmpty) return;
           try {
-            await _dio.post('/api/v1/community/posts', data: {'content': text, 'user_id': 'guest', 'category': '动态'});
+            await _dio.post('/api/v1/community/posts', data: {'content': text, ...userIdParam(), 'category': '动态'});
           } catch (_) {}
           if (mounted) {
             Navigator.pop(ctx);

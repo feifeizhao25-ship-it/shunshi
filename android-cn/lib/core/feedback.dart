@@ -1,11 +1,12 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'config/app_config.dart';
+import '../data/network/session.dart';
 
 /// 反馈服务
 
 class FeedbackService {
-  static final _dio = Dio(BaseOptions(baseUrl: AppConfig.apiBaseUrl.replaceAll('/api/v1', ''), connectTimeout: const Duration(seconds: 8)));
+  static final _dio = withSessionAuth(Dio(BaseOptions(baseUrl: AppConfig.apiBaseUrl.replaceAll('/api/v1', ''), connectTimeout: const Duration(seconds: 8))));
 
   /// 提交反馈
   static Future<bool> submitFeedback({
@@ -15,7 +16,7 @@ class FeedbackService {
   }) async {
     try {
       final res = await _dio.post('/api/v1/feedback/submit', data: {
-        'user_id': 'guest',
+        ...userIdParam(),
         'content': content,
         'contact': contact,
         'type': 'suggestion',
@@ -31,7 +32,7 @@ class FeedbackService {
   static Future<bool> rateApp({required int rating, String? comment}) async {
     try {
       await _dio.post('/api/v1/feedback/submit', data: {
-        'user_id': 'guest',
+        ...userIdParam(),
         'content': '评分: $rating/5 ${comment ?? ""}',
         'type': 'rating',
       });

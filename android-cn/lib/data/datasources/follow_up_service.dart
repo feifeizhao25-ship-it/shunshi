@@ -49,11 +49,9 @@ class FollowUpService {
   /// 获取待触发的跟进任务
   Future<List<FollowUpTask>> getDueTasks({required String userId, int limit = 5}) async {
     try {
-      final res = await _dio.get('/api/v1/followup/due', queryParameters: {
-        'user_id': userId,
-        'limit': limit,
-      });
-      final data = res.data is Map ? (res.data['data'] ?? res.data) : res.data;
+      // /followup/due 是管理员接口（所有人的到期任务）；用户自己的是 /followup/check-due。
+      final res = await _dio.get('/api/v1/followup/check-due', queryParameters: {'user_id': userId});
+      final data = res.data is Map ? (res.data['due_followups'] ?? res.data['data'] ?? res.data) : res.data;
       if (data is List) {
         return data.map((e) => FollowUpTask.fromJson(e)).toList();
       }

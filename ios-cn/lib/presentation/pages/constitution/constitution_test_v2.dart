@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/config/app_config.dart';
 import '../../../design_system/app_colors.dart';
+import '../../../data/network/session.dart';
 
 class ConstitutionTestV2 extends StatefulWidget {
   const ConstitutionTestV2({super.key});
@@ -47,9 +48,8 @@ class _ConstitutionTestV2State extends State<ConstitutionTestV2> {
     setState(() => _submitting = true);
 
     try {
-      // Get token first
-      final authRes = await _dio.post('/api/v1/auth/guest-login', data: {});
-      final token = authRes.data['data']['token'];
+      // 用本机已有的登录令牌；没有才建一个游客会话并保存
+      final token = await ensureSessionToken(_dio);
 
       // Map answers: option index → score (0=是→3, 1=有时→2, 2=否→1)
       final scores = <String, int>{};

@@ -1,19 +1,20 @@
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../config/app_config.dart';
+import '../../data/network/session.dart';
 
 class PersonalizationService {
   static final String _baseUrl = '${AppConfig.apiBaseUrl}/api/v1/personalization';
-  static final _dio = Dio(BaseOptions(
+  static final _dio = withSessionAuth(Dio(BaseOptions(
     baseUrl: _baseUrl,
     connectTimeout: const Duration(seconds: 10),
     receiveTimeout: const Duration(seconds: 15),
     headers: const {'Accept-Language': 'zh-CN'},
-  ));
+  )));
 
   static Future<String> _getToken() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('access_token') ?? 'guest';
+    return prefs.getString('auth_token') ?? '';
   }
 
   /// 获取今日个性化仪表盘

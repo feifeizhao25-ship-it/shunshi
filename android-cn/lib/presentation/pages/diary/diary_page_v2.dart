@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/solar_term/solar_term_table.dart';
+import '../../../data/network/session.dart';
 
 class DiaryPageV2 extends StatefulWidget {
   const DiaryPageV2({super.key});
@@ -18,7 +19,7 @@ class DiaryPageV2 extends StatefulWidget {
 
 class _DiaryPageV2State extends State<DiaryPageV2> {
   static final String _baseUrl = AppConfig.apiBaseUrl.replaceAll('/api/v1', '');
-  final _dio = Dio(BaseOptions(baseUrl: _baseUrl, connectTimeout: const Duration(seconds: 8)));
+  final _dio = withSessionAuth(Dio(BaseOptions(baseUrl: _baseUrl, connectTimeout: const Duration(seconds: 8))));
   final _noteController = TextEditingController();
   
   String _selectedMood = '平和';
@@ -51,20 +52,23 @@ class _DiaryPageV2State extends State<DiaryPageV2> {
   }
 
   Future<void> _fetchEntries() async {
+    final uid = currentUserId();
+    if (uid == null) {
+      // 没有登录令牌就没有「我的日记」可取；不再用 user-001 / guest 去撞别人的数据。
+      if (mounted) setState(() => _loading = false);
+      return;
+    }
     try {
-      final res = await _dio.get('/api/v1/journal/entries/user-001', queryParameters: {'limit': 7});
-      if (res.data is Map && res.data['entries'] is List) {
-        _recentEntries = (res.data['entries'] as List).cast<Map<String, dynamic>>();
-      }
-      // Try trends for AI insight
+      final res = await _dio.get('/api/v1/journal/entries/${Uri.encodeComponent(uid)}', queryParameters: {'limit': 7});
+      final entries = journalEntriesFromBody(res.data);
+      if (entries != null) _recentEntries = entries;
       try {
-        final trends = await _dio.get('/api/v1/journal/insights/user-001');
-        if (trends.data is Map && trends.data['insight'] != null) {
-          _aiInsight = trends.data['insight'].toString();
-        }
+        final insights = await _dio.get('/api/v1/journal/insights/${Uri.encodeComponent(uid)}');
+        final text = journalInsightFromBody(insights.data);
+        if (text != null) _aiInsight = text;
       } catch (_) {}
     } catch (_) {}
-    setState(() => _loading = false);
+    if (mounted) setState(() => _loading = false);
   }
 
   Future<void> _saveEntry() async {
@@ -72,7 +76,7 @@ class _DiaryPageV2State extends State<DiaryPageV2> {
     setState(() => _saving = true);
     try {
       await _dio.post('/api/v1/journal/entry', data: {
-        'user_id': 'user-001',
+        ...userIdParam(),
         'mood': _selectedMood,
         if (_sleepTime != null) 'sleep_time': _sleepTime,
         if (_wakeTime != null) 'wake_time': _wakeTime,

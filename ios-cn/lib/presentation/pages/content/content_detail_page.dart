@@ -8,6 +8,7 @@ import '../../../design_system/theme.dart';
 import '../../../data/network/api_client.dart';
 import '../../widgets/state_view.dart';
 import '../../../design_system/app_colors.dart';
+import '../../../data/network/session.dart';
 
 class ContentDetailPage extends StatefulWidget {
   final String contentId;
@@ -22,7 +23,7 @@ class _ContentDetailPageState extends State<ContentDetailPage> {
   bool _loading = true;
   String? _error;
   bool _isFavorited = false;
-  static const _userId = 'guest';
+  static String get _userId => currentUserId() ?? '';
 
   @override
   void initState() {

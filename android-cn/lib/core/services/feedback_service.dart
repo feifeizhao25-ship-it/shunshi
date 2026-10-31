@@ -1,12 +1,13 @@
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../config/app_config.dart';
+import '../../data/network/session.dart';
 
 class FeedbackService {
   static const String _baseUrl = '${AppConfig.apiBaseUrl}/api/v1';
-  static final _dio = Dio(
+  static final _dio = withSessionAuth(Dio(
     BaseOptions(baseUrl: _baseUrl, connectTimeout: Duration(seconds: 10)),
-  );
+  ));
 
   /// Record practice completion with rating
   static Future<bool> practiceComplete({
@@ -94,6 +95,6 @@ class FeedbackService {
 
   static Future<String> _getUserId() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('user_id') ?? 'guest';
+    return currentUserId() ?? '';
   }
 }
