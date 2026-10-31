@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shunshi/presentation/pages/home/widgets/personal_home_binding.dart';
 import 'package:shunshi/presentation/widgets/personal_home_section.dart';
+import 'package:shunshi/presentation/widgets/personal_home_strings_zh.dart';
 
 Map<String, dynamic> homeJson({String href = '/reference-library'}) => {
       'greeting': '早上好',
@@ -31,7 +32,7 @@ Widget app(Map<String, dynamic> json) {
       builder: (c, _) => Scaffold(
         body: SingleChildScrollView(
           child: PersonalHomeSection(
-            api: PersonalHomeApi(load: () async => json, setEnabled: (_) async {}),
+            strings: strings, api: PersonalHomeApi(load: () async => json, setEnabled: (_) async {}),
             onOpen: (card) => PersonalHomeBinding.open(c, card),
           ),
         ),
@@ -41,6 +42,8 @@ Widget app(Map<String, dynamic> json) {
   ]);
   return MaterialApp.router(routerConfig: router);
 }
+
+const strings = kPersonalHomeStringsZh;
 
 void main() {
   testWidgets('资料库卡显示标题和「为什么推荐」，点一下进入资料库页', (tester) async {

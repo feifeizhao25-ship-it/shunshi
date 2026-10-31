@@ -195,7 +195,7 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
 
             const SliverToBoxAdapter(child: SizedBox(height: 28)),
             // ═══════════════ Picked for you ═══════════════
-            SliverToBoxAdapter(child: PersonalHomeSection(api: PersonalHomeBinding.api())),
+            SliverToBoxAdapter(child: PersonalHomeSection(api: PersonalHomeBinding.api(), strings: PersonalHomeBinding.strings)),
             const SliverToBoxAdapter(child: SizedBox(height: 20)),
 
             // ═══════════════ Hero 经络意境区 ═══════════════
