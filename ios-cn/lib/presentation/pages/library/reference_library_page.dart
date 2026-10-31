@@ -9,6 +9,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show Clipboard, ClipboardData, rootBundle;
 
+import 'library_live.dart';
+
 const bool kShowPendingLibrary = bool.fromEnvironment('SHOW_PENDING_LIBRARY');
 
 /// 页面用到的所有文字。国内版用 [LibraryStrings.zh]，国际版用 [LibraryStrings.en]。
@@ -50,6 +52,8 @@ class LibraryStrings {
     required this.statusNoteLabel,
     required this.footer,
     required this.formatDate,
+    this.live,
+    this.colon = '：',
   });
 
   final String title;
@@ -91,54 +95,11 @@ class LibraryStrings {
   final String footer;
   final String Function(String) formatDate;
 
-  static String _zhDate(String d) {
-    final m = RegExp(r'^(\d{4})-(\d{2})(?:-(\d{2}))?$').firstMatch(d);
-    if (m == null) return d;
-    final month = int.parse(m.group(2)!);
-    if (m.group(3) == null) return '${m.group(1)}年$month月';
-    return '${m.group(1)}年$month月${int.parse(m.group(3)!)}日';
-  }
+  /// 「保持更新 / 为你推荐」的文字；不接后端的产品不传。
+  final LiveStrings? live;
 
-  /// 国内版文字。[title] / [intro] / [footer] 每个产品自己写。
-  static LibraryStrings zh({required String title, required String intro, required String footer}) => LibraryStrings(
-        title: title,
-        intro: intro,
-        searchHint: '搜索关键词',
-        allLabel: '全部',
-        statusAll: '全部状态',
-        statusLabels: const ['现行', '征求意见稿', '已废止', '待核实'],
-        pendingLabel: '待审核',
-        approvedLabel: '已审核',
-        previewBanner: '预览模式：下面的条目已对照官方原文整理，但还在等待人工审核，请不要当作最终结论。',
-        emptyReviewTitle: '资料正在审核中',
-        emptyReviewBody: '新整理的资料要先经过人工核对原文，通过后才会在这里出现。审核期间，请以官方公告为准。',
-        emptySearchTitle: '没有找到相关资料',
-        emptySearchBody: '换一个关键词，或者清除分类和状态筛选再试试。',
-        loading: '正在加载资料…',
-        loadFailed: '资料加载失败',
-        retry: '重试',
-        countLabel: (n) => '共 $n 条',
-        sourceLabel: '出处',
-        publishedLabel: '发布',
-        retrievedLabel: '读取于',
-        effectiveLabel: '生效日期',
-        pointsTitle: '要点',
-        tipTitle: '通俗理解',
-        cautionTitle: '注意',
-        sourceTitle: '出处',
-        fileLabel: '文件',
-        publisherLabel: '发文机关',
-        docNoLabel: '文号',
-        readScopeLabel: '读到的范围',
-        linkLabel: '原文链接',
-        openSource: '打开官方原文',
-        copyLink: '复制原文链接',
-        copiedHint: '链接已复制，可粘贴到浏览器打开',
-        statusNoteLabel: '状态说明',
-        footer: footer,
-        formatDate: _zhDate,
-      );
-
+  /// 标签和内容之间的冒号（国内版全角，国际版半角加空格）。
+  final String colon;
 }
 
 class LibrarySource {
@@ -178,6 +139,8 @@ class LibraryEntry {
     required this.effectiveDate,
     required this.retrievedAt,
     required this.reviewStatus,
+    this.display,
+    this.visitBadge,
   });
 
   factory LibraryEntry.fromJson(Map<String, dynamic> j) => LibraryEntry(
@@ -196,6 +159,8 @@ class LibraryEntry {
         effectiveDate: (j['effective_date'] ?? '') as String,
         retrievedAt: (j['retrieved_at'] ?? '') as String,
         reviewStatus: (j['review_status'] ?? '') as String,
+        display: j['display'] is Map ? LiveDisplay.fromJson(Map<String, dynamic>.from(j['display'] as Map)) : null,
+        visitBadge: j['badge'] as String?,
       );
 
   final String id;
@@ -213,6 +178,12 @@ class LibraryEntry {
   final String effectiveDate;
   final String retrievedAt;
   final String reviewStatus;
+
+  /// 后端给的展示结论（连不上后端、读的是离线资料时为空）。
+  final LiveDisplay? display;
+
+  /// 相对上次来访：'new'（新增）/ 'updated'（更新）/ null。
+  final String? visitBadge;
 }
 
 /// 解析 JSON 文本里的 entries。
@@ -306,9 +277,13 @@ class ReferenceLibraryPage extends StatefulWidget {
     this.showPending = kShowPendingLibrary,
     this.openUrl,
     this.fontFamily,
+    this.live,
   });
 
   final LibraryStrings strings;
+
+  /// 接了后端的产品传入：条目带展示规则、有「为你推荐」和推荐设置；连不上时退回 [assetPath] 的离线资料。
+  final LibraryLiveApi? live;
 
   /// 产品自己的正文字体（例如顺时的 NotoSansSC）；不传则沿用主题。
   final String? fontFamily;
@@ -329,6 +304,8 @@ class ReferenceLibraryPage extends StatefulWidget {
 
 class _ReferenceLibraryPageState extends State<ReferenceLibraryPage> {
   List<LibraryEntry>? _entries;
+  LibraryFeed? _feed;
+  bool _offline = false;
   Object? _error;
   String _query = '';
   String? _category;
@@ -345,12 +322,69 @@ class _ReferenceLibraryPageState extends State<ReferenceLibraryPage> {
       _entries = null;
       _error = null;
     });
+    final live = widget.live;
     try {
-      final visible = await loadVisibleLibrary(strings: widget.strings, assetPath: widget.assetPath, loader: widget.loader, showPending: widget.showPending);
-      if (mounted) setState(() => _entries = visible);
+      List<LibraryEntry> list;
+      LibraryFeed? feed;
+      var offline = false;
+      if (live != null) {
+        try {
+          final data = await live.entries();
+          list = [for (final e in (data['entries'] as List)) LibraryEntry.fromJson(Map<String, dynamic>.from(e as Map))];
+          try {
+            feed = LibraryFeed.fromJson(await live.feed());
+          } catch (_) {
+            feed = null; // 推荐失败不影响资料本身
+          }
+        } catch (_) {
+          offline = true;
+          list = await loadVisibleLibrary(strings: widget.strings, assetPath: widget.assetPath, loader: widget.loader, showPending: widget.showPending);
+        }
+      } else {
+        list = await loadVisibleLibrary(strings: widget.strings, assetPath: widget.assetPath, loader: widget.loader, showPending: widget.showPending);
+      }
+      if (!mounted) return;
+      setState(() {
+        _entries = list;
+        _feed = feed;
+        _offline = offline;
+      });
+      if (live != null && !offline) {
+        live.visit().catchError((Object _) {}); // 记下这次来访；失败就算了
+      }
     } catch (e) {
       if (mounted) setState(() => _error = e);
     }
+  }
+
+  Future<void> _reloadFeed() async {
+    final live = widget.live;
+    if (live == null) return;
+    try {
+      final feed = LibraryFeed.fromJson(await live.feed());
+      if (mounted) setState(() => _feed = feed);
+    } catch (_) {}
+  }
+
+  void _openEntry(BuildContext context, LibraryEntry e) {
+    final live = widget.live;
+    if (live != null && !_offline) live.opened(e.id).catchError((Object _) {});
+    Navigator.of(context).push(MaterialPageRoute<void>(
+      builder: (_) => LibraryEntryPage(entry: e, strings: widget.strings, openUrl: widget.openUrl, fontFamily: widget.fontFamily),
+    ));
+  }
+
+  void _openSettings(BuildContext context) {
+    final live = widget.live;
+    final feed = _feed;
+    final ls = widget.strings.live;
+    if (live == null || feed == null || ls == null) return;
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (sheet) => _withFont(context, widget.fontFamily, LibrarySettingsSheet(feed: feed, s: ls, api: live, onChanged: _reloadFeed)),
+    );
   }
 
   @override
@@ -360,7 +394,10 @@ class _ReferenceLibraryPageState extends State<ReferenceLibraryPage> {
       context,
       widget.fontFamily,
       Scaffold(
-        appBar: AppBar(title: Text(s.title)),
+        appBar: AppBar(title: Text(s.title), actions: [
+          if (widget.live != null && _feed != null && s.live != null)
+            Builder(builder: (inner) => IconButton(key: const Key('library-settings'), tooltip: s.live!.settingsTooltip, icon: const Icon(Icons.tune), onPressed: () => _openSettings(inner))),
+        ]),
         body: Builder(builder: (inner) => SafeArea(child: _body(inner, s))),
       ),
     );
@@ -407,6 +444,28 @@ class _ReferenceLibraryPageState extends State<ReferenceLibraryPage> {
               border: Border.all(color: const Color(0xFFFFD54F)),
             ),
             child: Text(s.previewBanner, style: const TextStyle(fontSize: 13, color: Color(0xFF5D4037), height: 1.4)),
+          ),
+        if (_offline && s.live != null)
+          Container(
+            key: const Key('library-offline-note'),
+            margin: const EdgeInsets.only(top: 12),
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.6), borderRadius: BorderRadius.circular(10)),
+            child: Row(children: [
+              Icon(Icons.cloud_off_outlined, size: 18, color: theme.colorScheme.onSurfaceVariant),
+              const SizedBox(width: 8),
+              Expanded(child: Text(s.live!.offlineNote, style: theme.textTheme.bodySmall?.copyWith(height: 1.4))),
+            ]),
+          ),
+        if (_feed != null && s.live != null && all.isNotEmpty)
+          ForYouSection(
+            feed: _feed!,
+            s: s.live!,
+            onOpen: (id) {
+              final hit = all.where((e) => e.id == id);
+              if (hit.isNotEmpty) _openEntry(context, hit.first);
+            },
+            onSettings: () => _openSettings(context),
           ),
         if (all.isEmpty)
           Container(
@@ -505,10 +564,15 @@ class _ReferenceLibraryPageState extends State<ReferenceLibraryPage> {
 
   Widget _badges(LibraryStrings s, LibraryEntry e) {
     final idx = s.statusLabels.indexOf(e.status);
+    final ls = s.live;
     return Wrap(spacing: 6, runSpacing: 6, children: [
+      if (ls != null && e.visitBadge == 'new') LiveBadgeChip(label: ls.newBadge, color: const Color(0xFF00796B), filled: true),
+      if (ls != null && e.visitBadge == 'updated') LiveBadgeChip(label: ls.updatedBadge, color: const Color(0xFFEF6C00), filled: true),
       _Badge(label: e.category, color: const Color(0xFF3949AB)),
       _Badge(label: e.status, color: _statusColor(idx < 0 ? 3 : idx)),
       if (e.reviewStatus == s.pendingLabel) _Badge(label: s.pendingLabel, color: const Color(0xFFF9A825), filled: true),
+      for (final b in e.display?.badges ?? const <LiveBadge>[])
+        LiveBadgeChip(label: b.text, color: b.kind == 'updated' ? const Color(0xFFEF6C00) : const Color(0xFF546E7A)),
     ]);
   }
 
@@ -522,17 +586,18 @@ class _ReferenceLibraryPageState extends State<ReferenceLibraryPage> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: BorderSide(color: theme.colorScheme.outlineVariant)),
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
-        onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => LibraryEntryPage(entry: e, strings: s, openUrl: widget.openUrl, fontFamily: widget.fontFamily))),
+        onTap: () => _openEntry(context, e),
         child: Padding(
           padding: const EdgeInsets.all(14),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             _badges(s, e),
+            if ((e.display?.banner ?? '').isNotEmpty) LiveBanner(text: e.display!.banner!, repealed: e.display!.state == 'repealed'),
             const SizedBox(height: 10),
             Text(e.title, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700, height: 1.3)),
             const SizedBox(height: 6),
             Text(e.summary, maxLines: 3, overflow: TextOverflow.ellipsis, style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant, height: 1.5)),
             const SizedBox(height: 10),
-            Text('${s.sourceLabel}：${e.source.publisher} · ${e.source.title}', maxLines: 2, overflow: TextOverflow.ellipsis, style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+            Text('${s.sourceLabel}${s.colon}${e.source.publisher} · ${e.source.title}', maxLines: 2, overflow: TextOverflow.ellipsis, style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
             Text('${s.publishedLabel} ${s.formatDate(e.publishDate)} · ${s.retrievedLabel} ${s.formatDate(e.retrievedAt)}', style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
           ]),
         ),
@@ -602,20 +667,32 @@ class LibraryEntryPage extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
           children: [
             Wrap(spacing: 6, runSpacing: 6, children: [
+              if (s.live != null && e.visitBadge == 'new') LiveBadgeChip(label: s.live!.newBadge, color: const Color(0xFF00796B), filled: true),
+              if (s.live != null && e.visitBadge == 'updated') LiveBadgeChip(label: s.live!.updatedBadge, color: const Color(0xFFEF6C00), filled: true),
               _Badge(label: e.category, color: const Color(0xFF3949AB)),
               _Badge(label: e.status, color: _statusColor(idx < 0 ? 3 : idx)),
               if (e.reviewStatus == s.pendingLabel) _Badge(label: s.pendingLabel, color: const Color(0xFFF9A825), filled: true),
+              for (final b in e.display?.badges ?? const <LiveBadge>[]) LiveBadgeChip(label: b.text, color: b.kind == 'updated' ? const Color(0xFFEF6C00) : const Color(0xFF546E7A)),
             ]),
+            if ((e.display?.banner ?? '').isNotEmpty) LiveBanner(text: e.display!.banner!, repealed: e.display!.state == 'repealed'),
             const SizedBox(height: 12),
             Text(e.title, style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800, height: 1.3)),
             const SizedBox(height: 10),
             Text(e.summary, style: theme.textTheme.bodyLarge?.copyWith(color: theme.colorScheme.onSurfaceVariant, height: 1.6)),
+            if (s.live != null && (e.display?.changeNote ?? '').isNotEmpty)
+              Container(
+                key: const Key('library-change-note'),
+                margin: const EdgeInsets.only(top: 12),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(color: const Color(0xFFFFF3E0), borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFFFFCC80))),
+                child: Text('${s.live!.changeNoteLabel}${s.colon}${e.display!.changeNote}', style: const TextStyle(fontSize: 13, color: Color(0xFF5D4037), height: 1.4)),
+              ),
             if (e.statusNote.isNotEmpty)
               Container(
                 margin: const EdgeInsets.only(top: 12),
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(color: const Color(0xFFFFF3E0), borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFFFFCC80))),
-                child: Text('${s.statusNoteLabel}：${e.statusNote}', style: const TextStyle(fontSize: 13, color: Color(0xFF5D4037), height: 1.4)),
+                child: Text('${s.statusNoteLabel}${s.colon}${e.statusNote}', style: const TextStyle(fontSize: 13, color: Color(0xFF5D4037), height: 1.4)),
               ),
             section(
               s.pointsTitle,
@@ -637,7 +714,7 @@ class LibraryEntryPage extends StatelessWidget {
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.6), borderRadius: BorderRadius.circular(12)),
                 child: Text.rich(TextSpan(children: [
-                  TextSpan(text: '${s.cautionTitle}：', style: const TextStyle(fontWeight: FontWeight.w700)),
+                  TextSpan(text: '${s.cautionTitle}${s.colon}', style: const TextStyle(fontWeight: FontWeight.w700)),
                   TextSpan(text: e.caution),
                 ]), style: theme.textTheme.bodyMedium?.copyWith(height: 1.5)),
               ),

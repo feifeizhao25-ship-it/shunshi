@@ -6,6 +6,7 @@
   python -m app.self_improve.run serve      # 常驻调度进程（docker-compose 的 self-improve 服务）
   python -m app.self_improve.run decide <candidate_id> approve|reject <reviewer>   # 企业微信回调落地
   python -m app.self_improve.run eval       # 只跑评测并打印指标（不改任何东西）
+  python -m app.self_improve.run library-check|library-discover   # 资料库来源核对 / 新候选暂存（LIBRARY_FRESHNESS_ENABLED=1 才运行）
 """
 
 from __future__ import annotations
@@ -36,6 +37,11 @@ def main(argv=None) -> int:
     if cmd == "daily":
         print(json.dumps(loop.run_monthly(date.today()) if loop.cfg.enabled else {"status": "disabled"}, ensure_ascii=False))
         return 0
+    if cmd in ("library-check", "library-discover"):
+        from . import library_job
+
+        print(json.dumps((library_job.run_check if cmd == "library-check" else library_job.run_discover)(), ensure_ascii=False))
+        return 0
     if cmd == "decide" and len(argv) == 4:
         c = loop.record_decision(argv[1], argv[3], argv[2] == "approve", datetime.now(TZ))
         print(c.state)
@@ -46,6 +52,9 @@ def main(argv=None) -> int:
             "weekly": (SCHEDULE_DEFAULTS["weekly_cycle"], loop.run_weekly),
             "monthly": (SCHEDULE_DEFAULTS["monthly_maintenance"], lambda now: loop.run_monthly(now.date())),
         }
+        from . import library_job
+
+        jobs.update(library_job.jobs())  # 资料库核对复用同一个调度循环和时间槽
         run_forever(jobs)
         return 0
     print(__doc__)
