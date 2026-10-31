@@ -6,6 +6,7 @@
 另有 010-58951332 / 010-82951332 两个互相矛盾的北京号码、台湾号码和美国的 988/911。
 """
 
+import json
 import pathlib
 import re
 
@@ -58,9 +59,6 @@ def test_12356_is_written_only_in_safety_config():
         str(path.relative_to(APP_DIR))
         for path in _app_files()
         if path != CONFIG_FILE
-        # 资料库条目是经审核的内容数据（不是代码）：其免责声明里的热线号码随内容保存，
-        # 不在这里强制走 config；代码文件仍然必须引用 app/safety/config.py。
-        and path.relative_to(APP_DIR).parts[:2] != ("library", "data")
         and CRISIS_HOTLINE in path.read_text(encoding="utf-8", errors="ignore")
     ]
     assert not hits, f"这些文件自己写死了 12356，应改为引用 app/safety/config.py：{hits}"
@@ -122,3 +120,24 @@ def test_domestic_flutter_clients_do_not_carry_the_wrong_hotline():
                 if PHONE_LIKE.search(text) or "4001619995" in text:
                     hits.append(str(path.relative_to(repo)))
     assert not hits, f"客户端还有旧热线号码：{hits}"
+
+
+def test_library_and_meditation_still_show_the_hotline_to_users():
+    """号码不再写死在这些文件里，但用户看到的文字里仍然有 12356。"""
+    from app.library import store
+    from app.router.meditation_cn import DISCLAIMER
+
+    raw = (APP_DIR / "library" / "data" / "reference_entries_v1.json").read_text(encoding="utf-8")
+    assert CRISIS_HOTLINE not in raw and store.HOTLINE_PLACEHOLDER in raw
+    doc = store.load_document()
+    shown = json.dumps(doc, ensure_ascii=False)
+    assert store.HOTLINE_PLACEHOLDER not in shown
+    assert any(CRISIS_HOTLINE in (e.get("caution") or "") for e in doc["entries"])
+    assert CRISIS_HOTLINE in DISCLAIMER and "{" not in DISCLAIMER
+
+
+def test_placeholder_follows_the_safety_config(monkeypatch):
+    from app.library import store
+
+    monkeypatch.setattr(store, "CRISIS_HOTLINE", "99999")
+    assert "99999" in json.dumps(store.load_document(), ensure_ascii=False)

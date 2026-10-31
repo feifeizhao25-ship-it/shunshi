@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Optional
 
 from ..library_live import decide
+from ..safety.config import CRISIS_HOTLINE
 
 HERE = Path(__file__).parent
 BUNDLED = HERE / "data" / "reference_entries_v1.json"
@@ -28,8 +29,22 @@ def entries_path() -> Path:
     return p if p.exists() else BUNDLED
 
 
+HOTLINE_PLACEHOLDER = "{crisis_hotline}"
+
+
+def _resolve(value):
+    """条目文本里的 {crisis_hotline} 在读取时换成 app/safety/config.py 的号码（热线号只在那一处写）。"""
+    if isinstance(value, str):
+        return value.replace(HOTLINE_PLACEHOLDER, CRISIS_HOTLINE)
+    if isinstance(value, list):
+        return [_resolve(v) for v in value]
+    if isinstance(value, dict):
+        return {k: _resolve(v) for k, v in value.items()}
+    return value
+
+
 def load_document() -> dict:
-    return json.loads(entries_path().read_text("utf-8"))
+    return _resolve(json.loads(entries_path().read_text("utf-8")))
 
 
 def load_staged() -> list[dict]:
