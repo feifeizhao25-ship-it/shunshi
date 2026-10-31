@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
 import '../../../design_system/theme_helper.dart';
+import '../../widgets/bold_text.dart';
 import '../../widgets/chat_sources.dart';
 import 'chat_models.dart';
 
@@ -66,11 +67,11 @@ class AIBubble extends StatelessWidget {
                     border: Border.all(color: borderColor),
                     boxShadow: isDark ? [] : ShunShiShadows.sm,
                   ),
-                  child: Text(message.text,
-                      style: TextStyle(
+                  child: Text.rich(boldSpans(message.text,
+                      TextStyle(
                           fontSize: 15,
                           color: AppColors.textPrimary(context),
-                          height: 1.6)),
+                          height: 1.6))),
                 ),
                 if (message.cards != null)
                   ...message.cards!.map((c) => Padding(
