@@ -511,8 +511,8 @@ class _MembershipCenterPageState extends State<MembershipCenterPage> {
   Widget _buildPrivileges() {
     final items = [
       _Privilege(Icons.auto_awesome, 'AI私人订制方案', '基于二十四节气与体质实时调整的个性化调理建议。', ShunShiColors.primaryContainer),
-      _Privilege(Icons.restaurant_menu, '全站食谱解锁', '5000+ 药膳食谱，包含详细营养成分与时令搭配。', ShunShiColors.apricotLight),
-      _Privilege(Icons.headphones, '高保真音频随心听', '沉浸式冥想导引、中医名家访谈，高品质声学体验。', ShunShiColors.surfaceVariant),
+      _Privilege(Icons.restaurant_menu, '全站食谱解锁', '解锁资料库中的全部药膳食谱，含食材与做法步骤。', ShunShiColors.apricotLight),
+      _Privilege(Icons.headphones, '高保真音频随心听', '呼吸、四季与睡前放松音频，随时收听。', ShunShiColors.surfaceVariant),
       _Privilege(Icons.family_restroom, '家庭成员健康互联', '一人订阅，全家守护。实时关注家人的健康动态。', ShunShiColors.apricotLight),
       _Privilege(Icons.military_tech, '专属会员勋章', '独有的身份标识，记录您的养生打卡每一刻荣誉。', ShunShiColors.primaryContainer),
     ];

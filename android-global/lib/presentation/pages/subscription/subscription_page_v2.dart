@@ -23,10 +23,29 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
   String? _purchasingPlanId;
   String? _orderMessage;
 
+  /// Real number of food-therapy recipes in the library (GET /contents total); null until it loads or if it fails.
+  int? _recipeCount;
+
   @override
   void initState() {
     super.initState();
     _loadData();
+    _loadRecipeCount();
+  }
+
+  Future<void> _loadRecipeCount() async {
+    try {
+      final res = await apiClient.get<dynamic>(
+        '/api/v1/contents',
+        queryParameters: {'locale': 'en-US', 'type': 'food_therapy', 'limit': 1},
+      );
+      final body = res.data;
+      final data = body is Map ? (body['data'] is Map ? body['data'] as Map : body) : null;
+      final total = data?['total'];
+      if (mounted && total is int && total > 0) setState(() => _recipeCount = total);
+    } catch (_) {
+      // No count is shown when the library cannot be reached; the benefit text stays accurate without it.
+    }
   }
 
   Future<void> _loadData() async {
@@ -418,9 +437,10 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text('Member Benefits', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
       const SizedBox(height: 12),
-      _buildBenefit('assets/images/wellness/wellness_seasonal.jpg', 'AI Personalized Plans', 'Wellness suggestions based on 24 solar terms and your constitution.'),
-      _buildBenefit('assets/images/wellness/food_lotus_soup.jpg', 'All Recipes', '5,000+ food therapy recipes with nutrition info and seasonal pairing.'),
-      _buildBenefit('assets/images/meditation.jpg', 'Hi-Fi Audio', 'Immersive meditation guides and TCM expert interviews.'),
+      _buildBenefit('assets/images/wellness/wellness_seasonal.jpg', 'Seasonal Daily Ideas', 'Daily suggestions that follow the season, the time of day and what you do in the app.'),
+      _buildBenefit('assets/images/wellness/food_lotus_soup.jpg', 'Full Recipe Library',
+          _recipeCount == null ? 'Every food therapy recipe in the library, with ingredients and steps.' : 'All $_recipeCount food therapy recipes in the library, with ingredients and steps.'),
+      _buildBenefit('assets/images/meditation.jpg', 'Audio Library', 'Breathing, seasonal and wind-down audio.'),
       _buildBenefit('assets/images/sg_badge_family.webp', 'Family Health', 'One subscription, whole family protected.'),
       _buildBenefit('assets/images/sg_badge_lotus.webp', 'Member Badge', 'Exclusive badge celebrating your wellness milestones.'),
     ]);
