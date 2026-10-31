@@ -478,3 +478,17 @@ def test_backend_copy_of_the_library_matches_the_app_asset():
     assert json.loads(app_copy.read_text("utf-8")) == mine
     if ios_copy.exists():
         assert json.loads(ios_copy.read_text("utf-8")) == mine
+
+
+def test_gov_zhengce_watch_url_is_the_live_policy_page_and_parses():
+    """gov-zhengce 监测地址曾指向已 404 的 zuixin/home.htm；现为 /zhengce/index.htm（2026-10-31 实测 200）。"""
+    from pathlib import Path
+    from urllib.parse import urlparse
+    from app.library_live.util import extract_links
+    w = {x["id"]: x for x in job.load_sources()["watch"]}["gov-zhengce"]
+    assert w["listing_url"] == "https://www.gov.cn/zhengce/index.htm"
+    assert "home.htm" not in w["listing_url"] and urlparse(w["listing_url"]).hostname == "www.gov.cn"
+    html = (Path(__file__).parent / "fixtures" / "gov_zhengce_index_excerpt.html").read_text(encoding="utf-8")
+    links = [x for x in extract_links(html, w["listing_url"]) if x["date"]]
+    assert len(links) >= 3
+    assert all(x["url"].startswith("https://www.gov.cn/zhengce/") for x in links)

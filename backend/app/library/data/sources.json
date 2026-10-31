@@ -11,7 +11,7 @@
   "watch": [
     {"id": "nhc-sps", "name": "国家卫生健康委·食品安全标准与监测评估司", "publisher": "国家卫生健康委员会", "listing_url": "https://www.nhc.gov.cn/sps/new_index.shtml",
      "title_include": ["食药物质", "食品药品", "药食同源", "按照传统既是食品又是中药材", "营养", "食养"], "license_note": "国家机关公文，不适用著作权保护（《著作权法》第五条）", "category_hint": "药食同源"},
-    {"id": "gov-zhengce", "name": "中国政府网·最新政策", "publisher": "国务院", "listing_url": "https://www.gov.cn/zhengce/zuixin/home.htm",
+    {"id": "gov-zhengce", "name": "中国政府网·最新政策", "publisher": "国务院", "listing_url": "https://www.gov.cn/zhengce/index.htm",
      "title_include": ["全民健身", "身体活动", "睡眠", "中医药", "食养", "养生"], "license_note": "国家机关公文，不适用著作权保护（《著作权法》第五条）", "category_hint": "运动健身"},
     {"id": "samr-fdzdgknr", "name": "市场监管总局·虚假宣传与广告监管", "publisher": "国家市场监督管理总局", "listing_url": "https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/tssps/index.html",
      "title_include": ["保健食品", "虚假宣传", "食品广告", "养生"], "license_note": "国家机关公文，不适用著作权保护（《著作权法》第五条）", "category_hint": "消费提醒"}
