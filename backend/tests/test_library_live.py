@@ -492,3 +492,25 @@ def test_gov_zhengce_watch_url_is_the_live_policy_page_and_parses():
     links = [x for x in extract_links(html, w["listing_url"]) if x["date"]]
     assert len(links) >= 3
     assert all(x["url"].startswith("https://www.gov.cn/zhengce/") for x in links)
+
+
+def test_season_signal_uses_feed_keys_every_day_of_the_year():
+    """回归：solar_term_calendar.season_of 返回「春夏秋冬」，feed 里的季节键是 spring…；
+    节气主题条目在节气过后第 4 天起会读到季节键，之前未转换时 KeyError → /library/feed 与首页卡片 500（被首页吞掉，但资料库页会挂）。"""
+    from app.utils import solar_term_calendar as stc
+    doc, st = _approved()
+    for k in range(366):
+        d = date(2026, 1, 1) + timedelta(days=k)
+        term = stc.term_on(d)
+        start = stc.term_start(d)
+        sig = fd.Signals(lang="zh", season=service._SEASON_KEY[stc.season_of(term)], term=term, days_since_term=(d - start).days)
+        items = store.annotated(d, "zh", document=doc, state=st, preview=False)
+        out = fd.rank(items, sig, "u", d)
+        assert out["enabled"] is True
+    # 季节条目在节气过后第 5 天：理由里是「秋季」这样的中文，不是键名
+    d = date(2026, 11, 12)
+    term, start = stc.term_on(d), stc.term_start(d)
+    sig = fd.Signals(lang="zh", season=service._SEASON_KEY[stc.season_of(term)], term=term, days_since_term=(d - start).days)
+    out = fd.rank(store.annotated(d, "zh", document=doc, state=st, preview=False), sig, "u", d, limit=12)
+    reasons = " ".join(i["reason"] for i in out["items"] if i["topic"] == "season")
+    assert "冬季" in reasons or "秋季" in reasons or "立冬" in reasons

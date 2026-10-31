@@ -32,6 +32,10 @@ GOAL_WORDS = (
 KEEP_DAYS = 30
 
 
+# solar_term_calendar 返回「春夏秋冬」；feed 里的季节键是英文（spring…）。不转换的话，节气主题条目在节气过后 4 天起会 KeyError → /library/feed 500。
+_SEASON_KEY = {"春": "spring", "夏": "summer", "秋": "autumn", "冬": "winter"}
+
+
 def _read(session: Session, uid: str, key: str):
     row = session.get(UserSetting, {"user_id": uid, "key": key})
     if not row:
@@ -107,7 +111,7 @@ def load_signals(session: Session, uid: str, today: date, lang: str = "zh") -> f
     lv = _read(session, uid, VISIT_KEY)
     return fd.Signals(
         lang=lang, enabled=prefs["enabled"] and flag.get("enabled", True), goals=goals, constitution=cons if cons in ("平和", "气虚", "阳虚", "阴虚", "痰湿", "湿热", "血瘀", "气郁") else None,
-        season=solar_term_calendar.season_of(term), term=term, days_since_term=(today - start).days if start else None,
+        season=_SEASON_KEY[solar_term_calendar.season_of(term)], term=term, days_since_term=(today - start).days if start else None,
         age_group="minor" if age_group in ("minor", "child", "teen") else age_group, followed=frozenset(prefs["followed"]), muted=frozenset(prefs["muted"]),
         opened=_day_map(session, uid, OPENED_KEY, today), shown=_day_map(session, uid, SHOWN_KEY, today),
         last_visit=date.fromisoformat(lv["day"]) if isinstance(lv, dict) and lv.get("day") else None)

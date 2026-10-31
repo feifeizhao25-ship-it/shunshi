@@ -57,6 +57,8 @@ def home_dashboard(
     is_global = locale.is_global
     hemi = "south" if hemisphere == "south" else "north"
     board = phs.build(session, user_id, lang="en" if is_global else "zh", is_global=is_global, hemisphere=hemi, tz_name=tz)
+    if not is_global:  # 官方资料库只在国内版；国际版没有这张卡
+        board = phs.with_library_card(session, user_id, board)
     out = {
         "greeting": board["greeting"],
         "hero": board["hero"],
