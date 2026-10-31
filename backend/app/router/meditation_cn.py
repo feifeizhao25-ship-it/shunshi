@@ -21,6 +21,7 @@ from typing import Optional
 from fastapi import APIRouter, HTTPException, Query, Response
 
 from ..aigc import AI_HEADERS
+from ..safety.config import CRISIS_HOTLINE
 
 router = APIRouter(prefix="/api/v1/meditation", tags=["meditation-cn"])
 
@@ -32,7 +33,7 @@ AUDIO_URL_PREFIX = "/static/audio/meditation/"
 AI_AUDIO_LABEL = "AI 合成语音"
 DISCLAIMER = (
     "本音频由 AI 合成语音朗读，仅用于放松与作息参考，不是医疗服务，也不能替代专业诊疗。"
-    "练习中感到不适请立即停止；如长期睡不好或情绪持续低落，请咨询医生或拨打 12356 心理援助热线。"
+    f"练习中感到不适请立即停止；如长期睡不好或情绪持续低落，请咨询医生或拨打 {CRISIS_HOTLINE} 心理援助热线。"
 )
 
 CATEGORY_ORDER = ["breathing", "sleep", "solar_term", "quick"]
