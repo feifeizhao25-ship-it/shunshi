@@ -12,6 +12,7 @@ import '../widgets/feedback_sheet.dart';
 import '../widgets/membership_widgets.dart';
 import 'chat/chat_models.dart';
 import '../widgets/chat_sources.dart';
+import '../../core/solar_term/solar_term_en.dart';
 import 'chat/chat_widgets.dart';
 
 const _baseUrl = 'https://api.seasonsapp.com';
@@ -53,8 +54,8 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
 
   String _userName = '';
   String _token = '';
-  final String _currentSolarTerm = 'Qingming';
-  final String _solarTermDesc = 'Spring is deepening and everything is fresh and clear. A good time for a walk outdoors and flying a kite — let your mood open up too.';
+  final String _currentSolarTerm = currentSolarTermEn()?.$1 ?? 'this season';
+  final String _solarTermDesc = currentSolarTermEn()?.$2 ?? 'Seasonal guidance is loading.';
   String? _conversationId;
 
   @override
