@@ -42,6 +42,16 @@ def main(argv=None) -> int:
 
         print(json.dumps((library_job.run_check if cmd == "library-check" else library_job.run_discover)(), ensure_ascii=False))
         return 0
+    if cmd in ("golden", "stale", "radar", "radar-stage", "monthly-report"):
+        from . import continuous
+
+        fn = {"golden": continuous.run_golden, "stale": continuous.run_stale, "radar": continuous.run_radar, "radar-stage": continuous.run_radar_stage,
+              "monthly-report": continuous.run_monthly_report}[cmd]
+        kw = {"force": "--force" in argv}  # --force：人工手动跑一次，不改任何开关
+        if cmd == "monthly-report" and "--month" in argv:
+            kw["month"] = argv[argv.index("--month") + 1]
+        print(json.dumps(fn(**kw), ensure_ascii=False, default=str))
+        return 0
     if cmd == "decide" and len(argv) == 4:
         c = loop.record_decision(argv[1], argv[3], argv[2] == "approve", datetime.now(TZ))
         print(c.state)
@@ -55,6 +65,10 @@ def main(argv=None) -> int:
         from . import library_job
 
         jobs.update(library_job.jobs())  # 资料库核对复用同一个调度循环和时间槽
+        from . import continuous
+
+        for k, v in continuous.jobs().items():
+            jobs.setdefault(k, v)  # 金标准评测 / 陈旧扫描 / 雷达 / 暂存 / 月报；雷达若已被别处注册就不重复
         run_forever(jobs)
         return 0
     print(__doc__)

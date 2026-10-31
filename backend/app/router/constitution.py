@@ -484,6 +484,8 @@ class SubmitResponse(BaseModel):
     secondary_types: List[str]
     scores: List[ScoreItem]
     advice: str
+    # 诚实说明：自编简化问卷，不是国家标准判定（新增字段，旧客户端忽略即可）
+    standard_note: str = "本问卷为顺时自编的简化版（25 题），不是国家标准《中医体质分类与判定》（GB/T 46939-2025）的量表和判定方法，结果仅供生活方式参考，不是诊断。"
 
 
 class ResultResponse(BaseModel):
@@ -566,11 +568,11 @@ def _calculate_scores(answers: List[AnswerItem]) -> Dict[str, float]:
 
 def _determine_levels(scores: Dict[str, float]) -> Dict[str, str]:
     """
-    根据分数判定体质偏颇程度
-    normal: 正常（转化分<30）, tendency: 倾向（30-39）, obvious: 偏颇（>=40）
-    原始分满分为该体质题目的5分之和，约60-75分
-    转化分 = (原始分 - 题目数) / (题目数 × 4) × 100
-    简化处理：直接按原始分判定
+    根据分数判定体质偏颇程度（顺时自编的简化规则，不是国家标准的判定方法）
+    normal: 原始分 <25；tendency: 25–39；obvious: >=40。
+    本问卷共 25 道自编题，阈值是产品内部的粗略分档，没有按 GB/T 46939-2025《中医体质分类与判定》
+    （2026-04-01 起实施，配套《中医体质量表》27 条）的转化分公式计算，也没有用该标准的判定阈值。
+    因此结果只能当“生活方式参考”，不能写成“按国家标准判定”，更不是诊断。
     """
     levels = {}
     for key, score in scores.items():
