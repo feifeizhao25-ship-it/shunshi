@@ -83,7 +83,7 @@ class AboutPage extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             Text(
-              '© 2024-2026 SEASONS ShunShi',
+              '© 2024-2026 SEASONS',
               style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary),
             ),
           ],
