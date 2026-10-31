@@ -2,6 +2,7 @@ import '../../../core/router/safe_pop.dart';
 import 'package:flutter/material.dart';
 import '../../../../design_system/theme.dart';
 import '../../widgets/paywall_banner.dart';
+import '../../widgets/seasons_visual.dart';
 import '../../../core/theme/app_localizations.dart';
 import '../../../core/network/api_singleton.dart';
 
@@ -22,6 +23,19 @@ class MoodPage extends StatefulWidget {
   @override
   State<MoodPage> createState() => _MoodPageState();
 }
+
+const Map<String, String> _moodImages = {
+  'happy': 'happy',
+  'sad': 'low',
+  'anxious': 'anxious',
+  'angry': 'angry',
+  'tired': 'tired',
+  'lonely': 'lonely',
+  'stressed': 'stressed',
+  'irritable': 'angry',
+};
+
+String _moodAsset(String key) => 'assets/images/sgx_mood_${_moodImages[key] ?? 'calm'}.webp';
 
 class _MoodPageState extends State<MoodPage> {
   String? _selectedMood;
@@ -137,13 +151,20 @@ class _MoodPageState extends State<MoodPage> {
       appBar: AppBar(
         leading: IconButton(icon: const Icon(Icons.arrow_back_ios, size: 20), onPressed: () => safePop(context)),
         title: Text(AppLocalizations.of(context).t('wellness_emotional_support')),
-        backgroundColor: isDark ? ShunShiColors.darkSurface : Colors.pink[50],
+        backgroundColor: isDark ? ShunShiColors.darkSurface : const Color(0xFFFDF9F0),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const SgHeroBanner(
+              asset: 'assets/images/sgx_hero_mood.webp',
+              title: 'Check in with yourself',
+              subtitle: 'Pick the word that fits today.',
+              height: 150,
+            ),
+            const SizedBox(height: 12),
             const PaywallBanner(message: 'Upgrade to unlock mood tracking and AI mood analysis', icon: Icons.favorite),
             // AI Chat Entry
             Card(
@@ -155,11 +176,7 @@ class _MoodPageState extends State<MoodPage> {
                   padding: const EdgeInsets.all(20),
                   child: Row(
                     children: [
-                      CircleAvatar(
-                        radius: 28,
-                        backgroundColor: Colors.pink[100],
-                        child: const Text('🤖', style: TextStyle(fontSize: 28)),
-                      ),
+                      ClipOval(child: Image.asset('assets/images/sgx_mood_support.webp', width: 56, height: 56, fit: BoxFit.cover)),
                       const SizedBox(width: 16),
                       Expanded(
                         child: Column(
@@ -187,11 +204,7 @@ class _MoodPageState extends State<MoodPage> {
                   padding: const EdgeInsets.all(20),
                   child: Row(
                     children: [
-                      CircleAvatar(
-                        radius: 28,
-                        backgroundColor: Colors.teal[100],
-                        child: const Text('🌬️', style: TextStyle(fontSize: 28)),
-                      ),
+                      ClipOval(child: Image.asset('assets/images/sgx_mood_calm.webp', width: 56, height: 56, fit: BoxFit.cover)),
                       const SizedBox(width: 16),
                       Expanded(
                         child: Column(
@@ -211,9 +224,13 @@ class _MoodPageState extends State<MoodPage> {
             const SizedBox(height: 24),
             Text(AppLocalizations.of(context).t('home_how_are_you_feeling_right_now'), style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 12),
-            Wrap(
-              spacing: 12,
-              runSpacing: 12,
+            GridView.count(
+              crossAxisCount: 4,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              mainAxisSpacing: 12,
+              crossAxisSpacing: 8,
+              childAspectRatio: 0.82,
               children: _moodResponses.entries.map((entry) {
                 return _buildMoodChip(entry.key, entry.value);
               }).toList(),
@@ -285,27 +302,35 @@ class _MoodPageState extends State<MoodPage> {
 
   Widget _buildMoodChip(String key, Map<String, dynamic> data) {
     final isSelected = _selectedMood == key;
+    final color = data['color'] as Color;
     return GestureDetector(
+      key: Key('mood_$key'),
+      behavior: HitTestBehavior.opaque,
       onTap: () => setState(() => _selectedMood = key),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: isSelected ? data['color'] : Colors.grey[100],
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: isSelected ? data['color'] : ShunShiColors.borderGhost!),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
+      child: Semantics(
+        button: true,
+        selected: isSelected,
+        label: _getMoodLabel(key),
+        child: Column(
           children: [
-            Text(data['icon'], style: const TextStyle(fontSize: 24)),
-            const SizedBox(width: 8),
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 180),
+              padding: const EdgeInsets.all(3),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: isSelected ? color : Colors.transparent, width: 2.5),
+              ),
+              child: ClipOval(
+                child: Opacity(
+                  opacity: _selectedMood == null || isSelected ? 1 : 0.55,
+                  child: Image.asset(_moodAsset(key), width: 58, height: 58, fit: BoxFit.cover),
+                ),
+              ),
+            ),
+            const SizedBox(height: 6),
             Text(
               _getMoodLabel(key),
-              style: TextStyle(
-                color: isSelected ? Colors.white : Colors.black87,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              ),
+              style: TextStyle(fontSize: 13, fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500, color: Colors.black87),
             ),
           ],
         ),
@@ -342,13 +367,13 @@ class _MoodPageState extends State<MoodPage> {
               children: [
                 Row(
                   children: [
-                    Text(data['icon'], style: const TextStyle(fontSize: 28)),
+                    ClipOval(child: Image.asset(_moodAsset(_selectedMood!), width: 52, height: 52, fit: BoxFit.cover)),
                     const SizedBox(width: 12),
-                    Text(data['title'], style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    Expanded(child: Text(data['title'], style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
                   ],
                 ),
                 const SizedBox(height: 8),
-                Text(data['description'], style: TextStyle(fontSize: 13, color: Colors.grey[700])),
+                Text(data['description'], style: TextStyle(fontSize: 14, height: 1.5, color: Colors.grey[800])),
               ],
             ),
           ),
@@ -356,26 +381,29 @@ class _MoodPageState extends State<MoodPage> {
         const SizedBox(height: 12),
         Text(AppLocalizations.of(context).t('wellness_relief_methods'), style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
         const SizedBox(height: 8),
-        ...tips.map((tip) => Card(
-          margin: const EdgeInsets.only(bottom: 8),
-          child: Padding(
-            padding: const EdgeInsets.all(14),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Icon(Icons.auto_awesome, size: 18, color: data['color'] as Color),
-                    const SizedBox(width: 8),
-                    Text(tip['title'], style: const TextStyle(fontWeight: FontWeight.bold)),
-                  ],
+        ...tips.asMap().entries.map((e) {
+          final tip = e.value;
+          return Card(
+            margin: const EdgeInsets.only(bottom: 8),
+            child: Theme(
+              data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+              child: ExpansionTile(
+                initiallyExpanded: e.key == 0,
+                leading: Container(
+                  width: 30,
+                  height: 30,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(color: (data['color'] as Color).withValues(alpha: 0.9), shape: BoxShape.circle),
+                  child: Text('${e.key + 1}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 13)),
                 ),
-                const SizedBox(height: 6),
-                Text(tip['desc'], style: TextStyle(fontSize: 13, color: Colors.grey[700], height: 1.5)),
-              ],
+                title: Text(tip['title'], style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
+                childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
+                expandedCrossAxisAlignment: CrossAxisAlignment.start,
+                children: [Text(tip['desc'], style: TextStyle(fontSize: 14, color: Colors.grey[800], height: 1.5))],
+              ),
             ),
-          ),
-        )),
+          );
+        }),
       ],
     );
   }
