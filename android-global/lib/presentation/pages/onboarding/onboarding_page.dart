@@ -121,8 +121,6 @@ class _OnboardingPageState extends State<OnboardingPage> {
         'life_stage': _lifeStage?.toLowerCase(),
         'support_time': _supportTime?.toLowerCase(),
         'style_preference': _feelStyle?.toLowerCase(),
-        'hemisphere': 'north',
-        'timezone': 'Asia/Shanghai',
       });
     } catch (_) {}
     
