@@ -1,10 +1,11 @@
 """未成年人与老年用户的对话策略（《人工智能拟人化互动服务管理暂行办法》与顺时红线）。
 
-- 未成年人（<18）不提供虚拟亲密关系类服务；<14 需监护人同意；
+- 未成年人（<18）不提供虚拟亲密关系类服务；最低使用年龄 16 周岁（2026-10-31 起所有产品、国内国际统一，
+  由助手代用户决定，待法务复核），<16 不提供对话；
 - 老年用户加强健康使用提示。
 
 年龄来自用户在 /api/v1/settings/age-profile 自己填的出生日期，是「自报」，不是实名核验。
-监护人同意目前没有可靠的核验途径（需要实名/人脸/监护人账号等外部能力），所以 <14 的处理是
+监护人同意目前没有可靠的核验途径（需要实名/人脸/监护人账号等外部能力），所以 <16 的处理是
 **直接不提供对话**，而不是提供一个自己点一下就能绕过的「我已获得监护人同意」开关。
 """
 
@@ -26,7 +27,8 @@ AGE_KEY = "profile:age"
 
 UNKNOWN, CHILD, MINOR, ADULT, SENIOR = "unknown", "child", "minor", "adult", "senior"
 
-CHILD_BLOCK_TEXT = "未满 14 周岁的用户需要监护人同意并陪同后才能使用对话功能，暂时无法使用，请让监护人协助你。"
+MIN_AGE = 16  # 所有产品、国内国际统一的最低使用年龄
+CHILD_BLOCK_TEXT = "顺时的最低使用年龄是 16 周岁，未满 16 周岁暂时无法使用对话功能，请让监护人协助你。"
 MINOR_NOTICE = "你正在使用未成年人模式：这里只聊日常健康与作息，不提供恋人、亲人等亲密关系陪伴。有心事也可以多和家人、老师聊聊。"
 SENIOR_NOTICE = (
     "健康提示：这里的内容只是日常养生参考，不能替代医生。身体不舒服、正在吃药或有慢性病，请先问医生；"
@@ -71,7 +73,7 @@ def age_on(birth: date, today: date) -> int:
 
 
 def group_for_age(age: int) -> str:
-    if age < 14:
+    if age < MIN_AGE:
         return CHILD
     if age < 18:
         return MINOR
@@ -88,7 +90,7 @@ def read_group(session: Session, user_id: str, today: date | None = None) -> str
         birth = date.fromisoformat(json.loads(row.value)["birth_date"])
     except (ValueError, KeyError, TypeError):
         return UNKNOWN
-    # 用当前日期重新算：14 岁生日过后，用户自动从 child 变成 minor。
+    # 用当前日期重新算：16 岁生日过后，用户自动从 child 变成 minor。
     return group_for_age(age_on(birth, today or date.today()))
 
 
@@ -115,7 +117,7 @@ def declare_birth_date(session: Session, user_id: str, birth: date, today: date 
 
 
 def policy_for(session: Session, user_id: str) -> AgePolicy:
-    """取用户的对话策略；未满 14 周岁直接拒绝（不调模型）。"""
+    """取用户的对话策略；未满 16 周岁直接拒绝（不调模型）。"""
     group = read_group(session, user_id)
     if group == CHILD:
         raise HTTPException(status_code=403, detail=CHILD_BLOCK_TEXT)

@@ -160,9 +160,10 @@ class AISafetyService {
     switch (level) {
       case RiskLevel.crisis:
         return '⚠️ We are very concerned about what you mentioned. Please reach out for help now:\n\n'
-            '• 24hr Crisis Hotline: 988 (Suicide & Crisis Lifeline)\n'
-            '• Crisis Text Line: Text HOME to 741741\n'
-            '• Emergency: 911\n\n'
+            '• US & Canada: call or text 988 (Suicide & Crisis Lifeline)\n'
+            '• US only: Crisis Text Line, text HOME to 741741\n'
+            '• UK & Ireland: Samaritans 116 123 · Australia: Lifeline 13 11 14\n'
+            '• Elsewhere: findahelpline.com, or your local emergency number\n\n'
             'Your safety and well-being matter most. SEASONS AI is not a substitute for professional care. Please seek help.';
       case RiskLevel.high:
         return '⚠️ The health concern you mentioned requires professional care. Please consult a doctor for a thorough examination.\n\n'
@@ -179,8 +180,8 @@ class AISafetyService {
       case RiskLevel.crisis:
         return 'It sounds like you\'re going through a really difficult time. '
             'Please reach out to someone who can help:\n\n'
-            '• 988 Suicide & Crisis Lifeline (US)\n'
-            '• 111 NHS Mental Health (UK)\n'
+            '• 988 Suicide & Crisis Lifeline (US & Canada)\n'
+            '• Samaritans 116 123 (UK & Ireland)\n'
             '• findahelpline.com (International)\n\n'
             'You don\'t have to face this alone. SEASONS cannot replace '
             'professional medical care.';

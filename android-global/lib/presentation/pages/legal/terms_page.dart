@@ -44,6 +44,12 @@ class TermsPage extends StatelessWidget {
             textColor,
           ),
           const SizedBox(height: 12),
+          _sectionTitle('Eligibility'),
+          _body(
+            'You must be at least 16 years old to use SEASONS. If you are 16 or 17, use it with the knowledge of a parent or guardian. We do not knowingly provide the service to anyone under 16 and may close an account if we learn the user is under 16.',
+            textColor,
+          ),
+          const SizedBox(height: 12),
           _sectionTitle('2. User Conduct'),
           _body(
             '2.1 You agree not to use the app for:\n'

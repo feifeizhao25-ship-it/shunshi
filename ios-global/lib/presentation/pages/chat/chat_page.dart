@@ -286,8 +286,8 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
       ]),
       content: const Text(
         'The content you mentioned involves health safety risks. Please contact a professional medical facility immediately:\n\n'
-        '• 24/7 Mental Health Hotline: 400-161-9995\n'
-        '• Emergency: 120\n\n'
+        '• Crisis line: call your local crisis line (findahelpline.com lists them by country)\n'
+        '• Emergency: call your local emergency number\n\n'
         'SEASONS AI cannot replace professional medical diagnosis.',
         style: TextStyle(fontSize: 14, color: ShunShiColors.textSecondary, height: 1.6),
       ),
@@ -391,7 +391,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
           const SizedBox(height: 12),
           const Text('If you\'re in crisis:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: ShunShiColors.textPrimary)),
           const SizedBox(height: 12),
-          const Text('US: 988 Suicide & Crisis Lifeline\nUK: 111 NHS Mental Health\nAU: 13 11 14 Beyond Blue\nInternational: findahelpline.com', style: TextStyle(fontSize: 14, color: ShunShiColors.textSecondary, height: 1.8)),
+          const Text('US & Canada: 988 Suicide & Crisis Lifeline\nUK & Ireland: Samaritans 116 123\nAU: Lifeline 13 11 14\nInternational: findahelpline.com', style: TextStyle(fontSize: 14, color: ShunShiColors.textSecondary, height: 1.8)),
           const SizedBox(height: 20),
           SizedBox(width: double.infinity, child: ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: ShunShiColors.primary, foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: ShunShiRadius.buttonRadius)),

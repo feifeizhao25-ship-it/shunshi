@@ -214,7 +214,7 @@ class _HelpCenterPageState extends State<HelpCenterPage> {
                 ),
                 _FaqItem(
                   question: 'Is SEASONS suitable for children?',
-                  answer: 'SEASONS is designed for adults (18+) and is not specifically designed for children. If you have teenagers who want to use SEASONS, we recommend reviewing the content together and ensuring parental guidance. SEASONS is not a replacement for professional care for young people experiencing mental health challenges.',
+                  answer: 'You must be at least 16 to use SEASONS. People aged 16–17 should use it with the knowledge and guidance of a parent or guardian, and SEASONS is not designed for children under 16. SEASONS is not a replacement for professional care for young people experiencing mental health challenges.',
                 ),
               ],
             ),

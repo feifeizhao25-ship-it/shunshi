@@ -194,7 +194,7 @@ class BoundariesPage extends StatelessWidget {
                         const SizedBox(height: 4),
                         Text(
                           'Persistent low mood, insomnia, loss of appetite, or self-harm thoughts. Seek help now:\n'
-                          '• Crisis Hotline: 988\n'
+                          '• Crisis line: US & Canada 988, UK & Ireland 116 123, or findahelpline.com\n'
                           '• Or visit the nearest hospital psychiatric dept.\n'
                           '• You are not alone. Seeking help takes courage',
                           style: ShunshiTextStyles.body.copyWith(

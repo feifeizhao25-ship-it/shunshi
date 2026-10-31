@@ -133,7 +133,7 @@ class PrivacyPolicyPage extends StatelessWidget {
           const SizedBox(height: 12),
           _sectionTitle(context, '七、未成年人保护'),
           _body(
-            '我们不向 14 周岁以下未成年人提供服务。如果我们在不知情的情况下收集了未成年人的数据，将在发现后立即删除。',
+            '我们不向 16 周岁以下未成年人提供服务。如果我们在不知情的情况下收集了未成年人的数据，将在发现后立即删除。',
             textColor,
           ),
           const SizedBox(height: 12),

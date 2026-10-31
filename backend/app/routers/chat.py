@@ -198,7 +198,7 @@ async def chat(
     is_global = locale.is_global
     # 先算再写：提醒依据的是「本轮之前」的使用记录。
     reminder = usage_reminder(session, user_id)
-    age = policy_for(session, user_id)  # 未满 14 周岁在这里直接 403，不会走到模型
+    age = policy_for(session, user_id)  # 未满 16 周岁在这里直接 403，不会走到模型
     extra = age.response_fields()
     if is_global:
         extra = _localize_age_fields(extra)

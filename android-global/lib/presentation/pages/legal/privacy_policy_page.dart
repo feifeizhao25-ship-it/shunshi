@@ -35,7 +35,8 @@ class PrivacyPolicyPage extends StatelessWidget {
             '4. Data Sharing\nWe do not sell or share your personal data with third parties, except:\n• With your explicit consent\n• As required by law\n\n'
             '5. Your Rights\nUnder GDPR and data protection laws, you may:\n• Access your personal data\n• Export your data\n• Delete your data\n• Withdraw consent\n\n'
             '6. Data Retention\nAfter account deletion, we clear all related data within 30 days.\n\n'
-            '7. Contact Us\nData protection inquiries: privacy@seasons.app',
+            '7. Minimum Age\nYou must be at least 16 to use SEASONS. We do not knowingly collect personal data from anyone under 16. If we learn that we have, we delete it promptly.\n\n'
+            '8. Contact Us\nData protection inquiries: privacy@seasons.app',
             style: TextStyle(fontSize: 14, color: ShunShiColors.textSecondary, height: 1.8),
           ),
         ],

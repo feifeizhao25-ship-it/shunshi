@@ -120,6 +120,7 @@ CURRENCY_PRICING = {
 # 区域合规要求
 # ─────────────────────────────────────────────────────────────────────────────
 
+# 2026-10-31：所有地区的最低使用年龄统一为 16（助手代用户决定，待法务复核）；原来 US/AU/SG 13、JP 15、KR 14 已取消。
 REGION_COMPLIANCE = {
     "EU": {
         "gdpr_required": True,
@@ -145,7 +146,7 @@ REGION_COMPLIANCE = {
         "gdpr_required": False,
         "data_retention_days": 180,
         "requires_explicit_consent": False,
-        "age_minimum": 13,
+        "age_minimum": 16,
         "vat_rate_percent": 0,
         "refund_policy_days": 7,
         "region_name": "美国",
@@ -155,7 +156,7 @@ REGION_COMPLIANCE = {
         "gdpr_required": False,
         "data_retention_days": 120,
         "requires_explicit_consent": True,
-        "age_minimum": 13,
+        "age_minimum": 16,
         "vat_rate_percent": 10,
         "refund_policy_days": 7,
         "region_name": "澳大利亚",
@@ -165,7 +166,7 @@ REGION_COMPLIANCE = {
         "gdpr_required": False,
         "data_retention_days": 180,
         "requires_explicit_consent": True,
-        "age_minimum": 13,
+        "age_minimum": 16,
         "vat_rate_percent": 8,
         "refund_policy_days": 7,
         "region_name": "新加坡",
@@ -175,7 +176,7 @@ REGION_COMPLIANCE = {
         "gdpr_required": False,
         "data_retention_days": 150,
         "requires_explicit_consent": True,
-        "age_minimum": 15,
+        "age_minimum": 16,
         "vat_rate_percent": 10,
         "refund_policy_days": 8,
         "region_name": "日本",
@@ -185,7 +186,7 @@ REGION_COMPLIANCE = {
         "gdpr_required": False,
         "data_retention_days": 180,
         "requires_explicit_consent": True,
-        "age_minimum": 14,
+        "age_minimum": 16,
         "vat_rate_percent": 10,
         "refund_policy_days": 7,
         "region_name": "韩国",

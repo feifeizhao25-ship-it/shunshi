@@ -2,7 +2,7 @@
 
 - 响应带「AI 生成」标识；
 - 编排器自己那份简易安全检测只认 6 个危机词，改为复用安全守卫；输出也要过守卫（不给剂量/服法/配伍）；
-- 未满 14 周岁不提供（和对话一致）。
+- 未满 16 周岁不提供（和对话一致）。
 """
 
 import time
@@ -81,7 +81,7 @@ async def test_orchestrator_output_with_dosage_is_replaced():
     assert "咨询" in result.final_response
 
 
-def test_under_14_cannot_use_skills(client, authed):
+def test_under_16_cannot_use_skills(client, authed):
     today = date.today()
     born = today.replace(year=today.year - 10).isoformat()
     assert client.post("/api/v1/settings/age-profile", headers=authed, json={"birth_date": born}).status_code == 200

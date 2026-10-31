@@ -198,7 +198,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
         _messages.add(ChatMessage(
           role: 'ai', text: crisisResponse,
           cards: riskLevel == RiskLevel.crisis
-              ? [SuggestionCard(type: 'crisis', title: AppLocalizations.of(context).t('chatpagedart_crisis_hotline'), subtitle: AppLocalizations.of(context).t('chatpagedart_4001619995_24h_mental_health_helpline'), icon: Icons.phone_in_talk)]
+              ? [SuggestionCard(type: 'crisis', title: AppLocalizations.of(context).t('chatpagedart_crisis_hotline'), subtitle: AppLocalizations.of(context).t('chatpagedart_crisis_support_subtitle'), icon: Icons.phone_in_talk)]
               : [SuggestionCard(type: 'health', title: AppLocalizations.of(context).t('chatpagedart_see_a_doctor'), subtitle: AppLocalizations.of(context).t('chatpagedart_please_consult_a_medical_professional'), icon: Icons.local_hospital)],
           time: _fmt(DateTime.now()),
         ));
@@ -332,8 +332,8 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
       ]),
       content: const Text(
         'The content you mentioned involves health safety risks. Please contact a medical professional immediately or call:\n\n'
-        '• 24h Mental Health Helpline: 400-161-9995\n'
-        '• Emergency: 120\n\n'
+        '• Crisis line: call your local crisis line (findahelpline.com lists them by country)\n'
+        '• Emergency: call your local emergency number\n\n'
         'SEASONS AI cannot replace professional medical diagnosis.',
         style: TextStyle(fontSize: 15, color: ShunShiColors.textSecondary, height: 1.6),
       ),

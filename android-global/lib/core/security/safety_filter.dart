@@ -49,7 +49,7 @@ class SafetyFilter {
 
   String _getSensitiveResponse(String keyword) {
     final responses = {
-      '自杀': 'I sense you may be going through a difficult time. Your life is precious. If you feel overwhelmed, please seek professional help. Call the Crisis Hotline: 988',
+      '自杀': 'I sense you may be going through a difficult time. Your life is precious. If you feel overwhelmed, please seek professional help. Call a crisis line (US & Canada: 988; elsewhere: findahelpline.com)',
       '自残': '我听到你提到伤害自己的想法。我很关心你，建议你和信任的人聊聊，或者寻求专业心理帮助。',
       '抑郁': '听起来你最近Emotions很低落。如果这种状态持续，建议你咨询专业心理医生。',
       'Anxious': 'Anxious是很多人都会有的感受。如果影响到了th常生活，可以考虑寻求专业帮助。',

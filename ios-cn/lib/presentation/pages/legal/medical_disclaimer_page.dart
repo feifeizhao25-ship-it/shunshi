@@ -69,8 +69,8 @@ class MedicalDisclaimerPage extends StatelessWidget {
             '• 术后恢复期用户应严格遵循医嘱\n'
             '• 运动和饮食建议需与主治医生确认后再执行\n\n'
             '3.4 儿童\n'
-            '• 本应用不面向 14 周岁以下儿童\n'
-            '• 青少年使用应在监护人陪同和指导下进行',
+            '• 本应用不面向 16 周岁以下的未成年人，未满 16 周岁不能使用\n'
+            '• 16–17 周岁的青少年使用应在监护人知情和指导下进行',
             textColor,
           ),
           const SizedBox(height: 12),

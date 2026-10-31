@@ -82,7 +82,7 @@ def test_dosage_in_model_answer_is_not_spoken(env):
     assert "煎服" not in state["speech"].spoken[0]
 
 
-def test_under_14_is_refused_for_voice_too(env):
+def test_under_16_is_refused_for_voice_too(env):
     client, headers, talk, state = env
     from datetime import date
     born = date.today().replace(year=date.today().year - 10).isoformat()

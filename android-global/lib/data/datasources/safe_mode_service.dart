@@ -89,8 +89,8 @@ class SafeModeService {
       }
     } catch (_) {}
     return [
-      {'name': '988 Suicide & Crisis Lifeline', 'phone': '988', 'type': 'hotline'},
-      {'name': 'Crisis Text Line', 'phone': 'Text HOME to 741741', 'type': 'hotline'},
+      {'name': '988 Suicide & Crisis Lifeline (US & Canada)', 'phone': '988', 'type': 'hotline'},
+      {'name': 'Crisis Text Line (US only)', 'phone': 'Text HOME to 741741', 'type': 'hotline'},
       {'name': 'LifeLine International', 'type': 'resource'},
     ];
   }
