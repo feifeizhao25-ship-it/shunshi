@@ -123,6 +123,17 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
           ),
           const SizedBox(height: 16),
 
+          _buildSectionCard([
+            ListTile(
+              key: const Key('settings-plan-usage'),
+              leading: Icon(Icons.data_usage_rounded, color: Theme.of(context).colorScheme.primary, size: 20),
+              title: Text('套餐与用量', style: const TextStyle(fontSize: 15)),
+              trailing: const Icon(Icons.chevron_right, size: 18),
+              onTap: () => context.push('/plan-usage'),
+            ),
+          ]),
+          const SizedBox(height: 16),
+
           // 清除缓存 + 关于
           _buildSectionCard([
             ListTile(

@@ -8,6 +8,7 @@ import '../../widgets/follow_up_card.dart';
 import '../../widgets/skeleton_loading.dart';
 import '../../../core/services/feedback_service.dart';
 import '../../widgets/membership_widgets.dart';
+import '../../../core/solar_term/solar_term_en.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -77,14 +78,14 @@ class _HomePageState extends State<HomePage> {
         final d = res.data['data'];
         if (mounted) {
           setState(() {
-          _currentTerm = d['name'] ?? 'Qingming';
+          _currentTerm = d['name'] ?? (currentSolarTermEn()?.$1 ?? '');
         });
         }
       }
     } catch (_) {
       if (mounted) {
         setState(() {
-        _currentTerm = 'Qingming';
+        _currentTerm = currentSolarTermEn()?.$1 ?? '';
       });
       }
     }

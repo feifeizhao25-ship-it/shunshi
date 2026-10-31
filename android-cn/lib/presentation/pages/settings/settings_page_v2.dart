@@ -226,6 +226,10 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
               boxShadow: isDark ? [] : ShunShiShadows.sm,
             ),
             child: Column(children: [
+              _buildNavTile(context, Icons.data_usage_rounded, '套餐与用量',
+                  const [Color(0xFF90A4AE), Color(0xFFB0BEC5)],
+                  onTap: () => context.push('/plan-usage')),
+              _buildDivider(isDark),
               _buildNavTile(context, Icons.cleaning_services_outlined, '清除缓存',
                   const [Color(0xFF90A4AE), Color(0xFFB0BEC5)],
                   onTap: () {

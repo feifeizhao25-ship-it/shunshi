@@ -87,7 +87,7 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
                 Text('Push notifications', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
                 const SizedBox(height: 12),
                 _buildSwitchTile('Solar term reminder', 'Follow the 24 solar terms for wellness tips', Icons.eco, _solarReminder, (v) { setState(() => _solarReminder = v); _savePref('solar_reminder', v); }),
-                _buildSwitchTile('Daily rhythm reminders', 'Timed reminders for the twelve two-hour periods', Icons.schedule, _shichenReminder, (v) { setState(() => _shichenReminder = v); _savePref('shichen_reminder', v); }),
+                _buildSwitchTile('Daily rhythm reminders', 'Gentle reminders through the day', Icons.schedule, _shichenReminder, (v) { setState(() => _shichenReminder = v); _savePref('shichen_reminder', v); }),
                 _buildSwitchTile('Check-in reminder', 'Daily wellness task reminder', Icons.done_all, _checkinReminder, (v) { setState(() => _checkinReminder = v); _savePref('checkin_reminder', v); }),
               ],
             ),
@@ -120,6 +120,24 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
               ),
             ]),
           ),
+          const SizedBox(height: 16),
+
+          _buildSectionCard([
+            ListTile(
+              key: const Key('settings-plan-usage'),
+              leading: Icon(Icons.data_usage_rounded, color: Theme.of(context).colorScheme.primary, size: 20),
+              title: Text('Plan & usage', style: const TextStyle(fontSize: 15)),
+              trailing: const Icon(Icons.chevron_right, size: 18),
+              onTap: () => context.push('/plan-usage'),
+            ),
+            ListTile(
+              key: const Key('settings-culture'),
+              leading: Icon(Icons.public_rounded, color: Theme.of(context).colorScheme.primary, size: 20),
+              title: const Text('Culture & units', style: TextStyle(fontSize: 15)),
+              trailing: const Icon(Icons.chevron_right, size: 18),
+              onTap: () => context.push('/culture-settings'),
+            ),
+          ]),
           const SizedBox(height: 16),
 
           // 清除缓存 + 关于

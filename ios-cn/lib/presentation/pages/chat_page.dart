@@ -102,7 +102,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
   String _token = '';
   // 以前写死「清明」，全年对话开场都说「清明时节」；改为查节气表（与后端同一份数据）
   final String _currentSolarTerm = currentSolarTermName() ?? '清明';
-  final String _solarTermDesc = '春意渐深，万物清洁而明净。适合踏青、放风筝，心情也该舒展。';
+  final String _solarTermDesc = '按这个节气把作息放慢一点。';
   String? _conversationId;
 
   @override

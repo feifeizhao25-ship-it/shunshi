@@ -111,18 +111,6 @@ class WellnessDashboardPage extends StatelessWidget {
                     const Text('Yin and yang in balance, everything reviving. Feel the gentle warmth of the awakening earth.', style: TextStyle(
                       fontSize: 16, color: ShunShiColors.secondary, height: 1.6,
                     )),
-                    const SizedBox(height: 16),
-                    // Countdown
-                    Row(
-                      children: [
-                        Container(width: 48, height: 1, color: ShunShiColors.textTertiary),
-                        const SizedBox(width: 12),
-                        const Text('12 days until Qingming', style: TextStyle(
-                          fontSize: 13, fontWeight: FontWeight.w600,
-                          color: ShunShiColors.textTertiary, letterSpacing: 1,
-                        )),
-                      ],
-                    ),
                   ],
                 ),
               ),
