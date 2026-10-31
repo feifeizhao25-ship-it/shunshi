@@ -2,10 +2,12 @@
 /// Wellness Diary页 V3 — 接 API
 library;
 
+import '../../../core/solar_term/solar_term_en.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import '../../../data/storage/storage_manager.dart';
 import '../../../design_system/theme.dart';
+import '../../widgets/seasons_visual.dart';
 
 class DiaryPageV2 extends StatefulWidget {
   const DiaryPageV2({super.key});
@@ -108,8 +110,8 @@ class _DiaryPageV2State extends State<DiaryPageV2> {
   @override
   Widget build(BuildContext context) {
     final now = DateTime.now();
-    final solarTerms = ['Minor Cold','Major Cold','Start of Spring','Rain Water','Awakening','Spring Equinox','Clear & Bright','Grain Rain','Start of Summer','Grain Buds','Grain in Ear','Summer Solstice','Minor Heat','Major Heat','Start of Autumn','End of Heat','White Dew','Autumn Equinox','Cold Dew','Frost Descent','Start of Winter','Minor Snow','Major Snow','Winter Solstice'];
-    final termIdx = ((now.month - 1) * 2 + (now.day >= 6 ? 1 : 0)) % 24;
+    // The astronomical solar-term table, not a month-based guess.
+    final termName = currentSolarTermEn()?.$1 ?? '';
     
     return Scaffold(
       backgroundColor: ShunShiColors.background,
@@ -119,32 +121,19 @@ class _DiaryPageV2State extends State<DiaryPageV2> {
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
           slivers: [
-            // Header
+            // Season banner: photo, date and solar term
             SliverToBoxAdapter(
               child: SafeArea(
+                bottom: false,
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
-                  child: Row(children: [
-                    Text('Wellness Diary', style: TextStyle(
-                      fontFamily: ShunShiTypography.serifFamily,
-                      fontSize: 22, fontWeight: FontWeight.bold, color: ShunShiColors.textPrimary,
-                    )),
-                    const Spacer(),
-                    Text('${now.month}/${now.day} · ${solarTerms[termIdx]}',
-                      style: TextStyle(fontSize: 13, color: ShunShiColors.textTertiary)),
-                  ]),
+                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+                  child: SgHeroBanner(
+                    asset: 'assets/images/sg_season_${sgSeasonFor(null)}.webp',
+                    title: 'Wellness diary',
+                    subtitle: '${now.month}/${now.day}${termName.isEmpty ? '' : ' · $termName'}  ·  Follow the seasons, listen to your body.',
+                    height: 150,
+                  ),
                 ),
-              ),
-            ),
-
-            // Quote
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
-                child: Text('"Follow the seasons, listen to your body rhythm."', style: TextStyle(
-                  fontFamily: ShunShiTypography.serifFamily,
-                  fontSize: 14, fontStyle: FontStyle.italic, color: ShunShiColors.textTertiary,
-                )),
               ),
             ),
 
@@ -221,15 +210,15 @@ class _DiaryPageV2State extends State<DiaryPageV2> {
                       Text('Daily Rituals', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
                     ]),
                     const SizedBox(height: 14),
-                    _buildRitualCheck(Icons.emoji_food_beverage, 'Tea', _teaDone, (v) => setState(() => _teaDone = v)),
-                    _buildRitualCheck(Icons.air, 'Meditation', _meditationDone, (v) => setState(() => _meditationDone = v)),
-                    _buildRitualCheck(Icons.directions_walk, 'Exercise', _exerciseDone, (v) => setState(() => _exerciseDone = v)),
+                    _buildRitualCheck('assets/images/wellness/tea_chamomile.jpg', 'Tea', 'Something warm and unhurried', _teaDone, (v) => setState(() => _teaDone = v)),
+                    _buildRitualCheck('assets/images/wellness/emotion_meditation.jpg', 'Meditation', 'A few quiet minutes', _meditationDone, (v) => setState(() => _meditationDone = v)),
+                    _buildRitualCheck('assets/images/wellness/exercise_morning_stretch.jpg', 'Exercise', 'Gentle movement', _exerciseDone, (v) => setState(() => _exerciseDone = v)),
                   ]),
                 ),
               ),
             ),
 
-            // 备注
+            // Note
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
@@ -250,7 +239,7 @@ class _DiaryPageV2State extends State<DiaryPageV2> {
               ),
             ),
 
-            // 保存按钮
+            // Save
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
@@ -270,7 +259,7 @@ class _DiaryPageV2State extends State<DiaryPageV2> {
               ),
             ),
 
-            // AI洞察
+            // AI insight
             if (_aiInsight.isNotEmpty) SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
@@ -293,7 +282,18 @@ class _DiaryPageV2State extends State<DiaryPageV2> {
               ),
             ),
 
-            // 历史记录
+            // Recent entries
+            if (_recentEntries.isEmpty && !_loading)
+              const SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(24, 20, 24, 0),
+                  child: SgEmptyState(
+                    asset: 'assets/images/sg_empty.webp',
+                    title: 'No entries yet',
+                    message: 'Save today\'s diary and it will show up here.',
+                  ),
+                ),
+              ),
             if (_recentEntries.isNotEmpty) ...[
               SliverToBoxAdapter(
                 child: Padding(
@@ -351,16 +351,20 @@ class _DiaryPageV2State extends State<DiaryPageV2> {
     );
   }
 
-  Widget _buildRitualCheck(IconData icon, String label, bool done, ValueChanged<bool> onToggle) {
+  Widget _buildRitualCheck(String photo, String label, String hint, bool done, ValueChanged<bool> onToggle) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: GestureDetector(
         onTap: () => onToggle(!done),
         child: Row(children: [
-          Icon(icon, color: ShunShiColors.primary, size: 18),
-          const SizedBox(width: 10),
-          Text(label, style: TextStyle(fontSize: 14, color: ShunShiColors.textPrimary)),
-          const Spacer(),
+          SgThumb(asset: photo, size: 44),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(label, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+              Text(hint, style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
+            ]),
+          ),
           Container(
             width: 22, height: 22,
             decoration: BoxDecoration(
