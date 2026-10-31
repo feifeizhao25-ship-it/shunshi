@@ -95,6 +95,10 @@ flutter:
 
   assets:
     - assets/images/
+    - assets/images/wellness/
+    - assets/images/library/
+    - assets/images/content/
+    - assets/images/acupoints/
     - assets/icons/
     - assets/animations/
     - assets/audio/

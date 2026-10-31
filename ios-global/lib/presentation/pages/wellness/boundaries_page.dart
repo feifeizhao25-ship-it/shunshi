@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../widgets/seasons_visual.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import '../../../core/theme/shunshi_text_styles.dart';
@@ -43,9 +44,9 @@ class BoundariesPage extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  Text(
-                    '🌿',
-                    style: const TextStyle(fontSize: 48),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Image.asset('assets/images/sg_hero_bound.webp', height: 150, width: double.infinity, fit: BoxFit.cover),
                   ),
                   const SizedBox(height: 12),
                   Text(
@@ -177,7 +178,7 @@ class BoundariesPage extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('⚠️', style: TextStyle(fontSize: 20)),
+                  const Icon(Icons.warning_amber_rounded, color: Color(0xFFE65100)),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
@@ -248,7 +249,7 @@ class _SectionTitle extends StatelessWidget {
       children: [
         Row(
           children: [
-            Text(emoji, style: const TextStyle(fontSize: 24)),
+            SgIconBadge(emoji: emoji, color: color, size: 32),
             const SizedBox(width: 8),
             Text(
               title,
@@ -303,7 +304,7 @@ class _BoundaryCard extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(emoji, style: const TextStyle(fontSize: 28)),
+          SgIconBadge(emoji: emoji, color: color),
           const SizedBox(width: 12),
           Expanded(
             child: Column(

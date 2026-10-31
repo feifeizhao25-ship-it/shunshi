@@ -6,6 +6,7 @@ import 'package:dio/dio.dart';
 import '../../../data/storage/storage_manager.dart';
 import '../../widgets/state_view.dart';
 import 'package:flutter/material.dart';
+import '../../widgets/seasons_visual.dart';
 import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
 
@@ -47,7 +48,7 @@ class _RecordsPageV2State extends State<RecordsPageV2> {
     try {
       final res = await _dio.post('/api/v1/auth/guest-login', data: {});
       final data = res.data;
-      _token = data is Map ? (data['data'] ?? data)['token'] : null;
+      _token = data is Map ? (data['access_token'] ?? (data['data'] is Map ? (data['data'] as Map)['token'] : null)) as String? : null;
     } catch (_) {}
   }
 
@@ -108,19 +109,27 @@ class _RecordsPageV2State extends State<RecordsPageV2> {
         child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
-            // Stats card
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(colors: [Color(0xFF144227), Color(0xFF2D7A4A)]),
-                borderRadius: BorderRadius.circular(16)),
-              child: Row(children: [
-                Expanded(child: _buildStat('Week Streak', '$_weekStreak days')),
-                Expanded(child: _buildStat('Done Today', '$_todayDone/$_todayTotal')),
-                Expanded(child: _buildStat('Total Points', '$_totalPoints')),
-              ]),
+            const SgHeroBanner(
+              asset: 'assets/images/sg_hero_records.webp',
+              title: 'Your week at a glance',
+              subtitle: 'Check-ins, sleep and mood in one place.',
+              height: 150,
             ),
+            const SizedBox(height: 14),
+            Row(children: [
+              SgStatChip(icon: Icons.local_fire_department, label: 'Week streak', value: '$_weekStreak'),
+              const SizedBox(width: 10),
+              SgStatChip(icon: Icons.task_alt, label: 'Done today', value: '$_todayDone/$_todayTotal'),
+              const SizedBox(width: 10),
+              SgStatChip(icon: Icons.stars_outlined, label: 'Points', value: '$_totalPoints'),
+            ]),
             const SizedBox(height: 16),
+            if (_weekStreak == 0 && _todayDone == 0 && _sleepStats['avg_hours'] == null && _emotionTrends.isEmpty)
+              const SgEmptyState(
+                asset: 'assets/images/sg_empty.webp',
+                title: 'No records yet',
+                message: 'Check in, log your sleep or note your mood and your week will show up here.',
+              ),
 
             // Today progress
             Text('Today\'s Progress', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
@@ -147,7 +156,7 @@ class _RecordsPageV2State extends State<RecordsPageV2> {
             const SizedBox(height: 16),
 
             // Sleep stats
-            if (_sleepStats.isNotEmpty) ...[
+            if (_sleepStats['avg_hours'] != null) ...[
               Text('Sleep Stats', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
               const SizedBox(height: 12),
               Container(
@@ -173,20 +182,15 @@ class _RecordsPageV2State extends State<RecordsPageV2> {
             if (_emotionTrends.isNotEmpty) ...[
               Text('Mood Trends', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
               const SizedBox(height: 12),
-              ..._emotionTrends.take(5).map((e) => Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: Container(
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(12)),
-                  child: Row(children: [
-                    Icon(_emotionIcon(e['avg_mood'] as int? ?? 3), color: ShunShiColors.primary, size: 18),
-                    const SizedBox(width: 10),
-                    Text(e['date']?.toString().substring(5, 10) ?? '', style: TextStyle(fontSize: 13, color: ShunShiColors.textSecondary)),
-                    const Spacer(),
-                    Text(_emotionLabel(e['avg_mood'] as int? ?? 3), style: TextStyle(fontSize: 13, color: ShunShiColors.textPrimary)),
-                  ]),
-                ),
-              )),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(16)),
+                child: SgMoodBars(entries: [
+                  for (final e in _emotionTrends.take(7))
+                    if (e['avg_mood'] is num)
+                      ((e['date']?.toString().length ?? 0) >= 10 ? e['date'].toString().substring(5, 10) : '', (e['avg_mood'] as num).round()),
+                ]),
+              ),
             ],
           ],
         ),
@@ -194,24 +198,6 @@ class _RecordsPageV2State extends State<RecordsPageV2> {
     );
   }
 
-  Widget _buildStat(String label, String value) {
-    return Column(children: [
-      Text(value, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
-      Text(label, style: TextStyle(fontSize: 12, color: Colors.white70)),
-    ]);
-  }
 
-  IconData _emotionIcon(int mood) {
-    if (mood >= 4) return Icons.sentiment_satisfied;
-    if (mood >= 3) return Icons.sentiment_neutral;
-    return Icons.sentiment_dissatisfied;
-  }
 
-  String _emotionLabel(int mood) {
-    if (mood >= 5) return 'Very Happy';
-    if (mood >= 4) return 'Good';
-    if (mood >= 3) return 'Quite Calm';
-    if (mood >= 2) return 'Somewhat Tired';
-    return 'Low Mood';
-  }
 }

@@ -6,6 +6,7 @@ library;
 import 'package:dio/dio.dart';
 import '../../../core/config/app_config.dart';import '../../widgets/state_view.dart';
 import 'package:flutter/material.dart';
+import '../../widgets/seasons_visual.dart';
 import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
@@ -174,14 +175,23 @@ class _SolarTermPageV2State extends State<SolarTermPageV2> {
                   ),
                 ),
 
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
+                    child: SgHeroBanner(
+                      asset: 'assets/images/sg_season_${sgSeasonFor(_term['date']?.toString())}.webp',
+                      title: sgSeasonLabel(sgSeasonFor(_term['date']?.toString())),
+                      height: 150,
+                    ),
+                  ),
+                ),
                 // 节气标题
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       Row(children: [
-                        Text(_term['emoji']?.toString() ?? '🌿', style: const TextStyle(fontSize: 32)),
-                        const SizedBox(width: 12),
+                        
                         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                           Text(ZhEnMapper.solarTermFromApi(_term), style: TextStyle(
                             fontFamily: ShunShiTypography.serifFamily,
@@ -214,7 +224,7 @@ class _SolarTermPageV2State extends State<SolarTermPageV2> {
                           color: ShunShiColors.primary.withValues(alpha: 0.06), borderRadius: BorderRadius.circular(14),
                         ),
                         child: Row(children: [
-                          Text(_next['emoji']?.toString() ?? '🌱', style: const TextStyle(fontSize: 24)),
+                          const Icon(Icons.event_outlined, size: 26, color: Color(0xFF144227)),
                           const SizedBox(width: 12),
                           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                             Text('${AppLocalizations.of(context).t('solar_next').replaceAll('{name}', ZhEnMapper.solarTermFromApi(_next))}', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
@@ -297,7 +307,7 @@ class _SolarTermPageV2State extends State<SolarTermPageV2> {
         decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(12)),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
-            Text(icon, style: const TextStyle(fontSize: 20)),
+            SgThumb(asset: sgWellnessThumb(icon == '🧘' ? 'exercise' : (icon == '🫖' ? 'tea' : 'food'), title), size: 48),
             const SizedBox(width: 10),
             Expanded(child: Text(title, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary))),
           ]),
