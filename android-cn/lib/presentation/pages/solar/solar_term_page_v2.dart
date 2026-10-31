@@ -4,6 +4,7 @@
 /// v3: 沉浸大卡片 + 进度环 + Tab分组 + 入场动画 + 滑动切换
 library;
 
+import '../../../core/solar_term/solar_cover.dart';
 import 'dart:math' as math;
 import '../../widgets/state_view.dart';
 import 'package:flutter/material.dart';
@@ -290,8 +291,9 @@ class _SolarTermPageV2State extends State<SolarTermPageV2>
           // ── Background image ──
           Positioned.fill(
             child: Image.asset(
-              'assets/images/solar_term_hero.jpg',
+              solarCoverAsset(_term['name']?.toString(), fallback: 'assets/images/solar_term_hero.jpg'),
               fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) => Image.asset('assets/images/solar_term_hero.jpg', fit: BoxFit.cover),
             ),
           ),
           // ── Gradient overlay ──

@@ -101,6 +101,7 @@ flutter:
     - assets/icons/
     - assets/images/acupoints/
     - assets/images/foods/
+    - assets/images/solar/
 
   fonts:
     - family: NotoSerifSC

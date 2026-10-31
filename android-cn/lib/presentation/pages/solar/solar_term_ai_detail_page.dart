@@ -1,5 +1,5 @@
-/// 节气AI详情页 — 对齐UI参考 _10
-/// 固定顶栏(返回+ShunShi AI+分享) → Hero水墨画 → 节气内涵卡片 → Bento Grid(饮食/起居/功法) → 冥想音频卡 → 浮动分享
+/// 节气详情页（图文版）— 封面插画 → 关键信息 chips → 引言卡 → 物候三候时间轴 → 生活方案卡片 → 静心 → 资料来源（可折叠）
+/// 全部条目为「待审核」，来源：中国气象局、紫金山天文台、国家中医药管理局；不含疗效声明。
 library;
 
 import 'package:flutter/material.dart';
@@ -19,9 +19,6 @@ class SolarTermAIDetailPage extends StatelessWidget {
     this.englishName,
   });
 
-  // 节气数据映射
-  // 24节气内容库：全部条目为「待审核」，每条附资料来源（中国气象局、紫金山天文台、国家中医药管理局）。
-  // 仅含节气物候、民俗与传统文化表述，不含任何疗效/医疗功效声明。
   static const _termData = {
     '立春': _TermData(
       englishName: '二十四节气 · 第1个',
@@ -553,6 +550,67 @@ class SolarTermAIDetailPage extends StatelessWidget {
     ),
   };
 
+  // 结构化关键信息：序号、太阳黄经、2026 交节时刻（紫金山天文台）、物候三候（中国气象局）
+  static const _facts = {
+    '立春': _Facts(1, 315, '2月4日 04:02', ['东风解冻', '蛰虫始振', '鱼陟负冰']),
+    '雨水': _Facts(2, 330, '2月18日 23:52', ['獭祭鱼', '雁北归', '草木萌动']),
+    '惊蛰': _Facts(3, 345, '3月5日 21:59', ['桃始华', '仓庚鸣', '鹰化为鸠']),
+    '春分': _Facts(4, 0, '3月20日 22:46', ['元鸟至', '雷乃发声', '始电']),
+    '清明': _Facts(5, 15, '4月5日 02:40', ['桐始华', '田鼠化为鴽', '虹始见']),
+    '谷雨': _Facts(6, 30, '4月20日 09:39', ['萍始生', '鸣鸠拂其羽', '戴胜降于桑']),
+    '立夏': _Facts(7, 45, '5月5日 19:49', ['蝼蝈鸣', '蚯蚓出', '王瓜生']),
+    '小满': _Facts(8, 60, '5月21日 08:37', ['苦菜秀', '靡草死', '麦秋至']),
+    '芒种': _Facts(9, 75, '6月5日 23:48', ['螳螂生', '鵙始鸣', '反舌无声']),
+    '夏至': _Facts(10, 90, '6月21日 16:25', ['鹿角解', '蝉始鸣', '半夏生']),
+    '小暑': _Facts(11, 105, '7月7日 09:57', ['温风至', '蟋蟀居宇', '鹰始鸷']),
+    '大暑': _Facts(12, 120, '7月23日 03:13', ['腐草为萤', '土润溽暑', '大雨时行']),
+    '立秋': _Facts(13, 135, '8月7日 19:43', ['凉风至', '白露生', '寒蝉鸣']),
+    '处暑': _Facts(14, 150, '8月23日 10:19', ['鹰乃祭鸟', '天地始肃', '禾乃登']),
+    '白露': _Facts(15, 165, '9月7日 22:41', ['鸿雁来', '玄鸟归', '群鸟养羞']),
+    '秋分': _Facts(16, 180, '9月23日 08:05', ['雷始收声', '蛰虫坯户', '水始涸']),
+    '寒露': _Facts(17, 195, '10月8日 14:29', ['鸿雁来宾', '雀入大水为蛤', '菊有黄华']),
+    '霜降': _Facts(18, 210, '10月23日 17:38', ['豺乃祭兽', '草木黄落', '蜇虫咸俯']),
+    '立冬': _Facts(19, 225, '11月7日 17:52', ['水始冰', '地始冻', '雉入大水为蜃']),
+    '小雪': _Facts(20, 240, '11月22日 15:23', ['虹藏不见', '天气上升地气下降', '闭塞而成冬']),
+    '大雪': _Facts(21, 255, '12月7日 10:53', ['鹖鴠不鸣', '虎始交', '荔挺出']),
+    '冬至': _Facts(22, 270, '12月22日 04:50', ['蚯蚓结', '麋角解', '水泉动']),
+    '小寒': _Facts(23, 285, '1月5日 16:23', ['雁北乡', '鹊始巢', '雉始雊']),
+    '大寒': _Facts(24, 300, '1月20日 09:45', ['鸡乳', '征鸟厉疾', '水泽腹坚']),
+  };
+
+  static const _cover = {
+    '立春': 'lichun',
+    '雨水': 'yushui',
+    '惊蛰': 'jingzhe',
+    '春分': 'chunfen',
+    '清明': 'qingming',
+    '谷雨': 'guyu',
+    '立夏': 'lixia',
+    '小满': 'xiaoman',
+    '芒种': 'mangzhong',
+    '夏至': 'xiazhi',
+    '小暑': 'xiaoshu',
+    '大暑': 'dashu',
+    '立秋': 'liqiu',
+    '处暑': 'chushu',
+    '白露': 'bailu',
+    '秋分': 'qiufen',
+    '寒露': 'hanlu',
+    '霜降': 'shuangjiang',
+    '立冬': 'lidong',
+    '小雪': 'xiaoxue',
+    '大雪': 'daxue',
+    '冬至': 'dongzhi',
+    '小寒': 'xiaohan',
+    '大寒': 'dahan',
+  };
+
+  // 食俗标签 → 已有的食材插画
+  static const _foodImg = {
+    '青团': 'qingtuan', '艾糍': 'aicao', '香椿芽': 'xiangchun', '香椿': 'xiangchun', '柿子': 'shizi',
+    '西瓜': 'xigua', '绿豆汤': 'lvdou', '腊八粥': 'laba', '芝麻': 'zhima', '萝卜': 'luobo',
+  };
+
   _TermData get _data =>
       _termData[termName] ??
       _TermData(
@@ -561,212 +619,131 @@ class SolarTermAIDetailPage extends StatelessWidget {
         quote: '顺天时，养正气。',
         description: '$termName时节，阴阳交替，万物更新。顺应自然节律，调和身心。',
         foodTitle: '时令饮食',
-        foodDesc: '选用当季食材，调和五脏。',
-        foodTags: ['推荐食谱'],
+        foodDesc: '选用当季食材，均衡搭配。',
+        foodTags: ['时令食材'],
         livingTitle: '起居有常',
         livingDesc: '顺应日出日落，调整作息。',
-        exerciseTitle: '传统功法',
-        exerciseDesc: '适度运动，疏通经络。',
-        meditationTitle: '$termName · 静心引导',
-        meditationDesc: '聆听自然之声，感受节气韵律。',
-        meditationDuration: '10 分钟',
+        exerciseTitle: '传统健身',
+        exerciseDesc: '太极拳、八段锦、五禽戏、六字诀，量力而行。',
+        meditationTitle: '$termName · 静心片刻',
+        meditationDesc: '找一处安静的地方坐下，缓缓呼吸几次。',
+        meditationDuration: '3 分钟',
         gradient: [Color(0xFF144227), Color(0xFF2D5A3D)],
         sources: const [],
       );
+
+  String get _shareText {
+    final d = _data;
+    final f = _facts[termName];
+    final extra = f == null ? d.description : '太阳黄经${f.longitude}°，2026年${f.when}交节';
+    return '$termName · ${d.season}\n${d.quote}\n$extra\n—— 来自顺时';
+  }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bg = isDark ? ShunShiColors.darkBackground : ShunShiColors.background;
-    final surfaceLow = isDark ? ShunShiColors.darkSurfaceContainerLow : ShunShiColors.surfaceContainerLow;
     final d = _data;
+    final f = _facts[termName];
     return Scaffold(
-  appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
-      backgroundColor: isDark ? ShunShiColors.darkBackground : ShunShiColors.background,
+      backgroundColor: bg,
       body: Stack(
         children: [
-          // Scrollable content
           SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // ── Hero Section ──
-                _buildHeroSection(context, d),
-                // ── 节气内涵 ──
-                _buildInsightSection(d),
-                // ── 顺时生活方案 Bento Grid ──
-                _buildBentoSection(d),
-                // ── 冥想音频卡 ──
-                _buildMeditationCard(context, d),
-                // ── 资料来源 / 待审核 ──
+                _buildHero(context, d, f),
+                if (f != null) _buildFactChips(f),
+                _buildQuoteCard(d, f),
+                if (f != null) _buildHouTimeline(f, d),
+                _buildSectionTitle(Icons.spa_outlined, '顺时生活方案'),
+                _buildFoodCard(d),
+                _buildLivingCard(d),
+                _buildExerciseCard(d),
+                _buildMeditationCard(d),
                 _buildSourcesSection(d),
                 const SizedBox(height: 120),
               ],
             ),
           ),
-
-          // ── 固定顶栏 ──
-          _buildTopBar(context),
-
-          // ── 浮动分享按钮 ──
           Positioned(
-            bottom: 36,
-            left: 0, right: 0,
-            child: Center(
-              child: GestureDetector(
-                onTap: () => SharePlus.instance.share(ShareParams(text: '${_data.season}\n${_data.quote}\n${_data.description}\n—— 来自顺时')),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
-                  decoration: BoxDecoration(
-                    color: ShunShiColors.primary,
-                    borderRadius: BorderRadius.circular(999),
-                    boxShadow: [
-                      BoxShadow(
-                        color: ShunShiColors.primary.withValues(alpha: 0.3),
-                        blurRadius: 20, offset: const Offset(0, 8),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: const [
-                      Icon(Icons.share, size: 20, color: Colors.white),
-                      SizedBox(width: 10),
-                      Text('分享这份顺时灵感', style: TextStyle(
-                        fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white,
-                      )),
-                    ],
-                  ),
-                ),
-              ),
-            ),
+            bottom: 28,
+            left: 0,
+            right: 0,
+            child: Center(child: _buildShareButton()),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildTopBar(BuildContext context) {
-    final bg = Theme.of(context).brightness == Brightness.dark ? ShunShiColors.darkBackground : ShunShiColors.background;
-    return Positioned(
-      top: 0, left: 0, right: 0,
-      child: Container(
-        decoration: BoxDecoration(
-          color: bg.withValues(alpha: 0.8),
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                GestureDetector(
-                  onTap: () => Navigator.of(context).pop(),
-                  child: Container(
-                    width: 40, height: 40,
-                    decoration: BoxDecoration(
-                      color: ShunShiColors.surfaceContainerLow,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Icon(Icons.arrow_back, size: 20, color: ShunShiColors.primary),
-                  ),
-                ),
-                const Text('顺时', style: TextStyle(
-                  fontSize: 20, fontStyle: FontStyle.italic,
-                  fontFamily: ShunShiTypography.serifFamily,
-                  color: ShunShiColors.primary,
-                )),
-                GestureDetector(
-                  onTap: () => SharePlus.instance.share(ShareParams(text: '${_data.season}\n${_data.quote}\n${_data.description}\n—— 来自顺时')),
-                  child: Container(
-                    width: 40, height: 40,
-                    decoration: BoxDecoration(
-                      color: ShunShiColors.surfaceContainerLow,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Icon(Icons.share, size: 20, color: ShunShiColors.primary),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeroSection(BuildContext context, _TermData d) {
-    final bg = Theme.of(context).brightness == Brightness.dark ? ShunShiColors.darkBackground : ShunShiColors.background;
+  // ── 封面插画 Hero ──
+  Widget _buildHero(BuildContext context, _TermData d, _Facts? f) {
+    final cover = _cover[termName];
     return SizedBox(
-      height: 420,
+      height: 360,
+      width: double.infinity,
       child: Stack(
+        fit: StackFit.expand,
         children: [
-          // Gradient background (代替水墨画)
-          Container(
-            width: double.infinity,
+          DecoratedBox(
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: d.gradient,
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-            child: Center(
-              child: Text(
-                termName,
-                style: TextStyle(
-                  fontSize: 120,
-                  fontFamily: ShunShiTypography.serifFamily,
-                  color: Colors.white.withValues(alpha: 0.08),
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
+              gradient: LinearGradient(colors: d.gradient, begin: Alignment.topLeft, end: Alignment.bottomRight),
             ),
           ),
-          // Gradient overlay
-          Container(
+          if (cover != null)
+            Image.asset(
+              'assets/images/solar/$cover.webp',
+              fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+            ),
+          // 底部渐暗，保证标题可读
+          const DecoratedBox(
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [
-                  Colors.transparent,
-                  bg.withValues(alpha: 0.3),
-                  bg,
-                ],
-                stops: const [0.5, 0.75, 1.0],
+                colors: [Color(0x40000000), Color(0x00000000), Color(0xB3000000)],
+                stops: [0.0, 0.45, 1.0],
               ),
             ),
           ),
-          // Text overlay
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _circleButton(Icons.arrow_back_ios_new, () => Navigator.of(context).maybePop(), '返回'),
+                  _circleButton(Icons.share_outlined, () => SharePlus.instance.share(ShareParams(text: _shareText)), '分享'),
+                ],
+              ),
+            ),
+          ),
           Positioned(
-            bottom: 40,
-            left: 24, right: 24,
+            left: 24,
+            right: 24,
+            bottom: 24,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: ShunShiColors.primary,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(d.season, style: TextStyle(
-                    fontSize: 10, fontWeight: FontWeight.w500, letterSpacing: 3,
-                    color: Colors.white,
-                  )),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                  decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.22), borderRadius: BorderRadius.circular(999)),
+                  child: Text(d.season, style: const TextStyle(fontSize: 13, letterSpacing: 2, color: Colors.white)),
                 ),
-                const SizedBox(height: 16),
-                Text(termName, style: TextStyle(
-                  fontSize: 52, fontWeight: FontWeight.w400,
+                const SizedBox(height: 12),
+                Text(termName, style: const TextStyle(
+                  fontSize: 48, height: 1.15, fontWeight: FontWeight.w600, color: Colors.white,
                   fontFamily: ShunShiTypography.serifFamily,
-                  color: ShunShiColors.textPrimary,
+                  shadows: [Shadow(color: Color(0x66000000), blurRadius: 12)],
                 )),
-                const SizedBox(height: 6),
+                const SizedBox(height: 4),
                 Text(d.englishName, style: TextStyle(
-                  fontSize: 18, fontStyle: FontStyle.italic,
+                  fontSize: 15, fontStyle: FontStyle.italic, color: Colors.white.withValues(alpha: 0.9),
                   fontFamily: ShunShiTypography.serifFamily,
-                  color: ShunShiColors.secondary,
                 )),
               ],
             ),
@@ -776,310 +753,393 @@ class SolarTermAIDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildInsightSection(_TermData d) {
+  Widget _circleButton(IconData icon, VoidCallback onTap, String label) {
+    return Semantics(
+      button: true,
+      label: label,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(color: Colors.black.withValues(alpha: 0.32), shape: BoxShape.circle),
+          child: Icon(icon, size: 18, color: Colors.white),
+        ),
+      ),
+    );
+  }
+
+  // ── 关键信息 chips：序号 / 黄经 / 交节时刻 ──
+  Widget _buildFactChips(_Facts f) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, -24, 24, 0),
+      padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+      child: Wrap(
+        spacing: 10,
+        runSpacing: 10,
+        children: [
+          _factChip(Icons.tag, '第 ${f.index} 个节气', ShunShiColors.primary),
+          _factChip(Icons.explore_outlined, '太阳黄经 ${f.longitude}°', ShunShiColors.secondary),
+          _factChip(Icons.schedule, '2026年${f.when} 交节', ShunShiColors.apricot),
+        ],
+      ),
+    );
+  }
+
+  Widget _factChip(IconData icon, String text, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: color.withValues(alpha: 0.28)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: color),
+          const SizedBox(width: 6),
+          Text(text, style: const TextStyle(fontSize: 14, height: 1.3, color: ShunShiColors.textPrimary)),
+        ],
+      ),
+    );
+  }
+
+  // ── 引言卡（pull-quote） ──
+  Widget _buildQuoteCard(_TermData d, _Facts? f) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
       child: Container(
-        padding: const EdgeInsets.all(28),
+        width: double.infinity,
+        padding: const EdgeInsets.fromLTRB(22, 20, 22, 20),
         decoration: BoxDecoration(
           color: ShunShiColors.surfaceContainerLowest,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: ShunShiColors.textTertiary.withValues(alpha: 0.1)),
+          border: Border(left: BorderSide(color: ShunShiColors.apricot, width: 4)),
           boxShadow: ShunShiShadows.sm,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                Container(width: 28, height: 1, color: ShunShiColors.apricot),
-                const SizedBox(width: 12),
-                Text('节气内涵', style: TextStyle(
-                  fontSize: 13, letterSpacing: 3,
-                  fontFamily: ShunShiTypography.serifFamily,
-                  color: ShunShiColors.secondary,
-                )),
-              ],
-            ),
-            const SizedBox(height: 20),
-            Text(d.quote, style: TextStyle(
-              fontSize: 22, fontWeight: FontWeight.w400, height: 1.4,
+            Icon(Icons.format_quote, size: 28, color: ShunShiColors.apricot.withValues(alpha: 0.8)),
+            const SizedBox(height: 4),
+            Text(d.quote, style: const TextStyle(
+              fontSize: 20, height: 1.6, color: ShunShiColors.textPrimary,
               fontFamily: ShunShiTypography.serifFamily,
-              color: ShunShiColors.textPrimary,
             )),
-            const SizedBox(height: 16),
-            Text(d.description, style: TextStyle(
-              fontSize: 15, height: 1.8,
-              color: ShunShiColors.textSecondary,
-            )),
+            if (f == null) ...[
+              const SizedBox(height: 12),
+              Text(d.description, style: const TextStyle(fontSize: 14, height: 1.7, color: ShunShiColors.textSecondary)),
+            ],
           ],
         ),
       ),
     );
   }
 
-  Widget _buildBentoSection(_TermData d) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 40, 24, 0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(width: 28, height: 1, color: ShunShiColors.apricot),
-              const SizedBox(width: 12),
-              Text('顺时生活方案', style: TextStyle(
-                fontSize: 13, letterSpacing: 3,
-                fontFamily: ShunShiTypography.serifFamily,
-                color: ShunShiColors.secondary,
-              )),
-            ],
+  // ── 物候三候时间轴 ──
+  Widget _buildHouTimeline(_Facts f, _TermData d) {
+    const labels = ['一候', '二候', '三候'];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionTitle(Icons.timeline, '物候三候'),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(24, 0, 24, 0),
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(16, 18, 16, 18),
+            decoration: BoxDecoration(
+              color: ShunShiColors.surfaceContainerLowest,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: ShunShiColors.textTertiary.withValues(alpha: 0.12)),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                for (var i = 0; i < f.hou.length; i++)
+                  Expanded(
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(child: Container(height: 2, color: i == 0 ? Colors.transparent : d.gradient.last.withValues(alpha: 0.35))),
+                            Container(
+                              width: 32,
+                              height: 32,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(shape: BoxShape.circle, color: d.gradient.last),
+                              child: Text('${i + 1}', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
+                            ),
+                            Expanded(child: Container(height: 2, color: i == f.hou.length - 1 ? Colors.transparent : d.gradient.last.withValues(alpha: 0.35))),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        Text(labels[i], style: const TextStyle(fontSize: 12, letterSpacing: 2, color: ShunShiColors.textTertiary)),
+                        const SizedBox(height: 4),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                          child: Text(f.hou[i], textAlign: TextAlign.center, style: const TextStyle(
+                            fontSize: 14, height: 1.45, color: ShunShiColors.textPrimary,
+                            fontFamily: ShunShiTypography.serifFamily,
+                          )),
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
           ),
-          const SizedBox(height: 24),
-          // Bento grid
-          Column(
-            children: [
-              // Full-width food card
-              _foodCard(d),
-              const SizedBox(height: 12),
-              // Two-column row
-              Row(
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSectionTitle(IconData icon, String title) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 28, 24, 12),
+      child: Row(
+        children: [
+          Container(
+            width: 30,
+            height: 30,
+            decoration: BoxDecoration(color: ShunShiColors.primary.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(9)),
+            child: Icon(icon, size: 18, color: ShunShiColors.primary),
+          ),
+          const SizedBox(width: 10),
+          Text(title, style: const TextStyle(
+            fontSize: 17, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary,
+            fontFamily: ShunShiTypography.serifFamily,
+          )),
+        ],
+      ),
+    );
+  }
+
+  Widget _lifeCard({required IconData icon, required Color color, required String label, required String title, required Widget body, Color? bgColor}) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 0, 24, 14),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(18),
+        decoration: BoxDecoration(
+          color: bgColor ?? ShunShiColors.surfaceContainerLowest,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: ShunShiColors.textTertiary.withValues(alpha: 0.12)),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(color: color.withValues(alpha: 0.14), borderRadius: BorderRadius.circular(14)),
+              child: Icon(icon, size: 24, color: color),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(child: _livingCard(d)),
-                  const SizedBox(width: 12),
-                  Expanded(child: _exerciseCard(d)),
+                  Text(label, style: const TextStyle(fontSize: 12, letterSpacing: 2, color: ShunShiColors.textTertiary)),
+                  const SizedBox(height: 2),
+                  Text(title, style: const TextStyle(
+                    fontSize: 17, height: 1.4, color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.serifFamily,
+                  )),
+                  const SizedBox(height: 8),
+                  body,
                 ],
               ),
-            ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  TextStyle get _bodyStyle => const TextStyle(fontSize: 14, height: 1.6, color: ShunShiColors.textSecondary);
+
+  Widget _buildFoodCard(_TermData d) {
+    return _lifeCard(
+      icon: Icons.restaurant_outlined,
+      color: ShunShiColors.apricot,
+      label: '节气食俗',
+      title: d.foodTitle,
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(d.foodDesc, style: _bodyStyle),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [for (final t in d.foodTags) _foodTag(t)],
           ),
         ],
       ),
     );
   }
 
-  Widget _foodCard(_TermData d) {
+  Widget _foodTag(String tag) {
+    final img = _foodImg[tag];
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: EdgeInsets.fromLTRB(img != null ? 4 : 12, 4, 12, 4),
       decoration: BoxDecoration(
         color: ShunShiColors.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: ShunShiColors.textTertiary.withValues(alpha: 0.14)),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            children: [
-              Icon(Icons.restaurant, size: 20, color: ShunShiColors.primary),
-              const SizedBox(width: 8),
-              Text('饮食之道', style: TextStyle(
-                fontSize: 11, letterSpacing: 2,
-                color: ShunShiColors.primary,
-              )),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Text(d.foodTitle, style: TextStyle(
-            fontSize: 20, fontFamily: ShunShiTypography.serifFamily,
-            color: ShunShiColors.textPrimary,
-          )),
-          const SizedBox(height: 12),
-          Text(d.foodDesc, style: TextStyle(
-            fontSize: 13, height: 1.6, color: ShunShiColors.textSecondary,
-          )),
-          const SizedBox(height: 16),
-          Row(
-            children: d.foodTags.map((tag) => Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                decoration: BoxDecoration(
-                  color: ShunShiColors.surfaceVariant,
-                  borderRadius: BorderRadius.circular(999),
-                  border: Border.all(color: ShunShiColors.textTertiary.withValues(alpha: 0.2)),
-                ),
-                child: Text(tag, style: TextStyle(
-                  fontSize: 11, color: ShunShiColors.secondary,
-                )),
-              ),
-            )).toList(),
-          ),
+          if (img != null) ...[
+            ClipOval(
+              child: Image.asset('assets/images/foods/$img.webp', width: 28, height: 28, fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => const SizedBox(width: 28, height: 28)),
+            ),
+            const SizedBox(width: 8),
+          ],
+          Text(tag, style: const TextStyle(fontSize: 14, height: 1.4, color: ShunShiColors.textPrimary)),
         ],
       ),
     );
   }
 
-  Widget _livingCard(_TermData d) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: ShunShiColors.apricotLight.withValues(alpha: 0.3),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(Icons.bedtime, size: 20, color: ShunShiColors.secondary),
-              const SizedBox(width: 8),
-              Text('起居之律', style: TextStyle(
-                fontSize: 11, letterSpacing: 2, color: ShunShiColors.secondary,
-              )),
-            ],
+  Widget _buildLivingCard(_TermData d) {
+    return _lifeCard(
+      icon: Icons.bedtime_outlined,
+      color: ShunShiColors.blue,
+      label: '起居',
+      title: d.livingTitle,
+      body: Text(d.livingDesc, style: _bodyStyle),
+    );
+  }
+
+  Widget _buildExerciseCard(_TermData d) {
+    return _lifeCard(
+      icon: Icons.self_improvement,
+      color: ShunShiColors.primaryLight,
+      label: '传统健身',
+      title: d.exerciseTitle.replaceFirst('传统健身 · ', ''),
+      body: Text(d.exerciseDesc, style: _bodyStyle),
+    );
+  }
+
+  // ── 静心：可折叠 ──
+  Widget _buildMeditationCard(_TermData d) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 0, 24, 14),
+      child: Container(
+        decoration: BoxDecoration(
+          color: ShunShiColors.primaryContainer.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Theme(
+          data: ThemeData(dividerColor: Colors.transparent),
+          child: ExpansionTile(
+            key: const ValueKey('solar-meditation'),
+            initiallyExpanded: false,
+            tilePadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
+            childrenPadding: const EdgeInsets.fromLTRB(18, 0, 18, 18),
+            leading: Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(color: ShunShiColors.primary.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(14)),
+              child: const Icon(Icons.air, size: 24, color: ShunShiColors.primary),
+            ),
+            title: Text(d.meditationTitle, style: const TextStyle(
+              fontSize: 17, color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.serifFamily,
+            )),
+            subtitle: const Text('静心提示 · 约 3 分钟', style: TextStyle(fontSize: 13, color: ShunShiColors.textTertiary)),
+            expandedCrossAxisAlignment: CrossAxisAlignment.start,
+            children: [Text(d.meditationDesc, style: _bodyStyle)],
           ),
-          const SizedBox(height: 12),
-          Text(d.livingTitle, style: TextStyle(
-            fontSize: 17, fontFamily: ShunShiTypography.serifFamily,
-            color: ShunShiColors.textPrimary,
-          )),
-          const SizedBox(height: 8),
-          Text(d.livingDesc, style: TextStyle(
-            fontSize: 12, height: 1.6, color: ShunShiColors.textSecondary,
-          )),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _exerciseCard(_TermData d) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: ShunShiColors.primaryContainer,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(Icons.self_improvement, size: 20, color: Colors.white),
-              const SizedBox(width: 8),
-              Text('功法练习', style: TextStyle(
-                fontSize: 11, letterSpacing: 2,
-                color: Colors.white.withValues(alpha: 0.8),
-              )),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Text(d.exerciseTitle, style: TextStyle(
-            fontSize: 17, fontFamily: ShunShiTypography.serifFamily,
-            color: Colors.white,
-          )),
-          const SizedBox(height: 8),
-          Text(d.exerciseDesc, style: TextStyle(
-            fontSize: 12, height: 1.6,
-            color: Colors.white.withValues(alpha: 0.85),
-          )),
-        ],
-      ),
-    );
-  }
-
+  // ── 资料来源 / 待审核（可折叠） ──
   Widget _buildSourcesSection(_TermData d) {
     if (d.sources.isEmpty) return const SizedBox.shrink();
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 28, 24, 0),
+      padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
       child: Container(
         key: const ValueKey('solar-sources'),
-        width: double.infinity,
-        padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: ShunShiColors.surfaceContainerLowest,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: ShunShiColors.textTertiary.withValues(alpha: 0.12)),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+        child: Theme(
+          data: ThemeData(dividerColor: Colors.transparent),
+          child: ExpansionTile(
+            initiallyExpanded: false,
+            tilePadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 2),
+            childrenPadding: const EdgeInsets.fromLTRB(18, 0, 18, 16),
+            leading: const Icon(Icons.menu_book_outlined, size: 22, color: ShunShiColors.secondary),
+            title: Row(
               children: [
-                Text('资料来源', style: TextStyle(
-                  fontSize: 13, letterSpacing: 2,
-                  fontFamily: ShunShiTypography.serifFamily,
-                  color: ShunShiColors.secondary,
-                )),
+                const Text('资料来源', style: TextStyle(fontSize: 15, color: ShunShiColors.textPrimary)),
                 const SizedBox(width: 10),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: ShunShiColors.apricot.withValues(alpha: 0.18),
-                    borderRadius: BorderRadius.circular(999),
-                  ),
-                  child: Text('待审核', style: TextStyle(
-                    fontSize: 11, fontWeight: FontWeight.w600, color: ShunShiColors.secondary,
-                  )),
+                  decoration: BoxDecoration(color: ShunShiColors.apricot.withValues(alpha: 0.18), borderRadius: BorderRadius.circular(999)),
+                  child: const Text('待审核', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: ShunShiColors.secondary)),
                 ),
               ],
             ),
-            const SizedBox(height: 10),
-            for (final src in d.sources)
-              InkWell(
-                onTap: () => launchUrl(Uri.parse(src.url), mode: LaunchMode.externalApplication),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 5),
-                  child: Text.rich(TextSpan(children: [
-                    TextSpan(text: '${src.label}\n', style: TextStyle(
-                      fontSize: 12.5, height: 1.5, color: ShunShiColors.textPrimary,
-                    )),
-                    TextSpan(text: src.url, style: TextStyle(
-                      fontSize: 11, height: 1.4, color: ShunShiColors.primary,
-                      decoration: TextDecoration.underline,
-                    )),
-                  ])),
+            expandedCrossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              for (final src in d.sources)
+                InkWell(
+                  onTap: () => launchUrl(Uri.parse(src.url), mode: LaunchMode.externalApplication),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 6),
+                    child: Text.rich(TextSpan(children: [
+                      TextSpan(text: '${src.label}\n', style: const TextStyle(fontSize: 14, height: 1.5, color: ShunShiColors.textPrimary)),
+                      TextSpan(text: src.url, style: const TextStyle(
+                        fontSize: 12, height: 1.4, color: ShunShiColors.primary, decoration: TextDecoration.underline)),
+                    ])),
+                  ),
                 ),
-              ),
-            const SizedBox(height: 6),
-            Text('内容仅为节气物候、民俗与传统文化介绍，不构成医疗建议；条目待专家审核后正式发布。',
-              style: TextStyle(fontSize: 11, height: 1.5, color: ShunShiColors.textTertiary)),
-          ],
+              const SizedBox(height: 6),
+              const Text('内容仅为节气物候、民俗与传统文化介绍，不构成医疗建议；条目待专家审核后正式发布。',
+                  style: TextStyle(fontSize: 12, height: 1.5, color: ShunShiColors.textTertiary)),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildMeditationCard(BuildContext context, _TermData d) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 36, 24, 0),
+  Widget _buildShareButton() {
+    return GestureDetector(
+      onTap: () => SharePlus.instance.share(ShareParams(text: _shareText)),
       child: Container(
-        padding: const EdgeInsets.all(28),
+        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
         decoration: BoxDecoration(
-          color: ShunShiColors.surfaceContainerLow.withValues(alpha: 0.8),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.4)),
-          boxShadow: ShunShiShadows.sm,
+          color: ShunShiColors.primary,
+          borderRadius: BorderRadius.circular(999),
+          boxShadow: [BoxShadow(color: ShunShiColors.primary.withValues(alpha: 0.3), blurRadius: 20, offset: const Offset(0, 8))],
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: const Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Icon(Icons.self_improvement, size: 20, color: ShunShiColors.primary),
-                    const SizedBox(width: 8),
-                    Text('静心冥想', style: TextStyle(
-                      fontSize: 11, letterSpacing: 2, color: ShunShiColors.primary,
-                    )),
-                  ],
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Text(d.meditationTitle, style: TextStyle(
-              fontSize: 24, fontFamily: ShunShiTypography.serifFamily,
-              color: ShunShiColors.textPrimary,
-            )),
-            const SizedBox(height: 12),
-            Text(d.meditationDesc, style: TextStyle(
-              fontSize: 13, height: 1.7, color: ShunShiColors.textSecondary,
-            )),
+            Icon(Icons.share, size: 20, color: Colors.white),
+            SizedBox(width: 10),
+            Text('分享这份顺时灵感', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white)),
           ],
         ),
       ),
     );
   }
+}
+
+class _Facts {
+  final int index;
+  final int longitude;
+  final String when;
+  final List<String> hou;
+  const _Facts(this.index, this.longitude, this.when, this.hou);
 }
 
 class _TermData {

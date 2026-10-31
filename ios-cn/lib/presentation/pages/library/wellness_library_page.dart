@@ -1,6 +1,7 @@
 /// Wellness Library — wired to /intl/contents/recommend API
 library;
 
+import '../../widgets/illustrated_widgets.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
@@ -197,16 +198,16 @@ class _WellnessLibraryPageState extends State<WellnessLibraryPage> {
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(24, 16, 24, 40),
                       child: _filtered.isEmpty
-                          ? Center(child: Padding(
-                              padding: const EdgeInsets.all(40),
-                              child: Text('这个分类下还没有内容', style: TextStyle(color: AppColors.textTertiary(context))),
+                          ? const Center(child: IllustratedEmptyState(
+                              title: '这个分类下还没有内容',
+                              message: '换一个分类看看，或稍后再来。我们会陆续整理并审核新的养生内容。',
                             ))
                           : Column(
                               children: _filtered.map((item) => Padding(
                                 padding: const EdgeInsets.only(bottom: 10),
                                 child: _buildContentCard(
                                   icon: _iconForType(item['type']),
-                                  category: (item['category'] ?? '养生').toString(),
+                                  category: (item['category'] ?? '').toString(),
                                   title: item['title'] ?? '未命名',
                                   desc: item['subtitle'] ?? item['description']?.toString().substring(0, (item['description']?.toString().length ?? 50).clamp(0, 80)) ?? '',
                                   color: _colorForCategory(item['category']),
@@ -246,25 +247,12 @@ class _WellnessLibraryPageState extends State<WellnessLibraryPage> {
     required IconData icon, required String category,
     required String title, required String desc, required Color color,
   }) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(14)),
-      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Container(
-          width: 48, height: 48,
-          decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
-          child: Icon(icon, color: color, size: 22),
-        ),
-        const SizedBox(width: 14),
-        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(category, style: TextStyle(fontSize: 11, color: color, fontWeight: FontWeight.w500)),
-          const SizedBox(height: 2),
-          Text(title, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
-          const SizedBox(height: 2),
-          Text(desc, style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context), height: 1.4)),
-        ])),
-        Icon(Icons.chevron_right, color: AppColors.textTertiary(context), size: 18),
-      ]),
+    return LibraryCard(
+      asset: libraryCategoryCover(category),
+      categoryLabel: libraryCategoryLabel(category),
+      icon: icon,
+      title: title,
+      desc: desc,
     );
   }
 }
