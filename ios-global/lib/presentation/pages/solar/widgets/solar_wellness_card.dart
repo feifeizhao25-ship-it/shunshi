@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import '../../../../design_system/theme.dart';
 import 'package:go_router/go_router.dart';
 import 'package:dio/dio.dart';
-import '../../../../core/config/app_config.dart';
 
 class SolarWellnessCard extends StatefulWidget {
   const SolarWellnessCard({super.key});
@@ -28,7 +27,7 @@ class _SolarWellnessCardState extends State<SolarWellnessCard> {
     try {
       // 使用 Dio 直接请求
       final dio = Dio(BaseOptions(
-        baseUrl: AppConfig.apiBaseUrl,
+        baseUrl: 'https://api.seasonsapp.com',
         connectTimeout: const Duration(seconds: 5),
       ));
       final res = await dio.get('/api/v1/solar-wellness/daily-advice');

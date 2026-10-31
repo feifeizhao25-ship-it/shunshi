@@ -1,9 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
-import '../../core/config/app_config.dart';
 
-const _baseUrl = AppConfig.apiBaseUrl;
+const _baseUrl = 'https://api.seasonsapp.com';
 
 /// Show practice completion dialog with rating
 Future<void> showPracticeFeedback(BuildContext context, {

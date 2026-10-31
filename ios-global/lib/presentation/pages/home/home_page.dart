@@ -9,7 +9,6 @@ import '../../widgets/skeleton_loading.dart';
 import '../../../core/services/feedback_service.dart';
 import '../../widgets/membership_widgets.dart';
 import '../../../core/solar_term/solar_term_en.dart';
-import '../../../core/config/app_config.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -73,7 +72,7 @@ class _HomePageState extends State<HomePage> {
       return;
     }
     try {
-      final dio = Dio(BaseOptions(baseUrl: AppConfig.apiBaseUrl));
+      final dio = Dio(BaseOptions(baseUrl: 'https://api.seasonsapp.com'));
       final res = await dio.get('/api/v1/solar-terms/current');
       if (res.data?['data'] != null) {
         final d = res.data['data'];

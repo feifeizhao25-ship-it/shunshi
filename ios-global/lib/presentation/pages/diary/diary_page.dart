@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import '../../../design_system/theme.dart';
-import '../../../core/config/app_config.dart';
 
 /// 日记页 — 横向日期选择 + 心情 + 标签 + 记录
 class DiaryPage extends StatefulWidget {
@@ -41,7 +40,7 @@ class _DiaryPageState extends State<DiaryPage> {
     try {
       final prefs = await SharedPreferences.getInstance();
       final userId = prefs.getString('user_id') ?? '';
-      final dio = Dio(BaseOptions(baseUrl: AppConfig.apiBaseUrl));
+      final dio = Dio(BaseOptions(baseUrl: 'https://api.seasonsapp.com'));
       final res = await dio.get('/api/v1/journal/entries/$userId', queryParameters: {'user_id': userId});
       if (res.data is List) {
         setState(() => _entries = List<Map<String, dynamic>>.from(res.data));
@@ -73,7 +72,7 @@ class _DiaryPageState extends State<DiaryPage> {
     try {
       final prefs = await SharedPreferences.getInstance();
       final userId = prefs.getString('user_id') ?? '';
-      final dio = Dio(BaseOptions(baseUrl: AppConfig.apiBaseUrl));
+      final dio = Dio(BaseOptions(baseUrl: 'https://api.seasonsapp.com'));
       await dio.post('/api/v1/journal/entry', data: {...data, 'user_id': userId});
     } catch (_) {
       // Save locally
