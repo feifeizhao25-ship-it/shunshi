@@ -180,7 +180,7 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
           final adviceList = <HealthAdvice>[];
 
           // 按 **标 questions:** 拆分段落
-          final sectionRegex = RegExp(r'\*\*(.+?)[:：]\*\*\s*');
+          final sectionRegex = RegExp(r'\*\*(.+?)[:\uff1a]\*\*\s*');
           final splits = sectionRegex.allMatches(adviceText);
           final sectionTitles = splits.map((m) => m.group(1)!.trim()).toList();
           final sectionContents = adviceText.split(sectionRegex).where((s) => s.trim().isNotEmpty).toList();
@@ -188,7 +188,7 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
           final sectionMeta = {
             'Characteristics': ('📝', 'Characteristics'),
             'Diet Advice': ('🥗', 'Dietary Care'),
-            'TeaRecommended': ('🍵', 'TeaRecommended'),
+            'Recommended Teas': ('🍵', 'TeaRecommended'),
             'Exercise Advice': ('🏃', 'Exercise Advice'),
             'Precautions': ('⚠️', 'Precautions'),
             'Daily Care': ('🌙', 'Daily Care'),
@@ -212,7 +212,7 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
           if (adviceList.isEmpty) {
             adviceList.addAll([
               HealthAdvice(category: 'Dietary Care', icon: '🥗', items: [(kConstitutionAdvice[primaryType]?['Diet'] ?? '')]),
-              HealthAdvice(category: 'TeaRecommended', icon: '🍵', items: [(kConstitutionAdvice[primaryType]?['Tea'] ?? '')]),
+              HealthAdvice(category: 'Recommended Teas', icon: '🍵', items: [(kConstitutionAdvice[primaryType]?['Tea'] ?? '')]),
               HealthAdvice(category: 'Exercise Advice', icon: '🏃', items: [(kConstitutionAdvice[primaryType]?['Exercise'] ?? '')]),
             ]);
           }
@@ -296,9 +296,9 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
             name: data['name'] as String? ?? '', emoji: kConstitutionEmoji[key] ?? '📋',
             description: data['description'] as String? ?? '', characteristics: chars,
             advice: [
-              HealthAdvice(category: 'Diet Advice', icon: '🥗', items: [(data['diet_advice'] as String? ?? '').split(': ').last]),
-              HealthAdvice(category: 'TeaRecommended', icon: '🍵', items: [(data['tea_advice'] as String? ?? '').split('：').last]),
-              HealthAdvice(category: 'Exercise Advice', icon: '🏃', items: [(data['exercise_advice'] as String? ?? '').split('：').last]),
+              HealthAdvice(category: 'Diet Advice', icon: '🥗', items: [(data['diet_advice'] as String? ?? '').split(RegExp(r'[:\uff1a]\s*')).last]),
+              HealthAdvice(category: 'Recommended Teas', icon: '🍵', items: [(data['tea_advice'] as String? ?? '').split(RegExp(r'[:\uff1a]\s*')).last]),
+              HealthAdvice(category: 'Exercise Advice', icon: '🏃', items: [(data['exercise_advice'] as String? ?? '').split(RegExp(r'[:\uff1a]\s*')).last]),
             ],
             avoidList: avoid.join(', '),
           );
@@ -323,7 +323,7 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
         characteristics: kConstitutionChars[key] ?? [],
         advice: [
           HealthAdvice(category: 'Diet Advice', icon: '🥗', items: [adv['Diet'] ?? '']),
-          HealthAdvice(category: 'TeaRecommended', icon: '🍵', items: [adv['Tea'] ?? '']),
+          HealthAdvice(category: 'Recommended Teas', icon: '🍵', items: [adv['Tea'] ?? '']),
           HealthAdvice(category: 'Exercise Advice', icon: '🏃', items: [adv['Exercise'] ?? '']),
         ],
         avoidList: (kConstitutionAvoid[key] ?? []).join(', '),

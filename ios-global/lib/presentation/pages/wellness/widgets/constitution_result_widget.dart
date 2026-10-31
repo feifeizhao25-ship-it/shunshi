@@ -56,7 +56,7 @@ class ConstitutionResultWidget extends StatelessWidget {
       child: Column(children: [
         Text(result.emoji, style: const TextStyle(fontSize: 56)),
         const SizedBox(height: 8),
-        Text('你的体质是',
+        Text('Your constitution is',
             style: TextStyle(fontSize: 14, color: Colors.white.withValues(alpha: 0.8))),
         const SizedBox(height: 4),
         Text(result.typeName,
@@ -67,7 +67,7 @@ class ConstitutionResultWidget extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
               color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(12)),
-          child: Text('测试时间: ${DateTime.now().toString().substring(0, 16)}',
+          child: Text('Taken: ${DateTime.now().toString().substring(0, 16)}',
               style: TextStyle(fontSize: 12, color: Colors.white.withValues(alpha: 0.7))),
         ),
       ]),
@@ -102,7 +102,7 @@ class ConstitutionResultWidget extends StatelessWidget {
       const Row(children: [
         Text('📊', style: TextStyle(fontSize: 18)),
         SizedBox(width: 8),
-        Text('体质分数',
+        Text('Constitution scores',
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: ShunshiColors.textPrimary))
       ]),
       const SizedBox(height: 14),
@@ -146,9 +146,9 @@ class ConstitutionResultWidget extends StatelessWidget {
                         color: isPrimary ? ShunshiColors.primaryDark : ShunshiColors.textPrimary))),
             const SizedBox(width: 4),
             if (level == 'obvious')
-              const Text('偏颇', style: TextStyle(fontSize: 10, color: ShunshiColors.earth))
+              const Text('Imbalanced', style: TextStyle(fontSize: 10, color: ShunshiColors.earth))
             else if (level == 'tendency')
-              const Text('倾向', style: TextStyle(fontSize: 10, color: Color(0xFFD4956A))),
+              const Text('Leaning', style: TextStyle(fontSize: 10, color: Color(0xFFD4956A))),
           ]),
         );
       }),
@@ -219,7 +219,7 @@ class ConstitutionResultWidget extends StatelessWidget {
             const Row(children: [
               Text('⚠️', style: TextStyle(fontSize: 16)),
               SizedBox(width: 8),
-              Text('注意事项',
+              Text('Things to note',
                   style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
@@ -260,10 +260,10 @@ class ConstitutionResultWidget extends StatelessWidget {
                 const Text('👑', style: TextStyle(fontSize: 20)),
                 const SizedBox(width: 10),
                 const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text('解锁完整体质报告',
+                  Text('Unlock the full constitution report',
                       style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF92400E))),
                   SizedBox(height: 2),
-                  Text('饮食·茶饮·运动·穴位·四季调理方案',
+                  Text('Diet · tea · exercise · acupoints · four-season plan',
                       style: TextStyle(fontSize: 11, color: Color(0xFFB07937))),
                 ])),
                 Icon(Icons.chevron_right, color: const Color(0xFFD4956A).withValues(alpha: 0.6)),
@@ -274,7 +274,7 @@ class ConstitutionResultWidget extends StatelessWidget {
                 child: ElevatedButton.icon(
                   onPressed: onUnlock,
                   icon: const Icon(Icons.lock_open, size: 18),
-                  label: const Text('解锁报告',
+                  label: const Text('Unlock report',
                       style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFE5A84B),
@@ -292,7 +292,7 @@ class ConstitutionResultWidget extends StatelessWidget {
                 child: OutlinedButton.icon(
                   onPressed: onRetest,
                   icon: const Icon(Icons.refresh, size: 18),
-                  label: const Text('重新测试', style: TextStyle(fontSize: 14)),
+                  label: const Text('Retake', style: TextStyle(fontSize: 14)),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: ShunshiColors.primary,
                     side: const BorderSide(color: ShunshiColors.primary),
@@ -306,7 +306,7 @@ class ConstitutionResultWidget extends StatelessWidget {
                 child: ElevatedButton.icon(
                   onPressed: onViewDetail,
                   icon: const Icon(Icons.auto_awesome, size: 18),
-                  label: const Text('查看详情',
+                  label: const Text('View details',
                       style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: ShunshiColors.primary,
@@ -322,7 +322,7 @@ class ConstitutionResultWidget extends StatelessWidget {
             TextButton.icon(
               onPressed: onShare,
               icon: const Icon(Icons.share_outlined, size: 16),
-              label: const Text('分享结果', style: TextStyle(fontSize: 13)),
+              label: const Text('Share result', style: TextStyle(fontSize: 13)),
               style: TextButton.styleFrom(foregroundColor: ShunshiColors.textSecondary),
             ),
           ],

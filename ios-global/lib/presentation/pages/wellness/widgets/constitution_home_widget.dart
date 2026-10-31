@@ -23,9 +23,9 @@ class ConstitutionHomeWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('了解你的体质', style: ShunshiTextStyles.greeting),
+          Text('Know your constitution', style: ShunshiTextStyles.greeting),
           const SizedBox(height: 8),
-          Text('中医体质辨识，找到最适合你的养生之道', style: ShunshiTextStyles.bodySecondary),
+          Text('Find the wellness approach that suits you best', style: ShunshiTextStyles.bodySecondary),
           const SizedBox(height: 24),
           SizedBox(
             width: double.infinity,
@@ -38,11 +38,11 @@ class ConstitutionHomeWidget extends StatelessWidget {
                 elevation: 0,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               ),
-              child: const Text('开始测试', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
+              child: const Text('Start the check', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
             ),
           ),
           const SizedBox(height: 32),
-          Text('九种体质', style: ShunshiTextStyles.heading),
+          Text('The nine constitutions', style: ShunshiTextStyles.heading),
           const SizedBox(height: 16),
           GridView.builder(
             shrinkWrap: true,

@@ -43,7 +43,7 @@ class _SolarDetailPageState extends State<SolarDetailPage> {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
     if (_data == null) {
-      return const Scaffold(body: Center(child: Text('加载失败')));
+      return const Scaffold(body: Center(child: Text('Failed to load')));
     }
 
     final solar = _data!['solar_term'] as Map<String, dynamic>? ?? {};
@@ -57,7 +57,7 @@ class _SolarDetailPageState extends State<SolarDetailPage> {
     return Scaffold(
       backgroundColor: ShunShiColors.background,
       appBar: AppBar(
-        title: Text('${solar['name'] ?? '节气'}养生', style: TextStyle(
+        title: Text('${solar['name'] ?? 'Solar term'} wellness', style: TextStyle(
           fontFamily: ShunShiTypography.serifFamily,
           color: ShunShiColors.textPrimary,
           fontWeight: FontWeight.w700,
@@ -94,11 +94,11 @@ class _SolarDetailPageState extends State<SolarDetailPage> {
                   )),
                   const SizedBox(height: 12),
                   Row(children: [
-                    _buildBadge('${solar['element'] ?? ''}行'),
+                    _buildBadge('${solar['element'] ?? ''} element'),
                     const SizedBox(width: 8),
-                    _buildBadge('${solar['organ'] ?? ''}经'),
+                    _buildBadge('${solar['organ'] ?? ''} meridian'),
                     const SizedBox(width: 8),
-                    _buildBadge('${shichen['name'] ?? ''} ${shichen['organ'] ?? ''}经'),
+                    _buildBadge('${shichen['name'] ?? ''} ${shichen['organ'] ?? ''} meridian'),
                   ]),
                 ],
               ),
@@ -106,30 +106,30 @@ class _SolarDetailPageState extends State<SolarDetailPage> {
             const SizedBox(height: 24),
 
             // 宜食
-            _buildSection('宜食', Icons.restaurant, dietList, ShunShiColors.primary),
+            _buildSection('Good to eat', Icons.restaurant, dietList, ShunShiColors.primary),
             const SizedBox(height: 16),
 
             // 忌食
             if (avoidList.isNotEmpty) ...[
-              _buildSection('少食', Icons.block, avoidList, Color(0xFF74593C)),
+              _buildSection('Eat less', Icons.block, avoidList, Color(0xFF74593C)),
               const SizedBox(height: 16),
             ],
 
             // 运动
             if (exercise.isNotEmpty) ...[
-              _buildInfoCard('运动建议', Icons.fitness_center, exercise),
+              _buildInfoCard('Exercise tips', Icons.fitness_center, exercise),
               const SizedBox(height: 16),
             ],
 
             // 睡眠
             if (sleepAdvice.isNotEmpty) ...[
-              _buildInfoCard('睡眠建议', Icons.bedtime, sleepAdvice),
+              _buildInfoCard('Sleep tips', Icons.bedtime, sleepAdvice),
               const SizedBox(height: 16),
             ],
 
             // 时辰
-            _buildInfoCard('当前时辰', Icons.access_time,
-              '${shichen['name'] ?? ''}（${shichen['organ'] ?? ''}经当令）\n${shichen['advice'] ?? ''}'),
+            _buildInfoCard('Current period', Icons.access_time,
+              '${shichen['name'] ?? ''} (${shichen['organ'] ?? ''} meridian in charge)\n${shichen['advice'] ?? ''}'),
             const SizedBox(height: 16),
 
             // 下一个节气
@@ -144,7 +144,7 @@ class _SolarDetailPageState extends State<SolarDetailPage> {
                 child: Row(children: [
                   Icon(Icons.arrow_forward, color: ShunShiColors.textTertiary, size: 20),
                   const SizedBox(width: 8),
-                  Text('下一个节气：$nextTerm', style: TextStyle(
+                  Text('Next solar term: $nextTerm', style: TextStyle(
                     color: ShunShiColors.textTertiary, fontSize: 14,
                   )),
                 ]),

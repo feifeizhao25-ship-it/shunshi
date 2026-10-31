@@ -18,13 +18,13 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
   String? _selectedType;
 
   static const _types = [
-    ('全部', null),
-    ('饮食', 'diet'),
-    ('茶饮', 'tea'),
-    ('运动', 'exercise'),
-    ('药膳', 'recipe'),
-    ('经络', 'meridian'),
-    ('穴位', 'acupoint'),
+    ('All', null),
+    ('Diet', 'diet'),
+    ('Tea', 'tea'),
+    ('Exercise', 'exercise'),
+    ('Medicinal meals', 'recipe'),
+    ('Meridians', 'meridian'),
+    ('Acupoints', 'acupoint'),
   ];
 
   @override
@@ -97,7 +97,7 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
       focusNode: _focusNode,
       style: TextStyle(fontSize: 16, color: ShunShiColors.textPrimary),
       decoration: InputDecoration(
-        hintText: '搜索养生知识...',
+        hintText: 'Search wellness knowledge...',
         hintStyle: TextStyle(color: ShunShiColors.textTertiary),
         border: InputBorder.none,
         suffixIcon: _controller.text.isNotEmpty
@@ -143,13 +143,13 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
   }
 
   Widget _buildEmpty() {
-    final hotTerms = ['枸杞', '失眠', '疏肝', '脾胃', '八段锦', '祛湿', '安神', '养肝'];
+    final hotTerms = ['Goji berry', 'insomnia', 'Soothe liver', 'Spleen & stomach', 'Baduanjin', 'Dispel dampness', 'Calming', 'Nourish liver'];
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('热门搜索', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+          Text('Popular searches', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
           const SizedBox(height: 12),
           Wrap(
             spacing: 8,
@@ -231,9 +231,9 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
       'acupoint': Colors.pink, 'acupressure': Colors.pink,
     };
     final labels = {
-      'diet': '饮食', 'tea': '茶饮', 'exercise': '运动',
-      'recipe': '药膳', 'herb': '草药', 'meridian': '经络',
-      'acupoint': '穴位', 'acupressure': '穴位',
+      'diet': 'Diet', 'tea': 'Tea', 'exercise': 'Exercise',
+      'recipe': 'Medicinal meals', 'herb': 'Herbs', 'meridian': 'Meridians',
+      'acupoint': 'Acupoints', 'acupressure': 'Acupoints',
     };
     final color = colors[type] ?? Colors.grey;
     return Container(

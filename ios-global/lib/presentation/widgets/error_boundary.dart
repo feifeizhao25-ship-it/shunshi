@@ -34,11 +34,11 @@ class _ErrorBoundaryState extends State<ErrorBoundary> {
           children: [
             const Icon(Icons.error_outline, size: 48, color: Colors.grey),
             const SizedBox(height: 16),
-            const Text('页面加载出错', style: TextStyle(fontSize: 16, color: Colors.grey)),
+            const Text('The page failed to load', style: TextStyle(fontSize: 16, color: Colors.grey)),
             const SizedBox(height: 12),
             TextButton(
               onPressed: () => setState(() => _hasError = false),
-              child: const Text('重试'),
+              child: const Text('Try again'),
             ),
           ],
         ),

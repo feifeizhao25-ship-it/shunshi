@@ -81,8 +81,8 @@ class AISafetyService {
 
   // 危机关键词 — 需要Now干预
   static const List<String> _crisisKeywords = [
-    '自杀', '想死', '不想活', '自残', '割腕', '跳楼', '上吊',
-    '结束生命', '活着没意思',
+    'suicide', 'want to die', 'don\'t want to live', 'self-harm', 'cut my wrists', 'jump off a building', 'hang myself',
+    'end my life', 'no point in living',
   ];
 
   static const List<String> _crisisKeywordsEn = [
@@ -93,9 +93,9 @@ class AISafetyService {
 
   // 高风险关键词 — 需要强烈警告
   static const List<String> _highRiskKeywords = [
-    '抑郁症', '心脏病发作', '心肌梗塞', '脑溢血', '中风',
-    '癌症', '肿瘤', '大出血', '窒息', '昏迷', '休克',
-    '过敏休克', '呼吸困难', '胸痛', '剧烈头痛',
+    'depression', 'heart attack', 'myocardial infarction', 'cerebral hemorrhage', 'stroke',
+    'cancer', 'tumor', 'severe bleeding', 'choking', 'unconscious', 'shock',
+    'anaphylaxis', 'trouble breathing', 'chest pain', 'severe headache',
   ];
 
   static const List<String> _highRiskKeywordsEn = [
@@ -106,9 +106,9 @@ class AISafetyService {
 
   // 中等风险关键词 — 添加Disclaimer
   static const List<String> _mediumRiskKeywords = [
-    '发烧', '咳嗽', '头痛', '腹痛', '腹泻', '呕吐', '皮疹', '出血',
-    '高血压', '糖尿病', '心脏病', '肝病', '肾病',
-    '吃药', '用药', '停药', '药物', '手术', '怀孕', '流产',
+    'fever', 'cough', 'headache', 'stomach pain', 'diarrhea', 'vomiting', 'rash', 'bleeding',
+    'high blood pressure', 'diabetes', 'heart disease', 'liver disease', 'kidney disease',
+    'take medicine', 'medication', 'stop medication', 'drugs', 'surgery', 'pregnant', 'miscarriage',
   ];
 
   static const List<String> _mediumRiskKeywordsEn = [

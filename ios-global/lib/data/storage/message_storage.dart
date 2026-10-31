@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class MessageStorage {
   static const String _keyMessages = 'cached_messages';
   static const String _keyConversations = 'conversations';
-  static const int _maxMessages = 100; // 最多缓存消息数
+  static const int _maxMessages = 100; // maximum cached messages
   
   final SharedPreferences _prefs;
   

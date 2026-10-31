@@ -20,7 +20,7 @@ class CommunityPageV2 extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
                 child: Row(children: [
-                  Text('顺时 ShunShi', style: TextStyle(
+                  Text('SEASONS', style: TextStyle(
                     fontFamily: ShunShiTypography.serifFamily,
                     fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.primary,
                   )),
@@ -35,7 +35,7 @@ class CommunityPageV2 extends StatelessWidget {
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
-              child: Text('养生圈', style: TextStyle(
+              child: Text('Wellness circle', style: TextStyle(
                 fontFamily: ShunShiTypography.serifFamily,
                 fontSize: 32, fontWeight: FontWeight.bold, color: ShunShiColors.textPrimary,
               )),
@@ -54,7 +54,7 @@ class CommunityPageV2 extends StatelessWidget {
                 child: Row(children: [
                   Icon(Icons.search, color: ShunShiColors.textTertiary, size: 20),
                   const SizedBox(width: 8),
-                  Text('搜索养生内容...', style: TextStyle(fontSize: 14, color: ShunShiColors.textTertiary)),
+                  Text('Search wellness content...', style: TextStyle(fontSize: 14, color: ShunShiColors.textTertiary)),
                 ]),
               ),
             ),
@@ -65,13 +65,13 @@ class CommunityPageV2 extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
               child: Row(children: [
-                _buildTab('精选', true),
+                _buildTab('Featured', true),
                 const SizedBox(width: 16),
-                _buildTab('动态', false),
+                _buildTab('Feed', false),
                 const SizedBox(width: 16),
-                _buildTab('挑战打卡', false),
+                _buildTab('Challenges', false),
                 const SizedBox(width: 16),
-                _buildTab('食疗分享', false),
+                _buildTab('Food therapy sharing', false),
               ]),
             ),
           ),
@@ -81,9 +81,9 @@ class CommunityPageV2 extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
               child: _buildPost(
-                name: '云水禅心',
-                type: '气虚质',
-                content: '今日立春，晨起尝试了黄芪炖鸡，加入了几枚大枣。温补而不燥，感觉精神确实好多了。',
+                name: 'CloudWater',
+                type: 'Qi Deficiency',
+                content: 'Today is the start of spring. I tried astragalus chicken stew with a few red dates this morning. Warming but not heating — I do feel more energetic.',
                 likes: 128, comments: 24,
               ),
             ),
@@ -103,19 +103,19 @@ class CommunityPageV2 extends StatelessWidget {
                   Row(children: [
                     Icon(Icons.auto_awesome, color: Color(0xFFE4C285), size: 18),
                     const SizedBox(width: 8),
-                    Text('顺时 AI 指导', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.white)),
+                    Text('SEASONS AI guidance', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.white)),
                     const Spacer(),
-                    Text('建议关注：春季疏肝', style: TextStyle(fontSize: 12, color: Color(0xFFE4C285))),
+                    Text('Suggested focus: soothing the liver in spring', style: TextStyle(fontSize: 12, color: Color(0xFFE4C285))),
                   ]),
                   const SizedBox(height: 12),
                   Text(
-                    '"春季养生，重在生发。建议多食青绿色蔬菜，晚睡早起，披发缓行，以使志生。"',
+                    '"Spring wellness is about growth. Eat more green vegetables, go to bed a little late, rise early and walk with loose hair so your spirit can grow."',
                     style: TextStyle(fontSize: 14, color: Colors.white70, height: 1.6),
                   ),
                   const SizedBox(height: 8),
                   Wrap(spacing: 8, children: [
-                    _buildHashTag('#立春'),
-                    _buildHashTag('#疏肝理气'),
+                    _buildHashTag('#StartOfSpring'),
+                    _buildHashTag('#LiverQi'),
                   ]),
                 ]),
               ),
@@ -127,11 +127,11 @@ class CommunityPageV2 extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
               child: _buildPost(
-                name: '松风听泉',
-                type: '阳虚质',
+                name: 'PineBreeze',
+                type: 'Yang Deficiency',
                 badge: Icons.emoji_events,
-                badgeText: '参与了「百日养生挑战」第 42 天',
-                content: '坚持每天晚间艾灸足三里，感觉双腿的沉重感明显消失了，睡眠也踏实了很多。',
+                badgeText: 'Joined day 42 of the "100-day wellness challenge"',
+                content: 'Moxibustion on Zusanli every evening — the heaviness in my legs has clearly gone and I sleep much better.',
                 likes: 352, comments: 89,
               ),
             ),
@@ -224,7 +224,7 @@ class CommunityPageV2 extends StatelessWidget {
           const Spacer(),
           Icon(Icons.share, size: 18, color: ShunShiColors.textTertiary),
           const SizedBox(width: 4),
-          Text('分享', style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
+          Text('Share', style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
         ]),
       ]),
     );

@@ -37,7 +37,7 @@ class _ContentDetailPageState extends State<ContentDetailPage> {
       if (data != null && data['success'] == true) {
         if (mounted) setState(() { _data = data['data']; _loading = false; });
       } else {
-        if (mounted) setState(() { _loading = false; _error = '内容不存在'; });
+        if (mounted) setState(() { _loading = false; _error = 'Content not found'; });
       }
       // Check favorite status
       try {
@@ -48,7 +48,7 @@ class _ContentDetailPageState extends State<ContentDetailPage> {
         }
       } catch (_) {}
     } catch (e) {
-      if (mounted) setState(() { _loading = false; _error = '网络错误，请重试'; });
+      if (mounted) setState(() { _loading = false; _error = 'Network error, please try again'; });
     }
   }
 
@@ -70,7 +70,7 @@ class _ContentDetailPageState extends State<ContentDetailPage> {
             onPressed: () => _shareContent(),
           ),
         ],
-        title: Text(_data?['title'] ?? '详情',
+        title: Text(_data?['title'] ?? 'Details',
           style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18, fontWeight: FontWeight.w600)),
       ),
       body: StateView<Map<String, dynamic>>(
@@ -88,7 +88,7 @@ class _ContentDetailPageState extends State<ContentDetailPage> {
 
             // Description
             if (data['description'] != null) ...[
-              _sectionTitle('概述'),
+              _sectionTitle('Overview'),
               const SizedBox(height: 8),
               Text(data['description'].toString(),
                 style: TextStyle(fontSize: 14, color: ShunShiColors.textSecondary, height: 1.8)),
@@ -97,7 +97,7 @@ class _ContentDetailPageState extends State<ContentDetailPage> {
 
             // Steps
             if (data['steps'] != null) ...[
-              _sectionTitle('步骤'),
+              _sectionTitle('Steps'),
               const SizedBox(height: 8),
               _buildSteps(data['steps']),
               const SizedBox(height: 20),
@@ -105,7 +105,7 @@ class _ContentDetailPageState extends State<ContentDetailPage> {
 
             // Content (for items with long text content)
             if (data['content'] != null && data['content'].toString().isNotEmpty) ...[
-              _sectionTitle('详细内容'),
+              _sectionTitle('Details'),
               const SizedBox(height: 8),
               Text(data['content'].toString(),
                 style: TextStyle(fontSize: 14, color: ShunShiColors.textSecondary, height: 1.8)),
@@ -141,7 +141,7 @@ class _ContentDetailPageState extends State<ContentDetailPage> {
                 child: Row(children: [
                   Icon(Icons.menu_book, size: 16, color: ShunShiColors.textTertiary),
                   const SizedBox(width: 8),
-                  Text('出处：${data['source_classic']}',
+                  Text('Source: ${data['source_classic']}',
                     style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary, fontStyle: FontStyle.italic)),
                 ]),
               ),
@@ -208,7 +208,7 @@ class _ContentDetailPageState extends State<ContentDetailPage> {
           if (data['duration_minutes'] != null && data['duration_minutes'] > 0) ...[
             Icon(Icons.timer, color: Colors.white.withOpacity(0.7), size: 14),
             const SizedBox(width: 4),
-            Text('${data['duration_minutes']}分钟', style: TextStyle(fontSize: 12, color: Colors.white.withOpacity(0.7))),
+            Text('${data['duration_minutes']} min', style: TextStyle(fontSize: 12, color: Colors.white.withOpacity(0.7))),
           ],
           if (data['season'] != null) ...[
             const SizedBox(width: 16),
@@ -271,17 +271,17 @@ class _ContentDetailPageState extends State<ContentDetailPage> {
 
   String _typeLabel(String? type) {
     switch (type) {
-      case 'diet': return '食疗';
-      case 'tea': return '药茶';
-      case 'recipe': return '食谱';
-      case 'herb': return '方剂';
-      case 'meridian': return '经络';
-      case 'exercise': return '导引';
-      case 'acupoint': return '穴位';
-      case 'emotion': return '情志';
-      case 'sleep': return '安神';
-      case 'constitution': return '体质';
-      default: return '养生';
+      case 'diet': return 'Food therapy';
+      case 'tea': return 'Herbal tea';
+      case 'recipe': return 'Recipes';
+      case 'herb': return 'Formulas';
+      case 'meridian': return 'Meridians';
+      case 'exercise': return 'Guided exercises';
+      case 'acupoint': return 'Acupoints';
+      case 'emotion': return 'Emotions';
+      case 'sleep': return 'Calming';
+      case 'constitution': return 'Constitution';
+      default: return 'Wellness';
     }
   }
 
@@ -308,7 +308,7 @@ class _ContentDetailPageState extends State<ContentDetailPage> {
     final desc = _data?['description'] ?? '';
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('已复制: $title'), duration: const Duration(seconds: 2)),
+      SnackBar(content: Text('Copied: $title'), duration: const Duration(seconds: 2)),
     );
   }
 }

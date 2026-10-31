@@ -24,11 +24,11 @@ class _DietRecommendPageState extends State<DietRecommendPage> {
   String _activeFilter = 'all';
 
   static const _filters = [
-    {'key': 'all', 'label': '全部', 'icon': Icons.apps},
-    {'key': 'diet', 'label': '食疗', 'icon': Icons.restaurant},
-    {'key': 'tea', 'label': '药茶', 'icon': Icons.local_cafe},
-    {'key': 'recipe', 'label': '食谱', 'icon': Icons.menu_book},
-    {'key': 'herb', 'label': '方剂', 'icon': Icons.healing},
+    {'key': 'all', 'label': 'All', 'icon': Icons.apps},
+    {'key': 'diet', 'label': 'Food therapy', 'icon': Icons.restaurant},
+    {'key': 'tea', 'label': 'Herbal tea', 'icon': Icons.local_cafe},
+    {'key': 'recipe', 'label': 'Recipes', 'icon': Icons.menu_book},
+    {'key': 'herb', 'label': 'Formulas', 'icon': Icons.healing},
   ];
 
   @override
@@ -64,15 +64,15 @@ class _DietRecommendPageState extends State<DietRecommendPage> {
 
   String _getQueryForType(String? type) {
     switch (type) {
-      case 'qixu': return '补气健脾';
-      case 'yangxu': return '温阳散寒';
-      case 'yinxu': return '滋阴润燥';
-      case 'tanshi': return '化痰祛湿';
-      case 'shire': return '清热利湿';
-      case 'xueyu': return '活血化瘀';
-      case 'qiyu': return '疏肝解郁';
-      case 'tebing': return '防过敏清淡';
-      default: return '养生食疗';
+      case 'qixu': return 'Boost qi, support digestion';
+      case 'yangxu': return 'Warm yang, dispel cold';
+      case 'yinxu': return 'Nourish yin, moisten dryness';
+      case 'tanshi': return 'Resolve phlegm and dampness';
+      case 'shire': return 'Clear heat and dampness';
+      case 'xueyu': return 'Move blood, clear stasis';
+      case 'qiyu': return 'Soothe the liver, ease stagnation';
+      case 'tebing': return 'Light, anti-allergy';
+      default: return 'Food therapy';
     }
   }
 
@@ -108,11 +108,11 @@ class _DietRecommendPageState extends State<DietRecommendPage> {
 
   String _typeLabel(String? type) {
     switch (type) {
-      case 'diet': return '食疗';
-      case 'tea': return '药茶';
-      case 'recipe': return '食谱';
-      case 'herb': return '方剂';
-      default: return '养生';
+      case 'diet': return 'Food therapy';
+      case 'tea': return 'Herbal tea';
+      case 'recipe': return 'Recipes';
+      case 'herb': return 'Formulas';
+      default: return 'Wellness';
     }
   }
 
@@ -124,7 +124,7 @@ class _DietRecommendPageState extends State<DietRecommendPage> {
       appBar: AppBar(
         backgroundColor: ShunShiColors.background,
         leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
-        title: Text('饮食推荐', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18, fontWeight: FontWeight.w600)),
+        title: Text('Diet recommendations', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18, fontWeight: FontWeight.w600)),
       ),
       body: Column(children: [
         // Filter chips
@@ -156,9 +156,9 @@ class _DietRecommendPageState extends State<DietRecommendPage> {
           child: _loading
               ? const LoadingSkeleton(itemCount: 4)
               : _error != null
-                  ? ErrorView(message: '加载失败，请重试', onRetry: _loadContent)
+                  ? ErrorView(message: 'Failed to load, please try again', onRetry: _loadContent)
                   : items.isEmpty
-                      ? const ErrorView(message: '暂无推荐内容', icon: Icons.search_off)
+                      ? const ErrorView(message: 'Nothing recommended yet', icon: Icons.search_off)
                       : RefreshIndicator(
                       onRefresh: _loadContent,
                       child: ListView.separated(
@@ -200,14 +200,14 @@ class _DietRecommendPageState extends State<DietRecommendPage> {
               child: Text(_typeLabel(type), style: TextStyle(fontSize: 10, color: color, fontWeight: FontWeight.w500)),
             ),
             const Spacer(),
-            Text('查看', style: TextStyle(fontSize: 12, color: ShunShiColors.primary)),
+            Text('View', style: TextStyle(fontSize: 12, color: ShunShiColors.primary)),
             GestureDetector(
           onTap: () {
             final id = item['id'];
             if (id != null) context.push('/content-detail', extra: {'contentId': id});
           },
           child: Row(children: [
-            Text('查看', style: TextStyle(fontSize: 12, color: ShunShiColors.primary)),
+            Text('View', style: TextStyle(fontSize: 12, color: ShunShiColors.primary)),
             Icon(Icons.arrow_forward, size: 14, color: ShunShiColors.primary),
           ]),
         ),

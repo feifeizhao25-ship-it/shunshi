@@ -68,8 +68,8 @@ class NotificationService {
   }) async {
     const androidDetails = AndroidNotificationDetails(
       'shunshi_default',
-      '默认通知',
-      channelDescription: '顺时默认通知渠道',
+      'Default notifications',
+      channelDescription: 'SEASONS default notification channel',
       importance: Importance.high,
       priority: Priority.high,
       showWhen: true,
@@ -101,8 +101,8 @@ class NotificationService {
 
     const androidDetails = AndroidNotificationDetails(
       'shunshi_reminder',
-      '养生提醒',
-      channelDescription: '定时养生提醒',
+      'Wellness reminders',
+      channelDescription: 'Scheduled wellness reminders',
       importance: Importance.high,
       priority: Priority.high,
       showWhen: true,
@@ -158,8 +158,8 @@ class NotificationService {
 
     const androidDetails = AndroidNotificationDetails(
       'shunshi_daily',
-      '每日提醒',
-      channelDescription: '每日养生提醒',
+      'Daily reminder',
+      channelDescription: 'Daily wellness reminder',
       importance: Importance.high,
       priority: Priority.high,
       showWhen: true,
@@ -183,7 +183,7 @@ class NotificationService {
       scheduledDate,
       details,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      matchDateTimeComponents: DateTimeComponents.time, // 每天重复
+      matchDateTimeComponents: DateTimeComponents.time, // repeats daily
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
       payload: payload,
@@ -219,8 +219,8 @@ class ReminderHelper {
     final service = NotificationService();
     await service.scheduleDailyReminder(
       id: 1,
-      title: '🌅 早安！该喝水了',
-      body: '喝一杯温开水，唤醒身体一天的能量',
+      title: '🌅 Good morning! Time for water',
+      body: 'Have a glass of warm water to wake your body up',
       hour: 7,
       minute: 30,
       payload: 'water',
@@ -232,8 +232,8 @@ class ReminderHelper {
     final service = NotificationService();
     await service.scheduleDailyReminder(
       id: 2,
-      title: '☀️ 午休时间到',
-      body: '适当休息，保护眼睛和肝脏',
+      title: '☀️ Midday break',
+      body: 'Rest a little to protect your eyes and liver',
       hour: 12,
       minute: 30,
       payload: 'break',
@@ -245,8 +245,8 @@ class ReminderHelper {
     final service = NotificationService();
     await service.scheduleDailyReminder(
       id: 3,
-      title: '🍵 下午茶时间',
-      body: '来杯养生茶，舒缓一下午的疲劳',
+      title: '🍵 Afternoon tea time',
+      body: 'Have a cup of wellness tea to ease the afternoon slump',
       hour: 15,
       minute: 0,
       payload: 'tea',
@@ -258,8 +258,8 @@ class ReminderHelper {
     final service = NotificationService();
     await service.scheduleDailyReminder(
       id: 4,
-      title: '🌙 睡前泡脚时间',
-      body: '泡脚15分钟，改善睡眠质量',
+      title: '🌙 Evening foot-soak time',
+      body: 'A 15-minute foot soak can improve your sleep',
       hour: 21,
       minute: 30,
       payload: 'footbath',

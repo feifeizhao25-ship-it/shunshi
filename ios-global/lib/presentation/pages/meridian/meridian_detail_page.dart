@@ -46,12 +46,12 @@ class _MeridianDetailPageState extends State<MeridianDetailPage> {
       appBar: AppBar(
         backgroundColor: ShunShiColors.background,
         leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
-        title: Text(_data?['title'] ?? '经络详情',
+        title: Text(_data?['title'] ?? 'Meridian details',
           style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18, fontWeight: FontWeight.w600)),
       ),
       body: StateView<Map<String, dynamic>>(
         loading: _loading,
-        error: !_loading && _data == null ? '内容加载失败' : null,
+        error: !_loading && _data == null ? 'Failed to load content' : null,
         data: _data,
         onRetry: _loadData,
         loadingWidget: const LoadingSkeleton(itemCount: 1),
@@ -75,14 +75,14 @@ class _MeridianDetailPageState extends State<MeridianDetailPage> {
                           Row(children: [
                             const Icon(Icons.access_time, color: Color(0xFFE4C285), size: 16),
                             const SizedBox(width: 6),
-                            Text('最佳时间：${_data?['best_time']}', style: const TextStyle(fontSize: 13, color: Color(0xFFE4C285))),
+                            Text('Best time: ${_data?['best_time']}', style: const TextStyle(fontSize: 13, color: Color(0xFFE4C285))),
                           ]),
                         if (_data?['duration_minutes'] != null && _data?['duration_minutes'] > 0) ...[
                           const SizedBox(height: 4),
                           Row(children: [
                             const Icon(Icons.timer, color: Color(0xFFE4C285), size: 16),
                             const SizedBox(width: 6),
-                            Text('预计时长：${_data?['duration_minutes']}分钟', style: const TextStyle(fontSize: 13, color: Color(0xFFE4C285))),
+                            Text('Estimated duration: ${_data?['duration_minutes']} min', style: const TextStyle(fontSize: 13, color: Color(0xFFE4C285))),
                           ]),
                         ],
                       ]),
@@ -90,13 +90,13 @@ class _MeridianDetailPageState extends State<MeridianDetailPage> {
                     const SizedBox(height: 20),
 
                     // Description
-                    Text('经络概述', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+                    Text('Meridian overview', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
                     const SizedBox(height: 8),
                     Text(_data?['description'] ?? '', style: TextStyle(fontSize: 14, color: ShunShiColors.textSecondary, height: 1.8)),
                     const SizedBox(height: 20),
 
                     // Steps
-                    Text('按揉步骤', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+                    Text('Massage steps', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
                     const SizedBox(height: 8),
                     _buildSteps(),
                     const SizedBox(height: 20),
@@ -130,7 +130,7 @@ class _MeridianDetailPageState extends State<MeridianDetailPage> {
                         child: Row(children: [
                           Icon(Icons.menu_book, size: 16, color: ShunShiColors.textTertiary),
                           const SizedBox(width: 8),
-                          Text('出处：${_data!['source_classic']}',
+                          Text('Source: ${_data!['source_classic']}',
                             style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary, fontStyle: FontStyle.italic)),
                         ]),
                       ),
@@ -152,7 +152,7 @@ class _MeridianDetailPageState extends State<MeridianDetailPage> {
                     ],
 
                     // Quote
-                    Center(child: Text('"通则不痛，痛则不通。"',
+                    Center(child: Text('"Where there is free flow, there is no pain; where there is pain, there is no free flow."',
                       style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 14,
                         fontStyle: FontStyle.italic, color: ShunShiColors.textTertiary))),
                     const SizedBox(height: 40),

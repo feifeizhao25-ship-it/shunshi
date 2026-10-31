@@ -35,7 +35,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
         if (mounted) setState(() { _items = items; _loading = false; });
       }
     } catch (e) {
-      if (mounted) setState(() { _loading = false; _error = '加载失败'; });
+      if (mounted) setState(() { _loading = false; _error = 'Failed to load'; });
     }
   }
 
@@ -64,8 +64,8 @@ class _FavoritesPageState extends State<FavoritesPage> {
   }
 
   String _typeLabel(String? type) {
-    const labels = {'diet': '食疗', 'tea': '药茶', 'recipe': '食谱', 'herb': '方剂', 'meridian': '经络', 'exercise': '导引', 'acupoint': '穴位', 'sleep': '安神', 'emotion': '情志'};
-    return labels[type] ?? '养生';
+    const labels = {'diet': 'Food therapy', 'tea': 'Herbal tea', 'recipe': 'Recipes', 'herb': 'Formulas', 'meridian': 'Meridians', 'exercise': 'Guided exercises', 'acupoint': 'Acupoints', 'sleep': 'Calming', 'emotion': 'Emotions'};
+    return labels[type] ?? 'Wellness';
   }
 
   Future<void> _removeFavorite(int index) async {
@@ -77,7 +77,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
     } catch (_) {
       if (mounted) {
         setState(() => _items.insert(index, item));
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('取消收藏失败')));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to remove from favourites')));
       }
     }
   }
@@ -89,7 +89,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
       appBar: AppBar(
         backgroundColor: ShunShiColors.background,
         leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
-        title: Text('我的收藏 (${_items.length})',
+        title: Text('My favourites (${_items.length})',
           style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18, fontWeight: FontWeight.w600)),
       ),
       body: StateView<List<dynamic>>(

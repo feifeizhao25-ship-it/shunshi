@@ -27,7 +27,7 @@ class ExerciseDetailPage extends StatefulWidget {
 class _ExerciseDetailPageState extends State<ExerciseDetailPage>
     with SingleTickerProviderStateMixin {
   late AnimationController _breathController;
-  String _breathPhase = '准备';
+  String _breathPhase = 'Get ready';
   bool _isBreathing = false;
 
   @override
@@ -53,16 +53,16 @@ class _ExerciseDetailPageState extends State<ExerciseDetailPage>
   void _breathCycle() async {
     while (_isBreathing) {
       if (!mounted) break;
-      setState(() => _breathPhase = '吸气 4秒');
+      setState(() => _breathPhase = 'Inhale 4s');
       await Future.delayed(const Duration(seconds: 4));
       if (!mounted || !_isBreathing) break;
-      setState(() => _breathPhase = '屏气 2秒');
+      setState(() => _breathPhase = 'Hold 2s');
       await Future.delayed(const Duration(seconds: 2));
       if (!mounted || !_isBreathing) break;
-      setState(() => _breathPhase = '呼气 6秒');
+      setState(() => _breathPhase = 'Exhale 6s');
       await Future.delayed(const Duration(seconds: 6));
     }
-    if (mounted) setState(() => _breathPhase = '准备');
+    if (mounted) setState(() => _breathPhase = 'Get ready');
   }
 
   @override
@@ -135,7 +135,7 @@ class _ExerciseDetailPageState extends State<ExerciseDetailPage>
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          '${widget.exerciseName ?? '八段锦'}·第三式',
+                          '${widget.exerciseName ?? 'Baduanjin'}· Form 3',
                           style: const TextStyle(
                             fontSize: 26,
                             fontWeight: FontWeight.w700,
@@ -144,7 +144,7 @@ class _ExerciseDetailPageState extends State<ExerciseDetailPage>
                           ),
                         ),
                         Text(
-                          '调理脾胃须单举',
+                          'Regulate the spleen and stomach: single-arm lift',
                           style: TextStyle(
                             fontSize: 16,
                             color: Colors.white.withValues(alpha: 0.8),
@@ -161,7 +161,7 @@ class _ExerciseDetailPageState extends State<ExerciseDetailPage>
                       children: [
                         const Icon(Icons.timer_outlined, size: 14, color: Colors.white70),
                         const SizedBox(width: 4),
-                        Text('12分钟', style: TextStyle(
+                        Text('12 min', style: TextStyle(
                           fontSize: 12, color: Colors.white70, fontFamily: ShunShiTypography.sansFamily,
                         )),
                         const Spacer(),
@@ -184,9 +184,9 @@ class _ExerciseDetailPageState extends State<ExerciseDetailPage>
                 children: [
                   // ── 简介 ──
                   const Text(
-                    '这一式通过上下对拉的动作，充分伸展腹部腔体，'
-                    '对内脏进行柔和的按摩。长期练习可以改善消化不良、'
-                    '食欲不振、腹胀等脾胃不适症状。',
+                    'This form stretches the abdomen with an up-and-down pull,'
+                    'giving the internal organs a gentle massage. Regular practice can ease indigestion,'
+                    'poor appetite, bloating and other spleen-and-stomach discomfort.',
                     style: TextStyle(
                       fontSize: 14,
                       color: ShunShiColors.textSecondary,
@@ -197,16 +197,16 @@ class _ExerciseDetailPageState extends State<ExerciseDetailPage>
                   const SizedBox(height: 28),
 
                   // ── 步骤详解 ──
-                  _sectionTitle('步骤详解'),
+                  _sectionTitle('Step by step'),
                   const SizedBox(height: 16),
-                  _numberedStep('一', '起势', '自然站立，两脚与肩同宽，双手自然垂于体侧。调息三次，身心放松。'),
-                  _numberedStep('二', '左手翻托', '左手翻掌上举至头顶上方，掌心朝天，指尖向右。右手翻掌下按至髋侧。'),
-                  _numberedStep('三', '对拉伸展', '双手如分别托天按地，形成上下对拉。注意两臂保持伸直，不要弯曲。'),
-                  _numberedStep('四', '还原换手', '双手还原至体侧，换右手翻托上举，左手下按。左右交替，各做6次。'),
+                  _numberedStep('1', 'Opening stance', 'Stand naturally, feet shoulder-width apart, hands relaxed at your sides. Breathe three times and relax.'),
+                  _numberedStep('2', 'Left hand lifts', 'Turn the left palm up and raise it above the head, palm to the sky, fingers pointing right. Press the right palm down beside the hip.'),
+                  _numberedStep('3', 'Pull and stretch', 'Both hands work like holding up the sky and pressing the earth, creating an up-and-down pull. Keep both arms straight.'),
+                  _numberedStep('4', 'Return and switch', 'Bring both hands back to your sides, then lift the right hand and press the left down. Alternate sides, 6 times each.'),
                   const SizedBox(height: 28),
 
                   // ── 呼吸节拍指导 ──
-                  _sectionTitle('呼吸节拍指导'),
+                  _sectionTitle('Breathing rhythm guide'),
                   const SizedBox(height: 12),
                   Container(
                     padding: const EdgeInsets.all(24),
@@ -251,11 +251,11 @@ class _ExerciseDetailPageState extends State<ExerciseDetailPage>
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            _breathBar('吸气', '4s', ShunShiColors.primary),
+                            _breathBar('Inhale', '4s', ShunShiColors.primary),
                             const SizedBox(width: 12),
-                            _breathBar('屏气', '2s', ShunShiColors.gold),
+                            _breathBar('Hold', '2s', ShunShiColors.gold),
                             const SizedBox(width: 12),
-                            _breathBar('呼气', '6s', ShunShiColors.apricot),
+                            _breathBar('Exhale', '6s', ShunShiColors.apricot),
                           ],
                         ),
                         const SizedBox(height: 16),
@@ -277,7 +277,7 @@ class _ExerciseDetailPageState extends State<ExerciseDetailPage>
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Text(
-                              _isBreathing ? '停止' : '开始跟练呼吸',
+                              _isBreathing ? 'Stop' : 'Start guided breathing',
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
@@ -309,7 +309,7 @@ class _ExerciseDetailPageState extends State<ExerciseDetailPage>
                         children: [
                           const Icon(Icons.fullscreen, size: 20),
                           const SizedBox(width: 8),
-                          Text('开始全屏教学', style: TextStyle(
+                          Text('Start full-screen lesson', style: TextStyle(
                             fontSize: 16, fontWeight: FontWeight.w600, fontFamily: ShunShiTypography.sansFamily,
                           )),
                         ],
@@ -320,37 +320,37 @@ class _ExerciseDetailPageState extends State<ExerciseDetailPage>
 
                   // ── 中医原理 ──
                   _infoCard(
-                    '中医原理',
-                    '脾胃为后天之本，气血生化之源。单臂上举时，一侧的腹腔被拉伸，另一侧被压缩，'
-                    '形成对脾胃的按摩效应。这个动作直接刺激足太阴脾经和足阳明胃经的循行区域。',
+                    'Principle',
+                    'The spleen and stomach are the foundation of postnatal health and the source of qi and blood. When one arm lifts, one side of the abdomen is stretched and the other compressed,'
+                    'massaging the spleen and stomach. The movement directly stimulates the areas along the Spleen and Stomach meridians.',
                     ShunShiColors.primary,
                   ),
                   const SizedBox(height: 12),
 
                   // ── 心身连接 ──
                   _infoCard(
-                    '心身连接',
-                    '练习时面部保持放松，嘴角微微上扬。紧张的面部会传导到全身，'
-                    '放松的面部能让动作更加流畅自然。想象自己在清晨的花园里舒展身体。',
+                    'Mind-body link',
+                    'Keep your face relaxed and the corners of your mouth slightly lifted during practice. A tense face spreads tension through the body,'
+                    'while a relaxed face makes the movement smoother. Imagine stretching in a garden at dawn.',
                     ShunShiColors.apricot,
                   ),
                   const SizedBox(height: 12),
 
                   // ── 常见错误 ──
                   _infoCard(
-                    '常见错误',
-                    '• 耸肩：手臂上举时肩膀不要耸起，保持沉肩坠肘\n'
-                    '• 憋气：动作和呼吸配合，上升时吸气，下落时呼气\n'
-                    '• 过度后仰：上身保持中正，不要为了拉伸而过度后仰',
+                    'Common mistakes',
+                    '• Shrugging: don\'t hunch the shoulders as the arm rises; keep shoulders down and elbows relaxed\n'
+                    '• Holding your breath: match movement and breath — inhale as you rise, exhale as you lower\n'
+                    '• Leaning back too far: keep the torso upright; don\'t over-arch to get a bigger stretch',
                     ShunShiColors.textSecondary,
                   ),
                   const SizedBox(height: 12),
 
                   // ── 晨练建议 ──
                   _infoCard(
-                    '晨练建议',
-                    '最佳练习时间：日出后30分钟至上午9点。此时阳气升发，'
-                    '与八段锦的升举动作相得益彰。建议在空气清新的户外练习。',
+                    'Morning practice tips',
+                    'Best time: 30 minutes after sunrise until 9 a.m., when yang energy rises,'
+                    'which suits the lifting movements of Baduanjin. Practise outdoors in fresh air if you can.',
                     ShunShiColors.calm,
                   ),
 

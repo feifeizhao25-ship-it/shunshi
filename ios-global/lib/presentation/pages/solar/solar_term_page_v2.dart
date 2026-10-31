@@ -89,7 +89,7 @@ class _SolarTermPageV2State extends State<SolarTermPageV2> {
                           ),
                         ),
                         const Spacer(),
-                        Text('顺时', style: TextStyle(
+                        Text('SEASONS', style: TextStyle(
                           fontFamily: ShunShiTypography.serifFamily,
                           fontSize: 16, fontWeight: FontWeight.w600, color: ShunShiColors.primary,
                         )),
@@ -109,7 +109,7 @@ class _SolarTermPageV2State extends State<SolarTermPageV2> {
                         Text(_term['emoji']?.toString() ?? '🌿', style: const TextStyle(fontSize: 32)),
                         const SizedBox(width: 12),
                         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                          Text(_term['name']?.toString() ?? '节气', style: TextStyle(
+                          Text(_term['name']?.toString() ?? 'Solar term', style: TextStyle(
                             fontFamily: ShunShiTypography.serifFamily,
                             fontSize: 32, fontWeight: FontWeight.bold, color: ShunShiColors.textPrimary,
                           )),
@@ -123,7 +123,7 @@ class _SolarTermPageV2State extends State<SolarTermPageV2> {
                         Text('${_term['date']}', style: TextStyle(fontSize: 13, color: ShunShiColors.textSecondary)),
                       if (_term['days_remaining'] != null) ...[
                         const SizedBox(height: 4),
-                        Text('距下一个节气还有 ${_term['days_remaining']} 天', style: TextStyle(fontSize: 13, color: ShunShiColors.primary, fontWeight: FontWeight.w500)),
+                        Text('Next solar term in ${_term['days_remaining']} days', style: TextStyle(fontSize: 13, color: ShunShiColors.primary, fontWeight: FontWeight.w500)),
                       ],
                     ]),
                   ),
@@ -143,8 +143,8 @@ class _SolarTermPageV2State extends State<SolarTermPageV2> {
                           Text(_next['emoji']?.toString() ?? '🌱', style: const TextStyle(fontSize: 24)),
                           const SizedBox(width: 12),
                           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                            Text('下一个：${_next['name']}', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
-                            Text('${_next['name_en'] ?? ''} · ${_next['countdown_days'] != null ? '${_next['countdown_days']}天后' : _next['date'] ?? ''}',
+                            Text('Next: ${_next['name']}', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+                            Text('${_next['name_en'] ?? ''} · ${_next['countdown_days'] != null ? '${_next['countdown_days']} days' : _next['date'] ?? ''}',
                               style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
                           ])),
                         ]),
@@ -154,7 +154,7 @@ class _SolarTermPageV2State extends State<SolarTermPageV2> {
 
                 // 饮食建议
                 if (_wellness['diet'] is List) ...[
-                  _buildSectionTitle('饮食调养'),
+                  _buildSectionTitle('Eating well'),
                   SliverToBoxAdapter(
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
@@ -170,7 +170,7 @@ class _SolarTermPageV2State extends State<SolarTermPageV2> {
 
                 // 运动建议
                 if (_wellness['exercise'] is List) ...[
-                  _buildSectionTitle('运动养生'),
+                  _buildSectionTitle('Exercise wellness'),
                   SliverToBoxAdapter(
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
@@ -186,7 +186,7 @@ class _SolarTermPageV2State extends State<SolarTermPageV2> {
 
                 // 茶饮建议
                 if (_wellness['tea'] is List) ...[
-                  _buildSectionTitle('时令茶饮'),
+                  _buildSectionTitle('Seasonal tea'),
                   SliverToBoxAdapter(
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),

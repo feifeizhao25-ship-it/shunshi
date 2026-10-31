@@ -53,7 +53,7 @@ class _DiaryReportPageState extends State<DiaryReportPage> {
   }
 
   String _generateObservation() {
-    if (_trends.isEmpty) return 'This weekNo data。';
+    if (_trends.isEmpty) return 'This week: no data.';
     final avgMood = _trends.map((e) => (e['mood'] ?? 0) as num).reduce((a, b) => a + b) / _trends.length;
     final avgSleep = _trends.map((e) => (e['sleep'] ?? 0) as num).reduce((a, b) => a + b) / _trends.length;
     final parts = <String>[];

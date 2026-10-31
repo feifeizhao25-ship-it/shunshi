@@ -26,15 +26,15 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
   static const _blockedKeywords = [
-    '自杀', '自残', '死亡', '想死', '不想活', '抑郁症', 'depression', 'suicide', 'kill',
-    '手术', '开刀', '癌症', '肿瘤', 'cancer', 'tumor',
-    '怀孕', '流产', '堕胎', 'pregnancy', 'abortion',
-    '过敏休克', '呼吸困难', '胸痛', '昏迷',
+    'suicide', 'self-harm', 'death', 'want to die', 'don\'t want to live', 'depression', 'depression', 'suicide', 'kill',
+    'surgery', 'operation', 'cancer', 'tumor', 'cancer', 'tumor',
+    'pregnant', 'miscarriage', 'abortion', 'pregnancy', 'abortion',
+    'anaphylaxis', 'trouble breathing', 'chest pain', 'unconscious',
   ];
   static const _riskKeywords = [
-    '发烧', '咳嗽', '头痛', '腹痛', '腹泻', '呕吐', '皮疹', '出血',
-    '高血压', '糖尿病', '心脏病', '肝病', '肾病',
-    '吃药', '用药', '停药', '药物',
+    'fever', 'cough', 'headache', 'stomach pain', 'diarrhea', 'vomiting', 'rash', 'bleeding',
+    'high blood pressure', 'diabetes', 'heart disease', 'liver disease', 'kidney disease',
+    'take medicine', 'medication', 'stop medication', 'drugs',
   ];
 
   bool _containsBlocked(String text) => _blockedKeywords.any((k) => text.contains(k));
