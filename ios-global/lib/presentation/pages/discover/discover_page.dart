@@ -11,6 +11,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
+import '../../widgets/seasons_visual.dart';
 
 class DiscoverPage extends StatefulWidget {
   const DiscoverPage({super.key});
@@ -49,7 +50,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
     }
     setState(() => _searching = true);
     try {
-      final res = await _dio.get('/api/v1/contents/search', queryParameters: {'q': query.trim()});
+      final res = await _dio.get('/api/v1/contents/search', queryParameters: {'q': query.trim(), 'locale': 'en-US'});
       if (!mounted) return;
       final data = res.data;
       if (data is Map && data['data'] is Map) {
@@ -70,7 +71,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
 
   Future<void> _fetchArticles() async {
     try {
-      final res = await _dio.get('/api/v1/contents/recommend', queryParameters: {'limit': 6});
+      final res = await _dio.get('/api/v1/contents/recommend', queryParameters: {'limit': 6, 'locale': 'en-US'});
       if (!mounted) return;
       final data = res.data;
       if (data is Map && data['data'] is Map) {
@@ -185,7 +186,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
                 physics: const NeverScrollableScrollPhysics(),
                 mainAxisSpacing: 12,
                 crossAxisSpacing: 12,
-                childAspectRatio: 1.15,
+                childAspectRatio: 0.95,
                 children: _categories.map((cat) => _categoryCard(context, cat)).toList(),
               ),
             ),
@@ -201,10 +202,6 @@ class _DiscoverPageState extends State<DiscoverPage> {
                   fontSize: 18, fontWeight: FontWeight.w700,
                   color: ShunShiColors.textPrimary,
                   fontFamily: ShunShiTypography.serifFamily,
-                )),
-                Text("Editor's Choice", style: TextStyle(
-                  fontSize: 12, color: ShunShiColors.textTertiary,
-                  fontFamily: ShunShiTypography.sansFamily,
                 )),
                 const Spacer(),
                 GestureDetector(
@@ -264,36 +261,51 @@ class _DiscoverPageState extends State<DiscoverPage> {
           ctx.push('/wellness-category/${cat.route}');
         }
       },
-      child: Container(
-        decoration: BoxDecoration(
-          color: ShunShiColors.surfaceContainerLowest,
+      child: Semantics(
+        button: true,
+        label: cat.title,
+        child: ClipRRect(
           borderRadius: BorderRadius.circular(16),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 48, height: 48,
-              decoration: BoxDecoration(
-                color: cat.bgColor,
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Icon(cat.icon, size: 24, color: ShunShiColors.primary),
+          child: Stack(fit: StackFit.expand, children: [
+            Image.asset(
+              _categoryPhotos[cat.route] ?? 'assets/images/wellness/wellness_seasonal.jpg',
+              fit: BoxFit.cover,
+              errorBuilder: (_, _, _) => Container(color: cat.bgColor),
             ),
-            const SizedBox(height: 8),
-            Text(cat.title, style: TextStyle(
-              fontSize: 13, fontWeight: FontWeight.w600,
-              color: ShunShiColors.textPrimary,
-              fontFamily: ShunShiTypography.sansFamily,
-            )),
-          ],
+            const DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Color(0x00000000), Color(0xCC10241A)],
+                ),
+              ),
+            ),
+            Positioned(
+              left: 8,
+              right: 8,
+              bottom: 8,
+              child: Text(cat.title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Colors.white, height: 1.2)),
+            ),
+          ]),
         ),
       ),
     );
   }
 
+  static const Map<String, String> _categoryPhotos = {
+    'constitution': 'assets/images/wellness/emotion_meditation_bowl.jpg',
+    'diet': 'assets/images/wellness/food_spring_salad.jpg',
+    'tea': 'assets/images/wellness/tea_green_tea.jpg',
+    'meridian': 'assets/images/wellness/acupoint_hand_massage.jpg',
+    'exercise': 'assets/images/wellness/exercise_yoga_nature.jpg',
+    'sleep': 'assets/images/wellness/sleep_pillow_moon.jpg',
+  };
+
   Widget _apiArticleCard(Map<String, dynamic> item) {
-    final tags = (item['tags'] as List?)?.map((t) => t.toString()).toList() ?? [];
     final type = item['type']?.toString() ?? '';
     return GestureDetector(
       onTap: () {
@@ -301,38 +313,59 @@ class _DiscoverPageState extends State<DiscoverPage> {
         if (id != null) context.push('/content-detail', extra: {'contentId': id});
       },
       child: Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: ShunShiColors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(16),
       ),
-      child: Column(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(children: [
-            _articleTag(item['category']?.toString() ?? type),
-            if (item['duration'] != null) ...[
-              const SizedBox(width: 8),
-              Text(item['duration'].toString(), style: TextStyle(fontSize: 11, color: ShunShiColors.textTertiary)),
-            ],
-          ]),
-          const SizedBox(height: 8),
-          Text(item['title']?.toString() ?? '', style: TextStyle(
-            fontSize: 16, fontWeight: FontWeight.w700, color: ShunShiColors.textPrimary,
-            fontFamily: ShunShiTypography.serifFamily,
-          )),
-          const SizedBox(height: 6),
-          Text(item['description']?.toString() ?? '', maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(
-            fontSize: 13, color: ShunShiColors.textSecondary, height: 1.5,
-          )),
-          if (tags.isNotEmpty) ...[
-            const SizedBox(height: 8),
-            Wrap(spacing: 6, children: tags.take(3).map((t) => _articleTag(t)).toList()),
-          ],
+          SgThumb(asset: _articlePhoto(item), size: 84),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(children: [
+                  Flexible(child: _articleTag(item['category']?.toString() ?? type)),
+                  if (item['duration'] != null) ...[
+                    const SizedBox(width: 8),
+                    Text(item['duration'].toString(), style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
+                  ],
+                ]),
+                const SizedBox(height: 6),
+                Text(item['title']?.toString() ?? '', maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(
+                  fontSize: 16, fontWeight: FontWeight.w700, color: ShunShiColors.textPrimary,
+                  fontFamily: ShunShiTypography.serifFamily,
+                )),
+                const SizedBox(height: 4),
+                Text(item['description']?.toString() ?? '', maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(
+                  fontSize: 13, color: ShunShiColors.textSecondary, height: 1.45,
+                )),
+              ],
+            ),
+          ),
         ],
       ),
     ),
     );
+  }
+
+  /// A photo that matches the article's own category (no food photo on a sleep article).
+  String _articlePhoto(Map<String, dynamic> item) {
+    final label = '${item['category'] ?? ''} ${item['type'] ?? ''}'.toLowerCase();
+    const w = 'assets/images/wellness/';
+    if (label.contains('sleep')) return '${w}sleep_quality.jpg';
+    if (label.contains('emotion') || label.contains('meditat') || label.contains('mind')) return '${w}emotion_meditation.jpg';
+    if (label.contains('tea')) return '${w}tea_green_tea.jpg';
+    if (label.contains('exercise') || label.contains('movement') || label.contains('qigong')) return '${w}exercise_morning_stretch.jpg';
+    if (label.contains('acupress') || label.contains('meridian')) return '${w}acupoint_hand_massage.jpg';
+    if (label.contains('herb')) return '${w}wellness_herbs.jpg';
+    if (label.contains('nutrition') || label.contains('diet') || label.contains('food') || label.contains('recipe')) {
+      return sgWellnessThumb('food', '${item['title'] ?? ''}');
+    }
+    return '${w}wellness_seasonal.jpg';
   }
 
   Widget _articleTag(String text) => Container(
