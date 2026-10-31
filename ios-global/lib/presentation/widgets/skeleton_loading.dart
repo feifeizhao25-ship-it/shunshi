@@ -23,7 +23,7 @@ class SkeletonLoader extends StatelessWidget {
     // Use warm cream tones matching 顺时 brand background (#FDF9F4)
     return Shimmer.fromColors(
       baseColor: baseColor ?? const Color(0xFFEDE8E0),  // warm gray, visible on cream
-      highlightColor: const Color(0xFFFDF9F4),           // 宣纸米白 background
+      highlightColor: const Color(0xFFFDF9F4),           // rice-paper cream background
       child: Container(
         width: width,
         height: height,
