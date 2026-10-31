@@ -11,6 +11,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
+import '../../../data/network/api_client.dart';
 import '../../widgets/seasons_visual.dart';
 
 class DiscoverPage extends StatefulWidget {
@@ -21,12 +22,8 @@ class DiscoverPage extends StatefulWidget {
 }
 
 class _DiscoverPageState extends State<DiscoverPage> {
-  static const _baseUrl = 'https://api.seasonsapp.com';
-  final _dio = Dio(BaseOptions(
-    baseUrl: _baseUrl,
-    connectTimeout: const Duration(seconds: 8),
-    receiveTimeout: const Duration(seconds: 15),
-  ));
+  // The shared client: configured API base, sign-in token and the locale/market headers.
+  final Dio _dio = ApiClient().dio;
 
   List<Map<String, dynamic>> _articles = [];
   List<Map<String, dynamic>> _searchResults = [];

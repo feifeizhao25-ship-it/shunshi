@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// 空状态组件
+/// Empty state: an icon, a title, optional description and an optional action.
 class EmptyState extends StatelessWidget {
   final IconData icon;
   final String title;
@@ -60,7 +60,7 @@ class EmptyState extends StatelessWidget {
   }
 }
 
-/// 网络错误状态
+/// Shown when the device is offline or the server can't be reached.
 class NetworkErrorState extends StatelessWidget {
   final VoidCallback? onRetry;
   
@@ -70,15 +70,15 @@ class NetworkErrorState extends StatelessWidget {
   Widget build(BuildContext context) {
     return EmptyState(
       icon: Icons.wifi_off,
-      title: '网络连接失败',
-      description: '请检查网络设置后重试',
-      actionLabel: '重试',
+      title: "You're offline",
+      description: 'Check your connection and try again.',
+      actionLabel: 'Try again',
       onAction: onRetry,
     );
   }
 }
 
-/// 通用错误状态
+/// Generic error state.
 class ErrorState extends StatelessWidget {
   final String message;
   final VoidCallback? onRetry;
@@ -93,9 +93,9 @@ class ErrorState extends StatelessWidget {
   Widget build(BuildContext context) {
     return EmptyState(
       icon: Icons.error_outline,
-      title: '出错了',
+      title: 'Something went wrong',
       description: message,
-      actionLabel: onRetry != null ? '重试' : null,
+      actionLabel: onRetry != null ? 'Try again' : null,
       onAction: onRetry,
     );
   }

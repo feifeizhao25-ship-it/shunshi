@@ -4,14 +4,14 @@
 /// 节气
 class SolarTerm {
   final String id;
-  final String name;         // 中文名，如"立春"
-  final String nameEn;       // 英文名，如"Start of Spring"
+  final String name;         // Chinese name used as the key, e.g. "立春"
+  final String nameEn;       // English name, e.g. "Start of Spring"
   final String emoji;
   final String season;       // spring/summer/autumn/winter
-  final String date;         // 日期描述，如"2月3日-5日"
-  final String description;  // 节气简介
-  final Map<String, dynamic>? wellnessPlan; // 完整养生方案
-  final bool isCurrent;      // 是否为当前节气
+  final String date;         // Date range, e.g. "Feb 3-5"
+  final String description;  // Short description
+  final Map<String, dynamic>? wellnessPlan; // Full wellness plan
+  final bool isCurrent;      // Whether this is the current term
 
   const SolarTerm({
     required this.id,

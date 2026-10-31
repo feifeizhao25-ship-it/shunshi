@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import '../../widgets/seasons_visual.dart';
 import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
+import '../../../core/config/app_config.dart';
 
 class RecordsPageV2 extends StatefulWidget {
   const RecordsPageV2({super.key});
@@ -17,7 +18,7 @@ class RecordsPageV2 extends StatefulWidget {
 }
 
 class _RecordsPageV2State extends State<RecordsPageV2> {
-  static const _baseUrl = 'https://api.seasonsapp.com';
+  static const _baseUrl = AppConfig.apiBaseUrl;
   final _dio = Dio(BaseOptions(baseUrl: _baseUrl, connectTimeout: const Duration(seconds: 8)));
   
   int _weekStreak = 0;

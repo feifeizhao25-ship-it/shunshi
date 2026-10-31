@@ -7,6 +7,7 @@ import '../../../data/storage/storage_manager.dart';
 import '../../widgets/state_view.dart';
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
+import '../../../core/config/app_config.dart';
 
 class FamilyPageV2 extends StatefulWidget {
   const FamilyPageV2({super.key});
@@ -16,7 +17,7 @@ class FamilyPageV2 extends StatefulWidget {
 }
 
 class _FamilyPageV2State extends State<FamilyPageV2> {
-  static const _baseUrl = 'https://api.seasonsapp.com';
+  static const _baseUrl = AppConfig.apiBaseUrl;
   final _dio = Dio(BaseOptions(baseUrl: _baseUrl, connectTimeout: const Duration(seconds: 8)));
   
   String _familyName = 'ProfileFamily';

@@ -1,8 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../config/app_config.dart';
 
 class FeedbackService {
-  static const String _baseUrl = 'https://api.seasonsapp.com/api/v1';
+  static const String _baseUrl = '${AppConfig.apiBaseUrl}/api/v1';
   static final _dio = Dio(BaseOptions(baseUrl: _baseUrl, connectTimeout: Duration(seconds: 10)));
 
   /// Record practice completion with rating

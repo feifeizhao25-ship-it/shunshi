@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../data/services/subscription_service.dart';
+import '../../core/config/app_config.dart';
 
 class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
   final Dio _dio;
@@ -9,7 +10,7 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
 
   SubscriptionNotifier()
       : _dio = Dio(BaseOptions(
-          baseUrl: 'https://api.seasonsapp.com',
+          baseUrl: AppConfig.apiBaseUrl,
           connectTimeout: const Duration(seconds: 10),
         )),
         super(SubscriptionState(

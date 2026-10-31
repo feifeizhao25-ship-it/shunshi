@@ -4,6 +4,7 @@
 
 端点:
 - GET  /api/v1/skills              - Skill 列表
+- GET  /api/v1/skills/practices    - 面向用户的日常练习（随请求语言返回；英文请求得到英文）
 - GET  /api/v1/skills/{skill_id}   - Skill 详情
 - POST /api/v1/skills/execute       - 执行 Skill
 - GET  /api/v1/skills/categories    - 分类树
@@ -24,6 +25,7 @@ from ..skills.orchestrator import SkillOrchestrator, SkillExecutionResult
 from ..skill_access import SkillAccess, get_skill_access
 
 from ..aigc import AI_IDENTITY_NOTICE, AI_LABEL
+from ..locale_context import RequestLocale, request_locale
 
 router = APIRouter(prefix="/api/v1/skills")
 
@@ -176,6 +178,94 @@ async def list_skills(
     ]
 
 
+# ==================== 面向用户的日常练习（国际版 Skills 页） ====================
+
+# 国际版 Skills 页只展示这几项：每一项都对应注册表里真实存在的 skill_id，
+# 名称与说明用英文写（不是把中文名直译），不暴露内部的 safety / meta 之类的技能。
+# 中文请求返回注册表里的中文名称与说明。
+_PRACTICES = [
+    {
+        "id": "sleep_optimization", "skill_id": "generate_daily_plan_sleep",
+        "en_name": "Sleep wind-down plan",
+        "en_description": "A gentle evening routine to help you fall asleep and wake up steadier.",
+    },
+    {
+        "id": "focus_improvement", "skill_id": "generate_screen_time_plan",
+        "en_name": "Focus and screen time",
+        "en_description": "Simple limits and breaks so your attention lasts through the day.",
+    },
+    {
+        "id": "stress_relief", "skill_id": "generate_emotion_stress_manage",
+        "en_name": "Stress relief",
+        "en_description": "Small, practical steps for when the day feels like too much.",
+    },
+    {
+        "id": "nutrition_guidance", "skill_id": "generate_meal_plan_daily",
+        "en_name": "Daily meal plan",
+        "en_description": "Balanced meals and snacks for today, built around ordinary ingredients.",
+    },
+    {
+        "id": "mental_reset", "skill_id": "generate_emotion_mindful_pause",
+        "en_name": "Mindful pause",
+        "en_description": "A two-minute pause to slow down and come back to the present.",
+    },
+    {
+        "id": "breathing", "skill_id": "generate_emotion_breathing",
+        "en_name": "Breathing exercise",
+        "en_description": "Slow, guided breathing you can do at your desk or in bed.",
+    },
+    {
+        "id": "gratitude", "skill_id": "generate_emotion_gratitude",
+        "en_name": "Gratitude practice",
+        "en_description": "Three quick prompts to notice what went well today.",
+    },
+    {
+        "id": "morning_routine", "skill_id": "generate_morning_routine",
+        "en_name": "Morning routine",
+        "en_description": "An easy start to the day: light, water, movement and a calm first hour.",
+    },
+]
+
+_ENGLISH_FALLBACK_REPLY = (
+    "We couldn't produce a suggestion this time. Please try again in a moment."
+)
+_ENGLISH_UNAVAILABLE = "Suggestions are temporarily unavailable. Please try again shortly."
+_ENGLISH_CHECK_FAILED = (
+    "This answer didn't pass our safety check. Try asking in a different way, "
+    "or talk to a qualified professional."
+)
+
+
+def _has_cjk(text: str) -> bool:
+    return any("\u4e00" <= ch <= "\u9fff" for ch in text or "")
+
+
+@router.get("/practices")
+async def list_practices(locale: RequestLocale = Depends(request_locale)):
+    """
+    面向用户的日常练习列表（国际版 Skills 页使用）。
+
+    返回 ``{"skills": [...], "count": n, "locale": "en" | "zh"}``。
+    英文请求（X-App-Market: global 或非中文 Accept-Language）得到英文名称与说明，
+    中文请求得到注册表里的中文名称与说明。
+    """
+    items = []
+    for p in _PRACTICES:
+        skill = skill_registry.get(p["skill_id"])
+        if skill is None:
+            continue
+        english = locale.lang == "en"
+        items.append({
+            "id": p["id"],
+            "skill_id": skill.skill_id,
+            "name": p["en_name"] if english else skill.name,
+            "description": p["en_description"] if english else skill.description,
+            "category": skill.category,
+            "is_premium": skill.is_premium,
+        })
+    return {"skills": items, "count": len(items), "locale": "en" if locale.lang != "zh" else "zh"}
+
+
 @router.get("/categories", response_model=List[CategoryInfo])
 async def list_categories():
     """
@@ -275,7 +365,11 @@ async def get_skill(skill_id: str):
 
 
 @router.post("/execute", response_model=ExecuteResponse)
-async def execute_skill(request: ExecuteRequest, access: SkillAccess = Depends(get_skill_access)):
+async def execute_skill(
+    request: ExecuteRequest,
+    access: SkillAccess = Depends(get_skill_access),
+    locale: RequestLocale = Depends(request_locale),
+):
     """
     执行 Skill
 
@@ -291,17 +385,28 @@ async def execute_skill(request: ExecuteRequest, access: SkillAccess = Depends(g
     for skill_id in request.skill_ids or []:
         access.require(request.user_id, skill_registry.get(skill_id).is_premium)
     orchestrator = get_orchestrator()
+    english = locale.lang == "en"
+    message = request.message
+    if english:
+        # 技能提示词是中文写的，英文请求要明确要求用英文作答。
+        message = f"{message}\n\nPlease answer in English."
 
     try:
         result: SkillExecutionResult = await orchestrator.execute(
-            user_message=request.message,
+            user_message=message,
             user_context=request.context,
             skill_ids=request.skill_ids,
             allow_premium=access.premium,
         )
+        final_response = result.final_response
+        if english and _has_cjk(final_response):
+            final_response = (
+                _ENGLISH_CHECK_FAILED if result.safety_flag not in (None, "", "none")
+                else _ENGLISH_FALLBACK_REPLY
+            )
         return ExecuteResponse(
             status=result.status.value,
-            final_response=result.final_response,
+            final_response=final_response,
             skills_executed=[
                 {
                     "skill_id": sr.skill_id,
@@ -320,7 +425,10 @@ async def execute_skill(request: ExecuteRequest, access: SkillAccess = Depends(g
             follow_up=result.follow_up,
         )
     except Exception:
-        raise HTTPException(status_code=503, detail="建议生成服务暂时不可用，请稍后重试") from None
+        raise HTTPException(
+            status_code=503,
+            detail=_ENGLISH_UNAVAILABLE if english else "建议生成服务暂时不可用，请稍后重试",
+        ) from None
 
 
 @router.post("/daily-plan", response_model=ExecuteResponse)

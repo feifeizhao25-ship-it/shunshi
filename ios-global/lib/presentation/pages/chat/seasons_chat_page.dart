@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/services/ai_safety.dart';
 import '../../widgets/feedback_sheet.dart';
 import '../../../design_system/theme.dart';
+import '../../../core/config/app_config.dart';
 
 const String _systemPrompt =
     'You are SEASONS, a calm and thoughtful AI companion focused on seasonal '
@@ -164,7 +165,7 @@ class _SeasonsChatPageState extends State<SeasonsChatPage>
 
     try {
       final dio = Dio(BaseOptions(
-        baseUrl: 'https://api.seasonsapp.com',
+        baseUrl: AppConfig.apiBaseUrl,
         connectTimeout: const Duration(seconds: 10),
         receiveTimeout: const Duration(seconds: 30),
       ));

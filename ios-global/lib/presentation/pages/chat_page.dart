@@ -18,8 +18,9 @@ import '../../core/culture/device_hints.dart';
 import '../../core/culture/opening_greeting.dart';
 import 'settings/culture_binding.dart';
 import 'chat/chat_widgets.dart';
+import '../../core/config/app_config.dart';
 
-const _baseUrl = 'https://api.seasonsapp.com';
+const _baseUrl = AppConfig.apiBaseUrl;
 
 class ChatPage extends StatefulWidget {
   final String? conversationId;
@@ -250,7 +251,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
       handleAIReply(aiText, cards: cards, sources: sources, sourceDetails: ChatSource.parseAll(res.data?['source_details']), convId: res.data?['conversation_id']);
     } catch (_) {
       try {
-        final v2Dio = Dio(BaseOptions(baseUrl: 'https://api.seasonsapp.com', connectTimeout: const Duration(seconds: 10), receiveTimeout: const Duration(seconds: 60)));
+        final v2Dio = Dio(BaseOptions(baseUrl: AppConfig.apiBaseUrl, connectTimeout: const Duration(seconds: 10), receiveTimeout: const Duration(seconds: 60)));
         v2Dio.options.headers['Authorization'] = 'Bearer $_token';
         final v2Res = await v2Dio.post('/api/v1/chat', data: {'message': text, 'context': {'solar_term': _currentSolarTerm}, 'conversation_id': _conversationId});  // CN uses Chinese endpoint
         final aiText = v2Res.data?['reply'] ?? 'Sorry, I can\'t respond right now.';

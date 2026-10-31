@@ -1,4 +1,5 @@
-// English names for the 24 solar terms, keyed by the Chinese name used in solar_term_table.dart.
+// English names for the 24 solar terms. The keys are the canonical Chinese term names from the generated
+// solar_term_table.dart (data keys, never shown to the user); every value shown in the app is English.
 import 'solar_term_table.dart';
 
 const Map<String, (String, String)> kSolarTermEn = {

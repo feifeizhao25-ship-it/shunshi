@@ -5,6 +5,7 @@ library;
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
+import '../../../core/config/app_config.dart';
 
 class StripeCheckoutPage extends StatefulWidget {
   final String plan;
@@ -19,7 +20,7 @@ class _StripeCheckoutPageState extends State<StripeCheckoutPage> {
   String? _checkoutUrl;
   String? _error;
 
-  static const _baseUrl = 'https://api.seasonsapp.com';
+  static const _baseUrl = AppConfig.apiBaseUrl;
 
   @override
   void initState() {
