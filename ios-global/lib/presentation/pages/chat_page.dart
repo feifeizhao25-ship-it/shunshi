@@ -11,6 +11,7 @@ import '../../../design_system/theme_helper.dart';
 import '../widgets/feedback_sheet.dart';
 import '../widgets/membership_widgets.dart';
 import 'chat/chat_models.dart';
+import 'chat/chat_topic_cards.dart';
 import '../widgets/chat_sources.dart';
 import '../../core/solar_term/solar_term_en.dart';
 import '../../core/culture/device_hints.dart';
@@ -437,19 +438,24 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
 
   Widget _buildList() {
     final showUpgradeNudge = _aiMessageCount >= 5 && !_isVip;
+    // Only the greeting is on screen: offer tappable topics.
+    final showTopics = _messages.length == 1 && !_isLoading;
     if (_messages.isEmpty && _isLoading) {
       return ListView(children: [const SkeletonMessage(isAI: true), const SkeletonMessage(isAI: false), const SkeletonMessage(isAI: true)]);
     }
     return ListView.builder(
       controller: _scrollController,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-      itemCount: _messages.length + (_isLoading ? 1 : 0) + (showUpgradeNudge ? 1 : 0),
+      itemCount: _messages.length + (_isLoading ? 1 : 0) + (showUpgradeNudge ? 1 : 0) + (showTopics ? 1 : 0),
       itemBuilder: (context, i) {
         if (i == 0 && showUpgradeNudge) {
           return Column(children: [UpgradeNudge(onTap: _showUpgradePrompt), const SizedBox(height: 16)]);
         }
         final idx = showUpgradeNudge ? i - 1 : i;
         if (idx == _messages.length && _isLoading) return const TypingIndicator();
+        if (idx == _messages.length && showTopics) {
+          return ChatTopicCards(onPick: (t) { _controller.text = t; _sendMessage(); });
+        }
         if (idx >= _messages.length) return const SizedBox.shrink();
         final m = _messages[idx];
         if (m.role == 'ai') return AIBubble(message: m, onFeedback: () => FeedbackSheet.show(context, contentId: 'chat-$idx', type: 'chat'));

@@ -522,6 +522,55 @@ IconData _iconFor(String kind) {
   return Icons.lightbulb_outline_rounded;
 }
 
+/// Existing wellness photos for the suggestion categories the SEASONS backend sends.
+/// A stable pick by card id keeps a card's picture the same across reloads.
+String? _photoFor(String kind, String id) {
+  const table = <String, List<String>>{
+    'sleep': ['sleep_pillow_moon', 'sleep_quality', 'sleep_herbal_pillow'],
+    'breath': ['exercise_sleep_relax', 'emotion_meditation'],
+    'exercise': ['exercise_morning_stretch', 'exercise_walking', 'exercise_yoga_nature', 'exercise_taichi'],
+    'food': ['food_spring_salad', 'food_lotus_soup', 'food_red_bean_porridge', 'food_yam_porridge', 'food_winter_stew'],
+    'mood': ['emotion_journal_writing', 'emotion_meditation_bowl'],
+    'rest': ['emotion_meditation_bowl', 'sleep_quality'],
+    'family': ['wellness_seasonal', 'exercise_walking'],
+    'season': ['wellness_seasonal', 'wellness_herbs'],
+  };
+  final k = kind.toLowerCase();
+  for (final e in table.entries) {
+    if (k.contains(e.key)) {
+      var h = 0;
+      for (final c in id.codeUnits) {
+        h = (h * 31 + c) & 0x7fffffff;
+      }
+      return 'assets/images/wellness/${e.value[h % e.value.length]}.jpg';
+    }
+  }
+  return null;
+}
+
+class _CardLead extends StatelessWidget {
+  const _CardLead({required this.card, required this.scheme});
+  final PersonalHomeCard card;
+  final ColorScheme scheme;
+
+  @override
+  Widget build(BuildContext context) {
+    final icon = Container(
+      width: 36,
+      height: 36,
+      decoration: BoxDecoration(color: scheme.primary.withValues(alpha: 0.12), shape: BoxShape.circle),
+      child: Icon(_iconFor(card.kind), size: 20, color: scheme.primary),
+    );
+    final photo = _photoFor(card.kind, card.id);
+    if (photo == null) return icon;
+    return ClipRRect(
+      key: Key('personal-home-photo-${card.id}'),
+      borderRadius: BorderRadius.circular(12),
+      child: Image.asset(photo, width: 56, height: 56, fit: BoxFit.cover, cacheWidth: 168, errorBuilder: (_, __, ___) => icon),
+    );
+  }
+}
+
 class _CardTile extends StatelessWidget {
   const _CardTile({required this.card, required this.strings, required this.featured, this.onTap});
   final PersonalHomeCard card;
@@ -542,12 +591,7 @@ class _CardTile extends StatelessWidget {
         border: featured ? null : Border.all(color: scheme.outlineVariant.withValues(alpha: 0.5)),
       ),
       child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Container(
-          width: 36,
-          height: 36,
-          decoration: BoxDecoration(color: scheme.primary.withValues(alpha: 0.12), shape: BoxShape.circle),
-          child: Icon(_iconFor(card.kind), size: 20, color: scheme.primary),
-        ),
+        _CardLead(card: card, scheme: scheme),
         const SizedBox(width: 12),
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
