@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
 import '../../../core/network/api_singleton.dart';
+import '../../../data/network/session.dart';
 
 class ConstitutionTestV2 extends StatefulWidget {
   const ConstitutionTestV2({super.key});
@@ -47,13 +48,8 @@ class _ConstitutionTestV2State extends State<ConstitutionTestV2> {
     setState(() => _submitting = true);
 
     try {
-      // Use saved token, fallback to guest login
-      String? token = StorageManager.user.getToken();
-      if (token == null) {
-        final authRes = await _dio.post('/api/v1/auth/guest-login', data: {});
-        final d = authRes.data;
-        token = d is Map ? (d['data'] ?? d)['token'] : null;
-      }
+      // 用本机已有的登录令牌；没有才建一个游客会话并保存
+      final token = await ensureSessionToken(_dio);
 
       // Map answers: option index → score (0=是→3, 1=有时→2, 2=否→1)
       final scores = <String, int>{};

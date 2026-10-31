@@ -8,6 +8,7 @@ import '../../../core/theme/shunshi_colors.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
 import '../../../core/network/api_singleton.dart';
+import '../../../data/network/session.dart';
 
 class StripeCheckoutPage extends StatefulWidget {
   final String plan;
@@ -32,7 +33,7 @@ class _StripeCheckoutPageState extends State<StripeCheckoutPage> {
       final dio = apiClient.dio;
       final resp = await dio.post('/api/v1/stripe/checkout', data: {
         'plan': widget.plan,
-        'user_id': 'user-001',
+        ...userIdParam(),
         'success_url': 'shunshi://stripe/success',
         'cancel_url': 'shunshi://stripe/cancel',
       });

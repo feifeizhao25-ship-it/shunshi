@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../design_system/theme.dart';
 import '../../core/config/app_config.dart';
+import '../../data/network/session.dart';
 
 /// Bottom sheet for content feedback: 👍👎 + optional text comment.
 class FeedbackSheet extends StatefulWidget {
@@ -42,9 +43,9 @@ class _FeedbackSheetState extends State<FeedbackSheet> {
 
     try {
       final prefs = await SharedPreferences.getInstance();
-      final userId = prefs.getString('user_id') ?? 'guest';
+      final userId = currentUserId() ?? '';
 
-      await Dio().post(
+      await withSessionAuth(Dio()).post(
         '${AppConfig.apiBaseUrl}/api/v1/feedback',
         data: {
           'user_id': userId,

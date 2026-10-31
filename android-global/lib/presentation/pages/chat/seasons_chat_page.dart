@@ -11,6 +11,7 @@ import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
 import '../../../core/network/api_singleton.dart';
 import '../../../core/config/app_config.dart';
+import '../../../data/network/session.dart';
 
 const String _systemPrompt =
     'You are SEASONS, a calm and thoughtful AI companion focused on seasonal '
@@ -186,7 +187,7 @@ class _SeasonsChatPageState extends State<SeasonsChatPage>
     try {
       final eventStream = sseService.sendMessage(
         message: text,
-        userId: 'seasons-user',
+        userId: currentUserId() ?? '',
         conversationId: _conversationId,
       );
 

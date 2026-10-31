@@ -4,6 +4,7 @@ import '../../../core/theme/app_localizations.dart';
 import '../../../design_system/theme.dart';
 import '../../../data/network/api_client.dart';
 import '../../../core/network/api_singleton.dart';
+import '../../../data/network/session.dart';
 
 /// 用户Feedback页
 class FeedbackPage extends StatefulWidget {
@@ -36,7 +37,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
     setState(() => _submitting = true);
     try {
       await ApiClient().post('/api/v1/feedback/submit', data: {
-        'user_id': 'guest',
+        ...userIdParam(),
         'category': _category,
         'message': _msgCtrl.text.trim(),
         'rating': _rating > 0 ? _rating : null,

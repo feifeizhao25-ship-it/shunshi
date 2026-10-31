@@ -6,6 +6,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/config/app_config.dart';
+import '../../../data/network/session.dart';
 
 class StripeCheckoutPage extends StatefulWidget {
   final String plan;
@@ -30,10 +31,10 @@ class _StripeCheckoutPageState extends State<StripeCheckoutPage> {
 
   Future<void> _createCheckoutSession() async {
     try {
-      final dio = Dio(BaseOptions(baseUrl: _baseUrl));
+      final dio = withSessionAuth(Dio(BaseOptions(baseUrl: _baseUrl)));
       final resp = await dio.post('/api/v1/stripe/checkout', data: {
         'plan': widget.plan,
-        'user_id': 'user-001',
+        ...userIdParam(),
         'success_url': 'shunshi://stripe/success',
         'cancel_url': 'shunshi://stripe/cancel',
       });

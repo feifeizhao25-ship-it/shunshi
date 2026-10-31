@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../design_system/theme.dart';
 import '../../../data/network/api_client.dart';
+import '../../../data/network/session.dart';
 
 class ProfilePageV2 extends StatefulWidget {
   const ProfilePageV2({super.key});
@@ -29,7 +30,7 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
 
   Future<void> _loadData() async {
     try {
-      final resp = await ApiClient().get('/api/v1/favorites', queryParameters: {'user_id': 'guest', 'limit': 1});
+      final resp = await ApiClient().get('/api/v1/favorites', queryParameters: {...userIdParam(), 'limit': 1});
       if (resp.data?['success'] == true) {
         final total = resp.data['data']?['total'] ?? 0;
         if (mounted) setState(() => _favoriteCount = total);

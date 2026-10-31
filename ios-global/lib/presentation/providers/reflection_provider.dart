@@ -2,6 +2,7 @@ import '../../core/constants/app_constants.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../domain/entities/reflection.dart';
+import '../../data/network/session.dart';
 
 const _baseUrl = AppConstants.baseUrl;
 
@@ -42,11 +43,11 @@ class ReflectionState {
 }
 
 class ReflectionNotifier extends StateNotifier<ReflectionState> {
-  final Dio _dio = Dio(BaseOptions(
+  final Dio _dio = withSessionAuth(Dio(BaseOptions(
     baseUrl: _baseUrl,
     connectTimeout: const Duration(seconds: 10),
     receiveTimeout: const Duration(seconds: 10),
-  ));
+  )));
 
   ReflectionNotifier() : super(const ReflectionState()) {
     loadReflectionData();
@@ -58,7 +59,7 @@ class ReflectionNotifier extends StateNotifier<ReflectionState> {
     try {
       final response = await _dio.get(
         '/api/v1/journal/entries/user-001',
-        queryParameters: {'user_id': 'seasons-user'},
+        queryParameters: {...userIdParam()},
       );
 
       final data = response.data as List;
@@ -94,7 +95,7 @@ class ReflectionNotifier extends StateNotifier<ReflectionState> {
       await _dio.post(
         '/api/v1/user/daily-checkin',
         data: {
-          'user_id': 'seasons-user',
+          ...userIdParam(),
           'mood': moodStr,
           'energy': energyStr,
           'sleep': sleepStr,
@@ -104,7 +105,7 @@ class ReflectionNotifier extends StateNotifier<ReflectionState> {
 
       final newReflection = DailyReflection(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
-        userId: 'seasons-user',
+        userId: currentUserId() ?? '',
         date: DateTime.now(),
         mood: mood,
         energy: energy,
@@ -121,7 +122,7 @@ class ReflectionNotifier extends StateNotifier<ReflectionState> {
       // Still update UI optimistically
       final newReflection = DailyReflection(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
-        userId: 'seasons-user',
+        userId: currentUserId() ?? '',
         date: DateTime.now(),
         mood: mood,
         energy: energy,
@@ -146,7 +147,7 @@ class ReflectionNotifier extends StateNotifier<ReflectionState> {
   DailyReflection _parseReflection(Map<String, dynamic> json) {
     return DailyReflection(
       id: json['id'] ?? '',
-      userId: json['user_id'] ?? 'seasons-user',
+      userId: json['user_id'] ?? '',
       date: DateTime.tryParse(json['date'] ?? '') ?? DateTime.now(),
       mood: _stringToMood(json['mood'] ?? 'calm'),
       energy: _stringToEnergy(json['energy'] ?? 'medium'),

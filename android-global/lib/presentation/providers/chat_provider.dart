@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import '../../../domain/entities/message.dart';
 import '../../../core/network/api_service.dart';
+import '../../data/network/session.dart';
 
 final apiServiceProvider = Provider<ApiService>((ref) {
   return ApiService(baseUrl: AppConstants.baseUrl);
@@ -63,7 +64,7 @@ class ChatNotifier extends StateNotifier<ChatState> {
       final response = await _api.sendChat(
         prompt: text,
         conversationId: state.conversationId,
-        userId: 'seasons-user',
+        userId: currentUserId() ?? '',
       );
       
       final assistantMessage = Message(

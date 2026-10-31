@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../domain/entities/user.dart';
 import '../../../data/storage/storage_manager.dart';
+import '../../data/network/session.dart';
 
 class ProfileState {
   final User user;
@@ -39,7 +40,7 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
   ProfileNotifier() : super(
     ProfileState(
       user: User(
-        id: 'guest',
+        id: '',
         email: '',
         name: 'Guest',
         subscription: SubscriptionTier.free,
@@ -70,7 +71,7 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
         // Will be refreshed via API when the user navigates to profile
         // For now, use stored data or defaults
         final prefs = await SharedPreferences.getInstance();
-        final userId = prefs.getString('user_id') ?? 'guest';
+        final userId = currentUserId() ?? '';
         state = state.copyWith(
           user: User(
             id: userId,
@@ -110,7 +111,7 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
     }
     
     return User(
-      id: info['id']?.toString() ?? 'guest',
+      id: info['id']?.toString() ?? '',
       email: info['email']?.toString() ?? '',
       name: info['name']?.toString() ?? info['displayName']?.toString(),
       avatarUrl: info['avatar_url']?.toString() ?? info['photoUrl']?.toString(),

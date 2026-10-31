@@ -3,16 +3,17 @@ import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../data/services/subscription_service.dart';
 import '../../core/config/app_config.dart';
+import '../../data/network/session.dart';
 
 class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
   final Dio _dio;
-  String _userId = 'seasons-user';
+  String _userId = '';
 
   SubscriptionNotifier()
-      : _dio = Dio(BaseOptions(
+      : _dio = withSessionAuth(Dio(BaseOptions(
           baseUrl: AppConfig.apiBaseUrl,
           connectTimeout: const Duration(seconds: 10),
-        )),
+        ))),
         super(SubscriptionState(
           isLoading: true,
           plans: SubscriptionProducts.plans,
@@ -38,9 +39,9 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
   Future<void> _loadUserId() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      _userId = prefs.getString('user_id') ?? 'seasons-user';
+      _userId = currentUserId() ?? '';
     } catch (_) {
-      _userId = 'seasons-user';
+      _userId = '';
     }
   }
 

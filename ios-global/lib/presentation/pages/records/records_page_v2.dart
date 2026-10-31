@@ -10,6 +10,7 @@ import '../../widgets/seasons_visual.dart';
 import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/config/app_config.dart';
+import '../../../data/network/session.dart';
 
 class RecordsPageV2 extends StatefulWidget {
   const RecordsPageV2({super.key});
@@ -42,15 +43,8 @@ class _RecordsPageV2State extends State<RecordsPageV2> {
   }
 
   Future<void> _getToken() async {
-    // Try saved token first
-    _token = StorageManager.user.getToken();
-    if (_token != null) return;
-    // Fallback to guest login
-    try {
-      final res = await _dio.post('/api/v1/auth/guest-login', data: {});
-      final data = res.data;
-      _token = data is Map ? (data['access_token'] ?? (data['data'] is Map ? (data['data'] as Map)['token'] : null)) as String? : null;
-    } catch (_) {}
+    // 用本机已有的登录令牌；没有才建一个游客会话并保存（不再每次打开页面都换一个空账号）。
+    _token = await ensureSessionToken(_dio);
   }
 
   Future<void> _fetchData() async {
