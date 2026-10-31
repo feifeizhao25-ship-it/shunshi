@@ -2,6 +2,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../../core/router/safe_pop.dart';
+import '../../../core/solar_term/solar_cover.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../../design_system/theme.dart';
@@ -174,10 +175,10 @@ class _SolarTermDetailPageState extends State<SolarTermDetailPage> {
             // Hero image
             Container(
               width: double.infinity,
-              height: 180,
+              height: 220,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(16),
-                image: const DecorationImage(image: AssetImage('assets/images/ref_10.jpg'), fit: BoxFit.cover),
+                image: DecorationImage(image: AssetImage(solarCoverAsset(termName, fallback: 'assets/images/ref_10.jpg')), fit: BoxFit.cover),
               ),
             ),
             const SizedBox(height: 24),

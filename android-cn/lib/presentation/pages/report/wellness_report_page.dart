@@ -46,6 +46,12 @@ class WellnessReportPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Center(child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Image.asset('assets/images/wellness/empty_basket.webp', width: 220, height: 165, fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => const SizedBox(width: 220, height: 165)),
+                )),
+                const SizedBox(height: 16),
                 Text('还没有个人评估', style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w700,

@@ -3,6 +3,7 @@
 /// 展示节气内涵、饮食/起居/功法/冥想建议
 library;
 
+import '../../../core/solar_term/solar_cover.dart';
 import 'package:dio/dio.dart';
 import '../../widgets/state_view.dart';
 import 'package:flutter/material.dart';
@@ -132,6 +133,24 @@ class _SolarTermPageV2State extends State<SolarTermPageV2> {
                         Text('距下一个节气还有 ${_term['days_remaining']} 天', style: TextStyle(fontSize: 13, color: AppColors.primary(context), fontWeight: FontWeight.w500)),
                       ],
                     ]),
+                  ),
+                ),
+
+                // 节气封面插画
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(18),
+                      child: AspectRatio(
+                        aspectRatio: 4 / 3,
+                        child: Image.asset(
+                          solarCoverAsset(_term['name']?.toString()),
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
 
