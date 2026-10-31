@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
 
+import '../../widgets/chat_sources.dart';
+
 String parseGuestToken(dynamic body) {
   final token = body is Map ? body['access_token'] : null;
   if (token is! String || token.trim().isEmpty) {
@@ -12,7 +14,8 @@ class ChatReply {
   final String text;
   final List<String> sources;
   final String? usageReminder;
-  ChatReply(this.text, this.sources, {this.usageReminder});
+  final List<ChatSource> sourceDetails;
+  ChatReply(this.text, this.sources, {this.usageReminder, this.sourceDetails = const []});
 }
 
 Future<ChatReply> sendChat(Dio client, String token, String text) async {
@@ -44,6 +47,7 @@ Future<ChatReply> sendChat(Dio client, String token, String text) async {
     content,
     sources == null ? [] : List<String>.from(sources),
     usageReminder: reminder,
+    sourceDetails: ChatSource.parseAll(body['source_details']),
   );
 }
 
