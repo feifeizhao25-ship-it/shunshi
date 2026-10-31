@@ -372,7 +372,7 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
 
             const SliverToBoxAdapter(child: SizedBox(height: 28)),
             // ═══════════════ 今天为你准备的 ═══════════════
-            SliverToBoxAdapter(child: PersonalHomeSection(api: PersonalHomeBinding.api(), onOpen: (card) => PersonalHomeBinding.open(context, card))),
+            SliverToBoxAdapter(child: PersonalHomeSection(api: PersonalHomeBinding.api(), strings: PersonalHomeBinding.strings, onOpen: (card) => PersonalHomeBinding.open(context, card))),
             const SliverToBoxAdapter(child: SizedBox(height: 20)),
 
             // ═══════════════ Hero 经络意境区 ═══════════════

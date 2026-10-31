@@ -3,10 +3,14 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../data/network/api_client.dart';
 import '../../../widgets/personal_home_section.dart';
+import '../../../widgets/personal_home_strings_zh.dart';
 
 /// Connects the personalised-home block to this app's authenticated API client.
 class PersonalHomeBinding {
   const PersonalHomeBinding._();
+
+  /// This edition's text; the shared widget carries no language of its own.
+  static const PersonalHomeStrings strings = kPersonalHomeStringsZh;
 
   static PersonalHomeApi api() => PersonalHomeApi(
         load: () async {

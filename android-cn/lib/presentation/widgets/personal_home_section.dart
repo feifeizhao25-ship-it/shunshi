@@ -2,38 +2,61 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-/// Per-user personalised home block ("今天为你准备的" / "Picked for you today").
+/// Per-user personalised home block.
 ///
 /// One widget for every app of both products. It only draws what the backend sends:
 /// a greeting, a short headline, up to four suggestion cards each with the reason it is shown,
 /// and a one-tap switch to turn personalisation off (and back on). It has its own loading,
 /// error, empty and "off" states so a slow or failing request never breaks the page around it.
 ///
-/// Language is fixed per edition ([_zh]); nothing here is translated at run time.
-const bool _zh = true;
+/// Language is fixed per edition (the [PersonalHomeStrings] the page passes in); nothing here is translated at run time.
+/// Everything the block says, in one language. One instance per edition: `personal_home_strings_zh.dart`
+/// (domestic apps only) or `personal_home_strings_en.dart` (international apps only). This file holds no
+/// user-visible text of its own, so neither edition ships the other one's language.
+class PersonalHomeStrings {
+  const PersonalHomeStrings({
+    required this.heading,
+    required this.why,
+    required this.turnOff,
+    required this.turnOn,
+    required this.offTitle,
+    required this.offBody,
+    required this.confirmTitle,
+    required this.confirmBody,
+    required this.cancel,
+    required this.confirm,
+    required this.errorTitle,
+    required this.errorBody,
+    required this.retry,
+    required this.emptyTitle,
+    required this.emptyBody,
+    required this.saveFailed,
+    required this.loading,
+    required this.letterSpacing,
+    required this.minutes,
+    required this.days,
+  });
 
-class _S {
-  const _S._();
-  static const heading = _zh ? '今天为你准备的' : 'Picked for you today';
-  static const why = _zh ? '为什么看到这个' : 'Why you see this';
-  static const turnOff = _zh ? '关闭个性化' : 'Turn off personalisation';
-  static const turnOn = _zh ? '重新打开' : 'Turn on';
-  static const offTitle = _zh ? '个性化已关闭' : 'Personalisation is off';
-  static const offBody = _zh ? '现在显示的是通用内容，你的记录没有被删除。' : 'You are seeing general content. Your records are not deleted.';
-  static const confirmTitle = _zh ? '关闭个性化推荐？' : 'Turn off personalised suggestions?';
-  static const confirmBody = _zh
-      ? '关闭后首页只显示通用内容，之前的记录不会被删除，随时可以重新打开。'
-      : 'The home page will show general content only. Nothing is deleted and you can turn it back on any time.';
-  static const cancel = _zh ? '取消' : 'Cancel';
-  static const confirm = _zh ? '关闭' : 'Turn off';
-  static const errorTitle = _zh ? '暂时没能加载' : 'Could not load right now';
-  static const errorBody = _zh ? '请检查网络后再试一次。' : 'Check your connection and try again.';
-  static const retry = _zh ? '重试' : 'Try again';
-  static const emptyTitle = _zh ? '今天暂时没有新的建议' : 'No new suggestions for today';
-  static const emptyBody = _zh ? '晚点再来看看。' : 'Check back a little later.';
-  static const saveFailed = _zh ? '没能保存设置，请稍后再试' : 'Could not save your setting. Please try again.';
-  static String minutes(int n) => _zh ? '$n 分钟' : '$n min';
-  static String days(int n) => _zh ? '已连续 $n 天打开' : '$n days in a row';
+  final String heading;
+  final String why;
+  final String turnOff;
+  final String turnOn;
+  final String offTitle;
+  final String offBody;
+  final String confirmTitle;
+  final String confirmBody;
+  final String cancel;
+  final String confirm;
+  final String errorTitle;
+  final String errorBody;
+  final String retry;
+  final String emptyTitle;
+  final String emptyBody;
+  final String saveFailed;
+  final String loading;
+  final double letterSpacing;
+  final String Function(int n) minutes;
+  final String Function(int n) days;
 }
 
 /// What the screen needs from the network; the page supplies the real calls, tests supply fakes.
@@ -71,9 +94,9 @@ class PersonalHomeData {
 
   static String _s(dynamic v) => v is String ? v : '';
 
-  /// Accepts both backends: 顺时 ({greeting, hero, suggestions, streak:{text}, personalization})
-  /// and 新能源 ({data:{hero:{greeting,headline,subtext}, cards, streak:int, note, personalized}}).
-  factory PersonalHomeData.fromJson(Map<String, dynamic> raw) {
+  /// Accepts both backends: the Shunshi / SEASONS one ({greeting, hero, suggestions, streak:{text}, personalization})
+  /// and the Energy Intelligence one ({data:{hero:{greeting,headline,subtext}, cards, streak:int, note, personalized}}).
+  factory PersonalHomeData.fromJson(Map<String, dynamic> raw, PersonalHomeStrings strings) {
     final root = raw['data'] is Map ? Map<String, dynamic>.from(raw['data'] as Map) : raw;
     final hero = root['hero'] is Map ? Map<String, dynamic>.from(root['hero'] as Map) : const <String, dynamic>{};
     final pers = root['personalization'] is Map ? Map<String, dynamic>.from(root['personalization'] as Map) : const <String, dynamic>{};
@@ -103,9 +126,9 @@ class PersonalHomeData {
     if (st is Map) {
       final days = st['days'] is num ? (st['days'] as num).toInt() : 0;
       streakText = _s(st['text']);
-      if (st['kind'] == 'streak' && days >= 2 && streakText.isEmpty) streakText = _S.days(days);
+      if (st['kind'] == 'streak' && days >= 2 && streakText.isEmpty) streakText = strings.days(days);
     } else if (st is num && st >= 2) {
-      streakText = _S.days(st.toInt());
+      streakText = strings.days(st.toInt());
     }
     final energyHeadline = _s(hero['headline']);
     return PersonalHomeData(
@@ -122,14 +145,17 @@ class PersonalHomeData {
 enum _Phase { loading, ready, empty, off, error }
 
 class PersonalHomeSection extends StatefulWidget {
-  const PersonalHomeSection({super.key, required this.api, this.onOpen, this.margin = const EdgeInsets.symmetric(horizontal: 20, vertical: 8)});
+  const PersonalHomeSection({super.key, required this.api, required this.strings, this.onOpen, this.margin = const EdgeInsets.symmetric(horizontal: 20, vertical: 8)});
 
   final PersonalHomeApi api;
+
+  /// The edition's text (personal_home_strings_zh.dart or personal_home_strings_en.dart).
+  final PersonalHomeStrings strings;
 
   /// Outer spacing; pages that already pad their content pass [EdgeInsets.zero].
   final EdgeInsets margin;
 
-  /// Called with a card's in-app link (新能源 only) when the card is tapped.
+  /// Called with a card's in-app link (Energy Intelligence only) when the card is tapped.
   final void Function(PersonalHomeCard card)? onOpen;
 
   @override
@@ -137,6 +163,7 @@ class PersonalHomeSection extends StatefulWidget {
 }
 
 class _PersonalHomeSectionState extends State<PersonalHomeSection> {
+  PersonalHomeStrings get _t => widget.strings;
   _Phase _phase = _Phase.loading;
   PersonalHomeData? _data;
   bool _saving = false;
@@ -150,7 +177,7 @@ class _PersonalHomeSectionState extends State<PersonalHomeSection> {
   Future<void> _load() async {
     if (mounted) setState(() => _phase = _Phase.loading);
     try {
-      final data = PersonalHomeData.fromJson(await widget.api.load());
+      final data = PersonalHomeData.fromJson(await widget.api.load(), widget.strings);
       if (!mounted) return;
       setState(() {
         _data = data;
@@ -172,7 +199,7 @@ class _PersonalHomeSectionState extends State<PersonalHomeSection> {
     } catch (_) {
       if (!mounted) return;
       setState(() => _saving = false);
-      ScaffoldMessenger.maybeOf(context)?.showSnackBar(const SnackBar(content: Text(_S.saveFailed)));
+      ScaffoldMessenger.maybeOf(context)?.showSnackBar(SnackBar(content: Text(_t.saveFailed)));
     }
   }
 
@@ -180,11 +207,11 @@ class _PersonalHomeSectionState extends State<PersonalHomeSection> {
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text(_S.confirmTitle),
-        content: const Text(_S.confirmBody),
+        title: Text(_t.confirmTitle),
+        content: Text(_t.confirmBody),
         actions: [
-          TextButton(key: const Key('personal-home-cancel'), onPressed: () => Navigator.of(ctx).pop(false), child: const Text(_S.cancel)),
-          FilledButton(key: const Key('personal-home-confirm'), onPressed: () => Navigator.of(ctx).pop(true), child: const Text(_S.confirm)),
+          TextButton(key: const Key('personal-home-cancel'), onPressed: () => Navigator.of(ctx).pop(false), child: Text(_t.cancel)),
+          FilledButton(key: const Key('personal-home-confirm'), onPressed: () => Navigator.of(ctx).pop(true), child: Text(_t.confirm)),
         ],
       ),
     );
@@ -217,25 +244,25 @@ class _PersonalHomeSectionState extends State<PersonalHomeSection> {
   Widget _body(BuildContext context) {
     switch (_phase) {
       case _Phase.loading:
-        return const _Skeleton();
+        return _Skeleton(label: _t.loading);
       case _Phase.error:
         return _Message(
           key: const Key('personal-home-error'),
           icon: Icons.cloud_off_rounded,
-          title: _S.errorTitle,
-          body: _S.errorBody,
-          action: TextButton(key: const Key('personal-home-retry'), onPressed: _load, child: const Text(_S.retry)),
+          title: _t.errorTitle,
+          body: _t.errorBody,
+          action: TextButton(key: const Key('personal-home-retry'), onPressed: _load, child: Text(_t.retry)),
         );
       case _Phase.off:
         return _Message(
           key: const Key('personal-home-off'),
           icon: Icons.tune_rounded,
-          title: _S.offTitle,
-          body: _S.offBody,
-          action: FilledButton.tonal(key: const Key('personal-home-turn-on'), onPressed: _saving ? null : () => _toggle(true), child: const Text(_S.turnOn)),
+          title: _t.offTitle,
+          body: _t.offBody,
+          action: FilledButton.tonal(key: const Key('personal-home-turn-on'), onPressed: _saving ? null : () => _toggle(true), child: Text(_t.turnOn)),
         );
       case _Phase.empty:
-        return _Message(key: const Key('personal-home-empty'), icon: Icons.spa_outlined, title: _S.emptyTitle, body: _S.emptyBody, action: _offButton());
+        return _Message(key: const Key('personal-home-empty'), icon: Icons.spa_outlined, title: _t.emptyTitle, body: _t.emptyBody, action: _offButton());
       case _Phase.ready:
         return _content(context, _data!);
     }
@@ -245,7 +272,7 @@ class _PersonalHomeSectionState extends State<PersonalHomeSection> {
         key: const Key('personal-home-turn-off'),
         onPressed: _saving ? null : _askTurnOff,
         icon: const Icon(Icons.tune_rounded, size: 16),
-        label: const Text(_S.turnOff),
+        label: Text(_t.turnOff),
         style: TextButton.styleFrom(visualDensity: VisualDensity.compact),
       );
 
@@ -256,7 +283,7 @@ class _PersonalHomeSectionState extends State<PersonalHomeSection> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(_S.heading, style: text.labelMedium?.copyWith(color: scheme.primary, letterSpacing: _zh ? 1 : 0.4, fontWeight: FontWeight.w600)),
+        Text(_t.heading, style: text.labelMedium?.copyWith(color: scheme.primary, letterSpacing: _t.letterSpacing, fontWeight: FontWeight.w600)),
         const SizedBox(height: 6),
         if (d.greeting.isNotEmpty) Text(d.greeting, key: const Key('personal-home-greeting'), style: text.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
         if (d.headline.isNotEmpty) ...[
@@ -269,7 +296,7 @@ class _PersonalHomeSectionState extends State<PersonalHomeSection> {
         ],
         const SizedBox(height: 12),
         for (var i = 0; i < d.cards.length; i++) ...[
-          _CardTile(card: d.cards[i], featured: i == 0, onTap: widget.onOpen == null || d.cards[i].href == null ? null : () => widget.onOpen!(d.cards[i])),
+          _CardTile(card: d.cards[i], strings: _t, featured: i == 0, onTap: widget.onOpen == null || d.cards[i].href == null ? null : () => widget.onOpen!(d.cards[i])),
           const SizedBox(height: 8),
         ],
         const Divider(height: 16),
@@ -337,8 +364,9 @@ IconData _iconFor(String kind) {
 }
 
 class _CardTile extends StatelessWidget {
-  const _CardTile({required this.card, required this.featured, this.onTap});
+  const _CardTile({required this.card, required this.strings, required this.featured, this.onTap});
   final PersonalHomeCard card;
+  final PersonalHomeStrings strings;
   final bool featured;
   final VoidCallback? onTap;
 
@@ -371,7 +399,7 @@ class _CardTile extends StatelessWidget {
             ],
             if (card.minutes != null) ...[
               const SizedBox(height: 6),
-              Text(_S.minutes(card.minutes!), style: text.labelSmall?.copyWith(color: scheme.primary, fontWeight: FontWeight.w600)),
+              Text(strings.minutes(card.minutes!), style: text.labelSmall?.copyWith(color: scheme.primary, fontWeight: FontWeight.w600)),
             ],
             if (card.reason.isNotEmpty) ...[
               const SizedBox(height: 8),
@@ -381,7 +409,7 @@ class _CardTile extends StatelessWidget {
                 Expanded(
                   child: Text.rich(
                     TextSpan(children: [
-                      TextSpan(text: '${_S.why}  ', style: const TextStyle(fontWeight: FontWeight.w600)),
+                      TextSpan(text: '${strings.why}  ', style: const TextStyle(fontWeight: FontWeight.w600)),
                       TextSpan(text: card.reason),
                     ]),
                     key: Key('personal-home-why-${card.id}'),
@@ -432,14 +460,15 @@ class _Message extends StatelessWidget {
 }
 
 class _Skeleton extends StatelessWidget {
-  const _Skeleton();
+  const _Skeleton({required this.label});
+  final String label;
 
   @override
   Widget build(BuildContext context) {
     final c = Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.7);
     Widget bar(double w, double h) => Container(width: w, height: h, decoration: BoxDecoration(color: c, borderRadius: BorderRadius.circular(8)));
     return Semantics(
-      label: _zh ? '加载中' : 'Loading',
+      label: label,
       child: Column(key: const Key('personal-home-loading'), crossAxisAlignment: CrossAxisAlignment.start, children: [
         bar(96, 12),
         const SizedBox(height: 10),
