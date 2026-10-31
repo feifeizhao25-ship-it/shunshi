@@ -20,6 +20,10 @@ import '../../presentation/pages/profile/profile_setup_page.dart';
 import '../../presentation/pages/profile/privacy_page.dart';
 import '../../presentation/pages/profile/family_invite_page.dart';
 import '../../presentation/pages/settings/settings_page_v2.dart';
+import '../../presentation/pages/settings/plan_usage_page.dart';
+import '../../presentation/pages/settings/plan_usage_binding.dart';
+import '../../presentation/pages/settings/culture_settings_page.dart';
+import '../../presentation/pages/settings/culture_binding.dart';
 import '../../presentation/pages/settings/notification_settings_page.dart';
 import '../../presentation/pages/constitution/constitution_test_v2.dart';
 import '../../presentation/pages/constitution_report/constitution_report_page_v3.dart';
@@ -153,6 +157,8 @@ class AppRouter {
         return ContentDetailPage(contentId: extra?['contentId'] as String? ?? '');
       }),
       GoRoute(path: '/favorites', builder: (context, state) => const FavoritesPage()),
+      GoRoute(path: '/plan-usage', builder: (context, state) => PlanUsagePage(load: PlanUsageBinding.load, onUpgrade: () => context.push('/subscription'))),
+      GoRoute(path: '/culture-settings', builder: (context, state) => const CultureSettingsPage(load: CultureBinding.load, save: CultureBinding.save)),
       GoRoute(path: '/about', builder: (context, state) => const AboutPage()),
       GoRoute(path: '/search', builder: (context, state) => const GlobalSearchPage()),
       GoRoute(path: '/feedback', builder: (context, state) => const fb.FeedbackPage()),

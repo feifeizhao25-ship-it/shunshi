@@ -19,6 +19,8 @@ import '../../presentation/pages/profile/profile_setup_page.dart';
 import '../../presentation/pages/profile/privacy_page.dart';
 import '../../presentation/pages/profile/family_invite_page.dart';
 import '../../presentation/pages/settings/settings_page_v2.dart';
+import '../../presentation/pages/settings/plan_usage_page.dart';
+import '../../presentation/pages/settings/plan_usage_binding.dart';
 import '../../presentation/pages/settings/notification_settings_page.dart';
 import '../../presentation/pages/constitution/constitution_test_v2.dart';
 import '../../presentation/pages/constitution_report/constitution_report_page_v3.dart';
@@ -138,6 +140,7 @@ class AppRouter {
         return ContentDetailPage(contentId: extra?['contentId'] as String? ?? '');
       }),
       GoRoute(path: '/favorites', builder: (context, state) => const FavoritesPage()),
+      GoRoute(path: '/plan-usage', builder: (context, state) => PlanUsagePage(load: PlanUsageBinding.load, onUpgrade: () => context.push('/subscription'))),
       GoRoute(path: '/about', builder: (context, state) => const AboutPage()),
       GoRoute(path: '/library', builder: (context, state) => const WellnessLibraryPage()),
       GoRoute(path: '/growth', builder: (context, state) => const GrowthMilestonesPage()),

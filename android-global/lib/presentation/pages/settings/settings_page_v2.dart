@@ -125,6 +125,24 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
           ),
           const SizedBox(height: 16),
 
+          _buildSectionCard([
+            ListTile(
+              key: const Key('settings-plan-usage'),
+              leading: Icon(Icons.data_usage_rounded, color: Theme.of(context).colorScheme.primary, size: 20),
+              title: Text('Plan & usage', style: const TextStyle(fontSize: 15)),
+              trailing: const Icon(Icons.chevron_right, size: 18),
+              onTap: () => context.push('/plan-usage'),
+            ),
+            ListTile(
+              key: const Key('settings-culture'),
+              leading: Icon(Icons.public_rounded, color: Theme.of(context).colorScheme.primary, size: 20),
+              title: const Text('Culture & units', style: TextStyle(fontSize: 15)),
+              trailing: const Icon(Icons.chevron_right, size: 18),
+              onTap: () => context.push('/culture-settings'),
+            ),
+          ]),
+          const SizedBox(height: 16),
+
           // Clear Cache + About
           _buildSectionCard([
             ListTile(
