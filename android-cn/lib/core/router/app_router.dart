@@ -6,6 +6,7 @@ import '../../presentation/pages/splash/splash_page.dart';
 import '../../presentation/pages/onboarding/onboarding_page.dart';
 import '../../presentation/pages/onboarding/wellness_onboarding_page.dart';
 import '../../presentation/pages/login/login_page.dart';
+import '../../presentation/pages/library/shunshi_reference_library.dart';
 import '../../presentation/pages/home/ultimate_home_page.dart';
 import '../../presentation/pages/home/daily_checkin_page.dart';
 import '../../presentation/pages/home/wellness_dashboard_page.dart';
@@ -161,6 +162,7 @@ class AppRouter {
       // Newly registered pages
       GoRoute(path: '/achievements', builder: (context, state) => const AchievementsPage()),
       GoRoute(path: '/wellness-report', builder: (context, state) => const WellnessReportPage()),
+      GoRoute(path: '/reference-library', builder: (context, state) => const ShunshiReferenceLibraryPage()),
       GoRoute(path: '/tea', builder: (context, state) => const TeaPage()),
       GoRoute(path: '/meditation', builder: (context, state) => const MeditationFocusPage()),
       GoRoute(path: '/growth', builder: (context, state) => const GrowthMilestonesPage()),

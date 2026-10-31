@@ -59,6 +59,7 @@ import '../../presentation/pages/legal/terms_page.dart';
 import '../../presentation/pages/legal/privacy_policy_page.dart';
 import '../../presentation/widgets/shell/main_shell.dart';
 import '../../presentation/pages/error/error_page.dart';
+import '../../presentation/pages/library/shunshi_reference_library.dart';
 
 class AppRouter {
   AppRouter._();
@@ -142,6 +143,7 @@ class AppRouter {
       GoRoute(path: '/library', builder: (context, state) => const WellnessLibraryPage()),
       GoRoute(path: '/growth', builder: (context, state) => const GrowthMilestonesPage()),
       GoRoute(path: '/wellness-report', builder: (context, state) => const WellnessReportPage()),
+      GoRoute(path: '/reference-library', builder: (context, state) => const ShunshiReferenceLibraryPage()),
       GoRoute(path: '/seasons', builder: (context, state) => const SeasonsPage()),
       GoRoute(path: '/meditation', builder: (context, state) => const MeditationFocusPage()),
       GoRoute(path: '/body-type-essence', builder: (context, state) => const BodyTypeEssencePage()),
