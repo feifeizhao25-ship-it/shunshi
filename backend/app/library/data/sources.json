@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "note": "资料库自动核对用的来源登记。只登记官方/权威来源；抓取只用于发现「有变化」，不改条目、不上线。",
-  "extra_allowed_domains": ["zgggws.com", "unesco.org", "nbphsp.org.cn"],
+  "extra_allowed_domains": ["zgggws.com", "unesco.org", "nbphsp.org.cn", "pmo.cas.cn", "weather.gov.hk"],
   "http_upgrade_hosts": ["www.npc.gov.cn"],
   "manual_hosts": {
     "www.nhc.gov.cn": "该站点拒绝程序访问（HTTP 412），需人工用浏览器核对",

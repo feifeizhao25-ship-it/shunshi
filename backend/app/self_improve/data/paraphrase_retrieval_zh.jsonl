@@ -1,0 +1,49 @@
+# 口语化检索评测（国内版）：问法不含标题原词；expected = 任一命中即算对（source_file:chunk_id）。作者：自动化（2026-11-01），审核状态：待审核。
+{"id": "ss-par-zh-001", "query": "晚上翻来覆去睡不着怎么办", "expected": ["顺时知识库_中文版.md:cn_0038", "顺时知识库_中文版.md:cn_0077", "顺时知识库_中文版.md:cn_0079", "顺时知识库_中文版.md:cn_0076"], "review_status": "待审核"}
+{"id": "ss-par-zh-002", "query": "办公室坐久了脖子好僵", "expected": ["顺时知识库_中文版.md:cn_0092", "顺时知识库_补充篇_中文版.md:cn_0032"], "review_status": "待审核"}
+{"id": "ss-par-zh-003", "query": "爸妈上了年纪吃饭要注意啥", "expected": ["顺时知识库_中文版.md:cn_0100", "顺时知识库_补充篇_中文版.md:cn_0066"], "review_status": "待审核"}
+{"id": "ss-par-zh-004", "query": "怀孕前三个月要注意什么", "expected": ["顺时知识库_补充篇_中文版.md:cn_0041"], "review_status": "待审核"}
+{"id": "ss-par-zh-005", "query": "一天到底该喝多少水", "expected": ["verified_cn.md:cn_0004", "顺时知识库_中文版.md:cn_0108"], "review_status": "待审核"}
+{"id": "ss-par-zh-006", "query": "一个星期要运动多久才够", "expected": ["verified_cn.md:cn_0005", "顺时知识库_中文版.md:cn_0089"], "review_status": "待审核"}
+{"id": "ss-par-zh-007", "query": "成年人每天睡几个小时才算够", "expected": ["verified_cn.md:cn_0006"], "review_status": "待审核"}
+{"id": "ss-par-zh-008", "query": "快到立冬了有什么讲究", "expected": ["顺时知识库_中文版.md:cn_0019"], "review_status": "待审核"}
+{"id": "ss-par-zh-009", "query": "想学八段锦第一个动作怎么做", "expected": ["顺时知识库_中文版.md:cn_0064"], "review_status": "待审核"}
+{"id": "ss-par-zh-010", "query": "天天加班身体吃不消怎么安排一天", "expected": ["顺时知识库_补充篇_中文版.md:cn_0030", "顺时知识库_补充篇_中文版.md:cn_0031"], "review_status": "待审核"}
+{"id": "ss-par-zh-011", "query": "孩子总盯着屏幕眼睛不好怎么保护", "expected": ["顺时知识库_补充篇_中文版.md:cn_0011", "顺时知识库_补充篇_中文版.md:cn_0072"], "review_status": "待审核"}
+{"id": "ss-par-zh-012", "query": "上夜班的人怎么调整作息", "expected": ["顺时知识库_补充篇_中文版.md:cn_0070"], "review_status": "待审核"}
+{"id": "ss-par-zh-013", "query": "我想试试正念冥想", "expected": ["顺时知识库_中文版.md:cn_0084"], "review_status": "待审核"}
+{"id": "ss-par-zh-014", "query": "南半球现在是什么季节", "expected": ["顺时知识库_中文版.md:cn_0125", "顺时知识库_中文版.md:cn_0124"], "review_status": "待审核"}
+{"id": "ss-par-zh-015", "query": "睡觉前做点什么能放松下来", "expected": ["顺时知识库_中文版.md:cn_0077", "顺时知识库_中文版.md:cn_0078"], "review_status": "待审核"}
+{"id": "ss-par-zh-016", "query": "有哪些常见的养生误区", "expected": ["顺时知识库_中文版.md:cn_0116"], "review_status": "待审核"}
+{"id": "ss-par-zh-017", "query": "喝茶有什么需要避开的", "expected": ["顺时知识库_中文版.md:cn_0050"], "review_status": "待审核"}
+{"id": "ss-par-zh-018", "query": "头发掉得厉害怎么办", "expected": ["顺时知识库_中文版.md:cn_0045", "顺时知识库_补充篇_中文版.md:cn_0026"], "review_status": "待审核"}
+{"id": "ss-par-zh-019", "query": "吃饭要均衡有什么基本原则", "expected": ["verified_cn.md:cn_0001", "verified_cn.md:cn_0002"], "review_status": "待审核"}
+{"id": "ss-par-zh-020", "query": "小朋友体重怎么管", "expected": ["verified_cn.md:cn_0003"], "review_status": "待审核"}
+{"id": "ss-par-zh-021", "query": "经期前后吃什么要留意", "expected": ["顺时知识库_中文版.md:cn_0103", "顺时知识库_中文版.md:cn_0042"], "review_status": "待审核"}
+{"id": "ss-par-zh-022", "query": "怎么练太极站桩", "expected": ["顺时知识库_中文版.md:cn_0073"], "review_status": "待审核"}
+{"id": "ss-par-zh-023", "query": "总觉得累没精神", "expected": ["顺时知识库_中文版.md:cn_0039", "顺时知识库_补充篇_中文版.md:cn_0037"], "review_status": "待审核"}
+{"id": "ss-par-zh-024", "query": "考试前紧张焦虑怎么缓解", "expected": ["顺时知识库_补充篇_中文版.md:cn_0019"], "review_status": "待审核"}
+{"id": "ss-par-zh-025", "query": "老人在家要小心什么安全问题", "expected": ["顺时知识库_补充篇_中文版.md:cn_0065"], "review_status": "待审核"}
+{"id": "ss-par-zh-026", "query": "更年期烦躁又睡不好", "expected": ["顺时知识库_中文版.md:cn_0105", "顺时知识库_补充篇_中文版.md:cn_0056", "顺时知识库_补充篇_中文版.md:cn_0057"], "review_status": "待审核"}
+{"id": "ss-par-zh-027", "query": "吃素的人怎么搭配营养", "expected": ["顺时知识库_补充篇_中文版.md:cn_0074"], "review_status": "待审核"}
+{"id": "ss-par-zh-028", "query": "长时间看手机电脑眼睛干涩", "expected": ["顺时知识库_补充篇_中文版.md:cn_0034", "顺时知识库_中文版.md:cn_0095", "顺时知识库_补充篇_中文版.md:cn_0072"], "review_status": "待审核"}
+{"id": "ss-par-zh-029", "query": "产后第一周怎么恢复", "expected": ["顺时知识库_补充篇_中文版.md:cn_0044"], "review_status": "待审核"}
+{"id": "ss-par-zh-030", "query": "每天写日记应该记录哪些内容", "expected": ["顺时知识库_中文版.md:cn_0110", "顺时知识库_中文版.md:cn_0111", "顺时知识库_中文版.md:cn_0112", "顺时知识库_中文版.md:cn_0113", "顺时知识库_中文版.md:cn_0114"], "review_status": "待审核"}
+{"id": "ss-par-zh-031", "query": "夏至那天怎么过", "expected": ["顺时知识库_中文版.md:cn_0010"], "review_status": "待审核"}
+{"id": "ss-par-zh-032", "query": "喜欢健身的人怎么恢复", "expected": ["顺时知识库_补充篇_中文版.md:cn_0071"], "review_status": "待审核"}
+{"id": "ss-par-zh-033", "query": "经常出差怎么保持规律", "expected": ["顺时知识库_补充篇_中文版.md:cn_0069"], "review_status": "待审核"}
+{"id": "ss-par-zh-034", "query": "腰酸背痛随手能做什么放松", "expected": ["顺时知识库_中文版.md:cn_0094", "顺时知识库_中文版.md:cn_0093"], "review_status": "待审核"}
+{"id": "ss-par-zh-035", "query": "秋天空气干燥吃点什么", "expected": ["顺时知识库_中文版.md:cn_0036", "顺时知识库_中文版.md:cn_0048"], "review_status": "待审核"}
+{"id": "ss-par-zh-036", "query": "胃不舒服饮食上怎么办", "expected": ["顺时知识库_中文版.md:cn_0041", "顺时知识库_补充篇_中文版.md:cn_0035"], "review_status": "待审核"}
+{"id": "ss-par-zh-037", "query": "突然情绪崩溃了怎么应对", "expected": ["顺时知识库_中文版.md:cn_0140", "顺时知识库_中文版.md:cn_0087"], "review_status": "待审核"}
+{"id": "ss-par-zh-038", "query": "听声音音乐怎么帮助放松", "expected": ["顺时知识库_中文版.md:cn_0121", "顺时知识库_中文版.md:cn_0122"], "review_status": "待审核"}
+{"id": "ss-par-zh-039", "query": "老人记忆力下降怎么维护", "expected": ["顺时知识库_补充篇_中文版.md:cn_0061"], "review_status": "待审核"}
+{"id": "ss-par-zh-040", "query": "孩子青春期长个子营养怎么跟上", "expected": ["顺时知识库_补充篇_中文版.md:cn_0015"], "review_status": "待审核"}
+{"id": "ss-par-zh-041", "query": "高血压血糖想提前预防", "expected": ["顺时知识库_补充篇_中文版.md:cn_0049", "顺时知识库_补充篇_中文版.md:cn_0050", "顺时知识库_补充篇_中文版.md:cn_0051"], "review_status": "待审核"}
+{"id": "ss-par-zh-042", "query": "春分前后要注意什么", "expected": ["顺时知识库_中文版.md:cn_0004"], "review_status": "待审核"}
+{"id": "ss-par-zh-043", "query": "按哪个穴位能帮助睡眠", "expected": ["顺时知识库_中文版.md:cn_0081"], "review_status": "待审核"}
+{"id": "ss-par-zh-044", "query": "怎么做4-7-8呼吸", "expected": ["顺时知识库_中文版.md:cn_0078"], "review_status": "待审核"}
+{"id": "ss-par-zh-045", "query": "身体扫描怎么做", "expected": ["顺时知识库_中文版.md:cn_0085"], "review_status": "待审核"}
+{"id": "ss-par-zh-046", "query": "AI助手回答应该保持什么样的语气", "expected": ["顺时知识库_中文版.md:cn_0118", "顺时知识库_补充篇_中文版.md:cn_0083"], "review_status": "待审核"}
+{"id": "ss-par-zh-047", "query": "霜降到了天气转凉有什么要留意", "expected": ["顺时知识库_中文版.md:cn_0018"], "review_status": "待审核"}
+{"id": "ss-par-zh-048", "query": "工作倦怠了怎么办", "expected": ["顺时知识库_补充篇_中文版.md:cn_0038", "顺时知识库_补充篇_中文版.md:cn_0039"], "review_status": "待审核"}

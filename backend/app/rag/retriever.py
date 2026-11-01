@@ -11,6 +11,7 @@ from app.safety.efficacy import redact_efficacy_claims
 
 from .knowledge_base import cn_kb, gl_kb, KnowledgeChunk
 from .embedder import get_embedder
+from . import hybrid
 
 logger = logging.getLogger(__name__)
 
@@ -74,7 +75,10 @@ def retrieve(
 
     # TF-IDF 检索
     embedder = get_embedder(lang)
-    raw_results = embedder.query(query, top_k=top_k * 3)  # 多取一些，过滤后再截取
+    raw_results = embedder.query(query, top_k=max(top_k * 3, hybrid.POOL))  # 多取一些，过滤后再截取
+    if hybrid.enabled():
+        # BM25（含标题）+ TF-IDF，RRF 融合；RAG_HYBRID=0 退回纯 TF-IDF。融合后分数已归一化到 0–1。
+        raw_results = hybrid.fuse(kb, lang, query, raw_results)
 
     # 应用过滤
     filtered = []

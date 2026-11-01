@@ -42,10 +42,10 @@ def main(argv=None) -> int:
 
         print(json.dumps((library_job.run_check if cmd == "library-check" else library_job.run_discover)(), ensure_ascii=False))
         return 0
-    if cmd in ("golden", "stale", "radar", "radar-stage", "monthly-report"):
+    if cmd in ("golden", "stale", "radar", "radar-stage", "promote-gate", "monthly-report"):
         from . import continuous
 
-        fn = {"golden": continuous.run_golden, "stale": continuous.run_stale, "radar": continuous.run_radar, "radar-stage": continuous.run_radar_stage,
+        fn = {"golden": continuous.run_golden, "stale": continuous.run_stale, "radar": continuous.run_radar, "radar-stage": continuous.run_radar_stage, "promote-gate": continuous.run_promote_gate,
               "monthly-report": continuous.run_monthly_report}[cmd]
         kw = {"force": "--force" in argv}  # --force：人工手动跑一次，不改任何开关
         if cmd == "monthly-report" and "--month" in argv:

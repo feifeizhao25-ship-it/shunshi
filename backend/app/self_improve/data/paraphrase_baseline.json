@@ -1,0 +1,69 @@
+{
+ "note": "棘轮基线：口语化检索指标不得低于 after（tests/test_research_c_20261101.py）。2026-11-01 实测。before = 纯 TF-IDF（RAG_HYBRID=0）；after = BM25(含标题)+TF-IDF 的 RRF 融合 + 口语别名。dev 为调参用，heldout 为调参时没看过的留出集，只跑最终结果。",
+ "cn": {
+  "dev": {
+   "n": 48,
+   "recall_at_1": 0.5417,
+   "recall_at_3": 0.7917,
+   "recall_at_5": 0.8542,
+   "mrr": 0.6708
+  },
+  "heldout": {
+   "n": 24,
+   "recall_at_1": 0.5417,
+   "recall_at_3": 0.6667,
+   "recall_at_5": 0.7083,
+   "mrr": 0.6146
+  }
+ },
+ "gl": {
+  "dev": {
+   "n": 26,
+   "recall_at_1": 0.4231,
+   "recall_at_3": 0.7692,
+   "recall_at_5": 0.8462,
+   "mrr": 0.6026
+  },
+  "heldout": {
+   "n": 12,
+   "recall_at_1": 0.4167,
+   "recall_at_3": 0.6667,
+   "recall_at_5": 0.75,
+   "mrr": 0.5444
+  }
+ },
+ "before": {
+  "cn": {
+   "dev": {
+    "n": 48,
+    "recall_at_1": 0.5,
+    "recall_at_3": 0.6458,
+    "recall_at_5": 0.6875,
+    "mrr": 0.5684
+   },
+   "heldout": {
+    "n": 24,
+    "recall_at_1": 0.4167,
+    "recall_at_3": 0.5833,
+    "recall_at_5": 0.5833,
+    "mrr": 0.5
+   }
+  },
+  "gl": {
+   "dev": {
+    "n": 26,
+    "recall_at_1": 0.3077,
+    "recall_at_3": 0.6154,
+    "recall_at_5": 0.6923,
+    "mrr": 0.4744
+   },
+   "heldout": {
+    "n": 12,
+    "recall_at_1": 0.3333,
+    "recall_at_3": 0.5833,
+    "recall_at_5": 0.8333,
+    "mrr": 0.5167
+   }
+  }
+ }
+}
