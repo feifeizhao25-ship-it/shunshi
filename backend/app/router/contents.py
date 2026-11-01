@@ -188,7 +188,7 @@ async def search(
 
 @router.get("/recommend", response_model=dict)
 async def get_recommend(
-    user_id: str = Query("user-001"),
+    user_id: str = Query(..., description="用户ID；不传由服务端按令牌补上本人"),
     type: Optional[str] = Query(None, description="内容类型过滤"),
     season: Optional[str] = Query(None, description="季节过滤: spring/summer/autumn/winter"),
     locale: str = Query("zh-CN", description="语言: zh-CN/en-US"),

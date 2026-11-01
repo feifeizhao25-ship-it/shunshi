@@ -1,4 +1,5 @@
 import '../../../core/router/safe_pop.dart';
+import '../../../design_system/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import 'package:go_router/go_router.dart';
@@ -78,7 +79,7 @@ class _FamilyHomePageState extends State<FamilyHomePage> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : ShunShiColors.background,
+    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : AppColors.background(context),
       appBar: AppBar(
         elevation: 0,
         leading: IconButton(
@@ -95,9 +96,9 @@ class _FamilyHomePageState extends State<FamilyHomePage> {
         ],
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator(color: ShunShiColors.primary))
+          ? Center(child: CircularProgressIndicator(color: AppColors.primary(context)))
           : RefreshIndicator(
-              color: ShunShiColors.primary,
+              color: AppColors.primary(context),
               onRefresh: _loadMembers,
               child: ListView(
                 padding: const EdgeInsets.all(20),
@@ -110,15 +111,15 @@ class _FamilyHomePageState extends State<FamilyHomePage> {
                       padding: const EdgeInsets.all(16),
                       margin: const EdgeInsets.only(bottom: 20),
                       decoration: BoxDecoration(
-                        color: ShunShiColors.primary.withValues(alpha: 0.06),
+                        color: AppColors.primary(context).withValues(alpha: 0.06),
                         borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: ShunShiColors.primary.withValues(alpha: 0.15)),
+                        border: Border.all(color: AppColors.primary(context).withValues(alpha: 0.15)),
                       ),
                       child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                        Icon(Icons.person_add_rounded, size: 20, color: ShunShiColors.primary),
+                        Icon(Icons.person_add_rounded, size: 20, color: AppColors.primary(context)),
                         SizedBox(width: 8),
                         Text(AppLocalizations.of(context).t('family_invite_family'), style: TextStyle(fontSize: 15,
-                            color: ShunShiColors.primary, fontWeight: FontWeight.w500)),
+                            color: AppColors.primary(context), fontWeight: FontWeight.w500)),
                       ]),
                     ),
                   ),
@@ -128,14 +129,14 @@ class _FamilyHomePageState extends State<FamilyHomePage> {
                     padding: const EdgeInsets.all(12),
                     margin: const EdgeInsets.only(bottom: 20),
                     decoration: BoxDecoration(
-                      color: ShunShiColors.surfaceContainerLow,
+                      color: AppColors.surfaceContainerLow(context),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Row(children: [
-                      Icon(Icons.shield_outlined, size: 16, color: ShunShiColors.textTertiary),
+                    child: Row(children: [
+                      Icon(Icons.shield_outlined, size: 16, color: AppColors.textTertiary(context)),
                       SizedBox(width: 8),
                       Expanded(child: Text('Privacy: Only status level is shared, no detailed data exposed',
-                          style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary, height: 1.4))),
+                          style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context), height: 1.4))),
                     ]),
                   ),
 
@@ -143,7 +144,7 @@ class _FamilyHomePageState extends State<FamilyHomePage> {
                   if (_members.isEmpty)
                     Center(child: Padding(
                       padding: EdgeInsets.symmetric(vertical: 48),
-                      child: Text(AppLocalizations.of(context).t('family_no_members'), style: TextStyle(color: ShunShiColors.textTertiary, fontSize: 15)),
+                      child: Text(AppLocalizations.of(context).t('family_no_members'), style: TextStyle(color: AppColors.textTertiary(context), fontSize: 15)),
                     ))
                   else
                     ..._members.map((m) => _buildMemberCard(m)),
@@ -161,24 +162,24 @@ class _FamilyHomePageState extends State<FamilyHomePage> {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: ShunShiColors.surfaceContainerLowest,
+          color: AppColors.surfaceContainerLowest(context),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: ShunShiColors.textTertiary.withValues(alpha: 0.15)),
+          border: Border.all(color: AppColors.textTertiary(context).withValues(alpha: 0.15)),
         ),
         child: Row(children: [
           // Avatar
           Container(
             width: 44, height: 44,
             decoration: BoxDecoration(
-              color: ShunShiColors.surfaceContainerLow,
+              color: AppColors.surfaceContainerLow(context),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Center(child: Text(m['avatar'] ?? '👤', style: const TextStyle(fontSize: 22))),
           ),
           const SizedBox(width: 14),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(m['name'] ?? '', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600,
-                color: ShunShiColors.textPrimary)),
+            Text(m['name'] ?? '', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600,
+                color: AppColors.textPrimary(context))),
             const SizedBox(height: 2),
             Text('${m['relation'] ?? ''} · ${_statusText(status)}',
                 style: TextStyle(fontSize: 13, color: _statusColor(status))),

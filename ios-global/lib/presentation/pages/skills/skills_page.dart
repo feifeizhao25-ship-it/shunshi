@@ -252,7 +252,7 @@ class _SkillsPageState extends State<SkillsPage> {
             _active = null;
             _resultText = null;
           }),
-          icon: const Icon(Icons.arrow_back, size: 18),
+          icon: Icon(Icons.arrow_back, size: 18),
           label: const Text('All practices'),
           style: OutlinedButton.styleFrom(foregroundColor: const Color(0xFF144227)),
         ),
@@ -270,6 +270,6 @@ class SgBadgeLabel extends StatelessWidget {
   Widget build(BuildContext context) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
         decoration: BoxDecoration(color: const Color(0xFFE4C285).withValues(alpha: 0.35), borderRadius: BorderRadius.circular(10)),
-        child: Text(label, style: const TextStyle(color: Color(0xFF144227), fontSize: 11, fontWeight: FontWeight.w700)),
+        child: Text(label, style: TextStyle(color: Color(0xFF144227), fontSize: 11, fontWeight: FontWeight.w700)),
       );
 }

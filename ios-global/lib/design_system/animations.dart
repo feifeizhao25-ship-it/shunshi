@@ -213,7 +213,7 @@ class FadeIn extends StatefulWidget {
   final Duration delay;
   final Curve curve;
 
-  const FadeIn({
+  FadeIn({
     super.key,
     required this.child,
     this.duration = const Duration(milliseconds: 400),
@@ -274,7 +274,7 @@ class SlideIn extends StatefulWidget {
   final Offset beginOffset;
   final Curve curve;
 
-  const SlideIn({
+  SlideIn({
     super.key,
     required this.child,
     this.duration = const Duration(milliseconds: 400),

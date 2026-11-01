@@ -2,6 +2,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import '../../../core/theme/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -47,9 +48,9 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: isDark ? ShunShiColors.darkBackground : ShunShiColors.background,
+      backgroundColor: isDark ? ShunShiColors.darkBackground : AppColors.background(context),
       appBar: AppBar(
-        backgroundColor: isDark ? ShunShiColors.darkBackground : ShunShiColors.background,
+        backgroundColor: isDark ? ShunShiColors.darkBackground : AppColors.background(context),
         leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
         title: Text(AppLocalizations.of(context).get('settings_title'), style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18, fontWeight: FontWeight.w600)),
       ),
@@ -59,15 +60,15 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
           // 用户信息
           Container(
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(16)),
+            decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(16)),
             child: Row(children: [
               Container(width: 48, height: 48, decoration: BoxDecoration(
                 shape: BoxShape.circle, color: ShunShiColors.primaryContainer,
-              ), child: const Icon(Icons.person, color: ShunShiColors.primary)),
+              ), child: Icon(Icons.person, color: AppColors.primary(context))),
               const SizedBox(width: 12),
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(AppLocalizations.of(context).get('settings_cloud_zen'), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
-                Text('Account: shunshi_2024', style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
+                Text(AppLocalizations.of(context).get('settings_cloud_zen'), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
+                Text('Account: shunshi_2024', style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context))),
               ]),
             ]),
           ),
@@ -83,11 +84,11 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
           // Push Notifications
           Container(
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(16)),
+            decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(16)),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(AppLocalizations.of(context).get('settings_push_notifications'), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+                Text(AppLocalizations.of(context).get('settings_push_notifications'), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
                 const SizedBox(height: 12),
                 _buildSwitchTile('Solar Reminder', 'Follow the 24 Solar Terms for Wellness Tips', Icons.eco, _solarReminder, (v) { setState(() => _solarReminder = v); _savePref('solar_reminder', v); }),
                 _buildSwitchTile('Daily rhythm reminders', 'Gentle reminders through the day', Icons.schedule, _shichenReminder, (v) { setState(() => _shichenReminder = v); _savePref('shichen_reminder', v); }),
@@ -100,25 +101,25 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
           // 老year人模式
           Container(
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(16)),
+            decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(16)),
             child: Column(children: [
               SwitchListTile(
                 value: _elderMode,
                 onChanged: (v) { setState(() => _elderMode = v); _savePref('elder_mode', v); },
                 title: Row(children: [
-                  Icon(Icons.family_restroom, color: ShunShiColors.primary, size: 20),
+                  Icon(Icons.family_restroom, color: AppColors.primary(context), size: 20),
                   const SizedBox(width: 8),
-                  Text(AppLocalizations.of(context).get('settings_senior_mode'), style: TextStyle(fontSize: 15, color: ShunShiColors.textPrimary)),
+                  Text(AppLocalizations.of(context).get('settings_senior_mode'), style: TextStyle(fontSize: 15, color: AppColors.textPrimary(context))),
                 ]),
-                subtitle: Text(AppLocalizations.of(context).get('settings_senior_desc'), style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
-                activeThumbColor: ShunShiColors.primary,
+                subtitle: Text(AppLocalizations.of(context).get('settings_senior_desc'), style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context))),
+                activeThumbColor: AppColors.primary(context),
               ),
               if (_elderMode) Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Container(
                   padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(color: ShunShiColors.primary.withOpacity(0.06), borderRadius: BorderRadius.circular(10)),
-                  child: Text('Preview: Currently Yin (3-5) · Lung Active\nEarly morning breathing training', style: TextStyle(fontSize: 18, color: ShunShiColors.primary, fontWeight: FontWeight.w500)),
+                  decoration: BoxDecoration(color: AppColors.primary(context).withOpacity(0.06), borderRadius: BorderRadius.circular(10)),
+                  child: Text('Preview: Currently Yin (3-5) · Lung Active\nEarly morning breathing training', style: TextStyle(fontSize: 18, color: AppColors.primary(context), fontWeight: FontWeight.w500)),
                 ),
               ),
             ]),
@@ -146,9 +147,9 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
           // Clear Cache + About
           _buildSectionCard([
             ListTile(
-              leading: Icon(Icons.cleaning_services, color: ShunShiColors.primary, size: 20),
-              title: Text(AppLocalizations.of(context).get('settings_clear_cache'), style: TextStyle(fontSize: 15, color: ShunShiColors.textPrimary)),
-              trailing: Text('124.5 MB', style: TextStyle(fontSize: 13, color: ShunShiColors.textTertiary)),
+              leading: Icon(Icons.cleaning_services, color: AppColors.primary(context), size: 20),
+              title: Text(AppLocalizations.of(context).get('settings_clear_cache'), style: TextStyle(fontSize: 15, color: AppColors.textPrimary(context))),
+              trailing: Text('124.5 MB', style: TextStyle(fontSize: 13, color: AppColors.textTertiary(context))),
               onTap: () {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text('Cache cleared')),
@@ -156,10 +157,10 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
               },
             ),
             ListTile(
-              leading: Icon(Icons.info_outline, color: ShunShiColors.primary, size: 20),
-              title: Text('About SEASONS', style: TextStyle(fontSize: 15, color: ShunShiColors.textPrimary)),
+              leading: Icon(Icons.info_outline, color: AppColors.primary(context), size: 20),
+              title: Text('About SEASONS', style: TextStyle(fontSize: 15, color: AppColors.textPrimary(context))),
               trailing: Row(mainAxisSize: MainAxisSize.min, children: [
-                Text('Version 2.4.0', style: TextStyle(fontSize: 13, color: ShunShiColors.textTertiary)),
+                Text('Version 2.4.0', style: TextStyle(fontSize: 13, color: AppColors.textTertiary(context))),
                 const Icon(Icons.chevron_right, color: ShunShiColors.textTertiary, size: 18),
               ]),
               onTap: () => context.push('/about'),
@@ -175,7 +176,7 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
             ),
           ),
           const SizedBox(height: 16),
-          Center(child: Text('DESIGNED BY SHUNSHI · SEASONSWellness', style: TextStyle(fontSize: 10, color: ShunShiColors.textTertiary, letterSpacing: 1))),
+          Center(child: Text('DESIGNED BY SHUNSHI · SEASONSWellness', style: TextStyle(fontSize: 10, color: AppColors.textTertiary(context), letterSpacing: 1))),
           const SizedBox(height: 32),
         ],
       ),
@@ -184,16 +185,16 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
 
   Widget _buildSectionCard(List<Widget> children) {
     return Container(
-      decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(16)),
+      decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(16)),
       child: Column(children: children),
     );
   }
 
   Widget _buildNavTile(IconData icon, String title, {String? route}) {
     return ListTile(
-      leading: Icon(icon, color: ShunShiColors.primary, size: 20),
-      title: Text(title, style: TextStyle(fontSize: 15, color: ShunShiColors.textPrimary)),
-      trailing: const Icon(Icons.chevron_right, color: ShunShiColors.textTertiary, size: 18),
+      leading: Icon(icon, color: AppColors.primary(context), size: 20),
+      title: Text(title, style: TextStyle(fontSize: 15, color: AppColors.textPrimary(context))),
+      trailing: Icon(Icons.chevron_right, color: AppColors.textTertiary(context), size: 18),
       onTap: () {
         if (route != null) {
           context.push(route);
@@ -206,12 +207,12 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
     return SwitchListTile(
       value: value, onChanged: onChanged,
       title: Row(children: [
-        Icon(icon, color: ShunShiColors.primary, size: 18),
+        Icon(icon, color: AppColors.primary(context), size: 18),
         const SizedBox(width: 8),
-        Text(title, style: TextStyle(fontSize: 14, color: ShunShiColors.textPrimary)),
+        Text(title, style: TextStyle(fontSize: 14, color: AppColors.textPrimary(context))),
       ]),
-      subtitle: Text(subtitle, style: TextStyle(fontSize: 11, color: ShunShiColors.textTertiary)),
-      activeThumbColor: ShunShiColors.primary,
+      subtitle: Text(subtitle, style: TextStyle(fontSize: 11, color: AppColors.textTertiary(context))),
+      activeThumbColor: AppColors.primary(context),
       contentPadding: EdgeInsets.zero,
     );
   }

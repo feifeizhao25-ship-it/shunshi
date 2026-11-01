@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../design_system/app_colors.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../design_system/theme.dart';
@@ -36,7 +37,7 @@ class _MembershipCardState extends State<MembershipCard> {
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           colors: [Color(0xFFFFF8E1), Color(0xFFFFECB3)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -55,10 +56,10 @@ class _MembershipCardState extends State<MembershipCard> {
                   color: ShunShiColors.gold.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(Icons.star_rounded, size: 22, color: ShunShiColors.gold),
+                child: Icon(Icons.star_rounded, size: 22, color: ShunShiColors.gold),
               ),
               const SizedBox(width: 12),
-              const Expanded(
+              Expanded(
                 child: Text(
                   'Premium Membership',
                   style: TextStyle(
@@ -71,7 +72,7 @@ class _MembershipCardState extends State<MembershipCard> {
               ),
               GestureDetector(
                 onTap: () => setState(() => _dismissed = true),
-                child: const Icon(Icons.close, size: 18, color: Color(0xFF8D6E63)),
+                child: Icon(Icons.close, size: 18, color: Color(0xFF8D6E63)),
               ),
             ],
           ),
@@ -89,7 +90,7 @@ class _MembershipCardState extends State<MembershipCard> {
                 const SizedBox(width: 10),
                 Text(
                   item.$2,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     color: Color(0xFF5D4037),
                     fontFamily: ShunShiTypography.sansFamily,
@@ -110,7 +111,7 @@ class _MembershipCardState extends State<MembershipCard> {
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                 elevation: 0,
               ),
-              child: const Text(
+              child: Text(
                 'Subscribe Now',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFamily: ShunShiTypography.sansFamily),
               ),
@@ -149,12 +150,12 @@ class TokenBalanceBar extends StatelessWidget {
         decoration: BoxDecoration(
           color: isLow
               ? Colors.orange.withValues(alpha: 0.1)
-              : ShunShiColors.primary.withValues(alpha: 0.06),
+              : AppColors.primary(context).withValues(alpha: 0.06),
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
             color: isLow
                 ? Colors.orange.withValues(alpha: 0.2)
-                : ShunShiColors.primary.withValues(alpha: 0.1),
+                : AppColors.primary(context).withValues(alpha: 0.1),
           ),
         ),
         child: Row(
@@ -162,7 +163,7 @@ class TokenBalanceBar extends StatelessWidget {
             Icon(
               isLow ? Icons.warning_amber_rounded : Icons.chat_bubble_outline_rounded,
               size: 16,
-              color: isLow ? Colors.orange : ShunShiColors.primary,
+              color: isLow ? Colors.orange : AppColors.primary(context),
             ),
             const SizedBox(width: 8),
             Expanded(
@@ -171,7 +172,7 @@ class TokenBalanceBar extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
-                  color: isLow ? Colors.orange : ShunShiColors.primary,
+                  color: isLow ? Colors.orange : AppColors.primary(context),
                   fontFamily: ShunShiTypography.sansFamily,
                 ),
               ),
@@ -180,7 +181,7 @@ class TokenBalanceBar extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(color: Colors.orange, borderRadius: BorderRadius.circular(12)),
-                child: const Text('Upgrade', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Colors.white)),
+                child: Text('Upgrade', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Colors.white)),
               ),
           ],
         ),

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import '../../../design_system/app_colors.dart';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -373,7 +374,7 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
         SizedBox(width: double.infinity, height: 56, child: ElevatedButton(
           onPressed: _startQuiz,
           style: ElevatedButton.styleFrom(backgroundColor: ShunshiColors.primary, foregroundColor: Colors.white, elevation: 0, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))),
-          child: const Text('Start the check', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
+          child: Text('Start the check', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
         )),
         const SizedBox(height: 32),
         Text('The nine constitutions', style: ShunshiTextStyles.heading),
@@ -385,7 +386,7 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
             child: Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: ShunshiColors.surface, borderRadius: BorderRadius.circular(16), border: Border.all(color: ShunshiColors.divider)), child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
               Container(width: 48, height: 48, decoration: BoxDecoration(color: ShunshiColors.primaryLight.withValues(alpha: 0.15), shape: BoxShape.circle), child: Center(child: Text(type.emoji, style: const TextStyle(fontSize: 26)))),
               const SizedBox(height: 8),
-              Text(type.name, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: ShunshiColors.textPrimary)),
+              Text(type.name, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: ShunshiColors.textPrimary)),
               const SizedBox(height: 4),
               Text(type.description, style: ShunshiTextStyles.labelSmall, textAlign: TextAlign.center, maxLines: 2, overflow: TextOverflow.ellipsis),
             ])),
@@ -471,7 +472,7 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
                         ? () => setState(() => _currentIndex++)
                         : _answers.length == _questions.length ? _submitQuiz : null,
                     style: ElevatedButton.styleFrom(backgroundColor: ShunshiColors.primary, foregroundColor: Colors.white, disabledBackgroundColor: ShunshiColors.divider, disabledForegroundColor: ShunshiColors.textHint, elevation: 0, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), padding: const EdgeInsets.symmetric(vertical: 14)),
-                    child: Text(_currentIndex == _questions.length - 1 && _answers.length == _questions.length ? 'Submit answers' : 'Next question', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+                    child: Text(_currentIndex == _questions.length - 1 && _answers.length == _questions.length ? 'Submit answers' : 'Next question', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
                   ),
                 ),
               ],
@@ -499,7 +500,7 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
         _buildSection('Constitution overview', '📋', [
           Text(r.description, style: const TextStyle(fontSize: 14, color: ShunshiColors.textSecondary, height: 1.7)),
           const SizedBox(height: 12),
-          Wrap(spacing: 8, runSpacing: 8, children: r.characteristics.map((c) => Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), decoration: BoxDecoration(color: ShunshiColors.primaryLight.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(20)), child: Text(c, style: const TextStyle(fontSize: 12, color: ShunshiColors.primaryDark, fontWeight: FontWeight.w500)))).toList()),
+          Wrap(spacing: 8, runSpacing: 8, children: r.characteristics.map((c) => Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), decoration: BoxDecoration(color: ShunshiColors.primaryLight.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(20)), child: Text(c, style: TextStyle(fontSize: 12, color: ShunshiColors.primaryDark, fontWeight: FontWeight.w500)))).toList()),
         ]),
         _buildScoreBars(r),
         const SizedBox(height: 20),
@@ -522,13 +523,13 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
 
   Widget _buildResultHero(ConstitutionResult r) {
     return Container(width: double.infinity, padding: const EdgeInsets.fromLTRB(24, 32, 24, 28),
-      decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [ShunshiColors.primary, ShunshiColors.primaryDark]), borderRadius: const BorderRadius.vertical(bottom: Radius.circular(24))),
+      decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [ShunshiColors.primary, ShunshiColors.primaryDark]), borderRadius: BorderRadius.vertical(bottom: Radius.circular(24))),
       child: Column(children: [
         Text(r.emoji, style: const TextStyle(fontSize: 56)),
         const SizedBox(height: 8),
         Text('Your constitution is', style: TextStyle(fontSize: 14, color: Colors.white.withValues(alpha: 0.8))),
         const SizedBox(height: 4),
-        Text(r.typeName, style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w700, color: Colors.white, letterSpacing: 2)),
+        Text(r.typeName, style: TextStyle(fontSize: 32, fontWeight: FontWeight.w700, color: Colors.white, letterSpacing: 2)),
         const SizedBox(height: 12),
         Container(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8), decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(12)),
           child: Text('Taken: ${DateTime.now().toString().substring(0, 16)}', style: TextStyle(fontSize: 12, color: Colors.white.withValues(alpha: 0.7))),
@@ -538,9 +539,9 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
   }
 
   Widget _buildSection(String title, String icon, List<Widget> children) {
-    return Container(margin: const EdgeInsets.fromLTRB(20, 0, 20, 0), padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
+    return Container(margin: const EdgeInsets.fromLTRB(20, 0, 20, 0), padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: AppColors.card(context), borderRadius: BorderRadius.circular(16)),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [Text(icon, style: const TextStyle(fontSize: 18)), const SizedBox(width: 8), Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: ShunshiColors.textPrimary))]),
+        Row(children: [Text(icon, style: const TextStyle(fontSize: 18)), const SizedBox(width: 8), Text(title, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: ShunshiColors.textPrimary))]),
         const SizedBox(height: 14),
         ...children,
       ]),
@@ -548,9 +549,9 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
   }
 
   Widget _buildScoreBars(ConstitutionResult r) {
-    return Container(margin: const EdgeInsets.fromLTRB(20, 0, 20, 0), padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
+    return Container(margin: const EdgeInsets.fromLTRB(20, 0, 20, 0), padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: AppColors.card(context), borderRadius: BorderRadius.circular(16)),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Row(children: [Text('📊', style: TextStyle(fontSize: 18)), SizedBox(width: 8), Text('Constitution scores', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: ShunshiColors.textPrimary))]),
+        Row(children: [Text('📊', style: TextStyle(fontSize: 18)), SizedBox(width: 8), Text('Constitution scores', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: ShunshiColors.textPrimary))]),
         const SizedBox(height: 14),
         ...r.scores.map((s) {
           final name = s['name'] as String? ?? '';
@@ -578,10 +579,10 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
     return r.advice.map((adv) => Container(
       margin: const EdgeInsets.fromLTRB(20, 12, 20, 0),
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
+      decoration: BoxDecoration(color: AppColors.card(context), borderRadius: BorderRadius.circular(16)),
       child: ClipRRect(borderRadius: BorderRadius.circular(8), child: Stack(children: [
         Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [Text(adv.icon, style: const TextStyle(fontSize: 18)), const SizedBox(width: 8), Text(adv.category, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: ShunshiColors.textPrimary))]),
+          Row(children: [Text(adv.icon, style: const TextStyle(fontSize: 18)), const SizedBox(width: 8), Text(adv.category, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: ShunshiColors.textPrimary))]),
           const SizedBox(height: 14),
           ...adv.items.take(2).map((item) => Padding(padding: const EdgeInsets.only(bottom: 8), child: Text(item, style: const TextStyle(fontSize: 14, color: ShunshiColors.textSecondary, height: 1.6)))),
         ]),
@@ -595,14 +596,14 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
     return [
       ...r.advice.map((adv) => _buildSection(adv.category, adv.icon, [
         ...adv.items.map((item) => Padding(padding: const EdgeInsets.only(bottom: 8), child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Container(width: 6, height: 6, margin: const EdgeInsets.only(top: 8), decoration: const BoxDecoration(color: ShunshiColors.primary, shape: BoxShape.circle)),
+          Container(width: 6, height: 6, margin: const EdgeInsets.only(top: 8), decoration: BoxDecoration(color: ShunshiColors.primary, shape: BoxShape.circle)),
           const SizedBox(width: 10),
           Expanded(child: Text(item, style: const TextStyle(fontSize: 14, color: ShunshiColors.textSecondary, height: 1.7))),
         ]))),
       ])),
       if (r.avoidList.isNotEmpty) Container(margin: const EdgeInsets.fromLTRB(20, 12, 20, 0), padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: const Color(0xFFFFFBF0), borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0xFFFDE68A).withValues(alpha: 0.5))),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Row(children: [Text('⚠️', style: TextStyle(fontSize: 16)), SizedBox(width: 8), Text('Things to note', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Color(0xFF92400E)))]),
+          Row(children: [Text('⚠️', style: TextStyle(fontSize: 16)), SizedBox(width: 8), Text('Things to note', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Color(0xFF92400E)))]),
           const SizedBox(height: 10),
           Text(r.avoidList, style: const TextStyle(fontSize: 13, color: Color(0xFF92400E), height: 1.7)),
         ])),
@@ -613,7 +614,7 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
   Widget _buildBottomBar(ConstitutionResult r) {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
-      decoration: BoxDecoration(color: Colors.white, boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 20, offset: const Offset(0, -4))]),
+      decoration: BoxDecoration(color: AppColors.card(context), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 20, offset: const Offset(0, -4))]),
       child: SafeArea(top: false, child: Column(mainAxisSize: MainAxisSize.min, children: [
         if (!_reportUnlocked) ...[
           // 付费墙提示
@@ -622,7 +623,7 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
             child: Row(children: [
               const Text('👑', style: TextStyle(fontSize: 20)),
               const SizedBox(width: 10),
-              const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text('Unlock the full constitution report', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF92400E))),
                 SizedBox(height: 2),
                 Text('Diet · tea · exercise · acupoints · four-season plan', style: TextStyle(fontSize: 11, color: Color(0xFFB07937))),
@@ -633,8 +634,8 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
           Row(children: [
             Expanded(child: ElevatedButton.icon(
               onPressed: () { _unlockReport(); setState(() {}); },
-              icon: const Icon(Icons.lock_open, size: 18),
-              label: const Text('Unlock report', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+              icon: Icon(Icons.lock_open, size: 18),
+              label: Text('Unlock report', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
               style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFE5A84B), foregroundColor: Colors.white, elevation: 0, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), padding: const EdgeInsets.symmetric(vertical: 14)),
             )),
           ]),
@@ -642,22 +643,22 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
           Row(children: [
             Expanded(child: OutlinedButton.icon(
               onPressed: () { setState(() { _view = 'home'; _questions.clear(); _answers.clear(); _result = null; }); },
-              icon: const Icon(Icons.refresh, size: 18),
+              icon: Icon(Icons.refresh, size: 18),
               label: const Text('Retake', style: TextStyle(fontSize: 14)),
               style: OutlinedButton.styleFrom(foregroundColor: ShunshiColors.primary, side: const BorderSide(color: ShunshiColors.primary), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), padding: const EdgeInsets.symmetric(vertical: 13)),
             )),
             const SizedBox(width: 12),
             Expanded(child: ElevatedButton.icon(
               onPressed: () => _shareResult(r),
-              icon: const Icon(Icons.share, size: 18),
-              label: const Text('Share result', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+              icon: Icon(Icons.share, size: 18),
+              label: Text('Share result', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
               style: ElevatedButton.styleFrom(backgroundColor: ShunshiColors.primary, foregroundColor: Colors.white, elevation: 0, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), padding: const EdgeInsets.symmetric(vertical: 13)),
             )),
           ]),
           const SizedBox(height: 10),
           SizedBox(width: double.infinity, height: 46, child: OutlinedButton.icon(
             onPressed: () => _downloadReport(r),
-            icon: const Icon(Icons.download, size: 16),
+            icon: Icon(Icons.download, size: 16),
             label: const Text('Download report', style: TextStyle(fontSize: 13)),
             style: OutlinedButton.styleFrom(foregroundColor: ShunshiColors.textSecondary, side: const BorderSide(color: ShunshiColors.divider), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
           )),

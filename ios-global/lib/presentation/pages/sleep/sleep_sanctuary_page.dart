@@ -49,7 +49,7 @@ class _SleepSanctuaryPageState extends State<SleepSanctuaryPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.menu, color: Colors.white70),
+                    icon: Icon(Icons.menu, color: Colors.white70),
                     onPressed: () {},
                   ),
                   Text('Digital Sanctuary', style: TextStyle(
@@ -69,7 +69,7 @@ class _SleepSanctuaryPageState extends State<SleepSanctuaryPage> {
               fontFamily: ShunShiTypography.sansFamily, letterSpacing: 1,
             )),
             const SizedBox(height: 16),
-            Text('Midnight Rainfall', style: const TextStyle(
+            Text('Midnight Rainfall', style: TextStyle(
               fontSize: 28, fontWeight: FontWeight.w700,
               color: Colors.white, fontFamily: ShunShiTypography.serifFamily,
             )),
@@ -132,7 +132,7 @@ class _SleepSanctuaryPageState extends State<SleepSanctuaryPage> {
             const SizedBox(height: 8),
 
             // Sound wave icon
-            const Icon(Icons.graphic_eq, size: 28, color: Color(0xFF8B5CF6)),
+            Icon(Icons.graphic_eq, size: 28, color: Color(0xFF8B5CF6)),
 
             const Spacer(),
 
@@ -189,7 +189,7 @@ class _SleepSanctuaryPageState extends State<SleepSanctuaryPage> {
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.04),
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -233,7 +233,7 @@ class _SleepSanctuaryPageState extends State<SleepSanctuaryPage> {
                           )),
                         ]),
                       ),
-                      const Icon(Icons.play_circle_outline, size: 28, color: Color(0xFF8B5CF6)),
+                      Icon(Icons.play_circle_outline, size: 28, color: Color(0xFF8B5CF6)),
                     ]),
                   )),
                 ],

@@ -3,6 +3,7 @@
 library;
 
 import 'package:dio/dio.dart';
+import '../../../design_system/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/config/app_config.dart';
@@ -60,12 +61,12 @@ class _StripeCheckoutPageState extends State<StripeCheckoutPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       appBar: AppBar(
-        backgroundColor: ShunShiColors.background,
+        backgroundColor: AppColors.background(context),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: ShunShiColors.textPrimary),
+          icon: Icon(Icons.arrow_back_ios_new, color: AppColors.textPrimary(context)),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text('Checkout',
@@ -82,7 +83,7 @@ class _StripeCheckoutPageState extends State<StripeCheckoutPage> {
 
   Widget _buildContent() {
     if (_loading) {
-      return const Center(child: CircularProgressIndicator(color: ShunShiColors.primary));
+      return Center(child: CircularProgressIndicator(color: AppColors.primary(context)));
     }
 
     if (_error != null) {
@@ -90,14 +91,14 @@ class _StripeCheckoutPageState extends State<StripeCheckoutPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline, size: 48, color: ShunShiColors.textTertiary),
+            Icon(Icons.error_outline, size: 48, color: AppColors.textTertiary(context)),
             const SizedBox(height: 16),
             Text(_error!, textAlign: TextAlign.center,
-              style: TextStyle(color: ShunShiColors.textSecondary)),
+              style: TextStyle(color: AppColors.textSecondary(context))),
             const SizedBox(height: 24),
             ElevatedButton(
               onPressed: _createCheckoutSession,
-              style: ElevatedButton.styleFrom(backgroundColor: ShunShiColors.primary),
+              style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary(context)),
               child: const Text('Retry'),
             ),
           ],
@@ -112,12 +113,12 @@ class _StripeCheckoutPageState extends State<StripeCheckoutPage> {
           style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 24, fontWeight: FontWeight.w300)),
         const SizedBox(height: 8),
         Text('You will be redirected to Stripe to complete payment securely.',
-          style: TextStyle(fontSize: 14, color: ShunShiColors.textSecondary, height: 1.6)),
+          style: TextStyle(fontSize: 14, color: AppColors.textSecondary(context), height: 1.6)),
         const SizedBox(height: 32),
         Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: ShunShiColors.surfaceContainerLow,
+            color: AppColors.surfaceContainerLow(context),
             borderRadius: BorderRadius.circular(16),
           ),
           child: Row(
@@ -125,10 +126,10 @@ class _StripeCheckoutPageState extends State<StripeCheckoutPage> {
               Container(
                 width: 48, height: 48,
                 decoration: BoxDecoration(
-                  color: ShunShiColors.primary.withValues(alpha: 0.1),
+                  color: AppColors.primary(context).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(Icons.lock, color: ShunShiColors.primary),
+                child: Icon(Icons.lock, color: AppColors.primary(context)),
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -139,7 +140,7 @@ class _StripeCheckoutPageState extends State<StripeCheckoutPage> {
                       style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                     const SizedBox(height: 4),
                     Text('Powered by Stripe',
-                      style: TextStyle(fontSize: 13, color: ShunShiColors.textTertiary)),
+                      style: TextStyle(fontSize: 13, color: AppColors.textTertiary(context))),
                   ],
                 ),
               ),
@@ -158,12 +159,12 @@ class _StripeCheckoutPageState extends State<StripeCheckoutPage> {
               );
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: ShunShiColors.primary,
+              backgroundColor: AppColors.primary(context),
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
               elevation: 0,
             ),
-            child: const Text('Proceed to Payment', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+            child: Text('Proceed to Payment', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
           ),
         ),
       ],

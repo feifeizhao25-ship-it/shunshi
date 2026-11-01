@@ -2,6 +2,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
@@ -15,7 +16,7 @@ class CommunityPageV2 extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
 
-      appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),backgroundColor: isDark ? ShunshiDarkColors.background : ShunShiColors.background,
+      appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),backgroundColor: isDark ? ShunshiDarkColors.background : AppColors.background(context),
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
@@ -27,7 +28,7 @@ class CommunityPageV2 extends StatelessWidget {
                 child: Row(children: [
                   Text(AppLocalizations.of(context).t('community_seasons_shunshi'), style: TextStyle(
                     fontFamily: ShunShiTypography.serifFamily,
-                    fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.primary,
+                    fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.primary(context),
                   )),
                   const Spacer(),
                   const Icon(Icons.menu, color: ShunShiColors.textSecondary),
@@ -42,7 +43,7 @@ class CommunityPageV2 extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
               child: Text(AppLocalizations.of(context).t('community_wellness_circle'), style: TextStyle(
                 fontFamily: ShunShiTypography.serifFamily,
-                fontSize: 32, fontWeight: FontWeight.bold, color: ShunShiColors.textPrimary,
+                fontSize: 32, fontWeight: FontWeight.bold, color: AppColors.textPrimary(context),
               )),
             ),
           ),
@@ -54,12 +55,12 @@ class CommunityPageV2 extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
-                  color: ShunShiColors.surfaceContainerLow, borderRadius: BorderRadius.circular(12),
+                  color: AppColors.surfaceContainerLow(context), borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(children: [
-                  Icon(Icons.search, color: ShunShiColors.textTertiary, size: 20),
+                  Icon(Icons.search, color: AppColors.textTertiary(context), size: 20),
                   const SizedBox(width: 8),
-                  Text(AppLocalizations.of(context).t('community_search_wellness_content'), style: TextStyle(fontSize: 14, color: ShunShiColors.textTertiary)),
+                  Text(AppLocalizations.of(context).t('community_search_wellness_content'), style: TextStyle(fontSize: 14, color: AppColors.textTertiary(context))),
                 ]),
               ),
             ),
@@ -153,7 +154,7 @@ class CommunityPageV2 extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: const LinearGradient(colors: [Color(0xFF144227), Color(0xFF2D7A4A)]),
           shape: BoxShape.circle,
-          boxShadow: [BoxShadow(color: ShunShiColors.primary.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 4))],
+          boxShadow: [BoxShadow(color: AppColors.primary(context).withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 4))],
         ),
         child: const Icon(Icons.add, color: Colors.white, size: 28),
       ),
@@ -183,23 +184,23 @@ class CommunityPageV2 extends StatelessWidget {
   }) {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(14)),
+      decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(14)),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         // User row
         Row(children: [
           Container(width: 36, height: 36, decoration: BoxDecoration(
             shape: BoxShape.circle, color: ShunShiColors.primaryContainer,
-          ), child: Icon(Icons.person, color: ShunShiColors.primary, size: 18)),
+          ), child: Icon(Icons.person, color: AppColors.primary(context), size: 18)),
           const SizedBox(width: 10),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(name, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+            Text(name, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
               decoration: BoxDecoration(color: Colors.orange.withOpacity(0.1), borderRadius: BorderRadius.circular(4)),
               child: Text(type, style: TextStyle(fontSize: 10, color: Colors.orange)),
             ),
           ])),
-          Icon(Icons.more_horiz, color: ShunShiColors.textTertiary, size: 18),
+          Icon(Icons.more_horiz, color: AppColors.textTertiary(context), size: 18),
         ]),
 
         // Badge
@@ -208,28 +209,28 @@ class CommunityPageV2 extends StatelessWidget {
           Row(children: [
             Icon(badge, color: Color(0xFFFFD700), size: 16),
             const SizedBox(width: 6),
-            Text(badgeText, style: TextStyle(fontSize: 12, color: ShunShiColors.textSecondary, fontWeight: FontWeight.w500)),
+            Text(badgeText, style: TextStyle(fontSize: 12, color: AppColors.textSecondary(context), fontWeight: FontWeight.w500)),
           ]),
         ],
 
         // Content
         const SizedBox(height: 10),
-        Text(content, style: TextStyle(fontSize: 14, color: ShunShiColors.textSecondary, height: 1.6)),
+        Text(content, style: TextStyle(fontSize: 14, color: AppColors.textSecondary(context), height: 1.6)),
 
         // Actions
         const SizedBox(height: 12),
         Row(children: [
-          Icon(Icons.favorite_border, size: 18, color: ShunShiColors.textTertiary),
+          Icon(Icons.favorite_border, size: 18, color: AppColors.textTertiary(context)),
           const SizedBox(width: 4),
-          Text('$likes', style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
+          Text('$likes', style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context))),
           const SizedBox(width: 20),
-          Icon(Icons.chat_bubble_outline, size: 18, color: ShunShiColors.textTertiary),
+          Icon(Icons.chat_bubble_outline, size: 18, color: AppColors.textTertiary(context)),
           const SizedBox(width: 4),
-          Text('$comments', style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
+          Text('$comments', style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context))),
           const Spacer(),
-          Icon(Icons.share, size: 18, color: ShunShiColors.textTertiary),
+          Icon(Icons.share, size: 18, color: AppColors.textTertiary(context)),
           const SizedBox(width: 4),
-          Text(AppLocalizations.of(context).t('share'), style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
+          Text(AppLocalizations.of(context).t('share'), style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context))),
         ]),
       ]),
     );

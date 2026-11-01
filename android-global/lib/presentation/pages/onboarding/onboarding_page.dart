@@ -8,6 +8,7 @@
 library;
 
 import 'package:dio/dio.dart';
+import '../../../design_system/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import '../../../core/theme/app_localizations.dart';
@@ -132,7 +133,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : ShunShiColors.background,
+    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : AppColors.background(context),
       body: SafeArea(
         child: Column(children: [
           // Progress bar
@@ -148,9 +149,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
                   child: Container(
                     width: 36, height: 36,
                     decoration: BoxDecoration(
-                      color: ShunShiColors.surface, borderRadius: BorderRadius.circular(10),
+                      color: AppColors.surface(context), borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Icon(Icons.arrow_back, size: 18, color: ShunShiColors.textPrimary),
+                    child: Icon(Icons.arrow_back, size: 18, color: AppColors.textPrimary(context)),
                   ),
                 )
               else const SizedBox(width: 36),
@@ -170,7 +171,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
             child: Row(children: List.generate(5, (i) => Expanded(child: Container(
               height: 3, margin: const EdgeInsets.symmetric(horizontal: 3),
               decoration: BoxDecoration(
-                color: i <= _current ? const Color(0xFF533afd) : ShunShiColors.surface,
+                color: i <= _current ? const Color(0xFF533afd) : AppColors.surface(context),
                 borderRadius: BorderRadius.circular(2),
               ),
             )))),
@@ -216,10 +217,10 @@ class _OnboardingPageState extends State<OnboardingPage> {
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(_stepTitle(step), style: TextStyle(
           fontFamily: ShunShiTypography.serifFamily,
-          fontSize: 26, fontWeight: FontWeight.bold, color: ShunShiColors.textPrimary,
+          fontSize: 26, fontWeight: FontWeight.bold, color: AppColors.textPrimary(context),
         )),
         const SizedBox(height: 8),
-        Text(_stepSubtitle(step), style: TextStyle(fontSize: 15, color: ShunShiColors.textSecondary, height: 1.5)),
+        Text(_stepSubtitle(step), style: TextStyle(fontSize: 15, color: AppColors.textSecondary(context), height: 1.5)),
         const SizedBox(height: 24),
         ..._buildOptions(step),
       ]),
@@ -268,7 +269,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
           duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: selected ? const Color(0xFF533afd).withOpacity(0.08) : ShunShiColors.surface,
+            color: selected ? const Color(0xFF533afd).withOpacity(0.08) : AppColors.surface(context),
             borderRadius: BorderRadius.circular(14),
             border: Border.all(color: selected ? const Color(0xFF533afd) : Colors.transparent, width: 1.5),
           ),
@@ -278,10 +279,10 @@ class _OnboardingPageState extends State<OnboardingPage> {
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(title, style: TextStyle(
                 fontSize: 15, fontWeight: FontWeight.w600,
-                color: selected ? const Color(0xFF533afd) : ShunShiColors.textPrimary,
+                color: selected ? const Color(0xFF533afd) : AppColors.textPrimary(context),
               )),
               const SizedBox(height: 2),
-              Text(subtitle, style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
+              Text(subtitle, style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context))),
             ])),
             if (selected) const Icon(Icons.check_circle, color: Color(0xFF533afd), size: 22),
           ]),

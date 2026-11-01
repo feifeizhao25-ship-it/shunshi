@@ -209,7 +209,7 @@ class _CultureSettingsPageState extends State<CultureSettingsPage> {
           SegmentedButton<String>(
             key: const Key('culture-units'),
             emptySelectionAllowed: true,
-            segments: const [
+            segments: [
               ButtonSegment(value: 'metric', label: Text('Metric')),
               ButtonSegment(value: 'imperial', label: Text('Imperial')),
             ],
@@ -225,7 +225,7 @@ class _CultureSettingsPageState extends State<CultureSettingsPage> {
           SegmentedButton<String>(
             key: const Key('culture-hemisphere'),
             emptySelectionAllowed: true,
-            segments: const [
+            segments: [
               ButtonSegment(value: 'north', label: Text('Northern')),
               ButtonSegment(value: 'south', label: Text('Southern')),
             ],

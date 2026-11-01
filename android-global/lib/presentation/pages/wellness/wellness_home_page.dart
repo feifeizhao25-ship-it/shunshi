@@ -3,6 +3,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import '../../../core/theme/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
@@ -17,7 +18,7 @@ class WellnessHomePage extends StatelessWidget {
     return Scaffold(
 
       appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
-      backgroundColor: isDark ? ShunShiColors.darkBackground : ShunShiColors.background,
+      backgroundColor: isDark ? ShunShiColors.darkBackground : AppColors.background(context),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: Column(
@@ -33,26 +34,26 @@ class WellnessHomePage extends StatelessWidget {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: ShunShiColors.surfaceVariant,
-                        border: Border.all(color: ShunShiColors.textTertiary.withValues(alpha: 0.1)),
+                        border: Border.all(color: AppColors.textTertiary(context).withValues(alpha: 0.1)),
                       ),
-                      child: const Icon(Icons.person, size: 20, color: ShunShiColors.textSecondary),
+                      child: Icon(Icons.person, size: 20, color: AppColors.textSecondary(context)),
                     ),
                     const SizedBox(width: 12),
                     Text(AppLocalizations.of(context).get('wellness_studio'), style: TextStyle(
                       fontSize: 20, fontWeight: FontWeight.w300, letterSpacing: -0.3,
-                      color: ShunShiColors.primary,
+                      color: AppColors.primary(context),
                       fontFamily: ShunShiTypography.serifFamily,
                     )),
                     const Spacer(),
                     GestureDetector(
                       onTap: () => context.push('/notifications'),
-                      child: const Icon(Icons.notifications_outlined, size: 22, color: ShunShiColors.primary),
+                      child: Icon(Icons.notifications_outlined, size: 22, color: AppColors.primary(context)),
                     ),
                   ],
                 ),
               ),
             ),
-            Container(height: 1, color: ShunShiColors.surfaceContainerLow, margin: const EdgeInsets.symmetric(horizontal: 20)),
+            Container(height: 1, color: AppColors.surfaceContainerLow(context), margin: const EdgeInsets.symmetric(horizontal: 20)),
 
             // ── Content ──
             Padding(
@@ -62,14 +63,14 @@ class WellnessHomePage extends StatelessWidget {
                   // ── 搜索栏 ──
                   Container(
                     decoration: BoxDecoration(
-                      color: ShunShiColors.surfaceContainerLow,
+                      color: AppColors.surfaceContainerLow(context),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: TextField(
                       decoration: InputDecoration(
                         hintText: AppLocalizations.of(context).t('wellness_home_search_wellness_plans_seasonal_recipes'),
-                        hintStyle: TextStyle(color: ShunShiColors.textTertiary, fontSize: 14),
-                        prefixIcon: Icon(Icons.search, color: ShunShiColors.textTertiary, size: 22),
+                        hintStyle: TextStyle(color: AppColors.textTertiary(context), fontSize: 14),
+                        prefixIcon: Icon(Icons.search, color: AppColors.textTertiary(context), size: 22),
                         border: InputBorder.none,
                         contentPadding: EdgeInsets.symmetric(vertical: 16),
                       ),
@@ -129,10 +130,10 @@ class WellnessHomePage extends StatelessWidget {
                             child: Row(
                               children: [
                                 Text(AppLocalizations.of(context).get('view_all'), style: TextStyle(
-                                  fontSize: 14, fontWeight: FontWeight.w600, color: ShunShiColors.primary,
+                                  fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.primary(context),
                                 )),
                                 SizedBox(width: 2),
-                                Icon(Icons.chevron_right, size: 18, color: ShunShiColors.primary),
+                                Icon(Icons.chevron_right, size: 18, color: AppColors.primary(context)),
                               ],
                             ),
                           ),
@@ -156,7 +157,7 @@ class WellnessHomePage extends StatelessWidget {
                         title: AppLocalizations.of(context).t('wellness_home_baduanjin_awaken_your_meridian_energy'),
                         desc: 'Simple traditional exercises. Just 10 minutes daily to relieve neck and shoulder stiffness from sitting.',
                         likes: '3,450',
-                        gradient: [ShunShiColors.primaryContainer, ShunShiColors.primaryLight],
+                        gradient: [ShunShiColors.primaryContainer, AppColors.primaryLight(context)],
                       ),
                       const SizedBox(height: 16),
                       _editorCard(

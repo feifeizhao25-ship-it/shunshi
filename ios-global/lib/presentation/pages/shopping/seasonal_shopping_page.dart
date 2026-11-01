@@ -9,6 +9,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import '../../../design_system/theme.dart';
 
 class SeasonalShoppingPage extends StatefulWidget {
@@ -59,10 +60,10 @@ class _SeasonalShoppingPageState extends State<SeasonalShoppingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       appBar: AppBar(
-        backgroundColor: ShunShiColors.background,
-        leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new, size: 20), onPressed: () => Navigator.pop(context)),
+        backgroundColor: AppColors.background(context),
+        leading: IconButton(icon: Icon(Icons.arrow_back_ios_new, size: 20), onPressed: () => Navigator.pop(context)),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -74,29 +75,29 @@ class _SeasonalShoppingPageState extends State<SeasonalShoppingPage> {
               children: [
                 Text('Seasonal Essentials', style: TextStyle(
                   fontSize: 24, fontWeight: FontWeight.w700,
-                  color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.serifFamily,
+                  color: AppColors.textPrimary(context), fontFamily: ShunShiTypography.serifFamily,
                 )),
                 const SizedBox(height: 4),
                 Text(
                   "Curating your kitchen for the turning of the year.\nYour list is synced with the garden's natural rhythm.",
-                  style: TextStyle(fontSize: 13, color: ShunShiColors.textSecondary, fontFamily: ShunShiTypography.sansFamily, height: 1.5),
+                  style: TextStyle(fontSize: 13, color: AppColors.textSecondary(context), fontFamily: ShunShiTypography.sansFamily, height: 1.5),
                 ),
                 const SizedBox(height: 16),
                 // Import CTA
                 Container(
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: ShunShiColors.primary.withValues(alpha: 0.06),
+                    color: AppColors.primary(context).withValues(alpha: 0.06),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(children: [
-                    Icon(Icons.eco, size: 20, color: ShunShiColors.primary),
+                    Icon(Icons.eco, size: 20, color: AppColors.primary(context)),
                     const SizedBox(width: 12),
                     Expanded(child: Text('From your kitchen', style: TextStyle(
-                      fontSize: 14, fontWeight: FontWeight.w500, color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.sansFamily,
+                      fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.textPrimary(context), fontFamily: ShunShiTypography.sansFamily,
                     ))),
                     Text('Add 6 items', style: TextStyle(
-                      fontSize: 13, fontWeight: FontWeight.w600, color: ShunShiColors.primary, fontFamily: ShunShiTypography.sansFamily,
+                      fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.primary(context), fontFamily: ShunShiTypography.sansFamily,
                     )),
                   ]),
                 ),
@@ -116,11 +117,11 @@ class _SeasonalShoppingPageState extends State<SeasonalShoppingPage> {
                     Row(children: [
                       Text(cat.name, style: TextStyle(
                         fontSize: 16, fontWeight: FontWeight.w700,
-                        color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.sansFamily,
+                        color: AppColors.textPrimary(context), fontFamily: ShunShiTypography.sansFamily,
                       )),
                       const SizedBox(width: 8),
                       Text('${cat.items.where((i) => i.checked).length}/${cat.items.length} Items', style: TextStyle(
-                        fontSize: 13, color: ShunShiColors.textTertiary, fontFamily: ShunShiTypography.sansFamily,
+                        fontSize: 13, color: AppColors.textTertiary(context), fontFamily: ShunShiTypography.sansFamily,
                       )),
                     ]),
                     const SizedBox(height: 10),
@@ -146,8 +147,8 @@ class _SeasonalShoppingPageState extends State<SeasonalShoppingPage> {
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
                               color: item.checked
-                                  ? ShunShiColors.surfaceContainerLow
-                                  : ShunShiColors.surfaceContainerLowest,
+                                  ? AppColors.surfaceContainerLow(context)
+                                  : AppColors.surfaceContainerLowest(context),
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: Row(children: [
@@ -155,7 +156,7 @@ class _SeasonalShoppingPageState extends State<SeasonalShoppingPage> {
                                 onTap: () => setState(() => item.checked = !item.checked),
                                 child: Icon(
                                   item.checked ? Icons.check_circle : Icons.radio_button_unchecked,
-                                  size: 22, color: item.checked ? ShunShiColors.primary : ShunShiColors.textTertiary,
+                                  size: 22, color: item.checked ? AppColors.primary(context) : AppColors.textTertiary(context),
                                 ),
                               ),
                               const SizedBox(width: 12),
@@ -163,12 +164,12 @@ class _SeasonalShoppingPageState extends State<SeasonalShoppingPage> {
                                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                                   Text(item.name, style: TextStyle(
                                     fontSize: 14, fontWeight: FontWeight.w500,
-                                    color: item.checked ? ShunShiColors.textTertiary : ShunShiColors.textPrimary,
+                                    color: item.checked ? AppColors.textTertiary(context) : AppColors.textPrimary(context),
                                     fontFamily: ShunShiTypography.sansFamily,
                                     decoration: item.checked ? TextDecoration.lineThrough : null,
                                   )),
                                   Text('${item.tag} · ${item.desc}', style: TextStyle(
-                                    fontSize: 12, color: ShunShiColors.textTertiary, fontFamily: ShunShiTypography.sansFamily,
+                                    fontSize: 12, color: AppColors.textTertiary(context), fontFamily: ShunShiTypography.sansFamily,
                                   )),
                                 ]),
                               ),
@@ -187,8 +188,8 @@ class _SeasonalShoppingPageState extends State<SeasonalShoppingPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddDialog(context),
-        backgroundColor: ShunShiColors.primary,
-        child: const Icon(Icons.add, color: Colors.white),
+        backgroundColor: AppColors.primary(context),
+        child: Icon(Icons.add, color: Colors.white),
       ),
     );
   }
@@ -197,16 +198,16 @@ class _SeasonalShoppingPageState extends State<SeasonalShoppingPage> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: ShunShiColors.surface,
-        title: Text('Add Item', style: TextStyle(fontFamily: ShunShiTypography.sansFamily, color: ShunShiColors.textPrimary)),
+        backgroundColor: AppColors.surface(context),
+        title: Text('Add Item', style: TextStyle(fontFamily: ShunShiTypography.sansFamily, color: AppColors.textPrimary(context))),
         content: TextField(
           controller: _newItem,
           autofocus: true,
           decoration: InputDecoration(
             hintText: 'Ingredient name...',
-            hintStyle: TextStyle(color: ShunShiColors.textTertiary),
+            hintStyle: TextStyle(color: AppColors.textTertiary(context)),
             filled: true,
-            fillColor: ShunShiColors.surfaceContainerLow,
+            fillColor: AppColors.surfaceContainerLow(context),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
           ),
         ),
@@ -222,7 +223,7 @@ class _SeasonalShoppingPageState extends State<SeasonalShoppingPage> {
                 Navigator.pop(ctx);
               }
             },
-            child: Text('Add', style: TextStyle(color: ShunShiColors.primary)),
+            child: Text('Add', style: TextStyle(color: AppColors.primary(context))),
           ),
         ],
       ),

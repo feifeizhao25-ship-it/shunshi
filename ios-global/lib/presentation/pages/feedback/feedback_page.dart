@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import '../../../design_system/theme.dart';
 import '../../../data/network/api_client.dart';
 import '../../../data/network/session.dart';
@@ -59,45 +60,45 @@ class _FeedbackPageState extends State<FeedbackPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       appBar: AppBar(
-        title: const Text('Feedback', style: TextStyle(color: ShunShiColors.textPrimary, fontWeight: FontWeight.w700)),
-        backgroundColor: ShunShiColors.background,
+        title: Text('Feedback', style: TextStyle(color: AppColors.textPrimary(context), fontWeight: FontWeight.w700)),
+        backgroundColor: AppColors.background(context),
         elevation: 0,
-        iconTheme: const IconThemeData(color: ShunShiColors.textPrimary),
+        iconTheme: IconThemeData(color: AppColors.textPrimary(context)),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('Feedback type', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+          Text('Feedback type', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
           const SizedBox(height: 8),
           Wrap(spacing: 8, children: _categories.map((c) => ChoiceChip(
             label: Text(c.$2),
             selected: _category == c.$1,
             onSelected: (_) => setState(() => _category = c.$1),
-            backgroundColor: ShunShiColors.surfaceContainerLowest,
-            selectedColor: ShunShiColors.primary.withValues(alpha: 0.15),
+            backgroundColor: AppColors.surfaceContainerLowest(context),
+            selectedColor: AppColors.primary(context).withValues(alpha: 0.15),
             side: BorderSide.none,
           )).toList()),
           const SizedBox(height: 20),
-          Text('Rating', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+          Text('Rating', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
           const SizedBox(height: 8),
           Row(children: List.generate(5, (i) => GestureDetector(
             onTap: () => setState(() => _rating = i + 1),
             child: Icon(i < _rating ? Icons.star : Icons.star_border,
-              color: i < _rating ? Colors.amber : ShunShiColors.textTertiary, size: 32),
+              color: i < _rating ? Colors.amber : AppColors.textTertiary(context), size: 32),
           ))),
           const SizedBox(height: 20),
-          Text('Your feedback', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+          Text('Your feedback', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
           const SizedBox(height: 8),
           TextField(
             controller: _msgCtrl,
             maxLines: 5,
             decoration: InputDecoration(
               hintText: 'Describe your problem or suggestion...',
-              hintStyle: TextStyle(color: ShunShiColors.textTertiary),
+              hintStyle: TextStyle(color: AppColors.textTertiary(context)),
               filled: true,
-              fillColor: ShunShiColors.surfaceContainerLowest,
+              fillColor: AppColors.surfaceContainerLowest(context),
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
             ),
           ),
@@ -106,12 +107,12 @@ class _FeedbackPageState extends State<FeedbackPage> {
             child: ElevatedButton(
               onPressed: _submitting ? null : _submit,
               style: ElevatedButton.styleFrom(
-                backgroundColor: ShunShiColors.primary,
+                backgroundColor: AppColors.primary(context),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
               child: _submitting
-                ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                : const Text('Send feedback', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white)),
+                ? SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                : Text('Send feedback', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white)),
             ),
           ),
         ]),

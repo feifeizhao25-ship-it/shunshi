@@ -3,6 +3,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import '../../../design_system/theme.dart';
 
 class WellnessReportV2 extends StatelessWidget {
@@ -11,7 +12,7 @@ class WellnessReportV2 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
@@ -19,7 +20,7 @@ class WellnessReportV2 extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
               child: Row(children: [
-                IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => Navigator.pop(context)),
+                IconButton(icon: Icon(Icons.arrow_back), onPressed: () => Navigator.pop(context)),
                 const Spacer(),
                 Text('SEASONS', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18, fontWeight: FontWeight.w600, color: Color(0xFF533afd))),
                 const Spacer(),
@@ -34,10 +35,10 @@ class WellnessReportV2 extends StatelessWidget {
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text('Wellness Report', style: TextStyle(
                 fontFamily: ShunShiTypography.serifFamily,
-                fontSize: 28, fontWeight: FontWeight.bold, color: ShunShiColors.textPrimary,
+                fontSize: 28, fontWeight: FontWeight.bold, color: AppColors.textPrimary(context),
               )),
               const SizedBox(height: 4),
-              Text('Spring Equinox · Week 3', style: TextStyle(fontSize: 14, color: ShunShiColors.textTertiary)),
+              Text('Spring Equinox · Week 3', style: TextStyle(fontSize: 14, color: AppColors.textTertiary(context))),
             ]),
           )),
 
@@ -82,7 +83,7 @@ class WellnessReportV2 extends StatelessWidget {
           SliverToBoxAlternate(child: Padding(
             padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('Personalized Recommendation', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+              Text('Personalized Recommendation', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
               const SizedBox(height: 10),
               _buildRecCard(Icons.self_improvement, 'Morning Hip Flow', '10 min · Beginner', Color(0xFF533afd)),
               _buildRecCard(Icons.emoji_food_beverage, 'Dandelion Root Tea', 'Liver support · Spring', Color(0xFF4CAF50)),
@@ -90,7 +91,7 @@ class WellnessReportV2 extends StatelessWidget {
             ]),
           )),
 
-          const SliverToBoxAlternate(child: SizedBox(height: 40)),
+          SliverToBoxAlternate(child: SizedBox(height: 40)),
         ],
       ),
     );

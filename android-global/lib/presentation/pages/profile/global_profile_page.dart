@@ -3,6 +3,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
@@ -26,7 +27,7 @@ class _GlobalProfilePageState extends State<GlobalProfilePage> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
 
-      appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),backgroundColor: isDark ? ShunshiDarkColors.background : ShunShiColors.background,
+      appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),backgroundColor: isDark ? ShunshiDarkColors.background : AppColors.background(context),
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
@@ -41,10 +42,10 @@ class _GlobalProfilePageState extends State<GlobalProfilePage> {
                   Text(AppLocalizations.of(context).t('checkin_sanctuary'), style: TextStyle(
                     fontFamily: ShunShiTypography.serifFamily,
                     fontSize: 18, fontWeight: FontWeight.w600,
-                    color: ShunShiColors.primary,
+                    color: AppColors.primary(context),
                   )),
                   const Spacer(),
-                  IconButton(icon: const Icon(Icons.edit, size: 20, color: ShunShiColors.textSecondary), onPressed: () {}),
+                  IconButton(icon: Icon(Icons.edit, size: 20, color: AppColors.textSecondary(context)), onPressed: () {}),
                 ]),
               ),
             ),
@@ -67,10 +68,10 @@ class _GlobalProfilePageState extends State<GlobalProfilePage> {
                 const SizedBox(height: 12),
                 Text(AppLocalizations.of(context).t('profile_seeker_of_calm'), style: TextStyle(
                   fontFamily: ShunShiTypography.serifFamily,
-                  fontSize: 22, fontWeight: FontWeight.bold, color: ShunShiColors.textPrimary,
+                  fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.textPrimary(context),
                 )),
                 const SizedBox(height: 4),
-                Text(AppLocalizations.of(context).t('profile_spring_equinox_member_since_2023'), style: TextStyle(fontSize: 13, color: ShunShiColors.textTertiary)),
+                Text(AppLocalizations.of(context).t('profile_spring_equinox_member_since_2023'), style: TextStyle(fontSize: 13, color: AppColors.textTertiary(context))),
                 const SizedBox(height: 12),
                 // Badges
                 Row(mainAxisAlignment: MainAxisAlignment.center, children: [
@@ -87,7 +88,7 @@ class _GlobalProfilePageState extends State<GlobalProfilePage> {
             child: Padding(
               padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
               child: Text(AppLocalizations.of(context).t('profile_global_preferences'), style: TextStyle(
-                fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary,
+                fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context),
               )),
             ),
           ),
@@ -140,7 +141,7 @@ class _GlobalProfilePageState extends State<GlobalProfilePage> {
           SliverToBoxAlternate(child: Padding(
             padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
             child: Column(children: [
-              TextButton(onPressed: () {}, child: Text(AppLocalizations.of(context).t('profile_sign_out_of_sanctuary'), style: TextStyle(color: ShunShiColors.textTertiary))),
+              TextButton(onPressed: () {}, child: Text(AppLocalizations.of(context).t('profile_sign_out_of_sanctuary'), style: TextStyle(color: AppColors.textTertiary(context)))),
               TextButton(onPressed: () {}, child: Text(AppLocalizations.of(context).t('profile_deactivate_calm_account'), style: TextStyle(color: Colors.red[400], fontSize: 13))),
             ]),
           )),
@@ -168,15 +169,15 @@ class _GlobalProfilePageState extends State<GlobalProfilePage> {
       padding: const EdgeInsets.fromLTRB(24, 12, 24, 0),
       child: Container(
         padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(14)),
+        decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(14)),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
             Icon(icon, color: Color(0xFF533afd), size: 20),
             const SizedBox(width: 8),
-            Text(title, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+            Text(title, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
           ]),
           const SizedBox(height: 4),
-          Text(subtitle, style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
+          Text(subtitle, style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context))),
           const SizedBox(height: 10),
           child,
         ]),
@@ -190,13 +191,13 @@ class _GlobalProfilePageState extends State<GlobalProfilePage> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: selected ? Color(0xFF533afd).withOpacity(0.1) : ShunShiColors.surfaceContainerLow,
+          color: selected ? Color(0xFF533afd).withOpacity(0.1) : AppColors.surfaceContainerLow(context),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: selected ? Color(0xFF533afd) : ShunShiColors.borderGhost),
+          border: Border.all(color: selected ? Color(0xFF533afd) : AppColors.borderGhost(context)),
         ),
         child: Text(label, style: TextStyle(
           fontSize: 12, fontWeight: FontWeight.w500,
-          color: selected ? Color(0xFF533afd) : ShunShiColors.textSecondary,
+          color: selected ? Color(0xFF533afd) : AppColors.textSecondary(context),
         )),
       ),
     );

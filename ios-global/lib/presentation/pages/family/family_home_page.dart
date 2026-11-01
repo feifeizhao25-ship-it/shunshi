@@ -1,4 +1,5 @@
 import '../../../core/router/safe_pop.dart';
+import '../../../design_system/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../data/network/api_client.dart';
@@ -75,27 +76,27 @@ class _FamilyHomePageState extends State<FamilyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       appBar: AppBar(
-        backgroundColor: ShunShiColors.background,
+        backgroundColor: AppColors.background(context),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+          icon: Icon(Icons.arrow_back_ios_new, size: 20),
           onPressed: () => safePop(context),
         ),
         title: const Text('My family',
             style: TextStyle(fontFamily: ShunShiTypography.serifFamily)),
         actions: [
           IconButton(
-            icon: const Icon(Icons.person_add_rounded, size: 22),
+            icon: Icon(Icons.person_add_rounded, size: 22),
             onPressed: () => context.push('/family-invite'),
           ),
         ],
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator(color: ShunShiColors.primary))
+          ? Center(child: CircularProgressIndicator(color: AppColors.primary(context)))
           : RefreshIndicator(
-              color: ShunShiColors.primary,
+              color: AppColors.primary(context),
               onRefresh: _loadMembers,
               child: ListView(
                 padding: const EdgeInsets.all(20),
@@ -108,15 +109,15 @@ class _FamilyHomePageState extends State<FamilyHomePage> {
                       padding: const EdgeInsets.all(16),
                       margin: const EdgeInsets.only(bottom: 20),
                       decoration: BoxDecoration(
-                        color: ShunShiColors.primary.withValues(alpha: 0.06),
+                        color: AppColors.primary(context).withValues(alpha: 0.06),
                         borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: ShunShiColors.primary.withValues(alpha: 0.15)),
+                        border: Border.all(color: AppColors.primary(context).withValues(alpha: 0.15)),
                       ),
-                      child: const Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                        Icon(Icons.person_add_rounded, size: 20, color: ShunShiColors.primary),
+                      child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                        Icon(Icons.person_add_rounded, size: 20, color: AppColors.primary(context)),
                         SizedBox(width: 8),
                         Text('Invite family', style: TextStyle(fontSize: 15,
-                            color: ShunShiColors.primary, fontWeight: FontWeight.w500)),
+                            color: AppColors.primary(context), fontWeight: FontWeight.w500)),
                       ]),
                     ),
                   ),
@@ -126,22 +127,22 @@ class _FamilyHomePageState extends State<FamilyHomePage> {
                     padding: const EdgeInsets.all(12),
                     margin: const EdgeInsets.only(bottom: 20),
                     decoration: BoxDecoration(
-                      color: ShunShiColors.surfaceContainerLow,
+                      color: AppColors.surfaceContainerLow(context),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Row(children: [
-                      Icon(Icons.shield_outlined, size: 16, color: ShunShiColors.textTertiary),
+                    child: Row(children: [
+                      Icon(Icons.shield_outlined, size: 16, color: AppColors.textTertiary(context)),
                       SizedBox(width: 8),
                       Expanded(child: Text('Privacy: only a status level is shared — never detailed data',
-                          style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary, height: 1.4))),
+                          style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context), height: 1.4))),
                     ]),
                   ),
 
                   // Member list
                   if (_members.isEmpty)
-                    const Center(child: Padding(
+                    Center(child: Padding(
                       padding: EdgeInsets.symmetric(vertical: 48),
-                      child: Text('No family members yet', style: TextStyle(color: ShunShiColors.textTertiary, fontSize: 15)),
+                      child: Text('No family members yet', style: TextStyle(color: AppColors.textTertiary(context), fontSize: 15)),
                     ))
                   else
                     ..._members.map((m) => _buildMemberCard(m)),
@@ -159,31 +160,31 @@ class _FamilyHomePageState extends State<FamilyHomePage> {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: ShunShiColors.surfaceContainerLowest,
+          color: AppColors.surfaceContainerLowest(context),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: ShunShiColors.textTertiary.withValues(alpha: 0.15)),
+          border: Border.all(color: AppColors.textTertiary(context).withValues(alpha: 0.15)),
         ),
         child: Row(children: [
           // Avatar
           Container(
             width: 44, height: 44,
             decoration: BoxDecoration(
-              color: ShunShiColors.surfaceContainerLow,
+              color: AppColors.surfaceContainerLow(context),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Center(child: Text(m['avatar'] ?? '👤', style: const TextStyle(fontSize: 22))),
           ),
           const SizedBox(width: 14),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(m['name'] ?? '', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600,
-                color: ShunShiColors.textPrimary)),
+            Text(m['name'] ?? '', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600,
+                color: AppColors.textPrimary(context))),
             const SizedBox(height: 2),
             Text('${m['relation'] ?? ''} · ${_statusText(status)}',
                 style: TextStyle(fontSize: 13, color: _statusColor(status))),
           ])),
           Text(_statusEmoji(status), style: const TextStyle(fontSize: 16)),
           const SizedBox(width: 8),
-          const Icon(Icons.chevron_right, size: 18, color: ShunShiColors.textTertiary),
+          Icon(Icons.chevron_right, size: 18, color: AppColors.textTertiary(context)),
         ]),
       ),
     );

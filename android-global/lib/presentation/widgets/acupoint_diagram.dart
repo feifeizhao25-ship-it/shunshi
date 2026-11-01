@@ -183,7 +183,7 @@ class _AcupointDiagramCard extends StatelessWidget {
                 width: double.infinity,
                 margin: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: ShunShiColors.primary.withValues(alpha: 0.06),
+                  color: AppColors.primary(context).withValues(alpha: 0.06),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Stack(
@@ -193,7 +193,7 @@ class _AcupointDiagramCard extends StatelessWidget {
                       child: Icon(
                         data.bodyIcon,
                         size: 80,
-                        color: ShunShiColors.primary.withValues(alpha: 0.2),
+                        color: AppColors.primary(context).withValues(alpha: 0.2),
                       ),
                     ),
                     // Acupoint dot
@@ -204,12 +204,12 @@ class _AcupointDiagramCard extends StatelessWidget {
                         width: 12,
                         height: 12,
                         decoration: BoxDecoration(
-                          color: ShunShiColors.primary,
+                          color: AppColors.primary(context),
                           shape: BoxShape.circle,
                           border: Border.all(color: Colors.white, width: 2),
                           boxShadow: [
                             BoxShadow(
-                              color: ShunShiColors.primary.withValues(alpha: 0.3),
+                              color: AppColors.primary(context).withValues(alpha: 0.3),
                               blurRadius: 6,
                               spreadRadius: 2,
                             ),
@@ -232,7 +232,7 @@ class _AcupointDiagramCard extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
-                            color: ShunShiColors.primary,
+                            color: AppColors.primary(context),
                           ),
                         ),
                       ),
@@ -264,7 +264,7 @@ class _AcupointDiagramCard extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
                           decoration: BoxDecoration(
-                            color: ShunShiColors.primary.withValues(alpha: 0.1),
+                            color: AppColors.primary(context).withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
@@ -272,7 +272,7 @@ class _AcupointDiagramCard extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 10,
                               fontWeight: FontWeight.w500,
-                              color: ShunShiColors.primary,
+                              color: AppColors.primary(context),
                             ),
                           ),
                         ),
@@ -291,7 +291,7 @@ class _AcupointDiagramCard extends StatelessWidget {
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(vertical: 6),
                       decoration: BoxDecoration(
-                        color: ShunShiColors.primary.withValues(alpha: 0.08),
+                        color: AppColors.primary(context).withValues(alpha: 0.08),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
@@ -299,7 +299,7 @@ class _AcupointDiagramCard extends StatelessWidget {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 12,
-                          color: ShunShiColors.primary,
+                          color: AppColors.primary(context),
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -348,7 +348,7 @@ class _AcupointDiagramCard extends StatelessWidget {
                 const SizedBox(height: 20),
                 Row(
                   children: [
-                    Icon(data.bodyIcon, size: 36, color: ShunShiColors.primary),
+                    Icon(data.bodyIcon, size: 36, color: AppColors.primary(context)),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(

@@ -2,6 +2,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
@@ -14,7 +15,7 @@ class ConstitutionReportPageV2 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : ShunShiColors.background,
+    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : AppColors.background(context),
       appBar: AppBar(
         leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
         title: Text(AppLocalizations.of(context).t('constitution_report'), style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18, fontWeight: FontWeight.w600)),
@@ -26,7 +27,7 @@ class ConstitutionReportPageV2 extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Report title
-            Text(AppLocalizations.of(context).t('constitutionrep_constitution_report_spring_equinox_2024'), style: TextStyle(fontSize: 14, color: ShunShiColors.textTertiary)),
+            Text(AppLocalizations.of(context).t('constitutionrep_constitution_report_spring_equinox_2024'), style: TextStyle(fontSize: 14, color: AppColors.textTertiary(context))),
             const SizedBox(height: 16),
 
             // Body Type结果
@@ -55,21 +56,21 @@ class ConstitutionReportPageV2 extends StatelessWidget {
             const SizedBox(height: 20),
 
             // Constitution strength distribution
-            Text(AppLocalizations.of(context).t('constitutionrep_constitution_scores'), style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+            Text(AppLocalizations.of(context).t('constitutionrep_constitution_scores'), style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
             const SizedBox(height: 12),
-            _buildBar('Qi Deficient', 0.85, ShunShiColors.primary),
+            _buildBar('Qi Deficient', 0.85, AppColors.primary(context)),
             _buildBar('Phlegm-Damp', 0.62, Color(0xFF74593C)),
             _buildBar('Yang Deficient', 0.45, Color(0xFF9BB8C9)),
-            _buildBar('Balanced (Reference)', 0.30, ShunShiColors.textTertiary),
+            _buildBar('Balanced (Reference)', 0.30, AppColors.textTertiary(context)),
             const SizedBox(height: 8),
             Container(
               padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(color: ShunShiColors.surfaceContainerLow, borderRadius: BorderRadius.circular(10)),
+              decoration: BoxDecoration(color: AppColors.surfaceContainerLow(context), borderRadius: BorderRadius.circular(10)),
               child: Row(children: [
-                Icon(Icons.info, size: 16, color: ShunShiColors.textTertiary),
+                Icon(Icons.info, size: 16, color: AppColors.textTertiary(context)),
                 const SizedBox(width: 8),
                 Expanded(child: Text('Results based on recent physical and mental state. Constitution is influenced by environment and season; reassessment every 24 solar terms is recommended.',
-                  style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary, height: 1.5))),
+                  style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context), height: 1.5))),
               ]),
             ),
             const SizedBox(height: 20),
@@ -78,27 +79,27 @@ class ConstitutionReportPageV2 extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: ShunShiColors.surface,
+                color: AppColors.surface(context),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: ShunShiColors.primary.withOpacity(0.15)),
+                border: Border.all(color: AppColors.primary(context).withOpacity(0.15)),
               ),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Row(children: [
-                  Icon(Icons.auto_awesome, color: ShunShiColors.primary, size: 18),
+                  Icon(Icons.auto_awesome, color: AppColors.primary(context), size: 18),
                   const SizedBox(width: 8),
-                  Text(AppLocalizations.of(context).t('constitutionrep_ai_wellness_rating'), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+                  Text(AppLocalizations.of(context).t('constitutionrep_ai_wellness_rating'), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
                 ]),
                 const SizedBox(height: 12),
                 Text(
                   'In spring, your Qi Deficient traits manifest as fatigue and weakness—like seedlings needing gentle care in spring rain. Combined with Phlegm-Damp, fluid metabolism is sluggish. Focus on warming and strengthening the spleen, with phlegm-damp resolution. Remember, early sleep and light diet are the best brushstrokes for your life\'s canvas.',
-                  style: TextStyle(fontSize: 14, color: ShunShiColors.textSecondary, height: 1.8),
+                  style: TextStyle(fontSize: 14, color: AppColors.textSecondary(context), height: 1.8),
                 ),
               ]),
             ),
             const SizedBox(height: 20),
 
             // Personalized wellness plan
-            Text(AppLocalizations.of(context).t('constitutionrep_personalized_wellness_plan'), style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+            Text(AppLocalizations.of(context).t('constitutionrep_personalized_wellness_plan'), style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
             const SizedBox(height: 12),
 
             // recommended Recipes
@@ -114,7 +115,7 @@ class ConstitutionReportPageV2 extends StatelessWidget {
             // Quote
             Center(child: Text(AppLocalizations.of(context).t('constitutionrep_rest_the_body_move_the_qi'), style: TextStyle(
               fontFamily: ShunShiTypography.serifFamily,
-              fontSize: 14, fontStyle: FontStyle.italic, color: ShunShiColors.textTertiary,
+              fontSize: 14, fontStyle: FontStyle.italic, color: AppColors.textTertiary(context),
             ))),
             const SizedBox(height: 16),
 
@@ -124,10 +125,10 @@ class ConstitutionReportPageV2 extends StatelessWidget {
               child: OutlinedButton(
                 onPressed: () {},
                 style: OutlinedButton.styleFrom(
-                  side: BorderSide(color: ShunShiColors.primary),
+                  side: BorderSide(color: AppColors.primary(context)),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                 ),
-                child: Text(AppLocalizations.of(context).t('constitutionrep_generate_detailed_calendar'), style: TextStyle(color: ShunShiColors.primary, fontSize: 15, fontWeight: FontWeight.w500)),
+                child: Text(AppLocalizations.of(context).t('constitutionrep_generate_detailed_calendar'), style: TextStyle(color: AppColors.primary(context), fontSize: 15, fontWeight: FontWeight.w500)),
               ),
             ),
             const SizedBox(height: 40),

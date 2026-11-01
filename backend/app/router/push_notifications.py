@@ -202,7 +202,7 @@ async def get_unread_count(user_id: str = None):
         
         row = db.execute(
             "SELECT COUNT(*) as count FROM notifications WHERE user_id = ? AND is_read = 0",
-            (user_id or "user-001",)
+            (user_id or "",)
         ).fetchone()
         
         return {"success": True, "data": {"count": row["count"] if row else 0}}

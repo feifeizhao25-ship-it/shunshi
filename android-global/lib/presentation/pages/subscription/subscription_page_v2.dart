@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import '../../widgets/seasons_visual.dart';
 import '../../../core/theme/app_localizations.dart';
 import 'package:go_router/go_router.dart';
@@ -152,12 +153,12 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: isDark ? ShunShiColors.darkBackground : ShunShiColors.background,
+      backgroundColor: isDark ? ShunShiColors.darkBackground : AppColors.background(context),
       appBar: AppBar(
-        backgroundColor: isDark ? ShunShiColors.darkBackground : ShunShiColors.background,
+        backgroundColor: isDark ? ShunShiColors.darkBackground : AppColors.background(context),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: ShunShiColors.textPrimary),
+          icon: Icon(Icons.arrow_back, color: AppColors.textPrimary(context)),
           onPressed: () => context.pop(),
         ),
         title: Text(
@@ -166,21 +167,21 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
             fontFamily: ShunShiTypography.serifFamily,
             fontSize: 18,
             fontWeight: FontWeight.w600,
-            color: ShunShiColors.textPrimary,
+            color: AppColors.textPrimary(context),
           ),
         ),
         actions: [
           TextButton(
             onPressed: _restorePurchases,
-            child: Text(AppLocalizations.of(context).get('subscribe_restore'), style: TextStyle(fontSize: 13, color: ShunShiColors.textSecondary)),
+            child: Text(AppLocalizations.of(context).get('subscribe_restore'), style: TextStyle(fontSize: 13, color: AppColors.textSecondary(context))),
           ),
         ],
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator(color: ShunShiColors.primary))
+          ? Center(child: CircularProgressIndicator(color: AppColors.primary(context)))
           : RefreshIndicator(
               onRefresh: _loadData,
-              color: ShunShiColors.primary,
+              color: AppColors.primary(context),
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
@@ -206,14 +207,14 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
                       Container(
                         padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
-                          color: ShunShiColors.primary.withOpacity(0.08),
+                          color: AppColors.primary(context).withOpacity(0.08),
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: ShunShiColors.primary.withOpacity(0.3)),
+                          border: Border.all(color: AppColors.primary(context).withOpacity(0.3)),
                         ),
                         child: Row(children: [
-                          Icon(Icons.info_outline, color: ShunShiColors.primary, size: 18),
+                          Icon(Icons.info_outline, color: AppColors.primary(context), size: 18),
                           const SizedBox(width: 10),
-                          Expanded(child: Text(_orderMessage!, style: TextStyle(fontSize: 13, color: ShunShiColors.primary))),
+                          Expanded(child: Text(_orderMessage!, style: TextStyle(fontSize: 13, color: AppColors.primary(context)))),
                         ]),
                       ),
                     ],
@@ -228,7 +229,7 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
           child: Text(
             'Secure payment via Alipay/WeChat Pay',
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 11, color: ShunShiColors.textTertiary),
+            style: TextStyle(fontSize: 11, color: AppColors.textTertiary(context)),
           ),
         ),
       ),
@@ -247,7 +248,7 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
         gradient: LinearGradient(
           colors: planId == 'free'
               ? [const Color(0xFF8B7355), const Color(0xFF6B5344)]
-              : [ShunShiColors.primary, const Color(0xFF2D7A4A)],
+              : [AppColors.primary(context), const Color(0xFF2D7A4A)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -321,7 +322,7 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(AppLocalizations.of(context).get('subscribe_title'), style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+        Text(AppLocalizations.of(context).get('subscribe_title'), style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
         const SizedBox(height: 12),
 
         // Recommended 年度 plan
@@ -330,10 +331,10 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
           child: Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: ShunShiColors.surface,
+              color: AppColors.surface(context),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: ShunShiColors.primary, width: 2),
-              boxShadow: [BoxShadow(color: ShunShiColors.primary.withOpacity(0.1), blurRadius: 12, offset: const Offset(0, 4))],
+              border: Border.all(color: AppColors.primary(context), width: 2),
+              boxShadow: [BoxShadow(color: AppColors.primary(context).withOpacity(0.1), blurRadius: 12, offset: const Offset(0, 4))],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -341,24 +342,24 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
                 Row(children: [
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                    decoration: BoxDecoration(color: ShunShiColors.primary, borderRadius: BorderRadius.circular(6)),
+                    decoration: BoxDecoration(color: AppColors.primary(context), borderRadius: BorderRadius.circular(6)),
                     child: Text(AppLocalizations.of(context).get('subscription_recommended'), style: TextStyle(fontSize: 10, color: Colors.white, fontWeight: FontWeight.bold)),
                   ),
                   const SizedBox(width: 8),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(color: const Color(0xFFE4C285).withOpacity(0.2), borderRadius: BorderRadius.circular(6)),
-                    child: Text(AppLocalizations.of(context).get('subscription_annual_deal'), style: TextStyle(fontSize: 10, color: ShunShiColors.primary, fontWeight: FontWeight.w600)),
+                    child: Text(AppLocalizations.of(context).get('subscription_annual_deal'), style: TextStyle(fontSize: 10, color: AppColors.primary(context), fontWeight: FontWeight.w600)),
                   ),
                 ]),
                 const SizedBox(height: 12),
-                Text(recommended.name, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
-                Text('${recommended.periodName ?? ""}', style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
+                Text(recommended.name, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
+                Text('${recommended.periodName ?? ""}', style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context))),
                 const SizedBox(height: 8),
                 Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                  Text(_storeOr(recommended, yearly: true), style: TextStyle(fontSize: 34, fontWeight: FontWeight.bold, color: ShunShiColors.primary)),
+                  Text(_storeOr(recommended, yearly: true), style: TextStyle(fontSize: 34, fontWeight: FontWeight.bold, color: AppColors.primary(context))),
                   const SizedBox(width: 6),
-                  Padding(padding: const EdgeInsets.only(bottom: 6), child: Text(AppLocalizations.of(context).get('subscription_per_year'), style: TextStyle(fontSize: 13, color: ShunShiColors.textTertiary))),
+                  Padding(padding: const EdgeInsets.only(bottom: 6), child: Text(AppLocalizations.of(context).get('subscription_per_year'), style: TextStyle(fontSize: 13, color: AppColors.textTertiary(context)))),
                   const Spacer(),
                   _buildPurchaseButton(recommended),
                 ]),
@@ -389,19 +390,19 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: ShunShiColors.surface,
+          color: AppColors.surface(context),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: isSelected ? ShunShiColors.primary : ShunShiColors.borderGhost),
+          border: Border.all(color: isSelected ? AppColors.primary(context) : AppColors.borderGhost(context)),
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(plan.name, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+          Text(plan.name, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
           const SizedBox(height: 6),
           Text(
             plan.priceCents > 0 ? _planPriceLine(plan) : 'Free',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: ShunShiColors.primary),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.primary(context)),
           ),
           const SizedBox(height: 4),
-          Text(plan.description, style: TextStyle(fontSize: 10, color: ShunShiColors.textTertiary, height: 1.4), maxLines: 2, overflow: TextOverflow.ellipsis),
+          Text(plan.description, style: TextStyle(fontSize: 10, color: AppColors.textTertiary(context), height: 1.4), maxLines: 2, overflow: TextOverflow.ellipsis),
           const Spacer(),
           _buildPurchaseButton(plan),
         ]),
@@ -416,18 +417,18 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
     if (isCurrent) {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        decoration: BoxDecoration(color: ShunShiColors.textTertiary.withOpacity(0.15), borderRadius: BorderRadius.circular(8)),
-        child: Text('Current', style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
+        decoration: BoxDecoration(color: AppColors.textTertiary(context).withOpacity(0.15), borderRadius: BorderRadius.circular(8)),
+        child: Text('Current', style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context))),
       );
     }
     if (isPurchasing) {
-      return const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: ShunShiColors.primary));
+      return SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary(context)));
     }
     return GestureDetector(
       onTap: () => _purchase(plan),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        decoration: BoxDecoration(color: ShunShiColors.primary, borderRadius: BorderRadius.circular(8)),
+        decoration: BoxDecoration(color: AppColors.primary(context), borderRadius: BorderRadius.circular(8)),
         child: Text('Subscribe', style: const TextStyle(fontSize: 12, color: Colors.white, fontWeight: FontWeight.w600)),
       ),
     );
@@ -435,7 +436,7 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
 
   Widget _buildBenefits() {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text('Member Benefits', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+      Text('Member Benefits', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
       const SizedBox(height: 12),
       _buildBenefit('assets/images/wellness/wellness_seasonal.jpg', 'Seasonal Daily Ideas', 'Daily suggestions that follow the season, the time of day and what you do in the app.'),
       _buildBenefit('assets/images/wellness/food_lotus_soup.jpg', 'Full Recipe Library',
@@ -451,14 +452,14 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Container(
         padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(12)),
+        decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(12)),
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
           SgThumb(asset: asset, size: 44),
           const SizedBox(width: 12),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+            Text(title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
             const SizedBox(height: 2),
-            Text(desc, style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary, height: 1.5)),
+            Text(desc, style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context), height: 1.5)),
           ])),
         ]),
       ),
@@ -468,12 +469,12 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
   Widget _buildFAQ() {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: ShunShiColors.surfaceContainerLow, borderRadius: BorderRadius.circular(12)),
+      decoration: BoxDecoration(color: AppColors.surfaceContainerLow(context), borderRadius: BorderRadius.circular(12)),
       child: Row(children: [
-        Icon(Icons.help_outline, color: ShunShiColors.textTertiary, size: 18),
+        Icon(Icons.help_outline, color: AppColors.textTertiary(context), size: 18),
         const SizedBox(width: 8),
-        Expanded(child: Text('How to cancel auto-renewal?', style: TextStyle(fontSize: 14, color: ShunShiColors.textSecondary))),
-        Icon(Icons.chevron_right, color: ShunShiColors.textTertiary, size: 18),
+        Expanded(child: Text('How to cancel auto-renewal?', style: TextStyle(fontSize: 14, color: AppColors.textSecondary(context)))),
+        Icon(Icons.chevron_right, color: AppColors.textTertiary(context), size: 18),
       ]),
     );
   }

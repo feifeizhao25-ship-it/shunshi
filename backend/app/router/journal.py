@@ -14,6 +14,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func, and_
 
 from app.deps import current_user
+from app.locale_context import RequestLocale, request_locale
 from app.db.database import get_db
 from app.models.journal import JournalEntry as JournalEntryModel
 
@@ -171,12 +172,50 @@ def _get_tcm_insight(mood: int, energy: int, sleep_quality: int, constitution_ty
     return " | ".join(insights)
 
 
+# ── 国际版：英文版的日常建议（只讲生活方式，不做诊断，不谈药物）──────────────
+_EN_MOOD = {
+    "low": "Your mood was on the low side. A short walk, a few slow breaths or a chat with someone you trust can help; if low mood lasts, consider talking to a professional.",
+    "mid": "Your mood was steady but not at its best. A little time outdoors or with friends often helps.",
+    "good": "Your mood was positive. This is a good time for focused work or something creative.",
+}
+_EN_ENERGY = {
+    "low": "Energy was low. Prioritise rest, regular meals and an earlier night.",
+    "mid": "Energy was moderate. Gentle movement and a balanced meal can lift it.",
+    "good": "Energy was high. Keep your routine regular and get some daylight.",
+}
+_EN_SLEEP = {
+    "low": "Sleep was poor. Try a cooler, darker room, a regular bedtime and less screen time before bed.",
+    "mid": "Sleep was fair. A calming wind-down routine can make it deeper.",
+    "good": "Sleep was good. Keep your regular sleep and wake times.",
+}
+_EN_GUIDANCE = {
+    "qi_deficiency": "You noted a low-energy type. Pace yourself and keep regular meals and sleep.",
+    "yang_deficiency": "You noted a cold-prone type. Warm meals and warm layers can feel comfortable.",
+    "yin_deficiency": "You noted a dry, restless type. Enough sleep and downtime can help.",
+    "phlegm_dampness": "You noted a heavy, sleepy type. Regular movement and lighter meals can help.",
+    "damp_heat": "You noted a warm, irritable type. Lighter meals and cooling-down time can help.",
+    "qi_stagnation": "You noted a tense type. Time outdoors and slow breathing can help.",
+    "balanced": "You noted a balanced type. Keep your current routine.",
+}
+
+
+def _band(v: int) -> str:
+    return "low" if v <= 2 else ("mid" if v == 3 else "good")
+
+
+def _get_insight_en(mood: int, energy: int, sleep_quality: int, constitution_type: Optional[str] = None) -> str:
+    parts = [_EN_MOOD[_band(mood)], _EN_ENERGY[_band(energy)], _EN_SLEEP[_band(sleep_quality)]]
+    if constitution_type and constitution_type in _EN_GUIDANCE:
+        parts.append(_EN_GUIDANCE[constitution_type])
+    return " | ".join(parts)
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # 端点 (PostgreSQL backed)
 # ─────────────────────────────────────────────────────────────────────────────
 
 @router.post("/entry", summary="创建日记条目")
-async def create_journal_entry(request: JournalEntryRequest, db: Session = Depends(get_db)):
+async def create_journal_entry(request: JournalEntryRequest, db: Session = Depends(get_db), loc: RequestLocale = Depends(request_locale)):
     """创建新的日记条目，计算健康指数并生成中医建议。"""
     if not (1 <= request.mood <= 5) or not (1 <= request.energy <= 5) or not (1 <= request.sleep_quality <= 5):
         raise HTTPException(status_code=422, detail="mood, energy, sleep_quality must be between 1 and 5")
@@ -184,7 +223,7 @@ async def create_journal_entry(request: JournalEntryRequest, db: Session = Depen
     entry_date = request.date or _today().isoformat()
     entry_id = str(uuid4())
     wellness_score = _calculate_wellness_score(request.mood, request.energy, request.sleep_quality)
-    tcm_insight = _get_tcm_insight(request.mood, request.energy, request.sleep_quality, request.constitution_type)
+    tcm_insight = (_get_insight_en if loc.is_global else _get_tcm_insight)(request.mood, request.energy, request.sleep_quality, request.constitution_type)
 
     # 存入数据库
     row = JournalEntryModel(
@@ -203,9 +242,19 @@ async def create_journal_entry(request: JournalEntryRequest, db: Session = Depen
     db.commit()
     db.refresh(row)
 
+    # 日记就是每日打卡：今天第一篇记一次打卡、发积分（失败不影响日记本身）。「记录」「成就」页读的就是这里写下的数据。
+    checkin = None
+    try:
+        from app.router.gamification import award_checkin
+
+        checkin = award_checkin(db, request.user_id)
+    except Exception:
+        db.rollback()
+
     return {
         "success": True,
         "data": {
+            "checkin": checkin,
             "entry_id": entry_id,
             "user_id": request.user_id,
             "date": entry_date,
@@ -230,6 +279,7 @@ async def get_journal_entries(
     start_date: Optional[str] = Query(None),
     end_date: Optional[str] = Query(None),
     db: Session = Depends(get_db),
+    loc: RequestLocale = Depends(request_locale),
 ):
     """获取用户的日记历史，支持日期范围过滤和分页。"""
     q = db.query(JournalEntryModel).filter(JournalEntryModel.user_id == user_id)
@@ -252,7 +302,9 @@ async def get_journal_entries(
             "notes": r.content or "",
             "tags": r.tags or [],
             "wellness_score": _calculate_wellness_score(r.mood_score or 3, r.energy_level or 3, r.sleep_quality or 3),
-            "tcm_insight": r.ai_insight or "",
+            "tcm_insight": (
+                _get_insight_en(r.mood_score or 3, r.energy_level or 3, r.sleep_quality or 3) if loc.is_global else (r.ai_insight or "")
+            ),
             "timestamp": r.created_at.isoformat() if r.created_at else "",
         })
 
@@ -303,7 +355,7 @@ async def get_checkin_streak(user_id: str, db: Session = Depends(get_db)):
 
 
 @router.get("/insights/{user_id}", summary="获取周度健康洞察")
-async def get_wellness_insights(user_id: str, db: Session = Depends(get_db)):
+async def get_wellness_insights(user_id: str, db: Session = Depends(get_db), loc: RequestLocale = Depends(request_locale)):
     """获取过去7天的平均指标、趋势分析和中医模式识别。"""
     seven_days_ago = (_today() - timedelta(days=6)).isoformat()
     rows = (db.query(JournalEntryModel)
@@ -315,8 +367,9 @@ async def get_wellness_insights(user_id: str, db: Session = Depends(get_db)):
             "success": True, "data": {
                 "period": "last_7_days", "entries_count": 0,
                 "avg_mood": 0, "avg_energy": 0, "avg_sleep_quality": 0, "avg_wellness_score": 0,
-                "trend": "no_data", "tcm_pattern": "数据不足，无法分析",
-                "recommendations": ["开始记录日常状态，7天后可获得详细洞察"],
+                "trend": "no_data",
+                "tcm_pattern": "Not enough data to analyse yet" if loc.is_global else "数据不足，无法分析",
+                "recommendations": ["Log how you feel each day; after 7 days you'll see detailed insights"] if loc.is_global else ["开始记录日常状态，7天后可获得详细洞察"],
             },
         }
 
@@ -342,6 +395,11 @@ async def get_wellness_insights(user_id: str, db: Session = Depends(get_db)):
         trend, trend_msg = "declining", "状态有所下降，建议增加休息和调理。"
     else:
         trend, trend_msg = "stable", "状态稳定，继续维持。"
+    if loc.is_global:
+        trend_msg = {
+            "improving": "You're trending up. Keep doing what works for you.",
+            "declining": "You're trending down a little. Consider more rest and downtime.",
+        }.get(trend, "Not enough entries yet to see a trend." if len(scores) < 2 else "You're steady. Keep it up.")
 
     if avg_mood < 2.5:
         tcm_pattern = "肝气郁结，心神不宁"
@@ -355,6 +413,20 @@ async def get_wellness_insights(user_id: str, db: Session = Depends(get_db)):
     else:
         tcm_pattern = "气血调和，状态良好"
         recommendations = ["继续维持规律作息", "适度运动和日光照射", "均衡饮食"]
+
+    if loc.is_global:
+        if avg_mood < 2.5:
+            tcm_pattern = "Low mood this week"
+            recommendations = ["Take gentle walks outdoors", "Try slow breathing or light stretching", "Talk to someone you trust"]
+        elif avg_energy < 2.5:
+            tcm_pattern = "Low energy this week"
+            recommendations = ["Prioritise rest and regular meals", "Go to bed a little earlier", "Add short, gentle movement"]
+        elif avg_sleep < 2.5:
+            tcm_pattern = "Sleep needs attention this week"
+            recommendations = ["Keep the bedroom dark and cool", "Avoid screens before bed", "Keep a regular bedtime"]
+        else:
+            tcm_pattern = "Doing well this week"
+            recommendations = ["Keep a regular routine", "Get some daylight and gentle exercise", "Eat a balanced diet"]
 
     return {
         "success": True, "data": {

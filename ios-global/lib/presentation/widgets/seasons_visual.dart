@@ -2,6 +2,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../design_system/app_colors.dart';
 
 const _kGreen = Color(0xFF144227);
 const _kGold = Color(0xFFE4C285);
@@ -60,7 +61,7 @@ class SgHeroBanner extends StatelessWidget {
         width: double.infinity,
         child: Stack(fit: StackFit.expand, children: [
           _sgImg(asset),
-          const DecoratedBox(
+          DecoratedBox(
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
@@ -74,10 +75,10 @@ class SgHeroBanner extends StatelessWidget {
             right: 18,
             bottom: 14,
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-              Text(title, style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w700, height: 1.2)),
+              Text(title, style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w700, height: 1.2)),
               if (subtitle != null) ...[
                 const SizedBox(height: 4),
-                Text(subtitle!, style: const TextStyle(color: Colors.white, fontSize: 14, height: 1.4)),
+                Text(subtitle!, style: TextStyle(color: Colors.white, fontSize: 14, height: 1.4)),
               ],
             ]),
           ),
@@ -142,7 +143,7 @@ class SgEmptyState extends StatelessWidget {
       child: Column(mainAxisSize: MainAxisSize.min, children: [
         ClipRRect(borderRadius: BorderRadius.circular(18), child: _sgImg(asset, w: 240, h: 150)),
         const SizedBox(height: 12),
-        Text(title, textAlign: TextAlign.center, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: _kGreen)),
+        Text(title, textAlign: TextAlign.center, style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: _kGreen)),
         const SizedBox(height: 4),
         Text(message, textAlign: TextAlign.center, style: const TextStyle(fontSize: 14, height: 1.5, color: _kTextDim)),
       ]),
@@ -161,11 +162,11 @@ class SgStatChip extends StatelessWidget {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 6),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0xFFE6E1D2))),
+        decoration: BoxDecoration(color: AppColors.card(context), borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0xFFE6E1D2))),
         child: Column(children: [
           Icon(icon, size: 20, color: _kGreen),
           const SizedBox(height: 4),
-          Text(value, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: _kGreen)),
+          Text(value, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: _kGreen)),
           FittedBox(fit: BoxFit.scaleDown, child: Text(label, maxLines: 1, style: const TextStyle(fontSize: 12, color: _kTextDim))),
         ]),
       ),
@@ -188,7 +189,7 @@ class SgMoodBars extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 5),
               child: Column(mainAxisAlignment: MainAxisAlignment.end, children: [
-                Text('${e.$2}', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: _kGreen)),
+                Text('${e.$2}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: _kGreen)),
                 const SizedBox(height: 2),
                 Container(
                   height: 14.0 + 16.0 * e.$2.clamp(1, 5),

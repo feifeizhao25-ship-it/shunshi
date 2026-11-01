@@ -39,7 +39,7 @@ class SubscriptionPage extends ConsumerWidget {
                 children: [
                   IconButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    icon: const Icon(Icons.close, size: 22),
+                    icon: Icon(Icons.close, size: 22),
                     color: textSecondary,
                   ),
                   const Spacer(),
@@ -81,7 +81,7 @@ class SubscriptionPage extends ConsumerWidget {
                 child: Column(
                   children: [
                     if (subscriptionState.isRestoring)
-                      const Padding(
+                      Padding(
                         padding: EdgeInsets.only(bottom: SeasonsSpacing.sm),
                         child: SizedBox(
                           width: 20,

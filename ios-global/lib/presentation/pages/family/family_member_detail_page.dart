@@ -1,4 +1,5 @@
 import '../../../core/router/safe_pop.dart';
+import '../../../design_system/app_colors.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
@@ -80,19 +81,19 @@ class _FamilyMemberDetailPageState extends State<FamilyMemberDetailPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       appBar: AppBar(
-        backgroundColor: ShunShiColors.background,
+        backgroundColor: AppColors.background(context),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+          icon: Icon(Icons.arrow_back_ios_new, size: 20),
           onPressed: () => safePop(context),
         ),
         title: Text(_member?['name'] ?? 'Family details',
             style: const TextStyle(fontFamily: ShunShiTypography.serifFamily)),
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator(color: ShunShiColors.primary))
+          ? Center(child: CircularProgressIndicator(color: AppColors.primary(context)))
           : SingleChildScrollView(
               padding: const EdgeInsets.all(20),
               child: Column(children: [
@@ -101,17 +102,17 @@ class _FamilyMemberDetailPageState extends State<FamilyMemberDetailPage> {
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 24),
                   decoration: BoxDecoration(
-                    color: ShunShiColors.surfaceContainerLowest,
+                    color: AppColors.surfaceContainerLowest(context),
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: ShunShiColors.borderGhost),
+                    border: Border.all(color: AppColors.borderGhost(context)),
                   ),
                   child: Column(children: [
                     Text(_member?['avatar'] ?? '👤', style: const TextStyle(fontSize: 48)),
                     const SizedBox(height: 12),
-                    Text(_member?['name'] ?? '', style: const TextStyle(
+                    Text(_member?['name'] ?? '', style: TextStyle(
                         fontSize: 22, fontWeight: FontWeight.w600, fontFamily: ShunShiTypography.serifFamily)),
                     const SizedBox(height: 4),
-                    Text(_member?['relation'] ?? '', style: const TextStyle(fontSize: 14, color: ShunShiColors.textTertiary)),
+                    Text(_member?['relation'] ?? '', style: TextStyle(fontSize: 14, color: AppColors.textTertiary(context))),
                   ]),
                 ),
                 const SizedBox(height: 20),
@@ -121,21 +122,21 @@ class _FamilyMemberDetailPageState extends State<FamilyMemberDetailPage> {
                   width: double.infinity,
                   padding: const EdgeInsets.all(18),
                   decoration: BoxDecoration(
-                    color: ShunShiColors.surfaceContainerLowest,
+                    color: AppColors.surfaceContainerLowest(context),
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: ShunShiColors.borderGhost),
+                    border: Border.all(color: AppColors.borderGhost(context)),
                   ),
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    const Text('Status', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600,
+                    Text('Status', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600,
                         fontFamily: ShunShiTypography.serifFamily)),
                     const SizedBox(height: 16),
                     _infoRow('Current status',
                         '${_statusEmoji(_member?['status'] ?? 'stable')} ${_statusText(_member?['status'] ?? 'stable')}',
                         _statusColor(_member?['status'] ?? 'stable')),
                     const SizedBox(height: 12),
-                    _infoRow('Last active', _member?['lastActive'] ?? 'Unknown', ShunShiColors.textSecondary),
+                    _infoRow('Last active', _member?['lastActive'] ?? 'Unknown', AppColors.textSecondary(context)),
                     const SizedBox(height: 12),
-                    _infoRow('Last check-in', _member?['lastCheckin'] ?? 'Unknown', ShunShiColors.textSecondary),
+                    _infoRow('Last check-in', _member?['lastCheckin'] ?? 'Unknown', AppColors.textSecondary(context)),
                   ]),
                 ),
                 const SizedBox(height: 20),
@@ -144,14 +145,14 @@ class _FamilyMemberDetailPageState extends State<FamilyMemberDetailPage> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: ShunShiColors.surfaceContainerLow,
+                    color: AppColors.surfaceContainerLow(context),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Row(children: [
-                    Icon(Icons.lock_outline, size: 16, color: ShunShiColors.textTertiary),
+                  child: Row(children: [
+                    Icon(Icons.lock_outline, size: 16, color: AppColors.textTertiary(context)),
                     SizedBox(width: 8),
                     Expanded(child: Text('Privacy: you can only see a status level',
-                        style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary))),
+                        style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context)))),
                   ]),
                 ),
                 const SizedBox(height: 24),
@@ -164,10 +165,10 @@ class _FamilyMemberDetailPageState extends State<FamilyMemberDetailPage> {
                       ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text('Care reminder sent'), duration: Duration(seconds: 1)));
                     },
-                    icon: const Icon(Icons.favorite_border, size: 18),
+                    icon: Icon(Icons.favorite_border, size: 18),
                     label: const Text('Send a care reminder'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: ShunShiColors.primary,
+                      backgroundColor: AppColors.primary(context),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                     ),
                   ),
@@ -182,10 +183,10 @@ class _FamilyMemberDetailPageState extends State<FamilyMemberDetailPage> {
                       ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text('They see the same status card'), duration: Duration(seconds: 2)));
                     },
-                    icon: const Icon(Icons.visibility_outlined, size: 18),
+                    icon: Icon(Icons.visibility_outlined, size: 18),
                     label: const Text('View my status (their view)'),
                     style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: ShunShiColors.border),
+                      side: BorderSide(color: AppColors.border(context)),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                     ),
                   ),
@@ -198,7 +199,7 @@ class _FamilyMemberDetailPageState extends State<FamilyMemberDetailPage> {
 
   Widget _infoRow(String label, String value, Color valueColor) {
     return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-      Text(label, style: const TextStyle(fontSize: 14, color: ShunShiColors.textTertiary)),
+      Text(label, style: TextStyle(fontSize: 14, color: AppColors.textTertiary(context))),
       Text(value, style: TextStyle(fontSize: 14, color: valueColor, fontWeight: FontWeight.w500)),
     ]);
   }

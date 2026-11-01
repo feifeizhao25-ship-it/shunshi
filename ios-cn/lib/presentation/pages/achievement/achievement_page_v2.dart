@@ -6,7 +6,10 @@ library;
 import 'package:flutter/material.dart';
 import '../../widgets/illustrated_widgets.dart';
 import 'package:go_router/go_router.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:dio/dio.dart';
+import '../../../core/config/app_config.dart';
+import '../../../data/network/progress_api.dart';
+import '../../../data/network/session.dart';
 import '../../../design_system/theme.dart';
 import '../../../design_system/app_colors.dart';
 
@@ -22,8 +25,9 @@ class _AchievementPageV2State extends State<AchievementPageV2> {
   int _diaryCount = 0;
   int _favoriteCount = 0;
   int _checkinStreak = 0;
-  int _meditationCount = 0;
   int _points = 0;
+  UserProgress? _progress;
+  bool _loaded = false;
 
   @override
   void initState() {
@@ -31,58 +35,40 @@ class _AchievementPageV2State extends State<AchievementPageV2> {
     _loadStats();
   }
 
+  /// 数字全部来自服务端（打卡 / 日记 / 收藏 / 聊天写入接口留下的记录），不再读本地从来没人写过的计数，
+  /// 也不再用「聊天×10 + 日记×20…」自己拼一个积分（复测 B03：成就页永远 0）。
   Future<void> _loadStats() async {
-    final prefs = await SharedPreferences.getInstance();
-    if (mounted) {
-      setState(() {
-        _chatCount = prefs.getInt('chat_count') ?? 0;
-        _diaryCount = prefs.getInt('diary_count') ?? 0;
-        _favoriteCount = prefs.getInt('favorite_count') ?? 0;
-        _checkinStreak = prefs.getInt('checkin_streak') ?? 0;
-        _meditationCount = prefs.getInt('meditation_count') ?? 0;
-        _points = _chatCount * 10 + _diaryCount * 20 + _checkinStreak * 5 + _meditationCount * 15;
-      });
-    }
+    final dio = Dio(BaseOptions(baseUrl: AppConfig.apiBaseUrl, connectTimeout: const Duration(seconds: 8)));
+    final token = await ensureSessionToken(dio);
+    final p = token == null ? null : await fetchUserProgress(dio, token: token);
+    if (!mounted) return;
+    setState(() {
+      _progress = p;
+      _loaded = true;
+      _chatCount = p?.chatCount ?? 0;
+      _diaryCount = p?.journalCount ?? 0;
+      _favoriteCount = p?.favoriteCount ?? 0;
+      _checkinStreak = p?.streakDays ?? 0;
+      _points = p?.points ?? 0;
+    });
   }
 
-  int get _level {
-    if (_points >= 3000) return 5;
-    if (_points >= 2000) return 4;
-    if (_points >= 1000) return 3;
-    if (_points >= 300) return 2;
-    return 1;
-  }
-
-  String get _levelTitle {
-    const titles = ['入门修行者', '初级养生者', '中级养生者', '高级养生者', '养生大师'];
-    return titles[_level - 1];
-  }
-
-  String get _nextLevelTitle {
-    if (_level >= 5) return '已满级';
-    const titles = ['初级养生者', '中级养生者', '高级养生者', '养生大师', ''];
-    return titles[_level - 1];
-  }
-
-  int get _nextLevelPoints {
-    const thresholds = [300, 1000, 2000, 3000, 9999];
-    return thresholds[_level - 1];
-  }
+  int get _level => _progress?.level ?? 1;
+  String get _levelTitle => (_progress?.levelName.isNotEmpty ?? false) ? _progress!.levelName : '初学者';
+  String get _nextLevelTitle => _progress?.nextLevelName ?? '已满级';
+  int get _nextLevelPoints => _progress?.nextLevelPoints ?? 0;
 
   List<_Badge> get _badges => [
-    _Badge(Icons.wb_sunny, '早起达人', '连续早起$_checkinStreak/10天', _checkinStreak >= 10, _checkinStreak / 10, ShunShiColors.primary),
+    _Badge(Icons.wb_sunny, '早起达人', '连续打卡$_checkinStreak/10天', _checkinStreak >= 10, _checkinStreak / 10, ShunShiColors.primary),
     _Badge(Icons.eco, '节气使者', '顺时而养', _checkinStreak >= 3, _checkinStreak / 3, const Color(0xFF2D7A4A)),
     _Badge(Icons.storm, '养生先锋', '聊天$_chatCount/50次', _chatCount >= 50, _chatCount / 50, const Color(0xFF74593C)),
     _Badge(Icons.auto_stories, '日记达人', '日记$_diaryCount/30篇', _diaryCount >= 30, _diaryCount / 30, const Color(0xFF7c5cfc)),
-    _Badge(Icons.self_improvement, '冥想行者', '冥想$_meditationCount/20次', _meditationCount >= 20, _meditationCount / 20, const Color(0xFF533afd)),
     _Badge(Icons.favorite, '收藏家', '收藏$_favoriteCount/10个', _favoriteCount >= 10, _favoriteCount / 10, Colors.pink),
     _Badge(Icons.history_edu, '百日功成', '打卡$_checkinStreak/100天', _checkinStreak >= 100, _checkinStreak / 100, Colors.orange),
-    _Badge(Icons.family_restroom, '全家康泰', '亲友共修', false, 0, null),
   ];
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final bg = AppColors.background(context);
     final badges = _badges;
     final unlocked = badges.where((b) => b.unlocked).toList();
@@ -111,6 +97,17 @@ class _AchievementPageV2State extends State<AchievementPageV2> {
             ),
             const SizedBox(height: 16),
 
+            if (_loaded && _progress == null) ...[
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(color: ShunShiColors.primary.withOpacity(0.06), borderRadius: BorderRadius.circular(14)),
+                child: Row(children: [
+                  const Expanded(child: Text('暂时读不到你的成就数据，请检查网络后重试。', style: TextStyle(fontSize: 13))),
+                  TextButton(onPressed: () { setState(() => _loaded = false); _loadStats(); }, child: const Text('重试')),
+                ]),
+              ),
+              const SizedBox(height: 12),
+            ],
             // Points & Level Card
             Container(
               width: double.infinity,
@@ -151,7 +148,7 @@ class _AchievementPageV2State extends State<AchievementPageV2> {
               const SizedBox(width: 8),
               _statCard('日记', _diaryCount, Icons.auto_stories),
               const SizedBox(width: 8),
-              _statCard('冥想', _meditationCount, Icons.self_improvement),
+              _statCard('收藏', _favoriteCount, Icons.favorite_border),
               const SizedBox(width: 8),
               _statCard('连续', _checkinStreak, Icons.local_fire_department),
             ]),
@@ -209,8 +206,7 @@ class _AchievementPageV2State extends State<AchievementPageV2> {
   String _getAITip() {
     if (_checkinStreak >= 7) return '连续打卡$_checkinStreak天，太棒了！距离"百日功成"还需${100 - _checkinStreak}天。';
     if (_chatCount < 10) return '再和顺时AI聊${10 - _chatCount}次，即可解锁更多养生建议。';
-    if (_meditationCount < 5) return '试试冥想功能，再冥想${5 - _meditationCount}次就能获得"冥想行者"勋章。';
-    return '坚持每天打卡、聊天、冥想，解锁更多成就勋章。';
+    return '坚持每天打卡、写日记、和顺时聊聊，解锁更多成就勋章。';
   }
 
   Widget _statCard(String label, int value, IconData icon) {

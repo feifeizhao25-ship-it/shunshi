@@ -75,7 +75,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
     final contentId = item['content_id'];
     setState(() => _items.removeAt(index));
     try {
-      await ApiClient().delete('/api/v1/favorites/$contentId?user_id=guest');
+      await ApiClient().delete('/api/v1/favorites/$contentId${userIdQuery()}');
     } catch (_) {
       if (mounted) {
         setState(() => _items.insert(index, item));

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 
 import '../../../core/router/safe_pop.dart';
 import '../../../design_system/theme.dart';
@@ -61,9 +62,9 @@ class _TeaPageState extends State<TeaPage> {
   Widget build(BuildContext context) {
     final drinks = _drinksBySeason[_season]!;
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       appBar: AppBar(
-        backgroundColor: ShunShiColors.background,
+        backgroundColor: AppColors.background(context),
         leading: BackButton(onPressed: () => safePop(context)),
         title: const Text('Seasonal drinks'),
       ),
@@ -84,12 +85,12 @@ class _TeaPageState extends State<TeaPage> {
               for (final s in _drinksBySeason.keys)
                 ChoiceChip(
                   key: Key('season_$s'),
-                  avatar: Icon(_seasonIcons[s], size: 18, color: _season == s ? Colors.white : ShunShiColors.textSecondary),
+                  avatar: Icon(_seasonIcons[s], size: 18, color: _season == s ? Colors.white : AppColors.textSecondary(context)),
                   label: Text(s),
                   selected: _season == s,
                   showCheckmark: false,
-                  selectedColor: ShunShiColors.textPrimary,
-                  labelStyle: TextStyle(color: _season == s ? Colors.white : ShunShiColors.textPrimary, fontSize: 14),
+                  selectedColor: AppColors.textPrimary(context),
+                  labelStyle: TextStyle(color: _season == s ? Colors.white : AppColors.textPrimary(context), fontSize: 14),
                   onSelected: (_) => setState(() => _season = s),
                 ),
             ],
@@ -100,7 +101,7 @@ class _TeaPageState extends State<TeaPage> {
               key: Key('drink_${d.name}'),
               margin: const EdgeInsets.only(bottom: 12),
               padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(16)),
+              decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(16)),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -110,9 +111,9 @@ class _TeaPageState extends State<TeaPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(d.name, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+                        Text(d.name, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
                         const SizedBox(height: 4),
-                        Text(d.note, style: TextStyle(fontSize: 14, height: 1.4, color: ShunShiColors.textSecondary)),
+                        Text(d.note, style: TextStyle(fontSize: 14, height: 1.4, color: AppColors.textSecondary(context))),
                       ],
                     ),
                   ),
@@ -126,13 +127,13 @@ class _TeaPageState extends State<TeaPage> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(Icons.info_outline, size: 18, color: Color(0xFF8A6A1E)),
+                Icon(Icons.info_outline, size: 18, color: Color(0xFF8A6A1E)),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
                     'Herbal teas and supplements can interact with medicines. If you take any, check with your pharmacist first. '
                     'For wellness routine guidance only; not medical diagnosis or treatment.',
-                    style: TextStyle(fontSize: 13, height: 1.45, color: ShunShiColors.textSecondary),
+                    style: TextStyle(fontSize: 13, height: 1.45, color: AppColors.textSecondary(context)),
                   ),
                 ),
               ],

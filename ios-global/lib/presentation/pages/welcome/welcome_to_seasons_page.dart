@@ -10,6 +10,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import '../../../design_system/theme.dart';
 
 class WelcomeToSeasonsPage extends StatefulWidget {
@@ -25,7 +26,7 @@ class _WelcomeToSeasonsPageState extends State<WelcomeToSeasonsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 28),
@@ -37,7 +38,7 @@ class _WelcomeToSeasonsPageState extends State<WelcomeToSeasonsPage> {
               Container(
                 width: 72, height: 72,
                 decoration: BoxDecoration(
-                  color: ShunShiColors.primary.withValues(alpha: 0.1),
+                  color: AppColors.primary(context).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Center(
@@ -49,7 +50,7 @@ class _WelcomeToSeasonsPageState extends State<WelcomeToSeasonsPage> {
                 'Welcome to SEASONS.',
                 style: TextStyle(
                   fontSize: 28, fontWeight: FontWeight.w700,
-                  color: ShunShiColors.textPrimary,
+                  color: AppColors.textPrimary(context),
                   fontFamily: ShunShiTypography.serifFamily,
                   height: 1.2,
                 ),
@@ -59,7 +60,7 @@ class _WelcomeToSeasonsPageState extends State<WelcomeToSeasonsPage> {
               Text(
                 "Let's find your rhythm.",
                 style: TextStyle(
-                  fontSize: 17, color: ShunShiColors.textSecondary,
+                  fontSize: 17, color: AppColors.textSecondary(context),
                   fontFamily: ShunShiTypography.sansFamily,
                 ),
               ),
@@ -67,7 +68,7 @@ class _WelcomeToSeasonsPageState extends State<WelcomeToSeasonsPage> {
               Text(
                 "Align your wellness with nature's wisdom.\nBased on your location and unique body type.",
                 style: TextStyle(
-                  fontSize: 14, color: ShunShiColors.textTertiary,
+                  fontSize: 14, color: AppColors.textTertiary(context),
                   fontFamily: ShunShiTypography.sansFamily, height: 1.5,
                 ),
                 textAlign: TextAlign.center,
@@ -79,11 +80,11 @@ class _WelcomeToSeasonsPageState extends State<WelcomeToSeasonsPage> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: ShunShiColors.primary.withValues(alpha: 0.06),
+                  color: AppColors.primary(context).withValues(alpha: 0.06),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Row(children: [
-                  Icon(Icons.location_on, size: 20, color: ShunShiColors.primary),
+                  Icon(Icons.location_on, size: 20, color: AppColors.primary(context)),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -91,14 +92,14 @@ class _WelcomeToSeasonsPageState extends State<WelcomeToSeasonsPage> {
                         _isNorthern ? 'Northern Hemisphere detected' : 'Southern Hemisphere detected',
                         style: TextStyle(
                           fontSize: 14, fontWeight: FontWeight.w600,
-                          color: ShunShiColors.primary, fontFamily: ShunShiTypography.sansFamily,
+                          color: AppColors.primary(context), fontFamily: ShunShiTypography.sansFamily,
                         ),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         'Based on your current IP',
                         style: TextStyle(
-                          fontSize: 12, color: ShunShiColors.textTertiary,
+                          fontSize: 12, color: AppColors.textTertiary(context),
                           fontFamily: ShunShiTypography.sansFamily,
                         ),
                       ),
@@ -110,7 +111,7 @@ class _WelcomeToSeasonsPageState extends State<WelcomeToSeasonsPage> {
 
               // ── Manual Select ──
               Text('Or select manually', style: TextStyle(
-                fontSize: 13, color: ShunShiColors.textTertiary, fontFamily: ShunShiTypography.sansFamily,
+                fontSize: 13, color: AppColors.textTertiary(context), fontFamily: ShunShiTypography.sansFamily,
               )),
               const SizedBox(height: 10),
               Row(
@@ -121,17 +122,17 @@ class _WelcomeToSeasonsPageState extends State<WelcomeToSeasonsPage> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         decoration: BoxDecoration(
-                          color: _isNorthern ? ShunShiColors.primary : ShunShiColors.surfaceContainerLow,
+                          color: _isNorthern ? AppColors.primary(context) : AppColors.surfaceContainerLow(context),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Column(children: [
                           Icon(Icons.north_east, size: 24,
-                            color: _isNorthern ? Colors.white : ShunShiColors.textTertiary,
+                            color: _isNorthern ? Colors.white : AppColors.textTertiary(context),
                           ),
                           const SizedBox(height: 4),
                           Text('Northern', style: TextStyle(
                             fontSize: 14, fontWeight: FontWeight.w600,
-                            color: _isNorthern ? Colors.white : ShunShiColors.textSecondary,
+                            color: _isNorthern ? Colors.white : AppColors.textSecondary(context),
                             fontFamily: ShunShiTypography.sansFamily,
                           )),
                         ]),
@@ -145,17 +146,17 @@ class _WelcomeToSeasonsPageState extends State<WelcomeToSeasonsPage> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         decoration: BoxDecoration(
-                          color: !_isNorthern ? ShunShiColors.primary : ShunShiColors.surfaceContainerLow,
+                          color: !_isNorthern ? AppColors.primary(context) : AppColors.surfaceContainerLow(context),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Column(children: [
                           Icon(Icons.south_east, size: 24,
-                            color: !_isNorthern ? Colors.white : ShunShiColors.textTertiary,
+                            color: !_isNorthern ? Colors.white : AppColors.textTertiary(context),
                           ),
                           const SizedBox(height: 4),
                           Text('Southern', style: TextStyle(
                             fontSize: 14, fontWeight: FontWeight.w600,
-                            color: !_isNorthern ? Colors.white : ShunShiColors.textSecondary,
+                            color: !_isNorthern ? Colors.white : AppColors.textSecondary(context),
                             fontFamily: ShunShiTypography.sansFamily,
                           )),
                         ]),
@@ -173,7 +174,7 @@ class _WelcomeToSeasonsPageState extends State<WelcomeToSeasonsPage> {
                 child: ElevatedButton(
                   onPressed: () {},
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: ShunShiColors.primary,
+                    backgroundColor: AppColors.primary(context),
                     foregroundColor: Colors.white,
                     elevation: 0,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -188,7 +189,7 @@ class _WelcomeToSeasonsPageState extends State<WelcomeToSeasonsPage> {
                 'By continuing, you agree to our Seasonal Living Principles and Privacy Policy.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 11, color: ShunShiColors.textTertiary,
+                  fontSize: 11, color: AppColors.textTertiary(context),
                   fontFamily: ShunShiTypography.sansFamily, height: 1.4,
                 ),
               ),

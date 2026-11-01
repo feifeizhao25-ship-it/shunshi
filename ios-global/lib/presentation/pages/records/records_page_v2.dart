@@ -3,6 +3,7 @@
 library;
 
 import 'package:dio/dio.dart';
+import '../../../design_system/app_colors.dart';
 import '../../../data/storage/storage_manager.dart';
 import '../../widgets/state_view.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +11,7 @@ import '../../widgets/seasons_visual.dart';
 import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/config/app_config.dart';
+import '../../../core/network/locale_headers.dart';
 import '../../../data/network/session.dart';
 
 class RecordsPageV2 extends StatefulWidget {
@@ -20,12 +22,12 @@ class RecordsPageV2 extends StatefulWidget {
 
 class _RecordsPageV2State extends State<RecordsPageV2> {
   static const _baseUrl = AppConfig.apiBaseUrl;
-  final _dio = Dio(BaseOptions(baseUrl: _baseUrl, connectTimeout: const Duration(seconds: 8)));
+  final _dio = Dio(BaseOptions(baseUrl: _baseUrl, connectTimeout: const Duration(seconds: 8), headers: LocaleHeaders.values));
   
   int _weekStreak = 0;
   int _totalPoints = 0;
   int _todayDone = 0;
-  int _todayTotal = 5;
+  int _todayTotal = 3;
   List<Map<String, dynamic>> _emotionTrends = [];
   Map<String, dynamic> _sleepStats = {};
   bool _loading = true;
@@ -69,13 +71,14 @@ class _RecordsPageV2State extends State<RecordsPageV2> {
       if (today is Map && today['data'] is Map) {
         final d = today['data'] as Map<String, dynamic>;
         _todayDone = d['completed'] as int? ?? 0;
-        _todayTotal = d['total'] as int? ?? 5;
+        _todayTotal = d['total'] as int? ?? 3;
       }
       // Emotion trends
       final emotions = results[2].data;
-      if (emotions is Map && emotions['data'] is List) {
-        _emotionTrends = (emotions['data'] as List).cast<Map<String, dynamic>>();
-      }
+      // 后端：{data: {trends: [{date, avg_mood(1–5), count}], ...}}；旧版直接是列表，两种都认。
+      final eData = emotions is Map ? emotions['data'] : null;
+      final eList = eData is List ? eData : (eData is Map && eData['trends'] is List ? eData['trends'] as List : const []);
+      _emotionTrends = eList.whereType<Map>().map((e) => Map<String, dynamic>.from(e)).toList();
       // Sleep stats
       final sleep = results[3].data;
       if (sleep is Map && sleep['data'] is Map) {
@@ -87,19 +90,19 @@ class _RecordsPageV2State extends State<RecordsPageV2> {
 
   @override
   Widget build(BuildContext context) {
-    if (_loading) return Scaffold(backgroundColor: ShunShiColors.background, body: const LoadingSkeleton());
+    if (_loading) return Scaffold(backgroundColor: AppColors.background(context), body: const LoadingSkeleton());
 
     final progress = _todayTotal > 0 ? _todayDone / _todayTotal : 0.0;
 
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       appBar: AppBar(
-        backgroundColor: ShunShiColors.background,
-        leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
+        backgroundColor: AppColors.background(context),
+        leading: IconButton(icon: Icon(Icons.arrow_back), onPressed: () => context.pop()),
         title: Text('WellnessRecords', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18, fontWeight: FontWeight.w600)),
       ),
       body: RefreshIndicator(
-        color: ShunShiColors.primary,
+        color: AppColors.primary(context),
         onRefresh: _fetchData,
         child: ListView(
           padding: const EdgeInsets.all(20),
@@ -119,7 +122,7 @@ class _RecordsPageV2State extends State<RecordsPageV2> {
               SgStatChip(icon: Icons.stars_outlined, label: 'Points', value: '$_totalPoints'),
             ]),
             const SizedBox(height: 16),
-            if (_weekStreak == 0 && _todayDone == 0 && _sleepStats['avg_hours'] == null && _emotionTrends.isEmpty)
+            if (_weekStreak == 0 && _todayDone == 0 && _sleepStats['avg_hours'] == null && _sleepStats['avg_quality'] == null && _emotionTrends.isEmpty)
               const SgEmptyState(
                 asset: 'assets/images/sg_empty.webp',
                 title: 'No records yet',
@@ -127,46 +130,46 @@ class _RecordsPageV2State extends State<RecordsPageV2> {
               ),
 
             // Today progress
-            Text('Today\'s Progress', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+            Text('Today\'s Progress', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
             const SizedBox(height: 12),
             Container(
               padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(14)),
+              decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(14)),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Row(children: [
-                  Icon(progress >= 1.0 ? Icons.celebration : Icons.wb_sunny, color: ShunShiColors.primary, size: 18),
+                  Icon(progress >= 1.0 ? Icons.celebration : Icons.wb_sunny, color: AppColors.primary(context), size: 18),
                   const SizedBox(width: 8),
-                  Text('Today', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+                  Text('Today', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
                   const Spacer(),
-                  Text('${(progress * 100).toInt()}%', style: TextStyle(fontSize: 13, color: ShunShiColors.primary, fontWeight: FontWeight.w500)),
+                  Text('${(progress * 100).toInt()}%', style: TextStyle(fontSize: 13, color: AppColors.primary(context), fontWeight: FontWeight.w500)),
                 ]),
                 const SizedBox(height: 8),
                 Text(progress >= 1.0 ? 'All habits completed!' : 'Completed $_todayDone/$_todayTotal habits',
-                  style: TextStyle(fontSize: 13, color: ShunShiColors.textSecondary)),
+                  style: TextStyle(fontSize: 13, color: AppColors.textSecondary(context))),
                 const SizedBox(height: 8),
                 ClipRRect(borderRadius: BorderRadius.circular(3),
-                  child: LinearProgressIndicator(value: progress, backgroundColor: ShunShiColors.surfaceContainerLow, color: ShunShiColors.primary, minHeight: 4)),
+                  child: LinearProgressIndicator(value: progress, backgroundColor: AppColors.surfaceContainerLow(context), color: AppColors.primary(context), minHeight: 4)),
               ]),
             ),
             const SizedBox(height: 16),
 
             // Sleep stats
-            if (_sleepStats['avg_hours'] != null) ...[
-              Text('Sleep Stats', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+            if (_sleepStats['avg_hours'] != null || _sleepStats['avg_quality'] != null) ...[
+              Text('Sleep Stats', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
               const SizedBox(height: 12),
               Container(
                 padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(14)),
+                decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(14)),
                 child: Row(children: [
-                  Icon(Icons.bedtime, color: ShunShiColors.primary, size: 20),
+                  Icon(Icons.bedtime, color: AppColors.primary(context), size: 20),
                   const SizedBox(width: 10),
                   Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text('Avg Sleep', style: TextStyle(fontSize: 13, color: ShunShiColors.textTertiary)),
-                    Text('${_sleepStats['avg_hours'] ?? '-'}/hr', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: ShunShiColors.textPrimary)),
+                    Text('Avg Sleep', style: TextStyle(fontSize: 13, color: AppColors.textTertiary(context))),
+                    Text(_sleepStats['avg_hours'] == null ? '-' : '${_sleepStats['avg_hours']} h', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.textPrimary(context))),
                   ])),
                   Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text('Quality Score', style: TextStyle(fontSize: 13, color: ShunShiColors.textTertiary)),
-                    Text('${_sleepStats['avg_quality'] ?? '-'}/5', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: ShunShiColors.textPrimary)),
+                    Text('Quality Score', style: TextStyle(fontSize: 13, color: AppColors.textTertiary(context))),
+                    Text(_sleepStats['avg_quality'] == null ? '-' : '${_sleepStats['avg_quality']}/5', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.textPrimary(context))),
                   ])),
                 ]),
               ),
@@ -175,11 +178,11 @@ class _RecordsPageV2State extends State<RecordsPageV2> {
 
             // Emotion trends
             if (_emotionTrends.isNotEmpty) ...[
-              Text('Mood Trends', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+              Text('Mood Trends', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
               const SizedBox(height: 12),
               Container(
                 padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(16)),
+                decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(16)),
                 child: SgMoodBars(entries: [
                   for (final e in _emotionTrends.take(7))
                     if (e['avg_mood'] is num)

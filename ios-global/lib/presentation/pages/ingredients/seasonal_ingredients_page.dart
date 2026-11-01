@@ -8,6 +8,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import '../../../design_system/theme.dart';
 
 class SeasonalIngredientsPage extends StatefulWidget {
@@ -38,10 +39,10 @@ class _SeasonalIngredientsPageState extends State<SeasonalIngredientsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       appBar: AppBar(
-        backgroundColor: ShunShiColors.background,
-        leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new, size: 20), onPressed: () => Navigator.pop(context)),
+        backgroundColor: AppColors.background(context),
+        leading: IconButton(icon: Icon(Icons.arrow_back_ios_new, size: 20), onPressed: () => Navigator.pop(context)),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -51,19 +52,19 @@ class _SeasonalIngredientsPageState extends State<SeasonalIngredientsPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Late Summer Harvest', style: TextStyle(fontSize: 13, color: ShunShiColors.textTertiary, fontFamily: ShunShiTypography.sansFamily)),
-                Text('The Seasonal Directory', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700, color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.serifFamily)),
+                Text('Late Summer Harvest', style: TextStyle(fontSize: 13, color: AppColors.textTertiary(context), fontFamily: ShunShiTypography.sansFamily)),
+                Text('The Seasonal Directory', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700, color: AppColors.textPrimary(context), fontFamily: ShunShiTypography.serifFamily)),
                 const SizedBox(height: 6),
-                Text('Aligning your plate with the rhythms of the earth.', style: TextStyle(fontSize: 14, color: ShunShiColors.textSecondary, fontFamily: ShunShiTypography.sansFamily)),
+                Text('Aligning your plate with the rhythms of the earth.', style: TextStyle(fontSize: 14, color: AppColors.textSecondary(context), fontFamily: ShunShiTypography.sansFamily)),
                 const SizedBox(height: 16),
                 // Search
                 Container(
                   height: 44, padding: const EdgeInsets.symmetric(horizontal: 16),
-                  decoration: BoxDecoration(color: ShunShiColors.surfaceContainerLow, borderRadius: BorderRadius.circular(12)),
+                  decoration: BoxDecoration(color: AppColors.surfaceContainerLow(context), borderRadius: BorderRadius.circular(12)),
                   child: Row(children: [
-                    Icon(Icons.search, size: 20, color: ShunShiColors.textTertiary),
+                    Icon(Icons.search, size: 20, color: AppColors.textTertiary(context)),
                     const SizedBox(width: 10),
-                    Text('Search ingredients...', style: TextStyle(fontSize: 14, color: ShunShiColors.textTertiary, fontFamily: ShunShiTypography.sansFamily)),
+                    Text('Search ingredients...', style: TextStyle(fontSize: 14, color: AppColors.textTertiary(context), fontFamily: ShunShiTypography.sansFamily)),
                   ]),
                 ),
                 const SizedBox(height: 16),
@@ -97,12 +98,12 @@ class _SeasonalIngredientsPageState extends State<SeasonalIngredientsPage> {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
-            color: selected ? ShunShiColors.primary : ShunShiColors.surfaceContainerLow,
+            color: selected ? AppColors.primary(context) : AppColors.surfaceContainerLow(context),
             borderRadius: BorderRadius.circular(20),
           ),
           child: Text(_filters[i], style: TextStyle(
             fontSize: 13, fontWeight: FontWeight.w500,
-            color: selected ? Colors.white : ShunShiColors.textSecondary,
+            color: selected ? Colors.white : AppColors.textSecondary(context),
             fontFamily: ShunShiTypography.sansFamily,
           )),
         ),
@@ -115,36 +116,36 @@ class _SeasonalIngredientsPageState extends State<SeasonalIngredientsPage> {
       padding: const EdgeInsets.only(bottom: 16),
       child: Container(
         padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(color: ShunShiColors.surfaceContainerLowest, borderRadius: BorderRadius.circular(14)),
+        decoration: BoxDecoration(color: AppColors.surfaceContainerLowest(context), borderRadius: BorderRadius.circular(14)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(children: [
               Text('In Peak', style: TextStyle(fontSize: 11, color: const Color(0xFF22C55E), fontWeight: FontWeight.w600, fontFamily: ShunShiTypography.sansFamily)),
               const Spacer(),
-              const Icon(Icons.favorite_outline, size: 20, color: ShunShiColors.textTertiary),
+              Icon(Icons.favorite_outline, size: 20, color: AppColors.textTertiary(context)),
             ]),
             const SizedBox(height: 8),
-            Text(ing.name, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.serifFamily)),
+            Text(ing.name, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary(context), fontFamily: ShunShiTypography.serifFamily)),
             const SizedBox(height: 10),
-            Text('Wellness Benefits', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: ShunShiColors.textTertiary, fontFamily: ShunShiTypography.sansFamily)),
+            Text('Wellness Benefits', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.textTertiary(context), fontFamily: ShunShiTypography.sansFamily)),
             const SizedBox(height: 4),
-            Text(ing.benefits, style: TextStyle(fontSize: 13, color: ShunShiColors.textSecondary, height: 1.5, fontFamily: ShunShiTypography.sansFamily)),
+            Text(ing.benefits, style: TextStyle(fontSize: 13, color: AppColors.textSecondary(context), height: 1.5, fontFamily: ShunShiTypography.sansFamily)),
             const SizedBox(height: 10),
-            Text('Body Type Alignment', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: ShunShiColors.textTertiary, fontFamily: ShunShiTypography.sansFamily)),
+            Text('Body Type Alignment', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.textTertiary(context), fontFamily: ShunShiTypography.sansFamily)),
             const SizedBox(height: 6),
             Wrap(spacing: 6, runSpacing: 6, children: ing.types.map((t) => Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(color: ShunShiColors.primary.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(12)),
-              child: Text(t, style: TextStyle(fontSize: 12, color: ShunShiColors.primary, fontFamily: ShunShiTypography.sansFamily)),
+              decoration: BoxDecoration(color: AppColors.primary(context).withValues(alpha: 0.08), borderRadius: BorderRadius.circular(12)),
+              child: Text(t, style: TextStyle(fontSize: 12, color: AppColors.primary(context), fontFamily: ShunShiTypography.sansFamily)),
             )).toList()),
             const SizedBox(height: 10),
             GestureDetector(
               onTap: () {},
               child: Row(children: [
-                Text('View Rituals', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: ShunShiColors.primary, fontFamily: ShunShiTypography.sansFamily)),
+                Text('View Rituals', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.primary(context), fontFamily: ShunShiTypography.sansFamily)),
                 const SizedBox(width: 4),
-                const Icon(Icons.arrow_forward, size: 16, color: ShunShiColors.primary),
+                Icon(Icons.arrow_forward, size: 16, color: AppColors.primary(context)),
               ]),
             ),
           ],

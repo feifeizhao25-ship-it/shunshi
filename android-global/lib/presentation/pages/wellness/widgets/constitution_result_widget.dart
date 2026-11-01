@@ -1,4 +1,5 @@
 import 'dart:ui';
+import '../../../../design_system/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/theme/shunshi_colors.dart';
 import 'constitution_data.dart';
@@ -241,7 +242,7 @@ class ConstitutionResultWidget extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
       decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.card(context),
           boxShadow: [
             BoxShadow(
                 color: Colors.black.withValues(alpha: 0.06), blurRadius: 20, offset: const Offset(0, -4))

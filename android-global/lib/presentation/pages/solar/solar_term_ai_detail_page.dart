@@ -3,6 +3,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
 import 'package:go_router/go_router.dart';
@@ -85,7 +86,7 @@ class SolarTermAIDetailPage extends StatelessWidget {
     return Scaffold(
 
       appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
-      backgroundColor: isDark ? ShunShiColors.darkBackground : ShunShiColors.background,
+      backgroundColor: isDark ? ShunShiColors.darkBackground : AppColors.background(context),
       body: Stack(
         children: [
           // Scrollable content
@@ -119,11 +120,11 @@ class SolarTermAIDetailPage extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
                   decoration: BoxDecoration(
-                    color: ShunShiColors.primary,
+                    color: AppColors.primary(context),
                     borderRadius: BorderRadius.circular(999),
                     boxShadow: [
                       BoxShadow(
-                        color: ShunShiColors.primary.withValues(alpha: 0.3),
+                        color: AppColors.primary(context).withValues(alpha: 0.3),
                         blurRadius: 20, offset: const Offset(0, 8),
                       ),
                     ],
@@ -152,7 +153,7 @@ class SolarTermAIDetailPage extends StatelessWidget {
       top: 0, left: 0, right: 0,
       child: Container(
         decoration: BoxDecoration(
-          color: ShunShiColors.background.withValues(alpha: 0.8),
+          color: AppColors.background(context).withValues(alpha: 0.8),
         ),
         child: SafeArea(
           child: Padding(
@@ -165,26 +166,26 @@ class SolarTermAIDetailPage extends StatelessWidget {
                   child: Container(
                     width: 40, height: 40,
                     decoration: BoxDecoration(
-                      color: ShunShiColors.surfaceContainerLow,
+                      color: AppColors.surfaceContainerLow(context),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Icon(Icons.arrow_back, size: 20, color: ShunShiColors.primary),
+                    child: Icon(Icons.arrow_back, size: 20, color: AppColors.primary(context)),
                   ),
                 ),
                 Text(AppLocalizations.of(context).t('profile_brand'), style: TextStyle(
                   fontSize: 20, fontStyle: FontStyle.italic,
                   fontFamily: ShunShiTypography.serifFamily,
-                  color: ShunShiColors.primary,
+                  color: AppColors.primary(context),
                 )),
                 GestureDetector(
                   onTap: () => context.push('/chat'),
                   child: Container(
                     width: 40, height: 40,
                     decoration: BoxDecoration(
-                      color: ShunShiColors.surfaceContainerLow,
+                      color: AppColors.surfaceContainerLow(context),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Icon(Icons.share, size: 20, color: ShunShiColors.primary),
+                    child: Icon(Icons.share, size: 20, color: AppColors.primary(context)),
                   ),
                 ),
               ],
@@ -230,8 +231,8 @@ class SolarTermAIDetailPage extends StatelessWidget {
                 end: Alignment.bottomCenter,
                 colors: [
                   Colors.transparent,
-                  ShunShiColors.background.withValues(alpha: 0.3),
-                  ShunShiColors.background,
+                  AppColors.background(context).withValues(alpha: 0.3),
+                  AppColors.background(context),
                 ],
                 stops: const [0.5, 0.75, 1.0],
               ),
@@ -247,7 +248,7 @@ class SolarTermAIDetailPage extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                   decoration: BoxDecoration(
-                    color: ShunShiColors.primary,
+                    color: AppColors.primary(context),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(d.season, style: TextStyle(
@@ -259,7 +260,7 @@ class SolarTermAIDetailPage extends StatelessWidget {
                 Text(termName, style: TextStyle(
                   fontSize: 52, fontWeight: FontWeight.w400,
                   fontFamily: ShunShiTypography.serifFamily,
-                  color: ShunShiColors.textPrimary,
+                  color: AppColors.textPrimary(context),
                 )),
                 SizedBox(height: 6),
                 Text(d.englishName, style: TextStyle(
@@ -281,9 +282,9 @@ class SolarTermAIDetailPage extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(28),
         decoration: BoxDecoration(
-          color: ShunShiColors.surfaceContainerLowest,
+          color: AppColors.surfaceContainerLowest(context),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: ShunShiColors.textTertiary.withValues(alpha: 0.1)),
+          border: Border.all(color: AppColors.textTertiary(context).withValues(alpha: 0.1)),
           boxShadow: ShunShiShadows.sm,
         ),
         child: Column(
@@ -304,12 +305,12 @@ class SolarTermAIDetailPage extends StatelessWidget {
             Text(d.quote, style: TextStyle(
               fontSize: 22, fontWeight: FontWeight.w400, height: 1.4,
               fontFamily: ShunShiTypography.serifFamily,
-              color: ShunShiColors.textPrimary,
+              color: AppColors.textPrimary(context),
             )),
             SizedBox(height: 16),
             Text(d.description, style: TextStyle(
               fontSize: 15, height: 1.8,
-              color: ShunShiColors.textSecondary,
+              color: AppColors.textSecondary(context),
             )),
           ],
         ),
@@ -360,7 +361,7 @@ class SolarTermAIDetailPage extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: ShunShiColors.surfaceContainerLow,
+        color: AppColors.surfaceContainerLow(context),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -368,22 +369,22 @@ class SolarTermAIDetailPage extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(Icons.restaurant, size: 20, color: ShunShiColors.primary),
+              Icon(Icons.restaurant, size: 20, color: AppColors.primary(context)),
               SizedBox(width: 8),
               Text(AppLocalizations.of(context).t('home_dietary_wisdom'), style: TextStyle(
                 fontSize: 11, letterSpacing: 2,
-                color: ShunShiColors.primary,
+                color: AppColors.primary(context),
               )),
             ],
           ),
           SizedBox(height: 16),
           Text(d.foodTitle, style: TextStyle(
             fontSize: 20, fontFamily: ShunShiTypography.serifFamily,
-            color: ShunShiColors.textPrimary,
+            color: AppColors.textPrimary(context),
           )),
           SizedBox(height: 12),
           Text(d.foodDesc, style: TextStyle(
-            fontSize: 13, height: 1.6, color: ShunShiColors.textSecondary,
+            fontSize: 13, height: 1.6, color: AppColors.textSecondary(context),
           )),
           SizedBox(height: 16),
           Row(
@@ -394,7 +395,7 @@ class SolarTermAIDetailPage extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: ShunShiColors.surfaceVariant,
                   borderRadius: BorderRadius.circular(999),
-                  border: Border.all(color: ShunShiColors.textTertiary.withValues(alpha: 0.2)),
+                  border: Border.all(color: AppColors.textTertiary(context).withValues(alpha: 0.2)),
                 ),
                 child: Text(tag, style: TextStyle(
                   fontSize: 11, color: ShunShiColors.secondary,
@@ -429,11 +430,11 @@ class SolarTermAIDetailPage extends StatelessWidget {
           SizedBox(height: 12),
           Text(d.livingTitle, style: TextStyle(
             fontSize: 17, fontFamily: ShunShiTypography.serifFamily,
-            color: ShunShiColors.textPrimary,
+            color: AppColors.textPrimary(context),
           )),
           SizedBox(height: 8),
           Text(d.livingDesc, style: TextStyle(
-            fontSize: 12, height: 1.6, color: ShunShiColors.textSecondary,
+            fontSize: 12, height: 1.6, color: AppColors.textSecondary(context),
           )),
         ],
       ),
@@ -452,23 +453,23 @@ class SolarTermAIDetailPage extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(Icons.self_improvement, size: 20, color: ShunShiColors.primary),
+              Icon(Icons.self_improvement, size: 20, color: AppColors.primary(context)),
               SizedBox(width: 8),
               Text(AppLocalizations.of(context).t('home_movement_practice'), style: TextStyle(
                 fontSize: 11, letterSpacing: 2,
-                color: ShunShiColors.primary.withValues(alpha: 0.7),
+                color: AppColors.primary(context).withValues(alpha: 0.7),
               )),
             ],
           ),
           SizedBox(height: 12),
           Text(d.exerciseTitle, style: TextStyle(
             fontSize: 17, fontFamily: ShunShiTypography.serifFamily,
-            color: ShunShiColors.textPrimary,
+            color: AppColors.textPrimary(context),
           )),
           SizedBox(height: 8),
           Text(d.exerciseDesc, style: TextStyle(
             fontSize: 12, height: 1.6,
-            color: ShunShiColors.primary.withValues(alpha: 0.8),
+            color: AppColors.primary(context).withValues(alpha: 0.8),
           )),
         ],
       ),
@@ -481,7 +482,7 @@ class SolarTermAIDetailPage extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(28),
         decoration: BoxDecoration(
-          color: ShunShiColors.surfaceContainerLow.withValues(alpha: 0.8),
+          color: AppColors.surfaceContainerLow(context).withValues(alpha: 0.8),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: Colors.white.withValues(alpha: 0.4)),
           boxShadow: ShunShiShadows.sm,
@@ -494,27 +495,27 @@ class SolarTermAIDetailPage extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(Icons.graphic_eq, size: 20, color: ShunShiColors.primary),
+                    Icon(Icons.graphic_eq, size: 20, color: AppColors.primary(context)),
                     SizedBox(width: 8),
                     Text(AppLocalizations.of(context).t('solar_mindful_meditation'), style: TextStyle(
-                      fontSize: 11, letterSpacing: 2, color: ShunShiColors.primary,
+                      fontSize: 11, letterSpacing: 2, color: AppColors.primary(context),
                     )),
                   ],
                 ),
                 Text(d.meditationDuration, style: TextStyle(
                   fontSize: 10,
-                  color: ShunShiColors.textSecondary.withValues(alpha: 0.6),
+                  color: AppColors.textSecondary(context).withValues(alpha: 0.6),
                 )),
               ],
             ),
             SizedBox(height: 16),
             Text(d.meditationTitle, style: TextStyle(
               fontSize: 24, fontFamily: ShunShiTypography.serifFamily,
-              color: ShunShiColors.textPrimary,
+              color: AppColors.textPrimary(context),
             )),
             SizedBox(height: 12),
             Text(d.meditationDesc, style: TextStyle(
-              fontSize: 13, height: 1.7, color: ShunShiColors.textSecondary,
+              fontSize: 13, height: 1.7, color: AppColors.textSecondary(context),
             )),
             SizedBox(height: 24),
             // Audio player row
@@ -528,11 +529,11 @@ class SolarTermAIDetailPage extends StatelessWidget {
                   child: Container(
                     width: 52, height: 52,
                     decoration: BoxDecoration(
-                      color: ShunShiColors.primary,
+                      color: AppColors.primary(context),
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: ShunShiColors.primary.withValues(alpha: 0.3),
+                          color: AppColors.primary(context).withValues(alpha: 0.3),
                           blurRadius: 12, offset: const Offset(0, 4),
                         ),
                       ],
@@ -551,7 +552,7 @@ class SolarTermAIDetailPage extends StatelessWidget {
                           children: [
                             Container(
                               decoration: BoxDecoration(
-                                color: ShunShiColors.textTertiary.withValues(alpha: 0.3),
+                                color: AppColors.textTertiary(context).withValues(alpha: 0.3),
                                 borderRadius: BorderRadius.circular(2),
                               ),
                             ),
@@ -559,7 +560,7 @@ class SolarTermAIDetailPage extends StatelessWidget {
                               widthFactor: 0.33,
                               child: Container(
                                 decoration: BoxDecoration(
-                                  color: ShunShiColors.primary,
+                                  color: AppColors.primary(context),
                                   borderRadius: BorderRadius.circular(2),
                                 ),
                               ),
@@ -569,8 +570,8 @@ class SolarTermAIDetailPage extends StatelessWidget {
                               top: -2,
                               child: Container(
                                 width: 8, height: 8,
-                                decoration: const BoxDecoration(
-                                  color: ShunShiColors.primary, shape: BoxShape.circle,
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary(context), shape: BoxShape.circle,
                                 ),
                               ),
                             ),

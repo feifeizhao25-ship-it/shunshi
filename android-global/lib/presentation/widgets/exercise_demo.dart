@@ -145,8 +145,8 @@ class _ExerciseDemoState extends State<ExerciseDemo> {
                 height: 6,
                 decoration: BoxDecoration(
                   color: i == _currentPage
-                      ? ShunShiColors.primary
-                      : ShunShiColors.primary.withValues(alpha: 0.2),
+                      ? AppColors.primary(context)
+                      : AppColors.primary(context).withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(3),
                 ),
               ),
@@ -179,13 +179,13 @@ class _ExerciseStepCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: isActive
-              ? ShunShiColors.primary.withValues(alpha: 0.3)
+              ? AppColors.primary(context).withValues(alpha: 0.3)
               : AppColors.border(context),
         ),
         boxShadow: isActive
             ? [
                 BoxShadow(
-                  color: ShunShiColors.primary.withValues(alpha: 0.08),
+                  color: AppColors.primary(context).withValues(alpha: 0.08),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
@@ -201,7 +201,7 @@ class _ExerciseStepCard extends StatelessWidget {
               width: double.infinity,
               margin: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: ShunShiColors.primary.withValues(alpha: 0.05),
+                color: AppColors.primary(context).withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(14),
               ),
               child: Stack(
@@ -215,7 +215,7 @@ class _ExerciseStepCard extends StatelessWidget {
                       width: 32,
                       height: 32,
                       decoration: BoxDecoration(
-                        color: ShunShiColors.primary.withValues(alpha: 0.12),
+                        color: AppColors.primary(context).withValues(alpha: 0.12),
                         shape: BoxShape.circle,
                       ),
                       child: Center(
@@ -224,7 +224,7 @@ class _ExerciseStepCard extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
-                            color: ShunShiColors.primary,
+                            color: AppColors.primary(context),
                           ),
                         ),
                       ),
@@ -234,7 +234,7 @@ class _ExerciseStepCard extends StatelessWidget {
                   Icon(
                     step.icon,
                     size: 72,
-                    color: ShunShiColors.primary.withValues(alpha: 0.35),
+                    color: AppColors.primary(context).withValues(alpha: 0.35),
                   ),
                   // Duration badge
                   Positioned(
@@ -249,13 +249,13 @@ class _ExerciseStepCard extends StatelessWidget {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.timer_outlined, size: 12, color: ShunShiColors.primary),
+                          Icon(Icons.timer_outlined, size: 12, color: AppColors.primary(context)),
                           const SizedBox(width: 3),
                           Text(
                             step.duration,
                             style: TextStyle(
                               fontSize: 10,
-                              color: ShunShiColors.primary,
+                              color: AppColors.primary(context),
                               fontWeight: FontWeight.w500,
                             ),
                           ),

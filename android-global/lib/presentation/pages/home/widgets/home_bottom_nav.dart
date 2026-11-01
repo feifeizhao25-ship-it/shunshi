@@ -10,8 +10,8 @@ class HomeBottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
     decoration: BoxDecoration(
-      color: Colors.white,
-      border: Border(top: BorderSide(color: const Color(0xFFE5E5EA), width: 0.5)),
+      color: AppColors.surfaceContainerLowest(context),
+      border: Border(top: BorderSide(color: AppColors.borderGhost(context), width: 0.5)),
     ),
     child: SafeArea(
       top: false,
@@ -39,12 +39,12 @@ class HomeBottomNav extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, color: active ? ShunShiColors.primary : AppColors.textTertiary(context), size: 24),
+            Icon(icon, color: active ? AppColors.primary(context) : AppColors.textTertiary(context), size: 24),
             const SizedBox(height: 2),
             Text(label,
               style: TextStyle(
                 fontFamily: ShunShiTypography.sansFamily,
-                color: active ? ShunShiColors.primary : AppColors.textTertiary(context),
+                color: active ? AppColors.primary(context) : AppColors.textTertiary(context),
                 fontSize: 10, fontWeight: active ? FontWeight.w600 : FontWeight.w400,
               ),
             ),

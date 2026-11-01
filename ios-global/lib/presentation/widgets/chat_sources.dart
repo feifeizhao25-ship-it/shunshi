@@ -174,7 +174,7 @@ class ChatSourcesBar extends StatelessWidget {
                   FilledButton.icon(
                     key: const Key('chat-source-open'),
                     onPressed: () => _open(Uri.parse(s.url!)),
-                    icon: const Icon(Icons.open_in_new_rounded, size: 16),
+                    icon: Icon(Icons.open_in_new_rounded, size: 16),
                     label: const Text(_S.open),
                   ),
               ]),

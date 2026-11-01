@@ -27,6 +27,8 @@ _CN_PATH = _DATA_DIR / "顺时知识库_中文版.md"
 _GL_PATH = _DATA_DIR / "SEASONS_Knowledge_Base_English.md"
 _CN_SUPP_PATH = _DATA_DIR / "顺时知识库_补充篇_中文版.md"
 _GL_SUPP_PATH = _DATA_DIR / "SEASONS_Knowledge_Base_Supplement_English.md"
+_CN_PENDING_PATH = Path(__file__).with_name("pending_cn.md")
+_GL_PENDING_PATH = Path(__file__).with_name("pending_global.md")
 _CN_VERIFIED_PATH = Path(__file__).with_name("verified_cn.md")
 _GL_VERIFIED_PATH = Path(__file__).with_name("verified_global.md")
 _SOURCE_MANIFEST_PATH = Path(__file__).with_name("source_manifest.json")
@@ -34,10 +36,24 @@ _SOURCE_MANIFEST_PATH = Path(__file__).with_name("source_manifest.json")
 _APPROVED_DIR = Path(os.environ.get("SHUNSHI_APPROVED_KB_DIR") or Path(__file__).with_name("approved"))
 
 
+# 4 份 legacy 文档（从未经过专业核验，2026-11-30 到期）已从 source_manifest.json 撤下，
+# 用户侧运行时不再载入（改由 pending_cn.md / pending_global.md 的官方来源摘录，标「待审核」）。
+# 它们只作为评测语料保留：自改进评测（金标准召回 / 忠实度基线）与测试需要同一份语料才能对比，
+# 仅当 include_legacy=True（或环境变量 SHUNSHI_KB_LEGACY_EVAL=1）时载入，永远不会因此变成「已核验」。
+_LEGACY_EVAL_SOURCES = {
+    name: {"locale": loc, "region": region, "evidence_status": "legacy_unverified", "review_status": "待审核",
+           "legacy_eval_only": True, "high_risk_allowed": False, "reviewed_at": "2026-08-30", "valid_until": "2026-11-30"}
+    for name, loc, region in (
+        ("顺时知识库_中文版.md", "zh-CN", "CN"), ("顺时知识库_补充篇_中文版.md", "zh-CN", "CN"),
+        ("SEASONS_Knowledge_Base_English.md", "en", "GLOBAL"), ("SEASONS_Knowledge_Base_Supplement_English.md", "en", "GLOBAL"),
+    )
+}
+
+
 def _source_metadata(path: str | Path) -> dict:
     manifest = json.loads(_SOURCE_MANIFEST_PATH.read_text(encoding="utf-8"))
     filename = Path(path).name
-    entry = manifest.get("documents", {}).get(filename)
+    entry = manifest.get("documents", {}).get(filename) or _LEGACY_EVAL_SOURCES.get(filename)
     if not entry:
         raise RuntimeError(f"RAG 来源清单缺少文档: {filename}")
     meta = {"source_file": filename, **entry}
@@ -522,14 +538,25 @@ cn_kb = KnowledgeBase("cn")
 gl_kb = KnowledgeBase("gl")
 
 
-def load_knowledge_bases(force: bool = False):
-    """启动时加载所有知识库（主库 + 补充篇）"""
+_legacy_loaded = False
+
+
+def load_knowledge_bases(force: bool = False, include_legacy: Optional[bool] = None):
+    """启动时加载知识库。
+
+    用户侧运行时（默认）：已核验文稿 + 官方来源摘录（待审核）+ 经批准入库的条目。
+    include_legacy=True（评测 / 测试语料）：另外载入 4 份 legacy_unverified 文档。
+    """
+    global _legacy_loaded
+    if include_legacy is None:
+        include_legacy = os.environ.get("SHUNSHI_KB_LEGACY_EVAL") == "1"
     if (
         not force
         and cn_kb.loaded
         and gl_kb.loaded
         and cn_kb.chunks
         and gl_kb.chunks
+        and _legacy_loaded == include_legacy
     ):
         return
     logger.info("[KB] 开始加载知识库...")
@@ -537,14 +564,19 @@ def load_knowledge_bases(force: bool = False):
     gl_kb.chunks.clear()
     cn_kb.loaded = False
     gl_kb.loaded = False
-    cn_kb.load()
-    cn_kb.load_supplement()
+    if include_legacy:
+        cn_kb.load()
+        cn_kb.load_supplement()
     cn_kb.load(_CN_VERIFIED_PATH)
+    cn_kb.load(_CN_PENDING_PATH)
     cn_kb.load_approved()
-    gl_kb.load()
-    gl_kb.load_supplement()
+    if include_legacy:
+        gl_kb.load()
+        gl_kb.load_supplement()
     gl_kb.load(_GL_VERIFIED_PATH)
+    gl_kb.load(_GL_PENDING_PATH)
+    _legacy_loaded = include_legacy
     from .embedder import init_embedders
 
     init_embedders()
-    logger.info(f"[KB] 加载完成: CN={len(cn_kb.chunks)} chunks, GL={len(gl_kb.chunks)} chunks")
+    logger.info(f"[KB] 加载完成: CN={len(cn_kb.chunks)} chunks, GL={len(gl_kb.chunks)} chunks (legacy eval corpus: {include_legacy})")

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../design_system/app_colors.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../design_system/theme.dart';
 import '../../../../core/network/api_singleton.dart';
@@ -112,7 +113,7 @@ class TodayActionCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 9),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.card(context),
                 borderRadius: BorderRadius.circular(24),
               ),
               child: Row(

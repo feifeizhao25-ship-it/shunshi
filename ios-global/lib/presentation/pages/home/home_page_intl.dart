@@ -176,7 +176,7 @@ class _HomePageIntlState extends State<HomePageIntl> {
   Color get _sub => _dark ? const Color(0xFF8E8E9A) : const Color(0xFF8E8E93);
   Color get _accent => const Color(0xFF533AFD);
   Color get _mint => const Color(0xFF00C4A7);
-  Color get _seasonC => const {
+  Color get _seasonC => {
     'spring': Color(0xFF34C759), 'summer': Color(0xFFFF9500),
     'autumn': Color(0xFFFF3B30), 'winter': Color(0xFF5856D6),
   }[_season] ?? const Color(0xFF533AFD);
@@ -351,7 +351,7 @@ class _HomePageIntlState extends State<HomePageIntl> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(_primaryAction.isNotEmpty ? _primaryAction : 'Start',
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Colors.white,
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
@@ -360,7 +360,7 @@ class _HomePageIntlState extends State<HomePageIntl> {
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(width: 6),
-                    const Icon(Icons.arrow_forward, color: Colors.white, size: 16),
+                    Icon(Icons.arrow_forward, color: Colors.white, size: 16),
                   ],
                 ),
               ),
@@ -547,7 +547,7 @@ class _HomePageIntlState extends State<HomePageIntl> {
           Text(_error ?? 'Something went wrong', textAlign: TextAlign.center,
             style: TextStyle(fontSize: 16, color: _text, height: 1.5)),
           const SizedBox(height: 20),
-          TextButton.icon(onPressed: _load, icon: const Icon(Icons.refresh),
+          TextButton.icon(onPressed: _load, icon: Icon(Icons.refresh),
             label: const Text('Try again'),
             style: TextButton.styleFrom(foregroundColor: _accent)),
         ]),

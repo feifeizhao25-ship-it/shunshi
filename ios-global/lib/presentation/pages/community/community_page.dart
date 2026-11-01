@@ -1,4 +1,5 @@
 import 'dart:ui';
+import '../../../design_system/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
 
@@ -19,7 +20,7 @@ class _CommunityPageState extends State<CommunityPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       body: SafeArea(
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),
@@ -42,18 +43,18 @@ class _CommunityPageState extends State<CommunityPage> {
                               style: TextStyle(
                                 fontFamily: ShunShiTypography.sansFamily,
                                 fontSize: 13,
-                                color: ShunShiColors.textTertiary,
+                                color: AppColors.textTertiary(context),
                                 letterSpacing: 2,
                               ),
                             ),
                             const SizedBox(height: 4),
-                            const Text(
+                            Text(
                               'Wellness Circle',
                               style: TextStyle(
                                 fontFamily: ShunShiTypography.serifFamily,
                                 fontSize: 36,
                                 fontWeight: FontWeight.bold,
-                                color: ShunShiColors.primary,
+                                color: AppColors.primary(context),
                                 height: 1,
                               ),
                             ),
@@ -65,10 +66,10 @@ class _CommunityPageState extends State<CommunityPage> {
                           height: 40,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: ShunShiColors.surfaceContainerLow,
+                            color: AppColors.surfaceContainerLow(context),
                           ),
-                          child: const Icon(Icons.person_outline,
-                              color: ShunShiColors.textTertiary),
+                          child: Icon(Icons.person_outline,
+                              color: AppColors.textTertiary(context)),
                         ),
                       ],
                     ),
@@ -77,19 +78,19 @@ class _CommunityPageState extends State<CommunityPage> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       decoration: BoxDecoration(
-                        color: ShunShiColors.surfaceContainerLow,
+                        color: AppColors.surfaceContainerLow(context),
                         borderRadius: BorderRadius.circular(16),
                       ),
-                      child: const Row(
+                      child: Row(
                         children: [
-                          Icon(Icons.search, color: ShunShiColors.textTertiary, size: 20),
+                          Icon(Icons.search, color: AppColors.textTertiary(context), size: 20),
                           SizedBox(width: 12),
                           Expanded(
                             child: TextField(
                               decoration: InputDecoration(
                                 hintText: 'Search for wellness inspiration...',
                                 hintStyle: TextStyle(
-                                  color: ShunShiColors.textTertiary,
+                                  color: AppColors.textTertiary(context),
                                   fontSize: 14,
                                 ),
                                 border: InputBorder.none,
@@ -120,7 +121,7 @@ class _CommunityPageState extends State<CommunityPage> {
                                     fontFamily: ShunShiTypography.sansFamily,
                                     fontSize: 14,
                                     fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
-                                    color: isActive ? ShunShiColors.primary : ShunShiColors.secondary,
+                                    color: isActive ? AppColors.primary(context) : ShunShiColors.secondary,
                                   ),
                                 ),
                                 const SizedBox(height: 8),
@@ -128,7 +129,7 @@ class _CommunityPageState extends State<CommunityPage> {
                                   height: 2,
                                   width: 24,
                                   decoration: BoxDecoration(
-                                    color: isActive ? ShunShiColors.primary : Colors.transparent,
+                                    color: isActive ? AppColors.primary(context) : Colors.transparent,
                                     borderRadius: BorderRadius.circular(1),
                                   ),
                                 ),
@@ -182,17 +183,17 @@ class _CommunityPageState extends State<CommunityPage> {
         width: 56,
         height: 56,
         decoration: BoxDecoration(
-          color: ShunShiColors.primary,
+          color: AppColors.primary(context),
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: ShunShiColors.primary.withValues(alpha: 0.4),
+              color: AppColors.primary(context).withValues(alpha: 0.4),
               blurRadius: 16,
               offset: const Offset(0, 4),
             ),
           ],
         ),
-        child: const Icon(Icons.add, color: Colors.white, size: 28),
+        child: Icon(Icons.add, color: Colors.white, size: 28),
       ),
     );
   }
@@ -210,7 +211,7 @@ class _GlassAIInsightCard extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: ShunShiColors.surfaceContainerLow.withValues(alpha: 0.8),
+            color: AppColors.surfaceContainerLow(context).withValues(alpha: 0.8),
             borderRadius: BorderRadius.circular(24),
             border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
           ),
@@ -222,24 +223,24 @@ class _GlassAIInsightCard extends StatelessWidget {
                   Container(
                     width: 44,
                     height: 44,
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       color: ShunShiColors.primaryContainer,
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.auto_awesome,
-                        color: ShunShiColors.primary, size: 22),
+                    child: Icon(Icons.auto_awesome,
+                        color: AppColors.primary(context), size: 22),
                   ),
                   const SizedBox(width: 12),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'SEASONS AI Guide',
                         style: TextStyle(
                           fontFamily: ShunShiTypography.serifFamily,
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
-                          color: ShunShiColors.primary,
+                          color: AppColors.primary(context),
                         ),
                       ),
                       Text(
@@ -256,12 +257,12 @@ class _GlassAIInsightCard extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 16),
-              const Text(
+              Text(
                 '"Spring wellness focuses on growth and renewal. Eat more green vegetables, rise early, and move gently to cultivate vitality."',
                 style: TextStyle(
                   fontFamily: ShunShiTypography.serifFamily,
                   fontSize: 18,
-                  color: ShunShiColors.primary,
+                  color: AppColors.primary(context),
                   fontStyle: FontStyle.italic,
                   height: 1.6,
                 ),
@@ -293,14 +294,14 @@ class _TagChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: ShunShiColors.primary.withValues(alpha: 0.1)),
+        border: Border.all(color: AppColors.primary(context).withValues(alpha: 0.1)),
       ),
       child: Text(
         label,
-        style: const TextStyle(
+        style: TextStyle(
           fontFamily: ShunShiTypography.sansFamily,
           fontSize: 12,
-          color: ShunShiColors.primary,
+          color: AppColors.primary(context),
         ),
       ),
     );
@@ -333,7 +334,7 @@ class _FeedPostCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.card(context),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -354,9 +355,9 @@ class _FeedPostCard extends StatelessWidget {
                 height: 44,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: ShunShiColors.surfaceContainerLow,
+                  color: AppColors.surfaceContainerLow(context),
                 ),
-                child: const Icon(Icons.person, color: ShunShiColors.textTertiary),
+                child: Icon(Icons.person, color: AppColors.textTertiary(context)),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -365,15 +366,15 @@ class _FeedPostCard extends StatelessWidget {
                   children: [
                     Text(
                       author,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: ShunShiColors.textPrimary,
+                        color: AppColors.textPrimary(context),
                       ),
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
                       decoration: BoxDecoration(
-                        color: ShunShiColors.surfaceContainerLow,
+                        color: AppColors.surfaceContainerLow(context),
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
@@ -384,7 +385,7 @@ class _FeedPostCard extends StatelessWidget {
                   ],
                 ),
               ),
-              const Icon(Icons.more_horiz, color: ShunShiColors.textTertiary),
+              Icon(Icons.more_horiz, color: AppColors.textTertiary(context)),
             ],
           ),
           const SizedBox(height: 16),
@@ -401,9 +402,9 @@ class _FeedPostCard extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.emoji_events, color: ShunShiColors.secondary, size: 20),
+                  Icon(Icons.emoji_events, color: ShunShiColors.secondary, size: 20),
                   const SizedBox(width: 8),
-                  const Expanded(
+                  Expanded(
                     child: Text(
                       'Joined「100-Day Wellness Challenge」',
                       style: TextStyle(
@@ -414,7 +415,7 @@ class _FeedPostCard extends StatelessWidget {
                   ),
                   Text(
                     'Day $challengeDay',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
                       color: ShunShiColors.secondary,
@@ -428,9 +429,9 @@ class _FeedPostCard extends StatelessWidget {
           // Content
           Text(
             content,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
-              color: ShunShiColors.textPrimary,
+              color: AppColors.textPrimary(context),
               height: 1.6,
             ),
           ),

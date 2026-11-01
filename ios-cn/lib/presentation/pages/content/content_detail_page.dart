@@ -23,7 +23,6 @@ class _ContentDetailPageState extends State<ContentDetailPage> {
   bool _loading = true;
   String? _error;
   bool _isFavorited = false;
-  static String get _userId => currentUserId() ?? '';
 
   @override
   void initState() {
@@ -44,7 +43,7 @@ class _ContentDetailPageState extends State<ContentDetailPage> {
       // Check favorite status
       try {
         final favResp = await ApiClient().get('/api/v1/favorites/check',
-          queryParameters: {'user_id': _userId, 'content_id': widget.contentId});
+          queryParameters: {...userIdParam(), 'content_id': widget.contentId});
         if (favResp.data?['success'] == true) {
           if (mounted) setState(() => _isFavorited = favResp.data['data']['is_favorited'] ?? false);
         }
@@ -292,10 +291,10 @@ class _ContentDetailPageState extends State<ContentDetailPage> {
     setState(() => _isFavorited = !_isFavorited);
     try {
       if (wasFavorited) {
-        await ApiClient().delete('/api/v1/favorites/${widget.contentId}?user_id=$_userId');
+        await ApiClient().delete('/api/v1/favorites/${widget.contentId}${userIdQuery()}');
       } else {
         await ApiClient().post('/api/v1/favorites', data: {
-          'user_id': _userId,
+          ...userIdParam(),
           'content_id': widget.contentId,
           'content_type': _data?['type'] ?? 'unknown',
         });

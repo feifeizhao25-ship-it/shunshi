@@ -52,7 +52,6 @@ import '../../presentation/pages/diary/sleep_report_page.dart';
 import '../../presentation/pages/about/about_page.dart';
 import '../../presentation/pages/legal/terms_page.dart';
 import '../../presentation/pages/legal/privacy_policy_page.dart';
-import '../../presentation/pages/achievements/achievements_page.dart';
 import '../../presentation/pages/report/wellness_report_page.dart';
 import '../../presentation/pages/wellness/tea_page.dart';
 import '../../presentation/pages/meditation/meditation_focus_page.dart';
@@ -164,7 +163,7 @@ class AppRouter {
       GoRoute(path: '/privacy-policy', builder: (context, state) => const PrivacyPolicyPage()),
 
       // Newly registered pages
-      GoRoute(path: '/achievements', builder: (context, state) => const AchievementsPage()),
+      GoRoute(path: '/achievements', builder: (context, state) => const AchievementPageV2()),
       GoRoute(path: '/wellness-report', builder: (context, state) => const WellnessReportPage()),
       GoRoute(path: '/reference-library', builder: (context, state) => const ShunshiReferenceLibraryPage()),
       GoRoute(path: '/tea', builder: (context, state) => const TeaPage()),

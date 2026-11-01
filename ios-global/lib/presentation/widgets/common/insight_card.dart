@@ -11,7 +11,7 @@ class InsightCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(SeasonsSpacing.lg),
+      padding: EdgeInsets.all(SeasonsSpacing.lg),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -36,7 +36,7 @@ class InsightCard extends StatelessWidget {
                 color: SeasonsColors.primary,
                 size: 20,
               ),
-              const SizedBox(width: SeasonsSpacing.sm),
+              SizedBox(width: SeasonsSpacing.sm),
               Text(
                 'Daily Insight',
                 style: SeasonsTypography.labelMedium.copyWith(
@@ -46,7 +46,7 @@ class InsightCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: SeasonsSpacing.md),
+          SizedBox(height: SeasonsSpacing.md),
           Text(
             insight.text,
             style: SeasonsTypography.bodyLarge.copyWith(
@@ -54,9 +54,9 @@ class InsightCard extends StatelessWidget {
               height: 1.6,
             ),
           ),
-          const SizedBox(height: SeasonsSpacing.md),
+          SizedBox(height: SeasonsSpacing.md),
           Container(
-            padding: const EdgeInsets.symmetric(
+            padding: EdgeInsets.symmetric(
               horizontal: SeasonsSpacing.sm,
               vertical: SeasonsSpacing.xs,
             ),

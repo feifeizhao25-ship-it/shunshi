@@ -1,5 +1,6 @@
 // ignore_for_file: unused_local_variable
 import '../../../core/router/safe_pop.dart';
+import '../../../design_system/app_colors.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
@@ -40,10 +41,10 @@ class _PrivacyPageState extends State<PrivacyPage> {
 
   void _deleteAllData() {
     showDialog(context: context, builder: (ctx) => AlertDialog(
-      backgroundColor: ShunShiColors.surface,
-      title: const Text('Delete all data?', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-      content: const Text('This cannot be undone. All your wellness records, diary entries and constitution data will be permanently deleted.',
-          style: TextStyle(fontSize: 14, color: ShunShiColors.textSecondary, height: 1.6)),
+      backgroundColor: AppColors.surface(context),
+      title: Text('Delete all data?', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+      content: Text('This cannot be undone. All your wellness records, diary entries and constitution data will be permanently deleted.',
+          style: TextStyle(fontSize: 14, color: AppColors.textSecondary(context), height: 1.6)),
       actions: [
         TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
         TextButton(
@@ -71,10 +72,10 @@ class _PrivacyPageState extends State<PrivacyPage> {
 
   void _clearAiMemory() {
     showDialog(context: context, builder: (ctx) => AlertDialog(
-      backgroundColor: ShunShiColors.surface,
-      title: const Text('Clear AI memory?', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-      content: const Text('The AI companion will no longer remember your past conversations. Your constitution check results are not deleted.',
-          style: TextStyle(fontSize: 14, color: ShunShiColors.textSecondary, height: 1.6)),
+      backgroundColor: AppColors.surface(context),
+      title: Text('Clear AI memory?', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+      content: Text('The AI companion will no longer remember your past conversations. Your constitution check results are not deleted.',
+          style: TextStyle(fontSize: 14, color: AppColors.textSecondary(context), height: 1.6)),
       actions: [
         TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
         TextButton(
@@ -92,12 +93,12 @@ class _PrivacyPageState extends State<PrivacyPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       appBar: AppBar(
-        backgroundColor: ShunShiColors.background,
+        backgroundColor: AppColors.background(context),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+          icon: Icon(Icons.arrow_back_ios_new, size: 20),
           onPressed: () => safePop(context),
         ),
         title: const Text('Data & privacy',
@@ -107,8 +108,8 @@ class _PrivacyPageState extends State<PrivacyPage> {
         padding: const EdgeInsets.all(20),
         children: [
           // Your data section
-          const Text('Your data', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700,
-              fontFamily: ShunShiTypography.serifFamily, color: ShunShiColors.textPrimary)),
+          Text('Your data', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700,
+              fontFamily: ShunShiTypography.serifFamily, color: AppColors.textPrimary(context))),
           const SizedBox(height: 12),
           _buildTile(
             icon: Icons.download_outlined,
@@ -116,8 +117,8 @@ class _PrivacyPageState extends State<PrivacyPage> {
             subtitle: 'Download all your personal data (JSON format)',
             onTap: _exporting ? null : _exportData,
             trailing: _exporting
-                ? const SizedBox(width: 16, height: 16,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: ShunShiColors.primary))
+                ? SizedBox(width: 16, height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary(context)))
                 : null,
           ),
           const SizedBox(height: 8),
@@ -138,17 +139,17 @@ class _PrivacyPageState extends State<PrivacyPage> {
           const SizedBox(height: 32),
 
           // Privacy policy
-          const Text('Privacy Policy', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700,
-              fontFamily: ShunShiTypography.serifFamily, color: ShunShiColors.textPrimary)),
+          Text('Privacy Policy', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700,
+              fontFamily: ShunShiTypography.serifFamily, color: AppColors.textPrimary(context))),
           const SizedBox(height: 12),
           Container(
             width: double.infinity, padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: ShunShiColors.surfaceContainerLowest,
+              color: AppColors.surfaceContainerLowest(context),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: ShunShiColors.borderGhost),
+              border: Border.all(color: AppColors.borderGhost(context)),
             ),
-            child: const Text(
+            child: Text(
               'SEASONS respects and protects your privacy.\n\n'
               '• Your health data is used only to provide personalised wellness suggestions\n'
               '• Family members only see your status level (steady / a bit tired / reach out)\n'
@@ -156,7 +157,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
               '• You can export or delete all your data at any time\n'
               '• AI conversation history is stored encrypted and you can clear it at any time\n'
               '• In family features, chats, mood details, constitution information and diary entries are never shared',
-              style: TextStyle(fontSize: 13, color: ShunShiColors.textSecondary, height: 1.7),
+              style: TextStyle(fontSize: 13, color: AppColors.textSecondary(context), height: 1.7),
             ),
           ),
           const SizedBox(height: 24),
@@ -165,7 +166,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
           Center(child: Column(children: [
             const Text('Questions about your data?', style: TextStyle(fontSize: 13, color: ShunShiColors.textTertiary)),
             const SizedBox(height: 4),
-            Text('privacy@shunshi.app', style: TextStyle(fontSize: 13, color: ShunShiColors.primary,
+            Text('privacy@shunshi.app', style: TextStyle(fontSize: 13, color: AppColors.primary(context),
                 fontWeight: FontWeight.w500)),
           ])),
           const SizedBox(height: 32),
@@ -183,22 +184,22 @@ class _PrivacyPageState extends State<PrivacyPage> {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: ShunShiColors.surfaceContainerLowest,
+          color: AppColors.surfaceContainerLowest(context),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: ShunShiColors.borderGhost),
+          border: Border.all(color: AppColors.borderGhost(context)),
         ),
         child: Row(children: [
-          Icon(icon, size: 22, color: titleColor ?? ShunShiColors.textSecondary),
+          Icon(icon, size: 22, color: titleColor ?? AppColors.textSecondary(context)),
           const SizedBox(width: 14),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(title, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500,
-                color: titleColor ?? ShunShiColors.textPrimary)),
+                color: titleColor ?? AppColors.textPrimary(context))),
             if (subtitle != null) ...[
               const SizedBox(height: 2),
-              Text(subtitle, style: const TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
+              Text(subtitle, style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context))),
             ],
           ])),
-          trailing ?? const Icon(Icons.chevron_right, size: 18, color: ShunShiColors.textTertiary),
+          trailing ?? Icon(Icons.chevron_right, size: 18, color: AppColors.textTertiary(context)),
         ]),
       ),
     );

@@ -3,6 +3,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
 import '../../../data/network/api_client.dart';
@@ -22,7 +23,6 @@ class _ContentDetailPageState extends State<ContentDetailPage> {
   bool _loading = true;
   String? _error;
   bool _isFavorited = false;
-  static String get _userId => currentUserId() ?? '';
 
   @override
   void initState() {
@@ -43,7 +43,7 @@ class _ContentDetailPageState extends State<ContentDetailPage> {
       // Check favorite status
       try {
         final favResp = await ApiClient().get('/api/v1/favorites/check',
-          queryParameters: {'user_id': _userId, 'content_id': widget.contentId});
+          queryParameters: {...userIdParam(), 'content_id': widget.contentId});
         if (favResp.data?['success'] == true) {
           if (mounted) setState(() => _isFavorited = favResp.data['data']['is_favorited'] ?? false);
         }
@@ -56,10 +56,10 @@ class _ContentDetailPageState extends State<ContentDetailPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       appBar: AppBar(
-        backgroundColor: ShunShiColors.background,
-        leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
+        backgroundColor: AppColors.background(context),
+        leading: IconButton(icon: Icon(Icons.arrow_back), onPressed: () => context.pop()),
         actions: [
           IconButton(
             icon: Icon(_isFavorited ? Icons.favorite : Icons.favorite_border,
@@ -67,7 +67,7 @@ class _ContentDetailPageState extends State<ContentDetailPage> {
             onPressed: _toggleFavorite,
           ),
           IconButton(
-            icon: const Icon(Icons.share_outlined),
+            icon: Icon(Icons.share_outlined),
             onPressed: () => _shareContent(),
           ),
         ],
@@ -92,7 +92,7 @@ class _ContentDetailPageState extends State<ContentDetailPage> {
               _sectionTitle('Overview'),
               const SizedBox(height: 8),
               Text(data['description'].toString(),
-                style: TextStyle(fontSize: 14, color: ShunShiColors.textSecondary, height: 1.8)),
+                style: TextStyle(fontSize: 14, color: AppColors.textSecondary(context), height: 1.8)),
               const SizedBox(height: 20),
             ],
 
@@ -109,7 +109,7 @@ class _ContentDetailPageState extends State<ContentDetailPage> {
               _sectionTitle('Details'),
               const SizedBox(height: 8),
               Text(data['content'].toString(),
-                style: TextStyle(fontSize: 14, color: ShunShiColors.textSecondary, height: 1.8)),
+                style: TextStyle(fontSize: 14, color: AppColors.textSecondary(context), height: 1.8)),
               const SizedBox(height: 20),
             ],
 
@@ -122,7 +122,7 @@ class _ContentDetailPageState extends State<ContentDetailPage> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  const Icon(Icons.warning_amber, color: Color(0xFFFF9800), size: 20),
+                  Icon(Icons.warning_amber, color: Color(0xFFFF9800), size: 20),
                   const SizedBox(width: 12),
                   Expanded(child: Text(data['caution'].toString(),
                     style: const TextStyle(fontSize: 13, color: Color(0xFF795548), height: 1.6))),
@@ -136,14 +136,14 @@ class _ContentDetailPageState extends State<ContentDetailPage> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: ShunShiColors.surface,
+                  color: AppColors.surface(context),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Row(children: [
-                  Icon(Icons.menu_book, size: 16, color: ShunShiColors.textTertiary),
+                  Icon(Icons.menu_book, size: 16, color: AppColors.textTertiary(context)),
                   const SizedBox(width: 8),
                   Text('Source: ${data['source_classic']}',
-                    style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary, fontStyle: FontStyle.italic)),
+                    style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context), fontStyle: FontStyle.italic)),
                 ]),
               ),
               const SizedBox(height: 20),
@@ -155,10 +155,10 @@ class _ContentDetailPageState extends State<ContentDetailPage> {
                 children: (data['tags'] as List).map((t) => Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: ShunShiColors.primary.withOpacity(0.08),
+                    color: AppColors.primary(context).withOpacity(0.08),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Text(t.toString(), style: TextStyle(fontSize: 12, color: ShunShiColors.primary)),
+                  child: Text(t.toString(), style: TextStyle(fontSize: 12, color: AppColors.primary(context))),
                 )).toList()),
               const SizedBox(height: 20),
             ],
@@ -188,7 +188,7 @@ class _ContentDetailPageState extends State<ContentDetailPage> {
             color: Colors.white.withOpacity(0.2),
             borderRadius: BorderRadius.circular(12),
           ),
-          child: Text(typeLabel, style: const TextStyle(fontSize: 12, color: Colors.white, fontWeight: FontWeight.w500)),
+          child: Text(typeLabel, style: TextStyle(fontSize: 12, color: Colors.white, fontWeight: FontWeight.w500)),
         ),
         const SizedBox(height: 12),
         // Subtitle
@@ -196,7 +196,7 @@ class _ContentDetailPageState extends State<ContentDetailPage> {
           Text(data['subtitle'].toString(), style: TextStyle(fontSize: 13, color: Colors.white.withOpacity(0.8))),
         const SizedBox(height: 6),
         // Title
-        Text(data['title'] ?? '', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white)),
+        Text(data['title'] ?? '', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white)),
         // Meta row
         const SizedBox(height: 12),
         Row(children: [
@@ -224,7 +224,7 @@ class _ContentDetailPageState extends State<ContentDetailPage> {
 
   Widget _sectionTitle(String title) {
     return Text(title,
-      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary));
+      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context)));
   }
 
   Widget _buildSteps(dynamic steps) {
@@ -243,15 +243,15 @@ class _ContentDetailPageState extends State<ContentDetailPage> {
           Container(
             width: 28, height: 28,
             decoration: BoxDecoration(
-              color: ShunShiColors.primary.withOpacity(0.1),
+              color: AppColors.primary(context).withOpacity(0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Center(child: Text('${e.key + 1}',
-              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: ShunShiColors.primary))),
+              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.primary(context)))),
           ),
           const SizedBox(width: 12),
           Expanded(child: Text(e.value,
-            style: TextStyle(fontSize: 14, color: ShunShiColors.textSecondary, height: 1.6))),
+            style: TextStyle(fontSize: 14, color: AppColors.textSecondary(context), height: 1.6))),
         ]),
       );
     }).toList());
@@ -263,10 +263,10 @@ class _ContentDetailPageState extends State<ContentDetailPage> {
       case 'tea': return const Color(0xFF8D6E63);
       case 'recipe': return const Color(0xFFFF9800);
       case 'herb': return const Color(0xFF9C27B0);
-      case 'meridian': return ShunShiColors.primary;
+      case 'meridian': return AppColors.primary(context);
       case 'exercise': return const Color(0xFF2196F3);
       case 'acupoint': return const Color(0xFFE91E63);
-      default: return ShunShiColors.primary;
+      default: return AppColors.primary(context);
     }
   }
 
@@ -291,10 +291,10 @@ class _ContentDetailPageState extends State<ContentDetailPage> {
     setState(() => _isFavorited = !_isFavorited);
     try {
       if (wasFavorited) {
-        await ApiClient().delete('/api/v1/favorites/${widget.contentId}?user_id=$_userId');
+        await ApiClient().delete('/api/v1/favorites/${widget.contentId}${userIdQuery()}');
       } else {
         await ApiClient().post('/api/v1/favorites', data: {
-          'user_id': _userId,
+          ...userIdParam(),
           'content_id': widget.contentId,
           'content_type': _data?['type'] ?? 'unknown',
         });

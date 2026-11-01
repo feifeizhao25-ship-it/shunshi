@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../design_system/app_colors.dart';
 import '../../design_system/theme.dart';
 
 class StreakBadge extends StatelessWidget {
@@ -20,7 +21,7 @@ class StreakBadge extends StatelessWidget {
             colors: streakDays >= 30
                 ? [Colors.amber, Colors.orange]
                 : streakDays >= 7
-                    ? [ShunShiColors.primary, ShunShiColors.secondary]
+                    ? [AppColors.primary(context), ShunShiColors.secondary]
                     : [Colors.grey.shade300, Colors.grey.shade400],
           ),
           borderRadius: BorderRadius.circular(20),

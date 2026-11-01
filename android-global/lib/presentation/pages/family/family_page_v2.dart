@@ -3,6 +3,7 @@
 library;
 
 import 'package:dio/dio.dart';
+import '../../../design_system/app_colors.dart';
 import '../../../data/storage/storage_manager.dart';
 import '../../widgets/state_view.dart';
 import 'package:flutter/material.dart';
@@ -100,7 +101,7 @@ class _FamilyPageV2State extends State<FamilyPageV2> {
         TextButton(onPressed: () => Navigator.pop(ctx), child: Text(AppLocalizations.of(context).get('cancel'))),
         ElevatedButton(
           onPressed: () { Navigator.pop(ctx); _addMember(nameCtrl.text.trim(), relation); },
-          style: ElevatedButton.styleFrom(backgroundColor: ShunShiColors.primary),
+          style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary(context)),
           child: Text(AppLocalizations.of(context).get('confirm'), style: TextStyle(color: Colors.white)),
         ),
       ],
@@ -111,11 +112,11 @@ class _FamilyPageV2State extends State<FamilyPageV2> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     if (_loading) return Scaffold(
-   appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),backgroundColor: ShunShiColors.background, body: const LoadingSkeleton());
+   appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),backgroundColor: AppColors.background(context), body: const LoadingSkeleton());
 
-    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : ShunShiColors.background,
+    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : AppColors.background(context),
       body: RefreshIndicator(
-        color: ShunShiColors.primary,
+        color: AppColors.primary(context),
         onRefresh: _fetchFamily,
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
@@ -124,9 +125,9 @@ class _FamilyPageV2State extends State<FamilyPageV2> {
             SliverToBoxAdapter(child: SafeArea(child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
               child: Row(children: [
-                Text(AppLocalizations.of(context).get('family_title'), style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 22, fontWeight: FontWeight.bold, color: ShunShiColors.textPrimary)),
+                Text(AppLocalizations.of(context).get('family_title'), style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.textPrimary(context))),
                 const Spacer(),
-                IconButton(icon: Icon(Icons.person_add, color: ShunShiColors.primary), onPressed: _showAddMemberDialog),
+                IconButton(icon: Icon(Icons.person_add, color: AppColors.primary(context)), onPressed: _showAddMemberDialog),
               ]),
             ))),
 
@@ -157,24 +158,24 @@ class _FamilyPageV2State extends State<FamilyPageV2> {
               SliverToBoxAdapter(child: Padding(
                 padding: const EdgeInsets.fromLTRB(20, 40, 20, 0),
                 child: Column(children: [
-                  Icon(Icons.family_restroom, size: 48, color: ShunShiColors.textTertiary),
+                  Icon(Icons.family_restroom, size: 48, color: AppColors.textTertiary(context)),
                   const SizedBox(height: 12),
-                  Text(AppLocalizations.of(context).get('family_no_members'), style: TextStyle(fontSize: 16, color: ShunShiColors.textTertiary)),
+                  Text(AppLocalizations.of(context).get('family_no_members'), style: TextStyle(fontSize: 16, color: AppColors.textTertiary(context))),
                   const SizedBox(height: 8),
-                  Text('Add family members to get personalized wellness plans', style: TextStyle(fontSize: 13, color: ShunShiColors.textTertiary)),
+                  Text('Add family members to get personalized wellness plans', style: TextStyle(fontSize: 13, color: AppColors.textTertiary(context))),
                   const SizedBox(height: 16),
                   ElevatedButton.icon(
                     onPressed: _showAddMemberDialog,
                     icon: Icon(Icons.add, size: 18),
                     label: Text(AppLocalizations.of(context).get('family_add')),
-                    style: ElevatedButton.styleFrom(backgroundColor: ShunShiColors.primary, foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                    style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary(context), foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
                   ),
                 ]),
               )),
             ] else ...[
               SliverToBoxAdapter(child: Padding(
                 padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
-                child: Text('Family Members', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+                child: Text('Family Members', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
               )),
               SliverList(delegate: SliverChildBuilderDelegate((ctx, i) {
                 final m = _members[i];
@@ -182,16 +183,16 @@ class _FamilyPageV2State extends State<FamilyPageV2> {
                   padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
                   child: Container(
                     padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(12)),
+                    decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(12)),
                     child: Row(children: [
-                      CircleAvatar(radius: 20, backgroundColor: ShunShiColors.primary.withOpacity(0.1),
-                        child: Text(m['name']?.toString().substring(0, 1) ?? '?', style: TextStyle(color: ShunShiColors.primary, fontWeight: FontWeight.w600))),
+                      CircleAvatar(radius: 20, backgroundColor: AppColors.primary(context).withOpacity(0.1),
+                        child: Text(m['name']?.toString().substring(0, 1) ?? '?', style: TextStyle(color: AppColors.primary(context), fontWeight: FontWeight.w600))),
                       const SizedBox(width: 12),
                       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Text(m['name']?.toString() ?? '', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: ShunShiColors.textPrimary)),
-                        Text(m['relationship']?.toString() ?? '', style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
+                        Text(m['name']?.toString() ?? '', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: AppColors.textPrimary(context))),
+                        Text(m['relationship']?.toString() ?? '', style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context))),
                       ])),
-                      IconButton(icon: Icon(Icons.delete_outline, size: 18, color: ShunShiColors.textTertiary),
+                      IconButton(icon: Icon(Icons.delete_outline, size: 18, color: AppColors.textTertiary(context)),
                         onPressed: () => _removeMember(m['id']?.toString() ?? '')),
                     ]),
                   ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/router/safe_pop.dart';
 
@@ -8,21 +9,21 @@ class PrivacyPolicyPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       appBar: AppBar(
-        backgroundColor: ShunShiColors.background,
+        backgroundColor: AppColors.background(context),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+          icon: Icon(Icons.arrow_back_ios_new, size: 20),
           onPressed: () => safePop(context),
         ),
         title: const Text('Privacy Policy', style: TextStyle(fontFamily: ShunShiTypography.serifFamily)),
       ),
       body: ListView(
         padding: const EdgeInsets.all(20),
-        children: const [
+        children: [
           Text('Privacy Policy', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700,
-              fontFamily: ShunShiTypography.serifFamily, color: ShunShiColors.textPrimary)),
+              fontFamily: ShunShiTypography.serifFamily, color: AppColors.textPrimary(context))),
           SizedBox(height: 16),
           Text(
             'SEASONS Privacy Policy\n\n'
@@ -35,7 +36,7 @@ class PrivacyPolicyPage extends StatelessWidget {
             '6. Retention\nAfter an account is deleted, we remove all related data within 30 days.\n\n'
             '7. Minimum age\nYou must be at least 16 to use SEASONS. We do not knowingly collect personal data from anyone under 16. If we learn that we have, we delete it promptly.\n\n'
             '8. Contact us\nData protection questions: privacy@shunshi.app',
-            style: TextStyle(fontSize: 14, color: ShunShiColors.textSecondary, height: 1.8),
+            style: TextStyle(fontSize: 14, color: AppColors.textSecondary(context), height: 1.8),
           ),
         ],
       ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../design_system/app_colors.dart';
 import '../../../../../design_system/theme.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_localizations.dart';
@@ -46,7 +47,7 @@ class PremiumTeaser extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.card(context),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(AppLocalizations.of(context).t('home_7dayfree'),

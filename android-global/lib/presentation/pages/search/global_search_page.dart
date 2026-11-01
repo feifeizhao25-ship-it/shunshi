@@ -1,4 +1,5 @@
 import 'dart:async';
+import '../../../design_system/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import '../../../core/theme/app_localizations.dart';
@@ -76,11 +77,11 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : ShunShiColors.background,
+    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : AppColors.background(context),
       appBar: AppBar(
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, size: 20, color: ShunShiColors.textPrimary),
+          icon: Icon(Icons.arrow_back_ios_new, size: 20, color: AppColors.textPrimary(context)),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: _buildSearchField(),
@@ -105,14 +106,14 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
     return TextField(
       controller: _controller,
       focusNode: _focusNode,
-      style: TextStyle(fontSize: 16, color: ShunShiColors.textPrimary),
+      style: TextStyle(fontSize: 16, color: AppColors.textPrimary(context)),
       decoration: InputDecoration(
         hintText: AppLocalizations.of(context).t('global_search_search_wellness_knowledge'),
-        hintStyle: TextStyle(color: ShunShiColors.textTertiary),
+        hintStyle: TextStyle(color: AppColors.textTertiary(context)),
         border: InputBorder.none,
         suffixIcon: _controller.text.isNotEmpty
             ? IconButton(
-                icon: Icon(Icons.clear, color: ShunShiColors.textTertiary),
+                icon: Icon(Icons.clear, color: AppColors.textTertiary(context)),
                 onPressed: () {
                   _controller.clear();
                   setState(() => _results = []);
@@ -149,8 +150,8 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
                 setState(() => _selectedType = selected ? null : t.$2);
                 if (_controller.text.isNotEmpty) _search(_controller.text);
               },
-              backgroundColor: ShunShiColors.surfaceContainerLowest,
-              selectedColor: ShunShiColors.primary.withValues(alpha: 0.15),
+              backgroundColor: AppColors.surfaceContainerLowest(context),
+              selectedColor: AppColors.primary(context).withValues(alpha: 0.15),
               side: BorderSide.none,
             ),
           );
@@ -166,7 +167,7 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(AppLocalizations.of(context).get('search_popular'), style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+          Text(AppLocalizations.of(context).get('search_popular'), style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
           const SizedBox(height: 12),
           Wrap(
             spacing: 8,
@@ -176,10 +177,10 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                 decoration: BoxDecoration(
-                  color: ShunShiColors.surfaceContainerLowest,
+                  color: AppColors.surfaceContainerLowest(context),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: Text(term, style: TextStyle(fontSize: 14, color: ShunShiColors.textSecondary)),
+                child: Text(term, style: TextStyle(fontSize: 14, color: AppColors.textSecondary(context))),
               ),
             )).toList(),
           ),
@@ -212,7 +213,7 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: ShunShiColors.surfaceContainerLowest,
+          color: AppColors.surfaceContainerLowest(context),
           borderRadius: BorderRadius.circular(14),
         ),
         child: Column(
@@ -225,7 +226,7 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
                 Expanded(
                   child: Text(title, style: TextStyle(
                     fontSize: 16, fontWeight: FontWeight.w600,
-                    color: ShunShiColors.textPrimary,
+                    color: AppColors.textPrimary(context),
                   )),
                 ),
               ],
@@ -233,7 +234,7 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
             if (desc.isNotEmpty) ...[
               const SizedBox(height: 6),
               Text(desc, maxLines: 2, overflow: TextOverflow.ellipsis,
-                style: TextStyle(fontSize: 13, color: ShunShiColors.textSecondary)),
+                style: TextStyle(fontSize: 13, color: AppColors.textSecondary(context))),
             ],
           ],
         ),
@@ -244,7 +245,7 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
   Widget _typeChip(String type) {
     final colors = {
       'diet': Colors.green, 'tea': Color(0xFF8D6E63), 'exercise': Colors.blue,
-      'recipe': Colors.orange, 'herb': Colors.purple, 'meridian': ShunShiColors.primary,
+      'recipe': Colors.orange, 'herb': Colors.purple, 'meridian': AppColors.primary(context),
       'acupoint': Colors.pink, 'acupressure': Colors.pink,
     };
     final labels = {

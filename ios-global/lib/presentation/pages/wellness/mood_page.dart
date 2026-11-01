@@ -1,4 +1,5 @@
 import 'dart:ui' as ui;
+import '../../../design_system/app_colors.dart';
 
 import 'package:flutter/material.dart';
 
@@ -44,9 +45,9 @@ class _MoodPageState extends State<MoodPage> {
     final country = widget.countryCode ?? ui.PlatformDispatcher.instance.locale.countryCode;
     final selected = _moods.where((m) => m.id == _selected).firstOrNull;
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       appBar: AppBar(
-        backgroundColor: ShunShiColors.background,
+        backgroundColor: AppColors.background(context),
         leading: BackButton(onPressed: () => safePop(context)),
         title: const Text('How are you feeling?'),
       ),
@@ -97,7 +98,7 @@ class _MoodPageState extends State<MoodPage> {
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: _selected == m.id ? FontWeight.w700 : FontWeight.w500,
-                              color: ShunShiColors.textPrimary,
+                              color: AppColors.textPrimary(context),
                             ),
                           ),
                         ],
@@ -113,7 +114,7 @@ class _MoodPageState extends State<MoodPage> {
               key: const Key('mood_idea'),
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: ShunShiColors.surface,
+                color: AppColors.surface(context),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Row(
@@ -126,9 +127,9 @@ class _MoodPageState extends State<MoodPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('A small idea for feeling ${selected.label.toLowerCase()}',
-                            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: ShunShiColors.textSecondary)),
+                            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textSecondary(context))),
                         const SizedBox(height: 4),
-                        Text(selected.idea, style: TextStyle(fontSize: 15, height: 1.45, color: ShunShiColors.textPrimary)),
+                        Text(selected.idea, style: TextStyle(fontSize: 15, height: 1.45, color: AppColors.textPrimary(context))),
                       ],
                     ),
                   ),
@@ -140,7 +141,7 @@ class _MoodPageState extends State<MoodPage> {
             key: const Key('mood_support_card'),
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              border: Border.all(color: ShunShiColors.borderGhost),
+              border: Border.all(color: AppColors.borderGhost(context)),
               borderRadius: BorderRadius.circular(14),
             ),
             child: Row(
@@ -153,12 +154,12 @@ class _MoodPageState extends State<MoodPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('Need to talk to someone?',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
                       const SizedBox(height: 8),
                       for (final line in CrisisResources.lines(country))
                         Padding(
                           padding: const EdgeInsets.only(bottom: 4),
-                          child: Text(line, style: TextStyle(fontSize: 14, height: 1.4, color: ShunShiColors.textSecondary)),
+                          child: Text(line, style: TextStyle(fontSize: 14, height: 1.4, color: AppColors.textSecondary(context))),
                         ),
                     ],
                   ),
@@ -169,7 +170,7 @@ class _MoodPageState extends State<MoodPage> {
           const SizedBox(height: 16),
           Text(
             'For wellness routine guidance only; not medical diagnosis or treatment.',
-            style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary),
+            style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context)),
           ),
         ],
       ),

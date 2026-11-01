@@ -1,6 +1,7 @@
 import '../../../core/router/safe_pop.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import '../../../data/network/session.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/config/app_config.dart';
 import '../../../design_system/app_colors.dart';
@@ -33,12 +34,17 @@ class _DailyCheckinPageState extends State<DailyCheckinPage> {
     setState(() => _isSubmitting = true);
     try {
       final dio = Dio(BaseOptions(baseUrl: _baseUrl));
-      await dio.post('/api/v1/user/daily-checkin', data: {
+      // 打卡 = 写一条今日日记（心情 / 精力 / 睡眠）；服务端同时记一次打卡、发积分。
+      // 以前这里 POST 一个不存在的 /user/daily-checkin 且不带登录令牌，提交必然失败，「记录」「成就」页自然永远是 0。
+      final token = await ensureSessionToken(dio);
+      if (token == null) throw StateError('no session');
+      final note = _noteController.text.trim();
+      await dio.post('/api/v1/journal/entry', data: {
         'mood': _mood.round(),
-        'sleep_quality': _sleep.round(),
         'energy': _energy.round(),
-        'notes': _noteController.text.trim().isEmpty ? null : _noteController.text.trim(),
-      });
+        'sleep_quality': _sleep.round(),
+        if (note.isNotEmpty) 'notes': note,
+      }, options: Options(headers: {'Authorization': 'Bearer $token'}));
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('记录成功！继续保持 💪'), duration: Duration(seconds: 2), backgroundColor: AppColors.primary(context)),

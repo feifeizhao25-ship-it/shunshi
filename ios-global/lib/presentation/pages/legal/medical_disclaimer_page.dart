@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/router/safe_pop.dart';
 
@@ -8,8 +9,8 @@ class MedicalDisclaimerPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? ShunShiColors.darkBackground : ShunShiColors.background;
-    final textColor = isDark ? ShunShiColors.textPrimary : ShunShiColors.textSecondary;
+    final bg = isDark ? ShunShiColors.darkBackground : AppColors.background(context);
+    final textColor = isDark ? AppColors.textPrimary(context) : AppColors.textSecondary(context);
 
     return Scaffold(
       backgroundColor: bg,
@@ -17,7 +18,7 @@ class MedicalDisclaimerPage extends StatelessWidget {
         backgroundColor: bg,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+          icon: Icon(Icons.arrow_back_ios_new, size: 20),
           onPressed: () => safePop(context),
         ),
         title: const Text('Medical Disclaimer',
@@ -113,7 +114,7 @@ class MedicalDisclaimerPage extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 8),
       child: Text(
         text,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 17,
           fontWeight: FontWeight.w700,
           fontFamily: ShunShiTypography.serifFamily,

@@ -55,27 +55,26 @@ class ReflectionNotifier extends StateNotifier<ReflectionState> {
 
   Future<void> loadReflectionData() async {
     state = state.copyWith(isLoading: true, error: null);
-
+    final uid = currentUserId();
+    if (uid == null) {
+      // 没有登录令牌就没有「我的日记」可取（不再用写死的 user-001 去撞别人的数据）。
+      state = state.copyWith(history: [], isLoading: false);
+      return;
+    }
     try {
-      final response = await _dio.get(
-        '/api/v1/journal/entries/user-001',
-        queryParameters: {...userIdParam()},
-      );
-
-      final data = response.data as List;
-      final history = data.map((item) => _parseReflection(item)).toList();
-
-      state = state.copyWith(
-        history: history,
-        isLoading: false,
-      );
+      final enc = Uri.encodeComponent(uid);
+      final response = await _dio.get('/api/v1/journal/entries/$enc', queryParameters: {'limit': 30});
+      final entries = journalEntriesFromBody(response.data) ?? const [];
+      final history = entries.map(_parseReflection).toList();
+      var streak = 0;
+      try {
+        final s = await _dio.get('/api/v1/journal/streak/$enc');
+        final d = s.data is Map && s.data['data'] is Map ? s.data['data'] as Map : const {};
+        streak = (d['current_streak'] as num?)?.toInt() ?? 0;
+      } catch (_) {}
+      state = state.copyWith(history: history, streakDays: streak, isLoading: false);
     } catch (e) {
-      // Fallback to empty on error
-      state = state.copyWith(
-        history: [],
-        isLoading: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(history: [], isLoading: false, error: e.toString());
     }
   }
 
@@ -86,55 +85,22 @@ class ReflectionNotifier extends StateNotifier<ReflectionState> {
     String? notes,
   }) async {
     state = state.copyWith(isSubmitting: true, error: null);
-
     try {
-      final moodStr = _moodToString(mood);
-      final energyStr = _energyToString(energy);
-      final sleepStr = _sleepToString(sleep);
-
-      await _dio.post(
-        '/api/v1/user/daily-checkin',
-        data: {
-          ...userIdParam(),
-          'mood': moodStr,
-          'energy': energyStr,
-          'sleep': sleepStr,
-          'notes': notes,
-        },
-      );
-
-      final newReflection = DailyReflection(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        userId: currentUserId() ?? '',
-        date: DateTime.now(),
-        mood: mood,
-        energy: energy,
-        sleep: sleep,
-        notes: notes,
-      );
-
-      state = state.copyWith(
-        history: [newReflection, ...state.history],
-        streakDays: state.streakDays + 1,
-        isSubmitting: false,
-      );
+      final text = notes?.trim() ?? '';
+      // 与后端 POST /api/v1/journal/entry 一一对应：三项都是 1–5 的整数，心情词放进 tags 方便读回。
+      await _dio.post('/api/v1/journal/entry', data: {
+        ...userIdParam(),
+        'mood': _moodScore(mood),
+        'energy': _energyScore(energy),
+        'sleep_quality': _sleepScore(sleep),
+        if (text.isNotEmpty) 'notes': text,
+        'tags': [_moodToString(mood)],
+      });
+      await loadReflectionData();
+      state = state.copyWith(isSubmitting: false);
     } catch (e) {
-      // Still update UI optimistically
-      final newReflection = DailyReflection(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        userId: currentUserId() ?? '',
-        date: DateTime.now(),
-        mood: mood,
-        energy: energy,
-        sleep: sleep,
-        notes: notes,
-      );
-
-      state = state.copyWith(
-        history: [newReflection, ...state.history],
-        isSubmitting: false,
-        error: e.toString(),
-      );
+      // 保存失败就如实报错，不再在界面上假装已保存。
+      state = state.copyWith(isSubmitting: false, error: e.toString());
     }
   }
 
@@ -145,15 +111,42 @@ class ReflectionNotifier extends StateNotifier<ReflectionState> {
   }
 
   DailyReflection _parseReflection(Map<String, dynamic> json) {
+    final tags = (json['tags'] as List?)?.map((e) => '$e').toList() ?? const <String>[];
+    final moodScore = (json['mood'] as num?)?.toInt() ?? 3;
+    final energyScore = (json['energy'] as num?)?.toInt() ?? 3;
+    final sleepScore = (json['sleep_quality'] as num?)?.toInt() ?? 3;
+    final tagMood = tags.isEmpty ? null : tags.first;
     return DailyReflection(
-      id: json['id'] ?? '',
-      userId: json['user_id'] ?? '',
-      date: DateTime.tryParse(json['date'] ?? '') ?? DateTime.now(),
-      mood: _stringToMood(json['mood'] ?? 'calm'),
-      energy: _stringToEnergy(json['energy'] ?? 'medium'),
-      sleep: _stringToSleep(json['sleep'] ?? 'good'),
-      notes: json['notes'],
+      id: '${json['entry_id'] ?? json['id'] ?? ''}',
+      userId: '${json['user_id'] ?? ''}',
+      date: DateTime.tryParse('${json['date'] ?? ''}') ?? DateTime.now(),
+      mood: tagMood != null && _knownMoods.contains(tagMood) ? _stringToMood(tagMood) : _scoreToMood(moodScore),
+      energy: energyScore <= 2 ? EnergyLevel.low : (energyScore == 3 ? EnergyLevel.medium : EnergyLevel.high),
+      sleep: sleepScore <= 1 ? SleepQuality.poor : (sleepScore <= 3 ? SleepQuality.fair : (sleepScore == 4 ? SleepQuality.good : SleepQuality.excellent)),
+      notes: (json['notes'] as String?)?.isEmpty ?? true ? null : json['notes'] as String?,
     );
+  }
+
+  static const _knownMoods = {'grateful', 'calm', 'happy', 'tired', 'hopeful', 'anxious', 'sad'};
+
+  int _moodScore(Mood m) {
+    switch (m) {
+      case Mood.grateful: case Mood.happy: case Mood.energetic: return 5;
+      case Mood.calm: case Mood.hopeful: return 4;
+      case Mood.tired: return 3;
+      case Mood.anxious: case Mood.sad: return 2;
+    }
+  }
+
+  Mood _scoreToMood(int s) => s >= 5 ? Mood.happy : (s == 4 ? Mood.calm : (s == 3 ? Mood.tired : Mood.sad));
+  int _energyScore(EnergyLevel e) => e == EnergyLevel.low ? 2 : (e == EnergyLevel.medium ? 3 : 4);
+  int _sleepScore(SleepQuality s) {
+    switch (s) {
+      case SleepQuality.poor: return 1;
+      case SleepQuality.fair: return 3;
+      case SleepQuality.good: return 4;
+      case SleepQuality.excellent: return 5;
+    }
   }
 
   String _moodToString(Mood mood) {

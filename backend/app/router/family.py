@@ -77,7 +77,7 @@ def get_user_family(db, user_id: str) -> tuple:
 # ============ API Endpoints ============
 
 @router.get("", response_model=FamilyInfo)
-async def get_family(user_id: str = "user-001"):
+async def get_family(user_id: str = Query(..., description="用户ID；不传由服务端按令牌补上本人")):
     """获取家庭信息"""
     db = get_db()
     
@@ -121,7 +121,7 @@ async def get_family(user_id: str = "user-001"):
 @router.post("/members", response_model=FamilyMember)
 async def add_member(
     request: AddMemberRequest,
-    user_id: str = "user-001"
+    user_id: str = Query(..., description="用户ID；不传由服务端按令牌补上本人")
 ):
     """添加家庭成员"""
     db = get_db()
@@ -167,7 +167,7 @@ async def add_member(
 @router.delete("/members/{member_id}")
 async def remove_member(
     member_id: str,
-    user_id: str = "user-001"
+    user_id: str = Query(..., description="用户ID；不传由服务端按令牌补上本人")
 ):
     """移除家庭成员"""
     db = get_db()
@@ -192,7 +192,7 @@ async def remove_member(
 async def update_member_status(
     member_id: str,
     status: Literal["normal", "attention", "warning", "inactive"],
-    user_id: str = "user-001"
+    user_id: str = Query(..., description="用户ID；不传由服务端按令牌补上本人")
 ):
     """更新成员状态"""
     db = get_db()
@@ -218,7 +218,7 @@ async def update_member_status(
 
 
 @router.post("/invite", response_model=dict)
-async def generate_invite(request: GenerateInviteRequest, user_id: str = "user-001"):
+async def generate_invite(request: GenerateInviteRequest, user_id: str = Query(..., description="用户ID；不传由服务端按令牌补上本人")):
     """生成或复用当前邀请人、关系对应的邀请码。"""
     db = get_db()
     try:
@@ -258,7 +258,7 @@ async def generate_invite(request: GenerateInviteRequest, user_id: str = "user-0
 
 
 @router.post("/join")
-async def join_family(code: str, user_id: str = "user-001", session: Session = Depends(get_session)):
+async def join_family(code: str, user_id: str = Query(..., description="用户ID；不传由服务端按令牌补上本人"), session: Session = Depends(get_session)):
     """一次性消费邀请码；失败时不消耗邀请码、不留下部分加入记录。"""
     db = get_db()
     try:
@@ -302,7 +302,7 @@ async def join_family(code: str, user_id: str = "user-001", session: Session = D
 
 
 @router.get("/members")
-async def get_family_members(user_id: str = "user-001"):
+async def get_family_members(user_id: str = Query(..., description="用户ID；不传由服务端按令牌补上本人")):
     """获取家庭成员列表"""
     db = get_db()
     family_id, family_name = get_user_family(db, user_id)
@@ -330,7 +330,7 @@ async def get_family_members(user_id: str = "user-001"):
 
 
 @router.get("/status")
-async def get_family_status(user_id: str = "user-001"):
+async def get_family_status(user_id: str = Query(..., description="用户ID；不传由服务端按令牌补上本人")):
     """获取家人状态（趋势，不显示隐私）"""
     db = get_db()
     family_id, family_name = get_user_family(db, user_id)
@@ -370,7 +370,7 @@ class ReminderRequest(BaseModel):
     message: Optional[str] = None
 
 @router.post("/reminder")
-async def send_care_reminder(request: ReminderRequest, user_id: str = "user-001"):
+async def send_care_reminder(request: ReminderRequest, user_id: str = Query(..., description="用户ID；不传由服务端按令牌补上本人")):
     """发送关怀提醒"""
     db = get_db()
 
@@ -449,7 +449,7 @@ def _read_family_settings(db, user_id: str) -> FamilySettings:
 
 
 @router.get("/settings")
-async def get_family_settings(user_id: str = "user-001"):
+async def get_family_settings(user_id: str = Query(..., description="用户ID；不传由服务端按令牌补上本人")):
     """读取当前账号的家庭设置。"""
     db = get_db()
     try:
@@ -460,7 +460,7 @@ async def get_family_settings(user_id: str = "user-001"):
 
 
 @router.put("/settings")
-async def update_family_settings(settings: FamilySettings, user_id: str = "user-001"):
+async def update_family_settings(settings: FamilySettings, user_id: str = Query(..., description="用户ID；不传由服务端按令牌补上本人")):
     """持久化设置；只更新本次明确提交的字段。"""
     db = get_db()
     try:
@@ -501,7 +501,7 @@ def _get_member_trend(status: str) -> str:
 
 
 @router.post("/leave")
-async def leave_family(user_id: str = "user-001"):
+async def leave_family(user_id: str = Query(..., description="用户ID；不传由服务端按令牌补上本人")):
     """离开家庭"""
     db = get_db()
     
@@ -531,7 +531,7 @@ def _parse_json(s):
 
 @router.get("/overview")
 async def get_family_overview(
-    user_id: str = "user-001",
+    user_id: str = Query(..., description="用户ID；不传由服务端按令牌补上本人"),
     locale: str = Query("zh-CN", description="语言: zh-CN/en-US")
 ):
     """获取家庭健康概览（增强版）"""
@@ -541,7 +541,7 @@ async def get_family_overview(
 @router.get("/members/{member_id}/health")
 async def get_member_health_detail(
     member_id: str,
-    user_id: str = "user-001",
+    user_id: str = Query(..., description="用户ID；不传由服务端按令牌补上本人"),
     locale: str = Query("zh-CN", description="语言"),
 ):
     """获取家庭成员健康详情"""
@@ -550,7 +550,7 @@ async def get_member_health_detail(
 
 @router.get("/shared-content")
 async def get_shared_content_pack(
-    user_id: str = "user-001",
+    user_id: str = Query(..., description="用户ID；不传由服务端按令牌补上本人"),
     pack_type: str = Query("wellness", description="内容包类型: wellness/exercise/diet"),
     locale: str = Query("zh-CN", description="语言"),
 ):

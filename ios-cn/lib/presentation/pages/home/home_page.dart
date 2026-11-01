@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../data/network/session.dart';
 import '../../../design_system/theme.dart';
 import 'widgets/greeting_section.dart';
 import 'widgets/today_action_card.dart';
@@ -158,7 +159,18 @@ class _HomePageState extends State<HomePage> {
     if (_reflecting) return;
     setState(() { _selectedMood = mood; _reflecting = true; });
     try {
-      await _dio.post('/api/v1/user/daily-checkin', data: {'mood': mood, 'energy': 3});
+      // 快速记录心情 = 写一条今日日记（服务端同时记一次打卡）。心情词换成 1–5 分，精力 / 睡眠没问就不编，按「一般」3 分记。
+      // 以前这里 POST 一个不存在的 /user/daily-checkin 且不带令牌，必然失败（并被吞掉）。
+      final token = await ensureSessionToken(_dio);
+      if (token != null) {
+        const scores = {'calm': 4, 'peaceful': 5, 'energetic': 5, 'tired': 3, 'anxious': 2, 'overwhelmed': 2};
+        await _dio.post('/api/v1/journal/entry', data: {
+          'mood': scores[mood] ?? 3,
+          'energy': mood == 'energetic' ? 5 : (mood == 'tired' ? 2 : 3),
+          'sleep_quality': 3,
+          'tags': [mood],
+        }, options: Options(headers: {'Authorization': 'Bearer $token'}));
+      }
     } catch (_) {}
     if (mounted) setState(() { _selectedMood = ''; _reflecting = false; });
   }

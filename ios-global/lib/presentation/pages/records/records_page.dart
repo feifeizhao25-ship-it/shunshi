@@ -109,7 +109,7 @@ class _RecordsPageState extends State<RecordsPage>
 
   Widget _buildHeader() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(
+      padding: EdgeInsets.fromLTRB(
         SeasonsSpacing.md,
         SeasonsSpacing.md,
         SeasonsSpacing.md,
@@ -118,11 +118,11 @@ class _RecordsPageState extends State<RecordsPage>
       child: Row(
         children: [
           IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+            icon: Icon(Icons.arrow_back_ios_new, size: 20),
             onPressed: () => Navigator.of(context).pop(),
             color: SeasonsColors.textPrimary,
           ),
-          const SizedBox(width: SeasonsSpacing.xs),
+          SizedBox(width: SeasonsSpacing.xs),
           Text('Health Records', style: SeasonsTextStyles.heading),
         ],
       ),
@@ -132,7 +132,7 @@ class _RecordsPageState extends State<RecordsPage>
   Widget _buildTabs() {
     const tabs = ['Mood', 'Sleep', 'Exercise', 'Diet'];
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: SeasonsSpacing.pagePadding),
+      padding: EdgeInsets.symmetric(horizontal: SeasonsSpacing.pagePadding),
       child: Row(
         children: List.generate(tabs.length, (i) {
           final isActive = _currentTab == i;
@@ -151,7 +151,7 @@ class _RecordsPageState extends State<RecordsPage>
                       fontSize: isActive ? 15 : 14,
                     ),
                   ),
-                  const SizedBox(height: SeasonsSpacing.sm),
+                  SizedBox(height: SeasonsSpacing.sm),
                   AnimatedContainer(
                     duration: SeasonsAnimations.stateChange,
                     height: 2.5,
@@ -243,14 +243,14 @@ class _MoodTabState extends State<_MoodTab> {
     final today = widget.records.last;
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(SeasonsSpacing.pagePadding),
+      padding: EdgeInsets.all(SeasonsSpacing.pagePadding),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('This Week\'s Mood', style: SeasonsTextStyles.caption),
-          const SizedBox(height: SeasonsSpacing.sm),
+          SizedBox(height: SeasonsSpacing.sm),
           SoftCard(
-            padding: const EdgeInsets.all(SeasonsSpacing.md),
+            padding: EdgeInsets.all(SeasonsSpacing.md),
             child: SizedBox(
               height: 160,
               width: double.infinity,
@@ -261,16 +261,16 @@ class _MoodTabState extends State<_MoodTab> {
               ),
             ),
           ),
-          const SizedBox(height: SeasonsSpacing.xl),
+          SizedBox(height: SeasonsSpacing.xl),
 
           Text('Today', style: SeasonsTextStyles.caption),
-          const SizedBox(height: SeasonsSpacing.sm),
+          SizedBox(height: SeasonsSpacing.sm),
           SoftCard(
-            padding: const EdgeInsets.all(SeasonsSpacing.md),
+            padding: EdgeInsets.all(SeasonsSpacing.md),
             child: Row(
               children: [
                 Text(today.emoji, style: const TextStyle(fontSize: 36)),
-                const SizedBox(width: SeasonsSpacing.md),
+                SizedBox(width: SeasonsSpacing.md),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -286,18 +286,18 @@ class _MoodTabState extends State<_MoodTab> {
               ],
             ),
           ),
-          const SizedBox(height: SeasonsSpacing.xl),
+          SizedBox(height: SeasonsSpacing.xl),
 
           Text('Record This Moment', style: SeasonsTextStyles.caption),
-          const SizedBox(height: SeasonsSpacing.sm),
+          SizedBox(height: SeasonsSpacing.sm),
           SoftCard(
-            padding: const EdgeInsets.all(SeasonsSpacing.md),
+            padding: EdgeInsets.all(SeasonsSpacing.md),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('How are you feeling right now?',
                     style: SeasonsTextStyles.body),
-                const SizedBox(height: SeasonsSpacing.md),
+                SizedBox(height: SeasonsSpacing.md),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: List.generate(_emojis.length, (i) {
@@ -308,7 +308,7 @@ class _MoodTabState extends State<_MoodTab> {
                           setState(() => _selectedEmojiIndex = i),
                       child: AnimatedContainer(
                         duration: SeasonsAnimations.stateChange,
-                        padding: const EdgeInsets.symmetric(
+                        padding: EdgeInsets.symmetric(
                           horizontal: SeasonsSpacing.sm,
                           vertical: SeasonsSpacing.xs,
                         ),
@@ -340,7 +340,7 @@ class _MoodTabState extends State<_MoodTab> {
                     );
                   }),
                 ),
-                const SizedBox(height: SeasonsSpacing.md),
+                SizedBox(height: SeasonsSpacing.md),
                 TextField(
                   controller: _noteController,
                   style: SeasonsTextStyles.hint,
@@ -363,14 +363,14 @@ class _MoodTabState extends State<_MoodTab> {
                       borderSide: BorderSide(
                           color: SeasonsColors.primary, width: 1.5),
                     ),
-                    contentPadding: const EdgeInsets.symmetric(
+                    contentPadding: EdgeInsets.symmetric(
                       horizontal: SeasonsSpacing.md,
                       vertical: SeasonsSpacing.sm + 4,
                     ),
                   ),
                   maxLines: 2,
                 ),
-                const SizedBox(height: SeasonsSpacing.md),
+                SizedBox(height: SeasonsSpacing.md),
                 SizedBox(
                   width: double.infinity,
                   child: GentleButton(
@@ -382,7 +382,7 @@ class _MoodTabState extends State<_MoodTab> {
               ],
             ),
           ),
-          const SizedBox(height: SeasonsSpacing.xxl),
+          SizedBox(height: SeasonsSpacing.xxl),
         ],
       ),
     );
@@ -460,14 +460,14 @@ class _SleepTabState extends State<_SleepTab> {
     final last = widget.records.last;
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(SeasonsSpacing.pagePadding),
+      padding: EdgeInsets.all(SeasonsSpacing.pagePadding),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('This Week\'s Sleep', style: SeasonsTextStyles.caption),
-          const SizedBox(height: SeasonsSpacing.sm),
+          SizedBox(height: SeasonsSpacing.sm),
           SoftCard(
-            padding: const EdgeInsets.all(SeasonsSpacing.md),
+            padding: EdgeInsets.all(SeasonsSpacing.md),
             child: SizedBox(
               height: 160,
               width: double.infinity,
@@ -479,10 +479,10 @@ class _SleepTabState extends State<_SleepTab> {
               ),
             ),
           ),
-          const SizedBox(height: SeasonsSpacing.xl),
+          SizedBox(height: SeasonsSpacing.xl),
 
           Text('Last Night', style: SeasonsTextStyles.caption),
-          const SizedBox(height: SeasonsSpacing.xs),
+          SizedBox(height: SeasonsSpacing.xs),
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
@@ -506,7 +506,7 @@ class _SleepTabState extends State<_SleepTab> {
               ),
             ],
           ),
-          const SizedBox(height: SeasonsSpacing.xs),
+          SizedBox(height: SeasonsSpacing.xs),
           Row(
             children: [
               Text('Quality: ', style: SeasonsTextStyles.caption),
@@ -518,21 +518,21 @@ class _SleepTabState extends State<_SleepTab> {
               ),
             ],
           ),
-          const SizedBox(height: SeasonsSpacing.xl),
+          SizedBox(height: SeasonsSpacing.xl),
 
           Text('Record Sleep', style: SeasonsTextStyles.caption),
-          const SizedBox(height: SeasonsSpacing.sm),
+          SizedBox(height: SeasonsSpacing.sm),
           SoftCard(
-            padding: const EdgeInsets.all(SeasonsSpacing.md),
+            padding: EdgeInsets.all(SeasonsSpacing.md),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('Bedtime', style: SeasonsTextStyles.caption),
-                const SizedBox(height: SeasonsSpacing.xs),
+                SizedBox(height: SeasonsSpacing.xs),
                 GestureDetector(
                   onTap: _pickBedtime,
                   child: SoftCard(
-                    padding: const EdgeInsets.symmetric(
+                    padding: EdgeInsets.symmetric(
                       horizontal: SeasonsSpacing.md,
                       vertical: SeasonsSpacing.sm + 2,
                     ),
@@ -547,13 +547,13 @@ class _SleepTabState extends State<_SleepTab> {
                     ),
                   ),
                 ),
-                const SizedBox(height: SeasonsSpacing.md),
+                SizedBox(height: SeasonsSpacing.md),
                 Text('Wake Up', style: SeasonsTextStyles.caption),
-                const SizedBox(height: SeasonsSpacing.xs),
+                SizedBox(height: SeasonsSpacing.xs),
                 GestureDetector(
                   onTap: _pickWakeup,
                   child: SoftCard(
-                    padding: const EdgeInsets.symmetric(
+                    padding: EdgeInsets.symmetric(
                       horizontal: SeasonsSpacing.md,
                       vertical: SeasonsSpacing.sm + 2,
                     ),
@@ -568,9 +568,9 @@ class _SleepTabState extends State<_SleepTab> {
                     ),
                   ),
                 ),
-                const SizedBox(height: SeasonsSpacing.md),
+                SizedBox(height: SeasonsSpacing.md),
                 Text('Sleep Quality', style: SeasonsTextStyles.caption),
-                const SizedBox(height: SeasonsSpacing.sm),
+                SizedBox(height: SeasonsSpacing.sm),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: List.generate(
@@ -582,7 +582,7 @@ class _SleepTabState extends State<_SleepTab> {
                           setState(() => _qualityIndex = i),
                       child: AnimatedContainer(
                         duration: SeasonsAnimations.stateChange,
-                        padding: const EdgeInsets.symmetric(
+                        padding: EdgeInsets.symmetric(
                           horizontal: SeasonsSpacing.sm + 4,
                           vertical: SeasonsSpacing.xs + 2,
                         ),
@@ -614,7 +614,7 @@ class _SleepTabState extends State<_SleepTab> {
                     );
                   }),
                 ),
-                const SizedBox(height: SeasonsSpacing.lg),
+                SizedBox(height: SeasonsSpacing.lg),
                 SizedBox(
                   width: double.infinity,
                   child: GentleButton(
@@ -626,7 +626,7 @@ class _SleepTabState extends State<_SleepTab> {
               ],
             ),
           ),
-          const SizedBox(height: SeasonsSpacing.xxl),
+          SizedBox(height: SeasonsSpacing.xxl),
         ],
       ),
     );
@@ -685,14 +685,14 @@ class _ExerciseTabState extends State<_ExerciseTab> {
     final last = widget.records.last;
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(SeasonsSpacing.pagePadding),
+      padding: EdgeInsets.all(SeasonsSpacing.pagePadding),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('This Week\'s Exercise', style: SeasonsTextStyles.caption),
-          const SizedBox(height: SeasonsSpacing.sm),
+          SizedBox(height: SeasonsSpacing.sm),
           SoftCard(
-            padding: const EdgeInsets.all(SeasonsSpacing.md),
+            padding: EdgeInsets.all(SeasonsSpacing.md),
             child: SizedBox(
               height: 160,
               width: double.infinity,
@@ -704,12 +704,12 @@ class _ExerciseTabState extends State<_ExerciseTab> {
               ),
             ),
           ),
-          const SizedBox(height: SeasonsSpacing.xl),
+          SizedBox(height: SeasonsSpacing.xl),
 
           Text('Today', style: SeasonsTextStyles.caption),
-          const SizedBox(height: SeasonsSpacing.sm),
+          SizedBox(height: SeasonsSpacing.sm),
           SoftCard(
-            padding: const EdgeInsets.all(SeasonsSpacing.md),
+            padding: EdgeInsets.all(SeasonsSpacing.md),
             child: Row(
               children: [
                 Expanded(
@@ -730,7 +730,7 @@ class _ExerciseTabState extends State<_ExerciseTab> {
                 ),
                 if (last.intensity.isNotEmpty)
                   Container(
-                    padding: const EdgeInsets.symmetric(
+                    padding: EdgeInsets.symmetric(
                       horizontal: SeasonsSpacing.sm,
                       vertical: SeasonsSpacing.xs,
                     ),
@@ -749,24 +749,24 @@ class _ExerciseTabState extends State<_ExerciseTab> {
               ],
             ),
           ),
-          const SizedBox(height: SeasonsSpacing.xl),
+          SizedBox(height: SeasonsSpacing.xl),
 
           Text('Record Exercise', style: SeasonsTextStyles.caption),
-          const SizedBox(height: SeasonsSpacing.sm),
+          SizedBox(height: SeasonsSpacing.sm),
           SoftCard(
-            padding: const EdgeInsets.all(SeasonsSpacing.md),
+            padding: EdgeInsets.all(SeasonsSpacing.md),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('Activity Type', style: SeasonsTextStyles.caption),
-                const SizedBox(height: SeasonsSpacing.sm),
+                SizedBox(height: SeasonsSpacing.sm),
                 SizedBox(
                   height: 40,
                   child: ListView.separated(
                     scrollDirection: Axis.horizontal,
                     itemCount: _types.length,
                     separatorBuilder: (_, __) =>
-                        const SizedBox(width: SeasonsSpacing.sm),
+                        SizedBox(width: SeasonsSpacing.sm),
                     itemBuilder: (context, i) {
                       final selected = _typeIndex == i;
                       return GestureDetector(
@@ -774,7 +774,7 @@ class _ExerciseTabState extends State<_ExerciseTab> {
                             setState(() => _typeIndex = i),
                         child: AnimatedContainer(
                           duration: SeasonsAnimations.stateChange,
-                          padding: const EdgeInsets.symmetric(
+                          padding: EdgeInsets.symmetric(
                             horizontal: SeasonsSpacing.md,
                             vertical: SeasonsSpacing.sm,
                           ),
@@ -804,10 +804,10 @@ class _ExerciseTabState extends State<_ExerciseTab> {
                     },
                   ),
                 ),
-                const SizedBox(height: SeasonsSpacing.lg),
+                SizedBox(height: SeasonsSpacing.lg),
 
                 Text('Duration', style: SeasonsTextStyles.caption),
-                const SizedBox(height: SeasonsSpacing.sm),
+                SizedBox(height: SeasonsSpacing.sm),
                 Row(
                   children: [
                     Expanded(
@@ -844,10 +844,10 @@ class _ExerciseTabState extends State<_ExerciseTab> {
                     ),
                   ],
                 ),
-                const SizedBox(height: SeasonsSpacing.md),
+                SizedBox(height: SeasonsSpacing.md),
 
                 Text('Intensity', style: SeasonsTextStyles.caption),
-                const SizedBox(height: SeasonsSpacing.sm),
+                SizedBox(height: SeasonsSpacing.sm),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: List.generate(
@@ -858,7 +858,7 @@ class _ExerciseTabState extends State<_ExerciseTab> {
                           setState(() => _intensityIndex = i),
                       child: AnimatedContainer(
                         duration: SeasonsAnimations.stateChange,
-                        padding: const EdgeInsets.symmetric(
+                        padding: EdgeInsets.symmetric(
                           horizontal: SeasonsSpacing.md + 4,
                           vertical: SeasonsSpacing.sm,
                         ),
@@ -887,7 +887,7 @@ class _ExerciseTabState extends State<_ExerciseTab> {
                     );
                   }),
                 ),
-                const SizedBox(height: SeasonsSpacing.lg),
+                SizedBox(height: SeasonsSpacing.lg),
                 SizedBox(
                   width: double.infinity,
                   child: GentleButton(
@@ -899,7 +899,7 @@ class _ExerciseTabState extends State<_ExerciseTab> {
               ],
             ),
           ),
-          const SizedBox(height: SeasonsSpacing.xxl),
+          SizedBox(height: SeasonsSpacing.xxl),
         ],
       ),
     );
@@ -961,14 +961,14 @@ class _DietTabState extends State<_DietTab> {
     final last = widget.records.last;
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(SeasonsSpacing.pagePadding),
+      padding: EdgeInsets.all(SeasonsSpacing.pagePadding),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('This Week\'s Diet', style: SeasonsTextStyles.caption),
-          const SizedBox(height: SeasonsSpacing.sm),
+          SizedBox(height: SeasonsSpacing.sm),
           SoftCard(
-            padding: const EdgeInsets.all(SeasonsSpacing.md),
+            padding: EdgeInsets.all(SeasonsSpacing.md),
             child: SizedBox(
               height: 160,
               width: double.infinity,
@@ -979,16 +979,16 @@ class _DietTabState extends State<_DietTab> {
               ),
             ),
           ),
-          const SizedBox(height: SeasonsSpacing.xl),
+          SizedBox(height: SeasonsSpacing.xl),
 
           Text('Today', style: SeasonsTextStyles.caption),
-          const SizedBox(height: SeasonsSpacing.sm),
+          SizedBox(height: SeasonsSpacing.sm),
           SoftCard(
-            padding: const EdgeInsets.all(SeasonsSpacing.md),
+            padding: EdgeInsets.all(SeasonsSpacing.md),
             child: Row(
               children: [
                 Text(last.emoji, style: const TextStyle(fontSize: 36)),
-                const SizedBox(width: SeasonsSpacing.md),
+                SizedBox(width: SeasonsSpacing.md),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1002,18 +1002,18 @@ class _DietTabState extends State<_DietTab> {
               ],
             ),
           ),
-          const SizedBox(height: SeasonsSpacing.xl),
+          SizedBox(height: SeasonsSpacing.xl),
 
           Text('Record Diet', style: SeasonsTextStyles.caption),
-          const SizedBox(height: SeasonsSpacing.sm),
+          SizedBox(height: SeasonsSpacing.sm),
           SoftCard(
-            padding: const EdgeInsets.all(SeasonsSpacing.md),
+            padding: EdgeInsets.all(SeasonsSpacing.md),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('What did you eat today?',
                     style: SeasonsTextStyles.body),
-                const SizedBox(height: SeasonsSpacing.sm),
+                SizedBox(height: SeasonsSpacing.sm),
                 TextField(
                   controller: _noteController,
                   style: SeasonsTextStyles.body,
@@ -1036,17 +1036,17 @@ class _DietTabState extends State<_DietTab> {
                       borderSide: BorderSide(
                           color: SeasonsColors.primary, width: 1.5),
                     ),
-                    contentPadding: const EdgeInsets.symmetric(
+                    contentPadding: EdgeInsets.symmetric(
                       horizontal: SeasonsSpacing.md,
                       vertical: SeasonsSpacing.sm + 4,
                     ),
                   ),
                   maxLines: 3,
                 ),
-                const SizedBox(height: SeasonsSpacing.md),
+                SizedBox(height: SeasonsSpacing.md),
 
                 Text('Health Score', style: SeasonsTextStyles.caption),
-                const SizedBox(height: SeasonsSpacing.sm),
+                SizedBox(height: SeasonsSpacing.sm),
                 Row(
                   children: [
                     Expanded(
@@ -1084,7 +1084,7 @@ class _DietTabState extends State<_DietTab> {
                     ),
                   ],
                 ),
-                const SizedBox(height: SeasonsSpacing.lg),
+                SizedBox(height: SeasonsSpacing.lg),
                 SizedBox(
                   width: double.infinity,
                   child: GentleButton(
@@ -1096,7 +1096,7 @@ class _DietTabState extends State<_DietTab> {
               ],
             ),
           ),
-          const SizedBox(height: SeasonsSpacing.xxl),
+          SizedBox(height: SeasonsSpacing.xxl),
         ],
       ),
     );

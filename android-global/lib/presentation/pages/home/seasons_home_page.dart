@@ -1,4 +1,5 @@
 import 'dart:ui';
+import '../../../design_system/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -258,7 +259,7 @@ class _SeasonsHomePageState extends State<SeasonsHomePage> {
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.card(context),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: _inkGreen.withValues(alpha: 0.08),

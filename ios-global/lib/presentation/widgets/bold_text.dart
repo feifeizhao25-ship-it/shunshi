@@ -8,7 +8,7 @@ TextSpan boldSpans(String text, TextStyle style) {
   var last = 0;
   for (final m in re.allMatches(text)) {
     if (m.start > last) spans.add(TextSpan(text: text.substring(last, m.start)));
-    spans.add(TextSpan(text: m.group(1), style: const TextStyle(fontWeight: FontWeight.w700)));
+    spans.add(TextSpan(text: m.group(1), style: TextStyle(fontWeight: FontWeight.w700)));
     last = m.end;
   }
   if (last < text.length) spans.add(TextSpan(text: text.substring(last)));

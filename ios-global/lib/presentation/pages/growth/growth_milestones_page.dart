@@ -9,6 +9,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import '../../../design_system/theme.dart';
 
 class GrowthMilestonesPage extends StatelessWidget {
@@ -32,18 +33,18 @@ class GrowthMilestonesPage extends StatelessWidget {
     final totalXp = unlocked.fold<int>(0, (sum, m) => sum + m.xp);
 
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+          icon: Icon(Icons.arrow_back_ios_new, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text('Growth Milestones', style: TextStyle(
           fontSize: 20, fontWeight: FontWeight.w700,
           fontFamily: ShunShiTypography.serifFamily,
-          color: ShunShiColors.textPrimary,
+          color: AppColors.textPrimary(context),
         )),
-        backgroundColor: ShunShiColors.background,
+        backgroundColor: AppColors.background(context),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -54,7 +55,7 @@ class GrowthMilestonesPage extends StatelessWidget {
             Text(
               'Your journey of mindful growth',
               style: TextStyle(
-                fontSize: 14, color: ShunShiColors.textSecondary,
+                fontSize: 14, color: AppColors.textSecondary(context),
                 fontFamily: ShunShiTypography.sansFamily,
               ),
             ),
@@ -69,8 +70,8 @@ class GrowthMilestonesPage extends StatelessWidget {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    ShunShiColors.primary.withValues(alpha: 0.12),
-                    ShunShiColors.primary.withValues(alpha: 0.04),
+                    AppColors.primary(context).withValues(alpha: 0.12),
+                    AppColors.primary(context).withValues(alpha: 0.04),
                   ],
                 ),
                 borderRadius: BorderRadius.circular(20),
@@ -81,7 +82,7 @@ class GrowthMilestonesPage extends StatelessWidget {
                     '$totalXp',
                     style: TextStyle(
                       fontSize: 48, fontWeight: FontWeight.w700,
-                      color: ShunShiColors.primary,
+                      color: AppColors.primary(context),
                       fontFamily: ShunShiTypography.serifFamily,
                       height: 1,
                     ),
@@ -90,7 +91,7 @@ class GrowthMilestonesPage extends StatelessWidget {
                   Text(
                     'Experience Points',
                     style: TextStyle(
-                      fontSize: 14, color: ShunShiColors.textSecondary,
+                      fontSize: 14, color: AppColors.textSecondary(context),
                       fontFamily: ShunShiTypography.sansFamily,
                     ),
                   ),
@@ -99,7 +100,7 @@ class GrowthMilestonesPage extends StatelessWidget {
                     'Level: Mindful Seeker',
                     style: TextStyle(
                       fontSize: 14, fontWeight: FontWeight.w600,
-                      color: ShunShiColors.textPrimary,
+                      color: AppColors.textPrimary(context),
                       fontFamily: ShunShiTypography.sansFamily,
                     ),
                   ),
@@ -107,7 +108,7 @@ class GrowthMilestonesPage extends StatelessWidget {
                   Text(
                     'Next: Inner Sage — 570 XP remaining',
                     style: TextStyle(
-                      fontSize: 12, color: ShunShiColors.textTertiary,
+                      fontSize: 12, color: AppColors.textTertiary(context),
                       fontFamily: ShunShiTypography.sansFamily,
                     ),
                   ),
@@ -116,7 +117,7 @@ class GrowthMilestonesPage extends StatelessWidget {
                     Container(
                       height: 6,
                       decoration: BoxDecoration(
-                        color: ShunShiColors.surfaceContainerLow,
+                        color: AppColors.surfaceContainerLow(context),
                         borderRadius: BorderRadius.circular(3),
                       ),
                     ),
@@ -125,7 +126,7 @@ class GrowthMilestonesPage extends StatelessWidget {
                       child: Container(
                         height: 6,
                         decoration: BoxDecoration(
-                          color: ShunShiColors.primary,
+                          color: AppColors.primary(context),
                           borderRadius: BorderRadius.circular(3),
                         ),
                       ),
@@ -139,11 +140,11 @@ class GrowthMilestonesPage extends StatelessWidget {
             // ── Unlocked ──
             Text('Unlocked', style: TextStyle(
               fontSize: 16, fontWeight: FontWeight.w700,
-              color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.serifFamily,
+              color: AppColors.textPrimary(context), fontFamily: ShunShiTypography.serifFamily,
             )),
             const SizedBox(height: 4),
             Text('${unlocked.length} / ${_milestones.length} milestones', style: TextStyle(
-              fontSize: 13, color: ShunShiColors.textTertiary,
+              fontSize: 13, color: AppColors.textTertiary(context),
               fontFamily: ShunShiTypography.sansFamily,
             )),
             const SizedBox(height: 16),
@@ -156,7 +157,7 @@ class GrowthMilestonesPage extends StatelessWidget {
             // ── Locked ──
             Text('Journey Ahead', style: TextStyle(
               fontSize: 16, fontWeight: FontWeight.w700,
-              color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.serifFamily,
+              color: AppColors.textPrimary(context), fontFamily: ShunShiTypography.serifFamily,
             )),
             const SizedBox(height: 16),
             ...locked.map((m) => Padding(

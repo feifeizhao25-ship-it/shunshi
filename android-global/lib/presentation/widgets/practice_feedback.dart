@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import '../../design_system/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
 import '../../core/config/app_config.dart';
@@ -16,35 +17,35 @@ Future<void> showPracticeFeedback(BuildContext context, {
   final result = await showDialog<bool>(context: context, builder: (dc) {
     return StatefulBuilder(builder: (dc, setDialogState) {
       return AlertDialog(
-        backgroundColor: ShunShiColors.surface,
+        backgroundColor: AppColors.surface(context),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Column(children: [
           const Text('🎉', style: TextStyle(fontSize: 36)),
           const SizedBox(height: 8),
-          Text('Great job! You completed $itemName', style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 16, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary), textAlign: TextAlign.center),
+          Text('Great job! You completed $itemName', style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context)), textAlign: TextAlign.center),
         ]),
         content: Column(mainAxisSize: MainAxisSize.min, children: [
-          Text('How do you feel? Rate this practice', style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 14, color: ShunShiColors.textTertiary)),
+          Text('How do you feel? Rate this practice', style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 14, color: AppColors.textTertiary(context))),
           const SizedBox(height: 16),
           Row(mainAxisAlignment: MainAxisAlignment.center, children: List.generate(5, (i) {
             return GestureDetector(
               onTap: () => setDialogState(() => rating = i + 1),
               child: Padding(padding: const EdgeInsets.symmetric(horizontal: 4), child: Icon(
                 i < rating ? Icons.star_rounded : Icons.star_outline_rounded,
-                color: i < rating ? Colors.amber : ShunShiColors.textTertiary,
+                color: i < rating ? Colors.amber : AppColors.textTertiary(context),
                 size: 36,
               )),
             );
           })),
           const SizedBox(height: 16),
           Container(
-            decoration: BoxDecoration(color: ShunShiColors.background, borderRadius: BorderRadius.circular(12), border: Border.all(color: ShunShiColors.borderGhost)),
+            decoration: BoxDecoration(color: AppColors.background(context), borderRadius: BorderRadius.circular(12), border: Border.all(color: AppColors.borderGhost(context))),
             child: TextField(
               controller: noteController,
               maxLines: 2,
               decoration: InputDecoration(
                 hintText: 'Any thoughts to record?',
-                hintStyle: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 14, color: ShunShiColors.textTertiary),
+                hintStyle: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 14, color: AppColors.textTertiary(context)),
                 border: InputBorder.none,
                 contentPadding: const EdgeInsets.all(12),
               ),
@@ -52,10 +53,10 @@ Future<void> showPracticeFeedback(BuildContext context, {
           ),
         ]),
         actions: [
-          TextButton(onPressed: () => Navigator.of(dc).pop(false), child: Text('Cancel', style: TextStyle(color: ShunShiColors.textTertiary))),
+          TextButton(onPressed: () => Navigator.of(dc).pop(false), child: Text('Cancel', style: TextStyle(color: AppColors.textTertiary(context)))),
           ElevatedButton(
             onPressed: () => Navigator.of(dc).pop(true),
-            style: ElevatedButton.styleFrom(backgroundColor: ShunShiColors.primary, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary(context), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
             child: Text('Submit', style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontWeight: FontWeight.w600, color: Colors.white)),
           ),
         ],
@@ -106,7 +107,7 @@ class PracticeCompleteButton extends StatelessWidget {
         icon: const Text('🎉', style: TextStyle(fontSize: 18)),
         label: Text('Done!', style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white)),
         style: ElevatedButton.styleFrom(
-          backgroundColor: ShunShiColors.primary,
+          backgroundColor: AppColors.primary(context),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         ),
       ),

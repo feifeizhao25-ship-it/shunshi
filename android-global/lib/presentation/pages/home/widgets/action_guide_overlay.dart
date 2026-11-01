@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../design_system/app_colors.dart';
 import '../../../../design_system/theme.dart';
 import '../../../../core/theme/app_localizations.dart';
 import '../../../../core/network/api_singleton.dart';
@@ -59,7 +60,7 @@ class ActionGuideOverlay extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: ShunShiColors.textPrimary,
+                      color: AppColors.textPrimary(context),
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -67,7 +68,7 @@ class ActionGuideOverlay extends StatelessWidget {
                     guide.subtitle,
                     style: TextStyle(
                       fontSize: 12,
-                      color: ShunShiColors.textTertiary,
+                      color: AppColors.textTertiary(context),
                     ),
                   ),
                 ],
@@ -190,7 +191,7 @@ class ActionGuideOverlay extends StatelessWidget {
         icon: Icons.auto_awesome_outlined,
         title: AppLocalizations.of(context).t('home_start_your_first_action_today'),
         subtitle: AppLocalizations.of(context).t('home_solar_term_wellness_starts_from_morning'),
-        color: ShunShiColors.primary,
+        color: AppColors.primary(context),
         stepNum: 1,
       );
     }

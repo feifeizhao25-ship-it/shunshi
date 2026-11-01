@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'presentation/widgets/responsive_frame.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/router/app_router.dart';
@@ -51,6 +52,7 @@ class _ShunshiAppState extends State<ShunshiApp> {
           theme: ShunShiTheme.lightTheme,
           darkTheme: ShunShiTheme.darkTheme,
           themeMode: _themeNotifier.mode,
+          builder: (context, child) => ResponsiveFrame(child: child ?? const SizedBox.shrink()),
         );
       },
     );

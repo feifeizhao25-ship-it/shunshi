@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -49,7 +50,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : ShunShiColors.background,
+    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : AppColors.background(context),
       appBar: AppBar(
         elevation: 0,
         leading: IconButton(
@@ -71,7 +72,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: ShunShiColors.textPrimary,
+                color: AppColors.textPrimary(context),
               ),
             ),
             const SizedBox(height: 16),
@@ -80,16 +81,16 @@ class _FeedbackPageState extends State<FeedbackPage> {
               maxLines: 8,
               decoration: InputDecoration(
                 hintText: AppLocalizations.of(context).t('feedback_issues_suggestions_experience_feedback'),
-                hintStyle: TextStyle(color: ShunShiColors.textTertiary, fontSize: 14),
+                hintStyle: TextStyle(color: AppColors.textTertiary(context), fontSize: 14),
                 filled: true,
                 fillColor: Colors.white,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide(color: ShunShiColors.borderGhost),
+                  borderSide: BorderSide(color: AppColors.borderGhost(context)),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide(color: ShunShiColors.borderGhost),
+                  borderSide: BorderSide(color: AppColors.borderGhost(context)),
                 ),
               ),
             ),
@@ -100,7 +101,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
               child: ElevatedButton(
                 onPressed: _submitting ? null : _submit,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: ShunShiColors.primary,
+                  backgroundColor: AppColors.primary(context),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                 ),
                 child: _submitting

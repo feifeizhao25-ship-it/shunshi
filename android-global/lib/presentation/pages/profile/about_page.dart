@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/router/safe_pop.dart';
@@ -10,7 +11,7 @@ class AboutPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : ShunShiColors.background,
+    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : AppColors.background(context),
       appBar: AppBar(
         elevation: 0,
         leading: IconButton(
@@ -32,10 +33,10 @@ class AboutPage extends StatelessWidget {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: ShunShiColors.primary.withValues(alpha: 0.1),
+                color: AppColors.primary(context).withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.eco, size: 44, color: ShunShiColors.primary),
+              child: Icon(Icons.eco, size: 44, color: AppColors.primary(context)),
             ),
             const SizedBox(height: 16),
             Text(
@@ -44,7 +45,7 @@ class AboutPage extends StatelessWidget {
                 fontFamily: ShunShiTypography.serifFamily,
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: ShunShiColors.textPrimary,
+                color: AppColors.textPrimary(context),
               ),
             ),
             const SizedBox(height: 4),
@@ -52,7 +53,7 @@ class AboutPage extends StatelessWidget {
               'Live in Harmony with Time, Nourish the Heart',
               style: TextStyle(
                 fontSize: 14,
-                color: ShunShiColors.textTertiary,
+                color: AppColors.textTertiary(context),
               ),
             ),
             const SizedBox(height: 32),
@@ -60,7 +61,7 @@ class AboutPage extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.card(context),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Column(
@@ -70,7 +71,7 @@ class AboutPage extends StatelessWidget {
                     'SEASONS is a smart health app rooted in TCM ShiChen Wellness philosophy. Combining the 24 Solar Terms, 12 ShiChen periods, and your personal Body Type, it delivers personalized wellness suggestions for you.',
                     style: TextStyle(
                       fontSize: 14,
-                      color: ShunShiColors.textSecondary,
+                      color: AppColors.textSecondary(context),
                       height: 1.8,
                     ),
                   ),
@@ -84,7 +85,7 @@ class AboutPage extends StatelessWidget {
             const SizedBox(height: 24),
             Text(
               '© 2024-2026 SEASONS',
-              style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary),
+              style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context)),
             ),
           ],
         ),

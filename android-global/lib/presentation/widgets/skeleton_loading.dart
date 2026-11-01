@@ -2,6 +2,7 @@
 // Provides shimmer effect for loading states
 
 import 'package:flutter/material.dart';
+import '../../design_system/app_colors.dart';
 import '../../core/theme/shunshi_colors.dart';
 import '../../../design_system/theme.dart';
 import 'package:shimmer/shimmer.dart';
@@ -48,13 +49,13 @@ class SkeletonCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Shimmer.fromColors(
-      baseColor: isDark ? ShunShiColors.darkBorder : ShunShiColors.borderGhost,
-      highlightColor: isDark ? ShunShiColors.darkSurface : ShunShiColors.surface,
+      baseColor: isDark ? ShunShiColors.darkBorder : AppColors.borderGhost(context),
+      highlightColor: isDark ? ShunShiColors.darkSurface : AppColors.surface(context),
       child: Container(
         height: height,
         margin: margin,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.card(context),
           borderRadius: BorderRadius.circular(16),
         ),
       ),
@@ -93,8 +94,8 @@ class SkeletonProfile extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Shimmer.fromColors(
-      baseColor: isDark ? ShunShiColors.darkBorder : ShunShiColors.borderGhost,
-      highlightColor: isDark ? ShunShiColors.darkSurface : ShunShiColors.surface,
+      baseColor: isDark ? ShunShiColors.darkBorder : AppColors.borderGhost(context),
+      highlightColor: isDark ? ShunShiColors.darkSurface : AppColors.surface(context),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -105,7 +106,7 @@ class SkeletonProfile extends StatelessWidget {
               width: 120,
               height: 20,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.card(context),
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
@@ -114,7 +115,7 @@ class SkeletonProfile extends StatelessWidget {
               width: 80,
               height: 14,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.card(context),
                 borderRadius: BorderRadius.circular(7),
               ),
             ),
@@ -124,8 +125,8 @@ class SkeletonProfile extends StatelessWidget {
               children: List.generate(3, (index) => Container(
                 width: 60,
                 height: 60,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
+                decoration: BoxDecoration(
+                  color: AppColors.card(context),
                   shape: BoxShape.circle,
                 ),
               )),
@@ -144,8 +145,8 @@ class SkeletonChatBubble extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Shimmer.fromColors(
-      baseColor: isDark ? ShunShiColors.darkBorder : ShunShiColors.borderGhost,
-      highlightColor: isDark ? ShunShiColors.darkSurface : ShunShiColors.surface,
+      baseColor: isDark ? ShunShiColors.darkBorder : AppColors.borderGhost(context),
+      highlightColor: isDark ? ShunShiColors.darkSurface : AppColors.surface(context),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         child: Row(
@@ -161,7 +162,7 @@ class SkeletonChatBubble extends StatelessWidget {
                     width: 150,
                     height: 16,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.card(context),
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
@@ -170,7 +171,7 @@ class SkeletonChatBubble extends StatelessWidget {
                     width: double.infinity,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.card(context),
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),

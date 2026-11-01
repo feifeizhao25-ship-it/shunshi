@@ -146,17 +146,17 @@ class LibraryNotifier extends StateNotifier<LibraryState> {
   // ── Fallback Data ──────────────────────────────────────────────────────
   
   static List<ContentCategory> get _fallbackCategories => [
-    const ContentCategory(id: 'breathing', name: 'Breathing', type: ContentType.breathing),
-    const ContentCategory(id: 'stretch', name: 'Stretching', type: ContentType.stretch),
-    const ContentCategory(id: 'tea', name: 'Tea Rituals', type: ContentType.teaRitual),
-    const ContentCategory(id: 'sleep', name: 'Sleep', type: ContentType.sleep),
-    const ContentCategory(id: 'meditation', name: 'Meditation', type: ContentType.meditation),
-    const ContentCategory(id: 'reflection', name: 'Reflection', type: ContentType.reflection),
+    ContentCategory(id: 'breathing', name: 'Breathing', type: ContentType.breathing),
+    ContentCategory(id: 'stretch', name: 'Stretching', type: ContentType.stretch),
+    ContentCategory(id: 'tea', name: 'Tea Rituals', type: ContentType.teaRitual),
+    ContentCategory(id: 'sleep', name: 'Sleep', type: ContentType.sleep),
+    ContentCategory(id: 'meditation', name: 'Meditation', type: ContentType.meditation),
+    ContentCategory(id: 'reflection', name: 'Reflection', type: ContentType.reflection),
   ];
   
   static List<Content> get _fallbackContents => [
     // Breathing
-    const Content(
+    Content(
       id: 'br1', title: '4-7-8 Breathing',
       description: 'A calming breath technique: inhale 4, hold 7, exhale 8. Activates parasympathetic nervous system.',
       type: ContentType.breathing, durationSeconds: 180,
@@ -165,7 +165,7 @@ class LibraryNotifier extends StateNotifier<LibraryState> {
         'Inhale quietly through your nose for 4 counts', 'Hold your breath for 7 counts',
         'Exhale fully through your mouth for 8 counts', 'Repeat the cycle 4 times'],
     ),
-    const Content(
+    Content(
       id: 'br2', title: 'Box Breathing',
       description: 'Equal phases of inhale, hold, exhale, hold. Used by Navy SEALs for calm focus.',
       type: ContentType.breathing, durationSeconds: 240,
@@ -173,7 +173,7 @@ class LibraryNotifier extends StateNotifier<LibraryState> {
       steps: ['Find a quiet place and sit upright', 'Breathe in slowly for 4 counts',
         'Hold for 4 counts', 'Exhale for 4 counts', 'Hold empty for 4 counts', 'Repeat 4-6 cycles'],
     ),
-    const Content(
+    Content(
       id: 'br3', title: 'Diaphragmatic Breathing',
       description: 'Deep belly breathing to reduce stress and improve oxygen exchange.',
       type: ContentType.breathing, durationSeconds: 300,
@@ -183,7 +183,7 @@ class LibraryNotifier extends StateNotifier<LibraryState> {
         'Keep chest still throughout', 'Practice for 5-10 minutes'],
     ),
     // Stretching
-    const Content(
+    Content(
       id: 'st1', title: 'Morning Sun Salutation',
       description: 'A flowing sequence to greet the day, combining breath and movement.',
       type: ContentType.stretch, durationSeconds: 600,
@@ -192,7 +192,7 @@ class LibraryNotifier extends StateNotifier<LibraryState> {
         'Exhale — fold forward', 'Inhale — half lift, flat back',
         'Step back to plank', 'Lower to chaturanga', 'Upward dog', 'Downward dog', 'Repeat 3-5 rounds'],
     ),
-    const Content(
+    Content(
       id: 'st2', title: 'Desk Stretch Routine',
       description: 'Quick stretches you can do at your desk to relieve tension.',
       type: ContentType.stretch, durationSeconds: 300,
@@ -201,7 +201,7 @@ class LibraryNotifier extends StateNotifier<LibraryState> {
         'Seated spinal twist — each side', 'Wrist circles — 10 each',
         'Chest opener — clasp hands behind back', 'Seated forward fold — hold 30s'],
     ),
-    const Content(
+    Content(
       id: 'st3', title: 'Evening Wind-Down Stretch',
       description: 'Gentle stretches to release the day and prepare for sleep.',
       type: ContentType.stretch, durationSeconds: 480,
@@ -211,7 +211,7 @@ class LibraryNotifier extends StateNotifier<LibraryState> {
         'Legs up the wall — 3 min', 'Savasana — 2 min'],
     ),
     // Tea Rituals
-    const Content(
+    Content(
       id: 'te1', title: 'Morning Green Tea Ritual',
       description: 'Start your day with mindful tea preparation and appreciation.',
       type: ContentType.teaRitual, durationSeconds: 600,
@@ -220,7 +220,7 @@ class LibraryNotifier extends StateNotifier<LibraryState> {
         'Add 1 tsp loose leaf green tea', 'Pour water, steep 2-3 min',
         'Observe the color and aroma', 'Sip slowly, noticing each flavor note'],
     ),
-    const Content(
+    Content(
       id: 'te2', title: 'Afternoon Oolong Break',
       description: 'A midday pause with oolong tea to reset focus and energy.',
       type: ContentType.teaRitual, durationSeconds: 480,
@@ -229,7 +229,7 @@ class LibraryNotifier extends StateNotifier<LibraryState> {
         'Quick rinse the leaves', 'First infusion — 30 seconds',
         'Second infusion — 45 seconds', 'Notice how flavor evolves'],
     ),
-    const Content(
+    Content(
       id: 'te3', title: 'Evening Chamomile Calm',
       description: 'Wind down with a soothing herbal infusion before bed.',
       type: ContentType.teaRitual, durationSeconds: 420,
@@ -239,7 +239,7 @@ class LibraryNotifier extends StateNotifier<LibraryState> {
         'Find a quiet corner', 'Sip slowly, letting go of the day'],
     ),
     // Sleep
-    const Content(
+    Content(
       id: 'sl1', title: 'Progressive Muscle Relaxation',
       description: 'Systematically tense and release muscle groups for deep relaxation.',
       type: ContentType.sleep, durationSeconds: 900,
@@ -248,7 +248,7 @@ class LibraryNotifier extends StateNotifier<LibraryState> {
         'Tense calves — 5s, release — 10s', 'Work up through each muscle group',
         'Thighs, abdomen, hands, arms, shoulders, face', 'Finish with full body awareness'],
     ),
-    const Content(
+    Content(
       id: 'sl2', title: 'Guided Sleep Visualization',
       description: 'A calming journey through a peaceful landscape to drift off.',
       type: ContentType.sleep, durationSeconds: 1200,
@@ -257,7 +257,7 @@ class LibraryNotifier extends StateNotifier<LibraryState> {
         'Notice the flowers, trees, and sounds', 'Find a comfortable bench by a stream',
         'Listen to the gentle water flowing', 'Let yourself rest here as sleep comes'],
     ),
-    const Content(
+    Content(
       id: 'sl3', title: 'Body Scan for Sleep',
       description: 'A mindful body scan to release tension and prepare for rest.',
       type: ContentType.sleep, durationSeconds: 720,
@@ -267,7 +267,7 @@ class LibraryNotifier extends StateNotifier<LibraryState> {
         'Feet, legs, hips, belly, chest, arms, neck, head', 'Rest in whole-body awareness'],
     ),
     // Meditation
-    const Content(
+    Content(
       id: 'md1', title: '5-Minute Mindfulness',
       description: 'A short meditation to center yourself in the present moment.',
       type: ContentType.meditation, durationSeconds: 300,
@@ -276,7 +276,7 @@ class LibraryNotifier extends StateNotifier<LibraryState> {
         'Let breathing return to natural', 'Notice thoughts without judgment',
         'Return focus to breath when distracted', 'Gently open your eyes'],
     ),
-    const Content(
+    Content(
       id: 'md2', title: 'Loving-Kindness Meditation',
       description: 'Cultivate compassion for yourself and others through guided phrases.',
       type: ContentType.meditation, durationSeconds: 600,
@@ -285,7 +285,7 @@ class LibraryNotifier extends StateNotifier<LibraryState> {
         'Extend to a loved one', 'Extend to a neutral person',
         'Extend to all beings everywhere', 'Rest in feelings of warmth and connection'],
     ),
-    const Content(
+    Content(
       id: 'md3', title: 'Walking Meditation',
       description: 'Bring meditation into movement with slow, mindful walking.',
       type: ContentType.meditation, durationSeconds: 480,
@@ -295,7 +295,7 @@ class LibraryNotifier extends StateNotifier<LibraryState> {
         'Turn slowly at the end', 'Continue for 5-10 minutes'],
     ),
     // Reflection
-    const Content(
+    Content(
       id: 'rf1', title: 'Evening Gratitude Journal',
       description: 'Reflect on your day with gratitude prompts for a peaceful close.',
       type: ContentType.reflection, durationSeconds: 300,
@@ -304,7 +304,7 @@ class LibraryNotifier extends StateNotifier<LibraryState> {
         'Recall one moment of joy', 'Note one thing you learned',
         'Set an intention for tomorrow', 'Close with a deep breath'],
     ),
-    const Content(
+    Content(
       id: 'rf2', title: 'Weekly Reflection',
       description: 'A deeper weekly practice to review growth and set intentions.',
       type: ContentType.reflection, durationSeconds: 600,
@@ -313,7 +313,7 @@ class LibraryNotifier extends StateNotifier<LibraryState> {
         'What challenged you? What did you learn?', 'Rate your wellness: body, mind, spirit',
         'Set 1-2 intentions for next week', 'Close with appreciation for yourself'],
     ),
-    const Content(
+    Content(
       id: 'rf3', title: 'Seasonal Intention Setting',
       description: 'Align your goals with the energy of the current season.',
       type: ContentType.reflection, durationSeconds: 480,
@@ -323,7 +323,7 @@ class LibraryNotifier extends StateNotifier<LibraryState> {
         'Write your intention where you can see it', 'Revisit at each solar term'],
     ),
     // Story
-    const Content(
+    Content(
       id: 'sr1', title: 'The Wisdom of Water',
       description: 'A Taoist tale about flexibility, persistence, and inner strength.',
       type: ContentType.story, durationSeconds: 300,
@@ -332,7 +332,7 @@ class LibraryNotifier extends StateNotifier<LibraryState> {
         'Water is soft yet carves canyons', 'It takes the shape of any container',
         'Yet nothing can withstand its persistence', 'Reflect: where can you be more like water?'],
     ),
-    const Content(
+    Content(
       id: 'sr2', title: 'The Bamboo and the Oak',
       description: 'A story about resilience — bending vs breaking in lifes storms.',
       type: ContentType.story, durationSeconds: 240,
@@ -341,7 +341,7 @@ class LibraryNotifier extends StateNotifier<LibraryState> {
         'The bamboo swayed with every wind', 'When the hurricane came, the oak fell',
         'But the bamboo bent and survived', 'Reflect: when did bending serve you better than resisting?'],
     ),
-    const Content(
+    Content(
       id: 'sr3', title: 'The Empty Cup',
       description: 'A Zen story about the importance of beginner\'s mind and humility.',
       type: ContentType.story, durationSeconds: 180,

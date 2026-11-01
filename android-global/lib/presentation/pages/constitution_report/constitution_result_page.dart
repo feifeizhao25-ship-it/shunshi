@@ -3,6 +3,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
@@ -28,7 +29,7 @@ class ConstitutionResultPage extends StatelessWidget {
     return Scaffold(
 
 
-      appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),backgroundColor: isDark ? ShunshiDarkColors.background : ShunShiColors.background,
+      appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),backgroundColor: isDark ? ShunshiDarkColors.background : AppColors.background(context),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: Column(
@@ -45,24 +46,24 @@ class ConstitutionResultPage extends StatelessWidget {
                         shape: BoxShape.circle,
                         color: ShunShiColors.surfaceVariant,
                       ),
-                      child: Icon(Icons.person, size: 20, color: ShunShiColors.textSecondary),
+                      child: Icon(Icons.person, size: 20, color: AppColors.textSecondary(context)),
                     ),
                     SizedBox(width: 12),
                     Text(AppLocalizations.of(context).t('profile_brand'), style: TextStyle(
                       fontSize: 20, fontStyle: FontStyle.italic,
                       fontFamily: ShunShiTypography.serifFamily,
-                      color: ShunShiColors.primary,
+                      color: AppColors.primary(context),
                     )),
                     const Spacer(),
                     GestureDetector(
                       onTap: () => context.push('/notifications'),
-                      child: Icon(Icons.notifications_outlined, size: 22, color: ShunShiColors.primary),
+                      child: Icon(Icons.notifications_outlined, size: 22, color: AppColors.primary(context)),
                     ),
                   ],
                 ),
               ),
             ),
-            Container(height: 1, color: ShunShiColors.surfaceContainerLow, margin: const EdgeInsets.symmetric(horizontal: 20)),
+            Container(height: 1, color: AppColors.surfaceContainerLow(context), margin: const EdgeInsets.symmetric(horizontal: 20)),
 
             // ── Content ──
             Padding(
@@ -79,12 +80,12 @@ class ConstitutionResultPage extends StatelessWidget {
                   Text(AppLocalizations.of(context).t('constitutionrep_your_constitution'), style: TextStyle(
                     fontSize: 32, fontWeight: FontWeight.w700,
                     fontFamily: ShunShiTypography.serifFamily,
-                    color: ShunShiColors.primary, height: 1.3,
+                    color: AppColors.primary(context), height: 1.3,
                   )),
                   Text(constitutionType, style: TextStyle(
                     fontSize: 32, fontWeight: FontWeight.w700,
                     fontFamily: ShunShiTypography.serifFamily,
-                    color: ShunShiColors.primary, height: 1.3,
+                    color: AppColors.primary(context), height: 1.3,
                   )),
                   SizedBox(height: 20),
                   // Tags
@@ -124,7 +125,7 @@ class ConstitutionResultPage extends StatelessWidget {
                           child: ElevatedButton(
                             onPressed: () {},
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: ShunShiColors.primary,
+                              backgroundColor: AppColors.primary(context),
                               foregroundColor: Colors.white,
                               padding: const EdgeInsets.symmetric(vertical: 16),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -175,16 +176,16 @@ class ConstitutionResultPage extends StatelessWidget {
 
   Widget _buildDistributionSection(BuildContext context) {
     final bars = [
-      _BarData('Qi Deficiency', 0.85, ShunShiColors.primary),
+      _BarData('Qi Deficiency', 0.85, AppColors.primary(context)),
       _BarData('Phlegm-Dampness', 0.62, ShunShiColors.primaryContainer),
       _BarData('Yang Deficiency', 0.45, ShunShiColors.surfaceVariant),
-      _BarData('Balanced (baseline)', 0.30, ShunShiColors.textTertiary.withValues(alpha: 0.3)),
+      _BarData('Balanced (baseline)', 0.30, AppColors.textTertiary(context).withValues(alpha: 0.3)),
     ];
 
     return Container(
       padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
-        color: ShunShiColors.surfaceContainerLowest,
+        color: AppColors.surfaceContainerLowest(context),
         borderRadius: BorderRadius.circular(24),
       ),
       child: Column(
@@ -192,7 +193,7 @@ class ConstitutionResultPage extends StatelessWidget {
         children: [
           Text(AppLocalizations.of(context).t('constitutionrep_constitution_strength'), style: TextStyle(
             fontSize: 18, fontFamily: ShunShiTypography.serifFamily,
-            color: ShunShiColors.primary,
+            color: AppColors.primary(context),
           )),
           SizedBox(height: 24),
           ...bars.map((b) => Padding(
@@ -225,12 +226,12 @@ class ConstitutionResultPage extends StatelessWidget {
             ),
           )),
           SizedBox(height: 16),
-          Container(height: 1, color: ShunShiColors.textTertiary.withValues(alpha: 0.2)),
+          Container(height: 1, color: AppColors.textTertiary(context).withValues(alpha: 0.2)),
           SizedBox(height: 16),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(Icons.info_outline, size: 16, color: ShunShiColors.primary),
+              Icon(Icons.info_outline, size: 16, color: AppColors.primary(context)),
               SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -252,7 +253,7 @@ class ConstitutionResultPage extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
-        color: ShunShiColors.surfaceContainerLow.withValues(alpha: 0.8),
+        color: AppColors.surfaceContainerLow(context).withValues(alpha: 0.8),
         borderRadius: BorderRadius.circular(24),
       ),
       child: Column(
@@ -264,7 +265,7 @@ class ConstitutionResultPage extends StatelessWidget {
               SizedBox(width: 8),
               Text(AppLocalizations.of(context).t('constitutionrep_ai_wellness_summary'), style: TextStyle(
                 fontSize: 20, fontFamily: ShunShiTypography.serifFamily,
-                color: ShunShiColors.primary,
+                color: AppColors.primary(context),
               )),
             ],
           ),
@@ -273,7 +274,7 @@ class ConstitutionResultPage extends StatelessWidget {
             'In spring, your Qi Deficiency shows as easy fatigue. Combined with Phlegm-Dampness, fluid metabolism is sluggish. Focus on warming Spleen Qi and resolving phlegm.',
             style: TextStyle(
               fontSize: 15, height: 2.0,
-              color: ShunShiColors.textSecondary,
+              color: AppColors.textSecondary(context),
             ),
           ),
         ],
@@ -290,7 +291,7 @@ class ConstitutionResultPage extends StatelessWidget {
           children: [
             Text(AppLocalizations.of(context).t('constitutionrep_personalized_care_plan'), style: TextStyle(
               fontSize: 24, fontFamily: ShunShiTypography.serifFamily,
-              color: ShunShiColors.primary,
+              color: AppColors.primary(context),
             )),
             Text(AppLocalizations.of(context).t('view_all'), style: TextStyle(
               fontSize: 12, color: ShunShiColors.secondary,
@@ -303,7 +304,7 @@ class ConstitutionResultPage extends StatelessWidget {
         // Recipe card (full width)
         Container(
           decoration: BoxDecoration(
-            color: ShunShiColors.surfaceContainerLowest,
+            color: AppColors.surfaceContainerLowest(context),
             borderRadius: BorderRadius.circular(24),
             boxShadow: ShunShiShadows.sm,
           ),
@@ -338,11 +339,11 @@ class ConstitutionResultPage extends StatelessWidget {
                       Text(AppLocalizations.of(context).t('constitutionrep_astragalus_chicken_soup'), style: TextStyle(
                         fontSize: 18, fontWeight: FontWeight.w700,
                         fontFamily: ShunShiTypography.serifFamily,
-                        color: ShunShiColors.primary,
+                        color: AppColors.primary(context),
                       )),
                       SizedBox(height: 8),
                       Text(AppLocalizations.of(context).t('constitutionrep_tonifies_qi_and_warms_the_middleideal_for_qi_'), style: TextStyle(
-                        fontSize: 12, color: ShunShiColors.textSecondary,
+                        fontSize: 12, color: AppColors.textSecondary(context),
                       )),
                       SizedBox(height: 12),
                       GestureDetector(
@@ -351,10 +352,10 @@ class ConstitutionResultPage extends StatelessWidget {
                           children: [
                             Text(AppLocalizations.of(context).t('constitutionrep_start_cooking'), style: TextStyle(
                               fontSize: 12, fontWeight: FontWeight.w700,
-                              color: ShunShiColors.primary,
+                              color: AppColors.primary(context),
                             )),
                             SizedBox(width: 4),
-                            Icon(Icons.arrow_forward, size: 14, color: ShunShiColors.primary),
+                            Icon(Icons.arrow_forward, size: 14, color: AppColors.primary(context)),
                           ],
                         ),
                       ),
@@ -374,7 +375,7 @@ class ConstitutionResultPage extends StatelessWidget {
                 padding: const EdgeInsets.all(20),
                 height: 160,
                 decoration: BoxDecoration(
-                  color: ShunShiColors.surfaceContainerLow,
+                  color: AppColors.surfaceContainerLow(context),
                   borderRadius: BorderRadius.circular(24),
                 ),
                 child: Column(
@@ -384,16 +385,16 @@ class ConstitutionResultPage extends StatelessWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(Icons.spa, size: 28, color: ShunShiColors.primary),
+                        Icon(Icons.spa, size: 28, color: AppColors.primary(context)),
                         SizedBox(height: 12),
                         Text(AppLocalizations.of(context).t('constitutionrep_recommended_acupoint'), style: TextStyle(
                           fontSize: 17, fontWeight: FontWeight.w700,
                           fontFamily: ShunShiTypography.serifFamily,
-                          color: ShunShiColors.primary,
+                          color: AppColors.primary(context),
                         )),
                         SizedBox(height: 6),
                         Text(AppLocalizations.of(context).t('constitutionrep_zusanli_st36_tonify_middle_jiao_qi'), style: TextStyle(
-                          fontSize: 12, color: ShunShiColors.textSecondary,
+                          fontSize: 12, color: AppColors.textSecondary(context),
                         )),
                       ],
                     ),
@@ -402,11 +403,11 @@ class ConstitutionResultPage extends StatelessWidget {
                       child: Container(
                         width: 36, height: 36,
                         decoration: BoxDecoration(
-                          color: ShunShiColors.surfaceContainerLowest,
+                          color: AppColors.surfaceContainerLowest(context),
                           shape: BoxShape.circle,
                           boxShadow: ShunShiShadows.sm,
                         ),
-                        child: Icon(Icons.play_arrow, size: 18, color: ShunShiColors.primary),
+                        child: Icon(Icons.play_arrow, size: 18, color: AppColors.primary(context)),
                       ),
                     ),
                   ],
@@ -419,7 +420,7 @@ class ConstitutionResultPage extends StatelessWidget {
                 padding: const EdgeInsets.all(20),
                 height: 160,
                 decoration: BoxDecoration(
-                  color: ShunShiColors.surfaceContainerLow,
+                  color: AppColors.surfaceContainerLow(context),
                   borderRadius: BorderRadius.circular(24),
                 ),
                 child: Column(
@@ -429,16 +430,16 @@ class ConstitutionResultPage extends StatelessWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(Icons.self_improvement, size: 28, color: ShunShiColors.primary),
+                        Icon(Icons.self_improvement, size: 28, color: AppColors.primary(context)),
                         SizedBox(height: 12),
                         Text(AppLocalizations.of(context).t('constitutionrep_recommended_exercise'), style: TextStyle(
                           fontSize: 17, fontWeight: FontWeight.w700,
                           fontFamily: ShunShiTypography.serifFamily,
-                          color: ShunShiColors.primary,
+                          color: AppColors.primary(context),
                         )),
                         SizedBox(height: 6),
                         Text(AppLocalizations.of(context).t('constitutionrep_baduanjin_regulate_spleen_stomach'), style: TextStyle(
-                          fontSize: 12, color: ShunShiColors.textSecondary,
+                          fontSize: 12, color: AppColors.textSecondary(context),
                         )),
                       ],
                     ),
@@ -447,11 +448,11 @@ class ConstitutionResultPage extends StatelessWidget {
                       child: Container(
                         width: 36, height: 36,
                         decoration: BoxDecoration(
-                          color: ShunShiColors.surfaceContainerLowest,
+                          color: AppColors.surfaceContainerLowest(context),
                           shape: BoxShape.circle,
                           boxShadow: ShunShiShadows.sm,
                         ),
-                        child: Icon(Icons.play_arrow, size: 18, color: ShunShiColors.primary),
+                        child: Icon(Icons.play_arrow, size: 18, color: AppColors.primary(context)),
                       ),
                     ),
                   ],

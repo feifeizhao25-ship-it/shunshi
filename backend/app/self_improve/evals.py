@@ -131,7 +131,7 @@ def evaluate_all(retrieve_fn=None, *, today: date | None = None) -> dict:
     from app.rag.knowledge_base import cn_kb, load_knowledge_bases
     from app.rag.retriever import retrieve
 
-    load_knowledge_bases()
+    load_knowledge_bases(include_legacy=True)  # 评测语料含 legacy 文档（见 knowledge_base._LEGACY_EVAL_SOURCES）
     cases = build_retrieval_cases(cn_kb.chunks)
     fn = retrieve_fn or (lambda q, k: retrieve(q, lang="cn", top_k=k))
     out = {"splits": {}}

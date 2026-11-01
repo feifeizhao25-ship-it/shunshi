@@ -18,7 +18,8 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Optional
 
-from fastapi import APIRouter, HTTPException, Query, Response
+from fastapi import APIRouter, Depends, HTTPException, Query, Response
+from ..locale_context import RequestLocale, request_locale
 
 from ..aigc import AI_HEADERS
 from ..safety.config import CRISIS_HOTLINE
@@ -94,11 +95,18 @@ def _public(track: dict, *, detail: bool = False, season: str | None = None) -> 
 @router.get("/library")
 async def meditation_library(
     response: Response,
+    loc: RequestLocale = Depends(request_locale),
     category: Optional[str] = Query(None, description="breathing / sleep / solar_term / quick"),
     season: Optional[str] = Query(None, description="spring / summer / autumn / winter；不传则按当前季节排序"),
     best_time: Optional[str] = Query(None, description="morning / afternoon / evening / night / any"),
 ):
     response.headers.update(AI_HEADERS)
+    if loc.is_global:
+        # 冥想音频的文稿 / 标题只有中文版；国际版不返回中文，给英文的暂不提供状态。
+        return {"data": {"items": [], "total": 0, "season": season or _current_season(), "categories": [],
+                         "available": False,
+                         "message": "Guided meditation audio is not available in English yet.",
+                         "disclaimer": "General wellness content, not medical advice."}}
     tracks = [t for t in _catalog()["tracks"] if _available(t)]
     if category:
         tracks = [t for t in tracks if t["category"] == category]
@@ -126,8 +134,10 @@ async def meditation_library(
 
 
 @router.get("/library/{track_id}")
-async def meditation_track(track_id: str, response: Response):
+async def meditation_track(track_id: str, response: Response, loc: RequestLocale = Depends(request_locale)):
     response.headers.update(AI_HEADERS)
+    if loc.is_global:
+        raise HTTPException(status_code=404, detail="This meditation is not available in English yet.")
     for track in _catalog()["tracks"]:
         if track["id"] == track_id and _available(track):
             return {"data": _public(track, detail=True, season=_current_season())}

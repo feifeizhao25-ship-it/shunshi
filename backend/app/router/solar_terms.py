@@ -1,10 +1,22 @@
 # 节气系统 API 路由
-from fastapi import APIRouter, Query, HTTPException
+from fastapi import APIRouter, Depends, Query, HTTPException
+from ..locale_context import RequestLocale, request_locale
 from pydantic import BaseModel
 from typing import List, Optional
 from datetime import date, datetime, timedelta
 
 router = APIRouter(prefix="/api/v1/solar-terms", tags=["节气"])
+
+def _request_term_locale(
+    locale: Optional[str] = Query(None, description="语言: zh-CN/en-US；不传时按请求头（X-App-Market / Accept-Language）决定，国际版默认 en-US"),
+    loc: RequestLocale = Depends(request_locale),
+) -> str:
+    """显式传 locale 就听它的；没传时国际版请求（global）一律给英文，国内版给中文。
+    以前默认写死 zh-CN，国际版 App 不带 ?locale= 就收到中文节气内容。"""
+    if locale:
+        return locale
+    return "en-US" if loc.is_global else "zh-CN"
+
 
 # ============ 24节气英文数据 ============
 
@@ -661,7 +673,7 @@ class SolarTermSummary(BaseModel):
 
 @router.get("", response_model=dict, summary="获取所有节气", description="分页返回24节气列表，支持中英文locale切换")
 async def get_solar_terms(
-    locale: str = Query("zh-CN", description="语言: zh-CN/en-US"),
+    locale: str = Depends(_request_term_locale),
     page: int = Query(1, ge=1),
     limit: int = Query(24, ge=1, le=24)
 ):
@@ -679,13 +691,13 @@ async def get_solar_terms(
     }
 
 @router.get("/current", response_model=dict, summary="当前节气", description="返回当前所处的节气信息")
-async def get_current(locale: str = Query("zh-CN", description="语言: zh-CN/en-US")):
+async def get_current(locale: str = Depends(_request_term_locale)):
     """获取当前节气"""
     current = get_current_solar_term()
     return {"success": True, "data": _localize_term(current, locale)}
 
 @router.get("/today", response_model=dict, summary="今日节气建议", description="返回当前节气及前后节气信息，附带七日养生建议")
-async def get_today_solar_term(locale: str = Query("zh-CN", description="语言: zh-CN/en-US")):
+async def get_today_solar_term(locale: str = Depends(_request_term_locale)):
     """获取今日节气和建议"""
     current = get_current_solar_term()
     
@@ -720,7 +732,7 @@ async def get_today_solar_term(locale: str = Query("zh-CN", description="语言:
     }
 
 @router.get("/upcoming", response_model=dict, summary="即将到来的节气", description="返回未来7天内即将到来的节气列表")
-async def get_upcoming_solar_term(locale: str = Query("zh-CN", description="语言: zh-CN/en-US")):
+async def get_upcoming_solar_term(locale: str = Depends(_request_term_locale)):
     """获取即将到来的节气（今天交节或 7 天内交节），日期查节气表（北京时间）。"""
     from app.utils import solar_term_calendar
 
@@ -751,7 +763,7 @@ async def get_upcoming_solar_term(locale: str = Query("zh-CN", description="语�
 @router.get("/schedule", response_model=dict, summary="全年节气日程", description="返回指定年份24节气的日期日程表")
 async def get_solar_terms_schedule(
     year: int = Query(None),
-    locale: str = Query("zh-CN", description="语言: zh-CN/en-US"),
+    locale: str = Depends(_request_term_locale),
 ):
     """获取全年节气日程"""
     from app.utils import solar_term_calendar
@@ -763,9 +775,10 @@ async def get_solar_terms_schedule(
     for i, row in enumerate(rows):
         term = get_solar_term_by_name(row["name"]) or {}
         nxt = rows[i + 1] if i + 1 < len(rows) else following
+        shown = _localize_term(term, locale).get("name", row["name"]) if term else row["name"]
         schedule.append({
             "id": term.get("id", ""),
-            "name": row["name"],
+            "name": shown,
             "date": row["date"],
             "start_date": row["date"],
             "end_date": (date.fromisoformat(nxt["date"]) - timedelta(days=1)).isoformat(),
@@ -775,7 +788,7 @@ async def get_solar_terms_schedule(
 
 
 @router.get("/notifications", response_model=dict, summary="节气通知", description="生成即将到来节气的推送提醒文案")
-async def get_solar_term_notifications(locale: str = Query("zh-CN", description="语言: zh-CN/en-US")):
+async def get_solar_term_notifications(locale: str = Depends(_request_term_locale)):
     """节气通知内容生成 - 返回即将到来节气的提醒文案"""
     now = datetime.now()
     notifications = []
@@ -844,7 +857,7 @@ async def get_enhanced_current_term():
 
 @router.get("/enhanced/all", summary="增强版所有节气", description="返回所有节气含当前/过去/未来状态和高亮标记")
 async def get_all_terms_with_status(
-    locale: str = Query("zh-CN", description="语言: zh-CN/en-US"),
+    locale: str = Depends(_request_term_locale),
 ):
     """获取所有节气（含当前/过去/未来状态和高亮）"""
     terms = solar_term_enhanced_service.get_all_terms_with_status(locale)
@@ -853,7 +866,7 @@ async def get_all_terms_with_status(
 @router.get("/enhanced/{term_name}", summary="节气详细养生方案", description="返回指定节气的详细养生方案，包括食疗/茶饮/运动/穴位/睡眠/作息")
 async def get_enhanced_term_detail(
     term_name: str,
-    locale: str = Query("zh-CN", description="语言: zh-CN/en-US"),
+    locale: str = Depends(_request_term_locale),
 ):
     """获取节气详细养生方案（食疗/茶饮/运动/穴位/睡眠/作息）"""
     try:
@@ -865,7 +878,7 @@ async def get_enhanced_term_detail(
 @router.get("/wisdom", response_model=dict, summary="季节养生智慧", description="返回春/夏/秋/冬四季的养生智慧和核心建议")
 async def get_season_wisdom(
     season: str = Query("spring", description="季节: spring/summer/autumn/winter"),
-    locale: str = Query("zh-CN", description="语言: zh-CN/en-US"),
+    locale: str = Depends(_request_term_locale),
 ):
     """获取季节养生智慧"""
     wisdom_map = {
@@ -881,7 +894,7 @@ async def get_season_wisdom(
 @router.get("/{name}/recommendations", response_model=dict, summary="节气推荐内容", description="返回指定节气的推荐食疗、茶饮、运动、穴位、睡眠、作息方案")
 async def get_solar_term_recommendations(
     name: str,
-    locale: str = Query("zh-CN", description="语言: zh-CN/en-US"),
+    locale: str = Depends(_request_term_locale),
 ):
     """获取节气推荐内容"""
     # 支持通过 id (st-001) 或名称 (立春) 查找
@@ -915,7 +928,7 @@ async def get_solar_term_recommendations(
 
 
 @router.get("/{name}", response_model=dict, summary="节气详情", description="获取指定节气详情，支持通过id(st-001)或中英文名称查询")
-async def get_solar_term(name: str, locale: str = Query("zh-CN", description="语言: zh-CN/en-US")):
+async def get_solar_term(name: str, locale: str = Depends(_request_term_locale)):
     """获取指定节气详情（支持 id 或名称）"""
     term = get_solar_term_by_name(name)
     if not term:

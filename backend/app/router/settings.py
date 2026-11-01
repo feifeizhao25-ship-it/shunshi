@@ -74,7 +74,7 @@ def _parse_json(s):
 # ============ Settings API ============
 
 @router.get("", response_model=dict)
-async def get_settings(user_id: str = Query("user-001")):
+async def get_settings(user_id: str = Query(..., description="用户ID；不传由服务端按令牌补上本人")):
     """获取用户设置"""
     db = get_db()
     
@@ -86,7 +86,7 @@ async def get_settings(user_id: str = Query("user-001")):
 
 @router.post("", response_model=dict)
 async def update_settings(
-    user_id: str = Query("user-001"),
+    user_id: str = Query(..., description="用户ID；不传由服务端按令牌补上本人"),
     memory_enabled: Optional[bool] = Query(None),
     quiet_hours_enabled: Optional[bool] = Query(None),
     quiet_hours_start: Optional[str] = Query(None),
@@ -162,7 +162,7 @@ async def update_settings(
 
 @router.get("/memory", response_model=dict)
 async def get_memory(
-    user_id: str = Query("user-001"),
+    user_id: str = Query(..., description="用户ID；不传由服务端按令牌补上本人"),
     type: str = Query(None),
     limit: int = Query(50, ge=1, le=100)
 ):
@@ -196,7 +196,7 @@ async def get_memory(
 
 @router.post("/memory", response_model=dict)
 async def add_memory(
-    user_id: str = Query("user-001"),
+    user_id: str = Query(..., description="用户ID；不传由服务端按令牌补上本人"),
     type: str = Query(...),
     content: str = Query(...),
     metadata: str = Query(None)
@@ -233,7 +233,7 @@ async def add_memory(
 @router.delete("/memory/{memory_id}", response_model=dict)
 async def delete_memory(
     memory_id: str,
-    user_id: str = Query("user-001")
+    user_id: str = Query(..., description="用户ID；不传由服务端按令牌补上本人")
 ):
     """删除单条记忆"""
     db = get_db()
@@ -245,7 +245,7 @@ async def delete_memory(
 
 @router.delete("/memory", response_model=dict)
 async def clear_memory(
-    user_id: str = Query("user-001"),
+    user_id: str = Query(..., description="用户ID；不传由服务端按令牌补上本人"),
     confirm: str = Query(..., description="必须输入 'confirm' 确认")
 ):
     """清空所有记忆"""
@@ -269,7 +269,7 @@ async def clear_memory(
 
 @router.post("/memory/enable", response_model=dict)
 async def enable_memory(
-    user_id: str = Query("user-001"),
+    user_id: str = Query(..., description="用户ID；不传由服务端按令牌补上本人"),
     enabled: bool = Query(True)
 ):
     """开启/关闭记忆"""
@@ -288,7 +288,7 @@ async def enable_memory(
 # ============ Quiet Hours API ============
 
 @router.get("/quiet-hours", response_model=dict)
-async def get_quiet_hours(user_id: str = Query("user-001")):
+async def get_quiet_hours(user_id: str = Query(..., description="用户ID；不传由服务端按令牌补上本人")):
     """获取静默时段设置"""
     db = get_db()
     
@@ -311,7 +311,7 @@ async def get_quiet_hours(user_id: str = Query("user-001")):
 
 @router.post("/quiet-hours", response_model=dict)
 async def set_quiet_hours(
-    user_id: str = Query("user-001"),
+    user_id: str = Query(..., description="用户ID；不传由服务端按令牌补上本人"),
     enabled: bool = Query(True),
     start: str = Query("22:00"),
     end: str = Query("08:00")
@@ -335,7 +335,7 @@ async def set_quiet_hours(
     }
 
 @router.get("/quiet-hours/check", response_model=dict)
-async def check_quiet_hours(user_id: str = Query("user-001")):
+async def check_quiet_hours(user_id: str = Query(..., description="用户ID；不传由服务端按令牌补上本人")):
     """检查当前是否在静默时段"""
     db = get_db()
     
@@ -368,7 +368,7 @@ async def check_quiet_hours(user_id: str = Query("user-001")):
 # ============ 导出/导入设置 ============
 
 @router.get("/export", response_model=dict)
-async def export_settings(user_id: str = Query("user-001")):
+async def export_settings(user_id: str = Query(..., description="用户ID；不传由服务端按令牌补上本人")):
     """导出所有设置和记忆"""
     db = get_db()
     

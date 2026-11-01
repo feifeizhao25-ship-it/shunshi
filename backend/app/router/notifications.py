@@ -306,7 +306,7 @@ def get_user_notifications(user_id: str, unread_only: bool = False):
 
 @router.get("", response_model=dict)
 async def get_notifications(
-    user_id: str = Query("user-001"),
+    user_id: str = Query(..., description="用户ID；不传由服务端按令牌补上本人"),
     unread_only: bool = Query(False),
     page: int = Query(1, ge=1),
     limit: int = Query(20, ge=1, le=100)
@@ -334,7 +334,7 @@ async def get_notifications(
     }
 
 @router.get("/unread-count", response_model=dict)
-async def get_unread_count(user_id: str = Query("user-001")):
+async def get_unread_count(user_id: str = Query(..., description="用户ID；不传由服务端按令牌补上本人")):
     """获取未读数量"""
     notifs = get_user_notifications(user_id)
     unread_count = len([n for n in notifs if not n.get("is_read", False)])
@@ -349,7 +349,7 @@ async def send_notification(
     type: str = Query(...),
     title: str = Query(...),
     body: str = Query(...),
-    user_id: str = Query("user-001"),
+    user_id: str = Query(..., description="用户ID；不传由服务端按令牌补上本人"),
     data: Optional[dict] = None,
     push: bool = Query(True),
 ):
@@ -386,7 +386,7 @@ async def send_notification(
     }
 
 @router.post("/read-all", response_model=dict)
-async def mark_all_read(user_id: str = Query("user-001")):
+async def mark_all_read(user_id: str = Query(..., description="用户ID；不传由服务端按令牌补上本人")):
     """标记全部已读"""
     if user_id in notifications:
         for notif in notifications[user_id]:
@@ -397,7 +397,7 @@ async def mark_all_read(user_id: str = Query("user-001")):
 @router.post("/{notification_id}/read", response_model=dict)
 async def mark_read(
     notification_id: str,
-    user_id: str = Query("user-001")
+    user_id: str = Query(..., description="用户ID；不传由服务端按令牌补上本人")
 ):
     """标记已读"""
     notifs = notifications.get(user_id, [])
@@ -412,7 +412,7 @@ async def mark_read(
 @router.delete("/{notification_id}", response_model=dict)
 async def delete_notification(
     notification_id: str,
-    user_id: str = Query("user-001")
+    user_id: str = Query(..., description="用户ID；不传由服务端按令牌补上本人")
 ):
     """删除通知"""
     if user_id in notifications:
@@ -423,7 +423,7 @@ async def delete_notification(
 @router.post("/schedule", response_model=dict)
 async def schedule_notification(
     request: ScheduleNotificationRequest,
-    user_id: str = Query("user-001")
+    user_id: str = Query(..., description="用户ID；不传由服务端按令牌补上本人")
 ):
     """定时发送通知"""
     notif_id = generate_notification_id()
@@ -451,7 +451,7 @@ async def schedule_notification(
 
 @router.get("/schedule", response_model=dict)
 async def get_scheduled_notifications(
-    user_id: str = Query("user-001")
+    user_id: str = Query(..., description="用户ID；不传由服务端按令牌补上本人")
 ):
     """获取定时通知列表"""
     scheduled = scheduled_notifications.get(user_id, [])
@@ -464,7 +464,7 @@ async def get_scheduled_notifications(
 @router.delete("/schedule/{notification_id}", response_model=dict)
 async def cancel_scheduled(
     notification_id: str,
-    user_id: str = Query("user-001")
+    user_id: str = Query(..., description="用户ID；不传由服务端按令牌补上本人")
 ):
     """取消定时通知"""
     if user_id in scheduled_notifications:
@@ -496,7 +496,7 @@ async def get_followup_templates():
 # ============ 通知设置 API ============
 
 @router.get("/settings", response_model=dict)
-async def get_notification_settings(user_id: str = Query("user-001")):
+async def get_notification_settings(user_id: str = Query(..., description="用户ID；不传由服务端按令牌补上本人")):
     """获取通知设置"""
     settings = {
         "enabled": True,
@@ -514,7 +514,7 @@ async def get_notification_settings(user_id: str = Query("user-001")):
 
 @router.post("/settings", response_model=dict)
 async def update_notification_settings(
-    user_id: str = Query("user-001"),
+    user_id: str = Query(..., description="用户ID；不传由服务端按令牌补上本人"),
     enabled: bool = Query(True),
     solar_term: bool = Query(True),
     followup: bool = Query(True),
@@ -547,7 +547,7 @@ async def update_notification_settings(
 @router.post("/devices/register", response_model=dict)
 async def register_device(
     request: DeviceTokenRequest,
-    user_id: str = Query("user-001"),
+    user_id: str = Query(..., description="用户ID；不传由服务端按令牌补上本人"),
 ):
     """注册设备推送 token"""
     if user_id not in device_tokens:
@@ -573,7 +573,7 @@ async def register_device(
 @router.post("/devices/unregister", response_model=dict)
 async def unregister_device(
     request: DeviceTokenRequest,
-    user_id: str = Query("user-001"),
+    user_id: str = Query(..., description="用户ID；不传由服务端按令牌补上本人"),
 ):
     """注销设备推送 token"""
     if user_id in device_tokens:
@@ -591,7 +591,7 @@ async def unregister_device(
     return {"success": True, "message": "设备未找到"}
 
 @router.get("/devices", response_model=dict)
-async def list_devices(user_id: str = Query("user-001")):
+async def list_devices(user_id: str = Query(..., description="用户ID；不传由服务端按令牌补上本人")):
     """获取用户已注册设备列表"""
     tokens = device_tokens.get(user_id, [])
     

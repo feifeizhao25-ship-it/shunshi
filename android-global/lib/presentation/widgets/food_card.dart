@@ -110,13 +110,13 @@ class FoodCard extends StatelessWidget {
                   const SizedBox(height: 6),
                   Row(
                     children: [
-                      _buildBadge(context, food.category, ShunShiColors.primary),
+                      _buildBadge(context, food.category, AppColors.primary(context)),
                       const SizedBox(width: 8),
                       _buildBadge(
                         context,
                         food.difficulty,
                         food.difficulty == 'Easy'
-                            ? ShunShiColors.primary
+                            ? AppColors.primary(context)
                             : ShunShiColors.secondary,
                       ),
                     ],
@@ -227,7 +227,7 @@ class FoodCard extends StatelessWidget {
                   spacing: 8,
                   children: [
                     _buildBadge(context, '${food.seasonEmoji} ${food.seasonTag}', _seasonColor),
-                    _buildBadge(context, food.category, ShunShiColors.primary),
+                    _buildBadge(context, food.category, AppColors.primary(context)),
                     _buildBadge(context, food.difficulty, ShunShiColors.secondary),
                   ],
                 ),

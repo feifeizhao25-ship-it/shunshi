@@ -2,6 +2,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import '../../../design_system/theme.dart';
 
 class CommunityPageV2 extends StatelessWidget {
@@ -10,7 +11,7 @@ class CommunityPageV2 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
@@ -22,10 +23,10 @@ class CommunityPageV2 extends StatelessWidget {
                 child: Row(children: [
                   Text('SEASONS', style: TextStyle(
                     fontFamily: ShunShiTypography.serifFamily,
-                    fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.primary,
+                    fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.primary(context),
                   )),
                   const Spacer(),
-                  const Icon(Icons.menu, color: ShunShiColors.textSecondary),
+                  Icon(Icons.menu, color: AppColors.textSecondary(context)),
                 ]),
               ),
             ),
@@ -37,7 +38,7 @@ class CommunityPageV2 extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
               child: Text('Wellness circle', style: TextStyle(
                 fontFamily: ShunShiTypography.serifFamily,
-                fontSize: 32, fontWeight: FontWeight.bold, color: ShunShiColors.textPrimary,
+                fontSize: 32, fontWeight: FontWeight.bold, color: AppColors.textPrimary(context),
               )),
             ),
           ),
@@ -49,12 +50,12 @@ class CommunityPageV2 extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
-                  color: ShunShiColors.surfaceContainerLow, borderRadius: BorderRadius.circular(12),
+                  color: AppColors.surfaceContainerLow(context), borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(children: [
-                  Icon(Icons.search, color: ShunShiColors.textTertiary, size: 20),
+                  Icon(Icons.search, color: AppColors.textTertiary(context), size: 20),
                   const SizedBox(width: 8),
-                  Text('Search wellness content...', style: TextStyle(fontSize: 14, color: ShunShiColors.textTertiary)),
+                  Text('Search wellness content...', style: TextStyle(fontSize: 14, color: AppColors.textTertiary(context))),
                 ]),
               ),
             ),
@@ -148,9 +149,9 @@ class CommunityPageV2 extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: const LinearGradient(colors: [Color(0xFF144227), Color(0xFF2D7A4A)]),
           shape: BoxShape.circle,
-          boxShadow: [BoxShadow(color: ShunShiColors.primary.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 4))],
+          boxShadow: [BoxShadow(color: AppColors.primary(context).withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 4))],
         ),
-        child: const Icon(Icons.add, color: Colors.white, size: 28),
+        child: Icon(Icons.add, color: Colors.white, size: 28),
       ),
     );
   }

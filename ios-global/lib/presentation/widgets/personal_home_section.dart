@@ -203,7 +203,7 @@ class PersonalHomeData {
 enum _Phase { loading, ready, empty, off, error }
 
 class PersonalHomeSection extends StatefulWidget {
-  const PersonalHomeSection({super.key, required this.api, required this.strings, this.onOpen, this.margin = const EdgeInsets.symmetric(horizontal: 20, vertical: 8)});
+  PersonalHomeSection({super.key, required this.api, required this.strings, this.onOpen, this.margin = const EdgeInsets.symmetric(horizontal: 20, vertical: 8)});
 
   final PersonalHomeApi api;
 
@@ -330,7 +330,7 @@ class _PersonalHomeSectionState extends State<PersonalHomeSection> {
   Widget _offButton() => TextButton.icon(
         key: const Key('personal-home-turn-off'),
         onPressed: _saving ? null : _askTurnOff,
-        icon: const Icon(Icons.tune_rounded, size: 16),
+        icon: Icon(Icons.tune_rounded, size: 16),
         label: Text(_t.turnOff),
         style: TextButton.styleFrom(visualDensity: VisualDensity.compact),
       );
@@ -612,7 +612,7 @@ class _CardTile extends StatelessWidget {
                 Expanded(
                   child: Text.rich(
                     TextSpan(children: [
-                      TextSpan(text: '${strings.why}  ', style: const TextStyle(fontWeight: FontWeight.w600)),
+                      TextSpan(text: '${strings.why}  ', style: TextStyle(fontWeight: FontWeight.w600)),
                       TextSpan(text: card.reason),
                     ]),
                     key: Key('personal-home-why-${card.id}'),

@@ -126,3 +126,10 @@ Dio withSessionAuth(Dio dio) {
   }));
   return dio;
 }
+
+/// "?user_id=<当前登录用户>"（取不到登录身份时返回空串，由服务端按令牌补上本人）。给不支持 queryParameters 的 delete 用。
+String userIdQuery() {
+  final q = userIdParam();
+  final id = q['user_id'];
+  return id == null || '$id'.isEmpty ? '' : '?user_id=${Uri.encodeQueryComponent('$id')}';
+}

@@ -3,6 +3,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
@@ -14,7 +15,7 @@ class WellnessReportV2 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : ShunShiColors.background,
+    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : AppColors.background(context),
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
@@ -37,10 +38,10 @@ class WellnessReportV2 extends StatelessWidget {
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(AppLocalizations.of(context).t('wellness_report'), style: TextStyle(
                 fontFamily: ShunShiTypography.serifFamily,
-                fontSize: 28, fontWeight: FontWeight.bold, color: ShunShiColors.textPrimary,
+                fontSize: 28, fontWeight: FontWeight.bold, color: AppColors.textPrimary(context),
               )),
               const SizedBox(height: 4),
-              Text(AppLocalizations.of(context).t('report_spring_equinox_week_3'), style: TextStyle(fontSize: 14, color: ShunShiColors.textTertiary)),
+              Text(AppLocalizations.of(context).t('report_spring_equinox_week_3'), style: TextStyle(fontSize: 14, color: AppColors.textTertiary(context))),
             ]),
           )),
 
@@ -85,7 +86,7 @@ class WellnessReportV2 extends StatelessWidget {
           SliverToBoxAlternate(child: Padding(
             padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(AppLocalizations.of(context).t('report_personalized_recommendation'), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+              Text(AppLocalizations.of(context).t('report_personalized_recommendation'), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
               const SizedBox(height: 10),
               _buildRecCard(Icons.self_improvement, 'Morning Hip Flow', '10 min · Beginner', Color(0xFF533afd)),
               _buildRecCard(Icons.emoji_food_beverage, 'Dandelion Root Tea', 'Liver support · Spring', Color(0xFF4CAF50)),

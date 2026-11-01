@@ -3,6 +3,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
@@ -14,7 +15,7 @@ class GentleGuidanceV2 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : ShunShiColors.background,
+    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : AppColors.background(context),
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
@@ -24,7 +25,7 @@ class GentleGuidanceV2 extends StatelessWidget {
               child: Row(children: [
                 Text('SEASONS', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18, fontWeight: FontWeight.w600, color: Color(0xFF533afd))),
                 const Spacer(),
-                Icon(Icons.settings, color: ShunShiColors.textTertiary),
+                Icon(Icons.settings, color: AppColors.textTertiary(context)),
               ]),
             ),
           )),
@@ -35,10 +36,10 @@ class GentleGuidanceV2 extends StatelessWidget {
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(AppLocalizations.of(context).t('guidance_daily_whisper'), style: TextStyle(fontSize: 12, color: Color(0xFF533afd), fontWeight: FontWeight.w500, letterSpacing: 1.5)),
               const SizedBox(height: 4),
-              Text(AppLocalizations.of(context).t('guidance_gentle_guidance'), style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 28, fontWeight: FontWeight.bold, color: ShunShiColors.textPrimary)),
+              Text(AppLocalizations.of(context).t('guidance_gentle_guidance'), style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 28, fontWeight: FontWeight.bold, color: AppColors.textPrimary(context))),
               const SizedBox(height: 4),
               Text('A rhythm of reminders tailored to your current season and constitution.',
-                style: TextStyle(fontSize: 13, color: ShunShiColors.textTertiary, height: 1.5)),
+                style: TextStyle(fontSize: 13, color: AppColors.textTertiary(context), height: 1.5)),
             ]),
           )),
 

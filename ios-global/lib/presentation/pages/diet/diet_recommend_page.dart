@@ -4,6 +4,7 @@
 library;
 
 import 'package:dio/dio.dart';
+import '../../../design_system/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
@@ -123,9 +124,9 @@ class _DietRecommendPageState extends State<DietRecommendPage> {
   Widget build(BuildContext context) {
     final items = _visible;
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       appBar: AppBar(
-        leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
+        leading: IconButton(icon: Icon(Icons.arrow_back), onPressed: () => context.pop()),
         title: Text('Diet recommendations',
             style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18, fontWeight: FontWeight.w600)),
       ),
@@ -151,11 +152,11 @@ class _DietRecommendPageState extends State<DietRecommendPage> {
               final active = _activeFilter == f['key'];
               return ChoiceChip(
                 key: Key('diet_filter_${f['key']}'),
-                avatar: Icon(f['icon'] as IconData, size: 16, color: active ? Colors.white : ShunShiColors.textSecondary),
+                avatar: Icon(f['icon'] as IconData, size: 16, color: active ? Colors.white : AppColors.textSecondary(context)),
                 label: Text(f['label'] as String),
                 selected: active,
-                selectedColor: ShunShiColors.primary,
-                labelStyle: TextStyle(color: active ? Colors.white : ShunShiColors.textPrimary, fontSize: 13),
+                selectedColor: AppColors.primary(context),
+                labelStyle: TextStyle(color: active ? Colors.white : AppColors.textPrimary(context), fontSize: 13),
                 onSelected: (_) => _onFilterChanged(f['key'] as String),
               );
             },
@@ -199,7 +200,7 @@ class _DietRecommendPageState extends State<DietRecommendPage> {
         .take(3)
         .join(', ');
     return Material(
-      color: ShunShiColors.surface,
+      color: AppColors.surface(context),
       borderRadius: BorderRadius.circular(16),
       child: InkWell(
         key: Key('diet_card_${item['id']}'),
@@ -218,38 +219,38 @@ class _DietRecommendPageState extends State<DietRecommendPage> {
                 Row(children: [
                   _TypeBadge(_typeLabels[type] ?? 'Wellness'),
                   const Spacer(),
-                  Icon(Icons.chevron_right, size: 20, color: ShunShiColors.textTertiary),
+                  Icon(Icons.chevron_right, size: 20, color: AppColors.textTertiary(context)),
                 ]),
                 const SizedBox(height: 6),
                 Text(title,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: ShunShiColors.textPrimary, height: 1.25)),
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.textPrimary(context), height: 1.25)),
                 const SizedBox(height: 3),
                 Text(desc,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontSize: 12.5, color: ShunShiColors.textSecondary, height: 1.4)),
+                    style: TextStyle(fontSize: 12.5, color: AppColors.textSecondary(context), height: 1.4)),
                 if (duration.isNotEmpty || difficulty.isNotEmpty) ...[
                   const SizedBox(height: 6),
                   Row(children: [
                     if (duration.isNotEmpty) ...[
-                      Icon(Icons.schedule, size: 13, color: ShunShiColors.textTertiary),
+                      Icon(Icons.schedule, size: 13, color: AppColors.textTertiary(context)),
                       const SizedBox(width: 3),
-                      Text(duration, style: TextStyle(fontSize: 11.5, color: ShunShiColors.textTertiary)),
+                      Text(duration, style: TextStyle(fontSize: 11.5, color: AppColors.textTertiary(context))),
                       const SizedBox(width: 10),
                     ],
                     if (difficulty.isNotEmpty) ...[
-                      Icon(Icons.signal_cellular_alt, size: 13, color: ShunShiColors.textTertiary),
+                      Icon(Icons.signal_cellular_alt, size: 13, color: AppColors.textTertiary(context)),
                       const SizedBox(width: 3),
-                      Text(difficulty, style: TextStyle(fontSize: 11.5, color: ShunShiColors.textTertiary)),
+                      Text(difficulty, style: TextStyle(fontSize: 11.5, color: AppColors.textTertiary(context))),
                     ],
                   ]),
                 ],
                 if (ingredients.isNotEmpty) ...[
                   const SizedBox(height: 4),
                   Text('Ingredients: $ingredients',
-                      maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 11.5, color: ShunShiColors.textTertiary)),
+                      maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 11.5, color: AppColors.textTertiary(context))),
                 ],
               ]),
             ),
@@ -268,6 +269,6 @@ class _TypeBadge extends StatelessWidget {
   Widget build(BuildContext context) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
         decoration: BoxDecoration(color: const Color(0xFFE4C285).withValues(alpha: 0.35), borderRadius: BorderRadius.circular(8)),
-        child: Text(label, style: const TextStyle(color: Color(0xFF144227), fontSize: 10.5, fontWeight: FontWeight.w700)),
+        child: Text(label, style: TextStyle(color: Color(0xFF144227), fontSize: 10.5, fontWeight: FontWeight.w700)),
       );
 }

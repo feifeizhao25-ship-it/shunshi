@@ -1,5 +1,6 @@
 // ignore_for_file: unused_local_variable
 import '../../../core/router/safe_pop.dart';
+import '../../../design_system/app_colors.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import '../../../core/theme/shunshi_colors.dart';
@@ -43,10 +44,10 @@ class _PrivacyPageState extends State<PrivacyPage> {
 
   void _deleteAllData() {
     showDialog(context: context, builder: (ctx) => AlertDialog(
-      backgroundColor: ShunShiColors.surface,
+      backgroundColor: AppColors.surface(context),
       title: Text(AppLocalizations.of(context).t('profile_delete_all_data'), style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
       content: Text(AppLocalizations.of(context).t('profile_this_cannot_be_undone_all_data_will_be_perman'),
-          style: TextStyle(fontSize: 14, color: ShunShiColors.textSecondary, height: 1.6)),
+          style: TextStyle(fontSize: 14, color: AppColors.textSecondary(context), height: 1.6)),
       actions: [
         TextButton(onPressed: () => Navigator.pop(ctx), child: Text(AppLocalizations.of(context).t('cancel'))),
         TextButton(
@@ -74,10 +75,10 @@ class _PrivacyPageState extends State<PrivacyPage> {
 
   void _clearAiMemory() {
     showDialog(context: context, builder: (ctx) => AlertDialog(
-      backgroundColor: ShunShiColors.surface,
+      backgroundColor: AppColors.surface(context),
       title: Text(AppLocalizations.of(context).t('profile_clear_ai_memory'), style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-      content: const Text('The AI will no longer remember conversations. Constitution results are kept.',
-          style: TextStyle(fontSize: 14, color: ShunShiColors.textSecondary, height: 1.6)),
+      content: Text('The AI will no longer remember conversations. Constitution results are kept.',
+          style: TextStyle(fontSize: 14, color: AppColors.textSecondary(context), height: 1.6)),
       actions: [
         TextButton(onPressed: () => Navigator.pop(ctx), child: Text(AppLocalizations.of(context).t('privacy_cancel'))),
         TextButton(
@@ -95,7 +96,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : ShunShiColors.background,
+    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : AppColors.background(context),
       appBar: AppBar(
         elevation: 0,
         leading: IconButton(
@@ -110,7 +111,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
         children: [
           // Your data section
           Text(AppLocalizations.of(context).t('profile_your_data'), style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700,
-              fontFamily: ShunShiTypography.serifFamily, color: ShunShiColors.textPrimary)),
+              fontFamily: ShunShiTypography.serifFamily, color: AppColors.textPrimary(context))),
           const SizedBox(height: 12),
           _buildTile(
             icon: Icons.download_outlined,
@@ -118,8 +119,8 @@ class _PrivacyPageState extends State<PrivacyPage> {
             subtitle: AppLocalizations.of(context).t('profile_download_all_your_personal_data_json_format'),
             onTap: _exporting ? null : _exportData,
             trailing: _exporting
-                ? const SizedBox(width: 16, height: 16,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: ShunShiColors.primary))
+                ? SizedBox(width: 16, height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary(context)))
                 : null,
           ),
           const SizedBox(height: 8),
@@ -141,16 +142,16 @@ class _PrivacyPageState extends State<PrivacyPage> {
 
           // Privacy policy
           Text(AppLocalizations.of(context).t('settings_privacy'), style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700,
-              fontFamily: ShunShiTypography.serifFamily, color: ShunShiColors.textPrimary)),
+              fontFamily: ShunShiTypography.serifFamily, color: AppColors.textPrimary(context))),
           const SizedBox(height: 12),
           Container(
             width: double.infinity, padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: ShunShiColors.surfaceContainerLowest,
+              color: AppColors.surfaceContainerLowest(context),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: ShunShiColors.borderGhost),
+              border: Border.all(color: AppColors.borderGhost(context)),
             ),
-            child: const Text(
+            child: Text(
               'SEASONS respects and protects your personal privacy.\n\n'
               '• Your health data is used only for personalized wellness suggestions\n'
               '• Family members only see your status level (Stable / Tired / Suggest contact)\n'
@@ -158,16 +159,16 @@ class _PrivacyPageState extends State<PrivacyPage> {
               '• You can export or delete all your data anytime\n'
               '• AI conversations are encrypted and can be cleared anytime\n'
               '• Chat content, mood details, constitution info, and diary entries are never shared in family features',
-              style: TextStyle(fontSize: 13, color: ShunShiColors.textSecondary, height: 1.7),
+              style: TextStyle(fontSize: 13, color: AppColors.textSecondary(context), height: 1.7),
             ),
           ),
           const SizedBox(height: 24),
 
           // Contact
           Center(child: Column(children: [
-            Text(AppLocalizations.of(context).t('profile_questions_about_your_data'), style: TextStyle(fontSize: 13, color: ShunShiColors.textTertiary)),
+            Text(AppLocalizations.of(context).t('profile_questions_about_your_data'), style: TextStyle(fontSize: 13, color: AppColors.textTertiary(context))),
             const SizedBox(height: 4),
-            Text(AppLocalizations.of(context).t('profile_privacyshunshiapp'), style: TextStyle(fontSize: 13, color: ShunShiColors.primary,
+            Text(AppLocalizations.of(context).t('profile_privacyshunshiapp'), style: TextStyle(fontSize: 13, color: AppColors.primary(context),
                 fontWeight: FontWeight.w500)),
           ])),
           const SizedBox(height: 32),
@@ -185,22 +186,22 @@ class _PrivacyPageState extends State<PrivacyPage> {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: ShunShiColors.surfaceContainerLowest,
+          color: AppColors.surfaceContainerLowest(context),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: ShunShiColors.borderGhost),
+          border: Border.all(color: AppColors.borderGhost(context)),
         ),
         child: Row(children: [
-          Icon(icon, size: 22, color: titleColor ?? ShunShiColors.textSecondary),
+          Icon(icon, size: 22, color: titleColor ?? AppColors.textSecondary(context)),
           const SizedBox(width: 14),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(title, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500,
-                color: titleColor ?? ShunShiColors.textPrimary)),
+                color: titleColor ?? AppColors.textPrimary(context))),
             if (subtitle != null) ...[
               const SizedBox(height: 2),
-              Text(subtitle, style: const TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
+              Text(subtitle, style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context))),
             ],
           ])),
-          trailing ?? const Icon(Icons.chevron_right, size: 18, color: ShunShiColors.textTertiary),
+          trailing ?? Icon(Icons.chevron_right, size: 18, color: AppColors.textTertiary(context)),
         ]),
       ),
     );

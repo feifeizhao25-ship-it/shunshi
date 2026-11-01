@@ -1,4 +1,5 @@
 import '../../../core/router/safe_pop.dart';
+import '../../../design_system/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import '../../../design_system/theme.dart';
@@ -14,7 +15,7 @@ class ConstitutionTestPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : ShunShiColors.background,
+    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : AppColors.background(context),
       appBar: AppBar(
         title: Text(AppLocalizations.of(context).t('solar_constitution_test_result'), style: TextStyle(fontFamily: ShunShiTypography.serifFamily)),
         elevation: 0,
@@ -29,7 +30,7 @@ class ConstitutionTestPage extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(colors: [ShunShiColors.primary, Color(0xFF2D5A3D)]),
+                gradient: LinearGradient(colors: [AppColors.primary(context), Color(0xFF2D5A3D)]),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Column(
@@ -51,11 +52,11 @@ class ConstitutionTestPage extends StatelessWidget {
             const SizedBox(height: 8),
             Container(
               width: double.infinity, padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(color: ShunShiColors.surfaceContainerLowest, borderRadius: BorderRadius.circular(12), border: Border.all(color: ShunShiColors.borderGhost)),
-              child: const Text(
+              decoration: BoxDecoration(color: AppColors.surfaceContainerLowest(context), borderRadius: BorderRadius.circular(12), border: Border.all(color: AppColors.borderGhost(context))),
+              child: Text(
                 'Qi Deficient types often experience fatigue, weakness, shortness of breath, reluctance to speak, easy sweating, and pale complexion. '
                 'They have weaker resistance, catch colds easily, and recover slowly. The tongue is pale with a white coating, and the pulse is weak.',
-                style: TextStyle(fontSize: 14, color: ShunShiColors.textSecondary, height: 1.7),
+                style: TextStyle(fontSize: 14, color: AppColors.textSecondary(context), height: 1.7),
               ),
             ),
             const SizedBox(height: 24),
@@ -70,7 +71,7 @@ class ConstitutionTestPage extends StatelessWidget {
             // ── Wellness Advice ──
             _sectionTitle('Wellness Recommendations'),
             const SizedBox(height: 12),
-            _adviceCard('Diet', 'Eat Qi-boosting foods: yam, astragalus, jujube, millet porridge. Avoid raw and cold items.', Icons.restaurant, ShunShiColors.primary),
+            _adviceCard('Diet', 'Eat Qi-boosting foods: yam, astragalus, jujube, millet porridge. Avoid raw and cold items.', Icons.restaurant, AppColors.primary(context)),
             const SizedBox(height: 12),
             _adviceCard('Exercise', 'Gentle exercises recommended: walking, Tai Chi, Baduanjin. Avoid intense exercise that depletes Qi.', Icons.self_improvement, ShunShiColors.secondary),
             const SizedBox(height: 12),
@@ -85,7 +86,7 @@ class ConstitutionTestPage extends StatelessWidget {
                 icon: const Icon(Icons.share, size: 18),
                 label: Text(AppLocalizations.of(context).t('solar_share_result')),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: ShunShiColors.primary, foregroundColor: Colors.white,
+                  backgroundColor: AppColors.primary(context), foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                 ),
               ),
@@ -96,7 +97,7 @@ class ConstitutionTestPage extends StatelessWidget {
               child: OutlinedButton(
                 onPressed: () => Navigator.pop(context),
                 style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: ShunShiColors.border),
+                  side: BorderSide(color: AppColors.border(context)),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                 ),
                 child: Text(AppLocalizations.of(context).t('constitution_retake'))
@@ -110,7 +111,7 @@ class ConstitutionTestPage extends StatelessWidget {
 
   Widget _sectionTitle(String t) => Align(
     alignment: Alignment.centerLeft,
-    child: Text(t, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700, fontFamily: ShunShiTypography.serifFamily, color: ShunShiColors.textPrimary)),
+    child: Text(t, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, fontFamily: ShunShiTypography.serifFamily, color: ShunShiColors.textPrimary)),
   );
 
   Widget _adviceCard(String title, String desc, IconData icon, Color color) => Container(
@@ -131,7 +132,7 @@ class ConstitutionTestPage extends StatelessWidget {
             children: [
               Text(title, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: color, fontFamily: ShunShiTypography.serifFamily)),
               const SizedBox(height: 4),
-              Text(desc, style: const TextStyle(fontSize: 13, color: ShunShiColors.textSecondary, height: 1.5)),
+              Text(desc, style: TextStyle(fontSize: 13, color: ShunShiColors.textSecondary, height: 1.5)),
             ],
           ),
         ),

@@ -10,6 +10,7 @@
 library;
 
 import 'dart:async';
+import '../../../design_system/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
 
@@ -55,7 +56,7 @@ class _MovementPlayerPageState extends State<MovementPlayerPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       body: SafeArea(
         child: Column(
           children: [
@@ -64,13 +65,13 @@ class _MovementPlayerPageState extends State<MovementPlayerPage> {
               padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
               child: Row(children: [
                 IconButton(
-                  icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+                  icon: Icon(Icons.arrow_back_ios_new, size: 20),
                   onPressed: () => Navigator.pop(context),
                 ),
                 const Spacer(),
                 Text('SEASONS', style: TextStyle(
                   fontSize: 16, fontWeight: FontWeight.w700,
-                  color: ShunShiColors.primary, fontFamily: ShunShiTypography.serifFamily,
+                  color: AppColors.primary(context), fontFamily: ShunShiTypography.serifFamily,
                 )),
                 const Spacer(),
                 const SizedBox(width: 48),
@@ -80,17 +81,17 @@ class _MovementPlayerPageState extends State<MovementPlayerPage> {
 
             // ── Session Info ──
             Text('Session in Progress', style: TextStyle(
-              fontSize: 13, color: ShunShiColors.textTertiary,
+              fontSize: 13, color: AppColors.textTertiary(context),
               fontFamily: ShunShiTypography.sansFamily, letterSpacing: 1,
             )),
             const SizedBox(height: 16),
             Text('Late Summer Transition', style: TextStyle(
-              fontSize: 14, color: ShunShiColors.primary,
+              fontSize: 14, color: AppColors.primary(context),
               fontFamily: ShunShiTypography.sansFamily, fontWeight: FontWeight.w500,
             )),
             Text('Gentle Flow Ritual', style: TextStyle(
               fontSize: 24, fontWeight: FontWeight.w700,
-              color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.serifFamily,
+              color: AppColors.textPrimary(context), fontFamily: ShunShiTypography.serifFamily,
             )),
             const SizedBox(height: 12),
             Row(
@@ -106,10 +107,10 @@ class _MovementPlayerPageState extends State<MovementPlayerPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.spatial_audio_off, size: 16, color: ShunShiColors.primary),
+                  Icon(Icons.spatial_audio_off, size: 16, color: AppColors.primary(context)),
                   const SizedBox(width: 4),
                   Text('Spatial Audio Active', style: TextStyle(
-                    fontSize: 12, color: ShunShiColors.primary,
+                    fontSize: 12, color: AppColors.primary(context),
                     fontFamily: ShunShiTypography.sansFamily,
                   )),
                 ],
@@ -119,7 +120,7 @@ class _MovementPlayerPageState extends State<MovementPlayerPage> {
             // ── Timer + Controls ──
             Text(_formatTime(_elapsedSeconds), style: TextStyle(
               fontSize: 48, fontWeight: FontWeight.w300,
-              color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.sansFamily,
+              color: AppColors.textPrimary(context), fontFamily: ShunShiTypography.sansFamily,
             )),
             const SizedBox(height: 24),
             GestureDetector(
@@ -127,12 +128,12 @@ class _MovementPlayerPageState extends State<MovementPlayerPage> {
               child: Container(
                 width: 64, height: 64,
                 decoration: BoxDecoration(
-                  color: _isPlaying ? ShunShiColors.primary.withValues(alpha: 0.1) : ShunShiColors.primary,
+                  color: _isPlaying ? AppColors.primary(context).withValues(alpha: 0.1) : AppColors.primary(context),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   _isPlaying ? Icons.pause : Icons.play_arrow,
-                  size: 36, color: _isPlaying ? ShunShiColors.primary : Colors.white,
+                  size: 36, color: _isPlaying ? AppColors.primary(context) : Colors.white,
                 ),
               ),
             ),
@@ -145,7 +146,7 @@ class _MovementPlayerPageState extends State<MovementPlayerPage> {
                 '"In this practice, we focus on the element of earth. Find stability through the soles of your feet and let the breath move through your spine like wind through the reeds."',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 14, color: ShunShiColors.textSecondary,
+                  fontSize: 14, color: AppColors.textSecondary(context),
                   height: 1.7, fontStyle: FontStyle.italic,
                   fontFamily: ShunShiTypography.sansFamily,
                 ),
@@ -175,13 +176,13 @@ class _MovementPlayerPageState extends State<MovementPlayerPage> {
                 height: 48,
                 child: OutlinedButton.icon(
                   onPressed: () {},
-                  icon: const Icon(Icons.favorite_outline, size: 18),
+                  icon: Icon(Icons.favorite_outline, size: 18),
                   label: Text('Save to Rituals', style: TextStyle(
                     fontSize: 15, fontWeight: FontWeight.w600, fontFamily: ShunShiTypography.sansFamily,
                   )),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: ShunShiColors.primary,
-                    side: BorderSide(color: ShunShiColors.primary.withValues(alpha: 0.3)),
+                    foregroundColor: AppColors.primary(context),
+                    side: BorderSide(color: AppColors.primary(context).withValues(alpha: 0.3)),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                 ),
@@ -196,9 +197,9 @@ class _MovementPlayerPageState extends State<MovementPlayerPage> {
   Widget _infoChip(IconData icon, String text) => Row(
     mainAxisSize: MainAxisSize.min,
     children: [
-      Icon(icon, size: 16, color: ShunShiColors.textTertiary),
+      Icon(icon, size: 16, color: AppColors.textTertiary(context)),
       const SizedBox(width: 4),
-      Text(text, style: TextStyle(fontSize: 13, color: ShunShiColors.textSecondary, fontFamily: ShunShiTypography.sansFamily)),
+      Text(text, style: TextStyle(fontSize: 13, color: AppColors.textSecondary(context), fontFamily: ShunShiTypography.sansFamily)),
     ],
   );
 
@@ -207,11 +208,11 @@ class _MovementPlayerPageState extends State<MovementPlayerPage> {
       children: [
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.sansFamily)),
-            Text(subtitle, style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary, fontFamily: ShunShiTypography.sansFamily)),
+            Text(title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.textPrimary(context), fontFamily: ShunShiTypography.sansFamily)),
+            Text(subtitle, style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context), fontFamily: ShunShiTypography.sansFamily)),
           ]),
         ),
-        Switch(value: value, onChanged: onChanged, activeThumbColor: ShunShiColors.primary),
+        Switch(value: value, onChanged: onChanged, activeThumbColor: AppColors.primary(context)),
       ],
     );
   }

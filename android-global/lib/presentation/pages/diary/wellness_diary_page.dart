@@ -3,6 +3,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
 import 'package:go_router/go_router.dart';
@@ -49,7 +50,7 @@ class _WellnessDiaryPageState extends State<WellnessDiaryPage>
 
 
       appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
-      backgroundColor: isDark ? ShunShiColors.darkBackground : ShunShiColors.background,
+      backgroundColor: isDark ? ShunShiColors.darkBackground : AppColors.background(context),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: Column(
@@ -66,25 +67,25 @@ class _WellnessDiaryPageState extends State<WellnessDiaryPage>
                         shape: BoxShape.circle,
                         color: ShunShiColors.surfaceVariant,
                       ),
-                      child: const Icon(Icons.person, size: 20, color: ShunShiColors.textSecondary),
+                      child: Icon(Icons.person, size: 20, color: AppColors.textSecondary(context)),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(AppLocalizations.of(context).t('diary_good_morning_seasons_friend'), style: TextStyle(
                         fontSize: 20, fontWeight: FontWeight.w300, letterSpacing: -0.3,
-                        color: ShunShiColors.primary,
+                        color: AppColors.primary(context),
                         fontFamily: ShunShiTypography.serifFamily,
                       )),
                     ),
                     GestureDetector(
                       onTap: () => context.push('/notifications'),
-                      child: const Icon(Icons.notifications_outlined, size: 22, color: ShunShiColors.primary),
+                      child: Icon(Icons.notifications_outlined, size: 22, color: AppColors.primary(context)),
                     ),
                   ],
                 ),
               ),
             ),
-            Container(height: 1, color: ShunShiColors.surfaceContainerLow, margin: const EdgeInsets.symmetric(horizontal: 20)),
+            Container(height: 1, color: AppColors.surfaceContainerLow(context), margin: const EdgeInsets.symmetric(horizontal: 20)),
 
             // ── Content ──
             Padding(
@@ -100,7 +101,7 @@ class _WellnessDiaryPageState extends State<WellnessDiaryPage>
                         color: ShunShiColors.secondary, letterSpacing: 1.5,
                       )),
                       const SizedBox(width: 12),
-                      Expanded(child: Container(height: 1, color: ShunShiColors.textTertiary.withValues(alpha: 0.15))),
+                      Expanded(child: Container(height: 1, color: AppColors.textTertiary(context).withValues(alpha: 0.15))),
                     ],
                   ),
                   const SizedBox(height: 8),
@@ -134,7 +135,7 @@ class _WellnessDiaryPageState extends State<WellnessDiaryPage>
                   Container(
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      color: ShunShiColors.surfaceContainerLow,
+                      color: AppColors.surfaceContainerLow(context),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Row(
@@ -178,12 +179,12 @@ class _WellnessDiaryPageState extends State<WellnessDiaryPage>
   Widget _sectionHeader(IconData icon, String title) {
     return Row(
       children: [
-        Icon(icon, size: 22, color: ShunShiColors.primary),
+        Icon(icon, size: 22, color: AppColors.primary(context)),
         const SizedBox(width: 8),
         Text(title, style: TextStyle(
           fontSize: 20, fontWeight: FontWeight.w400,
           fontFamily: ShunShiTypography.serifFamily,
-          color: ShunShiColors.textPrimary,
+          color: AppColors.textPrimary(context),
         )),
       ],
     );
@@ -193,7 +194,7 @@ class _WellnessDiaryPageState extends State<WellnessDiaryPage>
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: ShunShiColors.surfaceContainerLowest,
+        color: AppColors.surfaceContainerLowest(context),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -201,7 +202,7 @@ class _WellnessDiaryPageState extends State<WellnessDiaryPage>
         children: [
           Text(label, style: TextStyle(
             fontSize: 11, fontWeight: FontWeight.w500,
-            color: ShunShiColors.textSecondary, letterSpacing: 1.5,
+            color: AppColors.textSecondary(context), letterSpacing: 1.5,
           )),
           const SizedBox(height: 16),
           Row(
@@ -210,13 +211,13 @@ class _WellnessDiaryPageState extends State<WellnessDiaryPage>
               Text(time, style: TextStyle(
                 fontSize: 30, fontWeight: FontWeight.w400,
                 fontFamily: ShunShiTypography.serifFamily,
-                color: ShunShiColors.primary,
+                color: AppColors.primary(context),
               )),
               const SizedBox(width: 4),
               Padding(
                 padding: const EdgeInsets.only(bottom: 6),
                 child: Text(period, style: TextStyle(
-                  fontSize: 13, color: ShunShiColors.textSecondary,
+                  fontSize: 13, color: AppColors.textSecondary(context),
                 )),
               ),
             ],
@@ -236,19 +237,19 @@ class _WellnessDiaryPageState extends State<WellnessDiaryPage>
             width: 56, height: 56,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: ShunShiColors.surfaceContainerLowest,
+              color: AppColors.surfaceContainerLowest(context),
               border: selected
-                  ? Border.all(color: ShunShiColors.primary, width: 2)
+                  ? Border.all(color: AppColors.primary(context), width: 2)
                   : Border.all(color: Colors.transparent),
             ),
             child: Icon(icon, size: 28,
-              color: selected ? ShunShiColors.primary : ShunShiColors.textSecondary,
+              color: selected ? AppColors.primary(context) : AppColors.textSecondary(context),
             ),
           ),
           const SizedBox(height: 8),
           Text(label, style: TextStyle(
             fontSize: 11,
-            color: selected ? ShunShiColors.primary : ShunShiColors.textSecondary,
+            color: selected ? AppColors.primary(context) : AppColors.textSecondary(context),
             fontWeight: selected ? FontWeight.w700 : FontWeight.w400,
           )),
         ],
@@ -263,9 +264,9 @@ class _WellnessDiaryPageState extends State<WellnessDiaryPage>
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: ShunShiColors.surfaceContainerLowest,
+          color: AppColors.surfaceContainerLowest(context),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: ShunShiColors.textTertiary.withValues(alpha: 0.1)),
+          border: Border.all(color: AppColors.textTertiary(context).withValues(alpha: 0.1)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -281,15 +282,15 @@ class _WellnessDiaryPageState extends State<WellnessDiaryPage>
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: checked ? ShunShiColors.primary : ShunShiColors.textTertiary,
+                      color: checked ? AppColors.primary(context) : AppColors.textTertiary(context),
                       width: 2,
                     ),
                   ),
                   child: checked
                       ? Center(child: Container(
                           width: 10, height: 10,
-                          decoration: const BoxDecoration(
-                            color: ShunShiColors.primary, shape: BoxShape.circle,
+                          decoration: BoxDecoration(
+                            color: AppColors.primary(context), shape: BoxShape.circle,
                           ),
                         ))
                       : null,
@@ -299,7 +300,7 @@ class _WellnessDiaryPageState extends State<WellnessDiaryPage>
             const SizedBox(height: 20),
             Text(label, style: TextStyle(
               fontSize: 17, fontFamily: ShunShiTypography.serifFamily,
-              color: checked ? ShunShiColors.primary : ShunShiColors.textPrimary,
+              color: checked ? AppColors.primary(context) : AppColors.textPrimary(context),
             )),
           ],
         ),
@@ -317,7 +318,7 @@ class _WellnessDiaryPageState extends State<WellnessDiaryPage>
       child: Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: ShunShiColors.primary.withValues(alpha: 0.95),
+          color: AppColors.primary(context).withValues(alpha: 0.95),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(

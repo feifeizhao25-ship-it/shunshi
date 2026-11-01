@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/router/safe_pop.dart';
@@ -11,7 +12,7 @@ class PrivacyPolicyPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : ShunShiColors.background,
+    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : AppColors.background(context),
       appBar: AppBar(
         elevation: 0,
         leading: IconButton(
@@ -24,7 +25,7 @@ class PrivacyPolicyPage extends StatelessWidget {
         padding: const EdgeInsets.all(20),
         children: [
           Text('Privacy Policy', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700,
-              fontFamily: ShunShiTypography.serifFamily, color: ShunShiColors.textPrimary)),
+              fontFamily: ShunShiTypography.serifFamily, color: AppColors.textPrimary(context))),
           SizedBox(height: 16),
           Text(
             'SEASONS Privacy Policy\n\n'
@@ -37,7 +38,7 @@ class PrivacyPolicyPage extends StatelessWidget {
             '6. Data Retention\nAfter account deletion, we clear all related data within 30 days.\n\n'
             '7. Minimum Age\nYou must be at least 16 to use SEASONS. We do not knowingly collect personal data from anyone under 16. If we learn that we have, we delete it promptly.\n\n'
             '8. Contact Us\nData protection inquiries: privacy@seasons.app',
-            style: TextStyle(fontSize: 14, color: ShunShiColors.textSecondary, height: 1.8),
+            style: TextStyle(fontSize: 14, color: AppColors.textSecondary(context), height: 1.8),
           ),
         ],
       ),

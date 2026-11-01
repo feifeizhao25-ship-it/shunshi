@@ -55,7 +55,7 @@ class _ShimmerBlockState extends State<ShimmerBlock>
           gradient: LinearGradient(
             begin: Alignment(_anim.value - 1, 0),
             end: Alignment(_anim.value, 0),
-            colors: const [
+            colors: [
               Color(0xFFEAEAEA),
               Color(0xFFF5F5F5),
               Color(0xFFEAEAEA),
@@ -170,7 +170,7 @@ class WellnessSkeleton extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 24),
-          const Padding(
+          Padding(
             padding: EdgeInsets.symmetric(horizontal: 20),
             child: ShimmerBlock(width: double.infinity, height: 38, borderRadius: 19),
           ),

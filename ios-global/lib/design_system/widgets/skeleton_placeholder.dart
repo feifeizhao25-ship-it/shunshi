@@ -25,7 +25,7 @@ class SkeletonCard extends StatelessWidget {
   final double height;
   final double borderRadius;
   final EdgeInsetsGeometry margin;
-  const SkeletonCard({
+  SkeletonCard({
     super.key,
     this.height = 120,
     this.borderRadius = 16,
@@ -68,7 +68,7 @@ class SkeletonListTile extends StatelessWidget {
               Container(
                 width: 48,
                 height: 48,
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   color: Colors.white,
                   shape: BoxShape.circle,
                 ),
@@ -162,7 +162,7 @@ class SkeletonCircle extends StatelessWidget {
       child: Container(
         width: radius * 2,
         height: radius * 2,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: Colors.white,
           shape: BoxShape.circle,
         ),
@@ -210,11 +210,11 @@ class SkeletonProfilePage extends StatelessWidget {
             child: Container(
               width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
               ),
-              child: const Column(
+              child: Column(
                 children: [
                   CircleAvatar(radius: 40, backgroundColor: Colors.white),
                   SizedBox(height: 16),
@@ -227,7 +227,7 @@ class SkeletonProfilePage extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           // Cards
-          ...List.generate(3, (_) => const SkeletonCard(height: 100)),
+          ...List.generate(3, (_) => SkeletonCard(height: 100)),
         ],
       ),
     );
@@ -255,7 +255,7 @@ class SkeletonChatPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (!isUser) ...[
-                  const CircleAvatar(radius: 16, backgroundColor: Colors.white),
+                  CircleAvatar(radius: 16, backgroundColor: Colors.white),
                   const SizedBox(width: 8),
                 ],
                 Container(
@@ -268,7 +268,7 @@ class SkeletonChatPage extends StatelessWidget {
                 ),
                 if (isUser) ...[
                   const SizedBox(width: 8),
-                  const CircleAvatar(radius: 16, backgroundColor: Colors.white),
+                  CircleAvatar(radius: 16, backgroundColor: Colors.white),
                 ],
               ],
             ),

@@ -10,6 +10,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import '../../../design_system/theme.dart';
 
 class WellnessReportPage extends StatelessWidget {
@@ -25,15 +26,15 @@ class WellnessReportPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
             expandedHeight: 180,
             pinned: true,
-            backgroundColor: ShunShiColors.primary,
+            backgroundColor: AppColors.primary(context),
             leading: IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
+              icon: Icon(Icons.arrow_back_ios_new, color: Colors.white),
               onPressed: () => Navigator.pop(context),
             ),
             flexibleSpace: FlexibleSpaceBar(
@@ -42,7 +43,7 @@ class WellnessReportPage extends StatelessWidget {
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [ShunShiColors.primaryDark, ShunShiColors.primary],
+                    colors: [ShunShiColors.primaryDark, AppColors.primary(context)],
                   ),
                 ),
                 child: SafeArea(
@@ -56,7 +57,7 @@ class WellnessReportPage extends StatelessWidget {
                           fontFamily: ShunShiTypography.sansFamily, letterSpacing: 1.5,
                         )),
                         const SizedBox(height: 10),
-                        const Text('Personal Assessment', style: TextStyle(
+                        Text('Personal Assessment', style: TextStyle(
                           fontSize: 24, fontWeight: FontWeight.w700,
                           color: Colors.white, fontFamily: ShunShiTypography.serifFamily,
                         )),
@@ -79,14 +80,14 @@ class WellnessReportPage extends StatelessWidget {
                     'Your Rhythm: Balanced & Vibrant.',
                     style: TextStyle(
                       fontSize: 20, fontWeight: FontWeight.w700,
-                      color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.serifFamily,
+                      color: AppColors.textPrimary(context), fontFamily: ShunShiTypography.serifFamily,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'You are naturally centered with good energy. In Late Spring, your focus is on maintaining this vitality through seasonal liver support.',
                     style: TextStyle(
-                      fontSize: 14, color: ShunShiColors.textSecondary,
+                      fontSize: 14, color: AppColors.textSecondary(context),
                       height: 1.7, fontFamily: ShunShiTypography.sansFamily,
                     ),
                   ),
@@ -104,7 +105,7 @@ class WellnessReportPage extends StatelessWidget {
                     width: double.infinity,
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: ShunShiColors.primary.withValues(alpha: 0.06),
+                      color: AppColors.primary(context).withValues(alpha: 0.06),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Row(
@@ -113,10 +114,10 @@ class WellnessReportPage extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: ShunShiColors.primary.withValues(alpha: 0.12),
+                            color: AppColors.primary(context).withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: const Icon(Icons.eco, size: 22, color: ShunShiColors.primary),
+                          child: Icon(Icons.eco, size: 22, color: AppColors.primary(context)),
                         ),
                         const SizedBox(width: 14),
                         Expanded(
@@ -125,13 +126,13 @@ class WellnessReportPage extends StatelessWidget {
                             children: [
                               Text('Late Spring Focus', style: TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.w600,
-                                color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.sansFamily,
+                                color: AppColors.textPrimary(context), fontFamily: ShunShiTypography.sansFamily,
                               )),
                               const SizedBox(height: 6),
                               Text(
                                 'Liver meridian activation is crucial as the yang energy peaks. Focus on bitter greens and gentle stretching.',
                                 style: TextStyle(
-                                  fontSize: 13, color: ShunShiColors.textSecondary,
+                                  fontSize: 13, color: AppColors.textSecondary(context),
                                   height: 1.6, fontFamily: ShunShiTypography.sansFamily,
                                 ),
                               ),
@@ -141,10 +142,10 @@ class WellnessReportPage extends StatelessWidget {
                                 child: Row(children: [
                                   Text('Learn More', style: TextStyle(
                                     fontSize: 13, fontWeight: FontWeight.w600,
-                                    color: ShunShiColors.primary, fontFamily: ShunShiTypography.sansFamily,
+                                    color: AppColors.primary(context), fontFamily: ShunShiTypography.sansFamily,
                                   )),
                                   const SizedBox(width: 4),
-                                  const Icon(Icons.arrow_forward, size: 16, color: ShunShiColors.primary),
+                                  Icon(Icons.arrow_forward, size: 16, color: AppColors.primary(context)),
                                 ]),
                               ),
                             ],
@@ -172,7 +173,7 @@ class WellnessReportPage extends StatelessWidget {
                             color: const Color(0xFFF59E0B).withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: const Icon(Icons.light_mode, size: 22, color: Color(0xFFF59E0B)),
+                          child: Icon(Icons.light_mode, size: 22, color: Color(0xFFF59E0B)),
                         ),
                         const SizedBox(width: 14),
                         Expanded(
@@ -181,7 +182,7 @@ class WellnessReportPage extends StatelessWidget {
                             children: [
                               Text('Recommended', style: TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.w600,
-                                color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.sansFamily,
+                                color: AppColors.textPrimary(context), fontFamily: ShunShiTypography.sansFamily,
                               )),
                               Text('Morning Sunlight', style: TextStyle(
                                 fontSize: 14, fontWeight: FontWeight.w500,
@@ -191,7 +192,7 @@ class WellnessReportPage extends StatelessWidget {
                               Text(
                                 'Exposure to morning light for 15 minutes will further stabilize your emotional balance scores.',
                                 style: TextStyle(
-                                  fontSize: 13, color: ShunShiColors.textSecondary,
+                                  fontSize: 13, color: AppColors.textSecondary(context),
                                   height: 1.6, fontFamily: ShunShiTypography.sansFamily,
                                 ),
                               ),
@@ -210,7 +211,7 @@ class WellnessReportPage extends StatelessWidget {
                     child: ElevatedButton(
                       onPressed: () {},
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: ShunShiColors.primary,
+                        backgroundColor: AppColors.primary(context),
                         foregroundColor: Colors.white,
                         elevation: 0,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -223,7 +224,7 @@ class WellnessReportPage extends StatelessWidget {
                   const SizedBox(height: 8),
                   Center(
                     child: Text('Revised May 12, 2024', style: TextStyle(
-                      fontSize: 12, color: ShunShiColors.textTertiary,
+                      fontSize: 12, color: AppColors.textTertiary(context),
                       fontFamily: ShunShiTypography.sansFamily,
                     )),
                   ),

@@ -25,7 +25,7 @@ class _RecordsPageV2State extends State<RecordsPageV2> {
   int _weekStreak = 0;
   int _totalPoints = 0;
   int _todayDone = 0;
-  int _todayTotal = 5;
+  int _todayTotal = 3;
   List<Map<String, dynamic>> _emotionTrends = [];
   Map<String, dynamic> _sleepStats = {};
   bool _loading = true;
@@ -69,13 +69,14 @@ class _RecordsPageV2State extends State<RecordsPageV2> {
       if (today is Map && today['data'] is Map) {
         final d = today['data'] as Map<String, dynamic>;
         _todayDone = d['completed'] as int? ?? 0;
-        _todayTotal = d['total'] as int? ?? 5;
+        _todayTotal = d['total'] as int? ?? 3;
       }
       // Emotion trends
       final emotions = results[2].data;
-      if (emotions is Map && emotions['data'] is List) {
-        _emotionTrends = (emotions['data'] as List).cast<Map<String, dynamic>>();
-      }
+      // 后端：{data: {trends: [{date, avg_mood(1–5), count}], ...}}；旧版直接是列表，两种都认。
+      final eData = emotions is Map ? emotions['data'] : null;
+      final eList = eData is List ? eData : (eData is Map && eData['trends'] is List ? eData['trends'] as List : const []);
+      _emotionTrends = eList.whereType<Map>().map((e) => Map<String, dynamic>.from(e)).toList();
       // Sleep stats
       final sleep = results[3].data;
       if (sleep is Map && sleep['data'] is Map) {
@@ -149,7 +150,7 @@ class _RecordsPageV2State extends State<RecordsPageV2> {
             ),
             const SizedBox(height: 16),
 
-            if (_sleepStats['avg_hours'] == null && _emotionTrends.isEmpty) ...[
+            if (_sleepStats['avg_hours'] == null && _sleepStats['avg_quality'] == null && _emotionTrends.isEmpty) ...[
               const IllustratedEmptyState(
                 title: '还没有睡眠与心情记录',
                 message: '写一篇养生日记或记录睡眠后，这里会出现你的变化趋势。',
@@ -158,7 +159,7 @@ class _RecordsPageV2State extends State<RecordsPageV2> {
               const SizedBox(height: 16),
             ],
             // Sleep stats
-            if (_sleepStats['avg_hours'] != null) ...[
+            if (_sleepStats['avg_hours'] != null || _sleepStats['avg_quality'] != null) ...[
               Text('睡眠统计', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
               const SizedBox(height: 12),
               Container(
@@ -169,11 +170,11 @@ class _RecordsPageV2State extends State<RecordsPageV2> {
                   const SizedBox(width: 10),
                   Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Text('平均睡眠', style: TextStyle(fontSize: 14, color: AppColors.textTertiary(context))),
-                    Text('${_sleepStats['avg_hours'] ?? '-'}小时', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.textPrimary(context))),
+                    Text(_sleepStats['avg_hours'] == null ? '-' : '${_sleepStats['avg_hours']}小时', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.textPrimary(context))),
                   ])),
                   Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Text('质量评分', style: TextStyle(fontSize: 14, color: AppColors.textTertiary(context))),
-                    Text('${_sleepStats['avg_quality'] ?? '-'}/5', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.textPrimary(context))),
+                    Text(_sleepStats['avg_quality'] == null ? '-' : '${_sleepStats['avg_quality']}/5', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.textPrimary(context))),
                   ])),
                 ]),
               ),
@@ -199,11 +200,11 @@ class _RecordsPageV2State extends State<RecordsPageV2> {
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(12)),
                   child: Row(children: [
-                    Icon(_emotionIcon(e['avg_mood'] as int? ?? 3), color: AppColors.primary(context), size: 18),
+                    Icon(_emotionIcon((e['avg_mood'] as num?)?.round() ?? 3), color: AppColors.primary(context), size: 18),
                     const SizedBox(width: 10),
                     Text(e['date']?.toString().substring(5, 10) ?? '', style: TextStyle(fontSize: 14, color: AppColors.textSecondary(context))),
                     const Spacer(),
-                    Text(_emotionLabel(e['avg_mood'] as int? ?? 3), style: TextStyle(fontSize: 14, color: AppColors.textPrimary(context))),
+                    Text(_emotionLabel((e['avg_mood'] as num?)?.round() ?? 3), style: TextStyle(fontSize: 14, color: AppColors.textPrimary(context))),
                   ]),
                 ),
               )),

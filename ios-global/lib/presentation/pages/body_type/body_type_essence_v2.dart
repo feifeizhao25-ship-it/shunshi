@@ -2,6 +2,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import '../../../design_system/theme.dart';
 
 class BodyTypeEssenceV2 extends StatelessWidget {
@@ -10,7 +11,7 @@ class BodyTypeEssenceV2 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
@@ -20,7 +21,7 @@ class BodyTypeEssenceV2 extends StatelessWidget {
               child: Row(children: [
                 Text('SEASONS', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18, fontWeight: FontWeight.w600, color: Color(0xFF533afd))),
                 const Spacer(),
-                Icon(Icons.settings, color: ShunShiColors.textTertiary),
+                Icon(Icons.settings, color: AppColors.textTertiary(context)),
               ]),
             ),
           )),
@@ -33,11 +34,11 @@ class BodyTypeEssenceV2 extends StatelessWidget {
               const SizedBox(height: 4),
               Text('Your Seasonal Essence: Balanced', style: TextStyle(
                 fontFamily: ShunShiTypography.serifFamily,
-                fontSize: 24, fontWeight: FontWeight.bold, color: ShunShiColors.textPrimary,
+                fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textPrimary(context),
               )),
               const SizedBox(height: 8),
               Text('Your constitution mirrors the transition between Spring and Autumn. You possess a resilient core with a fluid adaptability to external shifts.',
-                style: TextStyle(fontSize: 13, color: ShunShiColors.textTertiary, height: 1.5)),
+                style: TextStyle(fontSize: 13, color: AppColors.textTertiary(context), height: 1.5)),
             ]),
           )),
 
@@ -80,7 +81,7 @@ class BodyTypeEssenceV2 extends StatelessWidget {
           // Natural Rhythm
           SliverToBoxAlternate(child: Padding(
             padding: const EdgeInsets.fromLTRB(24, 20, 24, 40),
-            child: Text('Your Natural Rhythm', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+            child: Text('Your Natural Rhythm', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
           )),
         ],
       ),

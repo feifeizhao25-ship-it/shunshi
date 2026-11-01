@@ -47,7 +47,7 @@ class ThemeNotifier extends StateNotifier<ThemeState> {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
-      colorScheme: const ColorScheme.light(
+      colorScheme: ColorScheme.light(
         primary: SeasonsColors.primary,
         onPrimary: Colors.white,
         secondary: SeasonsColors.warm,
@@ -109,7 +109,7 @@ class ThemeNotifier extends StateNotifier<ThemeState> {
           vertical: SeasonsSpacing.md,
         ),
       ),
-      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: SeasonsColors.surface,
         selectedItemColor: SeasonsColors.primary,
         unselectedItemColor: SeasonsColors.textHint,
@@ -118,7 +118,7 @@ class ThemeNotifier extends StateNotifier<ThemeState> {
         selectedLabelStyle: TextStyle(fontSize: 12),
         unselectedLabelStyle: TextStyle(fontSize: 12),
       ),
-      pageTransitionsTheme: const PageTransitionsTheme(
+      pageTransitionsTheme: PageTransitionsTheme(
         builders: {
           TargetPlatform.android: CupertinoPageTransitionsBuilder(),
           TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
@@ -193,7 +193,7 @@ class ThemeNotifier extends StateNotifier<ThemeState> {
           vertical: SeasonsSpacing.md,
         ),
       ),
-      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: SeasonsDarkColors.surface,
         selectedItemColor: SeasonsDarkColors.primary,
         unselectedItemColor: SeasonsDarkColors.textHint,
@@ -202,7 +202,7 @@ class ThemeNotifier extends StateNotifier<ThemeState> {
         selectedLabelStyle: TextStyle(fontSize: 12),
         unselectedLabelStyle: TextStyle(fontSize: 12),
       ),
-      pageTransitionsTheme: const PageTransitionsTheme(
+      pageTransitionsTheme: PageTransitionsTheme(
         builders: {
           TargetPlatform.android: CupertinoPageTransitionsBuilder(),
           TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
