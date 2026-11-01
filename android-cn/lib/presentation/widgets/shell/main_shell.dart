@@ -55,7 +55,9 @@ class MainShell extends StatelessWidget {
                 top: false,
                 child: Padding(
                   padding: const EdgeInsets.only(top: 12, bottom: 4),
-                  child: Row(
+                  child: MediaQuery(
+                    data: MediaQuery.of(context).copyWith(textScaler: MediaQuery.textScalerOf(context).clamp(maxScaleFactor: 1.3)),
+                    child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: _tabs.asMap().entries.map((entry) {
                       final index = entry.key;
@@ -82,6 +84,7 @@ class MainShell extends StatelessWidget {
                         onTap: () => context.go(tab.path),
                       );
                     }).toList(),
+                  ),
                   ),
                 ),
               ),

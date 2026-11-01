@@ -43,7 +43,10 @@ class MainShell extends StatelessWidget {
                 top: false,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
-                  child: Row(
+                  // tab labels keep a 1.3 text-scale cap: five tabs cannot hold 200% type ('Wellness' broke mid-word)
+                  child: MediaQuery(
+                    data: MediaQuery.of(context).copyWith(textScaler: MediaQuery.textScalerOf(context).clamp(maxScaleFactor: 1.3)),
+                    child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: _tabs.map((tab) {
                       final isActive = currentPath == tab.path;
@@ -55,6 +58,7 @@ class MainShell extends StatelessWidget {
                         onTap: () => context.go(tab.path),
                       );
                     }).toList(),
+                  ),
                   ),
                 ),
               ),

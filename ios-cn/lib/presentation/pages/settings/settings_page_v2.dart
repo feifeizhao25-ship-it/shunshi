@@ -194,7 +194,7 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
       title: Row(children: [
         Icon(icon, color: AppColors.primary(context), size: 18),
         const SizedBox(width: 8),
-        Text(title, style: TextStyle(fontSize: 14, color: AppColors.textPrimary(context))),
+        Flexible(child: Text(title, style: TextStyle(fontSize: 14, color: AppColors.textPrimary(context)))),
       ]),
       subtitle: Text(subtitle, style: TextStyle(fontSize: 11, color: AppColors.textTertiary(context))),
       activeThumbColor: AppColors.primary(context),

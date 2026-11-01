@@ -63,10 +63,11 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
                 shape: BoxShape.circle, color: ShunShiColors.primaryContainer,
               ), child: Icon(Icons.person, color: AppColors.primary(context))),
               const SizedBox(width: 12),
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text('CloudWater', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
-                Text('Account: seasons_2024', style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context))),
-              ]),
+                // was a hard-coded 'Account: seasons_2024' (a made-up id that also overflowed at large text); same wording as the CN app
+                Text('Account details are on the Profile tab', style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context))),
+              ])),
             ]),
           ),
           const SizedBox(height: 16),
@@ -198,7 +199,7 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
       title: Row(children: [
         Icon(icon, color: AppColors.primary(context), size: 18),
         const SizedBox(width: 8),
-        Text(title, style: TextStyle(fontSize: 14, color: AppColors.textPrimary(context))),
+        Flexible(child: Text(title, style: TextStyle(fontSize: 14, color: AppColors.textPrimary(context)))),
       ]),
       subtitle: Text(subtitle, style: TextStyle(fontSize: 11, color: AppColors.textTertiary(context))),
       activeThumbColor: AppColors.primary(context),

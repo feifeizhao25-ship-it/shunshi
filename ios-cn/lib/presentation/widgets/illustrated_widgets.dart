@@ -325,20 +325,22 @@ class PageHeroBanner extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(20),
       child: SizedBox(
-        height: height,
         width: double.infinity,
-        child: Stack(fit: StackFit.expand, children: [
-          const DecoratedBox(decoration: BoxDecoration(color: ShunShiColors.primaryContainer)),
-          Image.asset(asset, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const SizedBox.shrink()),
-          const DecoratedBox(
+        // minHeight, not a fixed height: 200% text grows the banner instead of pushing the title out of it.
+        child: ConstrainedBox(
+        constraints: BoxConstraints(minHeight: height),
+        child: Stack(alignment: Alignment.bottomLeft, children: [
+          const Positioned.fill(child: DecoratedBox(decoration: BoxDecoration(color: ShunShiColors.primaryContainer))),
+          Positioned.fill(child: Image.asset(asset, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const SizedBox.shrink())),
+          const Positioned.fill(child: DecoratedBox(
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter, end: Alignment.bottomCenter,
                 colors: [Color(0x00000000), Color(0xB3000000)], stops: [0.3, 1.0]),
             ),
-          ),
-          Positioned(
-            left: 18, right: 18, bottom: 14,
+          )),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(18, 14, 18, 14),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
               Text(title, style: const TextStyle(
                 fontSize: 22, height: 1.25, color: Colors.white, fontWeight: FontWeight.w600,
@@ -349,6 +351,7 @@ class PageHeroBanner extends StatelessWidget {
             ]),
           ),
         ]),
+        ),
       ),
     );
   }
@@ -425,7 +428,8 @@ class MiniBarChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: height + 24,
+      // the label row grows with the text scale (200% type overflowed the old fixed height + 24)
+      height: height + 8 + 18 * (MediaQuery.textScalerOf(context).scale(14) / 14).clamp(1.0, 2.5),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [

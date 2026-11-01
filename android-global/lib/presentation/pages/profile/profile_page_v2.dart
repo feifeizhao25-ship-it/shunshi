@@ -339,9 +339,9 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
           color: AppColors.textPrimary(context),
         )),
         const SizedBox(height: 2),
-        Text(label, style: TextStyle(
+        FittedBox(fit: BoxFit.scaleDown, child: Text(label, maxLines: 1, style: TextStyle(
           fontSize: 12, color: AppColors.textTertiary(context),
-        )),
+        ))),
       ]),
     );
   }
