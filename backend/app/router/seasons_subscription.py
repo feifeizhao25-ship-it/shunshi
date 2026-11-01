@@ -18,55 +18,17 @@ router = APIRouter(prefix="/api/v1/seasons/subscription", tags=["seasons-subscri
 # In-memory subscription state
 subscriptions_db: dict = {}
 
-TRIAL_DAYS = {"serenity": 7, "harmony": 14, "family": 14}
+from app.seasons_plans import PAID_PLAN_IDS, PLANS, canonical_plan_id
 
-SUBSCRIPTION_PLANS = {
-    "serenity": {
-        "name": "Serenity",
-        "monthly_price": 9.99,
-        "yearly_price": 79.99,
-        "trial_days": 7,
-        "features": [
-            "Unlimited AI conversations",
-            "Full content library",
-            "Audio guides & soundscapes",
-            "Weekly reflection summaries",
-        ],
-    },
-    "harmony": {
-        "name": "Harmony",
-        "monthly_price": 14.99,
-        "yearly_price": 119.99,
-        "trial_days": 14,
-        "intro_offer_price": 0.99,
-        "intro_offer_days": 7,
-        "features": [
-            "Everything in Serenity",
-            "Exclusive Harmony content",
-            "Advanced weekly summaries",
-            "Custom rituals builder",
-        ],
-    },
-    "family": {
-        "name": "Family",
-        "monthly_price": 19.99,
-        "yearly_price": 159.99,
-        "trial_days": 14,
-        "intro_offer_price": 1.99,
-        "intro_offer_days": 7,
-        "features": [
-            "Everything in Harmony",
-            "Up to 4 family members",
-            "Shared family dashboard",
-            "Individual profiles",
-        ],
-    },
-}
+# 年付唯一：Free + Premium + Family（app/seasons_plans.py 是唯一定义）。
+TRIAL_DAYS = {pid: PLANS[pid]["trial_days"] for pid in PAID_PLAN_IDS}
+
+SUBSCRIPTION_PLANS = {pid: PLANS[pid] for pid in PAID_PLAN_IDS}
 
 
 class CheckoutRequest(BaseModel):
     product_id: str
-    billing: str  # "monthly" or "yearly"
+    billing: str = "yearly"  # 年付唯一；传 "monthly" 返回 400
     offer_code: Optional[str] = None
 
 
@@ -99,7 +61,7 @@ async def get_subscription_status(user_id: str = Query(...)):
     sub = subscriptions_db.get(user_id, {})
     
     now = datetime.now()
-    tier = sub.get("tier", "free")
+    tier = canonical_plan_id(sub.get("tier")) or "free"  # 旧 serenity/harmony → premium
     expires_at = sub.get("expires_at")
     trial_ends_at = sub.get("trial_ends_at")
     
@@ -131,16 +93,16 @@ async def start_trial(body: TrialRequest, user_id: str = Query(...)):
 @router.post("/checkout")
 async def create_checkout(body: CheckoutRequest, user_id: str = Query(...)):
     """Create a Stripe checkout session URL"""
-    product_id = body.product_id
+    product_id = canonical_plan_id(body.product_id)
     billing = body.billing
     
     if product_id not in SUBSCRIPTION_PLANS:
         raise HTTPException(status_code=400, detail="Invalid product")
     
-    if billing not in {"monthly", "yearly"}:
-        raise HTTPException(status_code=400, detail="Invalid billing period")
+    if billing != "yearly":
+        raise HTTPException(status_code=400, detail="Only yearly billing is offered")
     secret_key = os.getenv("STRIPE_SECRET_KEY", "").strip()
-    price_id = os.getenv(f"STRIPE_PRICE_{product_id.upper()}_{billing.upper()}", "").strip()
+    price_id = os.getenv(f"STRIPE_PRICE_{product_id.upper()}_YEARLY", "").strip()
     success_url = os.getenv("SEASONS_CHECKOUT_SUCCESS_URL", "").strip()
     cancel_url = os.getenv("SEASONS_CHECKOUT_CANCEL_URL", "").strip()
     if not all((secret_key, price_id, success_url, cancel_url)):
@@ -191,11 +153,12 @@ async def get_products():
         products.append({
             "id": pid,
             "name": plan["name"],
-            "monthly_price": plan["monthly_price"],
             "yearly_price": plan["yearly_price"],
+            "billing": "yearly",
+            "currency": "usd",
             "trial_days": plan.get("trial_days", 0),
-            "has_intro_offer": "intro_offer_price" in plan,
-            "intro_offer_price": plan.get("intro_offer_price"),
+            "has_intro_offer": False,
+            "intro_offer_price": None,
             "features": plan["features"],
         })
     return products
@@ -257,9 +220,7 @@ def _handle_subscription_updated(data: dict):
     metadata = data.get("metadata", {})
     user_id = metadata.get("user_id", customer_id)
 
-    plan_id = metadata.get("plan", "serenity")
-    if plan_id not in SUBSCRIPTION_PLANS:
-        plan_id = "serenity"
+    plan_id = canonical_plan_id(metadata.get("plan")) or "premium"
 
     now = datetime.now(timezone.utc)
 
@@ -271,9 +232,9 @@ def _handle_subscription_updated(data: dict):
                 from datetime import datetime as dt
                 expires_at = dt.fromtimestamp(current_period_end, tz=timezone.utc).isoformat()
             except Exception:
-                expires_at = (now + timedelta(days=30)).isoformat()
+                expires_at = (now + timedelta(days=365)).isoformat()
         else:
-            expires_at = (now + timedelta(days=30)).isoformat()
+            expires_at = (now + timedelta(days=365)).isoformat()
 
         subscriptions_db[user_id] = {
             "tier": plan_id,
@@ -335,9 +296,9 @@ def _handle_invoice_paid(data: dict):
             from datetime import datetime as dt
             expires_at = dt.fromtimestamp(period_end, tz=timezone.utc).isoformat()
         except Exception:
-            expires_at = (now + timedelta(days=30)).isoformat()
+            expires_at = (now + timedelta(days=365)).isoformat()
     else:
-        expires_at = (now + timedelta(days=30)).isoformat()
+        expires_at = (now + timedelta(days=365)).isoformat()
 
     if user_id in subscriptions_db:
         subscriptions_db[user_id]["expires_at"] = expires_at

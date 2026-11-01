@@ -70,7 +70,7 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
 
   /// The store's own localised price when the store has loaded it; otherwise what the
   /// API gave (shown only when it carries a currency) or "Price shown at checkout".
-  String _storeOr(SubscriptionPlan plan, {bool yearly = false}) {
+  String _storeOr(SubscriptionPlan plan, {bool yearly = true}) {
     final fromStore = StorePricing.price(plan.id, yearly: yearly);
     if (fromStore != StorePricing.pending) return fromStore;
     return yearly ? plan.priceYearlyDisplay : plan.priceDisplay;
@@ -78,7 +78,7 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
 
   String _planPriceLine(SubscriptionPlan plan) {
     final price = _storeOr(plan);
-    return price == SubscriptionPlan.pricePending ? price : '$price/${plan.periodName ?? "mo"}';
+    return price == SubscriptionPlan.pricePending ? price : '$price/${plan.periodName ?? "yr"}';
   }
 
   Future<void> _purchase(SubscriptionPlan plan) async {

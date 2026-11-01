@@ -62,8 +62,8 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
         case 'serenity':
           tier = SubscriptionTier.serenity;
           break;
-        case 'harmony':
-          tier = SubscriptionTier.harmony;
+        case 'harmony': // legacy Harmony subscribers are Premium now
+          tier = SubscriptionTier.serenity;
           break;
         case 'family':
           tier = SubscriptionTier.family;
@@ -100,7 +100,7 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
       final productId = _tierToId(tier);
       await _dio.post(
         '/api/v1/stripe/checkout',
-        data: {'product_id': productId, 'billing': 'monthly'},
+        data: {'product_id': productId, 'billing': 'yearly'},
         queryParameters: {'user_id': _userId},
       );
       // Note: Actual activation happens via Stripe webhook
@@ -156,8 +156,8 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
           case 'serenity':
             tier = SubscriptionTier.serenity;
             break;
-          case 'harmony':
-            tier = SubscriptionTier.harmony;
+          case 'harmony': // legacy Harmony subscribers are Premium now
+            tier = SubscriptionTier.serenity;
             break;
           case 'family':
             tier = SubscriptionTier.family;

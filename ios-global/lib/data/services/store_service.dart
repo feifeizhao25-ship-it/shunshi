@@ -20,11 +20,9 @@ class StoreService {
 
   // 国际版产品ID映射
   static const Map<String, String> productIds = {
-    'serenity_monthly': 'com.seasons.serenity.monthly',
+    // Annual-only (2026-11-01 decision): Free + Premium + Family. `serenity_yearly` is the Premium
+    // product (display name "Premium"); monthly and Harmony products are no longer offered.
     'serenity_yearly': 'com.seasons.serenity.yearly',
-    'harmony_monthly': 'com.seasons.harmony.monthly',
-    'harmony_yearly': 'com.seasons.harmony.yearly',
-    'family_monthly': 'com.seasons.family.monthly',
     'family_yearly': 'com.seasons.family.yearly',
   };
 
@@ -32,8 +30,9 @@ class StoreService {
   static const Map<String, String> _productToPlan = {
     'com.seasons.serenity.monthly': 'serenity',
     'com.seasons.serenity.yearly': 'serenity',
-    'com.seasons.harmony.monthly': 'harmony',
-    'com.seasons.harmony.yearly': 'harmony',
+    // Legacy Harmony purchases keep their access as Premium.
+    'com.seasons.harmony.monthly': 'serenity',
+    'com.seasons.harmony.yearly': 'serenity',
     'com.seasons.family.monthly': 'family',
     'com.seasons.family.yearly': 'family',
   };
@@ -162,7 +161,7 @@ class StoreService {
   }
 
   /// 发起购买
-  /// [productId] 内部产品Key（如 'serenity_monthly'）
+  /// [productId] 内部产品Key（如 'serenity_yearly'）
   Future<bool> purchase(String productId) async {
     if (!_available) {
       debugPrint('[StoreService] IAP not available');

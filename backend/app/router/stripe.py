@@ -23,11 +23,10 @@ STRIPE_PUBLISHABLE_KEY = os.getenv("STRIPE_PUBLISHABLE_KEY", "").strip()
 
 # Stripe 价格 ID (需要在 Stripe Dashboard 中创建)
 # 测试模式下创建 Price Objects 后填入
-STRIPE_PRICE_IDS = {
-    "serenity": os.getenv("STRIPE_PRICE_SERENITY", "").strip(),
-    "harmony": os.getenv("STRIPE_PRICE_HARMONY", "").strip(),
-    "family": os.getenv("STRIPE_PRICE_FAMILY", "").strip(),
-}
+# 年付 Price（STRIPE_PRICE_PREMIUM_YEARLY / STRIPE_PRICE_FAMILY_YEARLY；旧月付 Price 不能复用）
+from app.seasons_plans import PLANS as _SEASONS_PLANS, canonical_plan_id, stripe_price_ids
+
+STRIPE_PRICE_IDS = stripe_price_ids()
 
 # 初始化 Stripe SDK (仅在配置了有效 key 时)
 _stripe_configured = bool(STRIPE_SECRET_KEY)
@@ -40,67 +39,8 @@ else:
 
 # ============ 英文版订阅计划 (USD) ============
 
-SUBSCRIPTION_PLANS_EN = {
-    "free": {
-        "id": "free",
-        "name": "Free",
-        "price": 0,
-        "currency": "usd",
-        "period": None,
-        "features": [
-            "5 messages per day",
-            "Basic content library",
-            "Limited reflections",
-            "Daily suggestions",
-        ],
-        "description": "Start your wellness journey",
-    },
-    "serenity": {
-        "id": "serenity",
-        "name": "Serenity",
-        "price": 9.99,
-        "currency": "usd",
-        "period": "month",
-        "features": [
-            "Unlimited AI companion",
-            "All content library",
-            "Seasonal insights",
-            "Unlimited reflections",
-            "Sleep audio & stories",
-        ],
-        "description": "Perfect for personal wellness",
-    },
-    "harmony": {
-        "id": "harmony",
-        "name": "Harmony",
-        "price": 19.99,
-        "currency": "usd",
-        "period": "month",
-        "features": [
-            "Everything in Serenity",
-            "Family features",
-            "Priority support",
-            "Weekly AI insights",
-            "Advanced seasonal programs",
-        ],
-        "description": "Enhanced wellness with family care",
-    },
-    "family": {
-        "id": "family",
-        "name": "Family",
-        "price": 29.99,
-        "currency": "usd",
-        "period": "month",
-        "features": [
-            "Everything in Harmony",
-            "Up to 5 family members",
-            "Shared family insights",
-            "Family wellness plans",
-            "Dedicated support",
-        ],
-        "description": "Wellness for the whole family",
-    },
-}
+# 唯一定义在 app/seasons_plans.py：Free + Premium + Family，年付唯一（2026-11-01 决定）。
+SUBSCRIPTION_PLANS_EN = _SEASONS_PLANS
 
 # ============ Models ============
 
@@ -116,7 +56,7 @@ class CreateCheckoutRequest(BaseModel):
 
 def _get_plan_or_404(plan_id: str) -> dict:
     """获取英文版计划，不存在则 404"""
-    plan = SUBSCRIPTION_PLANS_EN.get(plan_id)
+    plan = SUBSCRIPTION_PLANS_EN.get(canonical_plan_id(plan_id) or "")
     if not plan:
         raise HTTPException(status_code=400, detail=f"Plan '{plan_id}' not found")
     return plan
@@ -143,7 +83,7 @@ def _activate_subscription(user_id: str, plan_id: str, stripe_customer_id: Optio
     from app.database.db import close_test_connection
     try:
         now = datetime.now().isoformat()
-        expires_at = (datetime.now() + timedelta(days=30)).isoformat()
+        expires_at = (datetime.now() + timedelta(days=365)).isoformat()  # 年付唯一
         db.execute("""
             UPDATE users SET subscription_plan = ?, is_premium = 1,
                 subscription_expires_at = ?, updated_at = ? WHERE id = ?
@@ -154,7 +94,8 @@ def _activate_subscription(user_id: str, plan_id: str, stripe_customer_id: Optio
             (id, user_id, plan, status, started_at, expires_at, auto_renew, platform, subscribed_at)
             VALUES (?, ?, ?, 'active', ?, ?, 1, 'stripe', ?)
         """, (sub_id, user_id, plan_id, now, expires_at, now))
-        plan = SUBSCRIPTION_PLANS_EN.get(plan_id, SUBSCRIPTION_PLANS_EN["serenity"])
+        plan_id = canonical_plan_id(plan_id) or "premium"
+        plan = SUBSCRIPTION_PLANS_EN[plan_id]
         db.execute("""
             INSERT INTO purchase_history
             (id, user_id, plan, price, platform, receipt, subscribed_at)
@@ -225,7 +166,7 @@ async def create_checkout_session(request: CreateCheckoutRequest):
     if plan["price"] == 0:
         raise HTTPException(status_code=400, detail="Free plan does not require checkout")
 
-    price_id = STRIPE_PRICE_IDS.get(request.plan_id)
+    price_id = STRIPE_PRICE_IDS.get(canonical_plan_id(request.plan_id) or "")
     if not _stripe_configured or not price_id:
         logger.error("[Stripe] Checkout 配置不完整: plan=%s", request.plan_id)
         raise HTTPException(status_code=503, detail="Stripe checkout is not configured")
@@ -324,7 +265,7 @@ async def stripe_webhook(request: Request):
         if event_type == "checkout.session.completed":
             # 支付成功 - 激活订阅
             user_id = data.get("metadata", {}).get("user_id", "")
-            plan_id = data.get("metadata", {}).get("plan_id", "serenity")
+            plan_id = canonical_plan_id(data.get("metadata", {}).get("plan_id")) or "premium"
             customer_id = data.get("customer")
             subscription_id = data.get("subscription")
 
@@ -344,7 +285,7 @@ async def stripe_webhook(request: Request):
         elif event_type == "customer.subscription.updated":
             # 订阅变更 (升级/降级)
             user_id = data.get("metadata", {}).get("user_id", "")
-            new_plan_id = data.get("metadata", {}).get("plan_id", "")
+            new_plan_id = canonical_plan_id(data.get("metadata", {}).get("plan_id")) or ""
             status = data.get("status")
 
             if user_id and new_plan_id and status == "active":

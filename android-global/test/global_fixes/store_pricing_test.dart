@@ -15,12 +15,18 @@ void main() {
     }
   });
 
+  test('annual-only: exactly Free + Premium + Family are offered', () {
+    expect(SubscriptionProducts.plans.map((p) => p.id).toList(), ['free', 'serenity', 'family']);
+    expect(SubscriptionProducts.plans.where((p) => p.id != 'free').every((p) => p.period == 'year'), isTrue);
+  });
+
   test('store price is used verbatim, in the store currency', () {
-    StorePricing.lookup = (id) => id == 'serenity_monthly'
+    StorePricing.lookup = (id) => id == 'serenity_yearly'
         ? ProductDetails(id: id, title: 't', description: '', price: 'CA\$11.99', rawPrice: 11.99, currencyCode: 'CAD')
         : null;
     expect(StorePricing.price('serenity'), 'CA\$11.99');
-    expect(StorePricing.price('harmony'), StorePricing.pending);
+    expect(StorePricing.price('harmony'), StorePricing.pending); // Harmony is folded into Premium: no store product
+    expect(StorePricing.price('family'), StorePricing.pending);
     expect(StorePricing.price('unknown'), StorePricing.pending);
   });
 }

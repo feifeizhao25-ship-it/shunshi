@@ -15,13 +15,14 @@ class StorePricing {
   static const pending = 'Price shown at checkout';
 
   /// Test hook: replace to supply product details without a store connection.
-  /// The argument is the StoreService.productIds key, for example `serenity_monthly`.
+  /// The argument is the StoreService.productIds key, for example `serenity_yearly`.
   static ProductDetails? Function(String productId) lookup =
       (id) => StoreService().getProductDetails(id);
 
   /// Store-localised price string (for example "£8.99" or "¥1,200"), or [pending].
-  static String price(String planId, {bool yearly = false}) {
-    final key = '${planId}_${yearly ? 'yearly' : 'monthly'}';
+  static String price(String planId, {bool yearly = true}) {
+    // Annual-only: the monthly store products no longer exist, so every price is the yearly one.
+    final key = '${planId}_yearly';
     if (!StoreService.productIds.containsKey(key)) return pending;
     final p = lookup(key);
     final text = p?.price;
