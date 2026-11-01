@@ -8,6 +8,10 @@ const _kGreen = Color(0xFF144227);
 const _kGold = Color(0xFFE4C285);
 const _kTextDim = Color(0xFF5E6B62);
 
+/// Theme-aware variants of the two fixed text colours (the fixed ones are unreadable on the dark surface: 1.3:1).
+Color _green(BuildContext c) => Theme.of(c).brightness == Brightness.dark ? const Color(0xFFA9D3B2) : _kGreen;
+Color _dim(BuildContext c) => Theme.of(c).brightness == Brightness.dark ? const Color(0xFFB4C1B8) : _kTextDim;
+
 Widget _sgImg(String asset, {double? w, double? h, BoxFit fit = BoxFit.cover}) => Image.asset(
       asset,
       width: w,
@@ -143,9 +147,9 @@ class SgEmptyState extends StatelessWidget {
       child: Column(mainAxisSize: MainAxisSize.min, children: [
         ClipRRect(borderRadius: BorderRadius.circular(18), child: _sgImg(asset, w: 240, h: 150)),
         const SizedBox(height: 12),
-        Text(title, textAlign: TextAlign.center, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: _kGreen)),
+        Text(title, textAlign: TextAlign.center, style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: _green(context))),
         const SizedBox(height: 4),
-        Text(message, textAlign: TextAlign.center, style: const TextStyle(fontSize: 14, height: 1.5, color: _kTextDim)),
+        Text(message, textAlign: TextAlign.center, style: TextStyle(fontSize: 14, height: 1.5, color: _dim(context))),
       ]),
     );
   }
@@ -162,12 +166,12 @@ class SgStatChip extends StatelessWidget {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 6),
-        decoration: BoxDecoration(color: AppColors.card(context), borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0xFFE6E1D2))),
+        decoration: BoxDecoration(color: AppColors.card(context), borderRadius: BorderRadius.circular(16), border: Border.all(color: AppColors.border(context))),
         child: Column(children: [
-          Icon(icon, size: 20, color: _kGreen),
+          Icon(icon, size: 20, color: _green(context)),
           const SizedBox(height: 4),
-          Text(value, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: _kGreen)),
-          FittedBox(fit: BoxFit.scaleDown, child: Text(label, maxLines: 1, style: const TextStyle(fontSize: 12, color: _kTextDim))),
+          Text(value, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: _green(context))),
+          FittedBox(fit: BoxFit.scaleDown, child: Text(label, maxLines: 1, style: TextStyle(fontSize: 12, color: _dim(context)))),
         ]),
       ),
     );
@@ -189,17 +193,17 @@ class SgMoodBars extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 5),
               child: Column(mainAxisAlignment: MainAxisAlignment.end, children: [
-                Text('${e.$2}', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: _kGreen)),
+                Text('${e.$2}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: _green(context))),
                 const SizedBox(height: 2),
                 Container(
                   height: 14.0 + 16.0 * e.$2.clamp(1, 5),
                   decoration: BoxDecoration(
-                    color: _kGreen.withValues(alpha: 0.25 + 0.15 * e.$2.clamp(1, 5)),
+                    color: _green(context).withValues(alpha: 0.25 + 0.15 * e.$2.clamp(1, 5)),
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
                 const SizedBox(height: 4),
-                Text(e.$1, style: const TextStyle(fontSize: 11, color: _kTextDim)),
+                Text(e.$1, style: TextStyle(fontSize: 11, color: _dim(context))),
               ]),
             ),
           ),
