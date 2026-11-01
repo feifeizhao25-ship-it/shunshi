@@ -10,7 +10,7 @@ Map<String, dynamic> usage({Object? resetsAt}) => {
       'active': false,
       'expires_at': null,
       if (resetsAt != null) 'resets_at': resetsAt,
-      'reset_note': 'Daily limits reset at 00:00 Beijing time (16:00 UTC).',
+      'reset_note': 'Daily limits reset once a day. See resets_at for the exact moment in your own time zone.',
       'items': [
         {'key': 'audio_minutes', 'limit': 30, 'unlimited': false, 'used': 12, 'used_known': true, 'remaining': 18, 'unit': 'minutes'},
       ],
@@ -62,6 +62,6 @@ void main() {
   testWidgets('without a reset instant the server note is still shown', (t) async {
     await t.pumpWidget(MaterialApp(home: PlanUsagePage(load: () async => usage())));
     await t.pumpAndSettle();
-    expect(allText(t), contains('Daily limits reset at 00:00 Beijing time'));
+    expect(allText(t), contains('Daily limits reset once a day'));
   });
 }

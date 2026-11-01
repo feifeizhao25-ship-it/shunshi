@@ -10,7 +10,7 @@ Map<String, dynamic> usage({bool active = false, int? chatUsed = 4, bool chatKno
       'plan_name': active ? (zh ? '会员' : 'Member') : (zh ? '免费版' : 'Free'),
       'active': active,
       'expires_at': active ? 1798675200 : null,
-      'reset_note': zh ? '每日额度于北京时间零点重置。' : 'Daily limits reset at 00:00 Beijing time (16:00 UTC).',
+      'reset_note': zh ? '每日额度于北京时间零点重置。' : 'Daily limits reset once a day. See resets_at for the exact moment in your own time zone.',
       'items': [
         {'key': 'chat_messages', 'limit': 20, 'unlimited': false, 'used': chatUsed, 'used_known': chatKnown, 'remaining': chatKnown && chatUsed != null ? 20 - chatUsed : null, 'unit': 'messages'},
         {'key': 'reflections', 'limit': unlimitedReflections ? null : 3, 'unlimited': unlimitedReflections, 'used': 1, 'used_known': true, 'remaining': unlimitedReflections ? null : 2, 'unit': 'entries'},

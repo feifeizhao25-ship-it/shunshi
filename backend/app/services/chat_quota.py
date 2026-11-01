@@ -42,7 +42,7 @@ def keys_for(user_id: str, now: datetime | None = None):
 MESSAGES = {
     "unavailable": ("对话额度服务暂不可用，请稍后重试", "The chat quota service is temporarily unavailable. Please try again shortly."),
     "misconfigured": ("对话额度配置异常，请稍后重试", "The chat quota is misconfigured. Please try again later."),
-    "exhausted": ("今日对话次数已达上限，将于北京时间零点重置", "You have used today's chat messages. The limit resets at 00:00 Beijing time (16:00 UTC)."),
+    "exhausted": ("今日对话次数已达上限，将于北京时间零点重置", "You have used today's chat messages. The limit resets once a day; Plan & usage shows when, in your own time zone."),
 }
 
 
