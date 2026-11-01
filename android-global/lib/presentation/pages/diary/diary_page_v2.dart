@@ -12,6 +12,8 @@ import '../../widgets/seasons_visual.dart';
 import '../../../core/theme/app_localizations.dart';
 import '../../../core/network/api_singleton.dart';
 import '../../../data/network/session.dart';
+import '../../../data/network/journal_payload.dart';
+import 'journal_score_row.dart';
 
 class DiaryPageV2 extends StatefulWidget {
   const DiaryPageV2({super.key});
@@ -26,6 +28,9 @@ class _DiaryPageV2State extends State<DiaryPageV2> {
   final _noteController = TextEditingController();
   
   String _selectedMood = 'Calm';
+  // 后端要求精力、睡眠质量各是 1–5 分；和心情一样默认选中「3 一般」，用户可改。
+  int _energy = 3;
+  int _sleepQuality = 3;
   String _sleepTime = '22:45';
   String _wakeTime = '06:30';
   bool _teaDone = false;
@@ -82,18 +87,13 @@ class _DiaryPageV2State extends State<DiaryPageV2> {
     if (_saving) return;
     setState(() => _saving = true);
     try {
-      await _dio.post('/api/v1/journal/entry', data: {
-        ...userIdParam(),
-        'mood': _selectedMood,
-        'sleep_time': _sleepTime,
-        'wake_time': _wakeTime,
-        'note': _noteController.text.trim(),
-        'rituals': {
-          'tea': _teaDone,
-          'meditation': _meditationDone,
-          'exercise': _exerciseDone,
-        },
-      });
+      await _dio.post('/api/v1/journal/entry', data: journalEntryBody(
+        moodLabel: _selectedMood,
+        energy: _energy,
+        sleepQuality: _sleepQuality,
+        notes: _noteController.text,
+        tags: [if (_teaDone) 'Tea', if (_meditationDone) 'Meditation', if (_exerciseDone) 'Exercise'],
+      ));
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(AppLocalizations.of(context).t('diary_diary_saved')), backgroundColor: ShunShiColors.primary),
@@ -163,6 +163,8 @@ class _DiaryPageV2State extends State<DiaryPageV2> {
                       const SizedBox(width: 16),
                       Expanded(child: _buildTimeInput('Wake time', _wakeTime, (v) => setState(() => _wakeTime = v))),
                     ]),
+                    const SizedBox(height: 16),
+                    JournalScoreRow(label: 'Sleep quality', value: _sleepQuality, onChanged: (v) => setState(() => _sleepQuality = v), activeColor: ShunShiColors.primary, textColor: ShunShiColors.textPrimary, lowHint: '1 poor', highHint: '5 great'),
                   ]),
                 ),
               ),
@@ -198,6 +200,8 @@ class _DiaryPageV2State extends State<DiaryPageV2> {
                         ]),
                       ),
                     )).toList()),
+                    const SizedBox(height: 16),
+                    JournalScoreRow(label: 'Energy', value: _energy, onChanged: (v) => setState(() => _energy = v), activeColor: ShunShiColors.primary, textColor: ShunShiColors.textPrimary, lowHint: '1 drained', highHint: '5 energised'),
                   ]),
                 ),
               ),
@@ -317,13 +321,13 @@ class _DiaryPageV2State extends State<DiaryPageV2> {
                       padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(12)),
                       child: Row(children: [
-                        Icon(_moodIcons[e['mood']] ?? Icons.sentiment_neutral, color: ShunShiColors.primary, size: 20),
+                        Icon(_moodIcons[moodLabelOfEntry(e, zh: false)] ?? Icons.sentiment_neutral, color: ShunShiColors.primary, size: 20),
                         const SizedBox(width: 10),
                         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                          Text(e['mood']?.toString() ?? '', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: ShunShiColors.textPrimary)),
-                          Text(e['created_at']?.toString().substring(5, 10) ?? '', style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
+                          Text(moodLabelOfEntry(e, zh: false) ?? '', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: ShunShiColors.textPrimary)),
+                          Text(journalEntryDateLabel(e), style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
                         ])),
-                        if (e['note'] != null) Icon(Icons.notes, color: ShunShiColors.textTertiary, size: 16),
+                        if (journalEntryHasNotes(e)) Icon(Icons.notes, color: ShunShiColors.textTertiary, size: 16),
                       ]),
                     ),
                   );
