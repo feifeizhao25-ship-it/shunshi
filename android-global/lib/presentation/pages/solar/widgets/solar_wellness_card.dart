@@ -2,6 +2,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../../../design_system/app_colors.dart';
 import '../../../../design_system/theme.dart';
 import 'package:go_router/go_router.dart';
 import 'package:dio/dio.dart';
@@ -62,7 +63,7 @@ class _SolarWellnessCardState extends State<SolarWellnessCard> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: ShunShiColors.primary.withValues(alpha: 0.08),
+            color: AppColors.primary(context).withValues(alpha: 0.08),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -77,7 +78,7 @@ class _SolarWellnessCardState extends State<SolarWellnessCard> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                 decoration: BoxDecoration(
-                  color: ShunShiColors.primary,
+                  color: AppColors.primary(context),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
@@ -111,8 +112,8 @@ class _SolarWellnessCardState extends State<SolarWellnessCard> {
           // Wellness原则
           Text(
             solar['principle'] ?? '',
-            style: const TextStyle(
-              color: ShunShiColors.primary,
+            style: TextStyle(
+              color: AppColors.primary(context),
               fontSize: 15,
               fontWeight: FontWeight.w600,
             ),
@@ -136,13 +137,13 @@ class _SolarWellnessCardState extends State<SolarWellnessCard> {
               children: dietList.map((item) => Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
                 decoration: BoxDecoration(
-                  color: ShunShiColors.primary.withValues(alpha: 0.06),
+                  color: AppColors.primary(context).withValues(alpha: 0.06),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
                   item,
                   style: TextStyle(
-                    color: ShunShiColors.primary.withValues(alpha: 0.8),
+                    color: AppColors.primary(context).withValues(alpha: 0.8),
                     fontSize: 12,
                   ),
                 ),
@@ -166,8 +167,8 @@ class _SolarWellnessCardState extends State<SolarWellnessCard> {
             alignment: Alignment.centerRight,
             child: TextButton.icon(
               onPressed: () => context.push('/solar-wellness'),
-              icon: Icon(Icons.arrow_forward, size: 16, color: ShunShiColors.primary),
-              label: Text(AppLocalizations.of(context).t('solar_view_details'), style: TextStyle(color: ShunShiColors.primary, fontSize: 13)),
+              icon: Icon(Icons.arrow_forward, size: 16, color: AppColors.primary(context)),
+              label: Text(AppLocalizations.of(context).t('solar_view_details'), style: TextStyle(color: AppColors.primary(context), fontSize: 13)),
               style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4)),
             ),
           ),

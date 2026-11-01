@@ -1,4 +1,5 @@
 import '../../../core/router/safe_pop.dart';
+import '../../../design_system/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import '../../../design_system/theme.dart';
@@ -74,20 +75,20 @@ class WellnessCategoryPage extends StatelessWidget {
 
   void _showDetail(BuildContext context, _Item item) {
     showDialog(context: context, builder: (_) => AlertDialog(
-      backgroundColor: ShunShiColors.surface,
-      title: Text(item.name, style: const TextStyle(fontFamily: ShunShiTypography.serifFamily, color: ShunShiColors.textPrimary)),
+      backgroundColor: AppColors.surface(context),
+      title: Text(item.name, style: TextStyle(fontFamily: ShunShiTypography.serifFamily, color: AppColors.textPrimary(context))),
       content: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(item.desc, style: const TextStyle(fontSize: 14, color: ShunShiColors.textSecondary, height: 1.6)),
+        Text(item.desc, style: TextStyle(fontSize: 14, color: AppColors.textSecondary(context), height: 1.6)),
         const SizedBox(height: 12),
-        Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: ShunShiColors.primary.withValues(alpha: 0.06), borderRadius: BorderRadius.circular(10)),
+        Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: AppColors.primary(context).withValues(alpha: 0.06), borderRadius: BorderRadius.circular(10)),
           child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Icon(Icons.tips_and_updates_outlined, size: 18, color: ShunShiColors.primary),
+            Icon(Icons.tips_and_updates_outlined, size: 18, color: AppColors.primary(context)),
             const SizedBox(width: 8),
-            Expanded(child: Text(item.tip, style: TextStyle(fontSize: 13, color: ShunShiColors.primary, height: 1.5))),
+            Expanded(child: Text(item.tip, style: TextStyle(fontSize: 13, color: AppColors.primary(context), height: 1.5))),
           ]),
         ),
       ]),
-      actions: [TextButton(onPressed: () => Navigator.pop(context), child: Text(AppLocalizations.of(context).t('wellness_got_it'), style: TextStyle(color: ShunShiColors.primary)))],
+      actions: [TextButton(onPressed: () => Navigator.pop(context), child: Text(AppLocalizations.of(context).t('wellness_got_it'), style: TextStyle(color: AppColors.primary(context))))],
     ));
   }
 
@@ -96,7 +97,7 @@ class WellnessCategoryPage extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final meta = _categoryMeta[type] ?? _categoryMeta['food_therapy']!;
     final items = _items[type] ?? [];
-    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : ShunShiColors.background,
+    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : AppColors.background(context),
       appBar: AppBar(
         title: Text(meta.title, style: const TextStyle(fontFamily: ShunShiTypography.serifFamily)),
         elevation: 0,
@@ -109,7 +110,7 @@ class WellnessCategoryPage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
-            child: Text(meta.subtitle, style: const TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 14, color: ShunShiColors.textTertiary)),
+            child: Text(meta.subtitle, style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 14, color: AppColors.textTertiary(context))),
           ),
           Expanded(child: ListView.builder(
             padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -122,19 +123,19 @@ class WellnessCategoryPage extends StatelessWidget {
                   onTap: () => _showDetail(context, item),
                   child: Container(
                     padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(14), border: Border.all(color: ShunShiColors.border)),
+                    decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(14), border: Border.all(color: AppColors.border(context))),
                     child: Row(children: [
                       item.image != null
                           ? ClipRRect(borderRadius: BorderRadius.circular(12), child: Image.asset(item.image!, width: 44, height: 44, fit: BoxFit.cover))
-                          : Container(width: 44, height: 44, decoration: BoxDecoration(color: ShunShiColors.primary.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(12)),
-                              child: Icon(meta.icon, size: 22, color: ShunShiColors.primary)),
+                          : Container(width: 44, height: 44, decoration: BoxDecoration(color: AppColors.primary(context).withValues(alpha: 0.08), borderRadius: BorderRadius.circular(12)),
+                              child: Icon(meta.icon, size: 22, color: AppColors.primary(context))),
                       const SizedBox(width: 14),
                       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Text(item.name, style: const TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 15, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+                        Text(item.name, style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 15, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
                         const SizedBox(height: 4),
-                        Text(item.desc, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 13, color: ShunShiColors.textTertiary, height: 1.4)),
+                        Text(item.desc, maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 13, color: AppColors.textTertiary(context), height: 1.4)),
                       ])),
-                      Icon(Icons.chevron_right, color: ShunShiColors.textDisabled, size: 20),
+                      Icon(Icons.chevron_right, color: AppColors.textDisabled(context), size: 20),
                     ]),
                   ),
                 ),

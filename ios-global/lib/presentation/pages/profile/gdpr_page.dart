@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../design_system/theme.dart';
 
@@ -8,9 +9,9 @@ class GdprPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       appBar: AppBar(
-        backgroundColor: ShunShiColors.background,
+        backgroundColor: AppColors.background(context),
         elevation: 0,
         title: Text(
           'GDPR Privacy Policy',
@@ -18,11 +19,11 @@ class GdprPage extends StatelessWidget {
             fontFamily: ShunShiTypography.serifFamily,
             fontSize: 18,
             fontWeight: FontWeight.w600,
-            color: ShunShiColors.primary,
+            color: AppColors.primary(context),
           ),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: ShunShiColors.primary),
+          icon: Icon(Icons.arrow_back, color: AppColors.primary(context)),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -69,7 +70,7 @@ class GdprPage extends StatelessWidget {
             style: TextStyle(
               fontFamily: ShunShiTypography.serifFamily,
               fontSize: 13,
-              color: ShunShiColors.textTertiary,
+              color: AppColors.textTertiary(context),
               fontStyle: FontStyle.italic,
             ),
           ),
@@ -159,11 +160,11 @@ class GdprPage extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       child: OutlinedButton.icon(
-        icon: const Icon(Icons.delete_forever, size: 18),
+        icon: Icon(Icons.delete_forever, size: 18),
         label: const Text('Delete All My Data'),
         style: OutlinedButton.styleFrom(
           foregroundColor: Colors.red,
-          side: const BorderSide(color: Colors.red),
+          side: BorderSide(color: Colors.red),
           padding: const EdgeInsets.symmetric(vertical: 14),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
@@ -193,7 +194,7 @@ class GdprPage extends StatelessWidget {
                 );
               }
             },
-            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            child: Text('Delete', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),

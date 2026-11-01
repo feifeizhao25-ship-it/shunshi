@@ -3,6 +3,7 @@
 library;
 
 import '../../../core/solar_term/solar_term_en.dart';
+import '../../../design_system/app_colors.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import '../../../core/theme/shunshi_colors.dart';
@@ -96,7 +97,7 @@ class _DiaryPageV2State extends State<DiaryPageV2> {
       ));
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context).t('diary_diary_saved')), backgroundColor: ShunShiColors.primary),
+          SnackBar(content: Text(AppLocalizations.of(context).t('diary_diary_saved')), backgroundColor: AppColors.primary(context)),
         );
         _noteController.clear();
         _fetchEntries();
@@ -121,10 +122,10 @@ class _DiaryPageV2State extends State<DiaryPageV2> {
     return Scaffold(
 
     
-      appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),backgroundColor: isDark ? ShunshiDarkColors.background : ShunShiColors.background,
+      appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),backgroundColor: isDark ? ShunshiDarkColors.background : AppColors.background(context),
       body: RefreshIndicator(
         onRefresh: _fetchEntries,
-        color: ShunShiColors.primary,
+        color: AppColors.primary(context),
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
           slivers: [
@@ -150,12 +151,12 @@ class _DiaryPageV2State extends State<DiaryPageV2> {
                 padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
                 child: Container(
                   padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(16)),
+                  decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(16)),
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Row(children: [
-                      Icon(Icons.bedtime, color: ShunShiColors.primary, size: 20),
+                      Icon(Icons.bedtime, color: AppColors.primary(context), size: 20),
                       const SizedBox(width: 8),
-                      Text(AppLocalizations.of(context).t('diary_sleep_quality'), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+                      Text(AppLocalizations.of(context).t('diary_sleep_quality'), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
                     ]),
                     const SizedBox(height: 16),
                     Row(children: [
@@ -164,7 +165,7 @@ class _DiaryPageV2State extends State<DiaryPageV2> {
                       Expanded(child: _buildTimeInput('Wake time', _wakeTime, (v) => setState(() => _wakeTime = v))),
                     ]),
                     const SizedBox(height: 16),
-                    JournalScoreRow(label: 'Sleep quality', value: _sleepQuality, onChanged: (v) => setState(() => _sleepQuality = v), activeColor: ShunShiColors.primary, textColor: ShunShiColors.textPrimary, lowHint: '1 poor', highHint: '5 great'),
+                    JournalScoreRow(label: 'Sleep quality', value: _sleepQuality, onChanged: (v) => setState(() => _sleepQuality = v), activeColor: AppColors.primary(context), textColor: AppColors.textPrimary(context), lowHint: '1 poor', highHint: '5 great'),
                   ]),
                 ),
               ),
@@ -176,12 +177,12 @@ class _DiaryPageV2State extends State<DiaryPageV2> {
                 padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
                 child: Container(
                   padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(16)),
+                  decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(16)),
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Row(children: [
-                      Icon(Icons.self_improvement, color: ShunShiColors.primary, size: 20),
+                      Icon(Icons.self_improvement, color: AppColors.primary(context), size: 20),
                       const SizedBox(width: 8),
-                      Text(AppLocalizations.of(context).t('diary_mood_map'), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+                      Text(AppLocalizations.of(context).t('diary_mood_map'), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
                     ]),
                     const SizedBox(height: 14),
                     Wrap(spacing: 8, runSpacing: 8, children: _moods.map((m) => GestureDetector(
@@ -189,19 +190,19 @@ class _DiaryPageV2State extends State<DiaryPageV2> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                         decoration: BoxDecoration(
-                          color: _selectedMood == m ? ShunShiColors.primary.withOpacity(0.1) : ShunShiColors.surfaceContainerLow,
+                          color: _selectedMood == m ? AppColors.primary(context).withOpacity(0.1) : AppColors.surfaceContainerLow(context),
                           borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: _selectedMood == m ? ShunShiColors.primary : Colors.transparent),
+                          border: Border.all(color: _selectedMood == m ? AppColors.primary(context) : Colors.transparent),
                         ),
                         child: Row(mainAxisSize: MainAxisSize.min, children: [
-                          Icon(_moodIcons[m] ?? Icons.sentiment_neutral, size: 16, color: _selectedMood == m ? ShunShiColors.primary : ShunShiColors.textTertiary),
+                          Icon(_moodIcons[m] ?? Icons.sentiment_neutral, size: 16, color: _selectedMood == m ? AppColors.primary(context) : AppColors.textTertiary(context)),
                           const SizedBox(width: 4),
-                          Text(m, style: TextStyle(fontSize: 13, color: _selectedMood == m ? ShunShiColors.primary : ShunShiColors.textTertiary, fontWeight: FontWeight.w500)),
+                          Text(m, style: TextStyle(fontSize: 13, color: _selectedMood == m ? AppColors.primary(context) : AppColors.textTertiary(context), fontWeight: FontWeight.w500)),
                         ]),
                       ),
                     )).toList()),
                     const SizedBox(height: 16),
-                    JournalScoreRow(label: 'Energy', value: _energy, onChanged: (v) => setState(() => _energy = v), activeColor: ShunShiColors.primary, textColor: ShunShiColors.textPrimary, lowHint: '1 drained', highHint: '5 energised'),
+                    JournalScoreRow(label: 'Energy', value: _energy, onChanged: (v) => setState(() => _energy = v), activeColor: AppColors.primary(context), textColor: AppColors.textPrimary(context), lowHint: '1 drained', highHint: '5 energised'),
                   ]),
                 ),
               ),
@@ -213,12 +214,12 @@ class _DiaryPageV2State extends State<DiaryPageV2> {
                 padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
                 child: Container(
                   padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(16)),
+                  decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(16)),
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Row(children: [
-                      Icon(Icons.done_all, color: ShunShiColors.primary, size: 20),
+                      Icon(Icons.done_all, color: AppColors.primary(context), size: 20),
                       const SizedBox(width: 8),
-                      Text(AppLocalizations.of(context).t('diary_daily_rituals'), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+                      Text(AppLocalizations.of(context).t('diary_daily_rituals'), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
                     ]),
                     const SizedBox(height: 14),
                     _buildRitualCheck('assets/images/wellness/tea_chamomile.jpg', 'Tea', 'Something warm and unhurried', _teaDone, (v) => setState(() => _teaDone = v)),
@@ -235,16 +236,16 @@ class _DiaryPageV2State extends State<DiaryPageV2> {
                 padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
                 child: Container(
                   padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(14)),
+                  decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(14)),
                   child: TextField(
                     controller: _noteController,
                     maxLines: 3,
                     decoration: InputDecoration(
                       hintText: AppLocalizations.of(context).t('diary_how_does_your_body_feel'),
-                      hintStyle: TextStyle(color: ShunShiColors.textTertiary, fontSize: 14),
+                      hintStyle: TextStyle(color: AppColors.textTertiary(context), fontSize: 14),
                       border: InputBorder.none,
                     ),
-                    style: TextStyle(fontSize: 14, color: ShunShiColors.textPrimary),
+                    style: TextStyle(fontSize: 14, color: AppColors.textPrimary(context)),
                   ),
                 ),
               ),
@@ -259,7 +260,7 @@ class _DiaryPageV2State extends State<DiaryPageV2> {
                   child: ElevatedButton(
                     onPressed: _saving ? null : _saveEntry,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: ShunShiColors.primary,
+                      backgroundColor: AppColors.primary(context),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
                     child: _saving
@@ -309,7 +310,7 @@ class _DiaryPageV2State extends State<DiaryPageV2> {
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(24, 20, 24, 8),
-                  child: Text(AppLocalizations.of(context).t('diary_recent_entries'), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+                  child: Text(AppLocalizations.of(context).t('diary_recent_entries'), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
                 ),
               ),
               SliverList(
@@ -319,15 +320,15 @@ class _DiaryPageV2State extends State<DiaryPageV2> {
                     padding: const EdgeInsets.fromLTRB(24, 0, 24, 8),
                     child: Container(
                       padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(12)),
+                      decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(12)),
                       child: Row(children: [
-                        Icon(_moodIcons[moodLabelOfEntry(e, zh: false)] ?? Icons.sentiment_neutral, color: ShunShiColors.primary, size: 20),
+                        Icon(_moodIcons[moodLabelOfEntry(e, zh: false)] ?? Icons.sentiment_neutral, color: AppColors.primary(context), size: 20),
                         const SizedBox(width: 10),
                         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                          Text(moodLabelOfEntry(e, zh: false) ?? '', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: ShunShiColors.textPrimary)),
-                          Text(journalEntryDateLabel(e), style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
+                          Text(moodLabelOfEntry(e, zh: false) ?? '', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.textPrimary(context))),
+                          Text(journalEntryDateLabel(e), style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context))),
                         ])),
-                        if (journalEntryHasNotes(e)) Icon(Icons.notes, color: ShunShiColors.textTertiary, size: 16),
+                        if (journalEntryHasNotes(e)) Icon(Icons.notes, color: AppColors.textTertiary(context), size: 16),
                       ]),
                     ),
                   );
@@ -345,9 +346,9 @@ class _DiaryPageV2State extends State<DiaryPageV2> {
   Widget _buildTimeInput(String label, String value, ValueChanged<String> onChanged) {
     return Container(
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: ShunShiColors.surfaceContainerLow, borderRadius: BorderRadius.circular(12)),
+      decoration: BoxDecoration(color: AppColors.surfaceContainerLow(context), borderRadius: BorderRadius.circular(12)),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(label, style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
+        Text(label, style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context))),
         const SizedBox(height: 4),
         GestureDetector(
           onTap: () async {
@@ -356,7 +357,7 @@ class _DiaryPageV2State extends State<DiaryPageV2> {
               initialTime: TimeOfDay(hour: int.tryParse(parts[0]) ?? 22, minute: int.tryParse(parts[1]) ?? 0));
             if (time != null) onChanged('${time.hour.toString().padLeft(2,'0')}:${time.minute.toString().padLeft(2,'0')}');
           },
-          child: Text(value, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: ShunShiColors.textPrimary)),
+          child: Text(value, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textPrimary(context))),
         ),
       ]),
     );
@@ -372,16 +373,16 @@ class _DiaryPageV2State extends State<DiaryPageV2> {
           const SizedBox(width: 12),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(label, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
-              Text(hint, style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
+              Text(label, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
+              Text(hint, style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context))),
             ]),
           ),
           Container(
             width: 22, height: 22,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: done ? ShunShiColors.primary : Colors.transparent,
-              border: Border.all(color: done ? ShunShiColors.primary : ShunShiColors.borderGhost),
+              color: done ? AppColors.primary(context) : Colors.transparent,
+              border: Border.all(color: done ? AppColors.primary(context) : AppColors.borderGhost(context)),
             ),
             child: done ? Icon(Icons.check, size: 14, color: Colors.white) : null,
           ),

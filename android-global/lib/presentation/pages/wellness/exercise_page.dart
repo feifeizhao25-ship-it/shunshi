@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import '../../../design_system/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_localizations.dart';
 import '../../../data/network/api_client.dart';
@@ -202,7 +203,7 @@ class _ExercisePageState extends State<ExercisePage> {
               Wrap(
                 spacing: 8,
                 children: [
-                  _buildTag(exercise['duration'] ?? '', ShunShiColors.borderGhost!),
+                  _buildTag(exercise['duration'] ?? '', AppColors.borderGhost(context)!),
                   _buildTag(exercise['difficulty'] ?? '', Colors.green[100]!),
                   _buildTag(exercise['category'] ?? '', Colors.orange[100]!),
                   ...tags.map((t) => _buildTag(t.toString(), Colors.blue[50]!)),

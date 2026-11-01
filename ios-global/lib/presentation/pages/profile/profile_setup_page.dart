@@ -238,7 +238,7 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
                 elevation: 0,
               ),
               child: _isLoading
-                  ? const SizedBox(
+                  ? SizedBox(
                       width: 24,
                       height: 24,
                       child: CircularProgressIndicator(
@@ -380,7 +380,7 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
         children: [
           const SizedBox(height: 40),
           Text('$_birthYear',
-              style: const TextStyle(
+              style: TextStyle(
                   fontSize: 56,
                   fontWeight: FontWeight.w200,
                   color: ShunshiColors.textPrimary)),
@@ -516,7 +516,7 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
               // 跳转体质测试
               context.push('/constitution-test');
             },
-            icon: const Icon(Icons.quiz_outlined, size: 18),
+            icon: Icon(Icons.quiz_outlined, size: 18),
             label: const Text('Not sure, help me find out'),
             style: OutlinedButton.styleFrom(
               foregroundColor: ShunshiColors.primary,

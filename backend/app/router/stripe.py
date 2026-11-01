@@ -106,7 +106,7 @@ SUBSCRIPTION_PLANS_EN = {
 
 class CreateCheckoutRequest(BaseModel):
     plan_id: str
-    user_id: str = "user-001"
+    user_id: str
     locale: str = "en-US"
     success_url: Optional[str] = "https://app.seasons.care/payment/success"
     cancel_url: Optional[str] = "https://app.seasons.care/payment/cancel"

@@ -13,7 +13,7 @@ class ChatEntryCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(SeasonsRadius.lg),
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.all(SeasonsSpacing.lg),
+        padding: EdgeInsets.all(SeasonsSpacing.lg),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
@@ -34,13 +34,13 @@ class ChatEntryCard extends StatelessWidget {
                 color: SeasonsColors.secondary.withValues(alpha: 0.2),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.auto_awesome,
                 color: SeasonsColors.secondary,
                 size: 24,
               ),
             ),
-            const SizedBox(width: SeasonsSpacing.md),
+            SizedBox(width: SeasonsSpacing.md),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -51,7 +51,7 @@ class ChatEntryCard extends StatelessWidget {
                       color: SeasonsColors.textPrimary,
                     ),
                   ),
-                  const SizedBox(height: SeasonsSpacing.xs),
+                  SizedBox(height: SeasonsSpacing.xs),
                   Text(
                     'Share your thoughts, feelings, or anything on your mind',
                     style: SeasonsTypography.bodySmall.copyWith(

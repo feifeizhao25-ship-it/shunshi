@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../design_system/app_colors.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../design_system/theme.dart';
@@ -67,12 +68,12 @@ class _PaywallBannerState extends State<PaywallBanner> {
                 context.push('/subscription');
               }
             },
-            child: const Text(
+            child: Text(
               'Learn More',
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
-                color: ShunShiColors.primary,
+                color: AppColors.primary(context),
                 decoration: TextDecoration.underline,
               ),
             ),
@@ -80,7 +81,7 @@ class _PaywallBannerState extends State<PaywallBanner> {
           const SizedBox(width: 8),
           GestureDetector(
             onTap: () => setState(() => _dismissed = true),
-            child: Icon(Icons.close, size: 16, color: ShunShiColors.textTertiary),
+            child: Icon(Icons.close, size: 16, color: AppColors.textTertiary(context)),
           ),
         ],
       ),

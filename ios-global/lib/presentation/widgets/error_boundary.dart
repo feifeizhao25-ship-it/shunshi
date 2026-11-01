@@ -32,9 +32,9 @@ class _ErrorBoundaryState extends State<ErrorBoundary> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.error_outline, size: 48, color: Colors.grey),
+            Icon(Icons.error_outline, size: 48, color: Colors.grey),
             const SizedBox(height: 16),
-            const Text('The page failed to load', style: TextStyle(fontSize: 16, color: Colors.grey)),
+            Text('The page failed to load', style: TextStyle(fontSize: 16, color: Colors.grey)),
             const SizedBox(height: 12),
             TextButton(
               onPressed: () => setState(() => _hasError = false),

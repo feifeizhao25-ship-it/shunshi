@@ -31,7 +31,7 @@ class SuggestionCard extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(SeasonsRadius.md),
       child: Container(
-        padding: const EdgeInsets.all(SeasonsSpacing.md),
+        padding: EdgeInsets.all(SeasonsSpacing.md),
         decoration: BoxDecoration(
           color: SeasonsColors.surface,
           borderRadius: BorderRadius.circular(SeasonsRadius.md),
@@ -58,7 +58,7 @@ class SuggestionCard extends StatelessWidget {
                 size: 20,
               ),
             ),
-            const SizedBox(width: SeasonsSpacing.md),
+            SizedBox(width: SeasonsSpacing.md),
             Expanded(
               child: Text(
                 suggestion.text,

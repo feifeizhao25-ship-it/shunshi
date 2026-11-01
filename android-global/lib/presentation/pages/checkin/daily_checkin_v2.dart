@@ -3,6 +3,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import '../../../core/theme/app_localizations.dart';
 import '../../../design_system/theme.dart';
@@ -22,7 +23,7 @@ class _DailyCheckinV2State extends State<DailyCheckinV2> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : ShunShiColors.background,
+    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : AppColors.background(context),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -45,11 +46,11 @@ class _DailyCheckinV2State extends State<DailyCheckinV2> {
               // Morning Stillness
               Text(AppLocalizations.of(context).get('checkin_morning'), style: TextStyle(
                 fontFamily: ShunShiTypography.serifFamily,
-                fontSize: 28, fontWeight: FontWeight.bold, color: ShunShiColors.textPrimary,
+                fontSize: 28, fontWeight: FontWeight.bold, color: AppColors.textPrimary(context),
               )),
               const SizedBox(height: 8),
               Text('"In the garden of the mind, every thought is a seed. Choose what you water today."',
-                style: TextStyle(fontSize: 13, color: ShunShiColors.textTertiary, fontStyle: FontStyle.italic, height: 1.5)),
+                style: TextStyle(fontSize: 13, color: AppColors.textTertiary(context), fontStyle: FontStyle.italic, height: 1.5)),
               const SizedBox(height: 20),
 
               // Weekly Rhythm
@@ -71,13 +72,13 @@ class _DailyCheckinV2State extends State<DailyCheckinV2> {
 
               // Energy Level
               Text('How is your energy flowing today?', style: TextStyle(
-                fontSize: 16, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary,
+                fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context),
               )),
               const SizedBox(height: 4),
               Text('Take a quiet moment to listen to your internal landscape.',
-                style: TextStyle(fontSize: 13, color: ShunShiColors.textTertiary)),
+                style: TextStyle(fontSize: 13, color: AppColors.textTertiary(context))),
               const SizedBox(height: 12),
-              Text(AppLocalizations.of(context).get('checkin_energy_level'), style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: ShunShiColors.textSecondary)),
+              Text(AppLocalizations.of(context).get('checkin_energy_level'), style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.textSecondary(context))),
               const SizedBox(height: 8),
               Wrap(spacing: 8, children: ['Gentle Flow', 'Stillness', 'Vibrant'].map((e) =>
                 GestureDetector(
@@ -85,13 +86,13 @@ class _DailyCheckinV2State extends State<DailyCheckinV2> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     decoration: BoxDecoration(
-                      color: _energy == e ? Color(0xFF533afd).withOpacity(0.1) : ShunShiColors.surface,
+                      color: _energy == e ? Color(0xFF533afd).withOpacity(0.1) : AppColors.surface(context),
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: _energy == e ? Color(0xFF533afd) : ShunShiColors.borderGhost),
+                      border: Border.all(color: _energy == e ? Color(0xFF533afd) : AppColors.borderGhost(context)),
                     ),
                     child: Text(e, style: TextStyle(
                       fontSize: 13, fontWeight: FontWeight.w500,
-                      color: _energy == e ? Color(0xFF533afd) : ShunShiColors.textSecondary,
+                      color: _energy == e ? Color(0xFF533afd) : AppColors.textSecondary(context),
                     )),
                   ),
                 ),
@@ -99,7 +100,7 @@ class _DailyCheckinV2State extends State<DailyCheckinV2> {
               const SizedBox(height: 20),
 
               // Mood
-              Text('Current Mood', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: ShunShiColors.textSecondary)),
+              Text('Current Mood', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.textSecondary(context))),
               const SizedBox(height: 8),
               Wrap(spacing: 8, children: [
                 ('Calm', Icons.filter_vintage, Color(0xFF533afd)),
@@ -111,16 +112,16 @@ class _DailyCheckinV2State extends State<DailyCheckinV2> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                     decoration: BoxDecoration(
-                      color: _mood == m.$1 ? m.$3.withOpacity(0.1) : ShunShiColors.surface,
+                      color: _mood == m.$1 ? m.$3.withOpacity(0.1) : AppColors.surface(context),
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: _mood == m.$1 ? m.$3 : ShunShiColors.borderGhost),
+                      border: Border.all(color: _mood == m.$1 ? m.$3 : AppColors.borderGhost(context)),
                     ),
                     child: Row(mainAxisSize: MainAxisSize.min, children: [
-                      Icon(m.$2, size: 16, color: _mood == m.$1 ? m.$3 : ShunShiColors.textTertiary),
+                      Icon(m.$2, size: 16, color: _mood == m.$1 ? m.$3 : AppColors.textTertiary(context)),
                       const SizedBox(width: 6),
                       Text(m.$1, style: TextStyle(
                         fontSize: 13, fontWeight: FontWeight.w500,
-                        color: _mood == m.$1 ? m.$3 : ShunShiColors.textSecondary,
+                        color: _mood == m.$1 ? m.$3 : AppColors.textSecondary(context),
                       )),
                     ]),
                   ),
@@ -135,7 +136,7 @@ class _DailyCheckinV2State extends State<DailyCheckinV2> {
                   onPressed: _energy.isNotEmpty && _mood.isNotEmpty ? () {} : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color(0xFF533afd),
-                    disabledBackgroundColor: ShunShiColors.surfaceContainerLow,
+                    disabledBackgroundColor: AppColors.surfaceContainerLow(context),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                   ),
                   child: Text('Complete Check-in', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white)),
@@ -144,7 +145,7 @@ class _DailyCheckinV2State extends State<DailyCheckinV2> {
               const SizedBox(height: 12),
               Center(child: TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: Text('Skip for now', style: TextStyle(color: ShunShiColors.textTertiary)),
+                child: Text('Skip for now', style: TextStyle(color: AppColors.textTertiary(context))),
               )),
             ],
           ),

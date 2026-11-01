@@ -73,7 +73,7 @@ class _SettingsPageState extends State<SettingsPage> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, size: 18),
+          icon: Icon(Icons.arrow_back_ios, size: 18),
           onPressed: () => context.pop(),
           color: SeasonsColors.textPrimary,
         ),
@@ -388,9 +388,9 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
               ),
               if (_exportLoading)
-                const Icon(Icons.check, color: SeasonsColors.primary, size: 18)
+                Icon(Icons.check, color: SeasonsColors.primary, size: 18)
               else
-                const Icon(Icons.chevron_right,
+                Icon(Icons.chevron_right,
                     color: SeasonsColors.textTertiary, size: 18),
             ],
           ),
@@ -428,7 +428,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   ],
                 ),
               ),
-              const Icon(Icons.chevron_right,
+              Icon(Icons.chevron_right,
                   color: SeasonsColors.textTertiary, size: 18),
             ],
           ),
@@ -514,7 +514,7 @@ class _SettingsPageState extends State<SettingsPage> {
               ],
             ),
           ),
-          const Icon(Icons.chevron_right,
+          Icon(Icons.chevron_right,
               color: SeasonsColors.textTertiary, size: 18),
         ],
       ),
@@ -533,7 +533,7 @@ class _SettingsPageState extends State<SettingsPage> {
           onTap: () {},
           child: Row(
             children: [
-              const Icon(Icons.description_outlined,
+              Icon(Icons.description_outlined,
                   color: SeasonsColors.textTertiary, size: 22),
               const SizedBox(width: SeasonsSpacing.md),
               Expanded(
@@ -544,7 +544,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                 ),
               ),
-              const Icon(Icons.open_in_new,
+              Icon(Icons.open_in_new,
                   color: SeasonsColors.textTertiary, size: 16),
             ],
           ),
@@ -559,7 +559,7 @@ class _SettingsPageState extends State<SettingsPage> {
           onTap: () {},
           child: Row(
             children: [
-              const Icon(Icons.article_outlined,
+              Icon(Icons.article_outlined,
                   color: SeasonsColors.textTertiary, size: 22),
               const SizedBox(width: SeasonsSpacing.md),
               Expanded(
@@ -570,7 +570,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                 ),
               ),
-              const Icon(Icons.open_in_new,
+              Icon(Icons.open_in_new,
                   color: SeasonsColors.textTertiary, size: 16),
             ],
           ),
@@ -585,7 +585,7 @@ class _SettingsPageState extends State<SettingsPage> {
           onTap: () {},
           child: Row(
             children: [
-              const Icon(Icons.help_outline,
+              Icon(Icons.help_outline,
                   color: SeasonsColors.textTertiary, size: 22),
               const SizedBox(width: SeasonsSpacing.md),
               Expanded(
@@ -596,7 +596,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                 ),
               ),
-              const Icon(Icons.chevron_right,
+              Icon(Icons.chevron_right,
                   color: SeasonsColors.textTertiary, size: 18),
             ],
           ),

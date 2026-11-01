@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../design_system/app_colors.dart';
 import '../../../design_system/theme.dart';
 
 class ActionCompleteButton extends StatefulWidget {
@@ -57,14 +58,14 @@ class _ActionCompleteButtonState extends State<ActionCompleteButton>
         duration: const Duration(milliseconds: 300),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         decoration: BoxDecoration(
-          color: _completed ? ShunShiColors.primary : Colors.white,
+          color: _completed ? AppColors.primary(context) : Colors.white,
           borderRadius: BorderRadius.circular(25),
           border: Border.all(
-            color: _completed ? ShunShiColors.primary : ShunShiColors.primary.withValues(alpha: 0.3),
+            color: _completed ? AppColors.primary(context) : AppColors.primary(context).withValues(alpha: 0.3),
             width: 2,
           ),
           boxShadow: _completed
-              ? [BoxShadow(color: ShunShiColors.primary.withValues(alpha: 0.3), blurRadius: 8, offset: const Offset(0, 2))]
+              ? [BoxShadow(color: AppColors.primary(context).withValues(alpha: 0.3), blurRadius: 8, offset: const Offset(0, 2))]
               : null,
         ),
         child: Row(
@@ -72,14 +73,14 @@ class _ActionCompleteButtonState extends State<ActionCompleteButton>
           children: [
             Icon(
               _completed ? Icons.check_circle : Icons.radio_button_unchecked,
-              color: _completed ? Colors.white : ShunShiColors.primary,
+              color: _completed ? Colors.white : AppColors.primary(context),
               size: 20,
             ),
             const SizedBox(width: 8),
             Text(
               _completed ? 'Done!' : 'Mark Complete',
               style: TextStyle(
-                color: _completed ? Colors.white : ShunShiColors.primary,
+                color: _completed ? Colors.white : AppColors.primary(context),
                 fontWeight: FontWeight.w600,
                 fontSize: 14,
               ),

@@ -10,6 +10,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
@@ -33,14 +34,14 @@ class BodyTypeEssencePage extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
 
-      appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),backgroundColor: isDark ? ShunshiDarkColors.background : ShunShiColors.background,
+      appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),backgroundColor: isDark ? ShunshiDarkColors.background : AppColors.background(context),
       body: CustomScrollView(
         slivers: [
           // ── Header ──
           SliverAppBar(
             expandedHeight: 200,
             pinned: true,
-            backgroundColor: ShunShiColors.primary,
+            backgroundColor: AppColors.primary(context),
             leading: IconButton(
               icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
               onPressed: () => Navigator.pop(context),
@@ -58,8 +59,8 @@ class BodyTypeEssencePage extends StatelessWidget {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      ShunShiColors.primary,
-                      ShunShiColors.primary,
+                      AppColors.primary(context),
+                      AppColors.primary(context),
                     ],
                   ),
                 ),
@@ -119,7 +120,7 @@ class BodyTypeEssencePage extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: ShunShiColors.surfaceContainerLow,
+                      color: AppColors.surfaceContainerLow(context),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(children: [
@@ -130,7 +131,7 @@ class BodyTypeEssencePage extends StatelessWidget {
                           '"Harmony in Flux"',
                           style: TextStyle(
                             fontSize: 16, fontWeight: FontWeight.w600,
-                            color: ShunShiColors.primary,
+                            color: AppColors.primary(context),
                             fontFamily: ShunShiTypography.serifFamily, fontStyle: FontStyle.italic,
                           ),
                         ),
@@ -145,14 +146,14 @@ class BodyTypeEssencePage extends StatelessWidget {
                     const SizedBox(width: 8),
                     Text(AppLocalizations.of(context).t('bodytype_solar_dominance'), style: TextStyle(
                       fontSize: 16, fontWeight: FontWeight.w700,
-                      color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.serifFamily,
+                      color: AppColors.textPrimary(context), fontFamily: ShunShiTypography.serifFamily,
                     )),
                   ]),
                   const SizedBox(height: 8),
                   Text(
                     'Your energy peaks with the rising sun. Morning rituals are your strongest foundation.',
                     style: TextStyle(
-                      fontSize: 14, color: ShunShiColors.textSecondary,
+                      fontSize: 14, color: AppColors.textSecondary(context),
                       height: 1.6, fontFamily: ShunShiTypography.sansFamily,
                     ),
                   ),
@@ -164,14 +165,14 @@ class BodyTypeEssencePage extends StatelessWidget {
                     const SizedBox(width: 8),
                     Text(AppLocalizations.of(context).t('bodytype_terrene_stability'), style: TextStyle(
                       fontSize: 16, fontWeight: FontWeight.w700,
-                      color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.serifFamily,
+                      color: AppColors.textPrimary(context), fontFamily: ShunShiTypography.serifFamily,
                     )),
                   ]),
                   const SizedBox(height: 8),
                   Text(
                     'Grounded and deliberate. Your body recovers best through stillness and earthy textures.',
                     style: TextStyle(
-                      fontSize: 14, color: ShunShiColors.textSecondary,
+                      fontSize: 14, color: AppColors.textSecondary(context),
                       height: 1.6, fontFamily: ShunShiTypography.sansFamily,
                     ),
                   ),
@@ -184,7 +185,7 @@ class BodyTypeEssencePage extends StatelessWidget {
                     width: double.infinity,
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: ShunShiColors.surfaceContainerLowest,
+                      color: AppColors.surfaceContainerLowest(context),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Column(
@@ -215,7 +216,7 @@ class BodyTypeEssencePage extends StatelessWidget {
                   const SizedBox(height: 12),
                   _seasonCard('Active Season', 'Spring · Wood Element',
                     'Your most vital period. Channel energy into creative projects and morning movement practices.',
-                    ShunShiColors.primary),
+                    AppColors.primary(context)),
                   const SizedBox(height: 12),
                   _seasonCard('Rest Season', 'Late Summer · Earth Element',
                     'Focus on grounding. Nourish with warm, cooked foods and prioritize sleep.',
@@ -292,7 +293,7 @@ class BodyTypeEssencePage extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Icon(Icons.check_circle, size: 18, color: ShunShiColors.primary),
+        Icon(Icons.check_circle, size: 18, color: ShunShiColors.primary),
         const SizedBox(width: 10),
         Expanded(child: Text(text, style: TextStyle(
           fontSize: 13, color: ShunShiColors.textSecondary,

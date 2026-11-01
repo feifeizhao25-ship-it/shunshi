@@ -1,6 +1,8 @@
 import '../../../core/router/safe_pop.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import '../../../core/config/app_config.dart';
+import '../../../data/network/session.dart';
 import '../../../design_system/theme.dart';
 
 /// 日记周报页 — 7 天趋势 + 观察建议
@@ -22,31 +24,29 @@ class _DiaryReportPageState extends State<DiaryReportPage> {
   }
 
   Future<void> _loadTrends() async {
+    // 取最近 7 篇自己写过的日记；没有记录就是没有——不再编一周假数据，也不再用写死的 guest 账号。
+    final uid = currentUserId();
+    if (uid == null) {
+      if (mounted) setState(() { _trends = []; _loading = false; });
+      return;
+    }
     try {
-      final dio = Dio();
-      final res = await dio.get('/api/v1/journal/insights/guest');
-      if (res.data is List) {
-        setState(() {
-          _trends = List<Map<String, dynamic>>.from(res.data);
-          _loading = false;
-        });
-        return;
-      }
-    } catch (_) {}
-    // Demo data
-    final now = DateTime.now();
-    setState(() {
-      _trends = List.generate(7, (i) {
-        final d = now.subtract(Duration(days: 6 - i));
-        return {
-          'date': '${d.month}/${d.day}',
-          'mood': 2.5 + (i * 0.3).clamp(0, 2),
-          'sleep': 3.0 + (i % 3) * 0.5,
-          'energy': 2.0 + i * 0.4,
+      final dio = withSessionAuth(Dio(BaseOptions(baseUrl: AppConfig.apiBaseUrl, connectTimeout: const Duration(seconds: 8))));
+      final res = await dio.get('/api/v1/journal/entries/${Uri.encodeComponent(uid)}', queryParameters: {'limit': 7});
+      final entries = journalEntriesFromBody(res.data) ?? const <Map<String, dynamic>>[];
+      final rows = entries.reversed.map((e) {
+        final d = '${e['date'] ?? ''}';
+        return <String, dynamic>{
+          'date': d.length >= 10 ? d.substring(5, 10) : d,
+          'mood': e['mood'] ?? 0,
+          'sleep': e['sleep_quality'] ?? 0,
+          'energy': e['energy'] ?? 0,
         };
-      });
-      _loading = false;
-    });
+      }).toList();
+      if (mounted) setState(() { _trends = rows; _loading = false; });
+    } catch (_) {
+      if (mounted) setState(() { _trends = []; _loading = false; });
+    }
   }
 
   String _generateObservation() {

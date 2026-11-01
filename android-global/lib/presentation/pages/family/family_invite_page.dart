@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import '../../../design_system/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import 'package:flutter/services.dart';
@@ -96,7 +97,7 @@ class _FamilyInvitePageState extends State<FamilyInvitePage> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : ShunShiColors.background,
+    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : AppColors.background(context),
       appBar: AppBar(
         elevation: 0,
         leading: IconButton(
@@ -109,7 +110,7 @@ class _FamilyInvitePageState extends State<FamilyInvitePage> {
         ),
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator(color: ShunShiColors.primary))
+          ? Center(child: CircularProgressIndicator(color: AppColors.primary(context)))
           : SingleChildScrollView(
               padding: const EdgeInsets.all(24),
               child: Column(
@@ -120,21 +121,21 @@ class _FamilyInvitePageState extends State<FamilyInvitePage> {
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
                     decoration: BoxDecoration(
-                      color: ShunShiColors.surfaceContainerLowest,
+                      color: AppColors.surfaceContainerLowest(context),
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: ShunShiColors.borderGhost),
+                      border: Border.all(color: AppColors.borderGhost(context)),
                     ),
                     child: Column(
                       children: [
-                        Text(AppLocalizations.of(context).t('family_invite_code'), style: TextStyle(fontSize: 14, color: ShunShiColors.textTertiary)),
+                        Text(AppLocalizations.of(context).t('family_invite_code'), style: TextStyle(fontSize: 14, color: AppColors.textTertiary(context))),
                         const SizedBox(height: 16),
                         Text(
                           _code ?? '',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 36,
                             fontWeight: FontWeight.w700,
                             fontFamily: ShunShiTypography.sansFamily,
-                            color: ShunShiColors.primary,
+                            color: AppColors.primary(context),
                             letterSpacing: 8,
                           ),
                         ),
@@ -160,7 +161,7 @@ class _FamilyInvitePageState extends State<FamilyInvitePage> {
                             icon: const Icon(Icons.copy, size: 18),
                             label: Text(AppLocalizations.of(context).t('family_copy_invite_code')),
                             style: OutlinedButton.styleFrom(
-                              side: const BorderSide(color: ShunShiColors.primary),
+                              side: BorderSide(color: AppColors.primary(context)),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                             ),
                           ),
@@ -175,7 +176,7 @@ class _FamilyInvitePageState extends State<FamilyInvitePage> {
                             icon: const Icon(Icons.share, size: 18),
                             label: Text(AppLocalizations.of(context).t('family_share_with_family')),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: ShunShiColors.primary,
+                              backgroundColor: AppColors.primary(context),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                             ),
                           ),
@@ -191,7 +192,7 @@ class _FamilyInvitePageState extends State<FamilyInvitePage> {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: ShunShiColors.textPrimary,
+                      color: AppColors.textPrimary(context),
                       fontFamily: ShunShiTypography.serifFamily,
                     ),
                   ),
@@ -200,7 +201,7 @@ class _FamilyInvitePageState extends State<FamilyInvitePage> {
                         margin: const EdgeInsets.only(bottom: 10),
                         padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: AppColors.card(context),
                           borderRadius: BorderRadius.circular(14),
                           boxShadow: [
                             BoxShadow(
@@ -216,7 +217,7 @@ class _FamilyInvitePageState extends State<FamilyInvitePage> {
                               width: 44,
                               height: 44,
                               decoration: BoxDecoration(
-                                color: ShunShiColors.primary.withValues(alpha: 0.1),
+                                color: AppColors.primary(context).withValues(alpha: 0.1),
                                 shape: BoxShape.circle,
                               ),
                               child: Center(
@@ -236,7 +237,7 @@ class _FamilyInvitePageState extends State<FamilyInvitePage> {
                                     style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.w600,
-                                      color: ShunShiColors.textPrimary,
+                                      color: AppColors.textPrimary(context),
                                     ),
                                   ),
                                   const SizedBox(height: 2),
@@ -244,7 +245,7 @@ class _FamilyInvitePageState extends State<FamilyInvitePage> {
                                     member['relation'] ?? '',
                                     style: TextStyle(
                                       fontSize: 13,
-                                      color: ShunShiColors.textTertiary,
+                                      color: AppColors.textTertiary(context),
                                     ),
                                   ),
                                 ],
@@ -260,9 +261,9 @@ class _FamilyInvitePageState extends State<FamilyInvitePage> {
                       setState(() => _loading = true);
                       _generateCode();
                     },
-                    child: const Text(
+                    child: Text(
                       'Regenerate Invite Code',
-                      style: TextStyle(color: ShunShiColors.textTertiary, fontSize: 14),
+                      style: TextStyle(color: AppColors.textTertiary(context), fontSize: 14),
                     ),
                   ),
                 ],

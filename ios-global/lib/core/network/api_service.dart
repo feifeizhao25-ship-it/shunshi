@@ -116,49 +116,47 @@ class ApiService {
   // Reflection
   // ===================
   
+  /// 保存今日反思 = 写一条日记（服务端同时记一次打卡）。mood/energy/sleep 为 1–5 分。
   Future<void> submitReflection({
     required String userId,
-    required String mood,
-    required String energy,
-    required String sleep,
+    required int mood,
+    required int energy,
+    required int sleepQuality,
     String? notes,
+    List<String> tags = const [],
   }) async {
     await _dio.post(
-      '/api/v1/user/daily-checkin',
+      '/api/v1/journal/entry',
       data: {
         'user_id': userId,
         'mood': mood,
         'energy': energy,
-        'sleep': sleep,
-        if (notes != null) 'notes': notes,
+        'sleep_quality': sleepQuality,
+        if (notes != null && notes.isNotEmpty) 'notes': notes,
+        if (tags.isNotEmpty) 'tags': tags,
       },
     );
   }
-  
-  Future<List<ReflectionResponse>> getReflections(String userId) async {
+
+  /// 日记历史。路径里的用户 id 必须是当前登录账号本人（服务端按令牌核对），不能写死。
+  Future<List<ReflectionResponse>> getReflections(String userId, {int limit = 30}) async {
     final response = await _dio.get(
-      '/api/v1/journal/entries/user-001',
-      queryParameters: {'user_id': userId},
+      '/api/v1/journal/entries/${Uri.encodeComponent(userId)}',
+      queryParameters: {'limit': limit},
     );
-    return (response.data as List)
-        .map((e) => ReflectionResponse.fromJson(e))
-        .toList();
+    final body = response.data;
+    final inner = body is Map && body['data'] is Map ? body['data'] as Map : body;
+    final list = inner is Map ? inner['entries'] : null;
+    if (list is! List) return const [];
+    return list.whereType<Map>().map((e) => ReflectionResponse.fromJson(Map<String, dynamic>.from(e))).toList();
   }
-  
-  Future<WeeklyReflectionResponse> getWeeklyReflection({
-    required String userId,
-    required DateTime weekStart,
-    required DateTime weekEnd,
-  }) async {
-    final response = await _dio.post(
-      '/api/v1/journal/insights/user-001',
-      data: {
-        'user_id': userId,
-        'week_start': weekStart.toIso8601String(),
-        'week_end': weekEnd.toIso8601String(),
-      },
-    );
-    return WeeklyReflectionResponse.fromJson(response.data);
+
+  /// 近 7 天的周度洞察（服务端按记录计算平均值与趋势；没有记录时 entries_count 为 0）。
+  Future<WeeklyReflectionResponse> getWeeklyReflection({required String userId}) async {
+    final response = await _dio.get('/api/v1/journal/insights/${Uri.encodeComponent(userId)}');
+    final body = response.data;
+    final inner = body is Map && body['data'] is Map ? body['data'] as Map : body;
+    return WeeklyReflectionResponse.fromJson(Map<String, dynamic>.from(inner as Map));
   }
   
   // ===================
@@ -443,35 +441,39 @@ class DailyInsightResponse {
 class ReflectionResponse {
   final String id;
   final DateTime date;
-  final String mood;
-  final String energy;
-  final String sleep;
+  final int mood;
+  final int energy;
+  final int sleepQuality;
   final String? notes;
-  
+
   ReflectionResponse.fromJson(Map<String, dynamic> json)
-      : id = json['id'] ?? '',
-        date = DateTime.tryParse(json['date'] ?? '') ?? DateTime.now(),
-        mood = json['mood'] ?? '',
-        energy = json['energy'] ?? '',
-        sleep = json['sleep'] ?? '',
-        notes = json['notes'];
+      : id = '${json['entry_id'] ?? json['id'] ?? ''}',
+        date = DateTime.tryParse('${json['date'] ?? ''}') ?? DateTime.now(),
+        mood = (json['mood'] as num?)?.toInt() ?? 0,
+        energy = (json['energy'] as num?)?.toInt() ?? 0,
+        sleepQuality = (json['sleep_quality'] as num?)?.toInt() ?? 0,
+        notes = json['notes'] as String?;
 }
 
 class WeeklyReflectionResponse {
-  final String aiSummary;
-  final String aiInsight;
-  final List<String> moodTrend;
-  final String averageEnergy;
-  final String averageSleep;
-  final int streakDays;
-  
+  final int entriesCount;
+  final double avgMood;
+  final double avgEnergy;
+  final double avgSleepQuality;
+  final String trend;
+  final String? trendMessage;
+  final String? pattern;
+  final List<String> recommendations;
+
   WeeklyReflectionResponse.fromJson(Map<String, dynamic> json)
-      : aiSummary = json['ai_summary'] ?? '',
-        aiInsight = json['ai_insight'] ?? '',
-        moodTrend = (json['mood_trend'] as List?)?.cast<String>() ?? [],
-        averageEnergy = json['average_energy'] ?? 'medium',
-        averageSleep = json['average_sleep'] ?? 'good',
-        streakDays = json['streak_days'] ?? 0;
+      : entriesCount = (json['entries_count'] as num?)?.toInt() ?? 0,
+        avgMood = (json['avg_mood'] as num?)?.toDouble() ?? 0,
+        avgEnergy = (json['avg_energy'] as num?)?.toDouble() ?? 0,
+        avgSleepQuality = (json['avg_sleep_quality'] as num?)?.toDouble() ?? 0,
+        trend = '${json['trend'] ?? 'no_data'}',
+        trendMessage = json['trend_message'] as String?,
+        pattern = json['tcm_pattern'] as String?,
+        recommendations = (json['recommendations'] as List?)?.map((e) => '$e').toList() ?? const [];
 }
 
 class ContentResponse {

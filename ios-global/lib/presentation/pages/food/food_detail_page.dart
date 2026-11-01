@@ -12,6 +12,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import '../../../design_system/theme.dart';
 
 class FoodDetailPage extends StatelessWidget {
@@ -21,16 +22,16 @@ class FoodDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       body: CustomScrollView(
         slivers: [
           // ── Hero Header ──
           SliverAppBar(
             expandedHeight: 240,
             pinned: true,
-            backgroundColor: ShunShiColors.primary,
+            backgroundColor: AppColors.primary(context),
             leading: IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
+              icon: Icon(Icons.arrow_back_ios_new, color: Colors.white),
               onPressed: () => Navigator.pop(context),
             ),
             flexibleSpace: FlexibleSpaceBar(
@@ -39,7 +40,7 @@ class FoodDetailPage extends StatelessWidget {
                 children: [
                   // Warm gradient background
                   Container(
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
@@ -87,7 +88,7 @@ class FoodDetailPage extends StatelessWidget {
                         const SizedBox(height: 12),
                         Text(
                           foodName ?? 'Astragalus chicken soup',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.w700,
                             color: Colors.white,
@@ -95,7 +96,7 @@ class FoodDetailPage extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 6),
-                        const Text(
+                        Text(
                           'Boosts qi, supports immunity, warms the middle',
                           style: TextStyle(
                             fontSize: 15,
@@ -136,7 +137,7 @@ class FoodDetailPage extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(children: [
-                          const Icon(Icons.auto_awesome, size: 18, color: ShunShiColors.gold),
+                          Icon(Icons.auto_awesome, size: 18, color: ShunShiColors.gold),
                           const SizedBox(width: 8),
                           Text('Wellness insight', style: TextStyle(
                             fontSize: 14, fontWeight: FontWeight.w700,
@@ -160,7 +161,7 @@ class FoodDetailPage extends StatelessWidget {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Row(children: [
-                            const Icon(Icons.auto_awesome, size: 14, color: ShunShiColors.gold),
+                            Icon(Icons.auto_awesome, size: 14, color: ShunShiColors.gold),
                             const SizedBox(width: 6),
                             Text('AI tip: "Spring is windy — protect against colds."', style: TextStyle(
                               fontSize: 12, color: ShunShiColors.gold,
@@ -184,7 +185,7 @@ class FoodDetailPage extends StatelessWidget {
                   Text(
                     '* Use a hen over one year old for better effect. Soak the astragalus for 15 minutes beforehand.',
                     style: TextStyle(
-                      fontSize: 12, color: ShunShiColors.textTertiary,
+                      fontSize: 12, color: AppColors.textTertiary(context),
                       fontFamily: ShunShiTypography.sansFamily, fontStyle: FontStyle.italic,
                     ),
                   ),
@@ -212,7 +213,7 @@ class FoodDetailPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   // Nutrition bars
-                  _nutritionBar('Protein', '28g', 0.7, ShunShiColors.primary),
+                  _nutritionBar('Protein', '28g', 0.7, AppColors.primary(context)),
                   const SizedBox(height: 8),
                   _nutritionBar('Fat', '12g', 0.3, ShunShiColors.gold),
                   const SizedBox(height: 8),
@@ -240,7 +241,7 @@ class FoodDetailPage extends StatelessWidget {
                     child: ElevatedButton(
                       onPressed: () {},
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: ShunShiColors.primary,
+                        backgroundColor: AppColors.primary(context),
                         foregroundColor: Colors.white,
                         elevation: 0,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -248,7 +249,7 @@ class FoodDetailPage extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.restaurant_menu, size: 20),
+                          Icon(Icons.restaurant_menu, size: 20),
                           const SizedBox(width: 8),
                           Text('Start cooking', style: TextStyle(
                             fontSize: 16, fontWeight: FontWeight.w600, fontFamily: ShunShiTypography.sansFamily,
@@ -266,17 +267,17 @@ class FoodDetailPage extends StatelessWidget {
                       width: double.infinity,
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: ShunShiColors.primary.withValues(alpha: 0.06),
+                        color: AppColors.primary(context).withValues(alpha: 0.06),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(children: [
-                        const Icon(Icons.auto_awesome, size: 20, color: ShunShiColors.primary),
+                        Icon(Icons.auto_awesome, size: 20, color: AppColors.primary(context)),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                             Text('Want to know more?', style: TextStyle(
                               fontSize: 14, fontWeight: FontWeight.w600,
-                              color: ShunShiColors.primary, fontFamily: ShunShiTypography.sansFamily,
+                              color: AppColors.primary(context), fontFamily: ShunShiTypography.sansFamily,
                             )),
                             const SizedBox(height: 2),
                             const Text('Ask the SEASONS AI companion for personalised diet tips', style: TextStyle(
@@ -284,7 +285,7 @@ class FoodDetailPage extends StatelessWidget {
                             )),
                           ]),
                         ),
-                        const Icon(Icons.arrow_forward_ios, size: 16, color: ShunShiColors.primary),
+                        Icon(Icons.arrow_forward_ios, size: 16, color: AppColors.primary(context)),
                       ]),
                     ),
                   ),
@@ -320,13 +321,13 @@ class FoodDetailPage extends StatelessWidget {
         fontSize: 11, color: Colors.white60, fontFamily: ShunShiTypography.sansFamily,
       )),
       const SizedBox(height: 2),
-      Text(value, style: const TextStyle(
+      Text(value, style: TextStyle(
         fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white, fontFamily: ShunShiTypography.sansFamily,
       )),
     ],
   );
 
-  Widget _sectionTitle(String t) => Text(t, style: const TextStyle(
+  Widget _sectionTitle(String t) => Text(t, style: TextStyle(
     fontSize: 18, fontWeight: FontWeight.w700,
     fontFamily: ShunShiTypography.serifFamily, color: ShunShiColors.textPrimary,
   ));
@@ -343,7 +344,7 @@ class FoodDetailPage extends StatelessWidget {
       ),
       const SizedBox(width: 12),
       Expanded(
-        child: Text(name, style: const TextStyle(
+        child: Text(name, style: TextStyle(
           fontSize: 14, color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.sansFamily,
         )),
       ),
@@ -364,12 +365,12 @@ class FoodDetailPage extends StatelessWidget {
             color: ShunShiColors.primary,
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Center(child: Text('$num', style: const TextStyle(
+          child: Center(child: Text('$num', style: TextStyle(
             fontSize: 13, fontWeight: FontWeight.w700, color: Colors.white, fontFamily: ShunShiTypography.sansFamily,
           ))),
         ),
         const SizedBox(width: 12),
-        Expanded(child: Text(text, style: const TextStyle(
+        Expanded(child: Text(text, style: TextStyle(
           fontSize: 14, color: ShunShiColors.textSecondary, height: 1.6, fontFamily: ShunShiTypography.sansFamily,
         ))),
       ],

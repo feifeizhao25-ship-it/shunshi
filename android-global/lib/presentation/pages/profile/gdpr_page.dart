@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../design_system/theme.dart';
@@ -11,7 +12,7 @@ class GdprPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : ShunShiColors.background,
+    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : AppColors.background(context),
       appBar: AppBar(
         elevation: 0,
         title: Text(
@@ -20,11 +21,11 @@ class GdprPage extends StatelessWidget {
             fontFamily: ShunShiTypography.serifFamily,
             fontSize: 18,
             fontWeight: FontWeight.w600,
-            color: ShunShiColors.primary,
+            color: AppColors.primary(context),
           ),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: ShunShiColors.primary),
+          icon: Icon(Icons.arrow_back, color: AppColors.primary(context)),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -71,7 +72,7 @@ class GdprPage extends StatelessWidget {
             style: TextStyle(
               fontFamily: ShunShiTypography.serifFamily,
               fontSize: 13,
-              color: ShunShiColors.textTertiary,
+              color: AppColors.textTertiary(context),
               fontStyle: FontStyle.italic,
             ),
           ),

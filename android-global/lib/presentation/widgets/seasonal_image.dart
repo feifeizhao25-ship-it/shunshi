@@ -1,5 +1,6 @@
 // Seasonal image widget for home page hero
 import 'package:flutter/material.dart';
+import '../../design_system/app_colors.dart';
 import '../../../design_system/theme.dart';
 
 class SeasonalImage extends StatelessWidget {
@@ -15,7 +16,7 @@ class SeasonalImage extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         gradient: LinearGradient(
-          colors: [ShunShiColors.primary, ShunShiColors.primaryContainer],
+          colors: [AppColors.primary(context), ShunShiColors.primaryContainer],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),

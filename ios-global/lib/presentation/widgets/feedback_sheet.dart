@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import '../../design_system/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../design_system/theme.dart';
@@ -80,24 +81,24 @@ class _FeedbackSheetState extends State<FeedbackSheet> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: ShunShiColors.surfaceContainerLowest,
+        backgroundColor: AppColors.surfaceContainerLowest(context),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text(
+        title: Text(
           'Thank you for your feedback!',
           style: TextStyle(
             fontFamily: ShunShiTypography.serifFamily,
-            color: ShunShiColors.primary,
+            color: AppColors.primary(context),
             fontSize: 18,
           ),
         ),
-        content: const Text(
+        content: Text(
           'Your input helps us improve and create a better experience for you.',
-          style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 14, color: ShunShiColors.textSecondary),
+          style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 14, color: AppColors.textSecondary(context)),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Glad to help!', style: TextStyle(color: ShunShiColors.primary)),
+            child: Text('Glad to help!', style: TextStyle(color: AppColors.primary(context))),
           ),
         ],
       ),
@@ -107,8 +108,8 @@ class _FeedbackSheetState extends State<FeedbackSheet> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        color: ShunShiColors.surfaceContainerLowest,
+      decoration: BoxDecoration(
+        color: AppColors.surfaceContainerLowest(context),
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: EdgeInsets.only(
@@ -123,19 +124,19 @@ class _FeedbackSheetState extends State<FeedbackSheet> {
             child: Container(
               width: 40, height: 4,
               decoration: BoxDecoration(
-                color: ShunShiColors.border,
+                color: AppColors.border(context),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
           ),
           const SizedBox(height: 20),
-          const Text(
+          Text(
             'Was this helpful?',
             style: TextStyle(
               fontFamily: ShunShiTypography.serifFamily,
               fontSize: 20,
               fontWeight: FontWeight.w600,
-              color: ShunShiColors.textPrimary,
+              color: AppColors.textPrimary(context),
             ),
           ),
           const SizedBox(height: 16),
@@ -152,9 +153,9 @@ class _FeedbackSheetState extends State<FeedbackSheet> {
             maxLines: 3,
             decoration: InputDecoration(
               hintText: 'Any additional thoughts? (optional)',
-              hintStyle: const TextStyle(color: ShunShiColors.textTertiary, fontSize: 14),
+              hintStyle: TextStyle(color: AppColors.textTertiary(context), fontSize: 14),
               filled: true,
-              fillColor: ShunShiColors.surfaceContainerLow,
+              fillColor: AppColors.surfaceContainerLow(context),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide.none,
@@ -167,15 +168,15 @@ class _FeedbackSheetState extends State<FeedbackSheet> {
             child: ElevatedButton(
               onPressed: _rating == null || _submitting ? null : _submit,
               style: ElevatedButton.styleFrom(
-                backgroundColor: ShunShiColors.primary,
+                backgroundColor: AppColors.primary(context),
                 foregroundColor: Colors.white,
-                disabledBackgroundColor: ShunShiColors.primary.withValues(alpha: 0.3),
+                disabledBackgroundColor: AppColors.primary(context).withValues(alpha: 0.3),
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
               child: _submitting
-                  ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                  : const Text('Submit', style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontWeight: FontWeight.w600)),
+                  ? SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                  : Text('Submit', style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontWeight: FontWeight.w600)),
             ),
           ),
         ],
@@ -190,13 +191,13 @@ class _FeedbackSheetState extends State<FeedbackSheet> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         decoration: BoxDecoration(
-          color: selected ? ShunShiColors.primary.withValues(alpha: 0.1) : ShunShiColors.surfaceContainerLow,
+          color: selected ? AppColors.primary(context).withValues(alpha: 0.1) : AppColors.surfaceContainerLow(context),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: selected ? ShunShiColors.primary : ShunShiColors.border,
+            color: selected ? AppColors.primary(context) : AppColors.border(context),
           ),
         ),
-        child: Icon(icon, color: selected ? ShunShiColors.primary : ShunShiColors.textTertiary, size: 28),
+        child: Icon(icon, color: selected ? AppColors.primary(context) : AppColors.textTertiary(context), size: 28),
       ),
     );
   }

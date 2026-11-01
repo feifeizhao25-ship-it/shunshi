@@ -6,6 +6,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import '../../widgets/seasons_visual.dart';
 import 'package:go_router/go_router.dart';
 
@@ -26,12 +27,12 @@ class SubscriptionPageV2 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       appBar: AppBar(
-        backgroundColor: ShunShiColors.background,
+        backgroundColor: AppColors.background(context),
         leading: IconButton(
           key: const Key('subscription_back'),
-          icon: const Icon(Icons.arrow_back),
+          icon: Icon(Icons.arrow_back),
           onPressed: () => context.canPop() ? context.pop() : context.go('/today'),
         ),
         title: Text(
@@ -55,7 +56,7 @@ class SubscriptionPageV2 extends StatelessWidget {
             'Prices are set by your app store and shown in your local currency. '
             'Subscriptions renew automatically until you cancel in your store account settings.',
             key: const Key('subscription_footnote'),
-            style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary, height: 1.4),
+            style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context), height: 1.4),
           ),
           const SizedBox(height: 32),
         ],
@@ -79,26 +80,26 @@ class _PlanTile extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: ShunShiColors.surface,
+        color: AppColors.surface(context),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: ShunShiColors.borderGhost),
+        border: Border.all(color: AppColors.borderGhost(context)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(product.name,
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
-          Text(product.description, style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
+          Text(product.description, style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context))),
           const SizedBox(height: 8),
           Text(
             pending ? monthly : '$monthly / month',
             key: Key('price_${product.id}_monthly'),
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: ShunShiColors.primary),
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.primary(context)),
           ),
           if (!pending && yearly != StorePricing.pending)
             Text('or $yearly / year',
                 key: Key('price_${product.id}_yearly'),
-                style: TextStyle(fontSize: 12, color: ShunShiColors.textSecondary)),
+                style: TextStyle(fontSize: 12, color: AppColors.textSecondary(context))),
           const SizedBox(height: 8),
           if (!pending)
             Padding(
@@ -112,7 +113,7 @@ class _PlanTile extends StatelessWidget {
           for (final f in product.features)
             Padding(
               padding: const EdgeInsets.only(bottom: 2),
-              child: Text('• $f', style: TextStyle(fontSize: 13, color: ShunShiColors.textSecondary)),
+              child: Text('• $f', style: TextStyle(fontSize: 13, color: AppColors.textSecondary(context))),
             ),
         ],
       ),

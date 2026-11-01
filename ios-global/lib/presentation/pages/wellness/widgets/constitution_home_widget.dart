@@ -38,7 +38,7 @@ class ConstitutionHomeWidget extends StatelessWidget {
                 elevation: 0,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               ),
-              child: const Text('Start the check', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
+              child: Text('Start the check', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
             ),
           ),
           const SizedBox(height: 32),
@@ -80,7 +80,7 @@ class ConstitutionHomeWidget extends StatelessWidget {
                       const SizedBox(height: 8),
                       Text(
                         type.name,
-                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: ShunshiColors.textPrimary),
+                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: ShunshiColors.textPrimary),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 4),

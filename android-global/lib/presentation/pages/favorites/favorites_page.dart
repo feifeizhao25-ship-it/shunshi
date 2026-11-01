@@ -2,6 +2,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import '../../../core/theme/app_localizations.dart';
 import 'package:go_router/go_router.dart';
@@ -61,9 +62,9 @@ class _FavoritesPageState extends State<FavoritesPage> {
       case 'tea': return const Color(0xFF8D6E63);
       case 'recipe': return const Color(0xFFFF9800);
       case 'herb': return const Color(0xFF9C27B0);
-      case 'meridian': return ShunShiColors.primary;
+      case 'meridian': return AppColors.primary(context);
       case 'exercise': return const Color(0xFF2196F3);
-      default: return ShunShiColors.primary;
+      default: return AppColors.primary(context);
     }
   }
 
@@ -77,7 +78,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
     final contentId = item['content_id'];
     setState(() => _items.removeAt(index));
     try {
-      await ApiClient().delete('/api/v1/favorites/$contentId?user_id=guest');
+      await ApiClient().delete('/api/v1/favorites/$contentId${userIdQuery()}');
     } catch (_) {
       if (mounted) {
         setState(() => _items.insert(index, item));
@@ -89,7 +90,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : ShunShiColors.background,
+    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : AppColors.background(context),
       appBar: AppBar(
         leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
         title: Text('${AppLocalizations.of(context).get('library_favorites')} (${_items.length})',
@@ -126,7 +127,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
                   child: Container(
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: ShunShiColors.surface,
+                      color: AppColors.surface(context),
                       borderRadius: BorderRadius.circular(14),
                     ),
                     child: Row(children: [
@@ -144,10 +145,10 @@ class _FavoritesPageState extends State<FavoritesPage> {
                             child: Text(_typeLabel(type), style: TextStyle(fontSize: 10, color: color, fontWeight: FontWeight.w500)),
                           ),
                           const Spacer(),
-                          Icon(Icons.chevron_right, size: 16, color: ShunShiColors.textTertiary),
+                          Icon(Icons.chevron_right, size: 16, color: AppColors.textTertiary(context)),
                         ]),
                         const SizedBox(height: 6),
-                        Text(item['content_id'] ?? '', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: ShunShiColors.textPrimary)),
+                        Text(item['content_id'] ?? '', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.textPrimary(context))),
                       ])),
                     ]),
                   ),

@@ -32,7 +32,7 @@ class QuizOptionCard extends StatelessWidget {
               duration: const Duration(milliseconds: 200),
               width: 22, height: 22,
               decoration: BoxDecoration(color: isSelected ? ShunshiColors.primary : null, shape: BoxShape.circle, border: isSelected ? null : Border.all(color: ShunshiColors.textHint)),
-              child: isSelected ? const Icon(Icons.check, size: 14, color: Colors.white) : null,
+              child: isSelected ? Icon(Icons.check, size: 14, color: Colors.white) : null,
             ),
             const SizedBox(width: 12),
             Expanded(child: Text(option.text, style: TextStyle(fontSize: 15, color: isSelected ? ShunshiColors.primaryDark : ShunshiColors.textPrimary, fontWeight: isSelected ? FontWeight.w500 : FontWeight.w400))),
@@ -80,7 +80,7 @@ class ResultHeroCard extends StatelessWidget {
       child: Column(children: [
         Text(icon, style: const TextStyle(fontSize: 56)),
         const SizedBox(height: 12),
-        Text(name, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: ShunshiColors.textPrimary)),
+        Text(name, style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: ShunshiColors.textPrimary)),
         const SizedBox(height: 4),
         Text(description, style: const TextStyle(fontSize: 15, color: ShunshiColors.textSecondary), textAlign: TextAlign.center),
       ]),
@@ -101,7 +101,7 @@ class DetailSection extends StatelessWidget {
       width: double.infinity, padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(color: ShunshiColors.surface, borderRadius: BorderRadius.circular(16), border: Border.all(color: ShunshiColors.divider)),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [Text(icon, style: const TextStyle(fontSize: 20)), const SizedBox(width: 10), Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: ShunshiColors.textPrimary))]),
+        Row(children: [Text(icon, style: const TextStyle(fontSize: 20)), const SizedBox(width: 10), Text(title, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: ShunshiColors.textPrimary))]),
         const SizedBox(height: 12),
         ...children,
       ]),
@@ -155,10 +155,10 @@ class ConstitutionDetailView extends StatelessWidget {
 
   Widget _detailSection(String title, List<String> items) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: ShunshiColors.textPrimary)),
+      Text(title, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: ShunshiColors.textPrimary)),
       const SizedBox(height: 10),
       ...items.map((item) => Padding(padding: const EdgeInsets.only(bottom: 8), child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Container(width: 6, height: 6, margin: const EdgeInsets.only(top: 8), decoration: const BoxDecoration(color: ShunshiColors.primary, shape: BoxShape.circle)),
+        Container(width: 6, height: 6, margin: const EdgeInsets.only(top: 8), decoration: BoxDecoration(color: ShunshiColors.primary, shape: BoxShape.circle)),
         const SizedBox(width: 10),
         Expanded(child: Text(item, style: ShunshiTextStyles.bodySecondary)),
       ]))),

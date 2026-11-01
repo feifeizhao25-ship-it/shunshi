@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/router/safe_pop.dart';
 import '../../../core/network/api_singleton.dart';
@@ -9,8 +10,8 @@ class TermsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? ShunShiColors.darkBackground : ShunShiColors.background;
-    final textColor = isDark ? ShunShiColors.textPrimary : ShunShiColors.textSecondary;
+    final bg = isDark ? ShunShiColors.darkBackground : AppColors.background(context);
+    final textColor = isDark ? AppColors.textPrimary(context) : AppColors.textSecondary(context);
 
     return Scaffold(
       backgroundColor: bg,
@@ -130,7 +131,7 @@ class TermsPage extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 8),
       child: Text(
         text,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 17,
           fontWeight: FontWeight.w700,
           fontFamily: ShunShiTypography.serifFamily,

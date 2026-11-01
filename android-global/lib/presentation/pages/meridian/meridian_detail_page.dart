@@ -2,6 +2,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
@@ -45,7 +46,7 @@ class _MeridianDetailPageState extends State<MeridianDetailPage> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : ShunShiColors.background,
+    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : AppColors.background(context),
       appBar: AppBar(
         leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
         title: Text(_data?['title'] ?? 'Meridian Details',
@@ -65,7 +66,7 @@ class _MeridianDetailPageState extends State<MeridianDetailPage> {
                       width: double.infinity,
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
-                        gradient: LinearGradient(colors: [ShunShiColors.primary, ShunShiColors.primary.withOpacity(0.7)]),
+                        gradient: LinearGradient(colors: [AppColors.primary(context), AppColors.primary(context).withOpacity(0.7)]),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -92,13 +93,13 @@ class _MeridianDetailPageState extends State<MeridianDetailPage> {
                     const SizedBox(height: 20),
 
                     // Description
-                    Text(AppLocalizations.of(context).t('meridian_meridian_overview'), style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+                    Text(AppLocalizations.of(context).t('meridian_meridian_overview'), style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
                     const SizedBox(height: 8),
-                    Text(_data?['description'] ?? '', style: TextStyle(fontSize: 14, color: ShunShiColors.textSecondary, height: 1.8)),
+                    Text(_data?['description'] ?? '', style: TextStyle(fontSize: 14, color: AppColors.textSecondary(context), height: 1.8)),
                     const SizedBox(height: 20),
 
                     // Steps
-                    Text(AppLocalizations.of(context).t('meridian_massage_steps'), style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+                    Text(AppLocalizations.of(context).t('meridian_massage_steps'), style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
                     const SizedBox(height: 8),
                     _buildSteps(),
                     const SizedBox(height: 20),
@@ -126,14 +127,14 @@ class _MeridianDetailPageState extends State<MeridianDetailPage> {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: ShunShiColors.surface,
+                          color: AppColors.surface(context),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Row(children: [
-                          Icon(Icons.menu_book, size: 16, color: ShunShiColors.textTertiary),
+                          Icon(Icons.menu_book, size: 16, color: AppColors.textTertiary(context)),
                           const SizedBox(width: 8),
                           Text('Source: ${_data!['source_classic']}',
-                            style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary, fontStyle: FontStyle.italic)),
+                            style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context), fontStyle: FontStyle.italic)),
                         ]),
                       ),
                       const SizedBox(height: 20),
@@ -145,10 +146,10 @@ class _MeridianDetailPageState extends State<MeridianDetailPage> {
                         children: (_data!['tags'] as List).map((t) => Container(
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
-                            color: ShunShiColors.primary.withOpacity(0.08),
+                            color: AppColors.primary(context).withOpacity(0.08),
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: Text(t.toString(), style: TextStyle(fontSize: 12, color: ShunShiColors.primary)),
+                          child: Text(t.toString(), style: TextStyle(fontSize: 12, color: AppColors.primary(context))),
                         )).toList()),
                       const SizedBox(height: 20),
                     ],
@@ -156,7 +157,7 @@ class _MeridianDetailPageState extends State<MeridianDetailPage> {
                     // Quote
                     Center(child: Text(AppLocalizations.of(context).t('meridian_where_there_is_flow_there_is_no_pain'),
                       style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 14,
-                        fontStyle: FontStyle.italic, color: ShunShiColors.textTertiary))),
+                        fontStyle: FontStyle.italic, color: AppColors.textTertiary(context)))),
                     const SizedBox(height: 40),
                   ]),
                 ),
@@ -181,13 +182,13 @@ class _MeridianDetailPageState extends State<MeridianDetailPage> {
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Container(
             width: 28, height: 28,
-            decoration: BoxDecoration(color: ShunShiColors.primary.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+            decoration: BoxDecoration(color: AppColors.primary(context).withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
             child: Center(child: Text('${e.key + 1}',
-              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: ShunShiColors.primary))),
+              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.primary(context)))),
           ),
           const SizedBox(width: 12),
           Expanded(child: Text(e.value,
-            style: TextStyle(fontSize: 14, color: ShunShiColors.textSecondary, height: 1.6))),
+            style: TextStyle(fontSize: 14, color: AppColors.textSecondary(context), height: 1.6))),
         ]),
       );
     }).toList());

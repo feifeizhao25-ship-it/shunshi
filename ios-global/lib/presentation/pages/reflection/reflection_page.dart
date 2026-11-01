@@ -149,7 +149,7 @@ class _ReflectionPageState extends ConsumerState<ReflectionPage> {
               // ── 英文问题 ──
               Text(
                 _todayQuestion,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w300,
                   color: SeasonsColors.textPrimary,
@@ -307,7 +307,7 @@ class _SuccessView extends StatelessWidget {
               style: TextStyle(fontSize: 56),
             ),
             const SizedBox(height: 24),
-            const Text(
+            Text(
               'Saved',
               style: TextStyle(
                 fontSize: 22,

@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import '../../../design_system/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../../../../design_system/theme.dart';
 import '../../../data/network/api_client.dart';
@@ -241,7 +242,7 @@ class _TeaCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.card(context),
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: const Color(0xFFE6E1D2)),
       ),

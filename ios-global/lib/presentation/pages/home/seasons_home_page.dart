@@ -1,4 +1,5 @@
 import 'dart:ui';
+import '../../../design_system/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -255,7 +256,7 @@ class _SeasonsHomePageState extends State<SeasonsHomePage> {
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.card(context),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: _inkGreen.withValues(alpha: 0.08),
@@ -333,7 +334,7 @@ class _SeasonsHomePageState extends State<SeasonsHomePage> {
                     color: _inkGreen.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.auto_awesome, color: _inkGreen, size: 22),
+                  child: Icon(Icons.auto_awesome, color: _inkGreen, size: 22),
                 ),
                 const SizedBox(width: 14),
                 Expanded(
@@ -399,7 +400,7 @@ class _SeasonsHomePageState extends State<SeasonsHomePage> {
                 const SizedBox(width: 10),
                 Text(
                   _currentSeason,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
                     color: Colors.white,

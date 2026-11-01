@@ -110,7 +110,7 @@ def make_answer_fn(entries: Optional[list[dict]] = None):
                 from app.rag.knowledge_base import load_knowledge_bases
                 from app.rag.retriever import retrieve
 
-                load_knowledge_bases()
+                load_knowledge_bases(include_legacy=True)
                 kb_cache["fn"] = G.retrieval_answer_fn(lambda q, k: retrieve(q, lang="cn", top_k=k))
             return kb_cache["fn"](case["question"], case["lang"])
         if ch == "growth":

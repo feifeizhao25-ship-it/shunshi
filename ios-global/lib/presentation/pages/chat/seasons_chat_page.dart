@@ -1,4 +1,5 @@
 import 'dart:convert';
+import '../../../design_system/app_colors.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -238,7 +239,7 @@ class _SeasonsChatPageState extends State<SeasonsChatPage>
                 fontFamily: ShunShiTypography.serifFamily,
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
-                color: isDark ? Colors.white : ShunShiColors.textPrimary,
+                color: isDark ? Colors.white : AppColors.textPrimary(context),
                 letterSpacing: 2,
               ),
             ),
@@ -250,9 +251,9 @@ class _SeasonsChatPageState extends State<SeasonsChatPage>
               height: 36,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: isDark ? const Color(0xFF1E1E2E) : ShunShiColors.surface,
+                color: isDark ? const Color(0xFF1E1E2E) : AppColors.surface(context),
                 border: Border.all(
-                  color: isDark ? const Color(0xFF2E2E3E) : ShunShiColors.border,
+                  color: isDark ? const Color(0xFF2E2E3E) : AppColors.border(context),
                 ),
               ),
               child: Icon(
@@ -260,7 +261,7 @@ class _SeasonsChatPageState extends State<SeasonsChatPage>
                 size: 18,
                 color: isDark
                     ? Colors.white.withValues(alpha: 0.7)
-                    : ShunShiColors.textSecondary,
+                    : AppColors.textSecondary(context),
               ),
             ),
           ),
@@ -302,7 +303,7 @@ class _SeasonsChatPageState extends State<SeasonsChatPage>
               ),
               child: Text(
                 msg.text,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 15,
                   color: Colors.white,
                   height: 1.5,
@@ -361,13 +362,13 @@ class _SeasonsChatPageState extends State<SeasonsChatPage>
                         Icon(
                           Icons.thumb_up_outlined,
                           size: 14,
-                          color: ShunShiColors.textTertiary.withValues(alpha: 0.6),
+                          color: AppColors.textTertiary(context).withValues(alpha: 0.6),
                         ),
                         const SizedBox(width: 6),
                         Icon(
                           Icons.thumb_down_outlined,
                           size: 14,
-                          color: ShunShiColors.textTertiary.withValues(alpha: 0.6),
+                          color: AppColors.textTertiary(context).withValues(alpha: 0.6),
                         ),
                       ],
                     ),
@@ -392,7 +393,7 @@ class _SeasonsChatPageState extends State<SeasonsChatPage>
         msg.text,
         style: TextStyle(
           fontSize: 15,
-          color: isDark ? Colors.white : ShunShiColors.textPrimary,
+          color: isDark ? Colors.white : AppColors.textPrimary(context),
           height: 1.5,
         ),
       ),
@@ -436,7 +437,7 @@ class _SeasonsChatPageState extends State<SeasonsChatPage>
             msg.text,
             style: TextStyle(
               fontSize: 15,
-              color: isDark ? Colors.white : ShunShiColors.textPrimary,
+              color: isDark ? Colors.white : AppColors.textPrimary(context),
               height: 1.5,
             ),
           ),
@@ -509,7 +510,7 @@ class _SeasonsChatPageState extends State<SeasonsChatPage>
                       fontStyle: FontStyle.italic,
                       color: isDark
                           ? Colors.white.withValues(alpha: 0.85)
-                          : ShunShiColors.textPrimary,
+                          : AppColors.textPrimary(context),
                       height: 1.5,
                     ),
                   ),
@@ -559,7 +560,7 @@ class _SeasonsChatPageState extends State<SeasonsChatPage>
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            color: isDark ? Colors.white : ShunShiColors.textPrimary,
+                            color: isDark ? Colors.white : AppColors.textPrimary(context),
                           ),
                         ),
                       ),
@@ -573,14 +574,14 @@ class _SeasonsChatPageState extends State<SeasonsChatPage>
                         Icon(
                           Icons.schedule,
                           size: 12,
-                          color: ShunShiColors.textTertiary,
+                          color: AppColors.textTertiary(context),
                         ),
                         const SizedBox(width: 4),
                         Text(
                           actionDuration,
                           style: TextStyle(
                             fontSize: 12,
-                            color: ShunShiColors.textTertiary,
+                            color: AppColors.textTertiary(context),
                           ),
                         ),
                       ],
@@ -660,7 +661,7 @@ class _SeasonsChatPageState extends State<SeasonsChatPage>
                               step,
                               style: TextStyle(
                                 fontSize: 14,
-                                color: isDark ? Colors.white : ShunShiColors.textPrimary,
+                                color: isDark ? Colors.white : AppColors.textPrimary(context),
                                 height: 1.4,
                               ),
                             ),
@@ -767,7 +768,7 @@ class _SeasonsChatPageState extends State<SeasonsChatPage>
                             shape: BoxShape.circle,
                             color: isDark
                                 ? Colors.white.withValues(alpha: 0.5)
-                                : ShunShiColors.textTertiary.withValues(alpha: 0.5),
+                                : AppColors.textTertiary(context).withValues(alpha: 0.5),
                           ),
                         ),
                       ),
@@ -790,7 +791,7 @@ class _SeasonsChatPageState extends State<SeasonsChatPage>
         textAlign: TextAlign.center,
         style: TextStyle(
           fontSize: 11,
-          color: ShunShiColors.textTertiary,
+          color: AppColors.textTertiary(context),
         ),
       ),
     );
@@ -802,7 +803,7 @@ class _SeasonsChatPageState extends State<SeasonsChatPage>
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF0F0F1A) : const Color(0xFFFDF9F4),
         border: Border(
-          top: BorderSide(color: ShunShiColors.divider, width: 0.5),
+          top: BorderSide(color: AppColors.divider(context), width: 0.5),
         ),
       ),
       child: Row(
@@ -822,10 +823,10 @@ class _SeasonsChatPageState extends State<SeasonsChatPage>
                   hintText: "Share what's on your mind...",
                   hintStyle: TextStyle(
                     fontSize: 15,
-                    color: ShunShiColors.textTertiary,
+                    color: AppColors.textTertiary(context),
                   ),
                   filled: true,
-                  fillColor: ShunShiColors.surface,
+                  fillColor: AppColors.surface(context),
                   contentPadding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                   border: OutlineInputBorder(
@@ -845,10 +846,10 @@ class _SeasonsChatPageState extends State<SeasonsChatPage>
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: _isLoading
-                    ? ShunShiColors.textDisabled
+                    ? AppColors.textDisabled(context)
                     : const Color(0xFF533AFD),
               ),
-              child: const Icon(Icons.arrow_upward, color: Colors.white, size: 20),
+              child: Icon(Icons.arrow_upward, color: Colors.white, size: 20),
             ),
           ),
         ],

@@ -3,6 +3,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import '../../../design_system/theme.dart';
@@ -17,7 +18,7 @@ class WellnessDashboardPage extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
 
-      appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),backgroundColor: isDark ? ShunshiDarkColors.background : ShunShiColors.background,
+      appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),backgroundColor: isDark ? ShunshiDarkColors.background : AppColors.background(context),
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
@@ -33,10 +34,10 @@ class WellnessDashboardPage extends StatelessWidget {
                       width: 40, height: 40,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: ShunShiColors.surfaceContainerLow,
-                        border: Border.all(color: ShunShiColors.borderGhost),
+                        color: AppColors.surfaceContainerLow(context),
+                        border: Border.all(color: AppColors.borderGhost(context)),
                       ),
-                      child: const Icon(Icons.person, size: 20, color: ShunShiColors.textSecondary),
+                      child: Icon(Icons.person, size: 20, color: AppColors.textSecondary(context)),
                     ),
                     const SizedBox(width: 12),
                     // Greeting
@@ -60,10 +61,10 @@ class WellnessDashboardPage extends StatelessWidget {
                       child: Container(
                         width: 40, height: 40,
                         decoration: BoxDecoration(
-                          color: ShunShiColors.surfaceContainerLow,
+                          color: AppColors.surfaceContainerLow(context),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Icon(Icons.notifications_outlined, size: 20, color: ShunShiColors.textSecondary),
+                        child: Icon(Icons.notifications_outlined, size: 20, color: AppColors.textSecondary(context)),
                       ),
                     ),
                   ],
@@ -81,11 +82,11 @@ class WellnessDashboardPage extends StatelessWidget {
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [ShunShiColors.primary.withValues(alpha: 0.06), ShunShiColors.primaryContainer.withValues(alpha: 0.12)],
+                    colors: [AppColors.primary(context).withValues(alpha: 0.06), ShunShiColors.primaryContainer.withValues(alpha: 0.12)],
                     begin: Alignment.topLeft, end: Alignment.bottomRight,
                   ),
                   borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: ShunShiColors.primary.withValues(alpha: 0.1)),
+                  border: Border.all(color: AppColors.primary(context).withValues(alpha: 0.1)),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -94,18 +95,18 @@ class WellnessDashboardPage extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                       decoration: BoxDecoration(
-                        color: ShunShiColors.primaryLight.withValues(alpha: 0.15),
+                        color: AppColors.primaryLight(context).withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(999),
                       ),
                       child: Text(AppLocalizations.of(context).t('notification_solar'), style: TextStyle(
-                        fontSize: 12, fontWeight: FontWeight.w500, color: ShunShiColors.primary,
+                        fontSize: 12, fontWeight: FontWeight.w500, color: AppColors.primary(context),
                         letterSpacing: 0.5,
                       )),
                     ),
                     const SizedBox(height: 16),
                     // Title
                     Text(AppLocalizations.of(context).t('st_chunfen'), style: TextStyle(
-                      fontSize: 42, fontWeight: FontWeight.w300, color: ShunShiColors.primary,
+                      fontSize: 42, fontWeight: FontWeight.w300, color: AppColors.primary(context),
                       height: 1.1, letterSpacing: -1, fontFamily: ShunShiTypography.serifFamily,
                     )),
                     const Text('Spring Equinox', style: TextStyle(
@@ -121,11 +122,11 @@ class WellnessDashboardPage extends StatelessWidget {
                     // Countdown
                     Row(
                       children: [
-                        Container(width: 48, height: 1, color: ShunShiColors.textTertiary),
+                        Container(width: 48, height: 1, color: AppColors.textTertiary(context)),
                         const SizedBox(width: 12),
                         Text(AppLocalizations.of(context).t('home_12_days_until_qingming'), style: TextStyle(
                           fontSize: 13, fontWeight: FontWeight.w600,
-                          color: ShunShiColors.textTertiary, letterSpacing: 1,
+                          color: AppColors.textTertiary(context), letterSpacing: 1,
                         )),
                       ],
                     ),
@@ -144,7 +145,7 @@ class WellnessDashboardPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(AppLocalizations.of(context).t('home_seasonal_rituals'), style: TextStyle(
-                    fontSize: 24, fontWeight: FontWeight.w300, color: ShunShiColors.primary,
+                    fontSize: 24, fontWeight: FontWeight.w300, color: AppColors.primary(context),
                     letterSpacing: -0.5, fontFamily: ShunShiTypography.serifFamily,
                   )),
                   GestureDetector(
@@ -205,9 +206,9 @@ class WellnessDashboardPage extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(28),
                 decoration: BoxDecoration(
-                  color: ShunShiColors.primary.withValues(alpha: 0.05),
+                  color: AppColors.primary(context).withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(32),
-                  border: Border.all(color: ShunShiColors.primary.withValues(alpha: 0.1)),
+                  border: Border.all(color: AppColors.primary(context).withValues(alpha: 0.1)),
                 ),
                 child: Column(
                   children: [
@@ -217,7 +218,7 @@ class WellnessDashboardPage extends StatelessWidget {
                     )),
                     const SizedBox(height: 8),
                     Text(AppLocalizations.of(context).t('home_3_habits_completed_today'), style: TextStyle(
-                      fontSize: 32, fontWeight: FontWeight.w300, color: ShunShiColors.primary,
+                      fontSize: 32, fontWeight: FontWeight.w300, color: AppColors.primary(context),
                       letterSpacing: -0.5, fontFamily: ShunShiTypography.serifFamily,
                     )),
                     const SizedBox(height: 8),
@@ -230,7 +231,7 @@ class WellnessDashboardPage extends StatelessWidget {
                       child: ElevatedButton(
                         onPressed: () {},
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: ShunShiColors.primary,
+                          backgroundColor: AppColors.primary(context),
                           foregroundColor: Colors.white,
                           elevation: 0,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -260,7 +261,7 @@ class WellnessDashboardPage extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(AppLocalizations.of(context).t('home_recommended_for_you'), style: TextStyle(
-                          fontSize: 20, fontWeight: FontWeight.w300, color: ShunShiColors.primary,
+                          fontSize: 20, fontWeight: FontWeight.w300, color: AppColors.primary(context),
                           fontFamily: ShunShiTypography.serifFamily,
                         )),
                         const SizedBox(height: 12),
@@ -268,7 +269,7 @@ class WellnessDashboardPage extends StatelessWidget {
                           onTap: () => context.push('/wellness-category/diet'),
                           child: Container(
                             decoration: BoxDecoration(
-                              color: ShunShiColors.surfaceContainerLowest,
+                              color: AppColors.surfaceContainerLowest(context),
                               borderRadius: BorderRadius.circular(16),
                               boxShadow: ShunShiShadows.sm,
                             ),
@@ -281,7 +282,7 @@ class WellnessDashboardPage extends StatelessWidget {
                                   decoration: BoxDecoration(
                                     borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
                                     gradient: LinearGradient(
-                                      colors: [ShunShiColors.primaryContainer, ShunShiColors.primaryLight],
+                                      colors: [ShunShiColors.primaryContainer, AppColors.primaryLight(context)],
                                       begin: Alignment.topLeft, end: Alignment.bottomRight,
                                     ),
                                   ),
@@ -297,19 +298,19 @@ class WellnessDashboardPage extends StatelessWidget {
                                       Container(
                                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                         decoration: BoxDecoration(
-                                          color: ShunShiColors.surfaceContainerLow,
+                                          color: AppColors.surfaceContainerLow(context),
                                           borderRadius: BorderRadius.circular(6),
                                         ),
                                         child: Text(AppLocalizations.of(context).t('food_recipe'), style: TextStyle(
                                           fontSize: 11, fontWeight: FontWeight.w700,
-                                          color: ShunShiColors.primary, letterSpacing: 0.5,
+                                          color: AppColors.primary(context), letterSpacing: 0.5,
                                         )),
                                       ),
                                       const SizedBox(height: 8),
                                       Text(AppLocalizations.of(context).t('home_spring_vegetable_porridge'), style: TextStyle(
                                         fontSize: 18, fontWeight: FontWeight.w700,
                                         fontFamily: ShunShiTypography.serifFamily,
-                                        color: ShunShiColors.textPrimary,
+                                        color: AppColors.textPrimary(context),
                                       )),
                                       const SizedBox(height: 4),
                                       const Text('A light, warming meal designed for gentle detox after winter.', style: TextStyle(
@@ -339,7 +340,7 @@ class WellnessDashboardPage extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.all(24),
                           decoration: BoxDecoration(
-                            color: ShunShiColors.surfaceContainerLow,
+                            color: AppColors.surfaceContainerLow(context),
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: Column(
@@ -360,13 +361,13 @@ class WellnessDashboardPage extends StatelessWidget {
                               Row(
                                 children: [
                                   Text(AppLocalizations.of(context).t('home_8_min_read'), style: TextStyle(
-                                    fontSize: 12, color: ShunShiColors.textTertiary,
+                                    fontSize: 12, color: AppColors.textTertiary(context),
                                   )),
                                   Container(width: 4, height: 4, margin: const EdgeInsets.symmetric(horizontal: 8),
-                                    decoration: BoxDecoration(color: ShunShiColors.textTertiary, shape: BoxShape.circle),
+                                    decoration: BoxDecoration(color: AppColors.textTertiary(context), shape: BoxShape.circle),
                                   ),
                                   Text(AppLocalizations.of(context).t('home_traditional_wellness_arts'), style: TextStyle(
-                                    fontSize: 12, color: ShunShiColors.textTertiary,
+                                    fontSize: 12, color: AppColors.textTertiary(context),
                                   )),
                                 ],
                               ),
@@ -374,13 +375,13 @@ class WellnessDashboardPage extends StatelessWidget {
                               OutlinedButton(
                                 onPressed: () {},
                                 style: OutlinedButton.styleFrom(
-                                  side: BorderSide(color: ShunShiColors.primary.withValues(alpha: 0.2)),
+                                  side: BorderSide(color: AppColors.primary(context).withValues(alpha: 0.2)),
                                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                                 ),
                                 child: Text(AppLocalizations.of(context).t('home_read_more'), style: TextStyle(
                                   fontSize: 12, fontWeight: FontWeight.w700, letterSpacing: 1.5,
-                                  color: ShunShiColors.primary,
+                                  color: AppColors.primary(context),
                                 )),
                               ),
                             ],
@@ -408,7 +409,7 @@ class WellnessDashboardPage extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.all(24),
                       decoration: ShunShiGlass.glassmorphism(
-                        tintColor: ShunShiColors.surfaceContainerLow,
+                        tintColor: AppColors.surfaceContainerLow(context),
                       ),
                       child: Row(
                         children: [
@@ -418,7 +419,7 @@ class WellnessDashboardPage extends StatelessWidget {
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(12),
                               gradient: LinearGradient(
-                                colors: [ShunShiColors.primaryContainer, ShunShiColors.primary],
+                                colors: [ShunShiColors.primaryContainer, AppColors.primary(context)],
                               ),
                             ),
                             child: const Icon(Icons.forest, size: 36, color: Colors.white54),
@@ -436,7 +437,7 @@ class WellnessDashboardPage extends StatelessWidget {
                                 const SizedBox(height: 4),
                                 Text(AppLocalizations.of(context).t('home_mountain_streams_bamboo'), style: TextStyle(
                                   fontSize: 18, fontFamily: ShunShiTypography.serifFamily,
-                                  color: ShunShiColors.primary,
+                                  color: AppColors.primary(context),
                                 )),
                                 const SizedBox(height: 16),
                                 Row(
@@ -445,7 +446,7 @@ class WellnessDashboardPage extends StatelessWidget {
                                     Container(
                                       width: 40, height: 40,
                                       decoration: BoxDecoration(
-                                        color: ShunShiColors.primary,
+                                        color: AppColors.primary(context),
                                         shape: BoxShape.circle,
                                       ),
                                       child: const Icon(Icons.play_arrow, size: 22, color: Colors.white),
@@ -458,7 +459,7 @@ class WellnessDashboardPage extends StatelessWidget {
                                           Container(
                                             height: 3,
                                             decoration: BoxDecoration(
-                                              color: ShunShiColors.textTertiary.withValues(alpha: 0.3),
+                                              color: AppColors.textTertiary(context).withValues(alpha: 0.3),
                                               borderRadius: BorderRadius.circular(2),
                                             ),
                                             child: FractionallySizedBox(
@@ -466,7 +467,7 @@ class WellnessDashboardPage extends StatelessWidget {
                                               widthFactor: 0.27,
                                               child: Container(
                                                 decoration: BoxDecoration(
-                                                  color: ShunShiColors.primary,
+                                                  color: AppColors.primary(context),
                                                   borderRadius: BorderRadius.circular(2),
                                                 ),
                                               ),
@@ -501,7 +502,7 @@ class WellnessDashboardPage extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(Icons.format_quote, size: 28,
-                            color: ShunShiColors.primary.withValues(alpha: 0.3)),
+                            color: AppColors.primary(context).withValues(alpha: 0.3)),
                           const SizedBox(height: 12),
                           const Text('"Nourish Yang in spring and summer,\nNourish Yin in autumn and winter."', textAlign: TextAlign.center,
                             style: TextStyle(
@@ -565,7 +566,7 @@ class _RitualCard extends StatelessWidget {
       width: 240,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: ShunShiColors.surfaceContainerLowest,
+        color: AppColors.surfaceContainerLowest(context),
         borderRadius: BorderRadius.circular(16),
         boxShadow: ShunShiShadows.sm,
       ),
@@ -576,16 +577,16 @@ class _RitualCard extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(icon, size: 28, color: ShunShiColors.primary),
+              Icon(icon, size: 28, color: AppColors.primary(context)),
               const SizedBox(height: 16),
-              Text(title, style: const TextStyle(
+              Text(title, style: TextStyle(
                 fontSize: 18, fontWeight: FontWeight.w500,
                 fontFamily: ShunShiTypography.serifFamily,
-                color: ShunShiColors.textPrimary,
+                color: AppColors.textPrimary(context),
               )),
               const SizedBox(height: 8),
-              Text(desc, style: const TextStyle(
-                fontSize: 13, color: ShunShiColors.textSecondary,
+              Text(desc, style: TextStyle(
+                fontSize: 13, color: AppColors.textSecondary(context),
                 height: 1.6,
               )),
             ],
@@ -593,12 +594,12 @@ class _RitualCard extends StatelessWidget {
           const SizedBox(height: 16),
           Row(
             children: [
-              Text(cta, style: const TextStyle(
+              Text(cta, style: TextStyle(
                 fontSize: 13, fontWeight: FontWeight.w700,
-                color: ShunShiColors.primary, letterSpacing: 1,
+                color: AppColors.primary(context), letterSpacing: 1,
               )),
               const SizedBox(width: 4),
-              Icon(Icons.arrow_forward, size: 16, color: ShunShiColors.primary),
+              Icon(Icons.arrow_forward, size: 16, color: AppColors.primary(context)),
             ],
           ),
         ],

@@ -8,6 +8,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import '../../../design_system/theme.dart';
 
 class GentleGuidancePage extends StatelessWidget {
@@ -16,16 +17,16 @@ class GentleGuidancePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       appBar: AppBar(
-        backgroundColor: ShunShiColors.background,
+        backgroundColor: AppColors.background(context),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+          icon: Icon(Icons.arrow_back_ios_new, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text('Gentle Guidance', style: TextStyle(
           fontSize: 20, fontWeight: FontWeight.w700,
-          color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.serifFamily,
+          color: AppColors.textPrimary(context), fontFamily: ShunShiTypography.serifFamily,
         )),
       ),
       body: SingleChildScrollView(
@@ -35,14 +36,14 @@ class GentleGuidancePage extends StatelessWidget {
           children: [
             const SizedBox(height: 4),
             Text('Daily Whisper', style: TextStyle(
-              fontSize: 13, color: ShunShiColors.textSecondary,
+              fontSize: 13, color: AppColors.textSecondary(context),
               fontFamily: ShunShiTypography.sansFamily, letterSpacing: 0.5,
             )),
             const SizedBox(height: 8),
             Text(
               'A rhythm of reminders tailored to your current season and constitution.',
               style: TextStyle(
-                fontSize: 15, color: ShunShiColors.textSecondary,
+                fontSize: 15, color: AppColors.textSecondary(context),
                 height: 1.6, fontFamily: ShunShiTypography.sansFamily,
               ),
             ),
@@ -75,8 +76,8 @@ class GentleGuidancePage extends StatelessWidget {
             // ── Body Type Insight ──
             _guidanceCard(
               icon: Icons.monitor_heart_outlined,
-              iconColor: ShunShiColors.primary,
-              iconBg: ShunShiColors.primary.withValues(alpha: 0.1),
+              iconColor: AppColors.primary(context),
+              iconBg: AppColors.primary(context).withValues(alpha: 0.1),
               title: 'Vata-Pitta Balance',
               time: 'Body Type Insight',
               description: 'Your energy might dip this afternoon around 3:00 PM. Consider a warm, spiced tea instead of caffeine to stay grounded.',
@@ -89,16 +90,16 @@ class GentleGuidancePage extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: ShunShiColors.primary.withValues(alpha: 0.05),
+                color: AppColors.primary(context).withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(children: [
-                Icon(Icons.auto_awesome, size: 18, color: ShunShiColors.primary),
+                Icon(Icons.auto_awesome, size: 18, color: AppColors.primary(context)),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text('Personalized for your cycle', style: TextStyle(
                     fontSize: 13, fontStyle: FontStyle.italic,
-                    color: ShunShiColors.primary, fontFamily: ShunShiTypography.sansFamily,
+                    color: AppColors.primary(context), fontFamily: ShunShiTypography.sansFamily,
                   )),
                 ),
               ]),

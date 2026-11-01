@@ -2,6 +2,7 @@
 // Account / Wellness / Support sections
 
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../design_system/theme.dart';
@@ -49,7 +50,7 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       body: SafeArea(
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),
@@ -61,18 +62,18 @@ class _ProfilePageState extends State<ProfilePage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       'SEASONS',
                       style: TextStyle(
                         fontFamily: ShunShiTypography.serifFamily,
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
-                        color: ShunShiColors.primary,
+                        color: AppColors.primary(context),
                         letterSpacing: 2,
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.notifications_outlined, color: ShunShiColors.primary),
+                      icon: Icon(Icons.notifications_outlined, color: AppColors.primary(context)),
                       onPressed: () {},
                     ),
                   ],
@@ -94,9 +95,9 @@ class _ProfilePageState extends State<ProfilePage> {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(color: Colors.white, width: 2),
-                            color: ShunShiColors.surfaceContainerLow,
+                            color: AppColors.surfaceContainerLow(context),
                           ),
-                          child: const Icon(Icons.person, size: 36, color: ShunShiColors.textTertiary),
+                          child: Icon(Icons.person, size: 36, color: AppColors.textTertiary(context)),
                         ),
                         Positioned(
                           bottom: 0,
@@ -106,9 +107,9 @@ class _ProfilePageState extends State<ProfilePage> {
                             decoration: BoxDecoration(
                               color: ShunShiColors.gold,
                               shape: BoxShape.circle,
-                              border: Border.all(color: ShunShiColors.background, width: 2),
+                              border: Border.all(color: AppColors.background(context), width: 2),
                             ),
-                            child: const Icon(Icons.verified, size: 14, color: Colors.white),
+                            child: Icon(Icons.verified, size: 14, color: Colors.white),
                           ),
                         ),
                       ],
@@ -117,13 +118,13 @@ class _ProfilePageState extends State<ProfilePage> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           'SEASONS Member',
                           style: TextStyle(
                             fontFamily: ShunShiTypography.serifFamily,
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
-                            color: ShunShiColors.primary,
+                            color: AppColors.primary(context),
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -286,20 +287,20 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Container(width: 16, height: 1, color: ShunShiColors.border),
+                      Container(width: 16, height: 1, color: AppColors.border(context)),
                       const SizedBox(width: 12),
                       Text(
                         'Live in harmony with nature',
                         style: TextStyle(
                           fontFamily: ShunShiTypography.serifFamily,
                           fontSize: 14,
-                          color: ShunShiColors.textTertiary,
+                          color: AppColors.textTertiary(context),
                           fontStyle: FontStyle.italic,
                           letterSpacing: 1,
                         ),
                       ),
                       const SizedBox(width: 12),
-                      Container(width: 16, height: 1, color: ShunShiColors.border),
+                      Container(width: 16, height: 1, color: AppColors.border(context)),
                     ],
                   ),
                 ),
@@ -323,7 +324,7 @@ class _StatCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: ShunShiColors.surfaceContainerLowest,
+          color: AppColors.surfaceContainerLowest(context),
           borderRadius: BorderRadius.circular(12),
           boxShadow: ShunShiShadows.sm,
         ),
@@ -332,14 +333,14 @@ class _StatCard extends StatelessWidget {
             Text(label, style: TextStyle(
               fontFamily: ShunShiTypography.sansFamily,
               fontSize: 11,
-              color: ShunShiColors.textTertiary,
+              color: AppColors.textTertiary(context),
             )),
             const SizedBox(height: 4),
-            Text(value, style: const TextStyle(
+            Text(value, style: TextStyle(
               fontFamily: ShunShiTypography.serifFamily,
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: ShunShiColors.primary,
+              color: AppColors.primary(context),
             )),
           ],
         ),
@@ -362,7 +363,7 @@ class _SectionHeader extends StatelessWidget {
           fontFamily: ShunShiTypography.sansFamily,
           fontSize: 13,
           fontWeight: FontWeight.w600,
-          color: ShunShiColors.textTertiary,
+          color: AppColors.textTertiary(context),
           letterSpacing: 1,
         ),
       ),
@@ -387,16 +388,16 @@ class _MenuTile extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 14),
           child: Row(
             children: [
-              Icon(icon, color: ShunShiColors.primary, size: 22),
+              Icon(icon, color: AppColors.primary(context), size: 22),
               const SizedBox(width: 16),
               Expanded(
-                child: Text(title, style: const TextStyle(
+                child: Text(title, style: TextStyle(
                   fontFamily: ShunShiTypography.sansFamily,
                   fontSize: 15,
-                  color: ShunShiColors.textPrimary,
+                  color: AppColors.textPrimary(context),
                 )),
               ),
-              Icon(Icons.chevron_right, size: 18, color: ShunShiColors.textTertiary),
+              Icon(Icons.chevron_right, size: 18, color: AppColors.textTertiary(context)),
             ],
           ),
         ),
@@ -419,13 +420,13 @@ class _ToggleTile extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: Row(
         children: [
-          Icon(Icons.tune, color: ShunShiColors.primary, size: 22),
+          Icon(Icons.tune, color: AppColors.primary(context), size: 22),
           const SizedBox(width: 16),
           Expanded(
-            child: Text(title, style: const TextStyle(
+            child: Text(title, style: TextStyle(
               fontFamily: ShunShiTypography.sansFamily,
               fontSize: 15,
-              color: ShunShiColors.textPrimary,
+              color: AppColors.textPrimary(context),
             )),
           ),
           _SegButton(label: optionA, active: isA, onTap: () => onChanged(true)),
@@ -450,9 +451,9 @@ class _SegButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
         decoration: BoxDecoration(
-          color: active ? ShunShiColors.primary : Colors.transparent,
+          color: active ? AppColors.primary(context) : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: active ? ShunShiColors.primary : ShunShiColors.borderGhost),
+          border: Border.all(color: active ? AppColors.primary(context) : AppColors.borderGhost(context)),
         ),
         child: Text(
           label,
@@ -460,7 +461,7 @@ class _SegButton extends StatelessWidget {
             fontFamily: ShunShiTypography.sansFamily,
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: active ? Colors.white : ShunShiColors.textTertiary,
+            color: active ? Colors.white : AppColors.textTertiary(context),
           ),
         ),
       ),

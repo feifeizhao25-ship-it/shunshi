@@ -144,7 +144,7 @@ class _HeroSection extends StatelessWidget {
             _seasonBgEnd(season),
           ],
         ),
-        borderRadius: const BorderRadius.only(
+        borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(SeasonsSpacing.radiusXL),
           bottomRight: Radius.circular(SeasonsSpacing.radiusXL),
         ),
@@ -163,7 +163,7 @@ class _HeroSection extends StatelessWidget {
             // Season name — 32sp w200
             Text(
               _seasonDisplayName(season),
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 32,
                 fontWeight: FontWeight.w200,
                 color: SeasonsColors.textPrimary,

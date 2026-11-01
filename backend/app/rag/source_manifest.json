@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "reviewed_at": "2026-08-30",
+  "reviewed_at": "2026-11-01",
   "documents": {
     "verified_cn.md": {
       "locale": "zh-CN",
@@ -10,44 +10,30 @@
       "reviewed_at": "2026-08-30",
       "valid_until": "2027-02-28"
     },
-    "顺时知识库_中文版.md": {
-      "locale": "zh-CN",
-      "region": "CN",
-      "evidence_status": "legacy_unverified",
-      "high_risk_allowed": false,
-      "reviewed_at": "2026-08-30",
-      "valid_until": "2026-11-30"
-    },
-    "顺时知识库_补充篇_中文版.md": {
-      "locale": "zh-CN",
-      "region": "CN",
-      "evidence_status": "legacy_unverified",
-      "high_risk_allowed": false,
-      "reviewed_at": "2026-08-30",
-      "valid_until": "2026-11-30"
-    },
-    "SEASONS_Knowledge_Base_English.md": {
-      "locale": "en",
-      "region": "GLOBAL",
-      "evidence_status": "legacy_unverified",
-      "high_risk_allowed": false,
-      "reviewed_at": "2026-08-30",
-      "valid_until": "2026-11-30"
-    },
-    "SEASONS_Knowledge_Base_Supplement_English.md": {
-      "locale": "en",
-      "region": "GLOBAL",
-      "evidence_status": "legacy_unverified",
-      "high_risk_allowed": false,
-      "reviewed_at": "2026-08-30",
-      "valid_until": "2026-11-30"
-    },
     "verified_global.md": {
       "locale": "en",
       "region": "GLOBAL",
       "evidence_status": "verified_official",
       "high_risk_allowed": false,
       "reviewed_at": "2026-10-31",
+      "valid_until": "2027-04-30"
+    },
+    "pending_cn.md": {
+      "locale": "zh-CN",
+      "region": "CN",
+      "evidence_status": "pending_review",
+      "review_status": "待审核",
+      "high_risk_allowed": false,
+      "reviewed_at": "2026-11-01",
+      "valid_until": "2027-04-30"
+    },
+    "pending_global.md": {
+      "locale": "en",
+      "region": "GLOBAL",
+      "evidence_status": "pending_review",
+      "review_status": "待审核",
+      "high_risk_allowed": false,
+      "reviewed_at": "2026-11-01",
       "valid_until": "2027-04-30"
     }
   },
@@ -121,6 +107,46 @@
       "url": "https://www.nhc.gov.cn/guihuaxxs/c100133/201907/2a6ed52f1c264203b5351bdbbadd2da8.shtml",
       "published_at": "2019-07-15",
       "reviewed_at": "2026-11-01"
+    },
+    {
+      "title": "国家卫生健康委员会2024年12月25日新闻发布会文字实录",
+      "publisher": "国家卫生健康委员会",
+      "url": "http://www.nhc.gov.cn/xcs/c100122/202412/01fe4c5b70b149cd86ce685893f87adb.shtml",
+      "published_at": "2024-12-25",
+      "reviewed_at": "2026-11-01",
+      "review_status": "待审核"
+    },
+    {
+      "title": "《睡眠健康核心信息及释义》解读",
+      "publisher": "国家卫生健康委员会网站（中国政府网转载）",
+      "url": "https://www.gov.cn/lianbo/bumen/202503/content_7014410.htm",
+      "published_at": "2025-03-19",
+      "reviewed_at": "2026-11-01",
+      "review_status": "待审核"
+    },
+    {
+      "title": "Doing What Matters in Times of Stress: An Illustrated Guide",
+      "publisher": "World Health Organization",
+      "url": "https://www.who.int/publications/i/item/9789240003927",
+      "published_at": "2020",
+      "reviewed_at": "2026-11-01",
+      "review_status": "待审核"
+    },
+    {
+      "title": "10 stress busters",
+      "publisher": "NHS (UK)",
+      "url": "https://www.nhs.uk/mental-health/self-help/guides-tools-and-activities/tips-to-reduce-stress/",
+      "published_at": "",
+      "reviewed_at": "2026-11-01",
+      "review_status": "待审核"
+    },
+    {
+      "title": "Be active for your mental health",
+      "publisher": "NHS Every Mind Matters",
+      "url": "https://www.nhs.uk/every-mind-matters/mental-wellbeing-tips/be-active-for-your-mental-health/",
+      "published_at": "",
+      "reviewed_at": "2026-11-01",
+      "review_status": "待审核"
     }
   ]
 }

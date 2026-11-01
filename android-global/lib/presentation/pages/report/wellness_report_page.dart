@@ -10,6 +10,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
@@ -31,13 +32,13 @@ class WellnessReportPage extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
 
-      appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),backgroundColor: isDark ? ShunshiDarkColors.background : ShunShiColors.background,
+      appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),backgroundColor: isDark ? ShunshiDarkColors.background : AppColors.background(context),
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
             expandedHeight: 180,
             pinned: true,
-            backgroundColor: ShunShiColors.primary,
+            backgroundColor: AppColors.primary(context),
             leading: IconButton(
               icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
               onPressed: () => Navigator.pop(context),
@@ -48,7 +49,7 @@ class WellnessReportPage extends StatelessWidget {
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [ShunShiColors.primary, ShunShiColors.primary],
+                    colors: [AppColors.primary(context), AppColors.primary(context)],
                   ),
                 ),
                 child: SafeArea(
@@ -85,14 +86,14 @@ class WellnessReportPage extends StatelessWidget {
                     'Your Rhythm: Balanced & Vibrant.',
                     style: TextStyle(
                       fontSize: 20, fontWeight: FontWeight.w700,
-                      color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.serifFamily,
+                      color: AppColors.textPrimary(context), fontFamily: ShunShiTypography.serifFamily,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'You are naturally centered with good energy. In Late Spring, your focus is on maintaining this vitality through seasonal liver support.',
                     style: TextStyle(
-                      fontSize: 14, color: ShunShiColors.textSecondary,
+                      fontSize: 14, color: AppColors.textSecondary(context),
                       height: 1.7, fontFamily: ShunShiTypography.sansFamily,
                     ),
                   ),
@@ -110,7 +111,7 @@ class WellnessReportPage extends StatelessWidget {
                     width: double.infinity,
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: ShunShiColors.primary.withValues(alpha: 0.06),
+                      color: AppColors.primary(context).withValues(alpha: 0.06),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Row(
@@ -119,10 +120,10 @@ class WellnessReportPage extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: ShunShiColors.primary.withValues(alpha: 0.12),
+                            color: AppColors.primary(context).withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: const Icon(Icons.eco, size: 22, color: ShunShiColors.primary),
+                          child: Icon(Icons.eco, size: 22, color: AppColors.primary(context)),
                         ),
                         const SizedBox(width: 14),
                         Expanded(
@@ -131,13 +132,13 @@ class WellnessReportPage extends StatelessWidget {
                             children: [
                               Text(AppLocalizations.of(context).t('report_late_spring_focus'), style: TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.w600,
-                                color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.sansFamily,
+                                color: AppColors.textPrimary(context), fontFamily: ShunShiTypography.sansFamily,
                               )),
                               const SizedBox(height: 6),
                               Text(
                                 'Liver meridian activation is crucial as the yang energy peaks. Focus on bitter greens and gentle stretching.',
                                 style: TextStyle(
-                                  fontSize: 13, color: ShunShiColors.textSecondary,
+                                  fontSize: 13, color: AppColors.textSecondary(context),
                                   height: 1.6, fontFamily: ShunShiTypography.sansFamily,
                                 ),
                               ),
@@ -147,7 +148,7 @@ class WellnessReportPage extends StatelessWidget {
                                 child: Row(children: [
                                   Text(AppLocalizations.of(context).t('learn_more'), style: TextStyle(
                                     fontSize: 13, fontWeight: FontWeight.w600,
-                                    color: ShunShiColors.primary, fontFamily: ShunShiTypography.sansFamily,
+                                    color: AppColors.primary(context), fontFamily: ShunShiTypography.sansFamily,
                                   )),
                                   const SizedBox(width: 4),
                                   const Icon(Icons.arrow_forward, size: 16, color: ShunShiColors.primary),
@@ -187,7 +188,7 @@ class WellnessReportPage extends StatelessWidget {
                             children: [
                               Text(AppLocalizations.of(context).t('report_recommended'), style: TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.w600,
-                                color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.sansFamily,
+                                color: AppColors.textPrimary(context), fontFamily: ShunShiTypography.sansFamily,
                               )),
                               Text(AppLocalizations.of(context).t('report_morning_sunlight'), style: TextStyle(
                                 fontSize: 14, fontWeight: FontWeight.w500,
@@ -197,7 +198,7 @@ class WellnessReportPage extends StatelessWidget {
                               Text(
                                 'Exposure to morning light for 15 minutes will further stabilize your emotional balance scores.',
                                 style: TextStyle(
-                                  fontSize: 13, color: ShunShiColors.textSecondary,
+                                  fontSize: 13, color: AppColors.textSecondary(context),
                                   height: 1.6, fontFamily: ShunShiTypography.sansFamily,
                                 ),
                               ),
@@ -216,7 +217,7 @@ class WellnessReportPage extends StatelessWidget {
                     child: ElevatedButton(
                       onPressed: () {},
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: ShunShiColors.primary,
+                        backgroundColor: AppColors.primary(context),
                         foregroundColor: Colors.white,
                         elevation: 0,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -229,7 +230,7 @@ class WellnessReportPage extends StatelessWidget {
                   const SizedBox(height: 8),
                   Center(
                     child: Text(AppLocalizations.of(context).t('report_revised_may_12_2024'), style: TextStyle(
-                      fontSize: 12, color: ShunShiColors.textTertiary,
+                      fontSize: 12, color: AppColors.textTertiary(context),
                       fontFamily: ShunShiTypography.sansFamily,
                     )),
                   ),

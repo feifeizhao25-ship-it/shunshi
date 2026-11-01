@@ -2,6 +2,7 @@
 // Grid of wellness categories with tap-to-expand content
 
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import '../../../design_system/theme.dart';
 import '../../../data/content/wellness_content.dart';
 
@@ -23,7 +24,7 @@ class LibraryPage extends StatefulWidget {
 
 class _LibraryPageState extends State<LibraryPage> {
   void _showBodyTypes() {
-    _showCategorySheet('Body Types', Icons.accessibility_new, ShunShiColors.primary,
+    _showCategorySheet('Body Types', Icons.accessibility_new, AppColors.primary(context),
       WellnessContent.bodyTypes.map((b) => _ContentItem(
         emoji: b.emoji,
         title: b.name,
@@ -78,7 +79,7 @@ class _LibraryPageState extends State<LibraryPage> {
   }
 
   void _showSleepSounds() {
-    _showCategorySheet('Sleep Sounds', Icons.bedtime, ShunShiColors.primaryLight,
+    _showCategorySheet('Sleep Sounds', Icons.bedtime, AppColors.primaryLight(context),
       WellnessContent.sleepSounds.map((s) => _ContentItem(
         emoji: s.emoji,
         title: s.name,
@@ -99,8 +100,8 @@ class _LibraryPageState extends State<LibraryPage> {
         minChildSize: 0.4,
         builder: (ctx, scrollController) => Container(
           decoration: BoxDecoration(
-            color: ShunShiColors.background,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            color: AppColors.background(context),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
           ),
           child: Column(
             children: [
@@ -109,7 +110,7 @@ class _LibraryPageState extends State<LibraryPage> {
                 margin: const EdgeInsets.symmetric(vertical: 12),
                 width: 40, height: 4,
                 decoration: BoxDecoration(
-                  color: ShunShiColors.borderGhost,
+                  color: AppColors.borderGhost(context),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -122,11 +123,11 @@ class _LibraryPageState extends State<LibraryPage> {
                     const SizedBox(width: 12),
                     Text(
                       title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: ShunShiTypography.serifFamily,
                         fontSize: 22,
                         fontWeight: FontWeight.w600,
-                        color: ShunShiColors.textPrimary,
+                        color: AppColors.textPrimary(context),
                       ),
                     ),
                   ],
@@ -151,16 +152,16 @@ class _LibraryPageState extends State<LibraryPage> {
   @override
   Widget build(BuildContext context) {
     final categories = [
-      _CategoryItem(Icons.accessibility_new, 'Body Types', 'Discover your wellness profile', ShunShiColors.primary, _showBodyTypes),
+      _CategoryItem(Icons.accessibility_new, 'Body Types', 'Discover your wellness profile', AppColors.primary(context), _showBodyTypes),
       _CategoryItem(Icons.restaurant_menu, 'Seasonal Recipes', 'Fresh ingredients by season', ShunShiColors.secondary, _showRecipes),
       _CategoryItem(Icons.local_cafe, 'Herbal Teas', 'Chamomile, Peppermint, Ginger', ShunShiColors.blue, _showHerbalTeas),
       _CategoryItem(Icons.touch_app, 'Pressure Points', 'Reflexology & acupressure', ShunShiColors.apricot, _showPressurePoints),
       _CategoryItem(Icons.fitness_center, 'Movement', 'Yoga, Tai Chi & Stretching', ShunShiColors.goldLight, _showMovement),
-      _CategoryItem(Icons.bedtime, 'Sleep Sounds', 'Nature, white noise & meditation', ShunShiColors.primaryLight, _showSleepSounds),
+      _CategoryItem(Icons.bedtime, 'Sleep Sounds', 'Nature, white noise & meditation', AppColors.primaryLight(context), _showSleepSounds),
     ];
 
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
@@ -172,13 +173,13 @@ class _LibraryPageState extends State<LibraryPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'Wellness Library',
                       style: TextStyle(
                         fontFamily: ShunShiTypography.serifFamily,
                         fontSize: 30,
                         fontWeight: FontWeight.w300,
-                        color: ShunShiColors.textPrimary,
+                        color: AppColors.textPrimary(context),
                         height: 1.2,
                       ),
                     ),
@@ -188,7 +189,7 @@ class _LibraryPageState extends State<LibraryPage> {
                       style: TextStyle(
                         fontFamily: ShunShiTypography.sansFamily,
                         fontSize: 15,
-                        color: ShunShiColors.textTertiary,
+                        color: AppColors.textTertiary(context),
                       ),
                     ),
                   ],
@@ -245,7 +246,7 @@ class _ContentItemCardState extends State<_ContentItemCard> {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: ShunShiColors.surfaceContainerLowest,
+          color: AppColors.surfaceContainerLowest(context),
           borderRadius: BorderRadius.circular(16),
           boxShadow: ShunShiShadows.sm,
         ),
@@ -262,20 +263,20 @@ class _ContentItemCardState extends State<_ContentItemCard> {
                     children: [
                       Text(
                         widget.item.title,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: ShunShiTypography.sansFamily,
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: ShunShiColors.textPrimary,
+                          color: AppColors.textPrimary(context),
                         ),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         widget.item.subtitle,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: ShunShiTypography.sansFamily,
                           fontSize: 13,
-                          color: ShunShiColors.textTertiary,
+                          color: AppColors.textTertiary(context),
                         ),
                       ),
                     ],
@@ -283,7 +284,7 @@ class _ContentItemCardState extends State<_ContentItemCard> {
                 ),
                 Icon(
                   _expanded ? Icons.expand_less : Icons.expand_more,
-                  color: ShunShiColors.textTertiary,
+                  color: AppColors.textTertiary(context),
                   size: 20,
                 ),
               ],
@@ -297,7 +298,7 @@ class _ContentItemCardState extends State<_ContentItemCard> {
                 style: TextStyle(
                   fontFamily: ShunShiTypography.sansFamily,
                   fontSize: 14,
-                  color: ShunShiColors.textSecondary,
+                  color: AppColors.textSecondary(context),
                   height: 1.7,
                 ),
               ),
@@ -320,7 +321,7 @@ class _CategoryCard extends StatelessWidget {
       onTap: category.onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: ShunShiColors.surfaceContainerLowest,
+          color: AppColors.surfaceContainerLowest(context),
           borderRadius: BorderRadius.circular(16),
           boxShadow: ShunShiShadows.sm,
         ),
@@ -333,7 +334,7 @@ class _CategoryCard extends StatelessWidget {
                 width: double.infinity,
                 decoration: BoxDecoration(
                   color: category.tintColor.withValues(alpha: 0.06),
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
                 ),
                 child: Center(
                   child: Icon(category.icon, size: 36, color: category.tintColor),
@@ -349,20 +350,20 @@ class _CategoryCard extends StatelessWidget {
                   children: [
                     Text(
                       category.title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: ShunShiTypography.sansFamily,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: ShunShiColors.textPrimary,
+                        color: AppColors.textPrimary(context),
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       category.subtitle,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: ShunShiTypography.sansFamily,
                         fontSize: 12,
-                        color: ShunShiColors.textTertiary,
+                        color: AppColors.textTertiary(context),
                       ),
                     ),
                     const Spacer(),

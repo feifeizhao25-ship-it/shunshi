@@ -213,7 +213,7 @@ class HomeNotifier extends StateNotifier<HomeState> {
   }
 
   List<GentleSuggestion> _getFallbackSuggestions() {
-    return const [
+    return [
       GentleSuggestion(id: 's1', text: 'Take three slower breaths before checking your phone', category: 'breathing', iconName: 'breathe'),
       GentleSuggestion(id: 's2', text: 'Make a warm drink and just hold it for a moment', category: 'ritual', iconName: 'tea'),
       GentleSuggestion(id: 's3', text: 'Step outside, even for 60 seconds', category: 'movement', iconName: 'walk'),

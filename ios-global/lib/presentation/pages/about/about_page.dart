@@ -2,6 +2,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
 
@@ -11,10 +12,10 @@ class AboutPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       appBar: AppBar(
-        backgroundColor: ShunShiColors.background,
-        leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
+        backgroundColor: AppColors.background(context),
+        leading: IconButton(icon: Icon(Icons.arrow_back), onPressed: () => context.pop()),
         title: Text('About SEASONS', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18, fontWeight: FontWeight.w600)),
       ),
       body: ListView(
@@ -27,24 +28,24 @@ class AboutPage extends StatelessWidget {
               borderRadius: BorderRadius.circular(20),
             ), child: const Center(child: Text('🌿', style: TextStyle(fontSize: 36)))),
             const SizedBox(height: 16),
-            Text('SEASONS', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 24, fontWeight: FontWeight.bold, color: ShunShiColors.textPrimary)),
+            Text('SEASONS', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textPrimary(context))),
             const SizedBox(height: 4),
-            Text('Version 2.4.0', style: TextStyle(fontSize: 14, color: ShunShiColors.textTertiary)),
+            Text('Version 2.4.0', style: TextStyle(fontSize: 14, color: AppColors.textTertiary(context))),
           ])),
           const SizedBox(height: 32),
 
           // Description
-          Container(padding: const EdgeInsets.all(20), decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(16)),
+          Container(padding: const EdgeInsets.all(20), decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(16)),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('Live in rhythm with the seasons', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.primary)),
+              Text('Live in rhythm with the seasons', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.primary(context))),
               const SizedBox(height: 12),
-              Text('SEASONS is a smart wellness companion built on traditional East Asian wellness ideas. It combines the 24 solar terms, daily rhythms and nine constitution types to give you personalised wellness suggestions.', style: TextStyle(fontSize: 14, color: ShunShiColors.textSecondary, height: 1.8)),
+              Text('SEASONS is a smart wellness companion built on traditional East Asian wellness ideas. It combines the 24 solar terms, daily rhythms and nine constitution types to give you personalised wellness suggestions.', style: TextStyle(fontSize: 14, color: AppColors.textSecondary(context), height: 1.8)),
             ]),
           ),
           const SizedBox(height: 16),
 
           // Features
-          Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(16)),
+          Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(16)),
             child: Column(children: [
               _featureRow(Icons.eco, 'Seasonal wellness', 'Follow the 24 solar terms'),
               const Divider(height: 20),
@@ -58,7 +59,7 @@ class AboutPage extends StatelessWidget {
           const SizedBox(height: 16),
 
           // Links
-          Container(decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(16)),
+          Container(decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(16)),
             child: Column(children: [
               _linkTile('Terms of Service', Icons.description_outlined),
               const Divider(height: 1, indent: 16, endIndent: 16),
@@ -71,7 +72,7 @@ class AboutPage extends StatelessWidget {
 
           // Footer
           Center(child: Text('© 2026 SEASONS\n"The best care is prevention" — Huangdi Neijing',
-            textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary, height: 1.8))),
+            textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context), height: 1.8))),
           const SizedBox(height: 32),
         ],
       ),
@@ -93,7 +94,7 @@ class AboutPage extends StatelessWidget {
     return ListTile(
       leading: Icon(icon, color: ShunShiColors.textSecondary, size: 20),
       title: Text(title, style: TextStyle(fontSize: 14, color: ShunShiColors.textPrimary)),
-      trailing: const Icon(Icons.chevron_right, color: ShunShiColors.textTertiary, size: 18),
+      trailing: Icon(Icons.chevron_right, color: ShunShiColors.textTertiary, size: 18),
       onTap: () {},
     );
   }

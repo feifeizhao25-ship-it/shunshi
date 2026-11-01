@@ -1,6 +1,10 @@
 import '../../../core/router/safe_pop.dart';
+import '../../../design_system/app_colors.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import '../../../core/config/app_config.dart';
+import '../../../data/network/session.dart';
+import '../../../core/network/locale_headers.dart';
 import '../../../design_system/theme.dart';
 
 /// 日记周报页 — 7 天趋势 + 观察建议
@@ -22,31 +26,29 @@ class _DiaryReportPageState extends State<DiaryReportPage> {
   }
 
   Future<void> _loadTrends() async {
+    // 取最近 7 篇自己写过的日记；没有记录就是没有——不再编一周假数据，也不再用写死的 guest 账号。
+    final uid = currentUserId();
+    if (uid == null) {
+      if (mounted) setState(() { _trends = []; _loading = false; });
+      return;
+    }
     try {
-      final dio = Dio();
-      final res = await dio.get('/api/v1/journal/trends');
-      if (res.data is List) {
-        setState(() {
-          _trends = List<Map<String, dynamic>>.from(res.data);
-          _loading = false;
-        });
-        return;
-      }
-    } catch (_) {}
-    // Demo data
-    final now = DateTime.now();
-    setState(() {
-      _trends = List.generate(7, (i) {
-        final d = now.subtract(Duration(days: 6 - i));
-        return {
-          'date': '${d.month}/${d.day}',
-          'mood': 2.5 + (i * 0.3).clamp(0, 2),
-          'sleep': 3.0 + (i % 3) * 0.5,
-          'energy': 2.0 + i * 0.4,
+      final dio = withSessionAuth(Dio(BaseOptions(baseUrl: AppConfig.apiBaseUrl, connectTimeout: const Duration(seconds: 8), headers: LocaleHeaders.values)));
+      final res = await dio.get('/api/v1/journal/entries/${Uri.encodeComponent(uid)}', queryParameters: {'limit': 7});
+      final entries = journalEntriesFromBody(res.data) ?? const <Map<String, dynamic>>[];
+      final rows = entries.reversed.map((e) {
+        final d = '${e['date'] ?? ''}';
+        return <String, dynamic>{
+          'date': d.length >= 10 ? d.substring(5, 10) : d,
+          'mood': e['mood'] ?? 0,
+          'sleep': e['sleep_quality'] ?? 0,
+          'energy': e['energy'] ?? 0,
         };
-      });
-      _loading = false;
-    });
+      }).toList();
+      if (mounted) setState(() { _trends = rows; _loading = false; });
+    } catch (_) {
+      if (mounted) setState(() { _trends = []; _loading = false; });
+    }
   }
 
   String _generateObservation() {
@@ -76,19 +78,19 @@ class _DiaryReportPageState extends State<DiaryReportPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       appBar: AppBar(
-        backgroundColor: ShunShiColors.background,
+        backgroundColor: AppColors.background(context),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+          icon: Icon(Icons.arrow_back_ios_new, size: 20),
           onPressed: () => safePop(context),
         ),
         title: const Text('Weekly report',
             style: TextStyle(fontFamily: ShunShiTypography.serifFamily)),
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator(color: ShunShiColors.primary))
+          ? Center(child: CircularProgressIndicator(color: AppColors.primary(context)))
           : SingleChildScrollView(
               padding: const EdgeInsets.all(20),
               child: Column(
@@ -106,12 +108,12 @@ class _DiaryReportPageState extends State<DiaryReportPage> {
                   Container(
                     width: double.infinity, padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: ShunShiColors.surfaceContainerLowest,
+                      color: AppColors.surfaceContainerLowest(context),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: ShunShiColors.borderGhost),
+                      border: Border.all(color: AppColors.borderGhost(context)),
                     ),
                     child: Text(_generateObservation(),
-                        style: const TextStyle(fontSize: 14, color: ShunShiColors.textSecondary, height: 1.7)),
+                        style: TextStyle(fontSize: 14, color: AppColors.textSecondary(context), height: 1.7)),
                   ),
                   const SizedBox(height: 24),
 
@@ -122,14 +124,14 @@ class _DiaryReportPageState extends State<DiaryReportPage> {
                     margin: const EdgeInsets.only(bottom: 10),
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: ShunShiColors.primary.withValues(alpha: 0.05),
+                      color: AppColors.primary(context).withValues(alpha: 0.05),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       const Text('💡', style: TextStyle(fontSize: 18)),
                       const SizedBox(width: 10),
                       Expanded(child: Text(s,
-                          style: const TextStyle(fontSize: 14, color: ShunShiColors.textPrimary, height: 1.5))),
+                          style: TextStyle(fontSize: 14, color: AppColors.textPrimary(context), height: 1.5))),
                     ]),
                   )),
                   const SizedBox(height: 32),
@@ -140,28 +142,28 @@ class _DiaryReportPageState extends State<DiaryReportPage> {
   }
 
   Widget _sectionTitle(String t) => Text(t,
-      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700,
-          fontFamily: ShunShiTypography.serifFamily, color: ShunShiColors.textPrimary));
+      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700,
+          fontFamily: ShunShiTypography.serifFamily, color: AppColors.textPrimary(context)));
 
   Widget _buildTrendChart() {
     if (_trends.isEmpty) {
-      return const Center(child: Padding(
+      return Center(child: Padding(
         padding: EdgeInsets.all(24),
-        child: Text('No data yet', style: TextStyle(color: ShunShiColors.textTertiary)),
+        child: Text('No data yet', style: TextStyle(color: AppColors.textTertiary(context))),
       ));
     }
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: ShunShiColors.surfaceContainerLowest,
+        color: AppColors.surfaceContainerLowest(context),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: ShunShiColors.borderGhost),
+        border: Border.all(color: AppColors.borderGhost(context)),
       ),
       child: Column(
         children: [
           // Legend
           Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            _legendDot(ShunShiColors.primary, 'Mood'),
+            _legendDot(AppColors.primary(context), 'Mood'),
             const SizedBox(width: 16),
             _legendDot(ShunShiColors.blue, 'Sleep'),
             const SizedBox(width: 16),
@@ -185,7 +187,7 @@ class _DiaryReportPageState extends State<DiaryReportPage> {
                       children: [
                         // Mood bar
                         Container(width: 6, height: mood * 20,
-                            decoration: BoxDecoration(color: ShunShiColors.primary, borderRadius: BorderRadius.circular(3))),
+                            decoration: BoxDecoration(color: AppColors.primary(context), borderRadius: BorderRadius.circular(3))),
                         const SizedBox(height: 2),
                         // Sleep bar
                         Container(width: 6, height: sleep * 20,
@@ -196,7 +198,7 @@ class _DiaryReportPageState extends State<DiaryReportPage> {
                             decoration: BoxDecoration(color: ShunShiColors.secondary, borderRadius: BorderRadius.circular(3))),
                         const SizedBox(height: 4),
                         Text(d['date']?.toString() ?? '',
-                            style: const TextStyle(fontSize: 9, color: ShunShiColors.textTertiary)),
+                            style: TextStyle(fontSize: 9, color: AppColors.textTertiary(context))),
                       ],
                     ),
                   ),
@@ -213,6 +215,6 @@ class _DiaryReportPageState extends State<DiaryReportPage> {
     Container(width: 8, height: 8,
         decoration: BoxDecoration(shape: BoxShape.circle, color: color)),
     const SizedBox(width: 4),
-    Text(label, style: const TextStyle(fontSize: 11, color: ShunShiColors.textTertiary)),
+    Text(label, style: TextStyle(fontSize: 11, color: AppColors.textTertiary(context))),
   ]);
 }

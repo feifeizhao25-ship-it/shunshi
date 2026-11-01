@@ -12,6 +12,8 @@ os.environ.setdefault("REDIS_URL", "redis://localhost")
 os.environ.setdefault("SHUNSHI_JWT_SECRET", "s" * 48)
 os.environ.setdefault("ADMIN_JWT_SECRET", "pytest-admin-secret-with-at-least-32-characters")
 os.environ.setdefault("ADMIN_PASSWORD_HASH", "a" * 64)
+# 评测 / 测试语料含 4 份 legacy 文档（用户侧运行时默认不载入，见 app/rag/knowledge_base._LEGACY_EVAL_SOURCES）。
+os.environ.setdefault("SHUNSHI_KB_LEGACY_EVAL", "1")
 
 # 每次 pytest 都从空的专用数据库开始，避免打卡/日记数据跨运行累积。
 _records_db = Path(__file__).resolve().parent / "test_shunshi_records.db"

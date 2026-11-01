@@ -307,19 +307,19 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
   void _showUpgradePrompt() {
     showModalBottomSheet(context: context, backgroundColor: Colors.transparent, builder: (_) => Container(
       padding: const EdgeInsets.all(24),
-      decoration: const BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       child: Column(mainAxisSize: MainAxisSize.min, children: [
-        Container(width: 40, height: 4, decoration: BoxDecoration(color: ShunShiColors.border, borderRadius: BorderRadius.circular(2))),
+        Container(width: 40, height: 4, decoration: BoxDecoration(color: AppColors.border(context), borderRadius: BorderRadius.circular(2))),
         const SizedBox(height: 20),
-        Container(padding: const EdgeInsets.all(14), decoration: BoxDecoration(color: ShunShiColors.gold.withValues(alpha: 0.1), shape: BoxShape.circle), child: const Icon(Icons.star_rounded, size: 36, color: ShunShiColors.gold)),
+        Container(padding: const EdgeInsets.all(14), decoration: BoxDecoration(color: ShunShiColors.gold.withValues(alpha: 0.1), shape: BoxShape.circle), child: Icon(Icons.star_rounded, size: 36, color: ShunShiColors.gold)),
         const SizedBox(height: 16),
-        const Text('Today\'s free messages are used up', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+        Text('Today\'s free messages are used up', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
         const SizedBox(height: 8),
-        Text('Upgrade to get $_quotaLimit personalised AI wellness messages a day\nUnlock all constitution tests + family members', textAlign: TextAlign.center, style: const TextStyle(fontSize: 14, color: ShunShiColors.textSecondary, height: 1.6)),
+        Text('Upgrade to get $_quotaLimit personalised AI wellness messages a day\nUnlock all constitution tests + family members', textAlign: TextAlign.center, style: TextStyle(fontSize: 14, color: AppColors.textSecondary(context), height: 1.6)),
         const SizedBox(height: 20),
-        SizedBox(width: double.infinity, child: ElevatedButton(style: ElevatedButton.styleFrom(backgroundColor: ShunShiColors.primary, foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), onPressed: () { Navigator.pop(context); context.push('/subscription'); }, child: const Text('Upgrade now', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)))),
+        SizedBox(width: double.infinity, child: ElevatedButton(style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary(context), foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), onPressed: () { Navigator.pop(context); context.push('/subscription'); }, child: Text('Upgrade now', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)))),
         const SizedBox(height: 10),
-        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Maybe later', style: TextStyle(color: ShunShiColors.textTertiary))),
+        TextButton(onPressed: () => Navigator.pop(context), child: Text('Maybe later', style: TextStyle(color: AppColors.textTertiary(context)))),
         const SizedBox(height: 8),
       ]),
     ));
@@ -327,20 +327,20 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
 
   void _showSafetyDialog() {
     showDialog(context: context, builder: (_) => AlertDialog(
-      backgroundColor: ShunShiColors.surface,
+      backgroundColor: AppColors.surface(context),
       title: Row(children: [
         Icon(Icons.warning_amber_rounded, color: Colors.orange.shade700, size: 28),
         const SizedBox(width: 8),
-        const Text('Health safety notice', style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+        Text('Health safety notice', style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
       ]),
-      content: const Text(
+      content: Text(
         'What you mentioned may involve a health or safety risk. Please contact a medical professional or your local emergency services right away:\n\n'
         '• Crisis line: call your local crisis line (US 988, UK 116 123)\n'
         '• Emergency: your local emergency number (US 911, UK 999, EU 112)\n\n'
         'SEASONS AI cannot replace professional medical diagnosis.',
-        style: TextStyle(fontSize: 15, color: ShunShiColors.textSecondary, height: 1.6),
+        style: TextStyle(fontSize: 15, color: AppColors.textSecondary(context), height: 1.6),
       ),
-      actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('Got it', style: TextStyle(color: ShunShiColors.primary, fontWeight: FontWeight.w600)))],
+      actions: [TextButton(onPressed: () => Navigator.pop(context), child: Text('Got it', style: TextStyle(color: AppColors.primary(context), fontWeight: FontWeight.w600)))],
     ));
   }
 
@@ -374,18 +374,18 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
   }
 
   void _showQuickTopics() {
-    showModalBottomSheet(context: context, backgroundColor: ShunShiColors.background, isScrollControlled: true, shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+    showModalBottomSheet(context: context, backgroundColor: AppColors.background(context), isScrollControlled: true, shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (context) => DraggableScrollableSheet(initialChildSize: 0.72, minChildSize: 0.4, maxChildSize: 0.9, expand: false,
         builder: (_, controller) => ListView(
           controller: controller, padding: const EdgeInsets.all(24),
           children: [
-            Center(child: Container(width: 36, height: 4, decoration: BoxDecoration(color: ShunShiColors.borderGhost, borderRadius: BorderRadius.circular(2)))),
+            Center(child: Container(width: 36, height: 4, decoration: BoxDecoration(color: AppColors.borderGhost(context), borderRadius: BorderRadius.circular(2)))),
             const SizedBox(height: 16),
-            const Text('Quick topics', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+            Text('Quick topics', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
             const SizedBox(height: 14),
             Wrap(spacing: 10, runSpacing: 10, children: ['I haven\'t been sleeping well', 'How to adjust for the change of season', 'Recommend seasonal recipes', 'What exercise suits me', 'What to do when I feel low', 'I\'d like to learn Baduanjin', 'Recommend wellness teas', 'Constitution check'].map((t) => ActionChip(
-              label: Text(t), labelStyle: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 13, color: ShunShiColors.textPrimary),
-              backgroundColor: ShunShiColors.surface, side: BorderSide(color: ShunShiColors.border), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              label: Text(t), labelStyle: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 13, color: AppColors.textPrimary(context)),
+              backgroundColor: AppColors.surface(context), side: BorderSide(color: AppColors.border(context)), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
               onPressed: () { Navigator.pop(context); _controller.text = t; _sendMessage(); },
             )).toList()),
             const SizedBox(height: 24),
@@ -412,25 +412,25 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
   Widget _buildTopBar() {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-      decoration: BoxDecoration(color: ShunShiColors.background, border: Border(bottom: BorderSide(color: ShunShiColors.borderGhost, width: 0.5))),
+      decoration: BoxDecoration(color: AppColors.background(context), border: Border(bottom: BorderSide(color: AppColors.borderGhost(context), width: 0.5))),
       child: Column(children: [
         if (!_isVip) Padding(padding: const EdgeInsets.only(bottom: 8), child: TokenBalanceBar(remaining: _quotaRemaining, limit: _quotaLimit, isVip: _isVip, onTapUpgrade: _showUpgradePrompt)),
         Row(children: [
-          Container(width: 36, height: 36, decoration: const BoxDecoration(color: ShunShiColors.primary, shape: BoxShape.circle), child: const Center(child: Text('🌱', style: TextStyle(fontSize: 18)))),
+          Container(width: 36, height: 36, decoration: BoxDecoration(color: AppColors.primary(context), shape: BoxShape.circle), child: const Center(child: Text('🌱', style: TextStyle(fontSize: 18)))),
           const SizedBox(width: 12),
-          const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text('SEASONS AI Companion', style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 16, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
-            Text('Warm company', style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 12, color: ShunShiColors.textTertiary)),
+          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text('SEASONS AI Companion', style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
+            Text('Warm company', style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 12, color: AppColors.textTertiary(context))),
           ])),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(color: _isVip ? ShunShiColors.gold.withValues(alpha: 0.15) : ShunShiColors.primary.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
+            decoration: BoxDecoration(color: _isVip ? ShunShiColors.gold.withValues(alpha: 0.15) : AppColors.primary(context).withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
             child: Row(mainAxisSize: MainAxisSize.min, children: [
-              if (_isVip) ...[const Icon(Icons.star_rounded, size: 14, color: ShunShiColors.gold), const SizedBox(width: 2), const Text('Premium', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: ShunShiColors.gold))]
-              else ...[Icon(_quotaRemaining > 3 ? Icons.chat_bubble_outline_rounded : Icons.chat_bubble_rounded, size: 13, color: _quotaRemaining > 3 ? ShunShiColors.primary : Colors.orange), const SizedBox(width: 3), Text('$_quotaRemaining/$_quotaLimit', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: _quotaRemaining > 3 ? ShunShiColors.primary : Colors.orange))],
+              if (_isVip) ...[Icon(Icons.star_rounded, size: 14, color: ShunShiColors.gold), const SizedBox(width: 2), Text('Premium', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: ShunShiColors.gold))]
+              else ...[Icon(_quotaRemaining > 3 ? Icons.chat_bubble_outline_rounded : Icons.chat_bubble_rounded, size: 13, color: _quotaRemaining > 3 ? AppColors.primary(context) : Colors.orange), const SizedBox(width: 3), Text('$_quotaRemaining/$_quotaLimit', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: _quotaRemaining > 3 ? AppColors.primary(context) : Colors.orange))],
             ]),
           ),
-          PopupMenuButton<String>(icon: const Icon(Icons.more_vert, size: 22, color: ShunShiColors.textTertiary), onSelected: (v) { if (v == 'clear') { setState(() => _messages.clear()); _saveConversation(); _initChat(); } }, itemBuilder: (_) => [const PopupMenuItem(value: 'clear', child: Text('Clear conversation'))]),
+          PopupMenuButton<String>(icon: Icon(Icons.more_vert, size: 22, color: AppColors.textTertiary(context)), onSelected: (v) { if (v == 'clear') { setState(() => _messages.clear()); _saveConversation(); _initChat(); } }, itemBuilder: (_) => [const PopupMenuItem(value: 'clear', child: Text('Clear conversation'))]),
         ]),
       ]),
     );
@@ -467,16 +467,16 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
   Widget _buildInput() {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-      decoration: BoxDecoration(color: ShunShiColors.background, border: Border(top: BorderSide(color: ShunShiColors.borderGhost, width: 0.5))),
+      decoration: BoxDecoration(color: AppColors.background(context), border: Border(top: BorderSide(color: AppColors.borderGhost(context), width: 0.5))),
       child: Row(children: [
-        GestureDetector(onTap: _showQuickTopics, child: Container(width: 40, height: 40, decoration: BoxDecoration(shape: BoxShape.circle, color: ShunShiColors.surface, border: Border.all(color: ShunShiColors.border)), child: Icon(Icons.add_circle_outline, size: 20, color: ShunShiColors.textTertiary))),
+        GestureDetector(onTap: _showQuickTopics, child: Container(width: 40, height: 40, decoration: BoxDecoration(shape: BoxShape.circle, color: AppColors.surface(context), border: Border.all(color: AppColors.border(context))), child: Icon(Icons.add_circle_outline, size: 20, color: AppColors.textTertiary(context)))),
         const SizedBox(width: 8),
         Expanded(child: Container(constraints: const BoxConstraints(maxHeight: 120), child: TextField(controller: _controller, focusNode: _focusNode, maxLines: null, textInputAction: TextInputAction.send, onSubmitted: (_) => _sendMessage(),
-          decoration: InputDecoration(hintText: 'Type what you\'d like to chat about...', hintStyle: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 15, color: ShunShiColors.textTertiary), filled: true, fillColor: ShunShiColors.surface, contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10), border: OutlineInputBorder(borderRadius: BorderRadius.circular(24), borderSide: BorderSide.none))))),
+          decoration: InputDecoration(hintText: 'Type what you\'d like to chat about...', hintStyle: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 15, color: AppColors.textTertiary(context)), filled: true, fillColor: AppColors.surface(context), contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10), border: OutlineInputBorder(borderRadius: BorderRadius.circular(24), borderSide: BorderSide.none))))),
         const SizedBox(width: 8),
         InkWell(onTap: _showVoiceInput, borderRadius: BorderRadius.circular(20), child: Container(width: 44, height: 44, decoration: BoxDecoration(shape: BoxShape.circle, color: _isRecording ? Colors.red : ShunShiColors.secondary), child: Icon(_isRecording ? Icons.stop : Icons.mic, color: Colors.white, size: 22))),
         const SizedBox(width: 8),
-        GestureDetector(onTap: _sendMessage, child: Container(width: 40, height: 40, decoration: const BoxDecoration(shape: BoxShape.circle, color: ShunShiColors.primary), child: const Icon(Icons.send, color: Colors.white, size: 18))),
+        GestureDetector(onTap: _sendMessage, child: Container(width: 40, height: 40, decoration: BoxDecoration(shape: BoxShape.circle, color: AppColors.primary(context)), child: Icon(Icons.send, color: Colors.white, size: 18))),
       ]),
     );
   }

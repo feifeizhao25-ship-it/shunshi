@@ -3,12 +3,18 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../design_system/theme.dart';
 import '../../../data/network/api_client.dart';
 import '../../../core/network/api_singleton.dart';
 import '../../../data/network/session.dart';
+import '../../../data/network/progress_api.dart';
+import '../../../data/storage/storage_manager.dart';
+import '../../../core/config/app_config.dart';
+import '../../../core/network/locale_headers.dart';
+import 'package:dio/dio.dart';
 
 class ProfilePageV2 extends StatefulWidget {
   const ProfilePageV2({super.key});
@@ -19,6 +25,8 @@ class ProfilePageV2 extends StatefulWidget {
 
 class _ProfilePageV2State extends State<ProfilePageV2> {
   int _favoriteCount = 0;
+  UserProgress? _progress;
+  int? _couponCount;
   String _userName = 'SEASONS';
 
   String _subscriptionTier = 'Free Plan';
@@ -42,6 +50,26 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
       final name = prefs.getString('user_name');
       if (name != null && mounted) setState(() => _userName = name);
     } catch (_) {}
+    await _loadRewards();
+  }
+
+  /// Points and coupons come from the server (check-ins and badges add points; admins issue coupons).
+  /// Nothing here is a placeholder: while loading or when signed out the tiles show an em dash.
+  Future<void> _loadRewards() async {
+    String? token;
+    try {
+      token = StorageManager.user.getToken();
+    } catch (_) {}
+    if (token == null || token.trim().isEmpty) return;
+    final dio = Dio(BaseOptions(baseUrl: AppConfig.apiBaseUrl, connectTimeout: const Duration(seconds: 8), headers: LocaleHeaders.values));
+    final p = await fetchUserProgress(dio, token: token, headers: LocaleHeaders.values);
+    int? coupons;
+    try {
+      final r = await dio.get('/api/v1/coupon/my', options: Options(headers: {...LocaleHeaders.values, 'Authorization': 'Bearer $token'}));
+      final d = r.data is Map && r.data['data'] is Map ? r.data['data'] as Map : const {};
+      coupons = (d['total'] as num?)?.toInt();
+    } catch (_) {}
+    if (mounted) setState(() { _progress = p; _couponCount = coupons; });
   }
 
   Future<String> _getConstitution() async {
@@ -56,7 +84,7 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? ShunShiColors.darkBackground : ShunShiColors.background;
+    final bg = isDark ? ShunShiColors.darkBackground : AppColors.background(context);
 
     return Scaffold(
       backgroundColor: bg,
@@ -73,7 +101,7 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
                     Text('SEASONS AI', style: TextStyle(
                       fontFamily: ShunShiTypography.serifFamily,
                       fontSize: 18, fontWeight: FontWeight.w600,
-                      color: ShunShiColors.primary,
+                      color: AppColors.primary(context),
                     )),
                     const Spacer(),
                     GestureDetector(
@@ -81,10 +109,10 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
                       child: Container(
                         width: 40, height: 40,
                         decoration: BoxDecoration(
-                          color: ShunShiColors.surfaceContainerLow,
+                          color: AppColors.surfaceContainerLow(context),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Icon(Icons.notifications_outlined, size: 20, color: ShunShiColors.textSecondary),
+                        child: Icon(Icons.notifications_outlined, size: 20, color: AppColors.textSecondary(context)),
                       ),
                     ),
                   ],
@@ -108,7 +136,7 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
                         begin: Alignment.topLeft, end: Alignment.bottomRight,
                       ),
                       boxShadow: [
-                        BoxShadow(color: ShunShiColors.primary.withOpacity(0.2), blurRadius: 12, offset: const Offset(0, 4)),
+                        BoxShadow(color: AppColors.primary(context).withOpacity(0.2), blurRadius: 12, offset: const Offset(0, 4)),
                       ],
                     ),
                     child: const Icon(Icons.person, size: 36, color: Colors.white),
@@ -120,7 +148,7 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
                       Text(_userName, style: TextStyle(
                         fontFamily: ShunShiTypography.serifFamily,
                         fontSize: 22, fontWeight: FontWeight.bold,
-                        color: ShunShiColors.textPrimary,
+                        color: AppColors.textPrimary(context),
                       )),
                       const SizedBox(width: 6),
                       const Icon(Icons.verified, size: 18, color: Color(0xFF144227)),
@@ -136,12 +164,12 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
                             child: Container(
                               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
                               decoration: BoxDecoration(
-                                color: ShunShiColors.primaryLight.withOpacity(0.12),
+                                color: AppColors.primaryLight(context).withOpacity(0.12),
                                 borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: ShunShiColors.primaryLight.withOpacity(0.3)),
+                                border: Border.all(color: AppColors.primaryLight(context).withOpacity(0.3)),
                               ),
                               child: Text('🌿 ${snap.data}', style: TextStyle(
-                                fontSize: 12, color: ShunShiColors.primary,
+                                fontSize: 12, color: AppColors.primary(context),
                                 fontWeight: FontWeight.w500,
                               )),
                             ),
@@ -171,7 +199,7 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 decoration: BoxDecoration(
-                  color: ShunShiColors.surface,
+                  color: AppColors.surface(context),
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, 2)),
@@ -179,10 +207,10 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
                 ),
                 child: Row(
                   children: [
-                    _buildStat('Points', '2560'),
-                    Container(width: 1, height: 32, color: ShunShiColors.borderGhost),
-                    _buildStat('Coupons', '3'),
-                    Container(width: 1, height: 32, color: ShunShiColors.borderGhost),
+                    _buildStat('Points', _progress == null ? '—' : '${_progress!.points}'),
+                    Container(width: 1, height: 32, color: AppColors.borderGhost(context)),
+                    _buildStat('Coupons', _couponCount == null ? '—' : '$_couponCount'),
+                    Container(width: 1, height: 32, color: AppColors.borderGhost(context)),
                     _buildStat('Favorites', '$_favoriteCount'),
                   ],
                 ),
@@ -196,7 +224,7 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
               padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
               child: Container(
                 decoration: BoxDecoration(
-                  color: ShunShiColors.surface,
+                  color: AppColors.surface(context),
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, 2)),
@@ -233,7 +261,7 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
                   children: [
                     Text('Invite Friends, Get Premium', style: TextStyle(
                       fontSize: 17, fontWeight: FontWeight.w600,
-                      color: ShunShiColors.surface,
+                      color: AppColors.surface(context),
                     )),
                     const SizedBox(height: 4),
                     Text('Share the gift of seasonal wellness', style: TextStyle(
@@ -247,7 +275,7 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text('Invite Now', style: TextStyle(
-                        fontSize: 13, color: ShunShiColors.surface, fontWeight: FontWeight.w500,
+                        fontSize: 13, color: AppColors.surface(context), fontWeight: FontWeight.w500,
                       )),
                     ),
                   ],
@@ -262,7 +290,7 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
               padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
               child: Container(
                 decoration: BoxDecoration(
-                  color: ShunShiColors.surface,
+                  color: AppColors.surface(context),
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, 2)),
@@ -292,7 +320,7 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
               child: Center(
                 child: Text('Live with the rhythm of nature', style: TextStyle(
                   fontFamily: ShunShiTypography.serifFamily,
-                  fontSize: 14, color: ShunShiColors.textTertiary,
+                  fontSize: 14, color: AppColors.textTertiary(context),
                   fontStyle: FontStyle.italic,
                 )),
               ),
@@ -308,11 +336,11 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
       child: Column(children: [
         Text(value, style: TextStyle(
           fontSize: 18, fontWeight: FontWeight.bold,
-          color: ShunShiColors.textPrimary,
+          color: AppColors.textPrimary(context),
         )),
         const SizedBox(height: 2),
         Text(label, style: TextStyle(
-          fontSize: 12, color: ShunShiColors.textTertiary,
+          fontSize: 12, color: AppColors.textTertiary(context),
         )),
       ]),
     );
@@ -320,11 +348,11 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
 
   Widget _buildMenuTile(IconData icon, String title, VoidCallback? onTap) {
     return ListTile(
-      leading: Icon(icon, color: ShunShiColors.primary, size: 22),
+      leading: Icon(icon, color: AppColors.primary(context), size: 22),
       title: Text(title, style: TextStyle(
-        fontSize: 15, color: ShunShiColors.textPrimary,
+        fontSize: 15, color: AppColors.textPrimary(context),
       )),
-      trailing: const Icon(Icons.chevron_right, color: ShunShiColors.textTertiary, size: 20),
+      trailing: Icon(Icons.chevron_right, color: AppColors.textTertiary(context), size: 20),
       onTap: onTap,
     );
   }
@@ -332,7 +360,7 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
   Widget _buildDivider() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Divider(height: 1, color: ShunShiColors.borderGhost),
+      child: Divider(height: 1, color: AppColors.borderGhost(context)),
     );
   }
 }

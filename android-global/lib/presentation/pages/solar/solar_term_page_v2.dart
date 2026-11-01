@@ -4,6 +4,7 @@
 library;
 
 import 'package:dio/dio.dart';
+import '../../../design_system/app_colors.dart';
 import '../../../core/config/app_config.dart';import '../../widgets/state_view.dart';
 import 'package:flutter/material.dart';
 import '../../widgets/seasons_visual.dart';
@@ -141,7 +142,7 @@ class _SolarTermPageV2State extends State<SolarTermPageV2> {
     return Scaffold(
 
       appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
-      backgroundColor: isDark ? ShunShiColors.darkBackground : ShunShiColors.background,
+      backgroundColor: isDark ? ShunShiColors.darkBackground : AppColors.background(context),
       body: _loading
           ? const LoadingSkeleton()
           : CustomScrollView(
@@ -158,15 +159,15 @@ class _SolarTermPageV2State extends State<SolarTermPageV2> {
                           child: Container(
                             width: 40, height: 40,
                             decoration: BoxDecoration(
-                              color: ShunShiColors.surfaceContainerLow, borderRadius: BorderRadius.circular(12),
+                              color: AppColors.surfaceContainerLow(context), borderRadius: BorderRadius.circular(12),
                             ),
-                            child: const Icon(Icons.arrow_back, size: 20, color: ShunShiColors.textPrimary),
+                            child: Icon(Icons.arrow_back, size: 20, color: AppColors.textPrimary(context)),
                           ),
                         ),
                         const Spacer(),
                         Text(AppLocalizations.of(context).t('app_title'), style: TextStyle(
                           fontFamily: ShunShiTypography.serifFamily,
-                          fontSize: 16, fontWeight: FontWeight.w600, color: ShunShiColors.primary,
+                          fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.primary(context),
                         )),
                         const Spacer(),
                         const SizedBox(width: 40),
@@ -195,16 +196,16 @@ class _SolarTermPageV2State extends State<SolarTermPageV2> {
                         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                           Text(ZhEnMapper.solarTermFromApi(_term), style: TextStyle(
                             fontFamily: ShunShiTypography.serifFamily,
-                            fontSize: 32, fontWeight: FontWeight.bold, color: ShunShiColors.textPrimary,
+                            fontSize: 32, fontWeight: FontWeight.bold, color: AppColors.textPrimary(context),
                           )),
                         ])),
                       ]),
                       const SizedBox(height: 8),
                       if (_term['date'] != null)
-                        Text('${_term['date']}', style: TextStyle(fontSize: 13, color: ShunShiColors.textSecondary)),
+                        Text('${_term['date']}', style: TextStyle(fontSize: 13, color: AppColors.textSecondary(context))),
                       if (_term['days_remaining'] != null) ...[
                         const SizedBox(height: 4),
-                        Text(AppLocalizations.of(context).t('solar_days_until_next', params: {'days': '${_term['days_remaining']}'}), style: TextStyle(fontSize: 13, color: ShunShiColors.primary, fontWeight: FontWeight.w500)),
+                        Text(AppLocalizations.of(context).t('solar_days_until_next', params: {'days': '${_term['days_remaining']}'}), style: TextStyle(fontSize: 13, color: AppColors.primary(context), fontWeight: FontWeight.w500)),
                       ],
                     ]),
                   ),
@@ -218,15 +219,15 @@ class _SolarTermPageV2State extends State<SolarTermPageV2> {
                       child: Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: ShunShiColors.primary.withValues(alpha: 0.06), borderRadius: BorderRadius.circular(14),
+                          color: AppColors.primary(context).withValues(alpha: 0.06), borderRadius: BorderRadius.circular(14),
                         ),
                         child: Row(children: [
                           const Icon(Icons.event_outlined, size: 26, color: Color(0xFF144227)),
                           const SizedBox(width: 12),
                           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                            Text('${AppLocalizations.of(context).t('solar_next').replaceAll('{name}', ZhEnMapper.solarTermFromApi(_next))}', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+                            Text('${AppLocalizations.of(context).t('solar_next').replaceAll('{name}', ZhEnMapper.solarTermFromApi(_next))}', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
                             Text(_next['countdown_days'] != null ? '${_next['countdown_days']}d away' : _next['date']?.toString() ?? '',
-                              style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
+                              style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context))),
                           ])),
                         ]),
                       ),
@@ -291,7 +292,7 @@ class _SolarTermPageV2State extends State<SolarTermPageV2> {
     return SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
-        child: Text(title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+        child: Text(title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
       ),
     );
   }
@@ -301,21 +302,21 @@ class _SolarTermPageV2State extends State<SolarTermPageV2> {
       padding: const EdgeInsets.only(bottom: 10),
       child: Container(
         padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(12)),
+        decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(12)),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
             SgThumb(asset: sgWellnessThumb(icon == '🧘' ? 'exercise' : (icon == '🫖' ? 'tea' : 'food'), title), size: 48),
             const SizedBox(width: 10),
-            Expanded(child: Text(title, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary))),
+            Expanded(child: Text(title, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context)))),
           ]),
           const SizedBox(height: 6),
-          Text(desc, style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary, height: 1.5), maxLines: 3, overflow: TextOverflow.ellipsis),
+          Text(desc, style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context), height: 1.5), maxLines: 3, overflow: TextOverflow.ellipsis),
           if (tags.isNotEmpty) ...[
             const SizedBox(height: 8),
             Wrap(spacing: 6, children: tags.map((t) => Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-              decoration: BoxDecoration(color: ShunShiColors.primary.withValues(alpha: 0.06), borderRadius: BorderRadius.circular(8)),
-              child: Text(t, style: TextStyle(fontSize: 10, color: ShunShiColors.primary, fontWeight: FontWeight.w500)),
+              decoration: BoxDecoration(color: AppColors.primary(context).withValues(alpha: 0.06), borderRadius: BorderRadius.circular(8)),
+              child: Text(t, style: TextStyle(fontSize: 10, color: AppColors.primary(context), fontWeight: FontWeight.w500)),
             )).toList()),
           ],
         ]),

@@ -13,6 +13,7 @@
 library;
 
 import 'dart:async';
+import '../../../design_system/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
 
@@ -68,16 +69,16 @@ class _ExerciseDetailPageState extends State<ExerciseDetailPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       body: CustomScrollView(
         slivers: [
           // ── Header ──
           SliverAppBar(
             expandedHeight: 280,
             pinned: true,
-            backgroundColor: ShunShiColors.primary,
+            backgroundColor: AppColors.primary(context),
             leading: IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
+              icon: Icon(Icons.arrow_back_ios_new, color: Colors.white),
               onPressed: () => Navigator.pop(context),
             ),
             flexibleSpace: FlexibleSpaceBar(
@@ -86,7 +87,7 @@ class _ExerciseDetailPageState extends State<ExerciseDetailPage>
                 children: [
                   // Mountain landscape placeholder
                   Container(
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
@@ -114,7 +115,7 @@ class _ExerciseDetailPageState extends State<ExerciseDetailPage>
                           ),
                         ],
                       ),
-                      child: const Icon(Icons.play_arrow, size: 36, color: ShunShiColors.primary),
+                      child: Icon(Icons.play_arrow, size: 36, color: AppColors.primary(context)),
                     ),
                   ),
                   // Progress bar
@@ -136,7 +137,7 @@ class _ExerciseDetailPageState extends State<ExerciseDetailPage>
                         const SizedBox(height: 4),
                         Text(
                           '${widget.exerciseName ?? 'Baduanjin'}· Form 3',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 26,
                             fontWeight: FontWeight.w700,
                             color: Colors.white,
@@ -159,7 +160,7 @@ class _ExerciseDetailPageState extends State<ExerciseDetailPage>
                     left: 20, right: 20, bottom: 20,
                     child: Row(
                       children: [
-                        const Icon(Icons.timer_outlined, size: 14, color: Colors.white70),
+                        Icon(Icons.timer_outlined, size: 14, color: Colors.white70),
                         const SizedBox(width: 4),
                         Text('12 min', style: TextStyle(
                           fontSize: 12, color: Colors.white70, fontFamily: ShunShiTypography.sansFamily,
@@ -211,7 +212,7 @@ class _ExerciseDetailPageState extends State<ExerciseDetailPage>
                   Container(
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      color: ShunShiColors.surfaceContainerLow,
+                      color: AppColors.surfaceContainerLow(context),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Column(
@@ -225,9 +226,9 @@ class _ExerciseDetailPageState extends State<ExerciseDetailPage>
                               height: 80,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: ShunShiColors.primary.withValues(alpha: 0.1),
+                                color: AppColors.primary(context).withValues(alpha: 0.1),
                                 border: Border.all(
-                                  color: ShunShiColors.primary,
+                                  color: AppColors.primary(context),
                                   width: 2,
                                 ),
                               ),
@@ -237,7 +238,7 @@ class _ExerciseDetailPageState extends State<ExerciseDetailPage>
                                   style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
-                                    color: ShunShiColors.primary,
+                                    color: AppColors.primary(context),
                                     fontFamily: ShunShiTypography.sansFamily,
                                   ),
                                   textAlign: TextAlign.center,
@@ -251,7 +252,7 @@ class _ExerciseDetailPageState extends State<ExerciseDetailPage>
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            _breathBar('Inhale', '4s', ShunShiColors.primary),
+                            _breathBar('Inhale', '4s', AppColors.primary(context)),
                             const SizedBox(width: 12),
                             _breathBar('Hold', '2s', ShunShiColors.gold),
                             const SizedBox(width: 12),
@@ -273,7 +274,7 @@ class _ExerciseDetailPageState extends State<ExerciseDetailPage>
                             decoration: BoxDecoration(
                               color: _isBreathing
                                   ? ShunShiColors.error.withValues(alpha: 0.1)
-                                  : ShunShiColors.primary,
+                                  : AppColors.primary(context),
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Text(
@@ -299,7 +300,7 @@ class _ExerciseDetailPageState extends State<ExerciseDetailPage>
                     child: ElevatedButton(
                       onPressed: () {},
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: ShunShiColors.primary,
+                        backgroundColor: AppColors.primary(context),
                         foregroundColor: Colors.white,
                         elevation: 0,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -307,7 +308,7 @@ class _ExerciseDetailPageState extends State<ExerciseDetailPage>
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.fullscreen, size: 20),
+                          Icon(Icons.fullscreen, size: 20),
                           const SizedBox(width: 8),
                           Text('Start full-screen lesson', style: TextStyle(
                             fontSize: 16, fontWeight: FontWeight.w600, fontFamily: ShunShiTypography.sansFamily,
@@ -323,7 +324,7 @@ class _ExerciseDetailPageState extends State<ExerciseDetailPage>
                     'Principle',
                     'The spleen and stomach are the foundation of postnatal health and the source of qi and blood. When one arm lifts, one side of the abdomen is stretched and the other compressed,'
                     'massaging the spleen and stomach. The movement directly stimulates the areas along the Spleen and Stomach meridians.',
-                    ShunShiColors.primary,
+                    AppColors.primary(context),
                   ),
                   const SizedBox(height: 12),
 
@@ -342,7 +343,7 @@ class _ExerciseDetailPageState extends State<ExerciseDetailPage>
                     '• Shrugging: don\'t hunch the shoulders as the arm rises; keep shoulders down and elbows relaxed\n'
                     '• Holding your breath: match movement and breath — inhale as you rise, exhale as you lower\n'
                     '• Leaning back too far: keep the torso upright; don\'t over-arch to get a bigger stretch',
-                    ShunShiColors.textSecondary,
+                    AppColors.textSecondary(context),
                   ),
                   const SizedBox(height: 12),
 
@@ -364,11 +365,11 @@ class _ExerciseDetailPageState extends State<ExerciseDetailPage>
     );
   }
 
-  Widget _sectionTitle(String t) => Text(t, style: const TextStyle(
+  Widget _sectionTitle(String t) => Text(t, style: TextStyle(
     fontSize: 18,
     fontWeight: FontWeight.w700,
     fontFamily: ShunShiTypography.serifFamily,
-    color: ShunShiColors.textPrimary,
+    color: AppColors.textPrimary(context),
   ));
 
   Widget _numberedStep(String num, String title, String desc) => Padding(
@@ -379,11 +380,11 @@ class _ExerciseDetailPageState extends State<ExerciseDetailPage>
         Container(
           width: 32, height: 32,
           decoration: BoxDecoration(
-            color: ShunShiColors.primary,
+            color: AppColors.primary(context),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Center(
-            child: Text(num, style: const TextStyle(
+            child: Text(num, style: TextStyle(
               fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white, fontFamily: ShunShiTypography.serifFamily,
             )),
           ),
@@ -393,12 +394,12 @@ class _ExerciseDetailPageState extends State<ExerciseDetailPage>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, style: const TextStyle(
-                fontSize: 16, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.sansFamily,
+              Text(title, style: TextStyle(
+                fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context), fontFamily: ShunShiTypography.sansFamily,
               )),
               const SizedBox(height: 4),
-              Text(desc, style: const TextStyle(
-                fontSize: 13, color: ShunShiColors.textSecondary, height: 1.6, fontFamily: ShunShiTypography.sansFamily,
+              Text(desc, style: TextStyle(
+                fontSize: 13, color: AppColors.textSecondary(context), height: 1.6, fontFamily: ShunShiTypography.sansFamily,
               )),
             ],
           ),
@@ -421,7 +422,7 @@ class _ExerciseDetailPageState extends State<ExerciseDetailPage>
         fontSize: 11, color: color, fontWeight: FontWeight.w500, fontFamily: ShunShiTypography.sansFamily,
       )),
       Text(time, style: TextStyle(
-        fontSize: 10, color: ShunShiColors.textTertiary, fontFamily: ShunShiTypography.sansFamily,
+        fontSize: 10, color: AppColors.textTertiary(context), fontFamily: ShunShiTypography.sansFamily,
       )),
     ],
   );
@@ -430,7 +431,7 @@ class _ExerciseDetailPageState extends State<ExerciseDetailPage>
     width: double.infinity,
     padding: const EdgeInsets.all(16),
     decoration: BoxDecoration(
-      color: ShunShiColors.surfaceContainerLowest,
+      color: AppColors.surfaceContainerLowest(context),
       borderRadius: BorderRadius.circular(12),
     ),
     child: Column(
@@ -440,8 +441,8 @@ class _ExerciseDetailPageState extends State<ExerciseDetailPage>
           fontSize: 14, fontWeight: FontWeight.w600, color: accentColor, fontFamily: ShunShiTypography.sansFamily,
         )),
         const SizedBox(height: 8),
-        Text(content, style: const TextStyle(
-          fontSize: 13, color: ShunShiColors.textSecondary, height: 1.7, fontFamily: ShunShiTypography.sansFamily,
+        Text(content, style: TextStyle(
+          fontSize: 13, color: AppColors.textSecondary(context), height: 1.7, fontFamily: ShunShiTypography.sansFamily,
         )),
       ],
     ),

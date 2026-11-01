@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../design_system/theme.dart';
 import '../../../data/network/api_client.dart';
+import '../../../data/network/progress_api.dart';
 
 class ProfilePageV2 extends StatefulWidget {
   const ProfilePageV2({super.key});
@@ -18,7 +19,7 @@ class ProfilePageV2 extends StatefulWidget {
 class _ProfilePageV2State extends State<ProfilePageV2> {
   int _favoriteCount = 0;
   int _wellnessDays = 0;
-  int _checkinCount = 0;
+  int _points = 0;
   bool _loggedIn = false;
   String _userName = '顺时小朋友';
   int _checkinDays = 0;
@@ -42,7 +43,7 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
     try {
       final results = await Future.wait([
         ApiClient().get('/api/v1/favorites', queryParameters: {'limit': 1}),
-        ApiClient().get('/api/v1/records/care/stats'),
+        ApiClient().get('/api/v1/gamification/me'),
       ]);
       // Favorites count
       final favResp = results[0];
@@ -50,13 +51,12 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
         final total = favResp.data['data']?['total'] ?? 0;
         if (mounted) setState(() => _favoriteCount = total);
       }
-      // Care stats
-      final statsResp = results[1];
-      if (statsResp.data is Map && statsResp.data['data'] is Map) {
-        final d = statsResp.data['data'] as Map<String, dynamic>;
-        if (mounted) setState(() {
-          _wellnessDays = d['total_days'] as int? ?? 0;
-          _checkinCount = d['total_checkins'] as int? ?? d['week_streak'] as int? ?? 0;
+      // 打卡 / 积分（服务端 gamification，不是本地拼的）
+      final p = UserProgress.fromBody(results[1].data);
+      if (p != null && mounted) {
+        setState(() {
+          _wellnessDays = p.totalCheckinDays;
+          _points = p.points;
         });
       }
     } catch (_) {}
@@ -299,7 +299,7 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
                         children: [
                           _buildStat(context, '养生天数', '$_wellnessDays', isDark),
                           _buildStatDivider(isDark),
-                          _buildStat(context, '打卡次数', '$_checkinCount', isDark),
+                          _buildStat(context, '积分', '$_points', isDark),
                           _buildStatDivider(isDark),
                           _buildStat(context, '收藏数', '$_favoriteCount', isDark),
                         ],

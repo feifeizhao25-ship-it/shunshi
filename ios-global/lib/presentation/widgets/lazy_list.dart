@@ -80,7 +80,7 @@ class _LazyListViewState<T> extends State<LazyListView<T>> {
         // 加载更多指示器
         if (index == widget.items.length) {
           return widget.loadingWidget ??
-              const Padding(
+              Padding(
                 padding: EdgeInsets.all(16),
                 child: Center(child: CircularProgressIndicator()),
               );

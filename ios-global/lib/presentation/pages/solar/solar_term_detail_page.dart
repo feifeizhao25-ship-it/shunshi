@@ -1,5 +1,6 @@
 // ignore_for_file: unused_field
 import 'dart:convert';
+import '../../../design_system/app_colors.dart';
 import 'package:http/http.dart' as http;
 import '../../../core/router/safe_pop.dart';
 import 'package:flutter/material.dart';
@@ -91,19 +92,19 @@ class _SolarTermDetailPageState extends State<SolarTermDetailPage> {
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Column(children: [
           const SizedBox(height: 60),
-          Container(height: 48, width: 120, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8))),
+          Container(height: 48, width: 120, decoration: BoxDecoration(color: AppColors.card(context), borderRadius: BorderRadius.circular(8))),
           const SizedBox(height: 8),
-          Container(height: 20, width: 160, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6))),
+          Container(height: 20, width: 160, decoration: BoxDecoration(color: AppColors.card(context), borderRadius: BorderRadius.circular(6))),
           const SizedBox(height: 32),
-          Container(height: 180, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16))),
+          Container(height: 180, decoration: BoxDecoration(color: AppColors.card(context), borderRadius: BorderRadius.circular(16))),
           const SizedBox(height: 24),
-          Container(height: 100, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16))),
+          Container(height: 100, decoration: BoxDecoration(color: AppColors.card(context), borderRadius: BorderRadius.circular(16))),
           const SizedBox(height: 24),
-          Container(height: 20, width: 120, alignment: Alignment.centerLeft, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6))),
+          Container(height: 20, width: 120, alignment: Alignment.centerLeft, decoration: BoxDecoration(color: AppColors.card(context), borderRadius: BorderRadius.circular(6))),
           const SizedBox(height: 14),
           ...List.generate(4, (_) => Padding(
             padding: const EdgeInsets.only(bottom: 10),
-            child: Container(height: 72, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14))),
+            child: Container(height: 72, decoration: BoxDecoration(color: AppColors.card(context), borderRadius: BorderRadius.circular(14))),
           )),
           const SizedBox(height: 40),
         ]),
@@ -114,7 +115,7 @@ class _SolarTermDetailPageState extends State<SolarTermDetailPage> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return Scaffold(backgroundColor: ShunShiColors.background, body: SafeArea(child: _buildSkeleton()));
+      return Scaffold(backgroundColor: AppColors.background(context), body: SafeArea(child: _buildSkeleton()));
     }
 
     final termName = widget.termName;
@@ -128,7 +129,7 @@ class _SolarTermDetailPageState extends State<SolarTermDetailPage> {
     final recommendedFoods = _getList(_termDetail['recommended_foods'], ['Seasonal produce', 'Warming foods']);
 
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -138,9 +139,9 @@ class _SolarTermDetailPageState extends State<SolarTermDetailPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                IconButton(onPressed: () => safePop(context), icon: Icon(Icons.arrow_back_ios_new_rounded, color: ShunShiColors.textPrimary, size: 22)),
-                Text('SEASONS AI', style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 16, fontWeight: FontWeight.w600, color: ShunShiColors.textSecondary)),
-                IconButton(onPressed: () { ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Share link copied'), duration: Duration(seconds: 1))); }, icon: Icon(Icons.share_rounded, color: ShunShiColors.textSecondary, size: 22)),
+                IconButton(onPressed: () => safePop(context), icon: Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary(context), size: 22)),
+                Text('SEASONS AI', style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textSecondary(context))),
+                IconButton(onPressed: () { ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Share link copied'), duration: Duration(seconds: 1))); }, icon: Icon(Icons.share_rounded, color: AppColors.textSecondary(context), size: 22)),
               ],
             ),
             const SizedBox(height: 24),
@@ -149,19 +150,19 @@ class _SolarTermDetailPageState extends State<SolarTermDetailPage> {
             Center(child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
               decoration: BoxDecoration(
-                color: ShunShiColors.primary.withValues(alpha: 0.08),
+                color: AppColors.primary(context).withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(999),
               ),
               child: Text('${info.season} · ${termName} Solar Term',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: ShunShiColors.primary, letterSpacing: 0.5)),
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.primary(context), letterSpacing: 0.5)),
             )),
             const SizedBox(height: 20),
 
             // Solar term title
             Center(child: Column(children: [
-              Text(termName, style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 42, fontWeight: FontWeight.w700, color: ShunShiColors.textPrimary)),
+              Text(termName, style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 42, fontWeight: FontWeight.w700, color: AppColors.textPrimary(context))),
               const SizedBox(height: 6),
-              Text(info.en, style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 16, color: ShunShiColors.textTertiary, letterSpacing: 1.2, fontStyle: FontStyle.italic)),
+              Text(info.en, style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 16, color: AppColors.textTertiary(context), letterSpacing: 1.2, fontStyle: FontStyle.italic)),
             ])),
             const SizedBox(height: 32),
 
@@ -171,7 +172,7 @@ class _SolarTermDetailPageState extends State<SolarTermDetailPage> {
               height: 180,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(16),
-                image: const DecorationImage(image: AssetImage('assets/images/ref_10.jpg'), fit: BoxFit.cover),
+                image: DecorationImage(image: AssetImage('assets/images/ref_10.jpg'), fit: BoxFit.cover),
               ),
             ),
             const SizedBox(height: 24),
@@ -180,17 +181,17 @@ class _SolarTermDetailPageState extends State<SolarTermDetailPage> {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(color: ShunShiColors.primary.withValues(alpha: 0.06), borderRadius: BorderRadius.circular(16)),
+              decoration: BoxDecoration(color: AppColors.primary(context).withValues(alpha: 0.06), borderRadius: BorderRadius.circular(16)),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('Solar Term Essence', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 16, fontWeight: FontWeight.w600, color: ShunShiColors.primary)),
+                Text('Solar Term Essence', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.primary(context))),
                 const SizedBox(height: 10),
-                Text('"${info.quote}"', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 15, color: ShunShiColors.textSecondary, height: 1.8)),
+                Text('"${info.quote}"', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 15, color: AppColors.textSecondary(context), height: 1.8)),
               ]),
             ),
             const SizedBox(height: 24),
 
             // 顺时生活方案
-            Text('SEASONS Living Guide', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+            Text('SEASONS Living Guide', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
             const SizedBox(height: 14),
 
             // 饮食（推荐食物）
@@ -225,19 +226,19 @@ class _SolarTermDetailPageState extends State<SolarTermDetailPage> {
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [ShunShiColors.primary.withValues(alpha: 0.08), ShunShiColors.primary.withValues(alpha: 0.03)],
+                    colors: [AppColors.primary(context).withValues(alpha: 0.08), AppColors.primary(context).withValues(alpha: 0.03)],
                   ),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Row(children: [
-                  const Icon(Icons.auto_awesome, size: 20, color: ShunShiColors.primary),
+                  Icon(Icons.auto_awesome, size: 20, color: AppColors.primary(context)),
                   const SizedBox(width: 12),
                   Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text('Solar term wellness goes further', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: ShunShiColors.primary)),
+                    Text('Solar term wellness goes further', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.primary(context))),
                     const SizedBox(height: 2),
-                    Text('Ask SEASONS AI for a personalized wellness plan for the current solar term', style: TextStyle(fontSize: 12, color: ShunShiColors.textSecondary)),
+                    Text('Ask SEASONS AI for a personalized wellness plan for the current solar term', style: TextStyle(fontSize: 12, color: AppColors.textSecondary(context))),
                   ])),
-                  const Icon(Icons.arrow_forward_ios, size: 16, color: ShunShiColors.primary),
+                  Icon(Icons.arrow_forward_ios, size: 16, color: AppColors.primary(context)),
                 ]),
               ),
             ),
@@ -252,10 +253,10 @@ class _SolarTermDetailPageState extends State<SolarTermDetailPage> {
                     const SnackBar(content: Text('Share link copied'), duration: Duration(seconds: 1)),
                   );
                 },
-                icon: const Icon(Icons.share, size: 18),
-                label: const Text('Share this seasonal inspiration', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+                icon: Icon(Icons.share, size: 18),
+                label: Text('Share this seasonal inspiration', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: ShunShiColors.primary,
+                  backgroundColor: AppColors.primary(context),
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
@@ -274,16 +275,16 @@ class _SolarTermDetailPageState extends State<SolarTermDetailPage> {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(14), border: Border.all(color: ShunShiColors.border)),
+      decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(14), border: Border.all(color: AppColors.border(context))),
       child: Row(children: [
-        Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: ShunShiColors.primary.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)), child: Icon(icon, color: ShunShiColors.primary, size: 22)),
+        Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: AppColors.primary(context).withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)), child: Icon(icon, color: AppColors.primary(context), size: 22)),
         const SizedBox(width: 14),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(title, style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 15, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+          Text(title, style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 15, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
           const SizedBox(height: 2),
-          Text(desc, style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 13, color: ShunShiColors.textTertiary)),
+          Text(desc, style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 13, color: AppColors.textTertiary(context))),
         ])),
-        Icon(Icons.chevron_right_rounded, color: ShunShiColors.textTertiary, size: 20),
+        Icon(Icons.chevron_right_rounded, color: AppColors.textTertiary(context), size: 20),
       ]),
     );
   }
@@ -292,18 +293,18 @@ class _SolarTermDetailPageState extends State<SolarTermDetailPage> {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(14), border: Border.all(color: ShunShiColors.border)),
+      decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(14), border: Border.all(color: AppColors.border(context))),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: ShunShiColors.primary.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)), child: Icon(icon, color: ShunShiColors.primary, size: 22)),
+          Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: AppColors.primary(context).withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)), child: Icon(icon, color: AppColors.primary(context), size: 22)),
           const SizedBox(width: 14),
-          Expanded(child: Text(title, style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 15, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary))),
+          Expanded(child: Text(title, style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 15, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context)))),
         ]),
         const SizedBox(height: 10),
         Wrap(spacing: 8, runSpacing: 6, children: items.map((item) => Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-          decoration: BoxDecoration(color: ShunShiColors.primary.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8)),
-          child: Text(item, style: TextStyle(fontSize: 13, color: ShunShiColors.primary)),
+          decoration: BoxDecoration(color: AppColors.primary(context).withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8)),
+          child: Text(item, style: TextStyle(fontSize: 13, color: AppColors.primary(context))),
         )).toList()),
       ]),
     );

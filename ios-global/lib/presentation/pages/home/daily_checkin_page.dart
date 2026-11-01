@@ -1,6 +1,9 @@
 import '../../../core/router/safe_pop.dart';
+import '../../../design_system/app_colors.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import '../../../data/network/session.dart';
+import '../../../core/network/locale_headers.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/config/app_config.dart';
 
@@ -31,13 +34,18 @@ class _DailyCheckinPageState extends State<DailyCheckinPage> {
   Future<void> _submit() async {
     setState(() => _isSubmitting = true);
     try {
-      final dio = Dio(BaseOptions(baseUrl: _baseUrl));
-      await dio.post('/api/v1/user/daily-checkin', data: {
+      final dio = Dio(BaseOptions(baseUrl: _baseUrl, headers: LocaleHeaders.values));
+      // 打卡 = 写一条今日日记（心情 / 精力 / 睡眠）；服务端同时记一次打卡、发积分。
+      // 以前这里 POST 一个不存在的 /user/daily-checkin 且不带登录令牌，提交必然失败，「记录」「成就」页自然永远是 0。
+      final token = await ensureSessionToken(dio);
+      if (token == null) throw StateError('no session');
+      final note = _noteController.text.trim();
+      await dio.post('/api/v1/journal/entry', data: {
         'mood': _mood.round(),
-        'sleep_quality': _sleep.round(),
         'energy': _energy.round(),
-        'notes': _noteController.text.trim().isEmpty ? null : _noteController.text.trim(),
-      });
+        'sleep_quality': _sleep.round(),
+        if (note.isNotEmpty) 'notes': note,
+      }, options: Options(headers: {'Authorization': 'Bearer $token'}));
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Saved! Keep it up 💪'), duration: Duration(seconds: 2), backgroundColor: ShunShiColors.primary),
@@ -64,9 +72,9 @@ class _DailyCheckinPageState extends State<DailyCheckinPage> {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: ShunShiColors.surface,
+        color: AppColors.surface(context),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: ShunShiColors.borderGhost),
+        border: Border.all(color: AppColors.borderGhost(context)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -74,23 +82,23 @@ class _DailyCheckinPageState extends State<DailyCheckinPage> {
           Row(children: [
             Text(emoji, style: const TextStyle(fontSize: 24)),
             const SizedBox(width: 10),
-            Text(label, style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 16, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+            Text(label, style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
             const Spacer(),
             Text(
               '${value.round()} · ${_moodLabels[value.round()]}',
-              style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 14, color: ShunShiColors.primary, fontWeight: FontWeight.w500),
+              style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 14, color: AppColors.primary(context), fontWeight: FontWeight.w500),
             ),
           ]),
           const SizedBox(height: 8),
           Row(children: [
-            Text('1', style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
+            Text('1', style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context))),
             Expanded(child: SliderTheme(data: SliderTheme.of(context).copyWith(
-              activeTrackColor: ShunShiColors.primary,
-              inactiveTrackColor: ShunShiColors.primary.withValues(alpha: 0.15),
-              thumbColor: ShunShiColors.primary,
-              overlayColor: ShunShiColors.primary.withValues(alpha: 0.1),
+              activeTrackColor: AppColors.primary(context),
+              inactiveTrackColor: AppColors.primary(context).withValues(alpha: 0.15),
+              thumbColor: AppColors.primary(context),
+              overlayColor: AppColors.primary(context).withValues(alpha: 0.1),
             ), child: Slider(value: value, min: 1, max: 5, divisions: 4, onChanged: onChanged))),
-            Text('5', style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
+            Text('5', style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context))),
           ]),
         ],
       ),
@@ -100,24 +108,24 @@ class _DailyCheckinPageState extends State<DailyCheckinPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       appBar: AppBar(
-        backgroundColor: ShunShiColors.background,
+        backgroundColor: AppColors.background(context),
         elevation: 0,
-        leading: IconButton(icon: const Icon(Icons.arrow_back_ios, size: 20, color: ShunShiColors.textPrimary), onPressed: () => safePop(context)),
-        title: Text('Daily check-in', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+        leading: IconButton(icon: Icon(Icons.arrow_back_ios, size: 20, color: AppColors.textPrimary(context)), onPressed: () => safePop(context)),
+        title: Text('Daily check-in', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(
             'How are you feeling today?',
-            style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 20, fontWeight: FontWeight.w700, color: ShunShiColors.textPrimary),
+            style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 20, fontWeight: FontWeight.w700, color: AppColors.textPrimary(context)),
           ),
           const SizedBox(height: 6),
           Text(
             'Log how you feel in body and mind and we\'ll tailor suggestions',
-            style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 14, color: ShunShiColors.textTertiary),
+            style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 14, color: AppColors.textTertiary(context)),
           ),
           const SizedBox(height: 24),
           _buildSlider(label: 'Mood', emoji: _moodEmojis[_mood.round()], value: _mood, onChanged: (v) => setState(() => _mood = v)),
@@ -126,16 +134,16 @@ class _DailyCheckinPageState extends State<DailyCheckinPage> {
           const SizedBox(height: 16),
           _buildSlider(label: 'Energy level', emoji: '⚡', value: _energy, onChanged: (v) => setState(() => _energy = v)),
           const SizedBox(height: 24),
-          Text('Anything you\'d like to note today?', style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 15, fontWeight: FontWeight.w500, color: ShunShiColors.textSecondary)),
+          Text('Anything you\'d like to note today?', style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 15, fontWeight: FontWeight.w500, color: AppColors.textSecondary(context))),
           const SizedBox(height: 10),
           Container(
-            decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(14), border: Border.all(color: ShunShiColors.borderGhost)),
+            decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(14), border: Border.all(color: AppColors.borderGhost(context))),
             child: TextField(
               controller: _noteController,
               maxLines: 3,
               decoration: InputDecoration(
                 hintText: 'For example: did Baduanjin today, had goji tea...',
-                hintStyle: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 14, color: ShunShiColors.textTertiary),
+                hintStyle: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 14, color: AppColors.textTertiary(context)),
                 border: InputBorder.none,
                 contentPadding: const EdgeInsets.all(14),
               ),
@@ -148,12 +156,12 @@ class _DailyCheckinPageState extends State<DailyCheckinPage> {
             child: ElevatedButton(
               onPressed: _isSubmitting ? null : _submit,
               style: ElevatedButton.styleFrom(
-                backgroundColor: ShunShiColors.primary,
-                disabledBackgroundColor: ShunShiColors.primary.withValues(alpha: 0.5),
+                backgroundColor: AppColors.primary(context),
+                disabledBackgroundColor: AppColors.primary(context).withValues(alpha: 0.5),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
               ),
               child: _isSubmitting
-                ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                ? SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
                 : Text('Submit check-in', style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white)),
             ),
           ),

@@ -10,6 +10,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
 import '../../../core/network/api_singleton.dart';
@@ -46,9 +47,9 @@ class _JournalReflectionPageState extends State<JournalReflectionPage> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: isDark ? ShunShiColors.darkBackground : ShunShiColors.background,
+      backgroundColor: isDark ? ShunShiColors.darkBackground : AppColors.background(context),
       appBar: AppBar(
-        backgroundColor: isDark ? ShunShiColors.darkBackground : ShunShiColors.background,
+        backgroundColor: isDark ? ShunShiColors.darkBackground : AppColors.background(context),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, size: 20),
           onPressed: () => Navigator.pop(context),
@@ -60,23 +61,23 @@ class _JournalReflectionPageState extends State<JournalReflectionPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(AppLocalizations.of(context).t('journal_late_summer_phase'), style: TextStyle(
-              fontSize: 13, color: ShunShiColors.textTertiary,
+              fontSize: 13, color: AppColors.textTertiary(context),
               fontFamily: ShunShiTypography.sansFamily,
             )),
             Text(AppLocalizations.of(context).t('journal_harvesting_the_light'), style: TextStyle(
               fontSize: 28, fontWeight: FontWeight.w700,
-              color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.serifFamily,
+              color: AppColors.textPrimary(context), fontFamily: ShunShiTypography.serifFamily,
             )),
             const SizedBox(height: 8),
             Text(
               'Take a moment to center yourself. The earth is slowing, and so may you.',
-              style: TextStyle(fontSize: 14, color: ShunShiColors.textSecondary, height: 1.6, fontFamily: ShunShiTypography.sansFamily),
+              style: TextStyle(fontSize: 14, color: AppColors.textSecondary(context), height: 1.6, fontFamily: ShunShiTypography.sansFamily),
             ),
             const SizedBox(height: 28),
 
             // ── Internal Climate ──
             Text(AppLocalizations.of(context).t('journal_current_internal_climate'), style: TextStyle(
-              fontSize: 16, fontWeight: FontWeight.w700, color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.serifFamily,
+              fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textPrimary(context), fontFamily: ShunShiTypography.serifFamily,
             )),
             const SizedBox(height: 16),
             Row(
@@ -91,15 +92,15 @@ class _JournalReflectionPageState extends State<JournalReflectionPage> {
                       Container(
                         width: 52, height: 52,
                         decoration: BoxDecoration(
-                          color: selected ? c.color.withValues(alpha: 0.15) : ShunShiColors.surfaceContainerLow,
+                          color: selected ? c.color.withValues(alpha: 0.15) : AppColors.surfaceContainerLow(context),
                           borderRadius: BorderRadius.circular(14),
                         ),
-                        child: Icon(c.icon, size: 24, color: selected ? c.color : ShunShiColors.textTertiary),
+                        child: Icon(c.icon, size: 24, color: selected ? c.color : AppColors.textTertiary(context)),
                       ),
                       const SizedBox(height: 6),
                       Text(c.name, style: TextStyle(
                         fontSize: 11,
-                        color: selected ? c.color : ShunShiColors.textTertiary,
+                        color: selected ? c.color : AppColors.textTertiary(context),
                         fontFamily: ShunShiTypography.sansFamily,
                       )),
                     ],
@@ -111,7 +112,7 @@ class _JournalReflectionPageState extends State<JournalReflectionPage> {
 
             // ── Daily Gratitude ──
             Text(AppLocalizations.of(context).t('journal_daily_gratitude'), style: TextStyle(
-              fontSize: 16, fontWeight: FontWeight.w700, color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.serifFamily,
+              fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textPrimary(context), fontFamily: ShunShiTypography.serifFamily,
             )),
             const SizedBox(height: 16),
             _gratitudeField(_gratitude1, Icons.restore, 'A small thing today...'),
@@ -121,7 +122,7 @@ class _JournalReflectionPageState extends State<JournalReflectionPage> {
 
             // ── Seasonal Reflection ──
             Text(AppLocalizations.of(context).t('journal_seasonal_reflection'), style: TextStyle(
-              fontSize: 16, fontWeight: FontWeight.w700, color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.serifFamily,
+              fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textPrimary(context), fontFamily: ShunShiTypography.serifFamily,
             )),
             const SizedBox(height: 12),
             TextField(
@@ -129,15 +130,15 @@ class _JournalReflectionPageState extends State<JournalReflectionPage> {
               maxLines: 5,
               decoration: InputDecoration(
                 hintText: AppLocalizations.of(context).t('journal_reflection_how_does_this_season_feel'),
-                hintStyle: TextStyle(color: ShunShiColors.textTertiary, fontFamily: ShunShiTypography.sansFamily),
+                hintStyle: TextStyle(color: AppColors.textTertiary(context), fontFamily: ShunShiTypography.sansFamily),
                 filled: true,
-                fillColor: ShunShiColors.surfaceContainerLowest,
+                fillColor: AppColors.surfaceContainerLowest(context),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
                 ),
               ),
-              style: TextStyle(fontSize: 14, color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.sansFamily, height: 1.6),
+              style: TextStyle(fontSize: 14, color: AppColors.textPrimary(context), fontFamily: ShunShiTypography.sansFamily, height: 1.6),
             ),
             const SizedBox(height: 24),
 
@@ -150,7 +151,7 @@ class _JournalReflectionPageState extends State<JournalReflectionPage> {
                   Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: ShunShiColors.primary,
+                  backgroundColor: AppColors.primary(context),
                   foregroundColor: Colors.white,
                   elevation: 0,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -171,7 +172,7 @@ class _JournalReflectionPageState extends State<JournalReflectionPage> {
       children: [
         Padding(
           padding: const EdgeInsets.only(top: 12),
-          child: Icon(icon, size: 20, color: ShunShiColors.textTertiary),
+          child: Icon(icon, size: 20, color: AppColors.textTertiary(context)),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -180,12 +181,12 @@ class _JournalReflectionPageState extends State<JournalReflectionPage> {
             maxLines: 2,
             decoration: InputDecoration(
               hintText: hint,
-              hintStyle: TextStyle(color: ShunShiColors.textTertiary, fontFamily: ShunShiTypography.sansFamily),
+              hintStyle: TextStyle(color: AppColors.textTertiary(context), fontFamily: ShunShiTypography.sansFamily),
               filled: true,
-              fillColor: ShunShiColors.surfaceContainerLowest,
+              fillColor: AppColors.surfaceContainerLowest(context),
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
             ),
-            style: TextStyle(fontSize: 14, color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.sansFamily),
+            style: TextStyle(fontSize: 14, color: AppColors.textPrimary(context), fontFamily: ShunShiTypography.sansFamily),
           ),
         ),
       ],

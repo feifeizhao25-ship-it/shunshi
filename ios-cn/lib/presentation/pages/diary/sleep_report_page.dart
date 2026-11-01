@@ -1,7 +1,7 @@
-import 'dart:convert';
 import '../../../core/router/safe_pop.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import '../../../data/network/session.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -28,57 +28,41 @@ class _SleepReportPageState extends State<SleepReportPage> {
     _loadData();
   }
 
-  Future<Dio> _dio() async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('access_token') ?? '';
-    return Dio(BaseOptions(
-      baseUrl: AppConfig.apiBaseUrl,
-      headers: token.isNotEmpty ? {'Authorization': 'Bearer $token'} : {},
-    ));
-  }
-
   Future<void> _loadData() async {
-    final prefs = await SharedPreferences.getInstance();
-    final userId = prefs.getString('user_id') ?? '';
-    final dio = await _dio();
-
+    // 全部来自服务端：自己写过的日记（睡眠评分）+ 周度洞察。没有记录就是没有，不再读本地缓存、也不再用 prefs 里不存在的 user_id。
+    final uid = currentUserId();
+    if (uid == null) {
+      if (mounted) setState(() => _loading = false);
+      return;
+    }
     try {
-      final [insightRes, entriesRes] = await Future.wait([
-        dio.get('/api/v1/records/sleep/stats', queryParameters: {'user_id': userId}),
-        dio.get('/api/v1/journal/entries/$userId', queryParameters: {
-          'user_id': userId,
-          'limit': 7,
-        }),
+      final dio = withSessionAuth(Dio(BaseOptions(baseUrl: AppConfig.apiBaseUrl, connectTimeout: const Duration(seconds: 8))));
+      final enc = Uri.encodeComponent(uid);
+      final results = await Future.wait([
+        dio.get('/api/v1/journal/insights/$enc'),
+        dio.get('/api/v1/journal/entries/$enc', queryParameters: {'limit': 7}),
       ]);
-      setState(() {
-        _insight = Map<String, dynamic>.from(insightRes.data);
-        _entries = List<Map<String, dynamic>>.from(entriesRes.data ?? []);
-        _loading = false;
-      });
-    } catch (_) {
-      // Offline fallback: try cached entries
-      final cached = prefs.getString('diary_entries');
-      if (cached != null) {
-        try {
-          final list = List<Map<String, dynamic>>.from(
-            (const JsonDecoder().convert(cached) as List).map((e) => Map<String, dynamic>.from(e)),
-          );
-          setState(() {
-            _entries = list.take(7).toList();
-            _insight = {
-              'insight': list.length < 3
-                  ? '再记录几天，就能解锁专属睡眠分析 ✨'
-                  : '睡眠分析加载中，请联网获取完整报告',
-              'trend': '数据收集中',
-              'score': 0,
-              'suggestions': ['坚持每天记录睡眠质量'],
-              'source_references': [],
-              'data_days': list.length,
-            };
-          });
-        } catch (_) {}
+      final raw = results[0].data;
+      final d = raw is Map && raw['data'] is Map ? Map<String, dynamic>.from(raw['data'] as Map) : <String, dynamic>{};
+      final days = (d['entries_count'] as num?)?.toInt() ?? 0;
+      final avgSleep = (d['avg_sleep_quality'] as num?)?.toDouble() ?? 0;
+      if (mounted) {
+        setState(() {
+          _entries = journalEntriesFromBody(results[1].data) ?? const [];
+          _insight = days == 0
+              ? null
+              : {
+                  'trend': d['trend_message'] ?? '',
+                  'insight': d['tcm_pattern'] ?? '',
+                  'score': (avgSleep * 20).round(),
+                  'suggestions': d['recommendations'] ?? const [],
+                  'data_days': days,
+                };
+          _loading = false;
+        });
       }
-      setState(() => _loading = false);
+    } catch (_) {
+      if (mounted) setState(() => _loading = false);
     }
   }
 
@@ -91,7 +75,7 @@ class _SleepReportPageState extends State<SleepReportPage> {
       final d = now.subtract(Duration(days: i));
       final dateStr = '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
       final entry = _entries.cast<Map<String, dynamic>?>().firstWhere(
-        (e) => (e?['entry_date'] ?? '').toString().startsWith(dateStr.substring(0, 10)),
+        (e) => (e?['date'] ?? '').toString().startsWith(dateStr.substring(0, 10)),
         orElse: () => null,
       );
       final sleep = (entry?['sleep_quality'] ?? 0).toDouble();

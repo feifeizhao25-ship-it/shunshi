@@ -4,7 +4,8 @@
 （非医疗诊断，需含专业帮助提醒）
 """
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
+from app.locale_context import RequestLocale, request_locale
 from pydantic import BaseModel, Field
 from typing import Optional, List
 from datetime import datetime
@@ -409,8 +410,11 @@ async def get_five_elements_emotions():
 
 
 @router.get("/meditation-guides", summary="冥想引导列表")
-async def get_meditation_guides():
-    """返回所有可用的冥想引导。"""
+async def get_meditation_guides(loc: RequestLocale = Depends(request_locale)):
+    """返回所有可用的冥想引导。国际版：引导文案只有中文，不返回中文内容，给英文的暂不提供状态。"""
+    if loc.is_global:
+        return {"success": True, "data": {"guides": [], "total": 0, "available": False,
+                                          "message": "Guided meditations are not available in English yet."}}
     guides_list = []
     for guide_id, guide_data in MEDITATION_GUIDES.items():
         guides_list.append({
@@ -430,8 +434,10 @@ async def get_meditation_guides():
 
 
 @router.get("/meditation-guides/{guide_id}", summary="冥想引导详情")
-async def get_meditation_guide_detail(guide_id: str):
+async def get_meditation_guide_detail(guide_id: str, loc: RequestLocale = Depends(request_locale)):
     """获取指定冥想引导的详细步骤。"""
+    if loc.is_global:
+        raise HTTPException(status_code=404, detail="This guided meditation is not available in English yet.")
     if guide_id not in MEDITATION_GUIDES:
         raise HTTPException(
             status_code=404,
@@ -511,8 +517,29 @@ async def mental_checkin(request: MentalCheckInRequest):
 
 
 @router.get("/crisis-resources", summary="心理危机资源列表")
-async def get_crisis_resources():
-    """获取心理危机援助资源列表。"""
+async def get_crisis_resources(loc: RequestLocale = Depends(request_locale)):
+    """获取心理危机援助资源列表。国际版按地区给核验过的本地热线（见 safety/crisis_resources.py），不给中国热线；
+    没有核验过的地区只给通用目录 + 当地急救电话，不猜号码。"""
+    if loc.is_global:
+        from ..safety import crisis_resources as cr
+
+        res = cr.resource_for(loc.region)
+        resources = [{"id": res.region, "name": res.name, "contact": res.contact, "emergency": res.emergency,
+                      "detail": res.detail, "source_url": res.source_url}] if res else []
+        emergency = cr.emergency_phrase_en(loc.region)
+        return {
+            "success": True,
+            "data": {
+                "resources": resources,
+                "emergency_note": f"If you are in immediate danger, call {emergency} or go to your nearest emergency department.",
+                "crisis_hotlines": {
+                    "region": (loc.region or None),
+                    "emergency": emergency,
+                    "directory": {"name": cr.DIRECTORY_NAME, "url": cr.DIRECTORY_URL},
+                },
+                "verified_at": cr.VERIFIED_AT,
+            },
+        }
     return {
         "success": True,
         "data": {

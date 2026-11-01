@@ -3,6 +3,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
@@ -14,7 +15,7 @@ class GrowthMilestonesV2 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : ShunShiColors.background,
+    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : AppColors.background(context),
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
@@ -37,11 +38,11 @@ class GrowthMilestonesV2 extends StatelessWidget {
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(AppLocalizations.of(context).t('growth_your_growth_journey'), style: TextStyle(
                 fontFamily: ShunShiTypography.serifFamily,
-                fontSize: 28, fontWeight: FontWeight.bold, color: ShunShiColors.textPrimary,
+                fontSize: 28, fontWeight: FontWeight.bold, color: AppColors.textPrimary(context),
               )),
               const SizedBox(height: 8),
               Text('Reflect on the quiet moments of consistency. Each ritual is a seed planted in the garden of your well-being.',
-                style: TextStyle(fontSize: 13, color: ShunShiColors.textTertiary, height: 1.5)),
+                style: TextStyle(fontSize: 13, color: AppColors.textTertiary(context), height: 1.5)),
             ]),
           )),
 
@@ -84,8 +85,8 @@ class GrowthMilestonesV2 extends StatelessWidget {
           SliverToBoxAlternate(child: Padding(
             padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(AppLocalizations.of(context).t('growth_reflective_milestones'), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
-              Text(AppLocalizations.of(context).t('growth_gently_nurtured_achievements'), style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
+              Text(AppLocalizations.of(context).t('growth_reflective_milestones'), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
+              Text(AppLocalizations.of(context).t('growth_gently_nurtured_achievements'), style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context))),
               const SizedBox(height: 12),
               _buildMilestone(Icons.local_florist, 'First Sprout', 'Ritual streak: 3 days', true, Color(0xFF4CAF50)),
               _buildMilestone(Icons.forest, 'Deep Roots', 'Complete a seasonal cycle', false, null),

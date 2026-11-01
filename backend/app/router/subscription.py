@@ -36,11 +36,11 @@ def _payment_user(
         settings = getattr(request.app.state, "settings", None)
         if settings is None:
             if os.getenv("APP_ENV") == "testing":
-                return user_id or "user-001"
+                return user_id or "test-user"
             raise HTTPException(status_code=503, detail="认证配置不可用")
         return verify_token(settings, credentials.credentials)
     if os.getenv("APP_ENV") == "testing":
-        return user_id or "user-001"
+        return user_id or "test-user"
     raise HTTPException(status_code=401, detail="请先登录后购买")
 
 
@@ -395,7 +395,7 @@ class SubscriptionPlan(BaseModel):
 
 class AlipayOrderRequest(BaseModel):
     plan: str
-    user_id: str = "user-001"
+    user_id: str
 
 
 class PaymentVerifyRequest(BaseModel):
@@ -405,7 +405,7 @@ class PaymentVerifyRequest(BaseModel):
 
 class StripeCheckoutRequest(BaseModel):
     plan: str
-    user_id: str = "user-001"
+    user_id: str
     success_url: str = "https://app.shunshi.com/payment/success"
     cancel_url: str = "https://app.shunshi.com/payment/cancel"
 
@@ -448,7 +448,7 @@ class ReceiptVerifyBody(BaseModel):
     transaction_id: Optional[str] = None
     product_id: Optional[str] = None
     plan: Optional[str] = None
-    user_id: Optional[str] = "user-001"
+    user_id: Optional[str] = None
 
 
 class CreateOrderRequest(BaseModel):
@@ -1154,7 +1154,7 @@ async def _verify_payment_signature(request: PurchaseVerifyRequest, order: dict)
 @router.get("/products", response_model=dict)
 async def get_products(
     platform: Optional[str] = Query(None, description="筛选平台: alipay/apple"),
-    user_id: str = Query("user-001"),
+    user_id: Optional[str] = Query(None, description="可选；商品列表是公开信息，不需要登录"),
 ):
     """
     获取产品列表（含4级会员）
@@ -1163,7 +1163,7 @@ async def get_products(
     - 标记当前订阅
     - 金额用分存储，前端展示时除以100
     """
-    current_sub = get_user_subscription(user_id)
+    current_sub = get_user_subscription(user_id or "")
 
     products = []
     for p in SUBSCRIPTION_PRODUCTS:
@@ -1799,7 +1799,7 @@ async def unbind_family_member_endpoint(
 # ============================================================
 
 @router.get("", response_model=dict)
-async def get_subscription(user_id: str = Query("user-001"), session: Session = Depends(get_session)):
+async def get_subscription(user_id: str = Query(..., description="用户ID；不传由服务端按令牌补上本人"), session: Session = Depends(get_session)):
     from app.services.store_restore import hydrate_restore
     hydrate_restore(session, user_id)
     """获取订阅状态"""
@@ -1818,9 +1818,9 @@ async def get_subscription(user_id: str = Query("user-001"), session: Session = 
 
 
 @router.get("/plans", response_model=dict)
-async def get_plans(user_id: str = Query("user-001")):
-    """获取订阅计划列表（4级）"""
-    current_sub = get_user_subscription(user_id)
+async def get_plans(user_id: Optional[str] = Query(None, description="可选；套餐列表是公开信息，不需要登录")):
+    """获取订阅计划列表（4级）。不带身份时只给套餐，当前订阅按免费版。"""
+    current_sub = get_user_subscription(user_id or "")
 
     plans = []
     for key, plan in SUBSCRIPTION_PLANS.items():

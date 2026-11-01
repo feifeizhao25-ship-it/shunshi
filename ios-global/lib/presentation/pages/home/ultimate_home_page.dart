@@ -4,6 +4,7 @@
 library;
 
 import 'dart:math';
+import '../../../design_system/app_colors.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import '../../../data/storage/storage_manager.dart';
@@ -183,7 +184,7 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
     if (_loading) return const HomeSkeleton();
 
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
@@ -287,10 +288,10 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
               child: Container(
                 width: 40, height: 40,
                 decoration: BoxDecoration(
-                  color: ShunShiColors.surfaceContainerLow,
+                  color: AppColors.surfaceContainerLow(context),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(Icons.menu, size: 20, color: ShunShiColors.textPrimary),
+                child: Icon(Icons.menu, size: 20, color: AppColors.textPrimary(context)),
               ),
             ),
             const SizedBox(width: 12),
@@ -310,10 +311,10 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
               width: 40, height: 40,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: ShunShiColors.borderGhost, width: 1.5),
+                border: Border.all(color: AppColors.borderGhost(context), width: 1.5),
               ),
-              child: const CircleAvatar(
-                backgroundColor: ShunShiColors.surfaceContainerLow,
+              child: CircleAvatar(
+                backgroundColor: AppColors.surfaceContainerLow(context),
                 child: Icon(Icons.person, size: 20, color: ShunShiColors.secondary),
               ),
             ),
@@ -387,8 +388,8 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            ShunShiColors.primary.withValues(alpha: 0.12),
-            ShunShiColors.surfaceContainerLow,
+            AppColors.primary(context).withValues(alpha: 0.12),
+            AppColors.surfaceContainerLow(context),
             ShunShiColors.goldLight.withValues(alpha: 0.15),
           ],
         ),
@@ -406,7 +407,7 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
                 height: 40 + rng.nextDouble() * 60,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: ShunShiColors.primary.withValues(alpha: 0.04 + rng.nextDouble() * 0.06),
+                  color: AppColors.primary(context).withValues(alpha: 0.04 + rng.nextDouble() * 0.06),
                 ),
               ),
             );
@@ -416,7 +417,7 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
             child: Icon(
               sc.icon,
               size: 64,
-              color: ShunShiColors.primary.withValues(alpha: 0.15),
+              color: AppColors.primary(context).withValues(alpha: 0.15),
             ),
           ),
           // Bottom gradient overlay
@@ -425,7 +426,7 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
             child: Container(
               height: 140,
               decoration: BoxDecoration(
-                borderRadius: const BorderRadius.only(
+                borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(20),
                   bottomRight: Radius.circular(20),
                 ),
@@ -433,8 +434,8 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    ShunShiColors.background.withValues(alpha: 0),
-                    ShunShiColors.background.withValues(alpha: 0.85),
+                    AppColors.background(context).withValues(alpha: 0),
+                    AppColors.background(context).withValues(alpha: 0.85),
                   ],
                 ),
               ),
@@ -446,7 +447,7 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
             child: Container(
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
-                color: ShunShiColors.background.withValues(alpha: 0.92),
+                color: AppColors.background(context).withValues(alpha: 0.92),
                 borderRadius: BorderRadius.circular(14),
                 boxShadow: [
                   BoxShadow(
@@ -471,7 +472,7 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
                     sc.wellnessPrinciple,
                     style: ShunShiTypography.serifTitle.copyWith(
                       fontSize: 18,
-                      color: ShunShiColors.primary,
+                      color: AppColors.primary(context),
                     ),
                   ),
                 ],
@@ -495,7 +496,7 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: ShunShiColors.surfaceContainerLowest,
+        color: AppColors.surfaceContainerLowest(context),
         borderRadius: BorderRadius.circular(16),
         boxShadow: ShunShiShadows.sm,
       ),
@@ -505,10 +506,10 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
           Container(
             width: 48, height: 48,
             decoration: BoxDecoration(
-              color: ShunShiColors.primary.withValues(alpha: 0.06),
+              color: AppColors.primary(context).withValues(alpha: 0.06),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(action.icon, size: 24, color: ShunShiColors.primary),
+            child: Icon(action.icon, size: 24, color: AppColors.primary(context)),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -527,7 +528,7 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
                   action.description,
                   style: ShunShiTypography.bodySmall.copyWith(
                     height: 1.6,
-                    color: ShunShiColors.textSecondary,
+                    color: AppColors.textSecondary(context),
                   ),
                 ),
               ],
@@ -543,9 +544,9 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: ShunShiColors.surfaceContainerLow,
+        color: AppColors.surfaceContainerLow(context),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: ShunShiColors.borderGhost),
+        border: Border.all(color: AppColors.borderGhost(context)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -557,11 +558,11 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
               children: [
                 Container(
                   width: 52, height: 52,
-                  decoration: const BoxDecoration(
-                    color: ShunShiColors.primary,
+                  decoration: BoxDecoration(
+                    color: AppColors.primary(context),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.auto_awesome,
                     color: Colors.white,
                     size: 26,
@@ -575,12 +576,12 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
                     decoration: BoxDecoration(
                       color: ShunShiColors.goldLight,
                       shape: BoxShape.circle,
-                      border: Border.all(color: ShunShiColors.background, width: 2.5),
+                      border: Border.all(color: AppColors.background(context), width: 2.5),
                     ),
                     child: Center(
                       child: Container(
                         width: 6, height: 6,
-                        decoration: const BoxDecoration(
+                        decoration: BoxDecoration(
                           color: ShunShiColors.gold,
                           shape: BoxShape.circle,
                         ),
@@ -609,7 +610,7 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
                   '"${sc.aiQuote}"',
                   style: ShunShiTypography.bodyMedium.copyWith(
                     fontStyle: FontStyle.italic,
-                    color: ShunShiColors.textSecondary,
+                    color: AppColors.textSecondary(context),
                     height: 1.7,
                   ),
                 ),
@@ -629,7 +630,7 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            ShunShiColors.primary,
+            AppColors.primary(context),
             ShunShiColors.primaryContainer,
           ],
         ),
@@ -663,19 +664,19 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: ShunShiColors.primary.withValues(alpha: 0.06),
+        color: AppColors.primary(context).withValues(alpha: 0.06),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: ShunShiColors.primary.withValues(alpha: 0.1)),
+        border: Border.all(color: AppColors.primary(context).withValues(alpha: 0.1)),
       ),
       child: Row(
         children: [
           Container(
             width: 36, height: 36,
             decoration: BoxDecoration(
-              color: ShunShiColors.primary.withValues(alpha: 0.1),
+              color: AppColors.primary(context).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: const Icon(Icons.notifications_active, color: ShunShiColors.primary, size: 18),
+            child: Icon(Icons.notifications_active, color: AppColors.primary(context), size: 18),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -683,7 +684,7 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('SEASONS Reminder', style: ShunShiTypography.labelMedium.copyWith(
-                  color: ShunShiColors.primary, fontWeight: FontWeight.w600,
+                  color: AppColors.primary(context), fontWeight: FontWeight.w600,
                 )),
                 const SizedBox(height: 2),
                 Text(
@@ -694,7 +695,7 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
               ],
             ),
           ),
-          Icon(Icons.chevron_right, color: ShunShiColors.textTertiary, size: 18),
+          Icon(Icons.chevron_right, color: AppColors.textTertiary(context), size: 18),
         ],
       ),
     );
@@ -706,10 +707,10 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
       width: double.infinity,
       child: ElevatedButton.icon(
         onPressed: () => context.push('/solar-wellness'),
-        icon: const Icon(Icons.arrow_forward, size: 20),
+        icon: Icon(Icons.arrow_forward, size: 20),
         label: const Text('View Full ShiChen Wellness Chart'),
         style: ElevatedButton.styleFrom(
-          backgroundColor: ShunShiColors.primary,
+          backgroundColor: AppColors.primary(context),
           foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),

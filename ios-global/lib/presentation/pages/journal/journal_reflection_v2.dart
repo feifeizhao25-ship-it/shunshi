@@ -3,6 +3,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import '../../../design_system/theme.dart';
 
 class JournalReflectionV2 extends StatelessWidget {
@@ -11,7 +12,7 @@ class JournalReflectionV2 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -20,7 +21,7 @@ class JournalReflectionV2 extends StatelessWidget {
             children: [
               // Header
               Row(children: [
-                const Icon(Icons.menu, color: Color(0xFF533afd)),
+                Icon(Icons.menu, color: Color(0xFF533afd)),
                 const Spacer(),
                 Text('SEASONS', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18, fontWeight: FontWeight.w600, color: Color(0xFF533afd))),
                 const Spacer(),
@@ -28,18 +29,18 @@ class JournalReflectionV2 extends StatelessWidget {
               ]),
               const SizedBox(height: 16),
 
-              Text('Late Summer Phase', style: TextStyle(fontSize: 13, color: ShunShiColors.textTertiary)),
+              Text('Late Summer Phase', style: TextStyle(fontSize: 13, color: AppColors.textTertiary(context))),
               Text('Harvesting the Light', style: TextStyle(
                 fontFamily: ShunShiTypography.serifFamily,
-                fontSize: 28, fontWeight: FontWeight.bold, color: ShunShiColors.textPrimary,
+                fontSize: 28, fontWeight: FontWeight.bold, color: AppColors.textPrimary(context),
               )),
               const SizedBox(height: 4),
               Text('Take a moment to center yourself. The earth is slowing, and so may you.',
-                style: TextStyle(fontSize: 13, color: ShunShiColors.textTertiary, height: 1.5)),
+                style: TextStyle(fontSize: 13, color: AppColors.textTertiary(context), height: 1.5)),
               const SizedBox(height: 24),
 
               // Current Internal Climate
-              Text('Current Internal Climate', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+              Text('Current Internal Climate', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
               const SizedBox(height: 10),
               Row(children: [
                 _buildClimateChip(Icons.wb_sunny, 'Rising Sun', Color(0xFFFF9800)),
@@ -55,9 +56,9 @@ class JournalReflectionV2 extends StatelessWidget {
               // Daily Gratitude
               Container(
                 padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(14)),
+                decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(14)),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text('Daily Gratitude', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+                  Text('Daily Gratitude', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
                   const SizedBox(height: 12),
                   _buildPromptRow(Icons.restore, 'A small thing today...'),
                   const SizedBox(height: 8),
@@ -90,11 +91,11 @@ class JournalReflectionV2 extends StatelessWidget {
               // Personal Intentions
               Container(
                 padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(14)),
+                decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(14)),
                 child: Row(children: [
                   Icon(Icons.add_circle_outline, color: Color(0xFF533afd), size: 20),
                   const SizedBox(width: 10),
-                  Text('Personal Intentions', style: TextStyle(fontSize: 15, color: ShunShiColors.textSecondary)),
+                  Text('Personal Intentions', style: TextStyle(fontSize: 15, color: AppColors.textSecondary(context))),
                 ]),
               ),
               const SizedBox(height: 40),

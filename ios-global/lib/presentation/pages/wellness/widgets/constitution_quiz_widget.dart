@@ -131,7 +131,7 @@ class ConstitutionQuizWidget extends StatelessWidget {
                     ),
                     child: Text(
                       isLast && allAnswered ? 'Submit answers' : 'Next question',
-                      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
                     ),
                   ),
                 ),

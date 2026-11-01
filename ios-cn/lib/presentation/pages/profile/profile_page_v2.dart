@@ -27,6 +27,7 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../design_system/theme.dart';
 import '../../../data/network/api_client.dart';
+import '../../../data/network/progress_api.dart';
 import '../../../data/storage/storage_manager.dart';
 import '../../../design_system/app_colors.dart';
 
@@ -41,6 +42,7 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
   bool _loggedIn = false;
   /// null 表示**没取到**，与 0 不是一回事：0 会显示成「0」，null 显示成「—」。
   int? _favoriteCount;
+  int? _points;
   String? _userName;
   String? _subscriptionTier;
 
@@ -78,6 +80,13 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
     // 于是无论谁打开，看到的都是 guest 这个账号的数字。
     final userId = StorageManager.user.getUserId();
     if (!loggedIn || userId == null || userId.isEmpty) return;
+
+    try {
+      final p = UserProgress.fromBody((await ApiClient().get('/api/v1/gamification/me')).data);
+      if (p != null && mounted) setState(() => _points = p.points);
+    } catch (_) {
+      // 取不到积分就显示「—」，不显示假数字。
+    }
 
     try {
       final resp = await ApiClient().get(
@@ -248,11 +257,12 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
                 // 原来这一行是：积分 2560 ｜ 优惠券 3 张 ｜ 收藏 $_favoriteCount。
                 // 前两个是**写死的字符串**，未登录也照显示。
                 //
-                // 积分与优惠券在服务端没有对应接口（后端没有积分体系），
-                // 所以这里不是"换个数据源"，而是**先把它们撤掉**——
-                // 等真有积分接口了再按接口加回来，不要先摆一个好看的数字。
+                // 现在服务端有积分体系（打卡 / 徽章加分，GET /api/v1/gamification/me），积分按接口显示；
+                // 优惠券仍没有面向用户的领取入口，所以不放。拿不到就显示「—」，不摆好看的数字。
                 child: Row(
                   children: [
+                    _buildStat('积分', _loggedIn ? (_points?.toString() ?? '—') : '—'),
+                    Container(width: 1, height: 32, color: AppColors.borderGhost(context)),
                     _buildStat('收藏', _loggedIn ? (_favoriteCount?.toString() ?? '—') : '—'),
                     Container(width: 1, height: 32, color: AppColors.borderGhost(context)),
                     _buildStat('订阅', _loggedIn ? (_subscriptionTier ?? '—') : '—'),

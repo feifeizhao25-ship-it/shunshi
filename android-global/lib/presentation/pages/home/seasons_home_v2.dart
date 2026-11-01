@@ -3,6 +3,7 @@
 library;
 
 import 'package:dio/dio.dart';
+import '../../../design_system/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import '../../../data/storage/storage_manager.dart';
@@ -129,7 +130,7 @@ class _SeasonsHomeV2State extends State<SeasonsHomeV2> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : ShunShiColors.background,
+    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : AppColors.background(context),
       body: _loading
           ? const Center(child: CircularProgressIndicator(color: Color(0xFF533afd)))
           : RefreshIndicator(
@@ -163,15 +164,15 @@ class _SeasonsHomeV2State extends State<SeasonsHomeV2> {
                       padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                         Text(AppLocalizations.of(context).t('home_todays_rhythm'), style: TextStyle(
-                          fontSize: 14, color: ShunShiColors.textTertiary, fontWeight: FontWeight.w500,
+                          fontSize: 14, color: AppColors.textTertiary(context), fontWeight: FontWeight.w500,
                         )),
                         const SizedBox(height: 4),
                         Text(_greeting, style: TextStyle(
                           fontFamily: ShunShiTypography.serifFamily,
-                          fontSize: 28, fontWeight: FontWeight.bold, color: ShunShiColors.textPrimary,
+                          fontSize: 28, fontWeight: FontWeight.bold, color: AppColors.textPrimary(context),
                         )),
                         Text("It's ${_seasonDisplayName(_season)}.", style: TextStyle(
-                          fontSize: 16, color: ShunShiColors.textSecondary,
+                          fontSize: 16, color: AppColors.textSecondary(context),
                         )),
                       ]),
                     ),
@@ -232,9 +233,9 @@ class _SeasonsHomeV2State extends State<SeasonsHomeV2> {
                             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                               Text(AppLocalizations.of(context).t('home_gentle_reminder'), style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF533afd))),
                               const SizedBox(height: 2),
-                              Text(_followUp['title']?.toString() ?? _followUp['description']?.toString() ?? '', style: TextStyle(fontSize: 13, color: ShunShiColors.textSecondary), maxLines: 2, overflow: TextOverflow.ellipsis),
+                              Text(_followUp['title']?.toString() ?? _followUp['description']?.toString() ?? '', style: TextStyle(fontSize: 13, color: AppColors.textSecondary(context)), maxLines: 2, overflow: TextOverflow.ellipsis),
                             ])),
-                            Icon(Icons.chevron_right, color: ShunShiColors.textTertiary, size: 18),
+                            Icon(Icons.chevron_right, color: AppColors.textTertiary(context), size: 18),
                           ]),
                         ),
                       ),
@@ -248,7 +249,7 @@ class _SeasonsHomeV2State extends State<SeasonsHomeV2> {
                       child: Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: ShunShiColors.surface,
+                          color: AppColors.surface(context),
                           borderRadius: BorderRadius.circular(14),
                           border: Border.all(color: const Color(0xFF533afd).withOpacity(0.15)),
                         ),
@@ -260,9 +261,9 @@ class _SeasonsHomeV2State extends State<SeasonsHomeV2> {
                           ),
                           const SizedBox(width: 12),
                           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                            Text(AppLocalizations.of(context).t('home_seasons_companion'), style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+                            Text(AppLocalizations.of(context).t('home_seasons_companion'), style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
                             Text('"$_companionTip"',
-                              style: TextStyle(fontSize: 12, color: ShunShiColors.textSecondary, height: 1.4)),
+                              style: TextStyle(fontSize: 12, color: AppColors.textSecondary(context), height: 1.4)),
                           ])),
                         ]),
                       ),
@@ -273,7 +274,7 @@ class _SeasonsHomeV2State extends State<SeasonsHomeV2> {
                   SliverToBoxAdapter(
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
-                      child: Text(AppLocalizations.of(context).t('home_quick_rituals'), style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+                      child: Text(AppLocalizations.of(context).t('home_quick_rituals'), style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
                     ),
                   ),
                   SliverToBoxAdapter(
@@ -292,7 +293,7 @@ class _SeasonsHomeV2State extends State<SeasonsHomeV2> {
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
                       child: Row(children: [
-                        Text(AppLocalizations.of(context).t('home_seasonal_library'), style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+                        Text(AppLocalizations.of(context).t('home_seasonal_library'), style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
                         const Spacer(),
                         Text(AppLocalizations.of(context).t('home_see_all'), style: TextStyle(fontSize: 13, color: const Color(0xFF533afd), fontWeight: FontWeight.w500)),
                       ]),
@@ -328,12 +329,12 @@ class _SeasonsHomeV2State extends State<SeasonsHomeV2> {
   Widget _buildRitualCard(IconData icon, String title, String subtitle) {
     return Container(
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(14)),
+      decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(14)),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Icon(icon, color: const Color(0xFF533afd), size: 22),
         const SizedBox(height: 8),
-        Text(title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
-        Text(subtitle, style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
+        Text(title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
+        Text(subtitle, style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context))),
       ]),
     );
   }
@@ -343,7 +344,7 @@ class _SeasonsHomeV2State extends State<SeasonsHomeV2> {
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Container(
         padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(12)),
+        decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(12)),
         child: Row(children: [
           Container(
             width: 40, height: 40,
@@ -352,10 +353,10 @@ class _SeasonsHomeV2State extends State<SeasonsHomeV2> {
           ),
           const SizedBox(width: 12),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: ShunShiColors.textPrimary)),
-            Text(category, style: TextStyle(fontSize: 11, color: ShunShiColors.textTertiary)),
+            Text(title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.textPrimary(context))),
+            Text(category, style: TextStyle(fontSize: 11, color: AppColors.textTertiary(context))),
           ])),
-          Icon(Icons.chevron_right, color: ShunShiColors.textTertiary, size: 18),
+          Icon(Icons.chevron_right, color: AppColors.textTertiary(context), size: 18),
         ]),
       ),
     );

@@ -27,7 +27,7 @@ class ChatTopicCards extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(top: 4, bottom: 12),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Padding(
+        Padding(
           padding: EdgeInsets.only(left: 2, bottom: 10),
           child: Text('Or start with a topic',
               style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF5B6B5F))),
@@ -56,7 +56,7 @@ class ChatTopicCards extends StatelessWidget {
                       DecoratedBox(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(14),
-                          gradient: const LinearGradient(
+                          gradient: LinearGradient(
                             begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,
                             colors: [Color(0x00000000), Color(0xB3102A1B)],
@@ -69,7 +69,7 @@ class ChatTopicCards extends StatelessWidget {
                         bottom: 9,
                         child: Text(t.label,
                             maxLines: 2,
-                            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Colors.white, height: 1.2)),
+                            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Colors.white, height: 1.2)),
                       ),
                     ]),
                   ),

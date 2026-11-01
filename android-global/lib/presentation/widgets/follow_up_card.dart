@@ -1,5 +1,6 @@
 // Follow-up recommendation card for home page
 import 'package:flutter/material.dart';
+import '../../design_system/app_colors.dart';
 import '../../../design_system/theme.dart';
 
 class FollowUpCard extends StatelessWidget {
@@ -16,16 +17,16 @@ class FollowUpCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: ShunShiColors.surface,
+          color: AppColors.surface(context),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: ShunShiColors.border),
+          border: Border.all(color: AppColors.border(context)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary, fontFamily: 'sans')),
+            Text(title, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context), fontFamily: 'sans')),
             const SizedBox(height: 4),
-            Text(subtitle, style: TextStyle(fontSize: 13, color: ShunShiColors.textSecondary, fontFamily: 'sans')),
+            Text(subtitle, style: TextStyle(fontSize: 13, color: AppColors.textSecondary(context), fontFamily: 'sans')),
           ],
         ),
       ),

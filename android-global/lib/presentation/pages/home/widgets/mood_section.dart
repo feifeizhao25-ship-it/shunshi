@@ -42,9 +42,9 @@ class MoodSection extends StatelessWidget {
                 duration: const Duration(milliseconds: 200),
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                 decoration: BoxDecoration(
-                  color: sel ? ShunShiColors.primary.withValues(alpha: 0.08) : const Color(0xFFF5F5F0),
+                  color: sel ? AppColors.primary(context).withValues(alpha: 0.08) : const Color(0xFFF5F5F0),
                   borderRadius: BorderRadius.circular(20),
-                  border: sel ? Border.all(color: ShunShiColors.primary, width: 1.5) : null,
+                  border: sel ? Border.all(color: AppColors.primary(context), width: 1.5) : null,
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -55,7 +55,7 @@ class MoodSection extends StatelessWidget {
                       style: TextStyle(
                         fontFamily: ShunShiTypography.sansFamily,
                         fontSize: 12, fontWeight: FontWeight.w500,
-                        color: sel ? ShunShiColors.primary : AppColors.textSecondary(context),
+                        color: sel ? AppColors.primary(context) : AppColors.textSecondary(context),
                       ),
                     ),
                   ],

@@ -1,4 +1,5 @@
 import 'dart:ui';
+import '../../../../design_system/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/theme/shunshi_colors.dart';
 import 'constitution_data.dart';
@@ -46,12 +47,12 @@ class ConstitutionResultWidget extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(24, 32, 24, 28),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [ShunshiColors.primary, ShunshiColors.primaryDark],
         ),
-        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(24)),
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
       ),
       child: Column(children: [
         Text(result.emoji, style: const TextStyle(fontSize: 56)),
@@ -60,7 +61,7 @@ class ConstitutionResultWidget extends StatelessWidget {
             style: TextStyle(fontSize: 14, color: Colors.white.withValues(alpha: 0.8))),
         const SizedBox(height: 4),
         Text(result.typeName,
-            style: const TextStyle(
+            style: TextStyle(
                 fontSize: 32, fontWeight: FontWeight.w700, color: Colors.white, letterSpacing: 2)),
         const SizedBox(height: 12),
         Container(
@@ -89,7 +90,7 @@ class ConstitutionResultWidget extends StatelessWidget {
                       color: ShunshiColors.primaryLight.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(20)),
                   child: Text(c,
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontSize: 12, color: ShunshiColors.primaryDark, fontWeight: FontWeight.w500)),
                 ))
             .toList(),
@@ -99,7 +100,7 @@ class ConstitutionResultWidget extends StatelessWidget {
 
   Widget _buildScoreBars() {
     return _Section([
-      const Row(children: [
+      Row(children: [
         Text('📊', style: TextStyle(fontSize: 18)),
         SizedBox(width: 8),
         Text('Constitution scores',
@@ -169,7 +170,7 @@ class ConstitutionResultWidget extends StatelessWidget {
                 Text(adv.icon, style: const TextStyle(fontSize: 18)),
                 const SizedBox(width: 8),
                 Text(adv.category,
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontSize: 16, fontWeight: FontWeight.w600, color: ShunshiColors.textPrimary))
               ]),
               const SizedBox(height: 14),
@@ -197,7 +198,7 @@ class ConstitutionResultWidget extends StatelessWidget {
                   padding: const EdgeInsets.only(bottom: 8),
                   child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Container(width: 6, height: 6, margin: const EdgeInsets.only(top: 8),
-                        decoration: const BoxDecoration(color: ShunshiColors.primary, shape: BoxShape.circle)),
+                        decoration: BoxDecoration(color: ShunshiColors.primary, shape: BoxShape.circle)),
                     const SizedBox(width: 10),
                     Expanded(
                         child: Text(item,
@@ -216,7 +217,7 @@ class ConstitutionResultWidget extends StatelessWidget {
             border: Border.all(color: const Color(0xFFFDE68A).withValues(alpha: 0.5)),
           ),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            const Row(children: [
+            Row(children: [
               Text('⚠️', style: TextStyle(fontSize: 16)),
               SizedBox(width: 8),
               Text('Things to note',
@@ -237,7 +238,7 @@ class ConstitutionResultWidget extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
       decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.card(context),
           boxShadow: [
             BoxShadow(
                 color: Colors.black.withValues(alpha: 0.06), blurRadius: 20, offset: const Offset(0, -4))
@@ -259,7 +260,7 @@ class ConstitutionResultWidget extends StatelessWidget {
               child: Row(children: [
                 const Text('👑', style: TextStyle(fontSize: 20)),
                 const SizedBox(width: 10),
-                const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text('Unlock the full constitution report',
                       style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF92400E))),
                   SizedBox(height: 2),
@@ -273,8 +274,8 @@ class ConstitutionResultWidget extends StatelessWidget {
               Expanded(
                 child: ElevatedButton.icon(
                   onPressed: onUnlock,
-                  icon: const Icon(Icons.lock_open, size: 18),
-                  label: const Text('Unlock report',
+                  icon: Icon(Icons.lock_open, size: 18),
+                  label: Text('Unlock report',
                       style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFE5A84B),
@@ -291,7 +292,7 @@ class ConstitutionResultWidget extends StatelessWidget {
               Expanded(
                 child: OutlinedButton.icon(
                   onPressed: onRetest,
-                  icon: const Icon(Icons.refresh, size: 18),
+                  icon: Icon(Icons.refresh, size: 18),
                   label: const Text('Retake', style: TextStyle(fontSize: 14)),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: ShunshiColors.primary,
@@ -305,8 +306,8 @@ class ConstitutionResultWidget extends StatelessWidget {
               Expanded(
                 child: ElevatedButton.icon(
                   onPressed: onViewDetail,
-                  icon: const Icon(Icons.auto_awesome, size: 18),
-                  label: const Text('View details',
+                  icon: Icon(Icons.auto_awesome, size: 18),
+                  label: Text('View details',
                       style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: ShunshiColors.primary,
@@ -321,7 +322,7 @@ class ConstitutionResultWidget extends StatelessWidget {
             const SizedBox(height: 8),
             TextButton.icon(
               onPressed: onShare,
-              icon: const Icon(Icons.share_outlined, size: 16),
+              icon: Icon(Icons.share_outlined, size: 16),
               label: const Text('Share result', style: TextStyle(fontSize: 13)),
               style: TextButton.styleFrom(foregroundColor: ShunshiColors.textSecondary),
             ),
@@ -341,7 +342,7 @@ class _Section extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.fromLTRB(20, 12, 20, 0),
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
+      decoration: BoxDecoration(color: AppColors.card(context), borderRadius: BorderRadius.circular(16)),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: children),
     );
   }

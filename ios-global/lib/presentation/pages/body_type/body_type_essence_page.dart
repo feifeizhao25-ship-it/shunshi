@@ -10,6 +10,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import '../../../design_system/theme.dart';
 
 class BodyTypeEssencePage extends StatelessWidget {
@@ -28,21 +29,21 @@ class BodyTypeEssencePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       body: CustomScrollView(
         slivers: [
           // ── Header ──
           SliverAppBar(
             expandedHeight: 200,
             pinned: true,
-            backgroundColor: ShunShiColors.primary,
+            backgroundColor: AppColors.primary(context),
             leading: IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
+              icon: Icon(Icons.arrow_back_ios_new, color: Colors.white),
               onPressed: () => Navigator.pop(context),
             ),
             actions: [
               IconButton(
-                icon: const Icon(Icons.settings_outlined, color: Colors.white),
+                icon: Icon(Icons.settings_outlined, color: Colors.white),
                 onPressed: () {},
               ),
             ],
@@ -54,7 +55,7 @@ class BodyTypeEssencePage extends StatelessWidget {
                     end: Alignment.bottomRight,
                     colors: [
                       ShunShiColors.primaryDark,
-                      ShunShiColors.primary,
+                      AppColors.primary(context),
                     ],
                   ),
                 ),
@@ -75,7 +76,7 @@ class BodyTypeEssencePage extends StatelessWidget {
                         const SizedBox(height: 8),
                         Text(
                           'Your Seasonal Essence: Balanced',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 24, fontWeight: FontWeight.w700,
                             color: Colors.white, fontFamily: ShunShiTypography.serifFamily,
                           ),
@@ -114,18 +115,18 @@ class BodyTypeEssencePage extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: ShunShiColors.surfaceContainerLow,
+                      color: AppColors.surfaceContainerLow(context),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(children: [
-                      const Icon(Icons.format_quote, size: 20, color: ShunShiColors.primary),
+                      Icon(Icons.format_quote, size: 20, color: AppColors.primary(context)),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
                           '"Harmony in Flux"',
                           style: TextStyle(
                             fontSize: 16, fontWeight: FontWeight.w600,
-                            color: ShunShiColors.primary,
+                            color: AppColors.primary(context),
                             fontFamily: ShunShiTypography.serifFamily, fontStyle: FontStyle.italic,
                           ),
                         ),
@@ -136,18 +137,18 @@ class BodyTypeEssencePage extends StatelessWidget {
 
                   // ── Solar Dominance ──
                   Row(children: [
-                    const Icon(Icons.wb_sunny, size: 20, color: Color(0xFFF59E0B)),
+                    Icon(Icons.wb_sunny, size: 20, color: Color(0xFFF59E0B)),
                     const SizedBox(width: 8),
                     Text('Solar Dominance', style: TextStyle(
                       fontSize: 16, fontWeight: FontWeight.w700,
-                      color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.serifFamily,
+                      color: AppColors.textPrimary(context), fontFamily: ShunShiTypography.serifFamily,
                     )),
                   ]),
                   const SizedBox(height: 8),
                   Text(
                     'Your energy peaks with the rising sun. Morning rituals are your strongest foundation.',
                     style: TextStyle(
-                      fontSize: 14, color: ShunShiColors.textSecondary,
+                      fontSize: 14, color: AppColors.textSecondary(context),
                       height: 1.6, fontFamily: ShunShiTypography.sansFamily,
                     ),
                   ),
@@ -155,18 +156,18 @@ class BodyTypeEssencePage extends StatelessWidget {
 
                   // ── Terrene Stability ──
                   Row(children: [
-                    const Icon(Icons.spa, size: 20, color: ShunShiColors.primary),
+                    Icon(Icons.spa, size: 20, color: AppColors.primary(context)),
                     const SizedBox(width: 8),
                     Text('Terrene Stability', style: TextStyle(
                       fontSize: 16, fontWeight: FontWeight.w700,
-                      color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.serifFamily,
+                      color: AppColors.textPrimary(context), fontFamily: ShunShiTypography.serifFamily,
                     )),
                   ]),
                   const SizedBox(height: 8),
                   Text(
                     'Grounded and deliberate. Your body recovers best through stillness and earthy textures.',
                     style: TextStyle(
-                      fontSize: 14, color: ShunShiColors.textSecondary,
+                      fontSize: 14, color: AppColors.textSecondary(context),
                       height: 1.6, fontFamily: ShunShiTypography.sansFamily,
                     ),
                   ),
@@ -179,7 +180,7 @@ class BodyTypeEssencePage extends StatelessWidget {
                     width: double.infinity,
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: ShunShiColors.surfaceContainerLowest,
+                      color: AppColors.surfaceContainerLowest(context),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Column(
@@ -210,7 +211,7 @@ class BodyTypeEssencePage extends StatelessWidget {
                   const SizedBox(height: 12),
                   _seasonCard('Active Season', 'Spring · Wood Element',
                     'Your most vital period. Channel energy into creative projects and morning movement practices.',
-                    ShunShiColors.primary),
+                    AppColors.primary(context)),
                   const SizedBox(height: 12),
                   _seasonCard('Rest Season', 'Late Summer · Earth Element',
                     'Focus on grounding. Nourish with warm, cooked foods and prioritize sleep.',
@@ -287,7 +288,7 @@ class BodyTypeEssencePage extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Icon(Icons.check_circle, size: 18, color: ShunShiColors.primary),
+        Icon(Icons.check_circle, size: 18, color: ShunShiColors.primary),
         const SizedBox(width: 10),
         Expanded(child: Text(text, style: TextStyle(
           fontSize: 13, color: ShunShiColors.textSecondary,

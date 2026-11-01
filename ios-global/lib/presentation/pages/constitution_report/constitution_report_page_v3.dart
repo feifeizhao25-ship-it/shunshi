@@ -2,6 +2,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import '../../widgets/state_view.dart';
 import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
@@ -68,10 +69,10 @@ class _ConstitutionReportPageV3State extends State<ConstitutionReportPageV3> {
     final typeColor = info['color'] as Color;
 
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       appBar: AppBar(
-        backgroundColor: ShunShiColors.background,
-        leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
+        backgroundColor: AppColors.background(context),
+        leading: IconButton(icon: Icon(Icons.arrow_back), onPressed: () => context.pop()),
         title: Text('Body Type Report',
           style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18, fontWeight: FontWeight.w600)),
       ),
@@ -83,7 +84,7 @@ class _ConstitutionReportPageV3State extends State<ConstitutionReportPageV3> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('Body Type Report · ${_getCurrentSeason()}',
-                    style: TextStyle(fontSize: 14, color: ShunShiColors.textTertiary)),
+                    style: TextStyle(fontSize: 14, color: AppColors.textTertiary(context))),
                   const SizedBox(height: 16),
 
                   // Body Type结果卡片
@@ -91,12 +92,12 @@ class _ConstitutionReportPageV3State extends State<ConstitutionReportPageV3> {
                     width: double.infinity,
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(colors: [ShunShiColors.primary, ShunShiColors.primary.withOpacity(0.7)]),
+                      gradient: LinearGradient(colors: [AppColors.primary(context), AppColors.primary(context).withOpacity(0.7)]),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       Text('Your Body Type: $name',
-                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
                       const SizedBox(height: 12),
                       Wrap(spacing: 8, children: tags.map((t) => _buildTag(t, const Color(0xFFE4C285))).toList()),
                     ]),
@@ -105,7 +106,7 @@ class _ConstitutionReportPageV3State extends State<ConstitutionReportPageV3> {
 
                   // Body Type评分柱状图
                   if (widget.scores != null && widget.scores!.isNotEmpty) ...[
-                    Text('Body Type Score Distribution', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+                    Text('Body Type Score Distribution', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
                     const SizedBox(height: 12),
                     ..._sortedScoreBars(),
                     const SizedBox(height: 8),
@@ -116,16 +117,16 @@ class _ConstitutionReportPageV3State extends State<ConstitutionReportPageV3> {
                     Container(
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: ShunShiColors.surface,
+                        color: AppColors.surface(context),
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: ShunShiColors.primary.withOpacity(0.15)),
+                        border: Border.all(color: AppColors.primary(context).withOpacity(0.15)),
                       ),
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                         Row(children: [
-                          Icon(Icons.auto_awesome, color: ShunShiColors.primary, size: 18),
+                          Icon(Icons.auto_awesome, color: AppColors.primary(context), size: 18),
                           const SizedBox(width: 8),
                           Text('AI Wellness Summary',
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
                         ]),
                         const SizedBox(height: 12),
                         _buildAdviceSection(Icons.restaurant, 'Dietsuggestion: ', _advice?['advice']?['diet'] ?? ''),
@@ -139,7 +140,7 @@ class _ConstitutionReportPageV3State extends State<ConstitutionReportPageV3> {
                   ],
 
                   // recommended 内容卡片（从API获取相关内容）
-                  Text('Personalized Wellness Plan', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+                  Text('Personalized Wellness Plan', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
                   const SizedBox(height: 12),
                   _buildPlanCard(Icons.restaurant, 'recommended Recipes', _advice?['advice']?['diet'] ?? 'Qi & Blood Tonifying Recipes', 'View'),
                   const SizedBox(height: 10),
@@ -151,7 +152,7 @@ class _ConstitutionReportPageV3State extends State<ConstitutionReportPageV3> {
                   // 引用
                   Center(child: Text('"Rest the body, move to nourish Qi."',
                     style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 14,
-                      fontStyle: FontStyle.italic, color: ShunShiColors.textTertiary))),
+                      fontStyle: FontStyle.italic, color: AppColors.textTertiary(context)))),
                   const SizedBox(height: 16),
 
                   // Generate Wellness Calendar CTA
@@ -163,10 +164,10 @@ class _ConstitutionReportPageV3State extends State<ConstitutionReportPageV3> {
                           const SnackBar(content: Text('Generating wellness calendar...'), duration: Duration(seconds: 1)),
                         );
                       },
-                      icon: const Icon(Icons.calendar_month, size: 20),
-                      label: const Text('Generate Wellness Calendar', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+                      icon: Icon(Icons.calendar_month, size: 20),
+                      label: Text('Generate Wellness Calendar', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: ShunShiColors.primary,
+                        backgroundColor: AppColors.primary(context),
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                         elevation: 0,
@@ -187,7 +188,7 @@ class _ConstitutionReportPageV3State extends State<ConstitutionReportPageV3> {
     return sorted.map((e) => _buildBar(
       _typeInfo[e.key]?['name'] as String? ?? e.key,
       e.value,
-      _typeInfo[e.key]?['color'] as Color? ?? ShunShiColors.textTertiary,
+      _typeInfo[e.key]?['color'] as Color? ?? AppColors.textTertiary(context),
     )).toList();
   }
 
@@ -212,28 +213,28 @@ class _ConstitutionReportPageV3State extends State<ConstitutionReportPageV3> {
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(children: [
         SizedBox(width: 80, child: Text(label,
-          style: TextStyle(fontSize: 13, color: ShunShiColors.textSecondary))),
+          style: TextStyle(fontSize: 13, color: AppColors.textSecondary(context)))),
         Expanded(child: ClipRRect(
           borderRadius: BorderRadius.circular(4),
           child: LinearProgressIndicator(
-            value: value, backgroundColor: ShunShiColors.surfaceContainerLow,
+            value: value, backgroundColor: AppColors.surfaceContainerLow(context),
             color: color, minHeight: 8),
         )),
         const SizedBox(width: 8),
         Text('${(value * 100).toInt()}%',
-          style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
+          style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context))),
       ]),
     );
   }
 
   Widget _buildAdviceSection(IconData icon, String title, String content) {
     return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Icon(icon, size: 16, color: ShunShiColors.textTertiary),
+      Icon(icon, size: 16, color: AppColors.textTertiary(context)),
       const SizedBox(width: 8),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(title, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+        Text(title, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
         const SizedBox(height: 2),
-        Text(content, style: TextStyle(fontSize: 13, color: ShunShiColors.textSecondary, height: 1.6)),
+        Text(content, style: TextStyle(fontSize: 13, color: AppColors.textSecondary(context), height: 1.6)),
       ])),
     ]);
   }
@@ -241,22 +242,22 @@ class _ConstitutionReportPageV3State extends State<ConstitutionReportPageV3> {
   Widget _buildPlanCard(IconData icon, String category, String title, String action) {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(14)),
+      decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(14)),
       child: Row(children: [
         Container(
           width: 44, height: 44,
           decoration: BoxDecoration(
-            color: ShunShiColors.primary.withOpacity(0.08),
+            color: AppColors.primary(context).withOpacity(0.08),
             borderRadius: BorderRadius.circular(12)),
-          child: Icon(icon, color: ShunShiColors.primary, size: 20),
+          child: Icon(icon, color: AppColors.primary(context), size: 20),
         ),
         const SizedBox(width: 12),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(category, style: TextStyle(fontSize: 11, color: ShunShiColors.textTertiary)),
-          Text(title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+          Text(category, style: TextStyle(fontSize: 11, color: AppColors.textTertiary(context))),
+          Text(title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
         ])),
-        Text(action, style: TextStyle(fontSize: 12, color: ShunShiColors.primary, fontWeight: FontWeight.w500)),
-        Icon(Icons.arrow_forward, size: 14, color: ShunShiColors.primary),
+        Text(action, style: TextStyle(fontSize: 12, color: AppColors.primary(context), fontWeight: FontWeight.w500)),
+        Icon(Icons.arrow_forward, size: 14, color: AppColors.primary(context)),
       ]),
     );
   }

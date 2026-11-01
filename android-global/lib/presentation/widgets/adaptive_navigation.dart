@@ -2,6 +2,7 @@
 // Based on Ultimate UI Structure v1.0
 
 import 'package:flutter/material.dart';
+import '../../design_system/app_colors.dart';
 import '../../core/theme/shunshi_colors.dart';
 
 // ==================== Age Groups ====================
@@ -139,7 +140,7 @@ class AdaptiveBottomNav extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.card(context),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withAlpha(13),

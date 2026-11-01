@@ -33,7 +33,7 @@ class _HelpCenterPageState extends State<HelpCenterPage> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, size: 18),
+          icon: Icon(Icons.arrow_back_ios, size: 18),
           onPressed: () => context.pop(),
           color: SeasonsColors.textPrimary,
         ),
@@ -68,7 +68,7 @@ class _HelpCenterPageState extends State<HelpCenterPage> {
                   hintStyle: SeasonsTextStyles.body.copyWith(
                     color: SeasonsColors.textHint,
                   ),
-                  prefixIcon: const Icon(
+                  prefixIcon: Icon(
                     Icons.search,
                     color: SeasonsColors.textHint,
                     size: 20,
@@ -283,7 +283,7 @@ class _HelpCenterPageState extends State<HelpCenterPage> {
                       ],
                     ),
                   ),
-                  const Icon(Icons.chevron_right,
+                  Icon(Icons.chevron_right,
                       color: SeasonsColors.textTertiary, size: 18),
                 ],
               ),
@@ -541,7 +541,7 @@ class _FaqExpandableState extends State<_FaqExpandable> {
                   AnimatedRotation(
                     turns: _expanded ? 0.5 : 0,
                     duration: const Duration(milliseconds: 200),
-                    child: const Icon(
+                    child: Icon(
                       Icons.keyboard_arrow_down,
                       size: 18,
                       color: SeasonsColors.textTertiary,

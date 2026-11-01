@@ -3,6 +3,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import '../../../design_system/theme.dart';
 
 class GrowthMilestonesV2 extends StatelessWidget {
@@ -11,7 +12,7 @@ class GrowthMilestonesV2 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
@@ -19,7 +20,7 @@ class GrowthMilestonesV2 extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
               child: Row(children: [
-                const Icon(Icons.menu, color: Color(0xFF533afd)),
+                Icon(Icons.menu, color: Color(0xFF533afd)),
                 const Spacer(),
                 Text('Digital Sanctuary', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 16, fontWeight: FontWeight.w600, color: Color(0xFF533afd))),
                 const Spacer(),
@@ -34,11 +35,11 @@ class GrowthMilestonesV2 extends StatelessWidget {
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text('Your Growth Journey', style: TextStyle(
                 fontFamily: ShunShiTypography.serifFamily,
-                fontSize: 28, fontWeight: FontWeight.bold, color: ShunShiColors.textPrimary,
+                fontSize: 28, fontWeight: FontWeight.bold, color: AppColors.textPrimary(context),
               )),
               const SizedBox(height: 8),
               Text('Reflect on the quiet moments of consistency. Each ritual is a seed planted in the garden of your well-being.',
-                style: TextStyle(fontSize: 13, color: ShunShiColors.textTertiary, height: 1.5)),
+                style: TextStyle(fontSize: 13, color: AppColors.textTertiary(context), height: 1.5)),
             ]),
           )),
 
@@ -81,8 +82,8 @@ class GrowthMilestonesV2 extends StatelessWidget {
           SliverToBoxAlternate(child: Padding(
             padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('Reflective Milestones', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
-              Text('Gently nurtured achievements', style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
+              Text('Reflective Milestones', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
+              Text('Gently nurtured achievements', style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context))),
               const SizedBox(height: 12),
               _buildMilestone(Icons.local_florist, 'First Sprout', 'Ritual streak: 3 days', true, Color(0xFF4CAF50)),
               _buildMilestone(Icons.forest, 'Deep Roots', 'Complete a seasonal cycle', false, null),
@@ -92,7 +93,7 @@ class GrowthMilestonesV2 extends StatelessWidget {
             ]),
           )),
 
-          const SliverToBoxAlternate(child: SizedBox(height: 40)),
+          SliverToBoxAlternate(child: SizedBox(height: 40)),
         ],
       ),
     );

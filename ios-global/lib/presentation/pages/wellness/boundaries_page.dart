@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import '../../widgets/seasons_visual.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/shunshi_colors.dart';
@@ -17,7 +18,7 @@ class BoundariesPage extends StatelessWidget {
         foregroundColor: ShunshiColors.textPrimary,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: Icon(Icons.arrow_back),
           onPressed: () => context.go('/home'),
         ),
         title: const Text('Product boundaries'),
@@ -178,7 +179,7 @@ class BoundariesPage extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.warning_amber_rounded, color: Color(0xFFE65100)),
+                  Icon(Icons.warning_amber_rounded, color: Color(0xFFE65100)),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
@@ -294,7 +295,7 @@ class _BoundaryCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.card(context),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: color.withValues(alpha: 0.3),

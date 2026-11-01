@@ -1,4 +1,5 @@
 import 'dart:ui';
+import '../../../design_system/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
@@ -32,7 +33,7 @@ class MainShell extends StatelessWidget {
           decoration: BoxDecoration(
             color: ShunShiColors.darkBackground.withValues(alpha: 0.85),
             border: Border(
-              top: BorderSide(color: ShunShiColors.borderGhost, width: 0.5),
+              top: BorderSide(color: AppColors.borderGhost(context), width: 0.5),
             ),
           ),
           child: ClipRect(
@@ -110,7 +111,7 @@ class _NavTab extends StatelessWidget {
                 isActive ? activeIcon : icon,
                 key: ValueKey(isActive),
                 size: 22,
-                color: isActive ? ShunShiColors.primary : ShunShiColors.textTertiary,
+                color: isActive ? AppColors.primary(context) : AppColors.textTertiary(context),
               ),
             ),
             const SizedBox(height: 2),
@@ -120,7 +121,7 @@ class _NavTab extends StatelessWidget {
                 fontFamily: ShunShiTypography.sansFamily,
                 fontSize: 10,
                 fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
-                color: isActive ? ShunShiColors.primary : ShunShiColors.textTertiary,
+                color: isActive ? AppColors.primary(context) : AppColors.textTertiary(context),
               ),
             ),
             if (isActive) ...[
@@ -129,7 +130,7 @@ class _NavTab extends StatelessWidget {
                 width: 16,
                 height: 2,
                 decoration: BoxDecoration(
-                  color: ShunShiColors.primary,
+                  color: AppColors.primary(context),
                   borderRadius: BorderRadius.circular(1),
                 ),
               ),

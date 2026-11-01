@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import '../../../design_system/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import 'package:go_router/go_router.dart';
@@ -143,9 +144,9 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    if (_isLoading) return Scaffold(backgroundColor: ShunShiColors.background, body: SafeArea(child: _buildSkeleton()));
+    if (_isLoading) return Scaffold(backgroundColor: AppColors.background(context), body: SafeArea(child: _buildSkeleton()));
     final sc = shiChenData[_currentShiChen]!;
-    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : ShunShiColors.background,
+    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : AppColors.background(context),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -157,8 +158,8 @@ class _HomePageState extends State<HomePage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Hello, $_userName', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500, color: ShunShiColors.textPrimary, letterSpacing: -0.5)),
-                  IconButton(onPressed: () { ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context).t('home_no_new_notifications')), duration: Duration(seconds: 1))); }, icon: const Icon(Icons.notifications_none_rounded, color: ShunShiColors.textTertiary, size: 26)),
+                  Text('Hello, $_userName', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500, color: AppColors.textPrimary(context), letterSpacing: -0.5)),
+                  IconButton(onPressed: () { ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context).t('home_no_new_notifications')), duration: Duration(seconds: 1))); }, icon: Icon(Icons.notifications_none_rounded, color: AppColors.textTertiary(context), size: 26)),
                 ],
               ),
               const SizedBox(height: 24),
@@ -171,34 +172,34 @@ class _HomePageState extends State<HomePage> {
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 decoration: BoxDecoration(
-                  color: ShunShiColors.surface,
+                  color: AppColors.surface(context),
                   borderRadius: ShunShiRadius.cardRadius,
-                  border: Border.all(color: ShunShiColors.border),
+                  border: Border.all(color: AppColors.border(context)),
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.access_time, size: 18, color: ShunShiColors.primary),
+                    Icon(Icons.access_time, size: 18, color: AppColors.primary(context)),
                     const SizedBox(width: 8),
-                    Text(sc['time']!, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+                    Text(sc['time']!, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
                     const SizedBox(width: 12),
-                    Text('${sc['organ']} Meridian · ${sc['element']}', style: const TextStyle(fontSize: 14, color: ShunShiColors.textSecondary)),
+                    Text('${sc['organ']} Meridian · ${sc['element']}', style: TextStyle(fontSize: 14, color: AppColors.textSecondary(context))),
                   ],
                 ),
               ),
               const SizedBox(height: 20),
 
               // Wellness tip
-              Text(AppLocalizations.of(context).t('home_wellness_focus'), style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: ShunShiColors.textPrimary, letterSpacing: -0.3)),
+              Text(AppLocalizations.of(context).t('home_wellness_focus'), style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: AppColors.textPrimary(context), letterSpacing: -0.3)),
               const SizedBox(height: 10),
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: ShunShiColors.surface,
+                  color: AppColors.surface(context),
                   borderRadius: ShunShiRadius.cardRadius,
-                  border: Border.all(color: ShunShiColors.border),
+                  border: Border.all(color: AppColors.border(context)),
                 ),
-                child: Text(AppLocalizations.of(context).t('home_nourish_yin_clear_heat_support_kidney_energy'), style: TextStyle(fontSize: 15, color: ShunShiColors.textSecondary, height: 1.5)),
+                child: Text(AppLocalizations.of(context).t('home_nourish_yin_clear_heat_support_kidney_energy'), style: TextStyle(fontSize: 15, color: AppColors.textSecondary(context), height: 1.5)),
               ),
               const SizedBox(height: 20),
 
@@ -209,21 +210,21 @@ class _HomePageState extends State<HomePage> {
                   width: double.infinity,
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: ShunShiColors.primaryLight.withValues(alpha: 0.1),
+                    color: AppColors.primaryLight(context).withValues(alpha: 0.1),
                     borderRadius: ShunShiRadius.cardRadius,
-                    border: Border.all(color: ShunShiColors.primaryLight.withValues(alpha: 0.3)),
+                    border: Border.all(color: AppColors.primaryLight(context).withValues(alpha: 0.3)),
                   ),
                   child: Row(children: [
                     Container(
                       padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(color: ShunShiColors.primary.withValues(alpha: 0.12), shape: BoxShape.circle),
+                      decoration: BoxDecoration(color: AppColors.primary(context).withValues(alpha: 0.12), shape: BoxShape.circle),
                       child: const Text('🧬', style: TextStyle(fontSize: 18)),
                     ),
                     const SizedBox(width: 14),
                     Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text(AppLocalizations.of(context).t('home_constitution_assessment'), style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+                      Text(AppLocalizations.of(context).t('home_constitution_assessment'), style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
                       const SizedBox(height: 2),
-                      Text(AppLocalizations.of(context).t('home_discover_your_body_type_for_personalized_well'), style: TextStyle(fontSize: 12, color: ShunShiColors.textSecondary)),
+                      Text(AppLocalizations.of(context).t('home_discover_your_body_type_for_personalized_well'), style: TextStyle(fontSize: 12, color: AppColors.textSecondary(context))),
                     ])),
                     const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: ShunShiColors.textTertiary),
                   ]),
@@ -247,21 +248,21 @@ class _HomePageState extends State<HomePage> {
                   width: double.infinity,
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: ShunShiColors.surface,
+                    color: AppColors.surface(context),
                     borderRadius: ShunShiRadius.cardRadius,
-                    border: Border.all(color: ShunShiColors.border),
+                    border: Border.all(color: AppColors.border(context)),
                   ),
                   child: Row(children: [
                     Container(
                       padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(color: ShunShiColors.primary.withValues(alpha: 0.08), shape: BoxShape.circle),
+                      decoration: BoxDecoration(color: AppColors.primary(context).withValues(alpha: 0.08), shape: BoxShape.circle),
                       child: const Text('📝', style: TextStyle(fontSize: 18)),
                     ),
                     const SizedBox(width: 14),
                     Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text(AppLocalizations.of(context).t('notification_checkin'), style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+                      Text(AppLocalizations.of(context).t('notification_checkin'), style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
                       const SizedBox(height: 2),
-                      Text(AppLocalizations.of(context).t('home_track_mood_sleep_and_energy_patterns'), style: TextStyle(fontSize: 12, color: ShunShiColors.textSecondary)),
+                      Text(AppLocalizations.of(context).t('home_track_mood_sleep_and_energy_patterns'), style: TextStyle(fontSize: 12, color: AppColors.textSecondary(context))),
                     ])),
                     const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: ShunShiColors.textTertiary),
                   ]),
@@ -270,7 +271,7 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(height: 20),
 
               // Action recommendations
-              Text(AppLocalizations.of(context).t('home_recommendations'), style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: ShunShiColors.textPrimary, letterSpacing: -0.3)),
+              Text(AppLocalizations.of(context).t('home_recommendations'), style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: AppColors.textPrimary(context), letterSpacing: -0.3)),
               const SizedBox(height: 10),
               if (_loadingRecs)
                 Row(children: [
@@ -302,24 +303,24 @@ class _HomePageState extends State<HomePage> {
                   width: double.infinity,
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: ShunShiColors.primary.withValues(alpha: 0.06),
+                    color: AppColors.primary(context).withValues(alpha: 0.06),
                     borderRadius: ShunShiRadius.cardRadius,
-                    border: Border.all(color: ShunShiColors.primary.withValues(alpha: 0.15)),
+                    border: Border.all(color: AppColors.primary(context).withValues(alpha: 0.15)),
                   ),
                   child: Row(
                     children: [
                       Container(
                         padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(color: ShunShiColors.primary.withValues(alpha: 0.12), shape: BoxShape.circle),
-                        child: Icon(Icons.auto_awesome, color: ShunShiColors.primary, size: 20),
+                        decoration: BoxDecoration(color: AppColors.primary(context).withValues(alpha: 0.12), shape: BoxShape.circle),
+                        child: Icon(Icons.auto_awesome, color: AppColors.primary(context), size: 20),
                       ),
                       const SizedBox(width: 14),
                       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Text(AppLocalizations.of(context).t('home_ai_wellness_assistant'), style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+                        Text(AppLocalizations.of(context).t('home_ai_wellness_assistant'), style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
                         const SizedBox(height: 2),
-                        Text(AppLocalizations.of(context).t('home_personalized_guidance_for_this_season'), style: TextStyle(fontSize: 13, color: ShunShiColors.textSecondary)),
+                        Text(AppLocalizations.of(context).t('home_personalized_guidance_for_this_season'), style: TextStyle(fontSize: 13, color: AppColors.textSecondary(context))),
                       ])),
-                      Icon(Icons.arrow_forward_ios_rounded, size: 16, color: ShunShiColors.textTertiary),
+                      Icon(Icons.arrow_forward_ios_rounded, size: 16, color: AppColors.textTertiary(context)),
                     ],
                   ),
                 ),
@@ -332,7 +333,7 @@ class _HomePageState extends State<HomePage> {
                 height: 48,
                 child: ElevatedButton(
                   onPressed: () => context.push('/solar-term-detail/$_currentTerm'),
-                  style: ElevatedButton.styleFrom(backgroundColor: ShunShiColors.primary, shape: RoundedRectangleBorder(borderRadius: ShunShiRadius.buttonRadius)),
+                  style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary(context), shape: RoundedRectangleBorder(borderRadius: ShunShiRadius.buttonRadius)),
                   child: Text(AppLocalizations.of(context).t('home_view_full_seasonal_guide'), style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.white)),
                 ),
               ),
@@ -352,27 +353,27 @@ class _HomePageState extends State<HomePage> {
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: ShunShiColors.surface,
+          color: AppColors.surface(context),
           borderRadius: ShunShiRadius.cardRadius,
-          border: Border.all(color: ShunShiColors.border),
+          border: Border.all(color: AppColors.border(context)),
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Icon(icons[type] ?? Icons.restaurant, color: ShunShiColors.primary, size: 22),
+          Icon(icons[type] ?? Icons.restaurant, color: AppColors.primary(context), size: 22),
           const SizedBox(height: 8),
           Row(children: [
             Expanded(child: Text(rec['title'] ?? '', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis)),
             if (rec['is_premium'] == true) Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(color: ShunShiColors.primary.withValues(alpha: 0.1), borderRadius: ShunShiRadius.chipRadius),
+              decoration: BoxDecoration(color: AppColors.primary(context).withValues(alpha: 0.1), borderRadius: ShunShiRadius.chipRadius),
               child: Row(mainAxisSize: MainAxisSize.min, children: [
-                Icon(Icons.lock_rounded, size: 10, color: ShunShiColors.primary),
+                Icon(Icons.lock_rounded, size: 10, color: AppColors.primary(context)),
                 const SizedBox(width: 2),
                 const Text('PRO', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w600, color: ShunShiColors.primary)),
               ]),
             ),
           ]),
           const SizedBox(height: 4),
-          Text(rec['reason'] ?? '', style: const TextStyle(fontSize: 11, color: ShunShiColors.textTertiary), maxLines: 2, overflow: TextOverflow.ellipsis),
+          Text(rec['reason'] ?? '', style: TextStyle(fontSize: 11, color: AppColors.textTertiary(context)), maxLines: 2, overflow: TextOverflow.ellipsis),
         ]),
       ),
     );
@@ -382,16 +383,16 @@ class _HomePageState extends State<HomePage> {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: ShunShiColors.surface,
+        color: AppColors.surface(context),
         borderRadius: ShunShiRadius.cardRadius,
-        border: Border.all(color: ShunShiColors.border),
+        border: Border.all(color: AppColors.border(context)),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Icon(icon, color: ShunShiColors.textSecondary, size: 24),
+        Icon(icon, color: AppColors.textSecondary(context), size: 24),
         const SizedBox(height: 10),
-        Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+        Text(title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
         const SizedBox(height: 4),
-        Text(desc, style: const TextStyle(fontSize: 12, color: ShunShiColors.textTertiary, height: 1.4)),
+        Text(desc, style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context), height: 1.4)),
       ]),
     );
   }

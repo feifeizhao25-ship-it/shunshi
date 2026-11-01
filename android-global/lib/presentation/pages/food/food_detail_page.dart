@@ -12,6 +12,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
 import 'package:go_router/go_router.dart';
@@ -27,14 +28,14 @@ class FoodDetailPage extends StatelessWidget {
     return Scaffold(
 
       appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
-      backgroundColor: isDark ? ShunShiColors.darkBackground : ShunShiColors.background,
+      backgroundColor: isDark ? ShunShiColors.darkBackground : AppColors.background(context),
       body: CustomScrollView(
         slivers: [
           // ── Hero Header ──
           SliverAppBar(
             expandedHeight: 240,
             pinned: true,
-            backgroundColor: ShunShiColors.primary,
+            backgroundColor: AppColors.primary(context),
             leading: IconButton(
               icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
               onPressed: () => Navigator.pop(context),
@@ -190,7 +191,7 @@ class FoodDetailPage extends StatelessWidget {
                   Text(
                     '* Use an old hen (1+ year) for better medicinal effect. Astragalus suggestion: Soak in advance for 15 min.',
                     style: TextStyle(
-                      fontSize: 12, color: ShunShiColors.textTertiary,
+                      fontSize: 12, color: AppColors.textTertiary(context),
                       fontFamily: ShunShiTypography.sansFamily, fontStyle: FontStyle.italic,
                     ),
                   ),
@@ -218,7 +219,7 @@ class FoodDetailPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   // Nutrition bars
-                  _nutritionBar('Protein', '28g', 0.7, ShunShiColors.primary),
+                  _nutritionBar('Protein', '28g', 0.7, AppColors.primary(context)),
                   const SizedBox(height: 8),
                   _nutritionBar('Fat', '12g', 0.3, ShunShiColors.gold),
                   const SizedBox(height: 8),
@@ -246,7 +247,7 @@ class FoodDetailPage extends StatelessWidget {
                     child: ElevatedButton(
                       onPressed: () {},
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: ShunShiColors.primary,
+                        backgroundColor: AppColors.primary(context),
                         foregroundColor: Colors.white,
                         elevation: 0,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -272,7 +273,7 @@ class FoodDetailPage extends StatelessWidget {
                       width: double.infinity,
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: ShunShiColors.primary.withValues(alpha: 0.06),
+                        color: AppColors.primary(context).withValues(alpha: 0.06),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(children: [
@@ -282,7 +283,7 @@ class FoodDetailPage extends StatelessWidget {
                           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                             Text(AppLocalizations.of(context).t('food_want_to_learn_more'), style: TextStyle(
                               fontSize: 14, fontWeight: FontWeight.w600,
-                              color: ShunShiColors.primary, fontFamily: ShunShiTypography.sansFamily,
+                              color: AppColors.primary(context), fontFamily: ShunShiTypography.sansFamily,
                             )),
                             const SizedBox(height: 2),
                             const Text('Consult the AI SEASONS assistant for personalized diet suggestions', style: TextStyle(
@@ -332,7 +333,7 @@ class FoodDetailPage extends StatelessWidget {
     ],
   );
 
-  Widget _sectionTitle(String t) => Text(t, style: const TextStyle(
+  Widget _sectionTitle(String t) => Text(t, style: TextStyle(
     fontSize: 18, fontWeight: FontWeight.w700,
     fontFamily: ShunShiTypography.serifFamily, color: ShunShiColors.textPrimary,
   ));
@@ -349,7 +350,7 @@ class FoodDetailPage extends StatelessWidget {
       ),
       const SizedBox(width: 12),
       Expanded(
-        child: Text(name, style: const TextStyle(
+        child: Text(name, style: TextStyle(
           fontSize: 14, color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.sansFamily,
         )),
       ),
@@ -375,7 +376,7 @@ class FoodDetailPage extends StatelessWidget {
           ))),
         ),
         const SizedBox(width: 12),
-        Expanded(child: Text(text, style: const TextStyle(
+        Expanded(child: Text(text, style: TextStyle(
           fontSize: 14, color: ShunShiColors.textSecondary, height: 1.6, fontFamily: ShunShiTypography.sansFamily,
         ))),
       ],

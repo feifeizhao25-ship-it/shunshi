@@ -56,7 +56,7 @@ class VoiceService {
 
       final dir = await getTemporaryDirectory();
       _recordPath = '${dir.path}/voice_${DateTime.now().millisecondsSinceEpoch}.aac';
-      await _recorder.start(const RecordConfig(
+      await _recorder.start(RecordConfig(
         encoder: AudioEncoder.aacLc,
         bitRate: 128000,
         sampleRate: 16000,

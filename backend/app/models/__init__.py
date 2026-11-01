@@ -16,6 +16,7 @@ from app.models.audio import AudioTrack, AudioPlayHistory
 from app.models.membership import MembershipPlan, UserMembership, MembershipBenefitUsage
 from app.models.reminder import Reminder, ReminderLog
 from app.models.content import ContentItem, ContentMedia, ContentTag, ContentTagRelation
+from app.models.favorite import Favorite
 
 __all__ = [
     "Base", "User", "UserAuth", "FamilyMember", "UserDevice",
@@ -29,6 +30,7 @@ __all__ = [
     "MembershipPlan", "UserMembership", "MembershipBenefitUsage",
     "Reminder", "ReminderLog",
     "ContentItem", "ContentMedia", "ContentTag", "ContentTagRelation",
+    "Favorite",
 ]
 
 from app.models.admin_identity import AdminCredential, AdminSession

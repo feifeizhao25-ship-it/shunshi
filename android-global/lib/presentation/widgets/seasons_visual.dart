@@ -2,6 +2,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../design_system/app_colors.dart';
 
 const _kGreen = Color(0xFF144227);
 const _kGold = Color(0xFFE4C285);
@@ -161,7 +162,7 @@ class SgStatChip extends StatelessWidget {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 6),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0xFFE6E1D2))),
+        decoration: BoxDecoration(color: AppColors.card(context), borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0xFFE6E1D2))),
         child: Column(children: [
           Icon(icon, size: 20, color: _kGreen),
           const SizedBox(height: 4),

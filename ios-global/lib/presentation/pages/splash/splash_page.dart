@@ -33,7 +33,7 @@ class _SplashPageState extends State<SplashPage>
     _scaleAnimation = Tween<double>(begin: 0.85, end: 1.0).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: const Interval(0.0, 0.5, curve: Curves.easeOutCubic),
+        curve: Interval(0.0, 0.5, curve: Curves.easeOutCubic),
       ),
     );
 
@@ -41,7 +41,7 @@ class _SplashPageState extends State<SplashPage>
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: const Interval(0.0, 0.6, curve: Curves.easeOut),
+        curve: Interval(0.0, 0.6, curve: Curves.easeOut),
       ),
     );
 
@@ -128,7 +128,7 @@ class _SplashPageState extends State<SplashPage>
                             ),
                           ],
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.eco,
                           size: 48,
                           color: Colors.white,

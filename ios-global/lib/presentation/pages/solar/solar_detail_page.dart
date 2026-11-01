@@ -3,6 +3,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import '../../../../design_system/theme.dart';
 import 'package:dio/dio.dart';
 import '../../../core/config/app_config.dart';
@@ -56,16 +57,16 @@ class _SolarDetailPageState extends State<SolarDetailPage> {
     final nextTerm = _data!['next_term'] as String? ?? '';
 
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       appBar: AppBar(
         title: Text('${solar['name'] ?? 'Solar term'} wellness', style: TextStyle(
           fontFamily: ShunShiTypography.serifFamily,
-          color: ShunShiColors.textPrimary,
+          color: AppColors.textPrimary(context),
           fontWeight: FontWeight.w700,
         )),
-        backgroundColor: ShunShiColors.background,
+        backgroundColor: AppColors.background(context),
         elevation: 0,
-        iconTheme: IconThemeData(color: ShunShiColors.textPrimary),
+        iconTheme: IconThemeData(color: AppColors.textPrimary(context)),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
@@ -78,7 +79,7 @@ class _SolarDetailPageState extends State<SolarDetailPage> {
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [ShunShiColors.primary, ShunShiColors.primary.withValues(alpha: 0.85)],
+                  colors: [AppColors.primary(context), AppColors.primary(context).withValues(alpha: 0.85)],
                 ),
                 borderRadius: BorderRadius.circular(20),
               ),
@@ -107,7 +108,7 @@ class _SolarDetailPageState extends State<SolarDetailPage> {
             const SizedBox(height: 24),
 
             // 宜食
-            _buildSection('Good to eat', Icons.restaurant, dietList, ShunShiColors.primary),
+            _buildSection('Good to eat', Icons.restaurant, dietList, AppColors.primary(context)),
             const SizedBox(height: 16),
 
             // 忌食
@@ -139,14 +140,14 @@ class _SolarDetailPageState extends State<SolarDetailPage> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: ShunShiColors.surface,
+                  color: AppColors.surface(context),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Row(children: [
-                  Icon(Icons.arrow_forward, color: ShunShiColors.textTertiary, size: 20),
+                  Icon(Icons.arrow_forward, color: AppColors.textTertiary(context), size: 20),
                   const SizedBox(width: 8),
                   Text('Next solar term: $nextTerm', style: TextStyle(
-                    color: ShunShiColors.textTertiary, fontSize: 14,
+                    color: AppColors.textTertiary(context), fontSize: 14,
                   )),
                 ]),
               ),
@@ -174,7 +175,7 @@ class _SolarDetailPageState extends State<SolarDetailPage> {
         Row(children: [
           Icon(icon, color: color, size: 20),
           const SizedBox(width: 8),
-          Text(title, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+          Text(title, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
         ]),
         const SizedBox(height: 8),
         Wrap(
@@ -198,19 +199,19 @@ class _SolarDetailPageState extends State<SolarDetailPage> {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: ShunShiColors.surface,
+        color: AppColors.surface(context),
         borderRadius: BorderRadius.circular(14),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(children: [
-            Icon(icon, color: ShunShiColors.primary, size: 20),
+            Icon(icon, color: AppColors.primary(context), size: 20),
             const SizedBox(width: 8),
-            Text(title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+            Text(title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
           ]),
           const SizedBox(height: 8),
-          Text(content, style: TextStyle(fontSize: 14, color: ShunShiColors.textSecondary, height: 1.6)),
+          Text(content, style: TextStyle(fontSize: 14, color: AppColors.textSecondary(context), height: 1.6)),
         ],
       ),
     );

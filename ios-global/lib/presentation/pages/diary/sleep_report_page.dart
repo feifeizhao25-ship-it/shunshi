@@ -1,7 +1,9 @@
-import 'dart:convert';
 import '../../../core/router/safe_pop.dart';
+import '../../../design_system/app_colors.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import '../../../data/network/session.dart';
+import '../../../core/network/locale_headers.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -27,57 +29,41 @@ class _SleepReportPageState extends State<SleepReportPage> {
     _loadData();
   }
 
-  Future<Dio> _dio() async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('access_token') ?? '';
-    return Dio(BaseOptions(
-      baseUrl: AppConfig.apiBaseUrl,
-      headers: token.isNotEmpty ? {'Authorization': 'Bearer $token'} : {},
-    ));
-  }
-
   Future<void> _loadData() async {
-    final prefs = await SharedPreferences.getInstance();
-    final userId = prefs.getString('user_id') ?? '';
-    final dio = await _dio();
-
+    // 全部来自服务端：自己写过的日记（睡眠评分）+ 周度洞察。没有记录就是没有，不再读本地缓存、也不再用 prefs 里不存在的 user_id。
+    final uid = currentUserId();
+    if (uid == null) {
+      if (mounted) setState(() => _loading = false);
+      return;
+    }
     try {
-      final [insightRes, entriesRes] = await Future.wait([
-        dio.get('/api/v1/records/sleep/stats', queryParameters: {'user_id': userId}),
-        dio.get('/api/v1/journal/entries/$userId', queryParameters: {
-          'user_id': userId,
-          'limit': 7,
-        }),
+      final dio = withSessionAuth(Dio(BaseOptions(baseUrl: AppConfig.apiBaseUrl, connectTimeout: const Duration(seconds: 8), headers: LocaleHeaders.values)));
+      final enc = Uri.encodeComponent(uid);
+      final results = await Future.wait([
+        dio.get('/api/v1/journal/insights/$enc'),
+        dio.get('/api/v1/journal/entries/$enc', queryParameters: {'limit': 7}),
       ]);
-      setState(() {
-        _insight = Map<String, dynamic>.from(insightRes.data);
-        _entries = List<Map<String, dynamic>>.from(entriesRes.data ?? []);
-        _loading = false;
-      });
-    } catch (_) {
-      // Offline fallback: try cached entries
-      final cached = prefs.getString('diary_entries');
-      if (cached != null) {
-        try {
-          final list = List<Map<String, dynamic>>.from(
-            (const JsonDecoder().convert(cached) as List).map((e) => Map<String, dynamic>.from(e)),
-          );
-          setState(() {
-            _entries = list.take(7).toList();
-            _insight = {
-              'insight': list.length < 3
-                  ? 'Log a few more days to unlock your personalised sleep analysis ✨'
-                  : 'Sleep analysis is loading — go online for the full report',
-              'trend': 'Collecting data',
-              'score': 0,
-              'suggestions': ['Log your sleep quality every day'],
-              'source_references': [],
-              'data_days': list.length,
-            };
-          });
-        } catch (_) {}
+      final raw = results[0].data;
+      final d = raw is Map && raw['data'] is Map ? Map<String, dynamic>.from(raw['data'] as Map) : <String, dynamic>{};
+      final days = (d['entries_count'] as num?)?.toInt() ?? 0;
+      final avgSleep = (d['avg_sleep_quality'] as num?)?.toDouble() ?? 0;
+      if (mounted) {
+        setState(() {
+          _entries = journalEntriesFromBody(results[1].data) ?? const [];
+          _insight = days == 0
+              ? null
+              : {
+                  'trend': d['trend_message'] ?? '',
+                  'insight': d['tcm_pattern'] ?? '',
+                  'score': (avgSleep * 20).round(),
+                  'suggestions': d['recommendations'] ?? const [],
+                  'data_days': days,
+                };
+          _loading = false;
+        });
       }
-      setState(() => _loading = false);
+    } catch (_) {
+      if (mounted) setState(() => _loading = false);
     }
   }
 
@@ -90,7 +76,7 @@ class _SleepReportPageState extends State<SleepReportPage> {
       final d = now.subtract(Duration(days: i));
       final dateStr = '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
       final entry = _entries.cast<Map<String, dynamic>?>().firstWhere(
-        (e) => (e?['entry_date'] ?? '').toString().startsWith(dateStr.substring(0, 10)),
+        (e) => (e?['date'] ?? '').toString().startsWith(dateStr.substring(0, 10)),
         orElse: () => null,
       );
       final sleep = (entry?['sleep_quality'] ?? 0).toDouble();
@@ -99,9 +85,9 @@ class _SleepReportPageState extends State<SleepReportPage> {
         barRods: [
           BarChartRodData(
             toY: sleep,
-            color: sleep >= 4 ? const Color(0xFF4CAF50) : sleep >= 3 ? ShunShiColors.primary : const Color(0xFFFF7043),
+            color: sleep >= 4 ? const Color(0xFF4CAF50) : sleep >= 3 ? AppColors.primary(context) : const Color(0xFFFF7043),
             width: 20,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(6)),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(6)),
           ),
         ],
       ));
@@ -112,19 +98,19 @@ class _SleepReportPageState extends State<SleepReportPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ShunShiColors.background,
+      backgroundColor: AppColors.background(context),
       appBar: AppBar(
-        backgroundColor: ShunShiColors.background,
+        backgroundColor: AppColors.background(context),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+          icon: Icon(Icons.arrow_back_ios_new, size: 20),
           onPressed: () => safePop(context),
         ),
         title: const Text('Sleep report',
             style: TextStyle(fontFamily: ShunShiTypography.serifFamily)),
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator(color: ShunShiColors.primary))
+          ? Center(child: CircularProgressIndicator(color: AppColors.primary(context)))
           : SingleChildScrollView(
               padding: const EdgeInsets.all(20),
               child: Column(
@@ -150,18 +136,18 @@ class _SleepReportPageState extends State<SleepReportPage> {
                       width: double.infinity,
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: ShunShiColors.surfaceContainerLowest,
+                        color: AppColors.surfaceContainerLowest(context),
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: ShunShiColors.borderGhost),
+                        border: Border.all(color: AppColors.borderGhost(context)),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(_insight!['trend'] ?? '',
-                              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
                           const SizedBox(height: 8),
                           Text(_insight!['insight'] ?? '',
-                              style: const TextStyle(fontSize: 14, color: ShunShiColors.textSecondary, height: 1.6)),
+                              style: TextStyle(fontSize: 14, color: AppColors.textSecondary(context), height: 1.6)),
                         ],
                       ),
                     ),
@@ -175,7 +161,7 @@ class _SleepReportPageState extends State<SleepReportPage> {
                         margin: const EdgeInsets.only(bottom: 10),
                         padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
-                          color: ShunShiColors.primary.withValues(alpha: 0.05),
+                          color: AppColors.primary(context).withValues(alpha: 0.05),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Row(
@@ -184,7 +170,7 @@ class _SleepReportPageState extends State<SleepReportPage> {
                             const Text('💡', style: TextStyle(fontSize: 18)),
                             const SizedBox(width: 10),
                             Expanded(child: Text(s.toString(),
-                                style: const TextStyle(fontSize: 14, color: ShunShiColors.textPrimary, height: 1.5))),
+                                style: TextStyle(fontSize: 14, color: AppColors.textPrimary(context), height: 1.5))),
                           ],
                         ),
                       )),
@@ -200,10 +186,10 @@ class _SleepReportPageState extends State<SleepReportPage> {
                               context.push('/chat?prefill=${Uri.encodeComponent("I tried this tip last night: $first. How do you think it went?")}');
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: ShunShiColors.primary,
+                              backgroundColor: AppColors.primary(context),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                             ),
-                            child: const Text('Try this tonight',
+                            child: Text('Try this tonight',
                                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white)),
                           ),
                         ),
@@ -217,12 +203,12 @@ class _SleepReportPageState extends State<SleepReportPage> {
   }
 
   Widget _sectionTitle(String t) => Text(t,
-      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700,
-          fontFamily: ShunShiTypography.serifFamily, color: ShunShiColors.textPrimary));
+      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700,
+          fontFamily: ShunShiTypography.serifFamily, color: AppColors.textPrimary(context)));
 
   Widget _buildScoreCard() {
     final score = _insight?['score'] ?? 0;
-    final color = score >= 80 ? const Color(0xFF4CAF50) : score >= 60 ? ShunShiColors.primary : const Color(0xFFFF7043);
+    final color = score >= 80 ? const Color(0xFF4CAF50) : score >= 60 ? AppColors.primary(context) : const Color(0xFFFF7043);
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -236,7 +222,7 @@ class _SleepReportPageState extends State<SleepReportPage> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Sleep score', style: TextStyle(fontSize: 13, color: ShunShiColors.textTertiary)),
+              Text('Sleep score', style: TextStyle(fontSize: 13, color: AppColors.textTertiary(context))),
               const SizedBox(height: 4),
               Text('$score', style: TextStyle(fontSize: 36, fontWeight: FontWeight.w700, color: color)),
             ],
@@ -261,9 +247,9 @@ class _SleepReportPageState extends State<SleepReportPage> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: ShunShiColors.surfaceContainerLowest,
+        color: AppColors.surfaceContainerLowest(context),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: ShunShiColors.borderGhost),
+        border: Border.all(color: AppColors.borderGhost(context)),
       ),
       height: 200,
       child: BarChart(
@@ -277,7 +263,7 @@ class _SleepReportPageState extends State<SleepReportPage> {
                 showTitles: true,
                 reservedSize: 24,
                 getTitlesWidget: (v, _) => Text('${v.toInt()}',
-                    style: const TextStyle(fontSize: 10, color: ShunShiColors.textTertiary)),
+                    style: TextStyle(fontSize: 10, color: AppColors.textTertiary(context))),
               ),
             ),
             bottomTitles: AxisTitles(
@@ -289,7 +275,7 @@ class _SleepReportPageState extends State<SleepReportPage> {
                   return Padding(
                     padding: const EdgeInsets.only(top: 8),
                     child: Text('${d.month}/${d.day}',
-                        style: const TextStyle(fontSize: 9, color: ShunShiColors.textTertiary)),
+                        style: TextStyle(fontSize: 9, color: AppColors.textTertiary(context))),
                   );
                 },
               ),
@@ -303,7 +289,7 @@ class _SleepReportPageState extends State<SleepReportPage> {
             drawVerticalLine: false,
             horizontalInterval: 1,
             getDrawingHorizontalLine: (v) => FlLine(
-              color: ShunShiColors.borderGhost,
+              color: AppColors.borderGhost(context),
               strokeWidth: 1,
             ),
           ),
@@ -316,16 +302,16 @@ class _SleepReportPageState extends State<SleepReportPage> {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
       decoration: BoxDecoration(
-        color: ShunShiColors.surfaceContainerLowest,
+        color: AppColors.surfaceContainerLowest(context),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: ShunShiColors.borderGhost),
+        border: Border.all(color: AppColors.borderGhost(context)),
       ),
-      child: const Column(
+      child: Column(
         children: [
           Text('🌙', style: TextStyle(fontSize: 40)),
           SizedBox(height: 12),
           Text('Log a few more days to unlock your personalised sleep analysis ✨',
-              style: TextStyle(fontSize: 15, color: ShunShiColors.textTertiary),
+              style: TextStyle(fontSize: 15, color: AppColors.textTertiary(context)),
               textAlign: TextAlign.center),
         ],
       ),

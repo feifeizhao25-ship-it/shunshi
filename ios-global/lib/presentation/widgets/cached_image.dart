@@ -11,7 +11,7 @@ class CachedImage extends StatelessWidget {
   final Widget? errorWidget;
   final BorderRadius? borderRadius;
 
-  const CachedImage({
+  CachedImage({
     super.key,
     this.url,
     this.width,
@@ -59,7 +59,7 @@ class CachedImage extends StatelessWidget {
       width: width,
       height: height,
       color: Colors.grey[200],
-      child: const Icon(Icons.image_not_supported, color: Colors.grey),
+      child: Icon(Icons.image_not_supported, color: Colors.grey),
     );
   }
 }

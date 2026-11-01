@@ -10,6 +10,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
@@ -42,7 +43,7 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : ShunShiColors.background,
+    return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : AppColors.background(context),
       appBar: AppBar(
         elevation: 0,
         leading: IconButton(
@@ -58,13 +59,13 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
             // ── Header ──
             Text(AppLocalizations.of(context).t('checkin_morning'), style: TextStyle(
               fontSize: 28, fontWeight: FontWeight.w700,
-              color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.serifFamily,
+              color: AppColors.textPrimary(context), fontFamily: ShunShiTypography.serifFamily,
             )),
             const SizedBox(height: 8),
             Text(
               '"In the garden of the mind, every thought is a seed.\nChoose what you water today."',
               style: TextStyle(
-                fontSize: 14, color: ShunShiColors.textSecondary,
+                fontSize: 14, color: AppColors.textSecondary(context),
                 height: 1.7, fontStyle: FontStyle.italic,
                 fontFamily: ShunShiTypography.sansFamily,
               ),
@@ -87,7 +88,7 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
                 )),
                 const Spacer(),
                 Text(AppLocalizations.of(context).t('checkin_streak_current'), style: TextStyle(
-                  fontSize: 12, color: ShunShiColors.textTertiary,
+                  fontSize: 12, color: AppColors.textTertiary(context),
                   fontFamily: ShunShiTypography.sansFamily,
                 )),
               ]),
@@ -97,11 +98,11 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
             // ── How is energy flowing ──
             Text(AppLocalizations.of(context).t('checkin_energy_question'), style: TextStyle(
               fontSize: 18, fontWeight: FontWeight.w700,
-              color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.serifFamily,
+              color: AppColors.textPrimary(context), fontFamily: ShunShiTypography.serifFamily,
             )),
             const SizedBox(height: 4),
             Text(AppLocalizations.of(context).t('checkin_take_a_quiet_moment_to_listen_to_your_interna'), style: TextStyle(
-              fontSize: 13, color: ShunShiColors.textSecondary,
+              fontSize: 13, color: AppColors.textSecondary(context),
               fontFamily: ShunShiTypography.sansFamily,
             )),
             const SizedBox(height: 20),
@@ -109,7 +110,7 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
             // ── Energy Level ──
             Text(AppLocalizations.of(context).t('checkin_energy_level'), style: TextStyle(
               fontSize: 14, fontWeight: FontWeight.w600,
-              color: ShunShiColors.textSecondary, fontFamily: ShunShiTypography.sansFamily,
+              color: AppColors.textSecondary(context), fontFamily: ShunShiTypography.sansFamily,
             )),
             const SizedBox(height: 12),
             Row(children: List.generate(_energyLevels.length, (i) => _optionChip(i, _energyLevels, _energyIndex, (v) => setState(() => _energyIndex = v)))),
@@ -118,7 +119,7 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
             // ── Current Mood ──
             Text(AppLocalizations.of(context).t('checkin_current_mood'), style: TextStyle(
               fontSize: 14, fontWeight: FontWeight.w600,
-              color: ShunShiColors.textSecondary, fontFamily: ShunShiTypography.sansFamily,
+              color: AppColors.textSecondary(context), fontFamily: ShunShiTypography.sansFamily,
             )),
             const SizedBox(height: 12),
             Wrap(
@@ -139,9 +140,9 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
                   Navigator.pop(context);
                 } : null,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: ShunShiColors.primary,
+                  backgroundColor: AppColors.primary(context),
                   foregroundColor: Colors.white,
-                  disabledBackgroundColor: ShunShiColors.surfaceContainerLow,
+                  disabledBackgroundColor: AppColors.surfaceContainerLow(context),
                   elevation: 0,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
@@ -165,19 +166,19 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
-          color: selected ? ShunShiColors.primary.withValues(alpha: 0.1) : ShunShiColors.surfaceContainerLow,
+          color: selected ? AppColors.primary(context).withValues(alpha: 0.1) : AppColors.surfaceContainerLow(context),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(opt.icon, size: 18,
-              color: selected ? ShunShiColors.primary : ShunShiColors.textTertiary,
+              color: selected ? AppColors.primary(context) : AppColors.textTertiary(context),
             ),
             const SizedBox(width: 8),
             Text(opt.label, style: TextStyle(
               fontSize: 14, fontWeight: FontWeight.w500,
-              color: selected ? ShunShiColors.primary : ShunShiColors.textSecondary,
+              color: selected ? AppColors.primary(context) : AppColors.textSecondary(context),
               fontFamily: ShunShiTypography.sansFamily,
             )),
           ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../design_system/theme.dart';
@@ -62,7 +63,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: isDark ? ShunShiColors.darkBackground : ShunShiColors.background,
+      backgroundColor: isDark ? ShunShiColors.darkBackground : AppColors.background(context),
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, size: 20),
@@ -128,16 +129,16 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
-        color: ShunShiColors.surfaceContainerLowest,
+        color: AppColors.surfaceContainerLowest(context),
         borderRadius: BorderRadius.circular(14),
       ),
       child: SwitchListTile(
-        secondary: Icon(icon, size: 22, color: ShunShiColors.textSecondary),
-        title: Text(title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: ShunShiColors.textPrimary)),
-        subtitle: Text(subtitle, style: const TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
+        secondary: Icon(icon, size: 22, color: AppColors.textSecondary(context)),
+        title: Text(title, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: AppColors.textPrimary(context))),
+        subtitle: Text(subtitle, style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context))),
         value: value,
         onChanged: onChanged,
-        activeThumbColor: ShunShiColors.primary,
+        activeThumbColor: AppColors.primary(context),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       ),
     );
@@ -155,18 +156,18 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
-        color: ShunShiColors.surfaceContainerLowest,
+        color: AppColors.surfaceContainerLowest(context),
         borderRadius: BorderRadius.circular(14),
       ),
       child: Column(
         children: [
           SwitchListTile(
-            secondary: Icon(icon, size: 22, color: ShunShiColors.textSecondary),
-            title: Text(title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: ShunShiColors.textPrimary)),
-            subtitle: Text(subtitle, style: const TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
+            secondary: Icon(icon, size: 22, color: AppColors.textSecondary(context)),
+            title: Text(title, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: AppColors.textPrimary(context))),
+            subtitle: Text(subtitle, style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context))),
             value: value,
             onChanged: onToggle,
-            activeThumbColor: ShunShiColors.primary,
+            activeThumbColor: AppColors.primary(context),
           ),
           if (value)
             Padding(
@@ -180,16 +181,16 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                   decoration: BoxDecoration(
-                    color: ShunShiColors.primary.withValues(alpha: 0.06),
+                    color: AppColors.primary(context).withValues(alpha: 0.06),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(AppLocalizations.of(context).t('settings_reminder_time'), style: TextStyle(fontSize: 13, color: ShunShiColors.textSecondary)),
+                      Text(AppLocalizations.of(context).t('settings_reminder_time'), style: TextStyle(fontSize: 13, color: AppColors.textSecondary(context))),
                       Row(children: [
                         Text(time.format(context),
-                            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: ShunShiColors.primary)),
+                            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AppColors.primary(context))),
                         const SizedBox(width: 8),
                         const Icon(Icons.access_time, size: 18, color: ShunShiColors.primary),
                       ]),

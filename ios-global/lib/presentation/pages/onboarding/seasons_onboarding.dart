@@ -393,7 +393,7 @@ class _SeasonsOnboardingState extends State<SeasonsOnboarding> {
                       ),
                       child: Text(
                         isLastStep ? 'Begin' : 'Continue',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                           letterSpacing: 0.3,
