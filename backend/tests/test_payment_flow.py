@@ -645,7 +645,7 @@ class TestExpiryRollback:
 
         # 先初始化家庭席位
         sub_mod.family_seats[user_id] = {
-            "family_seats": 4,
+            "family_seats": 2,
             "used_seats": 2,
             "members": [{"name": "张三"}, {"name": "李四"}],
             "order_id": "order-001",
@@ -824,8 +824,8 @@ class TestTierPermissions:
         assert data["plan"] == "jiahe"
         assert data["features"]["family"] is True
         assert data["family_seats"] is not None
-        assert data["family_seats"]["family_seats"] == 4
-        assert data["family_seats"]["available"] == 4
+        assert data["family_seats"]["family_seats"] == 2
+        assert data["family_seats"]["available"] == 2
 
     @pytest.mark.asyncio
     async def test_jiahe_family_bind_and_unbind(self, client, app, monkeypatch):
@@ -844,7 +844,7 @@ class TestTierPermissions:
         assert resp_bind.status_code == 200
         seats = resp_bind.json()["data"]
         assert seats["used_seats"] == 1
-        assert seats["available"] == 3
+        assert seats["available"] == 1
 
         # 解绑成员
         resp_unbind = await client.post(
@@ -854,7 +854,7 @@ class TestTierPermissions:
         assert resp_unbind.status_code == 200
         seats = resp_unbind.json()["data"]
         assert seats["used_seats"] == 0
-        assert seats["available"] == 4
+        assert seats["available"] == 2
 
 
 # ============================================================
@@ -1182,14 +1182,14 @@ class TestEdgeCases:
         await _create_and_pay_order(client, user_id, "jiahe_monthly")
         _seed_family_entitlement(app, user_id)
 
-        for i in range(4):
+        for i in range(2):
             resp = await client.post(
                 f"{API_BASE}/family-seats/bind",
                 params={"user_id": user_id, "member_name": f"成员{i}", "member_user_id": f"member-{i}"},
             )
             assert resp.status_code == 200
 
-        # 第5个应失败
+        # 第3位家人应失败（共 3 人含购买人）
         resp = await client.post(
             f"{API_BASE}/family-seats/bind",
             params={"user_id": user_id, "member_name": "超出成员", "member_user_id": "member-overflow"},

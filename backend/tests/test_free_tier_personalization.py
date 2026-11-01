@@ -42,7 +42,7 @@ sys.path.insert(0, str(BACKEND))
 from app.entitlements import get_registry, tier_for_product, validate_registry  # noqa: E402
 
 REGISTRY_PATH = BACKEND / "app" / "entitlements_registry.json"
-ALL_TIERS = ("free", "pro", "family", "enterprise")
+ALL_TIERS = ("free", "pro", "family")  # enterprise 已移除（年付唯一）
 
 
 @pytest.fixture(scope="module")
@@ -91,14 +91,15 @@ def test_the_enforced_difference_is_the_daily_message_quota(registry):
 
 
 def test_knowledge_depth_remains_a_paid_difference(registry):
-    """长期趋势仍是付费差异。周度深度报告没有执行点，各档都关着。
+    """长期趋势已撤下（所有档位关闭），不能作为付费差异宣传。周度深度报告没有执行点，各档都关着。
 
     2026-10-18 定稿（test_unimplemented_benefits_not_promoted）：
     weekly_deep_report 不能在付费档打开，否则订阅页会宣传一个没人实现的权益。
     """
     free = registry["tiers"]["free"]["knowledge"]
     pro = registry["tiers"]["pro"]["knowledge"]
-    assert free["long_term_trends"] is False and pro["long_term_trends"] is True
+    # 2026-11-01：趋势页已撤下，所有档位都关着（D4 SS-6-1）；重新交付后再改回付费差异。
+    assert free["long_term_trends"] is False and pro["long_term_trends"] is False
     assert free["weekly_deep_report"] is False and pro["weekly_deep_report"] is False
 
 

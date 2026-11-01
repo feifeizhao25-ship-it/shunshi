@@ -11,7 +11,7 @@ from typing import Any
 
 REGISTRY_PATH = Path(__file__).with_name("entitlements_registry.json")
 
-REQUIRED_TIERS = ("free", "pro", "family", "enterprise")
+REQUIRED_TIERS = ("free", "pro", "family")  # enterprise 已移除（年付唯一，0S3 / D4 SS-6-1）
 REQUIRED_DIMENSIONS = (
     "quotas",
     "knowledge",
@@ -51,6 +51,14 @@ def validate_registry(data: Any) -> dict:
     for product_id, tier in product_tier_map.items():
         if tier not in tiers:
             raise RegistryError(f"product_tier_map[{product_id}] 指向不存在的 tier: {tier}")
+        if product_id.endswith("_monthly"):
+            raise RegistryError(f"product_tier_map[{product_id}] 是月付 SKU：年付唯一，月付只能放 legacy_product_tier_map")
+    legacy_map = data.get("legacy_product_tier_map", {})
+    if not isinstance(legacy_map, dict):
+        raise RegistryError("legacy_product_tier_map 必须是对象")
+    for product_id, tier in legacy_map.items():
+        if tier not in tiers:
+            raise RegistryError(f"legacy_product_tier_map[{product_id}] 指向不存在的 tier: {tier}")
     return data
 
 
@@ -65,7 +73,10 @@ def get_registry() -> dict:
 
 def tier_for_product(product_id: str) -> str:
     """商品 id → tier；未登记的商品按 free 处理，绝不拔高权益。"""
-    return str(get_registry().get("product_tier_map", {}).get(product_id, "free"))
+    reg = get_registry()
+    # 在售（年付）映射优先；停售的月付 SKU 只为已购用户保留权益（legacy_product_tier_map）。
+    return str(reg.get("product_tier_map", {}).get(product_id)
+               or reg.get("legacy_product_tier_map", {}).get(product_id, "free"))
 
 
 # ── 国内订阅档位（养心 / 颐养 / 家和）与注册表的对应 ───────────────────────────
@@ -76,7 +87,7 @@ def registry_tier_for_plan(plan_id: str) -> str:
     """国内档位 id（free/yangxin/yiyang/jiahe）→ 注册表 tier。"""
     if plan_id == "free":
         return "free"
-    return tier_for_product(f"{plan_id}_monthly")
+    return tier_for_product(f"{plan_id}_yearly")  # 年付唯一
 
 
 def daily_chat_limit_for_plan(plan_id: str) -> int:
@@ -86,7 +97,7 @@ def daily_chat_limit_for_plan(plan_id: str) -> int:
 
 
 def family_seats_for_plan(plan_id: str) -> int:
-    """可绑定的家人席位数。注册表的 family_members 含购买人自己（免费版是 1），所以席位 = 人数 - 1。"""
+    """可绑定的家人席位数。注册表的 family_members 含购买人自己（免费版是 1；家庭档 3 = 购买人 + 2 位家人），所以席位 = 人数 - 1。"""
     tier = registry_tier_for_plan(plan_id)
     members = int(get_registry()["tiers"][tier]["collaboration"]["family_members"])
     return -1 if members == -1 else max(0, members - 1)

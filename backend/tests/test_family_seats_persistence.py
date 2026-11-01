@@ -25,7 +25,7 @@ def test_seats_survive_restart_and_are_exported(client, family, settings):
     assert bind(client, headers).status_code == 200
     with TestClient(create_app(settings)) as restarted:
         info = restarted.get('/api/v1/subscription/family-seats', headers=headers).json()['data']
-        assert info['used_seats'] == 1 and info['available'] == 3
+        assert info['used_seats'] == 1 and info['available'] == 1
         assert info['members'][0]['access_granted'] is False
         exported = restarted.get('/api/v1/auth/data/export', headers=headers).json()
         assert len(exported['family_seats']) == 1
@@ -33,14 +33,13 @@ def test_seats_survive_restart_and_are_exported(client, family, settings):
         assert removed.status_code == 200 and removed.json()['data']['used_seats'] == 0
 
 
-def test_duplicate_and_fifth_member_are_rejected(client, family):
+def test_duplicate_and_third_relative_are_rejected(client, family):
     _, headers = family
     assert bind(client, headers).status_code == 200
     assert bind(client, headers).status_code == 409
-    for i in range(2,5):
-        assert bind(client, headers, member=f'member-{i}').status_code == 200
-    assert bind(client, headers, member='fifth').status_code == 400
-    assert client.get('/api/v1/subscription/family-seats', headers=headers).json()['data']['used_seats'] == 4
+    assert bind(client, headers, member='member-2').status_code == 200
+    assert bind(client, headers, member='third').status_code == 400  # 共 3 人含购买人 → 最多 2 位家人
+    assert client.get('/api/v1/subscription/family-seats', headers=headers).json()['data']['used_seats'] == 2
 
 
 @pytest.mark.parametrize('change', ['expired', 'downgraded', 'removed'])
