@@ -55,7 +55,6 @@ dependencies:
   # Image Picker
   image_picker: ^1.1.2
   path_provider: ^2.1.5
-  video_player: ^2.9.2
 
   # Audio Recording (voice messages)
   record: ^6.2.0
