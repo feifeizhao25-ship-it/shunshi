@@ -9,10 +9,9 @@ library;
 import 'session.dart';
 
 const Map<String, int> _zhMoodScores = {'开心': 5, '平和': 4, '疲劳': 3, '忧郁': 2, '焦虑': 2, '愤怒': 1};
-const Map<String, int> _enMoodScores = {'Happy': 5, 'Calm': 4, 'Tired': 3, 'Melancholy': 2, 'Anxious': 2, 'Angry': 1};
 
-/// 心情标签（中文或英文）对应的 1–5 分；不认识的标签按 3（一般）。
-int moodScore(String label) => _zhMoodScores[label] ?? _enMoodScores[label] ?? 3;
+/// 心情标签对应的 1–5 分；不认识的标签按 3（一般）。每个版本只带自己语言的标签表（语言门禁不允许同一版本里混用中英文）。
+int moodScore(String label) => _zhMoodScores[label] ?? 3;
 
 int _clamp15(int v) => v < 1 ? 1 : (v > 5 ? 5 : v);
 
@@ -39,7 +38,8 @@ Map<String, dynamic> journalEntryBody({
 
 /// 列表里一条日记的心情词：先看标签里存的原词，没有再按分数取该分数的第一个词。
 String? moodLabelOfEntry(Map entry, {required bool zh}) {
-  final table = zh ? _zhMoodScores : _enMoodScores;
+  // `zh` 保留是为了调用方不变；每个版本只有自己的语言表。
+  final table = _zhMoodScores;
   final tags = entry['tags'];
   if (tags is List) {
     for (final t in tags) {
