@@ -75,7 +75,10 @@ class SemanticRetriever:
             
             # 3. 格式化输出
             formatted = []
+            from .retriever import is_expired
             for r in results:
+                if is_expired(r.metadata or {}):
+                    continue  # expired sources are never cited (retest B13)
                 formatted.append({
                     "chunk_id": r.id,
                     "content": redact_efficacy_claims(r.content),

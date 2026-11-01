@@ -4,6 +4,7 @@
 """
 import logging
 import re
+from datetime import date
 from typing import Optional
 
 from app.safety.efficacy import redact_efficacy_claims
@@ -19,7 +20,20 @@ _NUM = re.compile(r"^\s*(?:第[一二三四五六七八九十]+章[:：]\s*|[一
 _PAREN = re.compile(r"[（(].*?[）)]")
 _GENERIC_HEADINGS = frozenset({"说明", "简介", "概述", "注意事项", "总结", "前言", "备注"})
 HEADING_BOOST = 0.5
-STALE_PENALTY = 0.5
+STALE_PENALTY = 0.5  # kept for callers that import it; expired sources are now dropped, not just down-weighted
+
+
+def _today() -> date:
+    return date.today()
+
+
+def is_expired(meta: dict, today: date | None = None) -> bool:
+    """True when a chunk's source is past its valid_until (or has none). Worked out per call from valid_until,
+    not from a flag computed once at load, so a server that stays up across the expiry date stops using it too."""
+    try:
+        return date.fromisoformat(str(meta["valid_until"])) < (today or _today())
+    except (KeyError, ValueError):
+        return True
 
 
 def _heading_topic(heading_path: list[str]) -> str:
@@ -92,8 +106,9 @@ def retrieve(
             if not content_has and chunk_const != filter_const:
                 score *= 0.3
 
-        if meta.get("stale"):
-            score *= STALE_PENALTY  # 来源已过期：降权，不删除，避免集体过期时问答变空白
+        if is_expired(meta):
+            # 来源已过期：不再引用（复测 B13：以前只降权，过期的 legacy 文档仍会被检索进回答）。
+            continue
 
         topic = _heading_topic(chunk.heading_path)
         if len(topic) >= 2 and topic not in _GENERIC_HEADINGS and topic in query:
