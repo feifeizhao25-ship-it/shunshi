@@ -72,7 +72,6 @@ dependencies:
   record: ^6.2.0
   http: ^1.2.0
   audioplayers: ^6.6.0
-  video_player: ^2.11.1
 
 flutter_launcher_icons:
   android: "launcher_icon"
