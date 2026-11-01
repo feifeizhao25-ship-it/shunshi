@@ -157,7 +157,7 @@ SUBSCRIPTION_PLANS = {
         "price_yearly_cents": 69900,
         "period": "month",
         "period_name": "月",
-        "family_seats": 4,  # 实际值在下方按权益注册表覆盖
+        "family_seats": 2,  # 实际值在下方按权益注册表覆盖（family_members=3 含购买人 → 可绑定 2 位）
         "features": {
             "basic_chat": True,
             "solar_terms": True,
@@ -363,7 +363,7 @@ purchase_history: Dict[str, list] = {}
 payment_orders: Dict[str, dict] = {}
 usage_stats: Dict[str, dict] = {}
 audit_log: List[dict] = []
-# 家庭席位: {user_id: {family_seats: 4, used_seats: 1, members: [{"name": "xxx", "user_id": "xxx"}]}}
+# 家庭席位: {user_id: {family_seats: 2, used_seats: 1, members: [{"name": "xxx", "user_id": "xxx"}]}}
 family_seats: Dict[str, dict] = {}
 
 

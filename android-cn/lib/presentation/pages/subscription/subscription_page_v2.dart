@@ -474,7 +474,7 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
       case 'yiyang':
         return '每天 200 次对话 + 今日计划';
       case 'jiahe':
-        return '家庭共享（4席位）';
+        return '家庭共享（最多 3 人，含你自己）';
       default:
         return '';
     }

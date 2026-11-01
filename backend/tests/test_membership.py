@@ -103,13 +103,13 @@ def test_paid_tier_features_follow_registry():
     assert "companion" not in features
 
 
-def test_family_tier_5_members():
-    """已停售家和仍按 5 人（含购买人）说明，但不作为在售月付报价"""
+def test_family_tier_3_members():
+    """已停售家和按 3 人（含购买人）说明，口径与注册表一致，但不作为在售月付报价"""
     response = client.get("/api/v1/membership/benefits/jiahe")
     data = response.json()["data"]
     assert data["on_sale"] is False
     assert data["price_monthly"] is None
-    assert data["features"]["family_members"] == 5
+    assert data["features"]["family_members"] == 3
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -318,7 +318,7 @@ def test_activate_family_members_count():
         },
     )
     data = response.json()["data"]
-    assert data["features"]["family_members"] == 5
+    assert data["features"]["family_members"] == 3
 
 
 def test_activate_updates_membership_in_store():

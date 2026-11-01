@@ -119,10 +119,10 @@ class TestProductList4Tiers:
 
     def test_jiahe_has_family_seats(self):
         """家和版有家庭席位"""
-        assert SUBSCRIPTION_PLANS["jiahe"]["family_seats"] == 4
+        assert SUBSCRIPTION_PLANS["jiahe"]["family_seats"] == 2  # family_members=3 含购买人
         jiahe_products = [p for p in SUBSCRIPTION_PRODUCTS if p["tier"] == "jiahe"]
         for p in jiahe_products:
-            assert p.get("family_seats") == 4
+            assert p.get("family_seats") == 2
 
     def test_non_jiahe_no_family_seats(self):
         """非家和版没有家庭席位"""
@@ -363,7 +363,7 @@ class TestVerifyPayment:
         _init_family_seats("user-jiahe", "jiahe", "order-jiahe-001")
 
         assert "user-jiahe" in family_seats
-        assert family_seats["user-jiahe"]["family_seats"] == 4
+        assert family_seats["user-jiahe"]["family_seats"] == 2
         assert family_seats["user-jiahe"]["used_seats"] == 0
 
     def test_verify_payment_no_family_seats_for_yangxin(self):
@@ -529,13 +529,13 @@ class TestFamilySeats:
     """测试家庭席位管理"""
 
     def test_init_family_seats_jiahe(self):
-        """家和版初始化4个席位"""
+        """家和版初始化2个席位（共3人含购买人）"""
         _init_family_seats("owner-001", "jiahe", "order-001")
 
         info = get_family_seats_info("owner-001")
-        assert info["family_seats"] == 4
+        assert info["family_seats"] == 2
         assert info["used_seats"] == 0
-        assert info["available"] == 4
+        assert info["available"] == 2
         assert info["members"] == []
 
     def test_init_family_seats_yangxin(self):
@@ -549,7 +549,7 @@ class TestFamilySeats:
 
         info = bind_family_member("owner-bind", "张三", "user-zhangsan")
         assert info["used_seats"] == 1
-        assert info["available"] == 3
+        assert info["available"] == 1
         assert len(info["members"]) == 1
         assert info["members"][0]["name"] == "张三"
         assert info["members"][0]["user_id"] == "user-zhangsan"
@@ -558,23 +558,23 @@ class TestFamilySeats:
         """绑定多个成员"""
         _init_family_seats("owner-multi", "jiahe")
 
-        for name in ["张三", "李四", "王五", "赵六"]:
+        for name in ["张三", "李四"]:
             bind_family_member("owner-multi", name, f"user-{name}")
 
         info = get_family_seats_info("owner-multi")
-        assert info["used_seats"] == 4
+        assert info["used_seats"] == 2
         assert info["available"] == 0
 
     def test_cannot_exceed_seats(self):
         """不能超额分配"""
         _init_family_seats("owner-over", "jiahe")
 
-        for name in ["A", "B", "C", "D"]:
+        for name in ["A", "B"]:
             bind_family_member("owner-over", name)
 
-        # 第5个应该失败
+        # 第3位家人应该失败（共 3 人含购买人）
         try:
-            bind_family_member("owner-over", "E")
+            bind_family_member("owner-over", "C")
             assert False, "应该抛出异常"
         except HTTPException as e:
             assert e.status_code == 400
@@ -587,7 +587,7 @@ class TestFamilySeats:
 
         info = unbind_family_member("owner-unbind", member_user_id="user-zs")
         assert info["used_seats"] == 0
-        assert info["available"] == 4
+        assert info["available"] == 2
         assert len(info["members"]) == 0
 
     def test_unbind_by_index(self):

@@ -119,7 +119,7 @@ class SubscriptionProducts {
     introOfferDurationDays: 7,
     features: [
       'Everything in Harmony',
-      'Up to 4 family members',
+      'Up to 3 people (including you)',
       'Shared family dashboard',
       'Individual profiles',
       'Parent controls',

@@ -42,6 +42,10 @@ ALIPAY_GATEWAY = {
 
 # ==================== 产品定义 ====================
 
+from app.entitlements import family_seats_for_plan as _family_seats_for_plan
+
+_FAMILY_SEATS = _family_seats_for_plan("jiahe")
+
 ALIPAY_PRODUCTS: dict[str, dict] = {
     # 0S3 在售（年付唯一）
     "content_yearly": {
@@ -112,7 +116,7 @@ ALIPAY_PRODUCTS: dict[str, dict] = {
         "price": Decimal("99.00"),
         "currency": "CNY",
         "duration_days": 30,
-        "max_family_seats": 4,
+        "max_family_seats": _FAMILY_SEATS,  # 唯一口径：注册表 family tier（含购买人 3 人 → 2 位家人）
         "on_sale": False,
     },
     "family_yearly": {
@@ -122,7 +126,7 @@ ALIPAY_PRODUCTS: dict[str, dict] = {
         "price": Decimal("699.00"),
         "currency": "CNY",
         "duration_days": 365,
-        "max_family_seats": 4,
+        "max_family_seats": _FAMILY_SEATS,  # 唯一口径：注册表 family tier（含购买人 3 人 → 2 位家人）
         "on_sale": False,
     },
 }

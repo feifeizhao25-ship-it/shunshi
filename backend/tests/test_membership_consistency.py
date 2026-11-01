@@ -94,4 +94,5 @@ def test_core_failure_does_not_report_free_membership(client,account,monkeypatch
         assert 'is_premium' not in r.text
 
 def test_every_registered_product_has_exact_domestic_plan():
-    assert set(get_registry()['product_tier_map']) == set(_PRODUCT_PLANS)
+    reg = get_registry()
+    assert set(reg['product_tier_map']) | set(reg['legacy_product_tier_map']) == set(_PRODUCT_PLANS)

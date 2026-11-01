@@ -33,7 +33,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> with SingleTickerPr
   static const _coreValues = [
     ('AI 无限对话', '免费每天3次，SVIP 不限次数'),
     ('个性化养生方案', '根据体质、节气、情绪动态调整'),
-    ('家庭共享', '最多 5 人同步养生数据'),
+    ('家庭共享', '最多 3 人（含你自己）共享'),
   ];
 
   @override
