@@ -58,7 +58,7 @@ async def build(session: Session, redis_url: str, user_id: str, lang: str = "zh"
         "active": status["active"],
         "expires_at": status["expires_at"],
         "resets_at": reset.astimezone(timezone.utc).isoformat(),
-        "reset_note": ("Daily limits reset at 00:00 Beijing time (16:00 UTC)." if lang == "en" else "每日额度于北京时间零点重置。"),
+        "reset_note": ("Daily limits reset once a day. See resets_at for the exact moment in your own time zone." if lang == "en" else "每日额度于北京时间零点重置。"),
         "items": [
             _item("chat_messages", quotas["ai_daily_messages"], chat_used, "messages"),
             _item("reflections", quotas["reflections_per_day"], int(reflections), "entries"),

@@ -6,13 +6,16 @@
 规则（按顺序）：
 1. ``X-App-Market`` 明确给了 ``global`` / ``cn`` 就用它；
 2. 否则 ``Accept-Language`` 首选语言不是中文（``zh``）就当国际版；
-3. 其余（没有头、或中文）当国内版。
+3. 什么头都没有（第三方 / 旧客户端 / 直接调用）→ 取部署默认市场 ``SHUNSHI_DEFAULT_MARKET``（``cn`` 缺省；
+   国际部署设成 ``global``，这样缺头也回英文而不是中文）；
+4. 其余（带了中文 Accept-Language）当国内版。
 国际版一律用英文回答、英文安全文案、本地危机资源；地区取 ``X-Region``，否则取语言标签里的国家
 （``en-GB`` → GB），都没有就是 None，此时只给通用目录和「当地急救电话」，不猜号码。
 """
 
 from __future__ import annotations
 
+import os
 import re
 from dataclasses import dataclass
 
@@ -40,6 +43,12 @@ def _first_tag(accept_language: str | None) -> str | None:
     return first or None
 
 
+def default_market() -> str:
+    """部署默认市场：读环境变量（每次读，便于测试与热切换）；只认 global / cn，其余当 cn。"""
+    value = os.environ.get("SHUNSHI_DEFAULT_MARKET", "").strip().lower()
+    return "global" if value == "global" else "cn"
+
+
 def resolve_locale(
     accept_language: str | None = None,
     app_market: str | None = None,
@@ -58,6 +67,8 @@ def resolve_locale(
         market = market_header
     elif primary and primary != "zh":
         market = "global"
+    elif primary is None:
+        market = default_market()
     else:
         market = "cn"
     chosen_region = None

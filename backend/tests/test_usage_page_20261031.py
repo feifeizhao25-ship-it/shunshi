@@ -59,7 +59,7 @@ def test_reflection_usage_counts_todays_entries(api):
 def test_international_edition_gets_english_only(api):
     client, h, _ = api
     d = client.get("/api/v1/subscription/plan-usage", headers={**h, **GLOBAL}).json()
-    assert d["plan_name"] == "Free" and "Beijing time" in d["reset_note"]
+    assert d["plan_name"] == "Free" and "Beijing" not in d["reset_note"] and "time zone" in d["reset_note"]
     assert not CJK.search(str(d))
 
 
