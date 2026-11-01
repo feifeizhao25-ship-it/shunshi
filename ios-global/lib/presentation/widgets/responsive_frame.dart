@@ -15,7 +15,7 @@ class ResponsiveFrame extends StatelessWidget {
     if (media.size.shortestSide < 600) return child;
 
     final width = media.size.width;
-    final frameWidth = width >= 1100 ? 880.0 : 760.0;
+    final frameWidth = 720.0; // UI_WIDE_SCREEN_AND_GESTURES §2: reading column <= 720 dp
     final used = width < frameWidth ? width : frameWidth;
     final typeScale = width >= 1100 ? 1.28 : 1.16;
     final background = AppColors.background(context);
