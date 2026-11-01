@@ -71,11 +71,11 @@ class _AchievementPageV2State extends State<AchievementPageV2> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(14)),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [
+        // Wrap: at large text the points drop under the level instead of squeezing it into a mid-word break
+        SizedBox(width: double.infinity, child: Wrap(alignment: WrapAlignment.spaceBetween, crossAxisAlignment: WrapCrossAlignment.center, runSpacing: 4, children: [
           Text('Level ${p.level} · ${p.levelName}', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
-          const Spacer(),
           Text('${p.points} points', style: TextStyle(fontSize: 14, color: AppColors.primary(context), fontWeight: FontWeight.w600)),
-        ]),
+        ])),
         const SizedBox(height: 10),
         ClipRRect(
           borderRadius: BorderRadius.circular(3),
@@ -110,7 +110,7 @@ class _AchievementPageV2State extends State<AchievementPageV2> {
         physics: const NeverScrollableScrollPhysics(),
         mainAxisSpacing: 12,
         crossAxisSpacing: 12,
-        childAspectRatio: 0.95,
+        childAspectRatio: 0.9 / (MediaQuery.textScalerOf(context).scale(14) / 14).clamp(1.0, 2.5),
         children: [for (final b in items) SgBadge(asset: 'assets/images/${b.$1}.webp', title: b.$2, subtitle: b.$3, unlocked: b.$4)],
       );
 

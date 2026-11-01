@@ -164,7 +164,7 @@ class _AchievementPageV2State extends State<AchievementPageV2> {
 
             if (unlocked.isNotEmpty) GridView.count(
               crossAxisCount: 2, shrinkWrap: true, physics: const NeverScrollableScrollPhysics(),
-              mainAxisSpacing: 12, crossAxisSpacing: 12, childAspectRatio: 0.95,
+              mainAxisSpacing: 12, crossAxisSpacing: 12, childAspectRatio: 0.9 / (MediaQuery.textScalerOf(context).scale(14) / 14).clamp(1.0, 2.5),
               children: unlocked.map((b) => _buildBadgeCard(b)).toList(),
             ),
 
@@ -176,7 +176,7 @@ class _AchievementPageV2State extends State<AchievementPageV2> {
               const SizedBox(height: 12),
               GridView.count(
                 crossAxisCount: 2, shrinkWrap: true, physics: const NeverScrollableScrollPhysics(),
-                mainAxisSpacing: 12, crossAxisSpacing: 12, childAspectRatio: 0.95,
+                mainAxisSpacing: 12, crossAxisSpacing: 12, childAspectRatio: 0.9 / (MediaQuery.textScalerOf(context).scale(14) / 14).clamp(1.0, 2.5),
                 children: locked.map((b) => _buildBadgeCard(b)).toList(),
               ),
             ],

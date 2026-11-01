@@ -204,11 +204,12 @@ class _LibraryPageState extends State<LibraryPage> {
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(24, 28, 24, 100),
             sliver: SliverGrid(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              // mainAxisExtent grows with the text scale: a fixed 0.85 aspect clipped 2-3 line subtitles even at normal text on 375 dp.
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
                 mainAxisSpacing: 16,
                 crossAxisSpacing: 16,
-                childAspectRatio: 0.85,
+                mainAxisExtent: 76 + 135 * (MediaQuery.textScalerOf(context).scale(14) / 14).clamp(1.0, 2.5),
               ),
               delegate: SliverChildBuilderDelegate(
                 (context, index) => _CategoryCard(category: categories[index]),
@@ -333,7 +334,7 @@ class _CategoryCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
-              flex: 3,
+              flex: 1,
               child: Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
@@ -345,8 +346,8 @@ class _CategoryCard extends StatelessWidget {
                 ),
               ),
             ),
-            Expanded(
-              flex: 2,
+            Flexible(
+              flex: 0,
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
                 child: Column(
@@ -370,7 +371,7 @@ class _CategoryCard extends StatelessWidget {
                         color: ShunShiColors.textTertiary,
                       ),
                     ),
-                    const Spacer(),
+                    const SizedBox(height: 8),
                     GestureDetector(
                       onTap: category.onTap,
                       child: Text(

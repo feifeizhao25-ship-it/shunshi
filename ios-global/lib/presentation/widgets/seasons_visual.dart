@@ -61,11 +61,13 @@ class SgHeroBanner extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(22),
       child: SizedBox(
-        height: height,
         width: double.infinity,
-        child: Stack(fit: StackFit.expand, children: [
-          _sgImg(asset),
-          DecoratedBox(
+        // minHeight, not a fixed height: 200% text grows the banner instead of pushing the title out of it.
+        child: ConstrainedBox(
+        constraints: BoxConstraints(minHeight: height),
+        child: Stack(alignment: Alignment.bottomLeft, children: [
+          Positioned.fill(child: _sgImg(asset)),
+          Positioned.fill(child: DecoratedBox(
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
@@ -73,11 +75,9 @@ class SgHeroBanner extends StatelessWidget {
                 colors: [Color(0x00000000), Color(0xCC10241A)],
               ),
             ),
-          ),
-          Positioned(
-            left: 18,
-            right: 18,
-            bottom: 14,
+          )),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(18, 14, 18, 14),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
               Text(title, style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w700, height: 1.2)),
               if (subtitle != null) ...[
@@ -87,6 +87,7 @@ class SgHeroBanner extends StatelessWidget {
             ]),
           ),
         ]),
+        ),
       ),
     );
   }
@@ -186,7 +187,8 @@ class SgMoodBars extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 120,
+      // tallest bar (94) + value + label lines need ~127 even at 100% text; grows with the text scale
+      height: 132 * (MediaQuery.textScalerOf(context).scale(14) / 14).clamp(1.0, 2.5),
       child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
         for (final e in entries)
           Expanded(
