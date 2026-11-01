@@ -1,0 +1,25 @@
+# 口语化检索评测·留出集（国内版）：调参/加别名时不看这一组；只在最后跑一次报告。作者：自动化（2026-11-01），待审核。
+{"id": "ss-hold-zh-001", "query": "夜里老是醒，白天犯困", "expected": ["顺时知识库_中文版.md:cn_0038", "顺时知识库_中文版.md:cn_0076", "顺时知识库_中文版.md:cn_0077", "顺时知识库_中文版.md:cn_0079", "顺时知识库_中文版.md:cn_0135"], "review_status": "待审核"}
+{"id": "ss-hold-zh-002", "query": "膝盖不太好，平时怎么保养", "expected": ["顺时知识库_补充篇_中文版.md:cn_0062"], "review_status": "待审核"}
+{"id": "ss-hold-zh-003", "query": "小孩不爱吃饭怎么办", "expected": ["顺时知识库_中文版.md:cn_0097", "顺时知识库_补充篇_中文版.md:cn_0004", "顺时知识库_补充篇_中文版.md:cn_0010"], "review_status": "待审核"}
+{"id": "ss-hold-zh-004", "query": "刚生完孩子心情很低落", "expected": ["顺时知识库_补充篇_中文版.md:cn_0047"], "review_status": "待审核"}
+{"id": "ss-hold-zh-005", "query": "青少年玩手机睡得很晚", "expected": ["顺时知识库_补充篇_中文版.md:cn_0018"], "review_status": "待审核"}
+{"id": "ss-hold-zh-006", "query": "想开始减肥，吃什么比较好", "expected": ["顺时知识库_补充篇_中文版.md:cn_0075"], "review_status": "待审核"}
+{"id": "ss-hold-zh-007", "query": "高龄的爷爷奶奶怎么运动比较安全", "expected": ["顺时知识库_补充篇_中文版.md:cn_0067"], "review_status": "待审核"}
+{"id": "ss-hold-zh-008", "query": "上班族中午怎么放松一下", "expected": ["顺时知识库_补充篇_中文版.md:cn_0030", "顺时知识库_中文版.md:cn_0093"], "review_status": "待审核"}
+{"id": "ss-hold-zh-009", "query": "春天容易犯困吗，吃什么", "expected": ["顺时知识库_中文版.md:cn_0034", "顺时知识库_中文版.md:cn_0001"], "review_status": "待审核"}
+{"id": "ss-hold-zh-010", "query": "大雪这个节气是什么时候", "expected": ["顺时知识库_中文版.md:cn_0021"], "review_status": "待审核"}
+{"id": "ss-hold-zh-011", "query": "眼睛疲劳用什么方法缓解", "expected": ["顺时知识库_中文版.md:cn_0095", "顺时知识库_补充篇_中文版.md:cn_0034"], "review_status": "待审核"}
+{"id": "ss-hold-zh-012", "query": "怎样喝水才算正确", "expected": ["顺时知识库_中文版.md:cn_0108", "verified_cn.md:cn_0004"], "review_status": "待审核"}
+{"id": "ss-hold-zh-013", "query": "感恩日记怎么写", "expected": ["顺时知识库_中文版.md:cn_0086"], "review_status": "待审核"}
+{"id": "ss-hold-zh-014", "query": "练太极有哪些基本要领", "expected": ["顺时知识库_中文版.md:cn_0072", "顺时知识库_中文版.md:cn_0073", "顺时知识库_中文版.md:cn_0074"], "review_status": "待审核"}
+{"id": "ss-hold-zh-015", "query": "小雪节气吃什么", "expected": ["顺时知识库_中文版.md:cn_0020"], "review_status": "待审核"}
+{"id": "ss-hold-zh-016", "query": "每天走路对身体好吗，成年人建议多少", "expected": ["verified_cn.md:cn_0005", "顺时知识库_中文版.md:cn_0089"], "review_status": "待审核"}
+{"id": "ss-hold-zh-017", "query": "坚持锻炼的老年人要注意什么", "expected": ["顺时知识库_中文版.md:cn_0101"], "review_status": "待审核"}
+{"id": "ss-hold-zh-018", "query": "体质不同运动方式一样吗", "expected": ["顺时知识库_中文版.md:cn_0091"], "review_status": "待审核"}
+{"id": "ss-hold-zh-019", "query": "男士应酬喝酒多怎么保护身体", "expected": ["顺时知识库_补充篇_中文版.md:cn_0055", "顺时知识库_中文版.md:cn_0107"], "review_status": "待审核"}
+{"id": "ss-hold-zh-020", "query": "学生熬夜复习怎么保持精力", "expected": ["顺时知识库_补充篇_中文版.md:cn_0076", "顺时知识库_补充篇_中文版.md:cn_0020"], "review_status": "待审核"}
+{"id": "ss-hold-zh-021", "query": "坐飞机倒时差怎么调", "expected": ["顺时知识库_补充篇_中文版.md:cn_0069"], "review_status": "待审核"}
+{"id": "ss-hold-zh-022", "query": "孕晚期睡不好有什么办法", "expected": ["顺时知识库_补充篇_中文版.md:cn_0043"], "review_status": "待审核"}
+{"id": "ss-hold-zh-023", "query": "每天早上起来可以做什么", "expected": ["顺时知识库_补充篇_中文版.md:cn_0030", "顺时知识库_中文版.md:cn_0110"], "review_status": "待审核"}
+{"id": "ss-hold-zh-024", "query": "心情烦躁想发火怎么平复", "expected": ["顺时知识库_中文版.md:cn_0087", "顺时知识库_中文版.md:cn_0140", "顺时知识库_中文版.md:cn_0084"], "review_status": "待审核"}

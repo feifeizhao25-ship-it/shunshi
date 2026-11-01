@@ -1,0 +1,27 @@
+# Colloquial retrieval eval (international): queries avoid heading wording; any expected hit counts (source_file:chunk_id). Author: automation (2026-11-01), review_status: pending.
+{"id": "ss-par-en-001", "query": "I can't fall asleep at night, what helps", "expected": ["SEASONS_Knowledge_Base_English.md:gl_0028_1", "SEASONS_Knowledge_Base_English.md:gl_0029_2", "SEASONS_Knowledge_Base_English.md:gl_0016", "SEASONS_Knowledge_Base_English.md:gl_0015"], "review_status": "pending"}
+{"id": "ss-par-en-002", "query": "how many hours of sleep do adults need", "expected": ["verified_global.md:gl_0002", "SEASONS_Knowledge_Base_English.md:gl_0015"], "review_status": "pending"}
+{"id": "ss-par-en-003", "query": "how much exercise should I get per week", "expected": ["verified_global.md:gl_0003", "SEASONS_Knowledge_Base_English.md:gl_0025"], "review_status": "pending"}
+{"id": "ss-par-en-004", "query": "what is the 4-7-8 breathing technique", "expected": ["SEASONS_Knowledge_Base_English.md:gl_0022"], "review_status": "pending"}
+{"id": "ss-par-en-005", "query": "how do I set my hemisphere for the seasons", "expected": ["SEASONS_Knowledge_Base_English.md:gl_0058", "SEASONS_Knowledge_Base_English.md:gl_0056"], "review_status": "pending"}
+{"id": "ss-par-en-006", "query": "desk job and my neck and back hurt", "expected": ["SEASONS_Knowledge_Base_Supplement_English.md:gl_0036"], "review_status": "pending"}
+{"id": "ss-par-en-007", "query": "my eyes are tired from looking at screens all day", "expected": ["SEASONS_Knowledge_Base_Supplement_English.md:gl_0037", "SEASONS_Knowledge_Base_Supplement_English.md:gl_0071"], "review_status": "pending"}
+{"id": "ss-par-en-008", "query": "tips for people who work night shifts", "expected": ["SEASONS_Knowledge_Base_Supplement_English.md:gl_0069"], "review_status": "pending"}
+{"id": "ss-par-en-009", "query": "what should I know in the first trimester", "expected": ["SEASONS_Knowledge_Base_Supplement_English.md:gl_0043"], "review_status": "pending"}
+{"id": "ss-par-en-010", "query": "my teenager gets anxious before exams", "expected": ["SEASONS_Knowledge_Base_Supplement_English.md:gl_0023"], "review_status": "pending"}
+{"id": "ss-par-en-011", "query": "principles of eating mindfully", "expected": ["SEASONS_Knowledge_Base_English.md:gl_0030"], "review_status": "pending"}
+{"id": "ss-par-en-012", "query": "foods that help with inflammation", "expected": ["SEASONS_Knowledge_Base_English.md:gl_0032"], "review_status": "pending"}
+{"id": "ss-par-en-013", "query": "journal prompts for the evening", "expected": ["SEASONS_Knowledge_Base_English.md:gl_0036"], "review_status": "pending"}
+{"id": "ss-par-en-014", "query": "a template for a weekly check in", "expected": ["SEASONS_Knowledge_Base_English.md:gl_0038"], "review_status": "pending"}
+{"id": "ss-par-en-015", "query": "I feel low during the dark winter months", "expected": ["verified_global.md:gl_0005", "SEASONS_Knowledge_Base_English.md:gl_0020"], "review_status": "pending"}
+{"id": "ss-par-en-016", "query": "which tea should I drink in autumn", "expected": ["SEASONS_Knowledge_Base_English.md:gl_0046_1", "SEASONS_Knowledge_Base_English.md:gl_0047_2"], "review_status": "pending"}
+{"id": "ss-par-en-017", "query": "what does a good daily rhythm look like after retirement", "expected": ["SEASONS_Knowledge_Base_Supplement_English.md:gl_0058"], "review_status": "pending"}
+{"id": "ss-par-en-018", "query": "feeling down after having a baby", "expected": ["SEASONS_Knowledge_Base_Supplement_English.md:gl_0048"], "review_status": "pending"}
+{"id": "ss-par-en-019", "query": "eating well as a vegetarian", "expected": ["SEASONS_Knowledge_Base_Supplement_English.md:gl_0073"], "review_status": "pending"}
+{"id": "ss-par-en-020", "query": "what tone should the AI companion use", "expected": ["SEASONS_Knowledge_Base_English.md:gl_0040"], "review_status": "pending"}
+{"id": "ss-par-en-021", "query": "what words should the assistant never use", "expected": ["SEASONS_Knowledge_Base_English.md:gl_0041"], "review_status": "pending"}
+{"id": "ss-par-en-022", "query": "activities the whole family can do together", "expected": ["SEASONS_Knowledge_Base_English.md:gl_0051"], "review_status": "pending"}
+{"id": "ss-par-en-023", "query": "protecting my child's eyesight", "expected": ["SEASONS_Knowledge_Base_Supplement_English.md:gl_0013"], "review_status": "pending"}
+{"id": "ss-par-en-024", "query": "how can sound or music help me calm down", "expected": ["SEASONS_Knowledge_Base_English.md:gl_0053", "SEASONS_Knowledge_Base_English.md:gl_0074_1"], "review_status": "pending"}
+{"id": "ss-par-en-025", "query": "support during menopause", "expected": ["SEASONS_Knowledge_Base_Supplement_English.md:gl_0056_1", "SEASONS_Knowledge_Base_Supplement_English.md:gl_0057_2"], "review_status": "pending"}
+{"id": "ss-par-en-026", "query": "keeping my heart healthy in midlife", "expected": ["SEASONS_Knowledge_Base_Supplement_English.md:gl_0052"], "review_status": "pending"}

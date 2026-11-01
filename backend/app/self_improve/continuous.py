@@ -4,6 +4,7 @@
   python -m app.self_improve.run stale           [--force]   每日 02:30：资料库/知识库/金标准出处的陈旧扫描（只读）
   python -m app.self_improve.run radar           [--force]   每周三 05:00：研究雷达（只写摘要 + 结构化线索，不入库）
   python -m app.self_improve.run radar-stage     [--force]   每周三 06:00：把相关线索暂存成资料库“待审核候选”（永不自动通过）
+  python -m app.self_improve.run promote-gate    [--force]   每周三 07:00：对暂存区候选跑“变好才上线”闸门（证据/安全/对照/不重复），只出报告，从不上线
   python -m app.self_improve.run monthly-report  [--force]   每月 1 日 05:00：上月改了什么 / 评测分数 / 陈旧项 / 等人审核的候选（md + pdf + json）
 --force 只用于人工手动跑一次，不改变任何开关。所有任务只写 SIL_DATA_DIR 下的文件，不改知识库条目、不发消息。
 """
@@ -31,6 +32,7 @@ SLOTS = {
     "stale_scan": "daily@02:30",
     "radar": radar.RADAR_SCHEDULE,  # weekly:WED@05:00
     "radar_stage": "weekly:WED@06:00",
+    "promote_gate": "weekly:WED@07:00",
     "monthly_report": "monthly:1@05:00",
 }
 DOMAIN_SKILLS = ("kb-food-medicine-homology", "kb-exercise-sleep", "kb-solar-terms", "kb-constitution", "kb-verified-basics", "safety-medical-boundary")
@@ -189,6 +191,34 @@ def run_radar_stage(now: Optional[datetime] = None, *, force: bool = False, cfg=
     return {"status": "ok", **out}
 
 
+def run_promote_gate(now: Optional[datetime] = None, *, force: bool = False, cfg=None) -> dict:
+    """对暂存区候选逐条评估：keep = 可以交给人工审核；reject = 写明原因。从不 promote / approve（那两步只有 review_cli + 人名）。"""
+    from ..library import store as lib
+    from . import promote_gate as PG
+
+    cfg = cfg or _cfg()
+    if not _enabled(force, cfg):
+        return {"status": "disabled"}
+    now = now or datetime.now(TZ)
+    data = _data_dir(cfg)
+    doc = lib.load_document()
+    try:
+        from .library_job import policy
+
+        domain_ok = policy().domain_ok
+    except Exception:  # noqa: BLE001
+        domain_ok = None
+    rep = PG.evaluate_all(lib.load_staged(), doc["entries"], today=now.date(), domain_ok=domain_ok)
+    data.mkdir(parents=True, exist_ok=True)
+    (data / "promote_gate_report.json").write_text(json.dumps(rep, ensure_ascii=False, indent=1), "utf-8")
+    (data / "promote_gate_report.md").write_text(PG.render_md(rep), "utf-8")
+    prev = json.loads((data / "promote_gate_prev.json").read_text("utf-8")) if (data / "promote_gate_prev.json").exists() else []
+    new_keep = [i for i in rep["keep"] if i not in prev]
+    _worklist(data, [{"candidate": f"promote-ready-{i}", "url": "", "excerpt": f"候选 {i} 已通过闸门，等人工审核（review_cli promote → approve）"} for i in new_keep])
+    (data / "promote_gate_prev.json").write_text(json.dumps(rep["keep"], ensure_ascii=False), "utf-8")
+    return {"status": "ok", "n": rep["n"], "keep": rep["keep"], "reject": rep["reject"], "new_keep": new_keep}
+
+
 def run_monthly_report(now: Optional[datetime] = None, *, force: bool = False, month: Optional[str] = None, cfg=None, env=None) -> dict:
     cfg = cfg or _cfg()
     if not _enabled(force, cfg):
@@ -226,5 +256,6 @@ def jobs() -> dict:
     """给 run.py serve 用：name -> (slot, fn(now))，与 SIL 其它任务同一个调度循环；每个任务自己判断开关。"""
     return {
         "golden_eval": (SLOTS["golden_eval"], run_golden), "stale_scan": (SLOTS["stale_scan"], run_stale), "radar": (SLOTS["radar"], run_radar),
-        "radar_stage": (SLOTS["radar_stage"], run_radar_stage), "monthly_report": (SLOTS["monthly_report"], run_monthly_report),
+        "radar_stage": (SLOTS["radar_stage"], run_radar_stage), "promote_gate": (SLOTS["promote_gate"], run_promote_gate),
+        "monthly_report": (SLOTS["monthly_report"], run_monthly_report),
     }
