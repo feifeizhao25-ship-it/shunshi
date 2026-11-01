@@ -16,7 +16,7 @@ void main() {
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.reset);
     await tester.pumpWidget(const MaterialApp(home: SubscriptionPageV2()));
-    expect(find.text('Price shown at checkout'), findsNWidgets(3));
+    expect(find.text('Price shown at checkout'), findsNWidgets(2));
     final all = tester.widgetList<Text>(find.byType(Text)).map((t) => t.data ?? '').join('\n');
     expect(all.contains('128'), isFalse);
     expect(all.contains('¥'), isFalse);
@@ -26,19 +26,18 @@ void main() {
 
   testWidgets('shows the store-localised price and currency exactly as the store reports them', (tester) async {
     StorePricing.lookup = (id) => switch (id) {
-          'serenity_monthly' => _product(id, '£8.99', 'GBP'),
           'serenity_yearly' => _product(id, '£69.99', 'GBP'),
-          'harmony_monthly' => _product(id, '€12,99', 'EUR'),
+          'harmony_yearly' => _product(id, '€99,99', 'EUR'), // retired product: must not be shown
           _ => null,
         };
     tester.view.physicalSize = const Size(900, 3200);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.reset);
     await tester.pumpWidget(const MaterialApp(home: SubscriptionPageV2()));
-    expect(find.byKey(const Key('price_serenity_monthly')), findsOneWidget);
-    expect(tester.widget<Text>(find.byKey(const Key('price_serenity_monthly'))).data, '£8.99 / month');
-    expect(tester.widget<Text>(find.byKey(const Key('price_serenity_yearly'))).data, 'or £69.99 / year');
-    expect(tester.widget<Text>(find.byKey(const Key('price_harmony_monthly'))).data, '€12,99 / month');
-    expect(tester.widget<Text>(find.byKey(const Key('price_family_monthly'))).data, 'Price shown at checkout');
+    expect(find.byKey(const Key('price_serenity_yearly')), findsOneWidget);
+    expect(tester.widget<Text>(find.byKey(const Key('price_serenity_yearly'))).data, '£69.99 / year');
+    expect(find.byKey(const Key('price_harmony_yearly')), findsNothing);
+    expect(find.byKey(const Key('price_serenity_monthly')), findsNothing);
+    expect(tester.widget<Text>(find.byKey(const Key('price_family_yearly'))).data, 'Price shown at checkout');
   });
 }

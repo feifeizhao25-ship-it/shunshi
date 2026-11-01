@@ -3,10 +3,9 @@
 支持: 创建 Checkout / Portal / Webhook 处理 / 订阅管理
 缺少 Stripe 配置时所有支付写操作失败关闭。
 
-产品:
-  serenity  ($9.99/月)  - 个人基础版
-  harmony   ($19.99/月) - 个人增强版
-  family    ($29.99/月) - 家庭版
+产品（年付唯一，2026-11-01 决定；唯一定义在 app/seasons_plans.py）:
+  premium   ($79.99/年)  - 个人版（旧 serenity / harmony 订阅者按 premium 处理）
+  family    ($159.99/年) - 家庭版（含购买人共 3 人）
 """
 from __future__ import annotations
 import os
@@ -27,71 +26,15 @@ STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY", "")
 STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET", "")
 STRIPE_PUBLISHABLE_KEY = os.getenv("STRIPE_PUBLISHABLE_KEY", "").strip()
 
-STRIPE_PRICE_IDS: dict[str, str] = {
-    "serenity": os.getenv("STRIPE_PRICE_SERENITY", "").strip(),
-    "harmony": os.getenv("STRIPE_PRICE_HARMONY", "").strip(),
-    "family": os.getenv("STRIPE_PRICE_FAMILY", "").strip(),
-}
+from app.seasons_plans import PLANS as _SEASONS_PLANS, canonical_plan_id, stripe_price_ids
+
+# 年付 Price：STRIPE_PRICE_PREMIUM_YEARLY / STRIPE_PRICE_FAMILY_YEARLY（旧月付 Price 不能复用）
+STRIPE_PRICE_IDS: dict[str, str] = stripe_price_ids()
 
 # ==================== 产品定义 ====================
 
-STRIPE_PRODUCTS: dict[str, dict] = {
-    "free": {
-        "id": "free",
-        "name": "Free",
-        "price": 0,
-        "currency": "usd",
-        "period": None,
-        "features": [
-            "5 messages per day",
-            "Basic content library",
-            "Limited reflections",
-            "Daily suggestions",
-        ],
-    },
-    "serenity": {
-        "id": "serenity",
-        "name": "Serenity",
-        "price": 9.99,
-        "currency": "usd",
-        "period": "month",
-        "features": [
-            "Unlimited AI companion",
-            "All content library",
-            "Seasonal insights",
-            "Unlimited reflections",
-            "Sleep audio & stories",
-        ],
-    },
-    "harmony": {
-        "id": "harmony",
-        "name": "Harmony",
-        "price": 19.99,
-        "currency": "usd",
-        "period": "month",
-        "features": [
-            "Everything in Serenity",
-            "Family features",
-            "Priority support",
-            "Weekly AI insights",
-            "Advanced seasonal programs",
-        ],
-    },
-    "family": {
-        "id": "family",
-        "name": "Family",
-        "price": 29.99,
-        "currency": "usd",
-        "period": "month",
-        "features": [
-            "Everything in Harmony",
-            "Up to 5 family members",
-            "Shared family insights",
-            "Family wellness plans",
-            "Dedicated support",
-        ],
-    },
-}
+# 唯一定义在 app/seasons_plans.py：Free + Premium + Family，年付唯一（2026-11-01 决定）。
+STRIPE_PRODUCTS: dict[str, dict] = _SEASONS_PLANS
 
 
 # ==================== 数据模型 ====================
@@ -150,6 +93,7 @@ class StripeService:
         cancel_url: Optional[str] = None,
     ) -> CheckoutResult:
         """创建 Stripe Checkout Session"""
+        plan_id = canonical_plan_id(plan_id) or plan_id
         plan = STRIPE_PRODUCTS.get(plan_id)
         if not plan:
             raise ValueError(f"未知计划: {plan_id}")
@@ -225,7 +169,7 @@ class StripeService:
         metadata: dict = data.get("metadata", {})
 
         user_id: str = metadata.get("user_id", "")
-        plan_id: str = metadata.get("plan_id", "")
+        plan_id: str = canonical_plan_id(metadata.get("plan_id")) or ""
 
         try:
             if event_type == "checkout.session.completed":
@@ -269,7 +213,7 @@ class StripeService:
         from app.database.db import get_db
         db = get_db()
         now = datetime.now().isoformat()
-        expires_at = (datetime.now() + timedelta(days=30)).isoformat()
+        expires_at = (datetime.now() + timedelta(days=365)).isoformat()  # 年付唯一
         customer_id = data.get("customer")
         subscription_id = data.get("subscription")
 
@@ -365,7 +309,7 @@ class StripeGateway:
         """创建支付订单（Stripe Checkout Session）"""
         try:
             # metadata 中传递 plan_id 以复用现有 checkout 逻辑
-            plan_id = (metadata or {}).get("plan_id", "serenity")
+            plan_id = canonical_plan_id((metadata or {}).get("plan_id")) or "premium"
             result = self._svc.create_checkout_session(
                 plan_id=plan_id, user_id=user_id,
             )

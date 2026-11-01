@@ -12,7 +12,7 @@ class SubscriptionPlan {
   final String id;
   final String name;
   final String priceDisplay;
-  final String period; // "month" or "year"
+  final String period; // "year" (annual-only)
   final List<String> features;
 
   const SubscriptionPlan({
@@ -74,8 +74,8 @@ class SubscriptionProducts {
 
   static const serenity = SubscriptionProduct(
     id: 'serenity',
-    name: 'Serenity',
-    description: 'For your daily calm practice',
+    name: 'Premium',
+    description: 'For your daily calm practice, billed yearly',
     tier: SubscriptionTier.serenity,
     monthlyPriceUSD: 9.99,
     yearlyPriceUSD: 79.99,
@@ -89,30 +89,10 @@ class SubscriptionProducts {
     ],
   );
 
-  static const harmony = SubscriptionProduct(
-    id: 'harmony',
-    name: 'Harmony',
-    description: 'For deeper wellness',
-    tier: SubscriptionTier.harmony,
-    monthlyPriceUSD: 14.99,
-    yearlyPriceUSD: 119.99,
-    trialDays: 14,
-    hasIntroOffer: true,
-    introOfferPrice: 0.99,
-    introOfferDurationDays: 7,
-    features: [
-      'Everything in Serenity',
-      'Exclusive Harmony content',
-      'Advanced weekly summaries',
-      'Custom rituals builder',
-      'Insights dashboard',
-    ],
-  );
-
   static const family = SubscriptionProduct(
     id: 'family',
     name: 'Family',
-    description: 'Share calm with your household',
+    description: 'Share calm with your household, billed yearly',
     tier: SubscriptionTier.family,
     monthlyPriceUSD: 19.99,
     yearlyPriceUSD: 159.99,
@@ -121,15 +101,15 @@ class SubscriptionProducts {
     introOfferPrice: 1.99,
     introOfferDurationDays: 7,
     features: [
-      'Everything in Harmony',
-      'Up to 4 family members',
+      'Everything in Premium',
+      'Up to 3 people (including you)',
       'Shared family dashboard',
       'Individual profiles',
       'Parent controls',
     ],
   );
 
-  static List<SubscriptionProduct> get all => [free, serenity, harmony, family];
+  static List<SubscriptionProduct> get all => [free, serenity, family];
 
   static List<SubscriptionPlan> get plans => [
         SubscriptionPlan(
@@ -141,23 +121,16 @@ class SubscriptionProducts {
         ),
         SubscriptionPlan(
           id: 'serenity',
-          name: 'Serenity',
+          name: 'Premium',
           priceDisplay: StorePricing.price('serenity'),
-          period: 'month',
+          period: 'year',
           features: serenity.features,
-        ),
-        SubscriptionPlan(
-          id: 'harmony',
-          name: 'Harmony',
-          priceDisplay: StorePricing.price('harmony'),
-          period: 'month',
-          features: harmony.features,
         ),
         SubscriptionPlan(
           id: 'family',
           name: 'Family',
           priceDisplay: StorePricing.price('family'),
-          period: 'month',
+          period: 'year',
           features: family.features,
         ),
       ];
@@ -250,8 +223,8 @@ class SubscriptionService {
         case 'serenity':
           tier = SubscriptionTier.serenity;
           break;
-        case 'harmony':
-          tier = SubscriptionTier.harmony;
+        case 'harmony': // legacy Harmony subscribers are Premium now
+          tier = SubscriptionTier.serenity;
           break;
         case 'family':
           tier = SubscriptionTier.family;
@@ -300,7 +273,7 @@ class SubscriptionService {
     try {
       await _dio.post(
         '/api/v1/stripe/checkout',
-        data: {'product_id': productId, 'billing': 'monthly'},
+        data: {'product_id': productId, 'billing': 'yearly'},
         queryParameters: {'user_id': _userId},
       );
       return true;

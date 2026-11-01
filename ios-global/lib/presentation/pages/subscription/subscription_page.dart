@@ -133,22 +133,16 @@ class SubscriptionPage extends ConsumerWidget {
       Color border, Color surfaceDim) {
     final tiers = [
       (SubscriptionTier.free, 'Free', '\$0', null, false, <String>[]),
-      (SubscriptionTier.serenity, 'Serenity', StorePricing.price('serenity'), StorePricing.price('serenity') == StorePricing.pending ? null : 'month', true, [
+      (SubscriptionTier.serenity, 'Premium', StorePricing.price('serenity'), StorePricing.price('serenity') == StorePricing.pending ? null : 'year', true, [
         'Unlimited AI companion',
         'All content library',
         'Seasonal insights',
         'Unlimited reflections',
         'Sleep audio & stories',
       ]),
-      (SubscriptionTier.harmony, 'Harmony', StorePricing.price('harmony'), StorePricing.price('harmony') == StorePricing.pending ? null : 'month', false, [
-        'Everything in Serenity',
-        'Family features',
-        'Priority support',
-        'Weekly AI insights',
-      ]),
-      (SubscriptionTier.family, 'Family', StorePricing.price('family'), StorePricing.price('family') == StorePricing.pending ? null : 'month', false, [
-        'Everything in Harmony',
-        'Up to 5 family members',
+      (SubscriptionTier.family, 'Family', StorePricing.price('family'), StorePricing.price('family') == StorePricing.pending ? null : 'year', false, [
+        'Everything in Premium',
+        'Up to 3 people (including you)',
         'Shared insights',
         'Dedicated support',
       ]),

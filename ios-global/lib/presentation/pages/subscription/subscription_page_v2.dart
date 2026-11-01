@@ -20,7 +20,6 @@ class SubscriptionPageV2 extends StatelessWidget {
 
   static const _paid = [
     SubscriptionProducts.serenity,
-    SubscriptionProducts.harmony,
     SubscriptionProducts.family,
   ];
 
@@ -72,9 +71,8 @@ class _PlanTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final monthly = StorePricing.price(product.id);
     final yearly = StorePricing.price(product.id, yearly: true);
-    final pending = monthly == StorePricing.pending;
+    final pending = yearly == StorePricing.pending;
     return Container(
       key: Key('plan_${product.id}'),
       margin: const EdgeInsets.only(bottom: 12),
@@ -92,22 +90,18 @@ class _PlanTile extends StatelessWidget {
           Text(product.description, style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context))),
           const SizedBox(height: 8),
           Text(
-            pending ? monthly : '$monthly / month',
-            key: Key('price_${product.id}_monthly'),
+            pending ? yearly : '$yearly / year',
+            key: Key('price_${product.id}_yearly'),
             style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.primary(context)),
           ),
-          if (!pending && yearly != StorePricing.pending)
-            Text('or $yearly / year',
-                key: Key('price_${product.id}_yearly'),
-                style: TextStyle(fontSize: 12, color: AppColors.textSecondary(context))),
           const SizedBox(height: 8),
           if (!pending)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 6),
               child: ElevatedButton(
                 key: Key('subscribe_${product.id}'),
-                onPressed: () => StoreService().purchase('${product.id}_monthly'),
-                child: const Text('Subscribe monthly'),
+                onPressed: () => StoreService().purchase('${product.id}_yearly'),
+                child: const Text('Subscribe yearly'),
               ),
             ),
           for (final f in product.features)
