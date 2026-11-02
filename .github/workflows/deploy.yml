@@ -44,7 +44,7 @@ jobs:
         run: |
           python -m compileall -q app
           sudo apt-get update -qq && sudo apt-get install -y redis-server
-          for h in backend admin backend_api admin_panel web_cn; do grep -qE "127\.0\.0\.1[[:space:]]+$h$" /etc/hosts || echo "127.0.0.1 $h" | sudo tee -a /etc/hosts; done
+          for h in backend admin web-cn backend_api admin_panel web_cn; do grep -qE "127\.0\.0\.1[[:space:]]+$h$" /etc/hosts || echo "127.0.0.1 $h" | sudo tee -a /etc/hosts; done
           python -m pytest tests/ -v --tb=short
 
       - name: Verify backend image and storage contract
