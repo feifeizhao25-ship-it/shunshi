@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import os
 import re
+from contextvars import ContextVar
 from dataclasses import dataclass
 
 from fastapi import Header
@@ -87,3 +88,26 @@ def request_locale(
     region: str | None = Header(None, alias="X-Region"),
 ) -> RequestLocale:
     return resolve_locale(accept_language, app_market, region)
+
+
+# ---- 路由级别绑定：旧路由里大量中文文案，不想给每个接口都加参数 ----
+_current: ContextVar["RequestLocale | None"] = ContextVar("shunshi_request_locale", default=None)
+
+
+async def bind_request_locale(
+    accept_language: str | None = Header(None, alias="Accept-Language"),
+    app_market: str | None = Header(None, alias="X-App-Market"),
+    region: str | None = Header(None, alias="X-Region"),
+) -> None:
+    """路由依赖：把本次请求的语言/市场放进上下文，供 :func:`tr` 取用。必须是 async（同步依赖在线程池里，上下文不会传回处理函数）。"""
+    _current.set(resolve_locale(accept_language, app_market, region))
+
+
+def current_locale() -> RequestLocale:
+    loc = _current.get()
+    return loc if loc is not None else resolve_locale(None, None, None)
+
+
+def tr(zh: str, en: str) -> str:
+    """按本次请求的市场取文案：国际版英文，国内版中文。"""
+    return en if current_locale().is_global else zh

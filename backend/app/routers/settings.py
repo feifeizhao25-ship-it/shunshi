@@ -157,13 +157,13 @@ class AgeProfile(BaseModel):
 
 @router.get("/settings/age-profile")
 def get_age_profile(
-    user_id: str = Depends(current_user), session: Session = Depends(get_session)
+    user_id: str = Depends(current_user), session: Session = Depends(get_session),
+    locale: RequestLocale = Depends(request_locale),
 ):
-    """只返回年龄段，不回传出生日期。"""
-    from ..services.age_policy import read_group
+    """只返回年龄段（以及这一组的差异化说明），不回传出生日期。"""
+    from ..services.age_policy import age_profile_view, read_group
 
-    group = read_group(session, user_id)
-    return {"declared": group != "unknown", "age_group": group}
+    return age_profile_view(read_group(session, user_id), locale.lang)
 
 
 @router.post("/settings/age-profile")
@@ -176,8 +176,10 @@ def set_age_profile(
     """填写出生日期（自报）。用于未成年人保护与老年用户的健康使用提示。"""
     from ..services.age_policy import declare_birth_date
 
+    from ..services.age_policy import age_profile_view
+
     group = declare_birth_date(session, user_id, body.birth_date, lang=locale.lang)
-    return {"declared": True, "age_group": group}
+    return age_profile_view(group, locale.lang)
 
 
 # ── Culture & locale preferences (optional, user-chosen, clearable) ──────────────────────────────────────
