@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../design_system/theme.dart';
+import '../../../data/services/notification_service.dart';
 
 class SettingsPageV2 extends StatefulWidget {
   const SettingsPageV2({super.key});
@@ -50,6 +51,7 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
   Future<void> _savePref(String key, bool value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(key, value);
+    if (value && key == 'shichen_reminder') NotificationService().askForPermissionInContext();
   }
 
   @override

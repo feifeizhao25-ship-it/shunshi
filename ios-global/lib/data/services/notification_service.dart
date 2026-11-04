@@ -20,10 +20,12 @@ class NotificationService {
       tz_data.initializeTimeZones();
 
       // iOS 配置
+      // No system prompt at launch (it blocked the first screen on iOS). Permission is requested in context, when the
+      // user turns a reminder on: see [askForPermissionInContext].
       const iosSettings = DarwinInitializationSettings(
-        requestAlertPermission: true,
-        requestBadgePermission: true,
-        requestSoundPermission: true,
+        requestAlertPermission: false,
+        requestBadgePermission: false,
+        requestSoundPermission: false,
       );
 
       // Android 配置
@@ -44,6 +46,13 @@ class NotificationService {
       // 忽略初始化错误 (特别是在模拟器上)
       print('Notification init error: $e');
     }
+  }
+
+  /// Ask for the system permission at a moment the user chose (turning a reminder on), never at app launch.
+  Future<void> askForPermissionInContext() async {
+    try {
+      await requestPermission();
+    } catch (_) {}
   }
 
   /// 请求通知权限

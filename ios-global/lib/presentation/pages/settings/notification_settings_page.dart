@@ -3,6 +3,7 @@ import '../../../design_system/app_colors.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../design_system/theme.dart';
+import '../../../data/services/notification_service.dart';
 
 /// 通知设置页
 class NotificationSettingsPage extends StatefulWidget {
@@ -55,6 +56,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
     await prefs.setInt('notify_daily_checkin_minute', _dailyCheckinTime.minute);
     await prefs.setInt('notify_sleep_hour', _sleepReminderTime.hour);
     await prefs.setInt('notify_sleep_minute', _sleepReminderTime.minute);
+    if (_jieqiReminder || _dailyCheckin || _exerciseReminder || _sleepReminder) NotificationService().askForPermissionInContext();
   }
 
   @override

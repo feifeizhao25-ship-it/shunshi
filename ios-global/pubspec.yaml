@@ -99,9 +99,6 @@ flutter:
     - assets/images/library/
     - assets/images/content/
     - assets/images/acupoints/
-    - assets/icons/
-    - assets/animations/
-    - assets/audio/
 
   fonts:
     - family: NotoSerifSC

@@ -1,6 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 /// Storage is required before routes or receipt listeners may read credentials.
+///
+/// Notifications and the store are optional services: they start right after storage but are NOT awaited before the
+/// first frame (iOS showed a blank screen for up to 35 s while the system notification prompt was open).
 class StartupGate extends StatefulWidget {
   const StartupGate({
     super.key,
@@ -54,10 +59,8 @@ class _StartupGateState extends State<StartupGate> {
       return;
     }
     if (!mounted) return;
-    await Future.wait([
-      _optional(widget.initializeNotifications, '通知服务'),
-      _optional(widget.initializeStore, '商店服务'),
-    ]);
+    unawaited(_optional(widget.initializeNotifications, '通知服务'));
+    unawaited(_optional(widget.initializeStore, '商店服务'));
     if (mounted) {
       setState(() {
         _running = false;
