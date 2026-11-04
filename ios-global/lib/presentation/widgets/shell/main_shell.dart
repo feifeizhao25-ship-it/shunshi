@@ -34,7 +34,9 @@ class MainShell extends StatelessWidget {
           items: [for (final t in _tabs) DesktopNavItem(path: t.path, icon: t.icon, activeIcon: t.activeIcon, label: t.label)],
           currentPath: currentPath,
           onSelect: (path) => context.go(path),
-          background: ShunShiColors.darkBackground,
+          // The phone tab bar is dark; on desktop the sidebar and the side margins follow the light page colour so the
+          // green/grey labels stay readable (live check: dark labels on a black sidebar).
+          background: AppColors.background(context),
           line: AppColors.borderGhost(context),
           active: AppColors.primary(context),
           inactive: AppColors.textTertiary(context),

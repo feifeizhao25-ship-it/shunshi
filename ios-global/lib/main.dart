@@ -52,7 +52,11 @@ class _ShunshiAppState extends State<ShunshiApp> {
           theme: ShunShiTheme.lightTheme,
           darkTheme: ShunShiTheme.darkTheme,
           themeMode: _themeNotifier.mode,
-          builder: (context, child) => ResponsiveFrame(child: child ?? const SizedBox.shrink()),
+          builder: (context, child) => ResponsiveFrame(
+            routeListenable: AppRouter.router.routerDelegate,
+            currentPath: () => AppRouter.router.routerDelegate.currentConfiguration.uri.path,
+            child: child ?? const SizedBox.shrink(),
+          ),
         );
       },
     );
