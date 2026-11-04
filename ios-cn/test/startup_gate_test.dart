@@ -33,6 +33,29 @@ void main() {
     expect(events, ['storage', 'notification', 'store']);
     expect(find.text('已进入应用'), findsOneWidget);
   });
+  testWidgets('N-01: first screen does not wait for a notification permission prompt that never returns', (
+    tester,
+  ) async {
+    final notifications = Completer<void>();
+    var started = false;
+    await tester.pumpWidget(
+      StartupGate(
+        initializeStorage: () async {},
+        initializeNotifications: () {
+          started = true;
+          return notifications.future;
+        },
+        initializeStore: () => Completer<void>().future,
+        readyBuilder: ready,
+      ),
+    );
+    await tester.pump();
+    await tester.pump();
+    expect(started, isTrue);
+    expect(find.text('已进入应用'), findsOneWidget);
+    expect(find.byType(CircularProgressIndicator), findsNothing);
+    await tester.pump(const Duration(seconds: 36)); // let the background timeouts expire
+  });
   testWidgets('storage failure blocks dependent services and retry succeeds', (
     tester,
   ) async {
