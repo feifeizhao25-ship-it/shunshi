@@ -40,6 +40,34 @@ MINOR_LOCKED_EN = (
 )
 
 
+MINOR_NOTICE_EN = (
+    "Youth mode is on: chat stays with everyday wellness, sleep and emotional support. "
+    "There are no companion or romantic roles, and no diet, constitution or shopping content. "
+    "Talking to a parent, guardian or teacher about worries is encouraged."
+)
+MINOR_BREAK_MINUTES = 45   # 产品策略：未成年人连续使用满 45 分钟提醒休息
+MINOR_QUIET_FROM = "22:00"  # 产品策略：22:00 后提醒放下手机睡觉（只提醒，不强制锁屏）
+
+
+def age_profile_view(group: str, lang: str = "zh") -> dict:
+    """/settings/age-profile 的返回：除了 age_group，还把这一组实际会有什么不同说出来（I-17：minor 分组此前没有任何差异化可见）。"""
+    out: dict[str, Any] = {"declared": group != UNKNOWN, "age_group": group}
+    if group == MINOR:
+        zh = lang != "en"
+        out.update(
+            minor_mode=True,
+            minor_notice=MINOR_NOTICE if zh else MINOR_NOTICE_EN,
+            restrictions=(["不提供恋人 / 亲人等亲密关系陪伴", "不推送饮食、体质、消费类资料", "只聊日常健康、作息与情绪调节"] if zh else
+                          ["No companion or romantic roles", "No diet, constitution or shopping content", "Chat limited to everyday wellness, sleep and mood"]),
+            reminders={"break_every_minutes": MINOR_BREAK_MINUTES, "quiet_from": MINOR_QUIET_FROM},
+        )
+    elif group == SENIOR and lang == "en":
+        out["senior_notice"] = "These tips are everyday wellness references and do not replace a doctor. For chest pain, trouble breathing or sudden dizziness, call your local emergency number."
+    elif group == SENIOR:
+        out["senior_notice"] = SENIOR_NOTICE
+    return out
+
+
 def child_block_text(lang: str = "zh") -> str:
     """未满 16 周岁的拒绝文案：国际版（lang=en）给英文，其余给中文。"""
     return CHILD_BLOCK_TEXT_EN if lang == "en" else CHILD_BLOCK_TEXT

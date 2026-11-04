@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'desktop_shell.dart';
 import '../../../design_system/theme.dart';
 import '../../../design_system/app_colors.dart';
 
@@ -27,6 +28,24 @@ class MainShell extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final background = isDark ? ShunShiColors.darkBackground : AppColors.background(context);
     final line = isDark ? ShunShiColors.darkBorderGhost : AppColors.borderGhost(context);
+
+    // Desktop / wide web: left sidebar + a centred column of at most 960px (was: the phone layout stretched to 1440px).
+    if (DesktopShell.isWide(context)) {
+      return PopScope(
+        canPop: false,
+        child: DesktopShell(
+          title: '顺时',
+          items: [for (final t in _tabs) DesktopNavItem(path: t.path, icon: t.icon, activeIcon: t.activeIcon, label: t.label)],
+          currentPath: currentPath,
+          onSelect: (path) => context.go(path),
+          background: background,
+          line: line,
+          active: isDark ? ShunShiColors.darkPrimary : AppColors.primary(context),
+          inactive: isDark ? ShunShiColors.darkTextSecondary : AppColors.textTertiary(context),
+          child: child,
+        ),
+      );
+    }
 
     return PopScope(
       canPop: false,

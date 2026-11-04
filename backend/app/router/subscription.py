@@ -1,6 +1,6 @@
 # 订阅系统 API 路由
 # 生产级升级: SKU管理 · 支付状态机 · 权益中间件 · 过期回退 · 家庭席位
-from fastapi import APIRouter, HTTPException, Query, Depends, Request
+from fastapi import APIRouter, HTTPException, Query, Depends, Request, Header
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict
@@ -1817,10 +1817,61 @@ async def get_subscription(user_id: str = Query(..., description="用户ID；不
     }
 
 
+def _request_locale_dep(
+    accept_language: Optional[str] = Header(None, alias="Accept-Language"),
+    app_market: Optional[str] = Header(None, alias="X-App-Market"),
+    region: Optional[str] = Header(None, alias="X-Region"),
+):
+    from app.locale_context import resolve_locale
+    return resolve_locale(accept_language, app_market, region)
+
+
+def _global_plans(current_plan: str) -> list:
+    """国际版档位：数据只从 app/seasons_plans.py 读（唯一定义），格式与国内 /plans 保持一致，字段多一个 currency。"""
+    from app.seasons_plans import PLANS, canonical_plan_id
+    current = canonical_plan_id(current_plan) or "free"
+    flags = {
+        "free": dict(basic_chat=True, solar_terms=True, unlimited_chat=False, today_plan=False, deep_suggestions=False, weekly_summary=False, family=False),
+        "premium": dict(basic_chat=True, solar_terms=True, unlimited_chat=True, today_plan=True, deep_suggestions=False, weekly_summary=True, family=False),
+        "family": dict(basic_chat=True, solar_terms=True, unlimited_chat=True, today_plan=True, deep_suggestions=False, weekly_summary=True, family=True),
+    }
+    out = []
+    for pid, plan in PLANS.items():
+        yearly = plan.get("yearly_price") or None
+        out.append({
+            "id": pid,
+            "name": plan["name"],
+            "price": None if yearly else 0,
+            "price_yearly": yearly,
+            "price_cents": None if yearly else 0,
+            "price_yearly_cents": int(round(yearly * 100)) if yearly else None,
+            "currency": plan.get("currency", "usd"),
+            "period": plan.get("period"),
+            "period_name": "year" if plan.get("period") else None,
+            "features": flags.get(pid, {}),
+            "feature_list": plan.get("features", []),
+            "is_current": pid == current,
+            "description": plan.get("description", ""),
+            "trial_days": plan.get("trial_days", 0),
+            "family_seats": max(0, int(plan.get("family_members", 0)) - 1) if pid == "family" else 0,
+            "on_sale": True,
+        })
+    return out
+
+
 @router.get("/plans", response_model=dict)
-async def get_plans(user_id: Optional[str] = Query(None, description="可选；套餐列表是公开信息，不需要登录")):
-    """获取订阅计划列表（4级）。不带身份时只给套餐，当前订阅按免费版。"""
+async def get_plans(
+    user_id: Optional[str] = Query(None, description="可选；套餐列表是公开信息，不需要登录"),
+    loc=Depends(_request_locale_dep),
+):
+    """获取订阅计划列表（4级）。不带身份时只给套餐，当前订阅按免费版。
+
+    国际版（SEASONS）返回英文档位 Free / Premium / Family（美元、只卖年付，见 app/seasons_plans.py），
+    不再把国内的「免费版 / 内容订阅 / 会员 / 家和版」中文套餐和人民币价格漏给国际用户（I-07）。
+    """
     current_sub = get_user_subscription(user_id or "")
+    if loc.is_global:
+        return {"success": True, "data": _global_plans(getattr(current_sub, "plan", "free"))}
 
     plans = []
     for key, plan in SUBSCRIPTION_PLANS.items():

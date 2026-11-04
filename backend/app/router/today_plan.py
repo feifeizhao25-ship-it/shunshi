@@ -1,10 +1,14 @@
 # 今日计划 API 端点
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from pydantic import BaseModel
 from typing import List, Optional
-from datetime import datetime
+from datetime import date, datetime, timedelta
+import hashlib
 import random
+import logging
+
+from app.locale_context import RequestLocale, request_locale
 
 router = APIRouter(prefix="/api/v1/today-plan", tags=["今日计划"])
 
@@ -43,6 +47,8 @@ class SolarTermCard(BaseModel):
 class TodayPlan(BaseModel):
     id: str
     date: str
+    locale: str = "zh"
+    personalization: Optional[dict] = None
     insights: List[TodayInsight]
     tasks: List[FollowUpTask]
     recommendations: List[ContentRecommendation]
@@ -118,9 +124,56 @@ TASKS_BY_SLOT = {
     "evening": [t for t in TASK_TEMPLATES if t["time_slot"] == "evening"],
 }
 
+# ============ English content (international edition) ============
+# 国际版（SEASONS）今日计划用英文，不含中文、不含中医用语；都是日常生活建议，不是医疗建议。
+
+INSIGHTS_EN = [
+    {"title": "Good morning", "content": "A new day. Start it with a glass of water.", "icon": "🌅", "cat": "general"},
+    {"title": "Eat light", "content": "Today, favour simple meals with plenty of vegetables.", "icon": "🥗", "cat": "diet"},
+    {"title": "Move a little", "content": "A 30-minute walk is a gentle way to get moving.", "icon": "🚶", "cat": "exercise"},
+    {"title": "Wind down", "content": "A warm bath and screens off before bed make it easier to switch off.", "icon": "😴", "cat": "sleep"},
+    {"title": "Make room for calm", "content": "Put on something soothing and take a few slow breaths.", "icon": "🎵", "cat": "mental"},
+    {"title": "Eat the rainbow", "content": "Add one extra colourful vegetable or fruit to a meal today.", "icon": "🥬", "cat": "diet"},
+]
+
+TASKS_EN = [
+    {"title": "A glass of water on waking", "description": "Start the day hydrated", "category": "health", "priority": "high", "time_slot": "morning"},
+    {"title": "5-minute stretch", "description": "Loosen your neck, shoulders and back", "category": "exercise", "priority": "normal", "time_slot": "morning"},
+    {"title": "A proper breakfast", "description": "Something warm, with some protein", "category": "diet", "priority": "high", "time_slot": "morning"},
+    {"title": "Slow breathing", "description": "Five minutes of slow belly breathing", "category": "mental", "priority": "low", "time_slot": "morning"},
+    {"title": "Open a window", "description": "Fresh air for a couple of minutes", "category": "health", "priority": "low", "time_slot": "morning"},
+    {"title": "15-minute walk", "description": "Break up a long stretch of sitting", "category": "exercise", "priority": "normal", "time_slot": "afternoon"},
+    {"title": "20-minute rest", "description": "A short break to recharge", "category": "rest", "priority": "normal", "time_slot": "afternoon"},
+    {"title": "A cup of herbal tea", "description": "Caffeine-free, unhurried", "category": "diet", "priority": "normal", "time_slot": "afternoon"},
+    {"title": "10 minutes of daylight", "description": "Step outside if you can", "category": "health", "priority": "normal", "time_slot": "afternoon"},
+    {"title": "Desk neck stretches", "description": "Ease tension from screen time", "category": "exercise", "priority": "low", "time_slot": "afternoon"},
+    {"title": "Stop eating when you are comfortably full", "description": "A lighter dinner sits easier", "category": "diet", "priority": "high", "time_slot": "evening"},
+    {"title": "Warm shower or bath", "description": "A relaxing step before bed", "category": "health", "priority": "normal", "time_slot": "evening"},
+    {"title": "Lights out at a regular time", "description": "Aim for a consistent bedtime", "category": "rest", "priority": "high", "time_slot": "evening"},
+    {"title": "Five-minute wind-down", "description": "Write down tomorrow's top three things, then put the phone away", "category": "mental", "priority": "low", "time_slot": "evening"},
+    {"title": "Gentle evening stretch", "description": "Slow stretches for legs and back", "category": "exercise", "priority": "low", "time_slot": "evening"},
+]
+
+RECS_EN = [
+    {"id": "rec_1", "title": "{season} seasonal recipes", "description": "Home cooking that fits the season", "type": "recipe"},
+    {"id": "rec_2", "title": "Gentle morning movement", "description": "A short, easy routine", "type": "video"},
+    {"id": "rec_3", "title": "Sleep wind-down guide", "description": "Small habits for better evenings", "type": "article"},
+]
+
+SEASON_EN = {"春": "Spring", "夏": "Summer", "秋": "Autumn", "冬": "Winter"}
+
+# 需要关注 → 优先的任务类别 / 洞察类别
+NEED_CATEGORIES = {
+    "sleep_low": ("rest", "sleep"),
+    "stress_high": ("mental",),
+    "move_low": ("exercise",),
+}
+
+log = logging.getLogger(__name__)
+
 # ============ Helper Functions ============
 
-def get_current_solar_term():
+def get_current_solar_term(is_global: bool = False):
     """获取当前节气：查天文计算的节气表（北京时间），见 app/utils/solar_term_calendar.py。"""
     from app.utils import solar_term_calendar
 
@@ -131,7 +184,17 @@ def get_current_solar_term():
         if t["name"] == current_name:
             current_emoji, current_desc = t["emoji"], t["description"]
             break
-
+    if is_global:
+        # 国际版：只用英文节气名；说明是季节性的日常提示，不含中医用语
+        from app.services.solar_term_enhanced import SOLAR_TERMS_2026
+        name_en = next((t["name_en"] for t in SOLAR_TERMS_2026 if t["name"] == current_name), "Seasonal change")
+        return {
+            "name": name_en,
+            "emoji": current_emoji,
+            "description": "One of the 24 traditional East Asian solar terms, marking the turning of the season.",
+            "suggestions": ["Keep a gentle routine", "Make time to rest", "Eat with the season"],
+            "date": today.isoformat(),
+        }
     return {
         "name": current_name,
         "emoji": current_emoji,
@@ -141,10 +204,57 @@ def get_current_solar_term():
     }
 
 
+def _seed(user_key: str, day: str, market: str, variant: int = 0) -> random.Random:
+    """同一用户、同一天、同一市场 → 同一个随机序列：同日反复刷新结果不变，隔天才换（I-08）。"""
+    digest = hashlib.sha256(f"{user_key}|{day}|{market}|{variant}".encode()).digest()
+    return random.Random(int.from_bytes(digest[:8], "big"))
 
-def generate_insights():
+
+def read_signals(user_id: Optional[str], today: date) -> dict:
+    """只读用户自己最近 3 天写入的记录（打卡 / 睡眠 / 情绪），得出需要关注的方向；没有记录就不猜。"""
+    if not user_id:
+        return {"needs": [], "basis": None}
+    try:
+        from app.database.db import get_db
+        db = get_db()
+        since = (today - timedelta(days=3)).isoformat()
+        sleeps = [r["hours"] for r in db.execute("SELECT hours FROM sleep_records WHERE user_id = ? AND date >= ?", (user_id, since)).fetchall() if r["hours"] is not None]
+        care = db.execute("SELECT sleep_hours, exercise_minutes, stress_level FROM care_status WHERE user_id = ? AND date >= ?", (user_id, since)).fetchall()
+        sleeps += [r["sleep_hours"] for r in care if r["sleep_hours"] is not None]
+        moves = [r["exercise_minutes"] for r in care if r["exercise_minutes"] is not None]
+        emotions = [r["intensity"] for r in db.execute("SELECT intensity FROM emotion_records WHERE user_id = ? AND date >= ?", (user_id, since)).fetchall() if r["intensity"] is not None]
+        stress = [r["stress_level"] for r in care if r["stress_level"]]
+    except Exception:  # 读不到就当没有信号，不影响今日计划本身
+        log.warning("today-plan: could not read signals", exc_info=True)
+        return {"needs": [], "basis": None}
+    needs = []
+    if sleeps and sum(sleeps) / len(sleeps) < 6.5:
+        needs.append("sleep_low")
+    if (emotions and max(emotions) >= 7) or any(str(x).lower() in ("high", "高", "较高") for x in stress):
+        needs.append("stress_high")
+    if moves and sum(moves) / len(moves) < 20:
+        needs.append("move_low")
+    n = len(sleeps) + len(moves) + len(emotions) + len(stress)
+    return {"needs": needs, "basis": {"records_used": n, "window_days": 3} if n else None}
+
+
+def _prefer(pool: list, needs: list, rng: random.Random, count: int, key: str) -> list:
+    """先放符合需要的，再用同一个随机序列补足；顺序也由随机序列决定，所以同一天稳定。"""
+    wanted = {c for n in needs for c in NEED_CATEGORIES.get(n, ())}
+    shuffled = pool[:]
+    rng.shuffle(shuffled)
+    first = [x for x in shuffled if x.get(key) in wanted]
+    rest = [x for x in shuffled if x.get(key) not in wanted]
+    return (first + rest)[:count]
+
+
+def generate_insights(rng: Optional[random.Random] = None, needs: Optional[list] = None, is_global: bool = False):
     """生成今日洞察"""
-    selected = random.sample(INSIGHTS_TEMPLATES, min(3, len(INSIGHTS_TEMPLATES)))
+    rng = rng or random.Random()
+    pool = INSIGHTS_EN if is_global else INSIGHTS_TEMPLATES
+    if not is_global:
+        pool = [dict(t, cat={"睡眠养生": "sleep", "情绪调节": "mental", "运动建议": "exercise"}.get(t["title"], "general")) for t in pool]
+    selected = _prefer(pool, needs or [], rng, min(3, len(pool)), "cat")
     return [
         TodayInsight(
             id=f"insight_{i+1}",
@@ -156,13 +266,16 @@ def generate_insights():
         for i, item in enumerate(selected)
     ]
 
-def generate_tasks():
+def generate_tasks(rng: Optional[random.Random] = None, needs: Optional[list] = None, is_global: bool = False):
     """生成今日任务（每个时间段2-3个任务）"""
+    rng = rng or random.Random()
+    templates = TASKS_EN if is_global else TASK_TEMPLATES
+    # 国内版任务类别：rest/mental/exercise 与国际版同名，可共用
     tasks = []
     for slot in ["morning", "afternoon", "evening"]:
-        pool = TASKS_BY_SLOT.get(slot, [])
-        count = min(random.randint(2, 3), len(pool))
-        selected = random.sample(pool, count) if len(pool) >= count else pool
+        pool = [t for t in templates if t["time_slot"] == slot]
+        count = min(rng.randint(2, 3), len(pool))
+        selected = _prefer(pool, needs or [], rng, count, "category")
         for i, item in enumerate(selected):
             tasks.append(FollowUpTask(
                 id=f"task_{slot[0]}{i+1}",
@@ -175,11 +288,14 @@ def generate_tasks():
             ))
     return tasks
 
-def generate_recommendations():
+def generate_recommendations(is_global: bool = False):
     """生成内容推荐"""
     from app.utils import solar_term_calendar
 
     season = solar_term_calendar.season_of(solar_term_calendar.current_term())
+    if is_global:
+        season_en = SEASON_EN.get(season[:1], "Seasonal")
+        return [ContentRecommendation(**dict(r, title=r["title"].format(season=season_en))) for r in RECS_EN]
     recommendations = [
         {
             "id": "rec_1",
@@ -202,31 +318,48 @@ def generate_recommendations():
     ]
     return [ContentRecommendation(**r) for r in recommendations]
 
+
+def _optional_user(request: Request) -> Optional[str]:
+    """今日计划对游客也开放；带了有效令牌就按本人个性化，没带 / 无效就给通用版（不报错）。"""
+    auth = request.headers.get("authorization", "")
+    if not auth.lower().startswith("bearer "):
+        return None
+    try:
+        from app.security import verify_token
+        return verify_token(request.app.state.settings, auth[7:].strip())
+    except Exception:
+        return None
+
+
+def build_plan(user_id: Optional[str], loc: RequestLocale, variant: int = 0) -> TodayPlan:
+    now = datetime.now()
+    day = now.strftime("%Y-%m-%d")
+    sig = read_signals(user_id, now.date())
+    rng = _seed(user_id or "anonymous", day, loc.market, variant)
+    needs = sig["needs"]
+    return TodayPlan(
+        id=f"plan_{now.strftime('%Y%m%d')}",
+        date=day,
+        locale=loc.lang,
+        personalization={"signals": needs, "basis": sig["basis"], "stable_for_day": True} if user_id else {"signals": [], "basis": None, "stable_for_day": True},
+        insights=generate_insights(rng, needs, loc.is_global),
+        tasks=generate_tasks(rng, needs, loc.is_global),
+        recommendations=generate_recommendations(loc.is_global),
+        solar_term=get_current_solar_term(loc.is_global),
+    )
+
+
 # ============ API Endpoints ============
 
 @router.get("", response_model=TodayPlan)
-async def get_today_plan():
-    """获取今日计划"""
-    return TodayPlan(
-        id=f"plan_{datetime.now().strftime('%Y%m%d')}",
-        date=datetime.now().strftime("%Y-%m-%d"),
-        insights=generate_insights(),
-        tasks=generate_tasks(),
-        recommendations=generate_recommendations(),
-        solar_term=get_current_solar_term()
-    )
+async def get_today_plan(request: Request, loc: RequestLocale = Depends(request_locale)):
+    """获取今日计划：同一用户同一天内容固定，隔天更新；有最近记录时按记录调整重点。"""
+    return build_plan(_optional_user(request), loc)
 
 @router.post("/refresh", response_model=TodayPlan)
-async def refresh_today_plan():
-    """刷新今日计划"""
-    return TodayPlan(
-        id=f"plan_{datetime.now().strftime('%Y%m%d')}",
-        date=datetime.now().strftime("%Y-%m-%d"),
-        insights=generate_insights(),
-        tasks=generate_tasks(),
-        recommendations=generate_recommendations(),
-        solar_term=get_current_solar_term()
-    )
+async def refresh_today_plan(request: Request, loc: RequestLocale = Depends(request_locale), variant: int = Query(0, ge=0, le=20, description="想换一组时传 1、2…；不传就是今天固定的这一组")):
+    """刷新今日计划：默认返回与 GET 相同的稳定内容（不会无故“乱跳”）；传 variant 才换一组。"""
+    return build_plan(_optional_user(request), loc, variant)
 
 @router.patch("/tasks/{task_id}")
 async def update_task_status(task_id: str, status: str):

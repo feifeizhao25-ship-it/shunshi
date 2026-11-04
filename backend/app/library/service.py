@@ -121,6 +121,12 @@ def build_feed(session: Session, uid: str, today: date, lang: str = "zh", *, rec
     sig = load_signals(session, uid, today, lang)
     items = store.annotated(today, lang, document=document, state=state)
     out = fd.rank(items, sig, uid, today, limit=limit)
+    # I-09：资料库推荐本来就按目标 / 关注主题 / 读过的内容 / 节气排序（见 feed.rank），测试里「七天零变化」是因为库里
+    # 没有一条已通过人工审核的资料（全部待审核，闸门关着），列表为空。这里把原因说清楚，而不是静默返回空。
+    eligible = sum(1 for e in items if e["display"]["feed_eligible"])
+    out["eligible_count"] = eligible
+    if sig.enabled and not out["items"]:
+        out["empty_reason"] = "no_reviewed_entries" if eligible == 0 else "filtered_by_your_preferences"
     out.update({"topics": fd.topic_list(sig), "since": sig.last_visit.isoformat() if sig.last_visit else None, "generated_for": today.isoformat(),
                 "note": "推荐只用你自己填写的目标、关注的主题和在应用里读过的内容；资料来自官方文件，仅供了解，不是诊断或治疗建议。可随时关闭。" if lang == "zh" else
                 "Picks use only what you entered, the topics you follow and what you read in the app. Not medical advice. You can turn this off at any time."})

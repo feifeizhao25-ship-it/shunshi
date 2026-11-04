@@ -14,8 +14,9 @@ from app.deps import get_session
 from app.simple_models import User
 
 from app.database.db import get_db, close_test_connection
+from app.locale_context import bind_request_locale, tr
 
-router = APIRouter(prefix="/api/v1/family", tags=["家庭"])
+router = APIRouter(prefix="/api/v1/family", tags=["家庭"], dependencies=[Depends(bind_request_locale)])
 
 # ============ Models ============
 
@@ -71,7 +72,7 @@ def get_user_family(db, user_id: str) -> tuple:
     
     # 创建默认家庭
     family_id = f"family_{user_id}"
-    family_name = "我的家庭"
+    family_name = tr("我的家庭", "My family")
     return family_id, family_name
 
 # ============ API Endpoints ============
@@ -137,7 +138,7 @@ async def add_member(
         ).fetchone()[0]
 
         if count >= 4:
-            raise HTTPException(status_code=400, detail="家庭成员数量已达上限(4人)")
+            raise HTTPException(status_code=400, detail=tr("家庭成员数量已达上限(4人)", "The family is full (4 members maximum)"))
 
         member_id = f"member_{uuid.uuid4().hex}"
         now = datetime.now().isoformat()
@@ -178,9 +179,9 @@ async def remove_member(
             (member_id, user_id),
         ).rowcount
         if removed != 1:
-            raise HTTPException(status_code=404, detail="成员不存在")
+            raise HTTPException(status_code=404, detail=tr("成员不存在", "Member not found"))
         db.commit()
-        return {"success": True, "message": "成员已移除"}
+        return {"success": True, "message": tr("成员已移除", "Member removed")}
     except Exception:
         db.rollback()
         raise
@@ -203,7 +204,7 @@ async def update_member_status(
             (status, datetime.now().isoformat(), member_id, user_id),
         ).rowcount
         if changed != 1:
-            raise HTTPException(status_code=404, detail="成员不存在")
+            raise HTTPException(status_code=404, detail=tr("成员不存在", "Member not found"))
         row = db.execute(
             "SELECT * FROM family_relations WHERE id = ? AND user_id = ?",
             (member_id, user_id),
@@ -249,7 +250,7 @@ async def generate_invite(request: GenerateInviteRequest, user_id: str = Query(.
             except sqlite3.IntegrityError:
                 # A code collision must not expose another family's invitation.
                 continue
-        raise HTTPException(status_code=503, detail="邀请码生成繁忙，请稍后重试")
+        raise HTTPException(status_code=503, detail=tr("邀请码生成繁忙，请稍后重试", "Invite codes are busy right now. Please try again shortly."))
     except Exception:
         db.rollback()
         raise
@@ -265,22 +266,22 @@ async def join_family(code: str, user_id: str = Query(..., description="用户ID
         db.execute("BEGIN IMMEDIATE")
         invite = db.execute("SELECT * FROM family_invites WHERE code = ?", (code,)).fetchone()
         if not invite:
-            raise HTTPException(status_code=404, detail="邀请码不存在")
+            raise HTTPException(status_code=404, detail=tr("邀请码不存在", "Invite code not found"))
         if invite["used"]:
-            raise HTTPException(status_code=400, detail="邀请码已使用")
+            raise HTTPException(status_code=400, detail=tr("邀请码已使用", "This invite code has already been used"))
         now = datetime.now().isoformat()
         if invite["expires_at"] <= now:
-            raise HTTPException(status_code=400, detail="邀请码已过期")
+            raise HTTPException(status_code=400, detail=tr("邀请码已过期", "This invite code has expired"))
         if invite["created_by"] == user_id:
-            raise HTTPException(status_code=400, detail="不能使用自己生成的邀请码")
+            raise HTTPException(status_code=400, detail=tr("不能使用自己生成的邀请码", "You cannot use your own invite code"))
         if session.get(User, invite["created_by"]) is None:
-            raise HTTPException(status_code=410, detail="邀请账号已不存在，请重新获取邀请")
+            raise HTTPException(status_code=410, detail=tr("邀请账号已不存在，请重新获取邀请", "The inviting account no longer exists. Please ask for a new invite."))
         if db.execute("SELECT 1 FROM family_relations WHERE user_id = ? LIMIT 1", (user_id,)).fetchone():
-            raise HTTPException(status_code=409, detail="当前已有家庭关系，请先退出或移除现有关系")
+            raise HTTPException(status_code=409, detail=tr("当前已有家庭关系，请先退出或移除现有关系", "You are already in a family. Leave or remove the current one first."))
         family_id = invite["family_id"]
         count = db.execute("SELECT count(*) FROM family_relations WHERE family_id = ?", (family_id,)).fetchone()[0]
         if count >= 4:
-            raise HTTPException(status_code=400, detail="家庭成员数量已达上限(4人)")
+            raise HTTPException(status_code=400, detail=tr("家庭成员数量已达上限(4人)", "The family is full (4 members maximum)"))
         db.execute(
             "UPDATE family_invites SET used = 1, used_by = ?, used_at = ? WHERE code = ? AND used = 0",
             (user_id, now, code),
@@ -289,11 +290,11 @@ async def join_family(code: str, user_id: str = Query(..., description="用户ID
             """INSERT INTO family_relations
             (id, user_id, family_id, family_name, member_name, relation, age, status,
              last_active_at, user_id_member, created_at, updated_at)
-            VALUES (?, ?, ?, '已加入的家庭', '新成员', ?, NULL, 'normal', ?, ?, ?, ?)""",
-            (f"member_{uuid.uuid4().hex}", user_id, family_id, invite["relation"], now, user_id, now, now),
+            VALUES (?, ?, ?, ?, ?, ?, NULL, 'normal', ?, ?, ?, ?)""",
+            (f"member_{uuid.uuid4().hex}", user_id, family_id, tr("已加入的家庭", "Joined family"), tr("新成员", "New member"), invite["relation"], now, user_id, now, now),
         )
         db.commit()
-        return {"success": True, "message": "成功加入家庭"}
+        return {"success": True, "message": tr("成功加入家庭", "Joined the family")}
     except Exception:
         db.rollback()
         raise
@@ -384,13 +385,13 @@ async def send_care_reminder(request: ReminderRequest, user_id: str = Query(...,
         ).fetchone()
 
         if not target:
-            raise HTTPException(status_code=404, detail="成员不存在")
+            raise HTTPException(status_code=404, detail=tr("成员不存在", "Member not found"))
 
         if not db.execute("SELECT id FROM users WHERE id = ?", (user_id,)).fetchone():
-            raise HTTPException(status_code=404, detail="用户不存在")
+            raise HTTPException(status_code=404, detail=tr("用户不存在", "User not found"))
 
         if not _read_family_settings(db, user_id).reminder_enabled:
-            raise HTTPException(status_code=409, detail="家庭关怀提醒已关闭，请先在家庭设置中开启")
+            raise HTTPException(status_code=409, detail=tr("家庭关怀提醒已关闭，请先在家庭设置中开启", "Family care reminders are turned off. Turn them on in family settings first."))
 
         now = datetime.now().isoformat()
 
@@ -398,12 +399,12 @@ async def send_care_reminder(request: ReminderRequest, user_id: str = Query(...,
         notif_id = f"care_{now.replace(':', '').replace('.', '').replace('-', '')}"
 
         messages = {
-            "health_reminder": f"关怀提醒：请关注{target['member_name']}的健康状况。",
-            "care": f"关怀提醒：记得关心{target['member_name']}。",
-            "medication": f"关怀提醒：请提醒{target['member_name']}按时服药。",
+            "health_reminder": tr(f"关怀提醒：请关注{target['member_name']}的健康状况。", f"Care reminder: please check in on {target['member_name']}."),
+            "care": tr(f"关怀提醒：记得关心{target['member_name']}。", f"Care reminder: remember to look in on {target['member_name']}."),
+            "medication": tr(f"关怀提醒：请提醒{target['member_name']}按时服药。", f"Care reminder: please remind {target['member_name']} about their routine."),
         }
 
-        body = request.message or messages.get(request.type, f"向{target['member_name']}发送了关怀提醒。")
+        body = request.message or messages.get(request.type, tr(f"向{target['member_name']}发送了关怀提醒。", f"Care reminder sent to {target['member_name']}."))
 
         db.execute("""
             INSERT INTO notifications (id, user_id, type, title, body, data, sent_at)
@@ -412,7 +413,7 @@ async def send_care_reminder(request: ReminderRequest, user_id: str = Query(...,
             notif_id,
             user_id,
             request.type,
-            "家庭关怀",
+            tr("家庭关怀", "Family care"),
             body,
             json.dumps({"source": "family", "target_member": target["member_name"]}, ensure_ascii=False),
             now,
@@ -423,7 +424,7 @@ async def send_care_reminder(request: ReminderRequest, user_id: str = Query(...,
             "success": True,
             "notification_id": notif_id,
             "delivery": "self_inbox",
-            "message": "已保存到自己的通知列表",
+            "message": tr("已保存到自己的通知列表", "Saved to your own notifications"),
         }
     except Exception:
         db.rollback()
@@ -481,7 +482,7 @@ async def update_family_settings(settings: FamilySettings, user_id: str = Query(
         )
         db.commit()
         return {"success": True, "data": values, "reminder_schedule_active": False,
-                "message": "设置已保存；自动定时提醒尚未启用"}
+                "message": tr("设置已保存；自动定时提醒尚未启用", "Settings saved. Automatic scheduled reminders are not enabled yet.")}
     except Exception:
         db.rollback()
         raise
@@ -510,7 +511,7 @@ async def leave_family(user_id: str = Query(..., description="用户ID；不传�
         db.execute("DELETE FROM family_relations WHERE user_id_member = ?", (user_id,))
         db.execute("DELETE FROM family_invites WHERE created_by = ? AND used = 0", (user_id,))
         db.commit()
-        return {"success": True, "message": "已离开家庭"}
+        return {"success": True, "message": tr("已离开家庭", "Left the family")}
     except Exception:
         db.rollback()
         raise

@@ -211,8 +211,22 @@ def _reason(parts: list, lang: str) -> tuple[str, list]:
     """parts: [(kind, value)] -> sentence + basis list."""
     nm = NAMES[lang]
     bits, basis = [], []
+    # I-16: "现在是晚上，现在是秋季" 读起来像拼接模板。时段和季节合成一句：「现在是秋季的晚上」/ "it is an autumn evening"。
+    kinds = {k: v for k, v in parts}
+    merged_now = "time" in kinds and "season" in kinds
+    if merged_now:
+        if lang == "zh":
+            now_bit = f"现在是{nm[kinds['season']]}的{nm[kinds['time']]}"
+        else:
+            season = nm[kinds["season"]]
+            article = "an" if season[0] in "aeiou" else "a"
+            now_bit = f"it is {article} {season} {nm[kinds['time']]}"
     for kind, value in parts:
         basis.append(kind)
+        if merged_now and kind in ("time", "season"):
+            if kind == "time":
+                bits.append(now_bit)
+            continue
         if kind == "goal":
             bits.append(f"{_label('goal', lang)}：{nm[value]}" if lang == "zh" else f"you chose \"{nm[value]}\"")
         elif kind == "time":
