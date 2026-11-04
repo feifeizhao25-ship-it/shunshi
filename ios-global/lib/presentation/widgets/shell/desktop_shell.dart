@@ -41,6 +41,9 @@ class DesktopShell extends StatelessWidget {
     this.title,
   });
 
+  /// Paths that are rendered inside [DesktopShell] on a wide window (the five main tabs).
+  static bool isShellPath(String path) => const ['/chat', '/today', '/solar', '/wellness', '/profile', '/home'].any((p) => path == p || path.startsWith('$p/'));
+
   static bool isWide(BuildContext context) => MediaQuery.sizeOf(context).width >= breakpoint;
 
   @override
@@ -74,7 +77,14 @@ class DesktopShell extends StatelessWidget {
           Expanded(
             child: Align(
               alignment: Alignment.topCenter,
-              child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: contentMaxWidth), child: child),
+              child: LayoutBuilder(builder: (context, c) {
+                // Pages read MediaQuery for their own layout: give them the width they really get, not the window's.
+                final w = c.maxWidth < contentMaxWidth ? c.maxWidth : contentMaxWidth;
+                return ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: contentMaxWidth),
+                  child: MediaQuery(data: MediaQuery.of(context).copyWith(size: Size(w, MediaQuery.sizeOf(context).height)), child: child),
+                );
+              }),
             ),
           ),
         ],
