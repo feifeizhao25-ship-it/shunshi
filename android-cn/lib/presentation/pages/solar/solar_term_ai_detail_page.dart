@@ -39,7 +39,7 @@ class SolarTermAIDetailPage extends StatelessWidget {
       sources: [
         _Source('中国气象局 · 立春专题', 'https://www.cma.gov.cn/ztbd/2026zt/24jq/lichun/index.html'),
         _Source('中国科学院紫金山天文台 · 2026年日历资料（交节时刻）', 'https://www.pmo.cas.cn/xwdt2019/kpdt2019/202203/P020251230620718707826.pdf'),
-        _Source('国家中医药管理局 · 《中国公民中医养生保健素养》（起居与传统健身）', 'http://www.natcm.gov.cn/bangongshi/gongzuodongtai/2018-03-25/5248.html'),
+        _Source('国家中医药管理局 · 《中国公民中医养生保健素养》（起居与传统健身）', 'https://www.natcm.gov.cn/bangongshi/gongzuodongtai/2018-03-25/5248.html'),
       ],
     ),
     '雨水': _TermData(
@@ -61,7 +61,7 @@ class SolarTermAIDetailPage extends StatelessWidget {
       sources: [
         _Source('中国气象局 · 雨水专题', 'https://www.cma.gov.cn/ztbd/2026zt/24jq/yushui/index.html'),
         _Source('中国科学院紫金山天文台 · 2026年日历资料（交节时刻）', 'https://www.pmo.cas.cn/xwdt2019/kpdt2019/202203/P020251230620718707826.pdf'),
-        _Source('国家中医药管理局 · 《中国公民中医养生保健素养》（起居与传统健身）', 'http://www.natcm.gov.cn/bangongshi/gongzuodongtai/2018-03-25/5248.html'),
+        _Source('国家中医药管理局 · 《中国公民中医养生保健素养》（起居与传统健身）', 'https://www.natcm.gov.cn/bangongshi/gongzuodongtai/2018-03-25/5248.html'),
       ],
     ),
     '惊蛰': _TermData(
@@ -83,7 +83,7 @@ class SolarTermAIDetailPage extends StatelessWidget {
       sources: [
         _Source('中国气象局 · 惊蛰专题', 'https://www.cma.gov.cn/ztbd/2026zt/24jq/jingzhe/index.html'),
         _Source('中国科学院紫金山天文台 · 2026年日历资料（交节时刻）', 'https://www.pmo.cas.cn/xwdt2019/kpdt2019/202203/P020251230620718707826.pdf'),
-        _Source('国家中医药管理局 · 《中国公民中医养生保健素养》（起居与传统健身）', 'http://www.natcm.gov.cn/bangongshi/gongzuodongtai/2018-03-25/5248.html'),
+        _Source('国家中医药管理局 · 《中国公民中医养生保健素养》（起居与传统健身）', 'https://www.natcm.gov.cn/bangongshi/gongzuodongtai/2018-03-25/5248.html'),
       ],
     ),
     '春分': _TermData(
@@ -105,7 +105,7 @@ class SolarTermAIDetailPage extends StatelessWidget {
       sources: [
         _Source('中国气象局 · 春分专题', 'https://www.cma.gov.cn/ztbd/2026zt/24jq/chunfen/index.html'),
         _Source('中国科学院紫金山天文台 · 2026年日历资料（交节时刻）', 'https://www.pmo.cas.cn/xwdt2019/kpdt2019/202203/P020251230620718707826.pdf'),
-        _Source('国家中医药管理局 · 《中国公民中医养生保健素养》（起居与传统健身）', 'http://www.natcm.gov.cn/bangongshi/gongzuodongtai/2018-03-25/5248.html'),
+        _Source('国家中医药管理局 · 《中国公民中医养生保健素养》（起居与传统健身）', 'https://www.natcm.gov.cn/bangongshi/gongzuodongtai/2018-03-25/5248.html'),
       ],
     ),
     '清明': _TermData(
@@ -127,7 +127,7 @@ class SolarTermAIDetailPage extends StatelessWidget {
       sources: [
         _Source('中国气象局 · 清明专题', 'https://www.cma.gov.cn/ztbd/2026zt/24jq/qingming/index.html'),
         _Source('中国科学院紫金山天文台 · 2026年日历资料（交节时刻）', 'https://www.pmo.cas.cn/xwdt2019/kpdt2019/202203/P020251230620718707826.pdf'),
-        _Source('国家中医药管理局 · 《中国公民中医养生保健素养》（起居与传统健身）', 'http://www.natcm.gov.cn/bangongshi/gongzuodongtai/2018-03-25/5248.html'),
+        _Source('国家中医药管理局 · 《中国公民中医养生保健素养》（起居与传统健身）', 'https://www.natcm.gov.cn/bangongshi/gongzuodongtai/2018-03-25/5248.html'),
       ],
     ),
     '谷雨': _TermData(
@@ -149,7 +149,7 @@ class SolarTermAIDetailPage extends StatelessWidget {
       sources: [
         _Source('中国气象局 · 谷雨专题', 'https://www.cma.gov.cn/ztbd/2026zt/24jq/guyu/index.html'),
         _Source('中国科学院紫金山天文台 · 2026年日历资料（交节时刻）', 'https://www.pmo.cas.cn/xwdt2019/kpdt2019/202203/P020251230620718707826.pdf'),
-        _Source('国家中医药管理局 · 《中国公民中医养生保健素养》（起居与传统健身）', 'http://www.natcm.gov.cn/bangongshi/gongzuodongtai/2018-03-25/5248.html'),
+        _Source('国家中医药管理局 · 《中国公民中医养生保健素养》（起居与传统健身）', 'https://www.natcm.gov.cn/bangongshi/gongzuodongtai/2018-03-25/5248.html'),
       ],
     ),
     '立夏': _TermData(
@@ -171,7 +171,7 @@ class SolarTermAIDetailPage extends StatelessWidget {
       sources: [
         _Source('中国气象局 · 立夏专题', 'https://www.cma.gov.cn/ztbd/2026zt/24jq/lixia/index.html'),
         _Source('中国科学院紫金山天文台 · 2026年日历资料（交节时刻）', 'https://www.pmo.cas.cn/xwdt2019/kpdt2019/202203/P020251230620718707826.pdf'),
-        _Source('国家中医药管理局 · 《中国公民中医养生保健素养》（起居与传统健身）', 'http://www.natcm.gov.cn/bangongshi/gongzuodongtai/2018-03-25/5248.html'),
+        _Source('国家中医药管理局 · 《中国公民中医养生保健素养》（起居与传统健身）', 'https://www.natcm.gov.cn/bangongshi/gongzuodongtai/2018-03-25/5248.html'),
       ],
     ),
     '小满': _TermData(
@@ -193,7 +193,7 @@ class SolarTermAIDetailPage extends StatelessWidget {
       sources: [
         _Source('中国气象局 · 小满专题', 'https://www.cma.gov.cn/ztbd/2026zt/24jq/xiaoman/index.html'),
         _Source('中国科学院紫金山天文台 · 2026年日历资料（交节时刻）', 'https://www.pmo.cas.cn/xwdt2019/kpdt2019/202203/P020251230620718707826.pdf'),
-        _Source('国家中医药管理局 · 《中国公民中医养生保健素养》（起居与传统健身）', 'http://www.natcm.gov.cn/bangongshi/gongzuodongtai/2018-03-25/5248.html'),
+        _Source('国家中医药管理局 · 《中国公民中医养生保健素养》（起居与传统健身）', 'https://www.natcm.gov.cn/bangongshi/gongzuodongtai/2018-03-25/5248.html'),
       ],
     ),
     '芒种': _TermData(
@@ -215,7 +215,7 @@ class SolarTermAIDetailPage extends StatelessWidget {
       sources: [
         _Source('中国气象局 · 芒种专题', 'https://www.cma.gov.cn/ztbd/2026zt/24jq/mangzhong/index.html'),
         _Source('中国科学院紫金山天文台 · 2026年日历资料（交节时刻）', 'https://www.pmo.cas.cn/xwdt2019/kpdt2019/202203/P020251230620718707826.pdf'),
-        _Source('国家中医药管理局 · 《中国公民中医养生保健素养》（起居与传统健身）', 'http://www.natcm.gov.cn/bangongshi/gongzuodongtai/2018-03-25/5248.html'),
+        _Source('国家中医药管理局 · 《中国公民中医养生保健素养》（起居与传统健身）', 'https://www.natcm.gov.cn/bangongshi/gongzuodongtai/2018-03-25/5248.html'),
       ],
     ),
     '夏至': _TermData(
@@ -237,7 +237,7 @@ class SolarTermAIDetailPage extends StatelessWidget {
       sources: [
         _Source('中国气象局 · 夏至专题', 'https://www.cma.gov.cn/ztbd/2026zt/24jq/xiazhi/index.html'),
         _Source('中国科学院紫金山天文台 · 2026年日历资料（交节时刻）', 'https://www.pmo.cas.cn/xwdt2019/kpdt2019/202203/P020251230620718707826.pdf'),
-        _Source('国家中医药管理局 · 《中国公民中医养生保健素养》（起居与传统健身）', 'http://www.natcm.gov.cn/bangongshi/gongzuodongtai/2018-03-25/5248.html'),
+        _Source('国家中医药管理局 · 《中国公民中医养生保健素养》（起居与传统健身）', 'https://www.natcm.gov.cn/bangongshi/gongzuodongtai/2018-03-25/5248.html'),
       ],
     ),
     '小暑': _TermData(
@@ -259,7 +259,7 @@ class SolarTermAIDetailPage extends StatelessWidget {
       sources: [
         _Source('中国气象局 · 小暑专题', 'https://www.cma.gov.cn/ztbd/2026zt/24jq/xiaoshu/index.html'),
         _Source('中国科学院紫金山天文台 · 2026年日历资料（交节时刻）', 'https://www.pmo.cas.cn/xwdt2019/kpdt2019/202203/P020251230620718707826.pdf'),
-        _Source('国家中医药管理局 · 《中国公民中医养生保健素养》（起居与传统健身）', 'http://www.natcm.gov.cn/bangongshi/gongzuodongtai/2018-03-25/5248.html'),
+        _Source('国家中医药管理局 · 《中国公民中医养生保健素养》（起居与传统健身）', 'https://www.natcm.gov.cn/bangongshi/gongzuodongtai/2018-03-25/5248.html'),
       ],
     ),
     '大暑': _TermData(
@@ -281,7 +281,7 @@ class SolarTermAIDetailPage extends StatelessWidget {
       sources: [
         _Source('中国气象局 · 大暑专题', 'https://www.cma.gov.cn/ztbd/2026zt/24jq/dashu/index.html'),
         _Source('中国科学院紫金山天文台 · 2026年日历资料（交节时刻）', 'https://www.pmo.cas.cn/xwdt2019/kpdt2019/202203/P020251230620718707826.pdf'),
-        _Source('国家中医药管理局 · 《中国公民中医养生保健素养》（起居与传统健身）', 'http://www.natcm.gov.cn/bangongshi/gongzuodongtai/2018-03-25/5248.html'),
+        _Source('国家中医药管理局 · 《中国公民中医养生保健素养》（起居与传统健身）', 'https://www.natcm.gov.cn/bangongshi/gongzuodongtai/2018-03-25/5248.html'),
       ],
     ),
     '立秋': _TermData(
@@ -303,7 +303,7 @@ class SolarTermAIDetailPage extends StatelessWidget {
       sources: [
         _Source('中国气象局 · 立秋专题', 'https://www.cma.gov.cn/ztbd/2026zt/24jq/liqiu/index.html'),
         _Source('中国科学院紫金山天文台 · 2026年日历资料（交节时刻）', 'https://www.pmo.cas.cn/xwdt2019/kpdt2019/202203/P020251230620718707826.pdf'),
-        _Source('国家中医药管理局 · 《中国公民中医养生保健素养》（起居与传统健身）', 'http://www.natcm.gov.cn/bangongshi/gongzuodongtai/2018-03-25/5248.html'),
+        _Source('国家中医药管理局 · 《中国公民中医养生保健素养》（起居与传统健身）', 'https://www.natcm.gov.cn/bangongshi/gongzuodongtai/2018-03-25/5248.html'),
       ],
     ),
     '处暑': _TermData(
@@ -325,7 +325,7 @@ class SolarTermAIDetailPage extends StatelessWidget {
       sources: [
         _Source('中国气象局 · 处暑专题', 'https://www.cma.gov.cn/ztbd/2026zt/24jq/chushu/index.html'),
         _Source('中国科学院紫金山天文台 · 2026年日历资料（交节时刻）', 'https://www.pmo.cas.cn/xwdt2019/kpdt2019/202203/P020251230620718707826.pdf'),
-        _Source('国家中医药管理局 · 《中国公民中医养生保健素养》（起居与传统健身）', 'http://www.natcm.gov.cn/bangongshi/gongzuodongtai/2018-03-25/5248.html'),
+        _Source('国家中医药管理局 · 《中国公民中医养生保健素养》（起居与传统健身）', 'https://www.natcm.gov.cn/bangongshi/gongzuodongtai/2018-03-25/5248.html'),
       ],
     ),
     '白露': _TermData(
@@ -347,7 +347,7 @@ class SolarTermAIDetailPage extends StatelessWidget {
       sources: [
         _Source('中国气象局 · 白露专题', 'https://www.cma.gov.cn/ztbd/2026zt/24jq/bailu/index.html'),
         _Source('中国科学院紫金山天文台 · 2026年日历资料（交节时刻）', 'https://www.pmo.cas.cn/xwdt2019/kpdt2019/202203/P020251230620718707826.pdf'),
-        _Source('国家中医药管理局 · 《中国公民中医养生保健素养》（起居与传统健身）', 'http://www.natcm.gov.cn/bangongshi/gongzuodongtai/2018-03-25/5248.html'),
+        _Source('国家中医药管理局 · 《中国公民中医养生保健素养》（起居与传统健身）', 'https://www.natcm.gov.cn/bangongshi/gongzuodongtai/2018-03-25/5248.html'),
       ],
     ),
     '秋分': _TermData(
@@ -369,7 +369,7 @@ class SolarTermAIDetailPage extends StatelessWidget {
       sources: [
         _Source('中国气象局 · 秋分专题', 'https://www.cma.gov.cn/ztbd/2026zt/24jq/qiufen/index.html'),
         _Source('中国科学院紫金山天文台 · 2026年日历资料（交节时刻）', 'https://www.pmo.cas.cn/xwdt2019/kpdt2019/202203/P020251230620718707826.pdf'),
-        _Source('国家中医药管理局 · 《中国公民中医养生保健素养》（起居与传统健身）', 'http://www.natcm.gov.cn/bangongshi/gongzuodongtai/2018-03-25/5248.html'),
+        _Source('国家中医药管理局 · 《中国公民中医养生保健素养》（起居与传统健身）', 'https://www.natcm.gov.cn/bangongshi/gongzuodongtai/2018-03-25/5248.html'),
       ],
     ),
     '寒露': _TermData(
@@ -391,7 +391,7 @@ class SolarTermAIDetailPage extends StatelessWidget {
       sources: [
         _Source('中国气象局 · 寒露专题', 'https://www.cma.gov.cn/ztbd/2026zt/24jq/hanlu/index.html'),
         _Source('中国科学院紫金山天文台 · 2026年日历资料（交节时刻）', 'https://www.pmo.cas.cn/xwdt2019/kpdt2019/202203/P020251230620718707826.pdf'),
-        _Source('国家中医药管理局 · 《中国公民中医养生保健素养》（起居与传统健身）', 'http://www.natcm.gov.cn/bangongshi/gongzuodongtai/2018-03-25/5248.html'),
+        _Source('国家中医药管理局 · 《中国公民中医养生保健素养》（起居与传统健身）', 'https://www.natcm.gov.cn/bangongshi/gongzuodongtai/2018-03-25/5248.html'),
       ],
     ),
     '霜降': _TermData(
@@ -413,7 +413,7 @@ class SolarTermAIDetailPage extends StatelessWidget {
       sources: [
         _Source('中国气象局 · 霜降专题', 'https://www.cma.gov.cn/ztbd/2026zt/24jq/shuangjiang/index.html'),
         _Source('中国科学院紫金山天文台 · 2026年日历资料（交节时刻）', 'https://www.pmo.cas.cn/xwdt2019/kpdt2019/202203/P020251230620718707826.pdf'),
-        _Source('国家中医药管理局 · 《中国公民中医养生保健素养》（起居与传统健身）', 'http://www.natcm.gov.cn/bangongshi/gongzuodongtai/2018-03-25/5248.html'),
+        _Source('国家中医药管理局 · 《中国公民中医养生保健素养》（起居与传统健身）', 'https://www.natcm.gov.cn/bangongshi/gongzuodongtai/2018-03-25/5248.html'),
       ],
     ),
     '立冬': _TermData(
@@ -435,7 +435,7 @@ class SolarTermAIDetailPage extends StatelessWidget {
       sources: [
         _Source('中国气象局 · 立冬专题', 'https://www.cma.gov.cn/ztbd/2025zt/24jq/lidong/index.html'),
         _Source('中国科学院紫金山天文台 · 2026年日历资料（交节时刻）', 'https://www.pmo.cas.cn/xwdt2019/kpdt2019/202203/P020251230620718707826.pdf'),
-        _Source('国家中医药管理局 · 《中国公民中医养生保健素养》（起居与传统健身）', 'http://www.natcm.gov.cn/bangongshi/gongzuodongtai/2018-03-25/5248.html'),
+        _Source('国家中医药管理局 · 《中国公民中医养生保健素养》（起居与传统健身）', 'https://www.natcm.gov.cn/bangongshi/gongzuodongtai/2018-03-25/5248.html'),
       ],
     ),
     '小雪': _TermData(
@@ -457,7 +457,7 @@ class SolarTermAIDetailPage extends StatelessWidget {
       sources: [
         _Source('中国气象局 · 小雪专题', 'https://www.cma.gov.cn/ztbd/2025zt/24jq/xiaoxue/index.html'),
         _Source('中国科学院紫金山天文台 · 2026年日历资料（交节时刻）', 'https://www.pmo.cas.cn/xwdt2019/kpdt2019/202203/P020251230620718707826.pdf'),
-        _Source('国家中医药管理局 · 《中国公民中医养生保健素养》（起居与传统健身）', 'http://www.natcm.gov.cn/bangongshi/gongzuodongtai/2018-03-25/5248.html'),
+        _Source('国家中医药管理局 · 《中国公民中医养生保健素养》（起居与传统健身）', 'https://www.natcm.gov.cn/bangongshi/gongzuodongtai/2018-03-25/5248.html'),
       ],
     ),
     '大雪': _TermData(
@@ -479,7 +479,7 @@ class SolarTermAIDetailPage extends StatelessWidget {
       sources: [
         _Source('中国气象局 · 大雪专题', 'https://www.cma.gov.cn/ztbd/2025zt/24jq/daxue/index.html'),
         _Source('中国科学院紫金山天文台 · 2026年日历资料（交节时刻）', 'https://www.pmo.cas.cn/xwdt2019/kpdt2019/202203/P020251230620718707826.pdf'),
-        _Source('国家中医药管理局 · 《中国公民中医养生保健素养》（起居与传统健身）', 'http://www.natcm.gov.cn/bangongshi/gongzuodongtai/2018-03-25/5248.html'),
+        _Source('国家中医药管理局 · 《中国公民中医养生保健素养》（起居与传统健身）', 'https://www.natcm.gov.cn/bangongshi/gongzuodongtai/2018-03-25/5248.html'),
       ],
     ),
     '冬至': _TermData(
@@ -501,7 +501,7 @@ class SolarTermAIDetailPage extends StatelessWidget {
       sources: [
         _Source('中国气象局 · 冬至专题', 'https://www.cma.gov.cn/ztbd/2025zt/24jq/dongzhi/index.html'),
         _Source('中国科学院紫金山天文台 · 2026年日历资料（交节时刻）', 'https://www.pmo.cas.cn/xwdt2019/kpdt2019/202203/P020251230620718707826.pdf'),
-        _Source('国家中医药管理局 · 《中国公民中医养生保健素养》（起居与传统健身）', 'http://www.natcm.gov.cn/bangongshi/gongzuodongtai/2018-03-25/5248.html'),
+        _Source('国家中医药管理局 · 《中国公民中医养生保健素养》（起居与传统健身）', 'https://www.natcm.gov.cn/bangongshi/gongzuodongtai/2018-03-25/5248.html'),
       ],
     ),
     '小寒': _TermData(
@@ -523,7 +523,7 @@ class SolarTermAIDetailPage extends StatelessWidget {
       sources: [
         _Source('中国气象局 · 小寒专题', 'https://www.cma.gov.cn/ztbd/2025zt/24jq/xiaohan/index.html'),
         _Source('中国科学院紫金山天文台 · 2026年日历资料（交节时刻）', 'https://www.pmo.cas.cn/xwdt2019/kpdt2019/202203/P020251230620718707826.pdf'),
-        _Source('国家中医药管理局 · 《中国公民中医养生保健素养》（起居与传统健身）', 'http://www.natcm.gov.cn/bangongshi/gongzuodongtai/2018-03-25/5248.html'),
+        _Source('国家中医药管理局 · 《中国公民中医养生保健素养》（起居与传统健身）', 'https://www.natcm.gov.cn/bangongshi/gongzuodongtai/2018-03-25/5248.html'),
       ],
     ),
     '大寒': _TermData(
@@ -545,7 +545,7 @@ class SolarTermAIDetailPage extends StatelessWidget {
       sources: [
         _Source('中国气象局 · 大寒专题', 'https://www.cma.gov.cn/ztbd/2025zt/24jq/dahan/index.html'),
         _Source('中国科学院紫金山天文台 · 2026年日历资料（交节时刻）', 'https://www.pmo.cas.cn/xwdt2019/kpdt2019/202203/P020251230620718707826.pdf'),
-        _Source('国家中医药管理局 · 《中国公民中医养生保健素养》（起居与传统健身）', 'http://www.natcm.gov.cn/bangongshi/gongzuodongtai/2018-03-25/5248.html'),
+        _Source('国家中医药管理局 · 《中国公民中医养生保健素养》（起居与传统健身）', 'https://www.natcm.gov.cn/bangongshi/gongzuodongtai/2018-03-25/5248.html'),
       ],
     ),
   };

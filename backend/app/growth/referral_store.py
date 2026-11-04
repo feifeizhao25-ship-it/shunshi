@@ -4,10 +4,13 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 from datetime import datetime
 
 from sqlalchemy.orm import Session
 
+from app.growth.kit.flags import GrowthFlags
+from app.growth.kit.referral import make_code
 from app.growth.models import GrowthReferral, GrowthShare
 from app.simple_models import now_ts
 
@@ -19,6 +22,15 @@ def share_id_for(user_id: str, content_type: str, content_id: str, day=None) -> 
 
 
 def invite_code_for(user_id: str, channel: str) -> str:
+    """Invite code for (user, channel).
+
+    Default (flag off, unchanged): the legacy 8-hex md5 code, so codes already handed out keep working.
+    With ``REFERRAL_ENABLED=1`` AND ``REFERRAL_HMAC_SECRET`` set on the server, new codes are HMAC-derived
+    (growth kit): not computable from a user id. Existing rows keep their old codes.
+    """
+    secret = os.environ.get("REFERRAL_HMAC_SECRET", "").encode()
+    if secret and GrowthFlags.from_env().referral:
+        return make_code(f"{user_id}:{channel}", secret)
     return hashlib.md5(f"invite:{user_id}:{channel}".encode()).hexdigest()[:8]
 
 
