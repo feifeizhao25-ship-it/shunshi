@@ -27,16 +27,16 @@ LibraryLiveApi shunshiLibraryLive([ApiClient? client]) {
   final api = client ?? ApiClient();
   Map<String, dynamic> body(dynamic data) => Map<String, dynamic>.from(data as Map);
   return LibraryLiveApi(
-    entries: () async => body((await api.get('/library/entries')).data),
-    feed: () async => body((await api.get('/library/feed')).data),
+    entries: () async => body((await api.get('/api/v1/library/entries')).data),
+    feed: () async => body((await api.get('/api/v1/library/feed')).data),
     setPrefs: (b) async {
-      await api.put('/library/preferences', data: b);
+      await api.put('/api/v1/library/preferences', data: b);
     },
     visit: () async {
-      await api.post('/library/visit');
+      await api.post('/api/v1/library/visit');
     },
     opened: (id) async {
-      await api.post('/library/opened/$id');
+      await api.post('/api/v1/library/opened/$id');
     },
   );
 }

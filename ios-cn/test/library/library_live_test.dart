@@ -151,6 +151,24 @@ void main() {
     expect(find.text('个性化推荐已关闭'), findsOneWidget);
   });
 
+  testWidgets('有资料但没有适合你的推荐：显示一行说明和入口，不是整块消失', (tester) async {
+    currentFeed['items'] = [];
+    currentFeed['empty_reason'] = 'filtered_by_your_preferences';
+    await pump(tester, api());
+    expect(find.byKey(const Key('library-foryou')), findsNothing);
+    expect(find.byKey(const Key('library-foryou-empty')), findsOneWidget);
+    expect(find.text('暂时没有适合你的新内容'), findsOneWidget);
+    expect(find.text('推荐设置'), findsWidgets);
+  });
+
+  testWidgets('资料库里一条已审核的都没有：显示“正在审核”空状态（门禁保持关闭，不伪造内容）', (tester) async {
+    currentFeed['items'] = [];
+    currentFeed['empty_reason'] = 'no_reviewed_entries';
+    await pump(tester, LibraryLiveApi(entries: () async => {'entries': []}, feed: () async => currentFeed, setPrefs: (b) async {}, visit: () async {}, opened: (id) async {}));
+    expect(find.byKey(const Key('library-empty-review')), findsOneWidget);
+    expect(find.byKey(const Key('library-foryou')), findsNothing);
+  });
+
   testWidgets('后端连不上：退回离线资料并说明，不显示推荐', (tester) async {
     await pump(tester, api(failEntries: true));
     expect(find.byKey(const Key('library-offline-note')), findsOneWidget);
