@@ -473,7 +473,9 @@ class ContentService {
         if (constitution != null) 'constitution': constitution,
       });
       if (res.data is Map && res.data['success'] == true) {
-        return List<Map<String, dynamic>>.from(res.data['data'] ?? []);
+        final d = res.data['data'];
+        final list = d is Map ? (d['items'] ?? const []) : (d ?? const []);
+        return List<Map<String, dynamic>>.from(list as List);
       }
       return [];
     } catch (_) {
