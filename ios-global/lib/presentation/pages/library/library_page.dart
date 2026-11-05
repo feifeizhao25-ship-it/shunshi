@@ -292,7 +292,7 @@ class _ContentItemCardState extends State<_ContentItemCard> {
             ),
             if (_expanded) ...[
               const SizedBox(height: 12),
-              const Divider(height: 1, color: ShunShiColors.borderGhost),
+              Divider(height: 1, color: AppColors.borderGhost(context)),
               const SizedBox(height: 12),
               Text(
                 widget.item.details,

@@ -3,6 +3,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../../design_system/app_colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../design_system/theme.dart';
 
@@ -59,7 +60,7 @@ class _GrowthMilestonesV2State extends State<GrowthMilestonesV2> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? ShunShiColors.darkBackground : ShunShiColors.background;
+    final bg = AppColors.background(context);
 
     return Scaffold(
       backgroundColor: bg,
@@ -88,11 +89,11 @@ class _GrowthMilestonesV2State extends State<GrowthMilestonesV2> {
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text('你的成长之旅', style: TextStyle(
                 fontFamily: ShunShiTypography.serifFamily,
-                fontSize: 28, fontWeight: FontWeight.bold, color: ShunShiColors.textPrimary,
+                fontSize: 28, fontWeight: FontWeight.bold, color: AppColors.textPrimary(context),
               )),
               const SizedBox(height: 8),
               Text('每一步坚持都是种在健康花园里的一颗种子。',
-                style: TextStyle(fontSize: 13, color: ShunShiColors.textTertiary, height: 1.5)),
+                style: TextStyle(fontSize: 13, color: AppColors.textTertiary(context), height: 1.5)),
             ]),
           )),
 
@@ -139,8 +140,8 @@ class _GrowthMilestonesV2State extends State<GrowthMilestonesV2> {
           SliverToBoxAlternate(child: Padding(
             padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('Reflective Milestones', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
-              Text('Gently nurtured achievements', style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
+              Text('Reflective Milestones', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
+              Text('Gently nurtured achievements', style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context))),
               const SizedBox(height: 12),
               ..._milestones.map((m) => _buildMilestone(m)),
             ]),
@@ -155,12 +156,12 @@ class _GrowthMilestonesV2State extends State<GrowthMilestonesV2> {
   Widget _buildStatBox(IconData icon, String value, String label) {
     return Container(
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(14)),
+      decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(14)),
       child: Column(children: [
         Icon(icon, color: Color(0xFF533afd), size: 20),
         const SizedBox(height: 6),
-        Text(value, style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: ShunShiColors.textPrimary)),
-        Text(label, style: TextStyle(fontSize: 11, color: ShunShiColors.textTertiary), textAlign: TextAlign.center),
+        Text(value, style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.textPrimary(context))),
+        Text(label, style: TextStyle(fontSize: 11, color: AppColors.textTertiary(context)), textAlign: TextAlign.center),
       ]),
     );
   }
@@ -171,7 +172,7 @@ class _GrowthMilestonesV2State extends State<GrowthMilestonesV2> {
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: ShunShiColors.surface,
+          color: AppColors.surface(context),
           borderRadius: BorderRadius.circular(14),
           border: m.unlocked && m.color != null ? Border.all(color: m.color!.withOpacity(0.3)) : null,
         ),
@@ -179,17 +180,17 @@ class _GrowthMilestonesV2State extends State<GrowthMilestonesV2> {
           Container(
             width: 40, height: 40,
             decoration: BoxDecoration(
-              color: m.unlocked ? (m.color ?? Color(0xFF533afd)).withOpacity(0.1) : ShunShiColors.surfaceContainerLow,
+              color: m.unlocked ? (m.color ?? Color(0xFF533afd)).withOpacity(0.1) : AppColors.surfaceContainerLow(context),
               borderRadius: BorderRadius.circular(10),
             ),
             child: m.unlocked
               ? Icon(Icons.check, color: m.color ?? Color(0xFF533afd), size: 20)
-              : Icon(Icons.lock_outline, color: ShunShiColors.textTertiary, size: 18),
+              : Icon(Icons.lock_outline, color: AppColors.textTertiary(context), size: 18),
           ),
           const SizedBox(width: 12),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(m.title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: m.unlocked ? ShunShiColors.textPrimary : ShunShiColors.textTertiary)),
-            Text(m.desc, style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
+            Text(m.title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: m.unlocked ? AppColors.textPrimary(context) : AppColors.textTertiary(context))),
+            Text(m.desc, style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context))),
           ])),
         ]),
       ),

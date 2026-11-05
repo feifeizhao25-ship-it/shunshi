@@ -77,7 +77,7 @@ class GrowthMilestonesV2 extends StatelessWidget {
           SliverToBoxAlternate(child: Padding(
             padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
             child: Row(children: [
-              _buildStatBox(Icons.wb_sunny, '07', 'Days of Morning Light'),
+              _buildStatBox(context, Icons.wb_sunny, '07', 'Days of Morning Light'),
             ]),
           )),
 
@@ -88,11 +88,11 @@ class GrowthMilestonesV2 extends StatelessWidget {
               Text(AppLocalizations.of(context).t('growth_reflective_milestones'), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
               Text(AppLocalizations.of(context).t('growth_gently_nurtured_achievements'), style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context))),
               const SizedBox(height: 12),
-              _buildMilestone(Icons.local_florist, 'First Sprout', 'Ritual streak: 3 days', true, Color(0xFF4CAF50)),
-              _buildMilestone(Icons.forest, 'Deep Roots', 'Complete a seasonal cycle', false, null),
-              _buildMilestone(Icons.wb_sunny, 'Solar Devotee', '30 morning rituals', false, null),
-              _buildMilestone(Icons.water_drop, 'Rain Dancer', 'Practice in every weather', false, null),
-              _buildMilestone(Icons.auto_awesome, 'Equinox Aligned', 'Balance all 4 pillars', false, null),
+              _buildMilestone(context, Icons.local_florist, 'First Sprout', 'Ritual streak: 3 days', true, Color(0xFF4CAF50)),
+              _buildMilestone(context, Icons.forest, 'Deep Roots', 'Complete a seasonal cycle', false, null),
+              _buildMilestone(context, Icons.wb_sunny, 'Solar Devotee', '30 morning rituals', false, null),
+              _buildMilestone(context, Icons.water_drop, 'Rain Dancer', 'Practice in every weather', false, null),
+              _buildMilestone(context, Icons.auto_awesome, 'Equinox Aligned', 'Balance all 4 pillars', false, null),
             ]),
           )),
 
@@ -102,27 +102,27 @@ class GrowthMilestonesV2 extends StatelessWidget {
     );
   }
 
-  Widget _buildStatBox(IconData icon, String value, String label) {
+  Widget _buildStatBox(BuildContext context, IconData icon, String value, String label) {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(14)),
+      decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(14)),
       child: Row(children: [
         Icon(icon, color: Color(0xFF533afd), size: 24),
         const SizedBox(width: 12),
-        Text(value, style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: ShunShiColors.textPrimary)),
+        Text(value, style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: AppColors.textPrimary(context))),
         const SizedBox(width: 8),
-        Text(label, style: TextStyle(fontSize: 13, color: ShunShiColors.textTertiary)),
+        Text(label, style: TextStyle(fontSize: 13, color: AppColors.textTertiary(context))),
       ]),
     );
   }
 
-  Widget _buildMilestone(IconData icon, String title, String desc, bool unlocked, Color? color) {
+  Widget _buildMilestone(BuildContext context, IconData icon, String title, String desc, bool unlocked, Color? color) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: ShunShiColors.surface,
+          color: AppColors.surface(context),
           borderRadius: BorderRadius.circular(14),
           border: unlocked && color != null ? Border.all(color: color.withOpacity(0.3)) : null,
         ),
@@ -130,17 +130,17 @@ class GrowthMilestonesV2 extends StatelessWidget {
           Container(
             width: 40, height: 40,
             decoration: BoxDecoration(
-              color: unlocked ? (color ?? Color(0xFF533afd)).withOpacity(0.1) : ShunShiColors.surfaceContainerLow,
+              color: unlocked ? (color ?? Color(0xFF533afd)).withOpacity(0.1) : AppColors.surfaceContainerLow(context),
               borderRadius: BorderRadius.circular(10),
             ),
             child: unlocked
               ? Icon(Icons.check, color: color ?? Color(0xFF533afd), size: 20)
-              : Icon(Icons.lock_outline, color: ShunShiColors.textTertiary, size: 18),
+              : Icon(Icons.lock_outline, color: AppColors.textTertiary(context), size: 18),
           ),
           const SizedBox(width: 12),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: unlocked ? ShunShiColors.textPrimary : ShunShiColors.textTertiary)),
-            Text(desc, style: TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
+            Text(title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: unlocked ? AppColors.textPrimary(context) : AppColors.textTertiary(context))),
+            Text(desc, style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context))),
           ])),
         ]),
       ),
