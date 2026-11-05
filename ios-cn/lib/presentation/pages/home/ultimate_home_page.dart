@@ -546,14 +546,16 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
             color: AppColors.secondary(context).withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(999),
           ),
-          child: Text(
+          child: Flexible(child: Text(
             _solarTermInfo,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
             style: ShunShiTypography.caption.copyWith(
               color: AppColors.secondary(context),
               fontWeight: FontWeight.w600,
               letterSpacing: 0.5,
             ),
-          ),
+          )),
         ),
       ],
     );

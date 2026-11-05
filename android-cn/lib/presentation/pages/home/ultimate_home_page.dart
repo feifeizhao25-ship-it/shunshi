@@ -777,14 +777,16 @@ class _UltimateHomePageState extends State<UltimateHomePage>
                           shape: BoxShape.circle,
                         ),
                       ),
-                      Text(
+                      Flexible(child: Text(
                         _solarTermInfo,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
                         style: ShunShiTypography.caption.copyWith(
                           color: secondaryColor,
                           fontWeight: FontWeight.w600,
                           letterSpacing: 0.5,
                         ),
-                      ),
+                      )),
                     ],
                   ),
                 ),
