@@ -178,13 +178,13 @@ class _LibraryPageState extends State<LibraryPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'Wellness Library',
                       style: TextStyle(
                         fontFamily: ShunShiTypography.serifFamily,
                         fontSize: 30,
                         fontWeight: FontWeight.w300,
-                        color: ShunShiColors.textPrimary,
+                        color: AppColors.textPrimary(context),
                         height: 1.2,
                       ),
                     ),
@@ -297,7 +297,7 @@ class _ContentItemCardState extends State<_ContentItemCard> {
             ),
             if (_expanded) ...[
               const SizedBox(height: 12),
-              const Divider(height: 1, color: ShunShiColors.borderGhost),
+              Divider(height: 1, color: AppColors.borderGhost(context)),
               const SizedBox(height: 12),
               Text(
                 widget.item.details,

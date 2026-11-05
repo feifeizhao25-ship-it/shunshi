@@ -439,11 +439,11 @@ class _ReferenceLibraryPageState extends State<ReferenceLibraryPage> {
             margin: const EdgeInsets.only(top: 12),
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFFFFF8E1),
+              color: Theme.of(context).brightness == Brightness.dark ? const Color(0x33FFB300) : const Color(0xFFFFF8E1),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: const Color(0xFFFFD54F)),
             ),
-            child: Text(s.previewBanner, style: const TextStyle(fontSize: 13, color: Color(0xFF5D4037), height: 1.4)),
+            child: Text(s.previewBanner, style: TextStyle(fontSize: 13, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFFFE0B2) : const Color(0xFF5D4037), height: 1.4)),
           ),
         if (_offline && s.live != null)
           Container(
@@ -684,15 +684,15 @@ class LibraryEntryPage extends StatelessWidget {
                 key: const Key('library-change-note'),
                 margin: const EdgeInsets.only(top: 12),
                 padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(color: const Color(0xFFFFF3E0), borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFFFFCC80))),
-                child: Text('${s.live!.changeNoteLabel}${s.colon}${e.display!.changeNote}', style: const TextStyle(fontSize: 13, color: Color(0xFF5D4037), height: 1.4)),
+                decoration: BoxDecoration(color: Theme.of(context).brightness == Brightness.dark ? const Color(0x33FF9800) : const Color(0xFFFFF3E0), borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFFFFCC80))),
+                child: Text('${s.live!.changeNoteLabel}${s.colon}${e.display!.changeNote}', style: TextStyle(fontSize: 13, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFFFE0B2) : const Color(0xFF5D4037), height: 1.4)),
               ),
             if (e.statusNote.isNotEmpty)
               Container(
                 margin: const EdgeInsets.only(top: 12),
                 padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(color: const Color(0xFFFFF3E0), borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFFFFCC80))),
-                child: Text('${s.statusNoteLabel}${s.colon}${e.statusNote}', style: const TextStyle(fontSize: 13, color: Color(0xFF5D4037), height: 1.4)),
+                decoration: BoxDecoration(color: Theme.of(context).brightness == Brightness.dark ? const Color(0x33FF9800) : const Color(0xFFFFF3E0), borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFFFFCC80))),
+                child: Text('${s.statusNoteLabel}${s.colon}${e.statusNote}', style: TextStyle(fontSize: 13, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFFFE0B2) : const Color(0xFF5D4037), height: 1.4)),
               ),
             section(
               s.pointsTitle,
