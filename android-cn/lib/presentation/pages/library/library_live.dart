@@ -240,7 +240,21 @@ class ForYouSection extends StatelessWidget {
         ]),
       );
     }
-    if (feed.items.isEmpty) return const SizedBox.shrink();
+    if (feed.items.isEmpty) {
+      // 有已审核资料、但没有一条适合你（比如关注 / 屏蔽的主题把它们都滤掉了）：说清楚，不要整块消失。
+      return Container(
+        key: const Key('library-foryou-empty'),
+        margin: const EdgeInsets.only(top: 12),
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5), borderRadius: BorderRadius.circular(14)),
+        child: Row(children: [
+          Icon(Icons.auto_awesome_outlined, color: theme.colorScheme.onSurfaceVariant),
+          const SizedBox(width: 10),
+          Expanded(child: Text(s.nothingForYou, style: theme.textTheme.bodyMedium)),
+          TextButton(onPressed: onSettings, child: Text(s.settingsTitle)),
+        ]),
+      );
+    }
     return Container(
       key: const Key('library-foryou'),
       margin: const EdgeInsets.only(top: 12),
