@@ -6,6 +6,7 @@ import '../../../design_system/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/config/app_config.dart';
+import 'wellness_library_parse.dart';
 
 class WellnessLibraryPage extends StatefulWidget {
   const WellnessLibraryPage({super.key});
@@ -60,8 +61,9 @@ class _WellnessLibraryPageState extends State<WellnessLibraryPage> {
       final res = await _dio.get('/api/v1/intl/contents/recommend', queryParameters: {'limit': 20});
       if (!mounted) return;
       final data = res.data;
-      if (data is Map && data['data'] is List) {
-        _contents = (data['data'] as List).cast<Map<String, dynamic>>();
+      final parsed = parseRecommendItems(data);
+      if (parsed.isNotEmpty) {
+        _contents = parsed;
         _applyFilter(_activeFilter);
       }
       setState(() => _loading = false);
@@ -76,12 +78,7 @@ class _WellnessLibraryPageState extends State<WellnessLibraryPage> {
     if (filter == 'All') {
       _filtered = List.from(_contents);
     } else {
-      final lower = filter.toLowerCase();
-      _filtered = _contents.where((c) {
-        final cat = (c['category'] ?? '').toString().toLowerCase();
-        final tags = (c['tags'] as List?)?.map((t) => t.toString().toLowerCase()) ?? <String>[];
-        return cat == lower || tags.contains(lower);
-      }).toList();
+      _filtered = _contents.where((c) => matchesWellnessFilter(c, filter)).toList();
     }
   }
 
