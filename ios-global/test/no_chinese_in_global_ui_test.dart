@@ -10,6 +10,8 @@ void main() {
     const allowed = {
       'lib/core/solar_term/solar_term_table.dart',
       'lib/core/solar_term/solar_term_en.dart',
+      // Chinese filter keys sent by the backend; matched, never displayed.
+      'lib/presentation/pages/library/wellness_library_parse.dart',
     };
     final cjk = RegExp(r'[\u3400-\u9fff]');
     final offenders = <String>[];

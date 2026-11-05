@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
+import '../network/session.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:just_audio/just_audio.dart';
@@ -53,11 +54,11 @@ class TtsPlayerService extends SpeechPlayback {
     FlutterTts? tts,
     AudioPlayer? player,
   }) : _dio = dio ??
-            Dio(BaseOptions(
+            withSessionAuth(Dio(BaseOptions(
               baseUrl: _root(baseUrl ?? AppConfig.apiBaseUrl),
               connectTimeout: const Duration(seconds: 10),
               receiveTimeout: const Duration(seconds: 60),
-            )),
+            ))),
         _injectedTts = tts,
         _player = player;
 

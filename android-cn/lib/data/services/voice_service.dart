@@ -10,6 +10,7 @@ import 'web_speech.dart';
 import 'package:record/record.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:dio/dio.dart';
+import '../network/session.dart';
 import '../../core/config/app_config.dart';
 
 /// 语音输入服务
@@ -148,12 +149,12 @@ class VoiceService implements VoiceInput {
         'model': 'sensevoice',
       });
 
-      final response = await Dio(BaseOptions(
+      final response = await withSessionAuth(Dio(BaseOptions(
         baseUrl: _baseUrl,
         connectTimeout: const Duration(seconds: 10),
         receiveTimeout: const Duration(seconds: 30),
         headers: {'ngrok-skip-browser-warning': 'true'},
-      )).post(
+      ))).post(
         '/api/v1/speech/asr',
         data: formData,
         options: Options(contentType: 'multipart/form-data'),

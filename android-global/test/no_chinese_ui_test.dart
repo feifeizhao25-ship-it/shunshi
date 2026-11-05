@@ -14,7 +14,9 @@ void main() {
   /// - 聊天页里的安全词表：用来识别用户输入里的中文风险词；
   /// - 语言选择列表里的语言自称。
   bool allowed(String path, String line) =>
-      path.endsWith('pages/chat/chat_page.dart') || line.contains("'日本語'");
+      path.endsWith('pages/chat/chat_page.dart') ||
+      path.endsWith('pages/library/wellness_library_parse.dart') || // 后端分类键，不展示
+      line.contains("'日本語'");
 
   test('presentation 下没有中文字面量（含 \\u 转义）', () {
     final hits = <String>[];
