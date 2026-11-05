@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/services/ai_safety.dart';
+import '../../data/services/speech_text.dart';
+import '../../data/services/tts_player_service.dart';
 import '../../data/services/voice_service.dart';
 import '../../design_system/theme.dart';
 import '../../design_system/theme_helper.dart';
@@ -16,6 +18,7 @@ import 'chat/chat_membership.dart';
 import 'chat/chat_api.dart';
 import '../widgets/chat_sources.dart';
 import 'chat/chat_widgets.dart';
+import 'chat/voice_chrome.dart';
 import '../../core/solar_term/solar_term_table.dart';
 
 final String _baseUrl = AppConfig.apiBaseUrl.replaceAll('/api/v1', '');
@@ -27,7 +30,9 @@ class ChatPage extends StatefulWidget {
   final String? conversationId;
   final Dio? client;
   final VoiceInput? voiceInput;
-  const ChatPage({super.key, this.conversationId, this.client, this.voiceInput});
+  final SpeechPlayback? playback;
+  final VoiceChrome? chrome;
+  const ChatPage({super.key, this.conversationId, this.client, this.voiceInput, this.playback, this.chrome});
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -94,6 +99,8 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
   bool _isRecording = false;
   bool _voiceBusy = false;
   VoiceInput? _voice;
+  SpeechPlayback? _playback;
+  VoiceChrome get _chrome => resolveVoiceChrome(widget.chrome);
   bool _membershipKnown = false;
   bool _membershipLoading = false;
   bool _isVip = false;
@@ -134,10 +141,39 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
   @override
   void dispose() {
     _voice?.cancel().catchError((Object _) {});
+    _playback?.removeListener(_onPlayback);
+    _playback?.stop();
     _controller.dispose();
     _scrollController.dispose();
     _focusNode.dispose();
     super.dispose();
+  }
+
+  SpeechPlayback _ensurePlayback() {
+    final current = _playback;
+    if (current != null) return current;
+    final created = widget.playback ?? TtsPlayerService();
+    created.addListener(_onPlayback);
+    _playback = created;
+    return created;
+  }
+
+  void _onPlayback() {
+    if (!mounted) return;
+    final err = _playback?.errorMsg ?? '';
+    setState(() {
+      if (err.isNotEmpty) _chatError = err;
+    });
+  }
+
+  bool _speakingAt(int index) =>
+      (_playback?.isSpeaking ?? false) && _playback?.activeKey == 'ai-$index';
+
+  Future<void> _toggleSpeak(int index, ChatMessage message) async {
+    final extras = <String>[
+      for (final card in message.cards ?? const <SuggestionCard>[]) ...[card.title, card.subtitle],
+    ];
+    await SpeechToggle(_ensurePlayback()).toggle('ai-$index', speakableReply(message.text, extras));
   }
 
   // ── 初始化 & 数据加载 ──
@@ -924,6 +960,9 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
         if (m.role == 'ai')
           return AIBubble(
             message: m,
+            speaking: _speakingAt(idx),
+            chrome: _chrome,
+            onSpeak: () => _toggleSpeak(idx, m),
             onFeedback: () => FeedbackSheet.show(
               context,
               contentId: 'chat-$idx',
@@ -935,7 +974,60 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
     );
   }
 
+  Widget _buildBrowserInput() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final inputBg = isDark ? ShunShiColors.darkSurfaceContainerLowest : ShunShiColors.surfaceContainerLowest;
+    final hintC = isDark ? ShunShiColors.darkTextTertiary : ShunShiColors.textTertiary;
+    final ink = isDark ? ShunShiColors.darkTextPrimary : ShunShiColors.textPrimary;
+    final line = isDark ? ShunShiColors.darkBorderGhost : ShunShiColors.borderGhost;
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? ShunShiColors.darkBackground : ShunShiColors.background,
+        border: Border(top: BorderSide(color: line, width: 0.5)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (_chatError != null)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+              child: Text(_chatError!, key: const ValueKey('chat-error'), style: TextStyle(color: Theme.of(context).colorScheme.error)),
+            ),
+          QuickQuestionChips(onTap: (q) {
+            _controller.text = q;
+            _sendMessage();
+          }),
+          BrowserCompose(
+            field: TextField(
+              controller: _controller,
+              focusNode: _focusNode,
+              maxLines: null,
+              textInputAction: TextInputAction.send,
+              onSubmitted: (_) => _sendMessage(),
+              decoration: InputDecoration(
+                hintText: '写下这个节气里想安排的事，或用语音说',
+                hintStyle: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 15, color: hintC),
+                filled: true,
+                fillColor: inputBg,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+              ),
+            ),
+            recording: _isRecording,
+            onMic: _showVoiceInput,
+            onSend: _sendMessage,
+            accent: ShunShiColors.primary,
+            ink: ink,
+            muted: hintC,
+            line: line,
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildInput() {
+    if (_chrome == VoiceChrome.browser) return _buildBrowserInput();
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final inputBg = isDark
         ? ShunShiColors.darkSurfaceContainerLowest
@@ -960,6 +1052,15 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Text(_chatError!, key: const ValueKey('chat-error'),
                   style: TextStyle(color: Theme.of(context).colorScheme.error)),
+            ),
+          if (_isRecording)
+            const Padding(
+              padding: EdgeInsets.fromLTRB(16, 0, 16, 6),
+              child: Row(children: [
+                Icon(Icons.graphic_eq, size: 16, color: Color(0xFFB85450)),
+                SizedBox(width: 6),
+                Text('正在听你说', style: TextStyle(fontSize: 13, color: ShunShiColors.textSecondary)),
+              ]),
             ),
           // 快捷提问标签
           QuickQuestionChips(

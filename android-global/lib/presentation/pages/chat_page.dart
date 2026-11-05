@@ -5,6 +5,8 @@ import '../../core/theme/shunshi_colors.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/services/ai_safety.dart';
+import '../../../data/services/speech_text.dart';
+import '../../../data/services/tts_player_service.dart';
 import '../../../data/services/voice_service.dart';
 import '../../../design_system/theme.dart';
 import '../../../design_system/theme_helper.dart';
@@ -14,6 +16,7 @@ import 'chat/chat_models.dart';
 import 'chat/chat_topic_cards.dart';
 import '../widgets/chat_sources.dart';
 import 'chat/chat_widgets.dart';
+import 'chat/voice_chrome.dart';
 import '../../../core/theme/app_localizations.dart';
 import '../../../core/network/api_singleton.dart';
 import '../../core/config/app_config.dart';
@@ -23,7 +26,10 @@ import '../../core/culture/opening_greeting.dart';
 import 'settings/culture_binding.dart';
 class ChatPage extends StatefulWidget {
   final String? conversationId;
-  const ChatPage({super.key, this.conversationId});
+  final VoiceInput? voiceInput;
+  final SpeechPlayback? playback;
+  final VoiceChrome? chrome;
+  const ChatPage({super.key, this.conversationId, this.voiceInput, this.playback, this.chrome});
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -52,6 +58,10 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
   final _dio = apiClient.dio;
   bool _isLoading = false;
   bool _isRecording = false;
+  String? _chatError;
+  VoiceInput? _voice;
+  SpeechPlayback? _playback;
+  VoiceChrome get _chrome => resolveVoiceChrome(widget.chrome);
   int _quotaRemaining = 10;
   int _quotaLimit = 10;
   bool _isVip = false;
@@ -85,10 +95,42 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
 
   @override
   void dispose() {
+    _voice?.cancel().catchError((Object _) {});
+    _playback?.removeListener(_onPlayback);
+    _playback?.stop();
     _controller.dispose();
     _scrollController.dispose();
     _focusNode.dispose();
     super.dispose();
+  }
+
+  VoiceInput _activeVoice() => _voice ??= widget.voiceInput ?? VoiceService();
+
+  SpeechPlayback _ensurePlayback() {
+    final current = _playback;
+    if (current != null) return current;
+    final created = widget.playback ?? TtsPlayerService();
+    created.addListener(_onPlayback);
+    _playback = created;
+    return created;
+  }
+
+  void _onPlayback() {
+    if (!mounted) return;
+    final err = _playback?.errorMsg ?? '';
+    setState(() {
+      if (err.isNotEmpty) _chatError = err;
+    });
+  }
+
+  bool _speakingAt(int index) =>
+      (_playback?.isSpeaking ?? false) && _playback?.activeKey == 'ai-$index';
+
+  Future<void> _toggleSpeak(int index, ChatMessage message) async {
+    final extras = <String>[
+      for (final card in message.cards ?? const <SuggestionCard>[]) ...[card.title, card.subtitle],
+    ];
+    await SpeechToggle(_ensurePlayback()).toggle('ai-$index', speakableReply(message.text, extras));
   }
 
   // ── 初始化 & 数据加载 ──
@@ -363,10 +405,16 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
     if (_isRecording) {
       setState(() => _isRecording = false);
       try {
-        final voice = VoiceService();
+        final voice = _activeVoice();
         final text = await voice.stopAndRecognize();
-        if (text != null && text.isNotEmpty && mounted) {
-          setState(() => _controller.text = text);
+        if (!mounted) return;
+        if (text == null || text.trim().isEmpty) {
+          setState(() => _chatError = voice.errorMsg.isEmpty ? 'No speech detected.' : voice.errorMsg);
+        } else {
+          setState(() {
+            _chatError = null;
+            _controller.text = _controller.text.isEmpty ? text : '${_controller.text}\n$text';
+          });
         }
       } catch (e) {
         if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Speech recognition failed: $e'), duration: const Duration(seconds: 2)));
@@ -374,10 +422,10 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
       return;
     }
     try {
-      final voice = VoiceService();
+      final voice = _activeVoice();
       final started = await voice.startRecording();
       if (!started) {
-        if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context).t('chat_failed_to_start_recording_please')), duration: Duration(seconds: 2)));
+        if (mounted) setState(() => _chatError = voice.errorMsg.isEmpty ? 'Please allow microphone access.' : voice.errorMsg);
         return;
       }
       setState(() => _isRecording = true);
@@ -471,25 +519,73 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
         }
         if (idx >= _messages.length) return const SizedBox.shrink();
         final m = _messages[idx];
-        if (m.role == 'ai') return AIBubble(message: m, onFeedback: () => FeedbackSheet.show(context, contentId: 'chat-$idx', type: 'chat'));
+        if (m.role == 'ai') return AIBubble(message: m, speaking: _speakingAt(idx), chrome: _chrome, onSpeak: () => _toggleSpeak(idx, m), onFeedback: () => FeedbackSheet.show(context, contentId: 'chat-$idx', type: 'chat'));
         return UserBubble(message: m);
       },
     );
   }
 
+  Widget _field({String? hint}) {
+    return TextField(
+      controller: _controller,
+      focusNode: _focusNode,
+      maxLines: null,
+      textInputAction: TextInputAction.send,
+      onSubmitted: (_) => _sendMessage(),
+      decoration: InputDecoration(
+        hintText: hint ?? AppLocalizations.of(context).t('chat_chat_with_seasons'),
+        hintStyle: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 15, color: AppColors.textTertiary(context)),
+        filled: true,
+        fillColor: AppColors.surface(context),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+      ),
+    );
+  }
+
+  Widget _buildBrowserInput() {
+    return Container(
+      decoration: BoxDecoration(color: AppColors.background(context), border: Border(top: BorderSide(color: AppColors.borderGhost(context), width: 0.5))),
+      child: Column(mainAxisSize: MainAxisSize.min, children: [
+        if (_chatError != null)
+          Padding(padding: const EdgeInsets.fromLTRB(20, 8, 20, 0), child: Text(_chatError!, key: const ValueKey('chat-error'), style: TextStyle(color: Theme.of(context).colorScheme.error, fontSize: 13))),
+        BrowserCompose(
+          field: _field(hint: 'Write what you want to arrange this season, or speak it'),
+          recording: _isRecording,
+          onMic: _showVoiceInput,
+          onSend: _sendMessage,
+          accent: AppColors.primary(context),
+          ink: AppColors.textPrimary(context),
+          muted: AppColors.textTertiary(context),
+          line: AppColors.border(context),
+        ),
+      ]),
+    );
+  }
+
   Widget _buildInput() {
+    if (_chrome == VoiceChrome.browser) return _buildBrowserInput();
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
       decoration: BoxDecoration(color: AppColors.background(context), border: Border(top: BorderSide(color: AppColors.borderGhost(context), width: 0.5))),
-      child: Row(children: [
-        GestureDetector(onTap: _showQuickTopics, child: Container(width: 40, height: 40, decoration: BoxDecoration(shape: BoxShape.circle, color: AppColors.surface(context), border: Border.all(color: AppColors.border(context))), child: Icon(Icons.add_circle_outline, size: 20, color: AppColors.textTertiary(context)))),
-        const SizedBox(width: 8),
-        Expanded(child: Container(constraints: const BoxConstraints(maxHeight: 120), child: TextField(controller: _controller, focusNode: _focusNode, maxLines: null, textInputAction: TextInputAction.send, onSubmitted: (_) => _sendMessage(),
-          decoration: InputDecoration(hintText: AppLocalizations.of(context).t('chat_chat_with_seasons'), hintStyle: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 15, color: AppColors.textTertiary(context)), filled: true, fillColor: AppColors.surface(context), contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 10), border: OutlineInputBorder(borderRadius: BorderRadius.circular(24), borderSide: BorderSide.none))))),
-        const SizedBox(width: 8),
-        InkWell(onTap: _showVoiceInput, borderRadius: BorderRadius.circular(20), child: Container(width: 44, height: 44, decoration: BoxDecoration(shape: BoxShape.circle, color: _isRecording ? Colors.red : ShunShiColors.secondary), child: Icon(_isRecording ? Icons.stop : Icons.mic, color: Colors.white, size: 22))),
-        const SizedBox(width: 8),
-        GestureDetector(onTap: _sendMessage, child: Container(width: 40, height: 40, decoration: BoxDecoration(shape: BoxShape.circle, color: AppColors.primary(context)), child: const Icon(Icons.send, color: Colors.white, size: 18))),
+      child: Column(mainAxisSize: MainAxisSize.min, children: [
+        if (_chatError != null)
+          Padding(padding: const EdgeInsets.only(bottom: 8), child: Text(_chatError!, key: const ValueKey('chat-error'), style: TextStyle(color: Theme.of(context).colorScheme.error, fontSize: 13))),
+        if (_isRecording)
+          Padding(padding: const EdgeInsets.only(bottom: 8), child: Row(children: [
+            const Icon(Icons.graphic_eq, size: 16, color: Color(0xFFB85450)),
+            const SizedBox(width: 6),
+            Text('Listening', style: TextStyle(fontSize: 13, color: AppColors.textSecondary(context))),
+          ])),
+        Row(children: [
+          GestureDetector(onTap: _showQuickTopics, child: Container(width: 40, height: 40, decoration: BoxDecoration(shape: BoxShape.circle, color: AppColors.surface(context), border: Border.all(color: AppColors.border(context))), child: Icon(Icons.add_circle_outline, size: 20, color: AppColors.textTertiary(context)))),
+          const SizedBox(width: 8),
+          Expanded(child: Container(constraints: const BoxConstraints(maxHeight: 120), child: _field())),
+          const SizedBox(width: 8),
+          InkWell(onTap: _showVoiceInput, borderRadius: BorderRadius.circular(20), child: Container(width: 44, height: 44, decoration: BoxDecoration(shape: BoxShape.circle, color: _isRecording ? Colors.red : ShunShiColors.secondary), child: Icon(_isRecording ? Icons.stop : Icons.mic, color: Colors.white, size: 22))),
+          const SizedBox(width: 8),
+          GestureDetector(onTap: _sendMessage, child: Container(width: 40, height: 40, decoration: BoxDecoration(shape: BoxShape.circle, color: AppColors.primary(context)), child: const Icon(Icons.send, color: Colors.white, size: 18))),
+        ]),
       ]),
     );
   }

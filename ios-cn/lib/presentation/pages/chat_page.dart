@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/services/ai_safety.dart';
+import '../../data/services/speech_text.dart';
+import '../../data/services/tts_player_service.dart';
 import '../../data/services/voice_service.dart';
 import '../../design_system/theme.dart';
 import '../../design_system/theme_helper.dart';
@@ -15,6 +17,7 @@ import 'chat/chat_membership.dart';
 import 'chat/chat_api.dart';
 import '../widgets/chat_sources.dart';
 import 'chat/chat_widgets.dart';
+import 'chat/voice_chrome.dart';
 import '../../core/solar_term/solar_term_table.dart';
 import '../../core/config/app_config.dart';
 
@@ -27,7 +30,9 @@ class ChatPage extends StatefulWidget {
   final String? conversationId;
   final Dio? client;
   final VoiceInput? voiceInput;
-  const ChatPage({super.key, this.conversationId, this.client, this.voiceInput});
+  final SpeechPlayback? playback;
+  final VoiceChrome? chrome;
+  const ChatPage({super.key, this.conversationId, this.client, this.voiceInput, this.playback, this.chrome});
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -94,6 +99,8 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
   bool _isRecording = false;
   bool _voiceBusy = false;
   VoiceInput? _voice;
+  SpeechPlayback? _playback;
+  VoiceChrome get _chrome => resolveVoiceChrome(widget.chrome);
   bool _membershipKnown = false;
   bool _membershipLoading = false;
   bool _isVip = false;
@@ -115,10 +122,39 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
   @override
   void dispose() {
     _voice?.cancel().catchError((Object _) {});
+    _playback?.removeListener(_onPlayback);
+    _playback?.stop();
     _controller.dispose();
     _scrollController.dispose();
     _focusNode.dispose();
     super.dispose();
+  }
+
+  SpeechPlayback _ensurePlayback() {
+    final current = _playback;
+    if (current != null) return current;
+    final created = widget.playback ?? TtsPlayerService();
+    created.addListener(_onPlayback);
+    _playback = created;
+    return created;
+  }
+
+  void _onPlayback() {
+    if (!mounted) return;
+    final err = _playback?.errorMsg ?? '';
+    setState(() {
+      if (err.isNotEmpty) _chatError = err;
+    });
+  }
+
+  bool _speakingAt(int index) =>
+      (_playback?.isSpeaking ?? false) && _playback?.activeKey == 'ai-$index';
+
+  Future<void> _toggleSpeak(int index, ChatMessage message) async {
+    final extras = <String>[
+      for (final card in message.cards ?? const <SuggestionCard>[]) ...[card.title, card.subtitle],
+    ];
+    await SpeechToggle(_ensurePlayback()).toggle('ai-$index', speakableReply(message.text, extras));
   }
 
   // ── 初始化 & 数据加载 ──
@@ -899,6 +935,9 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
         if (m.role == 'ai')
           return AIBubble(
             message: m,
+            speaking: _speakingAt(idx),
+            chrome: _chrome,
+            onSpeak: () => _toggleSpeak(idx, m),
             onFeedback: () => FeedbackSheet.show(
               context,
               contentId: 'chat-$idx',
@@ -910,7 +949,60 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
     );
   }
 
+  Widget _composerField({required Color field, required Color ink, required Color muted, String? hint}) {
+    return TextField(
+      controller: _controller,
+      focusNode: _focusNode,
+      maxLines: null,
+      textInputAction: TextInputAction.send,
+      onSubmitted: (_) => _sendMessage(),
+      style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 15, color: ink),
+      decoration: InputDecoration(
+        hintText: hint ?? '输入想和顺时聊的...',
+        hintStyle: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 15, color: muted),
+        filled: true,
+        fillColor: field,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+      ),
+    );
+  }
+
+  Widget _buildBrowserInput() {
+    final field = AppColors.surface(context);
+    final ink = AppColors.textPrimary(context);
+    final muted = AppColors.textTertiary(context);
+    final accent = AppColors.primary(context);
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.background(context),
+        border: Border(top: BorderSide(color: AppColors.borderGhost(context), width: 0.5)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (_chatError != null)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+              child: Text(_chatError!, key: const ValueKey('chat-error'), style: TextStyle(color: Theme.of(context).colorScheme.error, fontSize: 13, height: 1.4)),
+            ),
+          BrowserCompose(
+            field: _composerField(field: field, ink: ink, muted: muted, hint: '写下这个节气里想安排的事，或用语音说'),
+            recording: _isRecording,
+            onMic: _showVoiceInput,
+            onSend: _sendMessage,
+            accent: accent,
+            ink: ink,
+            muted: muted,
+            line: AppColors.border(context),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildInput() {
+    if (_chrome == VoiceChrome.browser) return _buildBrowserInput();
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bar = AppColors.background(context);
     final field = AppColors.surface(context);
@@ -929,6 +1021,15 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          if (_isRecording)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(4, 0, 4, 8),
+              child: Row(children: [
+                const Icon(Icons.graphic_eq, size: 16, color: Color(0xFFB85450)),
+                const SizedBox(width: 6),
+                Text('正在听你说', style: TextStyle(fontSize: 13, color: AppColors.textSecondary(context))),
+              ]),
+            ),
           if (_chatError != null)
             Padding(
               padding: const EdgeInsets.fromLTRB(4, 0, 4, 8),

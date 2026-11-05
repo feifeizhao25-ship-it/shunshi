@@ -57,8 +57,9 @@ dependencies:
   # Sharing
   share_plus: ^12.0.1
 
-  # Voice Input
+  # Voice Input / on-device speech
   speech_to_text: ^7.0.0
+  flutter_tts: ^4.2.0
 
   # Image Picker
   image_picker: ^1.1.2

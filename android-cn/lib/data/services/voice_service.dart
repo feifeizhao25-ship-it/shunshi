@@ -3,8 +3,10 @@
 // 不依赖 Google 服务，兼容华为/小米等国产手机
 
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'voice_path_io.dart' if (dart.library.html) 'voice_path_web.dart';
+import 'web_speech.dart';
 import 'package:record/record.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:dio/dio.dart';
@@ -36,6 +38,14 @@ class VoiceService implements VoiceInput {
   String _lastWords = '';
   String _errorMsg = '';
   String _recordPath = '';
+  bool _webMode = false;
+  final _web = WebSpeechSession(
+    localeId: 'zh_CN',
+    permissionMessage: '请授予麦克风权限',
+    unavailableMessage: '当前浏览器不支持语音识别，请改用文字，或换用 Chrome。',
+    emptyMessage: '未识别到语音内容',
+    missedMessage: '没有听清，请再说一遍',
+  );
 
   /// 是否正在录音
   bool get isListening => _isListening;
@@ -57,6 +67,13 @@ class VoiceService implements VoiceInput {
 
   /// 开始录音
   Future<bool> startRecording() async {
+    if (kIsWeb) {
+      _webMode = true;
+      final ok = await _web.start();
+      _isListening = ok;
+      _errorMsg = ok ? '' : _web.errorMsg;
+      return ok;
+    }
     try {
       if (await _recorder.isRecording()) return true;
       if (!await _checkPermission()) return false;
@@ -82,6 +99,17 @@ class VoiceService implements VoiceInput {
   /// 停止录音并识别
   /// 返回识别出的文字，失败返回 null
   Future<String?> stopAndRecognize() async {
+    if (_webMode) {
+      _isListening = false;
+      final text = await _web.stop();
+      if (text == null || text.trim().isEmpty) {
+        _errorMsg = _web.errorMsg.isEmpty ? '未识别到语音内容' : _web.errorMsg;
+        return null;
+      }
+      _lastWords = text;
+      _errorMsg = '';
+      return text;
+    }
     try {
       _isListening = false;
       if (!(await _recorder.isRecording())) {
@@ -173,6 +201,12 @@ class VoiceService implements VoiceInput {
 
   /// 取消录音
   Future<void> cancel() async {
+    if (_webMode) {
+      _webMode = false;
+      _isListening = false;
+      await _web.cancel();
+      return;
+    }
     _isListening = false;
     if (await _recorder.isRecording()) {
       await _recorder.stop();
