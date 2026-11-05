@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="mic_permission">SEASONS needs the microphone so you can dictate a message.</string>
+    <string name="speech_permission">SEASONS uses speech recognition to turn what you say into text.</string>
+</resources>

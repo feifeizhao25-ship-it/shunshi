@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="mic_permission">需要使用麦克风，以便你用语音输入中文。</string>
+    <string name="speech_permission">需要使用语音识别，以便把你说的话转成中文文字。</string>
+</resources>

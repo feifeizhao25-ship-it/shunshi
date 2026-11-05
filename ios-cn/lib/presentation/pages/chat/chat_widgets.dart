@@ -5,20 +5,25 @@ import '../../../design_system/theme_helper.dart';
 import '../../widgets/bold_text.dart';
 import '../../widgets/chat_sources.dart';
 import 'chat_models.dart';
+import 'voice_chrome.dart';
 
 /// AI 消息气泡
 class AIBubble extends StatelessWidget {
   final ChatMessage message;
   final VoidCallback? onFeedback;
   final VoidCallback? onSpeak;
-  const AIBubble({super.key, required this.message, this.onFeedback, this.onSpeak});
+  final bool speaking;
+  final VoiceChrome chrome;
+  const AIBubble({super.key, required this.message, this.onFeedback, this.onSpeak, this.speaking = false, this.chrome = VoiceChrome.handset});
 
   @override
   Widget build(BuildContext context) {
+    final speaker = ReplySpeaker(chrome: chrome, speaking: speaking, onPressed: onSpeak);
     return Padding(padding: const EdgeInsets.only(bottom: 20), child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Container(width: 36, height: 36, decoration: BoxDecoration(color: AppColors.primary(context), shape: BoxShape.circle), child: const Center(child: Text('🌱', style: TextStyle(fontSize: 18)))),
       const SizedBox(width: 12),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        if (chrome == VoiceChrome.browser) speaker,
         Container(padding: const EdgeInsets.all(14), decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(16), border: Border.all(color: AppColors.border(context))),
           child: Text.rich(boldSpans(message.text, TextStyle(fontSize: 15, color: AppColors.textPrimary(context), height: 1.6)))),
         if (message.cards != null) ...message.cards!.map((c) => Padding(padding: const EdgeInsets.only(top: 10), child: _SuggestionCardWidget(card: c))),
@@ -29,8 +34,7 @@ class AIBubble extends StatelessWidget {
         const SizedBox(height: 4),
         Row(children: [
           Text(message.time, style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 11, color: AppColors.textTertiary(context))),
-          const SizedBox(width: 8),
-          IconButton(tooltip: onSpeak == null ? '语音播报尚未接通' : '朗读回复', onPressed: onSpeak, icon: const Icon(Icons.volume_up, size: 16)),
+          if (chrome == VoiceChrome.handset) speaker,
           const SizedBox(width: 8),
           if (onFeedback != null) GestureDetector(onTap: onFeedback, child: Icon(Icons.thumb_up_outlined, size: 16, color: AppColors.textTertiary(context))),
         ]),

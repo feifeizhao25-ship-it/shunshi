@@ -56,5 +56,9 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>SEASONS needs the microphone so you can dictate a message.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>SEASONS uses speech recognition to turn what you say into text.</string>
 </dict>
 </plist>

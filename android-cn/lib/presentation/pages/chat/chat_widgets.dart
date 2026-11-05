@@ -6,6 +6,7 @@ import '../../../design_system/theme_helper.dart';
 import '../../widgets/bold_text.dart';
 import '../../widgets/chat_sources.dart';
 import 'chat_models.dart';
+import 'voice_chrome.dart';
 
 // ── AI 头像：墨绿渐变 + eco 图标 ──
 
@@ -36,10 +37,13 @@ class AIBubble extends StatelessWidget {
   final ChatMessage message;
   final VoidCallback? onFeedback;
   final VoidCallback? onSpeak;
-  const AIBubble({super.key, required this.message, this.onFeedback, this.onSpeak});
+  final bool speaking;
+  final VoiceChrome chrome;
+  const AIBubble({super.key, required this.message, this.onFeedback, this.onSpeak, this.speaking = false, this.chrome = VoiceChrome.handset});
 
   @override
   Widget build(BuildContext context) {
+    final speaker = ReplySpeaker(chrome: chrome, speaking: speaking, onPressed: onSpeak);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bubbleColor = isDark ? ShunShiColors.darkSurfaceContainerLowest : ShunShiColors.surfaceContainerLowest;
     final borderColor = isDark ? ShunShiColors.darkBorderGhost : ShunShiColors.borderGhost;
@@ -54,6 +58,7 @@ class AIBubble extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                if (chrome == VoiceChrome.browser) speaker,
                 Container(
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
@@ -93,12 +98,7 @@ class AIBubble extends StatelessWidget {
                             fontFamily: ShunShiTypography.sansFamily,
                             fontSize: 11,
                             color: AppColors.textTertiary(context))),
-                    const SizedBox(width: 8),
-                    IconButton(
-                      tooltip: onSpeak == null ? '语音播报尚未接通' : '朗读回复',
-                      onPressed: onSpeak,
-                      icon: const Icon(Icons.volume_up, size: 16),
-                    ),
+                    if (chrome == VoiceChrome.handset) speaker,
                     const SizedBox(width: 8),
                     if (onFeedback != null)
                       GestureDetector(
