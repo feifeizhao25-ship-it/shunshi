@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // Pages
 import '../../presentation/pages/splash/splash_page.dart';
@@ -74,10 +75,19 @@ class AppRouter {
     navigatorKey: _rootNavigatorKey,
     initialLocation: '/splash',
     redirect: (context, state) {
-      // Splash handles its own redirect logic
+      // Splash handles its own redirect logic. `/` is a real route below.
       return null;
     },
     routes: [
+      // Browser URL `/` has an empty hash. HashUrlStrategy reports that as `/`
+      // and omits the hash again when the location is `/`, so a missing route
+      // stays on `http://host/` and errorBuilder shows the calm card
+      // (GoException: no routes for location: /).
+      GoRoute(
+        path: '/',
+        redirect: _redirectCompletedUsersAwayFromWelcome,
+        builder: (context, state) => const WellnessOnboardingPage(),
+      ),
       GoRoute(path: '/splash', builder: (context, state) => const SplashPage()),
       GoRoute(path: '/onboarding', builder: (context, state) => const OnboardingPage()),
       GoRoute(path: '/profile-setup', builder: (context, state) => const ProfileSetupPage()),
@@ -184,4 +194,16 @@ class AppRouter {
     ],
     errorBuilder: (context, state) => ErrorPage(error: state.error),
   );
+}
+
+/// Guests stay on the welcome page. Someone who already finished onboarding
+/// should not be sent back through it when `/` is opened again.
+Future<String?> _redirectCompletedUsersAwayFromWelcome(BuildContext context, GoRouterState state) async {
+  if (state.uri.path != '/') return null;
+  final prefs = await SharedPreferences.getInstance();
+  if (prefs.getBool('onboarding_completed') != true) return null;
+  final token = prefs.getString('auth_token');
+  if (token == null) return '/login';
+  if (prefs.getBool('profile_completed') != true) return '/profile-setup';
+  return '/today';
 }
