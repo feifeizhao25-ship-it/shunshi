@@ -58,6 +58,44 @@ import '../../../data/network/session.dart';
 // Home Page Widget
 // ═══════════════════════════════════════════════════════════════
 
+/// Season chip under the day-part title. The label ellipsizes inside the
+/// parent column's bounded width.
+///
+/// Do not wrap this label in [Flexible]. [Flexible] is only valid as a child
+/// of [Row], [Column], or [Flex]. Inside a [Container] the child receives
+/// [BoxParentData]. Debug builds swallow that mismatch, so an iOS debug
+/// screenshot still looks fine; profile and release (including web) cast it
+/// to [FlexParentData] in `Flexible.applyParentData` and throw
+/// `BoxParentData is not a subtype of FlexParentData`, which paints the Today
+/// body as a grey error box.
+class SolarTermPill extends StatelessWidget {
+  const SolarTermPill({super.key, required this.label, required this.color});
+
+  final String label;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        label,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: ShunShiTypography.caption.copyWith(
+          color: color,
+          fontWeight: FontWeight.w600,
+          letterSpacing: 0.5,
+        ),
+      ),
+    );
+  }
+}
+
 class UltimateHomePage extends StatefulWidget {
   const UltimateHomePage({super.key});
 
@@ -357,23 +395,9 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
           ),
         ),
         const SizedBox(height: 12),
-        // Solar term pill
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
-          decoration: BoxDecoration(
-            color: ShunShiColors.secondary.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(999),
-          ),
-          child: Flexible(child: Text(
-            _solarTermInfo,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-            style: ShunShiTypography.caption.copyWith(
-              color: ShunShiColors.secondary,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.5,
-            ),
-          )),
+        SolarTermPill(
+          label: _solarTermInfo,
+          color: ShunShiColors.secondary,
         ),
       ],
     );

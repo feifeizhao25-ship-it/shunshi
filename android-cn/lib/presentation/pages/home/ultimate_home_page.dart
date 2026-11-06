@@ -340,6 +340,64 @@ List<TodayRecommendation> _getTodayRecommendations(ShiChenData sc) {
 // 首页 Widget
 // ═══════════════════════════════════════════════════════════════
 
+/// 时辰标题下的节气胶囊。圆点和文字放在同一个 [Row] 里，所以这里的 [Flexible]
+/// 是合法的：它能让过长的节气名省略，而不是溢出。
+///
+/// [Flexible] 不能直接放进 [Container]。那样子组件拿到的是 [BoxParentData]，
+/// 调试模式会吞掉错误（iOS 调试截图看起来正常），profile / release（含 Web）
+/// 会在 `Flexible.applyParentData` 抛出
+/// `BoxParentData is not a subtype of FlexParentData`，今日页主体变成灰块。
+class SolarTermPill extends StatelessWidget {
+  const SolarTermPill({
+    super.key,
+    required this.label,
+    required this.color,
+    this.borderColor,
+  });
+
+  final String label;
+  final Color color;
+  final Color? borderColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(999),
+        border: borderColor == null ? null : Border.all(color: borderColor!, width: 1),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 6,
+            height: 6,
+            margin: const EdgeInsets.only(right: 8),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.6),
+              shape: BoxShape.circle,
+            ),
+          ),
+          Flexible(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: ShunShiTypography.caption.copyWith(
+                color: color,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.5,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class UltimateHomePage extends StatefulWidget {
   const UltimateHomePage({super.key});
 
@@ -756,42 +814,13 @@ class _UltimateHomePageState extends State<UltimateHomePage>
                 opacity: opacity,
                 child: GestureDetector(
                   onTap: () => context.push('/solar'),
-                  child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
-                  decoration: BoxDecoration(
-                    color: secondaryColor.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(999),
-                    border: Border.all(
-                      color: secondaryColor.withValues(alpha: 0.15 + _breathController.value * 0.1),
-                      width: 1,
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        width: 6, height: 6,
-                        margin: const EdgeInsets.only(right: 8),
-                        decoration: BoxDecoration(
-                          color: secondaryColor.withValues(alpha: 0.6),
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                      Flexible(child: Text(
-                        _solarTermInfo,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-                        style: ShunShiTypography.caption.copyWith(
-                          color: secondaryColor,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.5,
-                        ),
-                      )),
-                    ],
+                  child: SolarTermPill(
+                    label: _solarTermInfo,
+                    color: secondaryColor,
+                    borderColor: secondaryColor.withValues(alpha: 0.15 + _breathController.value * 0.1),
                   ),
                 ),
               ),
-            ),
             );
           },
         ),

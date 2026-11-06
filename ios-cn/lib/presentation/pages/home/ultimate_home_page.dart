@@ -251,6 +251,41 @@ String _getCurrentSolarTermInfo() {
 // 首页 Widget
 // ═══════════════════════════════════════════════════════════════
 
+/// 时辰标题下的节气胶囊。文字在父级 Column 的有限宽度里省略。
+///
+/// 不要把 [Flexible] 放进这个 [Container]。[Flexible] 只能做 [Row]/[Column]/[Flex]
+/// 的子节点。包在 [Container] 里时，子组件拿到的是 [BoxParentData]。调试模式会把
+/// 这个不匹配吞掉，所以 iOS 调试截图仍然正常；profile / release（含 Web）会在
+/// `Flexible.applyParentData` 里把它强转成 [FlexParentData]，抛出
+/// `BoxParentData is not a subtype of FlexParentData`，今日页主体变成灰块。
+class SolarTermPill extends StatelessWidget {
+  const SolarTermPill({super.key, required this.label, required this.color});
+
+  final String label;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        label,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: ShunShiTypography.caption.copyWith(
+          color: color,
+          fontWeight: FontWeight.w600,
+          letterSpacing: 0.5,
+        ),
+      ),
+    );
+  }
+}
+
 class UltimateHomePage extends StatefulWidget {
   const UltimateHomePage({super.key});
 
@@ -539,23 +574,9 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
           ),
         ),
         const SizedBox(height: 12),
-        // Solar term pill
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
-          decoration: BoxDecoration(
-            color: AppColors.secondary(context).withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(999),
-          ),
-          child: Flexible(child: Text(
-            _solarTermInfo,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-            style: ShunShiTypography.caption.copyWith(
-              color: AppColors.secondary(context),
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.5,
-            ),
-          )),
+        SolarTermPill(
+          label: _solarTermInfo,
+          color: AppColors.secondary(context),
         ),
       ],
     );
