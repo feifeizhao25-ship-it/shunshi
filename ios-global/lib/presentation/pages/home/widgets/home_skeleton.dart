@@ -12,6 +12,11 @@ class HomeSkeleton extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const Text(
+              'Preparing today. If this stays here, go back and open it again.',
+              key: Key('home-loading-explain'),
+            ),
+            const SizedBox(height: 12),
             _bone(160, 28),
             const SizedBox(height: 8),
             _bone(100, 16),

@@ -9,9 +9,11 @@ import 'design_system/theme.dart';
 import 'presentation/widgets/error_boundary.dart';
 import 'presentation/widgets/responsive_frame.dart';
 import 'presentation/widgets/startup_gate.dart';
+import 'web/readable_web_text.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+  enableReadableWebText();
 
   AppErrorHandler.init();
 

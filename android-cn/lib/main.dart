@@ -8,9 +8,11 @@ import 'data/services/wechat_pay_client.dart';
 import 'design_system/theme.dart';
 import 'presentation/widgets/error_boundary.dart';
 import 'presentation/widgets/responsive_frame.dart';
+import 'web/readable_web_text.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  enableReadableWebText();
 
   AppErrorHandler.init();
 

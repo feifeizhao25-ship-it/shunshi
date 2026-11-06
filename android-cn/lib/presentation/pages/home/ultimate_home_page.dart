@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
 import 'package:go_router/go_router.dart';
 import 'widgets/home_skeleton.dart';
+import 'widgets/today_voice_bar.dart';
 import 'widgets/personal_home_binding.dart';
 import '../../widgets/personal_home_section.dart';
 import '../../../core/solar_term/solar_term_table.dart';
@@ -361,38 +362,42 @@ class SolarTermPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(999),
-        border: borderColor == null ? null : Border.all(color: borderColor!, width: 1),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 6,
-            height: 6,
-            margin: const EdgeInsets.only(right: 8),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.6),
-              shape: BoxShape.circle,
-            ),
-          ),
-          Flexible(
-            child: Text(
-              label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: ShunShiTypography.caption.copyWith(
-                color: color,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 0.5,
+    return Semantics(
+      label: label,
+      excludeSemantics: true,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(999),
+          border: borderColor == null ? null : Border.all(color: borderColor!, width: 1),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 6,
+              height: 6,
+              margin: const EdgeInsets.only(right: 8),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.6),
+                shape: BoxShape.circle,
               ),
             ),
-          ),
-        ],
+            Flexible(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: ShunShiTypography.caption.copyWith(
+                  color: color,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -823,6 +828,11 @@ class _UltimateHomePageState extends State<UltimateHomePage>
               ),
             );
           },
+        ),
+        const SizedBox(height: 12),
+        TodayVoiceBar(
+          spokenText: '$timeDisplay。${sc.name}，${sc.meridian}当令。$_solarTermInfo。${sc.wellnessPrinciple}',
+          onTranscript: (text) => context.go('/chat?draft=${Uri.encodeQueryComponent(text)}'),
         ),
       ],
     );

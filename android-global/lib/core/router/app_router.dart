@@ -206,7 +206,7 @@ class AppRouter {
         navigatorKey: _shellNavigatorKey,
         builder: (context, state, child) => MainShell(child: child),
         routes: [
-          GoRoute(path: '/chat', pageBuilder: (context, state) => const NoTransitionPage(child: ChatPage())),
+          GoRoute(path: '/chat', pageBuilder: (context, state) => NoTransitionPage(child: ChatPage(initialDraft: state.uri.queryParameters['draft']))),
           GoRoute(path: '/today', pageBuilder: (context, state) => const NoTransitionPage(child: UltimateHomePage())),
           GoRoute(path: '/solar', pageBuilder: (context, state) => const NoTransitionPage(child: SolarTermPageV2())),
           GoRoute(path: '/wellness', pageBuilder: (context, state) => const NoTransitionPage(child: WellnessHomePage())),
