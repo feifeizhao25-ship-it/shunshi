@@ -12,6 +12,11 @@ class HomeSkeleton extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const Text(
+              '正在准备今日。如果一直停在这里，返回后再打开一次。',
+              key: Key('home-loading-explain'),
+            ),
+            const SizedBox(height: 12),
             _bone(160, 28),
             const SizedBox(height: 8),
             _bone(100, 16),

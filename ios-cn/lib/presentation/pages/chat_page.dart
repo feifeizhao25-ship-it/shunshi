@@ -33,7 +33,8 @@ class ChatPage extends StatefulWidget {
   final VoiceInput? voiceInput;
   final SpeechPlayback? playback;
   final VoiceChrome? chrome;
-  const ChatPage({super.key, this.conversationId, this.client, this.voiceInput, this.playback, this.chrome});
+  final String? initialDraft;
+  const ChatPage({super.key, this.conversationId, this.client, this.voiceInput, this.playback, this.chrome, this.initialDraft});
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -117,7 +118,18 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     _conversationId = widget.conversationId;
+    final draft = widget.initialDraft;
+    if (draft != null && draft.isNotEmpty) _controller.text = draft;
     _initChat();
+  }
+
+  @override
+  void didUpdateWidget(covariant ChatPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final draft = widget.initialDraft;
+    if (draft != null && draft.isNotEmpty && draft != oldWidget.initialDraft) {
+      _controller.text = draft;
+    }
   }
 
   @override
@@ -970,6 +982,31 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
     );
   }
 
+  String _pageSpokenText() {
+    for (var i = _messages.length - 1; i >= 0; i--) {
+      final m = _messages[i];
+      if (m.role == 'ai' && m.text.trim().isNotEmpty) return speakablePlainText(m.text);
+    }
+    return '你在和人工智能对话，不是真人。';
+  }
+
+  Future<void> _togglePageSpeak() async {
+    await SpeechToggle(_ensurePlayback()).toggle('chat-page', _pageSpokenText());
+  }
+
+  Widget _pageSpeaker() {
+    final speaking = (_playback?.isSpeaking ?? false) && _playback?.activeKey == 'chat-page';
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: ReplySpeaker(
+        key: const ValueKey('chat-page-speaker'),
+        chrome: VoiceChrome.browser,
+        speaking: speaking,
+        onPressed: _togglePageSpeak,
+      ),
+    );
+  }
+
   Widget _buildBrowserInput() {
     final field = AppColors.surface(context);
     final ink = AppColors.textPrimary(context);
@@ -983,6 +1020,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          _pageSpeaker(),
           if (_chatError != null)
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),

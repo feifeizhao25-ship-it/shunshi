@@ -11,6 +11,7 @@ import '../../../data/storage/storage_manager.dart';
 import '../../../design_system/theme.dart';
 import 'package:go_router/go_router.dart';
 import 'widgets/home_skeleton.dart';
+import 'widgets/today_voice_bar.dart';
 import '../../../core/culture/device_hints.dart';
 import '../../../core/culture/opening_greeting.dart';
 import '../../../core/day_part/day_part.dart';
@@ -76,20 +77,24 @@ class SolarTermPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Text(
-        label,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        style: ShunShiTypography.caption.copyWith(
-          color: color,
-          fontWeight: FontWeight.w600,
-          letterSpacing: 0.5,
+    return Semantics(
+      label: label,
+      excludeSemantics: true,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(999),
+        ),
+        child: Text(
+          label,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: ShunShiTypography.caption.copyWith(
+            color: color,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.5,
+          ),
         ),
       ),
     );
@@ -398,6 +403,11 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
         SolarTermPill(
           label: _solarTermInfo,
           color: ShunShiColors.secondary,
+        ),
+        const SizedBox(height: 12),
+        TodayVoiceBar(
+          spokenText: '$timeDisplay. ${sc.name}. ${sc.focus}. $_solarTermInfo. ${sc.wellnessPrinciple}',
+          onTranscript: (text) => context.go('/chat?draft=${Uri.encodeQueryComponent(text)}'),
         ),
       ],
     );

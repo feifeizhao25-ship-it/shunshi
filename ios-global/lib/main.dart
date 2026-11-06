@@ -7,9 +7,11 @@ import 'data/storage/storage_manager.dart';
 import 'data/services/notification_service.dart';
 import 'design_system/theme.dart';
 import 'presentation/widgets/error_boundary.dart';
+import 'web/readable_web_text.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  enableReadableWebText();
 
   AppErrorHandler.init();
 
