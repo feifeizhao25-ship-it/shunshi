@@ -85,15 +85,20 @@ def test_paraphrase_expected_ids_exist():
 
 # ------------------------------------------------------------------ 节气
 def test_solar_terms_match_pmo_2026():
-    pmo = json.loads((DATA / "solar_terms_pmo_2026.json").read_text("utf-8"))["terms"]
+    """公布分钟必须与紫台表相同；PyEphem 秒级结果只允许相差两分钟以内，且不得写回公布分钟。"""
+    official = json.loads((DATA / "solar_terms_pmo_2026.json").read_text("utf-8"))
+    pmo = official["terms"]
     ours = json.loads((Path(__file__).resolve().parents[1] / "app" / "data" / "solar_terms.json").read_text("utf-8"))
     ours = ours.get("terms", ours) if isinstance(ours, dict) else ours
-    got = {t["name"]: t["beijing_time"] for t in ours if t["date"].startswith("2026-")}
+    got = {t["name"]: t for t in ours if t["date"].startswith("2026-")}
     assert len(pmo) == 24
     for name, ts in pmo.items():
-        a = datetime.fromisoformat(ts)
-        b = datetime.fromisoformat(got[name])
-        assert abs((a - b).total_seconds()) <= 120, (name, ts, got[name])
+        published = datetime.fromisoformat(got[name]["beijing_time"])
+        assert published == datetime.fromisoformat(ts), (name, ts, got[name]["beijing_time"])
+        computed = got[name].get("computed_beijing_time")
+        if computed:
+            delta = abs((datetime.fromisoformat(ts) - datetime.fromisoformat(computed)).total_seconds())
+            assert delta <= 120, (name, ts, computed)
 
 
 # ------------------------------------------------------------------ 闸门

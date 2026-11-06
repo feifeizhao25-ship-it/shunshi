@@ -7,9 +7,36 @@ class AppErrorHandler {
   static void init() {
     FlutterError.onError = (details) {
       FlutterError.presentError(details);
-      // Log to local storage for debugging
       debugPrint('FlutterError: ${details.exceptionAsString()}');
     };
+    ErrorWidget.builder = (details) => const CalmErrorCard();
+  }
+}
+
+/// Calm card shown instead of the red error screen when a widget fails to build.
+class CalmErrorCard extends StatelessWidget {
+  const CalmErrorCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Directionality(
+      textDirection: TextDirection.ltr,
+      child: ColoredBox(
+        key: Key('calm-error-card'),
+        color: Color(0xFFF6F1E8),
+        child: Center(
+          child: Padding(
+            padding: EdgeInsets.all(24),
+            child: Text(
+              'This part could not be shown. Go back, then try again.',
+              key: Key('calm-error-message'),
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Color(0xFF3E3428), fontSize: 16, height: 1.5),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 

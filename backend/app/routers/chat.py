@@ -273,12 +273,18 @@ async def chat(
         messages.append({"role": "user", "content": lead + context_text})
     entitlement = session.get(Entitlement, user_id)
     tier = tier_for_product(entitlement.product_id) if entitlement and entitlement.expires_at > time.time() else 'free'
+    from ..entitlements import citation_depth_for_tier
+    from ..rag.claim_policy import ground_high_risk
     from ..rag.evidence import verified_cn_context, verified_global_context
 
+    depth = citation_depth_for_tier(tier)
     if is_global:
-        rag_context, rag_sources, rag_source_details = verified_global_context(message)
+        rag_context, rag_sources, rag_source_details = verified_global_context(message, citation_depth=depth)
     else:
-        rag_context, rag_sources, rag_source_details = verified_cn_context(message)
+        rag_context, rag_sources, rag_source_details = verified_cn_context(message, citation_depth=depth)
+    rag_context, rag_sources, rag_source_details = ground_high_risk(
+        message, rag_context, rag_sources, rag_source_details
+    )
     if rag_context:
         messages.append(
             {

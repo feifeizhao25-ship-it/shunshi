@@ -154,9 +154,19 @@ def render_dart(items: list[dict]) -> str:
 
 
 def main() -> None:
-    items = compute()
+    import sys
+
+    backend = Path(__file__).resolve().parents[1]
+    if str(backend) not in sys.path:
+        sys.path.insert(0, str(backend))
+    from app.utils.solar_term_publish import ROUNDING_RULE, apply_official_minutes
+
+    # 2026 的分钟改用紫台 + 香港天文台公布值；计算秒留在 computed_beijing_time。
+    items = apply_official_minutes(compute())
+    document = build_document(items)
+    document["minute_rule_2026"] = ROUNDING_RULE
     JSON_PATH.parent.mkdir(parents=True, exist_ok=True)
-    JSON_PATH.write_text(json.dumps(build_document(items), ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    JSON_PATH.write_text(json.dumps(document, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     dart = render_dart(items)
     for path in DART_PATHS:
         if path.parent.parent.exists():  # lib/core 存在才写

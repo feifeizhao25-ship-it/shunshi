@@ -71,7 +71,7 @@ class NetworkErrorState extends StatelessWidget {
     return EmptyState(
       icon: Icons.wifi_off,
       title: '网络连接失败',
-      description: '请检查网络设置后重试',
+      description: '现在没有网络，所以内容没有加载出来。连上网络后再试一次。',
       actionLabel: '重试',
       onAction: onRetry,
     );
@@ -97,6 +97,30 @@ class ErrorState extends StatelessWidget {
       description: message,
       actionLabel: onRetry != null ? '重试' : null,
       onAction: onRetry,
+    );
+  }
+}
+
+/// 加载态说明原因和下一步，而不是只有转圈。
+class LoadingExplain extends StatelessWidget {
+  const LoadingExplain({super.key, this.message = '正在加载。如果一直停在这里，返回后再打开一次。'});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const CircularProgressIndicator(),
+            const SizedBox(height: 16),
+            Text(message, key: const Key('loading-explain'), textAlign: TextAlign.center),
+          ],
+        ),
+      ),
     );
   }
 }

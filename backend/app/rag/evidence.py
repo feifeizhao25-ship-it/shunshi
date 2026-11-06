@@ -8,10 +8,21 @@ edition uses verified_global.md (CDC / WHO / NHS); it never cites the Chinese do
 已核验的，并要求最低相关度，避免为了凑数附上无关来源。
 """
 
+import json
 from datetime import date
+from functools import lru_cache
+from pathlib import Path
 
 from .embedder import get_embedder
 from .knowledge_base import cn_kb, gl_kb
+
+_MANIFEST = Path(__file__).with_name("source_manifest.json")
+
+
+@lru_cache(maxsize=1)
+def knowledge_version() -> str:
+    data = json.loads(_MANIFEST.read_text(encoding="utf-8"))
+    return str(data.get("knowledge_version") or "")
 
 MIN_RELEVANCE = 0.06  # TF-IDF 余弦相似度下限：低于它的片段不当作来源
 
@@ -50,26 +61,31 @@ def freshness(valid_until: str, today: date | None = None) -> tuple[str, int]:
     return ("review_due" if days <= REVIEW_DUE_DAYS else "current"), days
 
 
-def _details(picked, default_title: str, today: date | None = None) -> list[dict]:
+def _details(picked, default_title: str, today: date | None = None, citation_depth: str = "basic") -> list[dict]:
     out = []
     for chunk, score in picked:
         meta = chunk.metadata
         state, days_left = freshness(meta["valid_until"], today)
-        out.append(
-            {
-                "chunk_id": chunk.chunk_id,
-                "title": chunk.heading_path[-1] if chunk.heading_path else default_title,
-                "source_file": meta["source_file"],
-                "evidence_status": meta["evidence_status"],
-                "reviewed_at": meta["reviewed_at"],
-                "valid_until": meta["valid_until"],
-                "last_verified_at": meta["reviewed_at"],
-                "freshness": state,
-                "days_until_expiry": days_left,
-                "relevance": round(score, 4),
-                "url": _first_link(chunk.content),
-            }
-        )
+        item = {
+            "chunk_id": chunk.chunk_id,
+            "title": chunk.heading_path[-1] if chunk.heading_path else default_title,
+            "source_file": meta["source_file"],
+            "evidence_status": meta["evidence_status"],
+            "reviewed_at": meta["reviewed_at"],
+            "valid_until": meta["valid_until"],
+            "last_verified_at": meta["reviewed_at"],
+            "knowledge_version": meta.get("knowledge_version") or knowledge_version(),
+            "freshness": state,
+            "days_until_expiry": days_left,
+            "relevance": round(score, 4),
+            "url": _first_link(chunk.content),
+            "principle_only": bool(meta.get("principle_only")),
+            "review_status": meta.get("review_status") or "",
+            "citation_depth": citation_depth,
+        }
+        if citation_depth == "full":
+            item["excerpt"] = chunk.content[:180]
+        out.append(item)
     return out
 
 
@@ -95,17 +111,17 @@ def _label_en(item: dict) -> str:
     return text
 
 
-def verified_cn_context(query: str, top_k: int = 3) -> tuple[str, list[str], list[dict]]:
+def verified_cn_context(query: str, top_k: int = 3, citation_depth: str = "basic") -> tuple[str, list[str], list[dict]]:
     picked = _verified_chunks("cn", query, top_k)
     context = "\n\n".join(chunk.content[:900] for chunk, _ in picked)
-    details = _details(picked, "官方健康资料")
+    details = _details(picked, "官方健康资料", citation_depth=citation_depth)
     labels = [_label_cn(item) for item in details]
     return context, labels, details
 
 
-def verified_global_context(query: str, top_k: int = 3) -> tuple[str, list[str], list[dict]]:
+def verified_global_context(query: str, top_k: int = 3, citation_depth: str = "basic") -> tuple[str, list[str], list[dict]]:
     picked = _verified_chunks("gl", query, top_k)
     context = "\n\n".join(chunk.content[:900] for chunk, _ in picked)
-    details = _details(picked, "Official health information")
+    details = _details(picked, "Official health information", citation_depth=citation_depth)
     labels = [_label_en(item) for item in details]
     return context, labels, details

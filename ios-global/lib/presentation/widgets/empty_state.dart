@@ -71,7 +71,7 @@ class NetworkErrorState extends StatelessWidget {
     return EmptyState(
       icon: Icons.wifi_off,
       title: "You're offline",
-      description: 'Check your connection and try again.',
+      description: 'There is no connection, so this did not load. Reconnect, then try again.',
       actionLabel: 'Try again',
       onAction: onRetry,
     );
@@ -97,6 +97,30 @@ class ErrorState extends StatelessWidget {
       description: message,
       actionLabel: onRetry != null ? 'Try again' : null,
       onAction: onRetry,
+    );
+  }
+}
+
+/// Loading state that says why the screen is waiting and what to do next.
+class LoadingExplain extends StatelessWidget {
+  const LoadingExplain({super.key, this.message = 'Loading. If this stays here, go back and open it again.'});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const CircularProgressIndicator(),
+            const SizedBox(height: 16),
+            Text(message, key: const Key('loading-explain'), textAlign: TextAlign.center),
+          ],
+        ),
+      ),
     );
   }
 }

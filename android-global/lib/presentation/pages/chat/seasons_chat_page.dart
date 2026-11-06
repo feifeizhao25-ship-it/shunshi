@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/services/ai_safety.dart';
 import '../../../core/services/sse_chat_service.dart';
+import '../../widgets/companion_session_notice.dart';
 import '../../widgets/feedback_sheet.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
@@ -266,6 +267,7 @@ class _SeasonsChatPageState extends State<SeasonsChatPage>
         child: Column(
           children: [
             _buildHeader(isDark),
+            const CompanionSessionNotice(),
             Expanded(child: _buildMessageList()),
             _buildDisclaimer(),
             _buildInputBar(isDark),

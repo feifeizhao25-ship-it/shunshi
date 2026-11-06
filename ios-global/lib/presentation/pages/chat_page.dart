@@ -15,6 +15,7 @@ import '../widgets/membership_widgets.dart';
 import 'chat/chat_models.dart';
 import 'chat/chat_topic_cards.dart';
 import '../widgets/chat_sources.dart';
+import '../widgets/companion_session_notice.dart';
 import '../../core/solar_term/solar_term_en.dart';
 import '../../core/culture/device_hints.dart';
 import '../../core/culture/opening_greeting.dart';
@@ -468,7 +469,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
           const SizedBox(width: 12),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text('SEASONS AI Companion', style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
-            Text('Warm company', style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 12, color: AppColors.textTertiary(context))),
+            Text('You are talking with an AI, not a person.', key: const Key('companion-identity'), style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 12, color: AppColors.textTertiary(context))),
           ])),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -480,6 +481,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
           ),
           PopupMenuButton<String>(icon: Icon(Icons.more_vert, size: 22, color: AppColors.textTertiary(context)), onSelected: (v) { if (v == 'clear') { setState(() => _messages.clear()); _saveConversation(); _initChat(); } }, itemBuilder: (_) => [const PopupMenuItem(value: 'clear', child: Text('Clear conversation'))]),
         ]),
+        const CompanionSessionNotice(showIdentity: false),
       ]),
     );
   }

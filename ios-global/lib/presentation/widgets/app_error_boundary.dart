@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../pages/error/error_page.dart';
+import 'error_boundary.dart';
 
 /// Widget-tree error boundary for SEASONS global app
 ///
@@ -77,7 +78,7 @@ class _ErrorCatcher extends StatelessWidget {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         onError(details.exception, details.stack ?? StackTrace.empty);
       });
-      return const SizedBox.shrink();
+      return const CalmErrorCard();
     };
     return child;
   }
