@@ -7,6 +7,8 @@
   python -m app.self_improve.run decide <candidate_id> approve|reject <reviewer>   # 企业微信回调落地
   python -m app.self_improve.run eval       # 只跑评测并打印指标（不改任何东西）
   python -m app.self_improve.run library-check|library-discover   # 资料库来源核对 / 新候选暂存（LIBRARY_FRESHNESS_ENABLED=1 才运行）
+  python -m app.self_improve.run harvest [--out 目录]   # 节气表 + 膳食指南年度候选（不进 serve，不打开 SIL / LIBRARY_FRESHNESS）
+  python -m app.self_improve.run publish-candidates --signature 签名 [--out 目录]
 """
 
 from __future__ import annotations
@@ -22,6 +24,10 @@ from .scheduler import SCHEDULE_DEFAULTS, TZ, run_forever
 def main(argv=None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
     cmd = argv[0] if argv else "eval"
+    if cmd in ("harvest", "publish-candidates"):
+        from ..rag.yearly_harvest import main as harvest_main
+
+        return harvest_main(argv)
     loop, sh = build_loop()
     if cmd == "eval":
         from . import evals
