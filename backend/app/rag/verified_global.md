@@ -4,7 +4,7 @@
 
 ### Adult sleep duration and sleep habits
 
-The US Centers for Disease Control and Prevention (CDC) states that adults aged 18 to 60 need 7 or more hours of sleep a day, adults aged 61 to 64 need 7 to 9 hours, and adults aged 65 and older need 7 to 8 hours. Habits that can improve sleep include going to bed and getting up at the same time every day, keeping the bedroom quiet, relaxing and cool, turning off electronic devices at least 30 minutes before bedtime, avoiding large meals and alcohol before bedtime, avoiding caffeine in the afternoon or evening, and exercising regularly. People who regularly have problems sleeping should talk to a healthcare provider, who may ask them to keep a sleep diary.
+The US Centers for Disease Control and Prevention (CDC) states that adults aged 18 to 60 need 7 or more hours of sleep a day, adults aged 61 to 64 need 7 to 9 hours, and adults aged 65 and older need 7 to 8 hours. Habits include going to bed and getting up at the same time every day, keeping the bedroom quiet, relaxing and cool, turning off electronic devices at least 30 minutes before bedtime, avoiding large meals and alcohol before bedtime, avoiding caffeine in the afternoon or evening, and exercising regularly. People who regularly have problems sleeping should talk to a healthcare provider, who may ask them to keep a sleep diary. This note uses only those duration ranges and habit lines. It does not restate health-benefit claims from the CDC page.
 
 Source: CDC, About Sleep, published 2024-05-15; ShunShi reviewed 2026-10-31.
 Link: https://www.cdc.gov/sleep/about/index.html

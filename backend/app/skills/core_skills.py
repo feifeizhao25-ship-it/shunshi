@@ -577,27 +577,30 @@ class CoreSkillExecutor:
             inp.user_context,
         )
         
+        from app.rag.sleep_light import sleep_schedule_brief
+
+        brief = sleep_schedule_brief("zh")
         return CoreSkillOutput(
             skill="SleepWindDown",
-            text=result.final_response or "让我们一起为今晚的睡眠做准备吧。",
+            text=result.final_response or brief["conclusion"],
             cards=[ContentCard(
                 type="sleep",
                 title=f"{duration}分钟睡前仪式",
-                content="1. 调暗灯光\n2. 放下手机\n3. 深呼吸放松\n4. 温和拉伸",
+                content=brief["conclusion"] + "\n" + brief["today_action"],
                 emoji="🌙",
                 steps=[
-                    "调暗卧室灯光，营造睡眠氛围",
-                    "将手机放在伸手不可及的地方",
-                    "做3分钟腹式呼吸（吸气4秒-屏息4秒-呼气6秒）",
-                    "简单拉伸肩颈和腿部",
+                    "调暗卧室灯光",
+                    "把手机放到够不着的地方",
+                    "做几次放慢的呼吸，不把短练习说成某项 5 分钟研究的同等效果",
+                    brief["today_action"],
                 ],
                 duration_min=duration,
-                contraindications=["严重失眠请就医", "服用安眠药期间遵医嘱"],
+                contraindications=["这是作息安排，不是疾病诊断。"],
             )],
             safety_flag=SafetyFlag.NONE,
             presence_level=PresenceLevel.REDUCED,  # 睡前减少打扰
-            contraindications=["严重失眠请就医", "服用安眠药期间遵医嘱"],
-            when_to_seek_help="如果连续两周失眠且影响白天工作，建议就医。",
+            contraindications=["这是作息安排，不是疾病诊断。"],
+            when_to_seek_help="如果睡眠问题持续并影响白天安排，请咨询专业人员。",
             model_used=result.skills_executed[0].model if result.skills_executed else "fallback",
             tokens_used=result.total_tokens,
         )

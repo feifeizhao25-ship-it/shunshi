@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import '../../../core/config/app_config.dart';
 import '../../../data/storage/storage_manager.dart';
+import '../../widgets/empty_state.dart';
 
 /// Displays the real Skills API contract without inventing confidence or actions.
 class SkillsPage extends StatefulWidget {
@@ -180,7 +181,9 @@ class _SkillsPageState extends State<SkillsPage> {
               const Text('用于日常生活参考，不替代医疗诊断。会员能力会在调用时核验权益。'),
               const SizedBox(height: 20),
               if (!_loading && _skills.isEmpty && _error == null)
-                const Text('暂时没有可用能力'),
+                const Text('列表是空的，因为接口没有返回可用能力。请点下面的按钮再加载一次。'),
+              if (!_loading && _skills.isEmpty && _error == null)
+                TextButton(onPressed: _loadSkills, child: const Text('重新加载')),
               for (final skill in _skills)
                 Card(
                   child: ListTile(
@@ -206,7 +209,7 @@ class _SkillsPageState extends State<SkillsPage> {
                   onPressed: () => _loadSkills(more: true),
                   child: const Text('加载更多'),
                 ),
-              if (_loading) const Center(child: CircularProgressIndicator()),
+              if (_loading) const LoadingExplain(),
             ],
           ],
         ),

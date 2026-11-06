@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../pages/error/error_page.dart';
+import 'error_boundary.dart';
 
 /// Flutter Widget 树错误边界
 ///
@@ -87,8 +88,7 @@ class _ErrorCatcher extends StatelessWidget {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         onError(details.exception, details.stack ?? StackTrace.empty);
       });
-      // 渲染一个空容器，避免红色死亡屏幕
-      return const SizedBox.shrink();
+      return const CalmErrorCard();
     };
     return child;
   }

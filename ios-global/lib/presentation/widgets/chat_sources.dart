@@ -3,7 +3,18 @@ import 'package:url_launcher/url_launcher.dart';
 
 /// One verified source behind a chat answer, as sent by the backend in `source_details`.
 class ChatSource {
-  const ChatSource({required this.title, this.lastVerifiedAt, this.validUntil, this.freshness = 'current', this.url, this.sourceFile});
+  const ChatSource({
+    required this.title,
+    this.lastVerifiedAt,
+    this.validUntil,
+    this.freshness = 'current',
+    this.url,
+    this.sourceFile,
+    this.knowledgeVersion,
+    this.citationDepth = 'basic',
+    this.excerpt,
+    this.reviewStatus,
+  });
 
   final String title;
 
@@ -15,6 +26,19 @@ class ChatSource {
   final String freshness;
   final String? url;
   final String? sourceFile;
+  final String? knowledgeVersion;
+
+  /// "basic" or "full". Full is only sent when the existing library entitlement is full.
+  final String citationDepth;
+  final String? excerpt;
+  final String? reviewStatus;
+
+  bool get fullCitation => citationDepth == 'full';
+  bool get pendingReview {
+    final status = (reviewStatus ?? '').trim().toLowerCase();
+    if (status.isEmpty) return false;
+    return status != 'verified' && status != 'approved' && status != 'in_force';
+  }
 
   bool get reviewDue => freshness == 'review_due';
 
@@ -30,6 +54,10 @@ class ChatSource {
         'freshness': freshness,
         if (url != null) 'url': url,
         if (sourceFile != null) 'source_file': sourceFile,
+        if (knowledgeVersion != null) 'knowledge_version': knowledgeVersion,
+        if (citationDepth != 'basic') 'citation_depth': citationDepth,
+        if (excerpt != null) 'excerpt': excerpt,
+        if (reviewStatus != null) 'review_status': reviewStatus,
       };
 
   static String? _s(dynamic v) => v is String && v.trim().isNotEmpty ? v.trim() : null;
@@ -49,6 +77,10 @@ class ChatSource {
         freshness: d['freshness'] == 'review_due' ? 'review_due' : 'current',
         url: _s(d['url']),
         sourceFile: _s(d['source_file']),
+        knowledgeVersion: _s(d['knowledge_version']),
+        citationDepth: d['citation_depth'] == 'full' ? 'full' : 'basic',
+        excerpt: _s(d['excerpt']),
+        reviewStatus: _s(d['review_status']),
       ));
     }
     return out;
@@ -66,6 +98,8 @@ class _S {
   static const open = 'Open source';
   static const noDate = 'No verification date provided';
   static const close = 'Close';
+  static String knowledgeVersion(String v) => 'Knowledge version $v';
+  static const pending = 'Pending review. This cannot be the only basis for a claim.';
 }
 
 /// Chips under an answer: source title + "last verified" date + a "review due" tag when relevant.
@@ -114,6 +148,10 @@ class ChatSourcesBar extends StatelessWidget {
                       Text(sources[i].title, maxLines: 2, overflow: TextOverflow.ellipsis, style: text.labelMedium?.copyWith(fontWeight: FontWeight.w600)),
                       if (sources[i].lastVerifiedAt != null)
                         Text(_S.verified(sources[i].lastVerifiedAt!), key: Key('chat-source-verified-$i'), style: text.labelSmall?.copyWith(color: scheme.onSurfaceVariant)),
+                      if (sources[i].knowledgeVersion != null)
+                        Text(_S.knowledgeVersion(sources[i].knowledgeVersion!), key: Key('chat-source-version-$i'), style: text.labelSmall?.copyWith(color: scheme.onSurfaceVariant)),
+                      if (sources[i].pendingReview)
+                        Text(_S.pending, key: Key('chat-source-pending-$i'), style: text.labelSmall),
                       if (sources[i].reviewDue)
                         Text(_S.reviewDueShort, key: Key('chat-source-due-$i'), style: text.labelSmall?.copyWith(color: scheme.tertiary, fontWeight: FontWeight.w600)),
                     ]),
@@ -146,6 +184,18 @@ class ChatSourcesBar extends StatelessWidget {
                 const SizedBox(width: 8),
                 Text(s.lastVerifiedAt == null ? _S.noDate : _S.verified(s.lastVerifiedAt!), key: const Key('chat-source-detail-verified')),
               ]),
+              if (s.knowledgeVersion != null) ...[
+                const SizedBox(height: 6),
+                Text(_S.knowledgeVersion(s.knowledgeVersion!), key: const Key('chat-source-detail-version')),
+              ],
+              if (s.fullCitation && s.excerpt != null) ...[
+                const SizedBox(height: 8),
+                Text(s.excerpt!, key: const Key('chat-source-excerpt')),
+              ],
+              if (s.pendingReview) ...[
+                const SizedBox(height: 8),
+                Text(_S.pending, key: const Key('chat-source-detail-pending')),
+              ],
               if (s.validUntil != null) ...[
                 const SizedBox(height: 6),
                 Row(children: [
@@ -174,7 +224,7 @@ class ChatSourcesBar extends StatelessWidget {
                   FilledButton.icon(
                     key: const Key('chat-source-open'),
                     onPressed: () => _open(Uri.parse(s.url!)),
-                    icon: Icon(Icons.open_in_new_rounded, size: 16),
+                    icon: const Icon(Icons.open_in_new_rounded, size: 16),
                     label: const Text(_S.open),
                   ),
               ]),

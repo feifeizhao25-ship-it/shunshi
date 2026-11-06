@@ -53,7 +53,7 @@ dependencies:
   flutter_tts: ^4.2.0
   permission_handler: ^11.3.1
   # Markdown rendering
-  flutter_markdown: ^0.7.4
+  flutter_markdown_plus: ^1.0.0
   # Image Picker
   image_picker: ^1.1.2
   path_provider: ^2.1.5

@@ -96,6 +96,15 @@ def daily_chat_limit_for_plan(plan_id: str) -> int:
     return int(get_registry()["tiers"][tier]["quotas"]["ai_daily_messages"])
 
 
+def citation_depth_for_tier(tier: str) -> str:
+    """更完整的引用只给注册表里资料库已经是 full 的档。不新增档名，也不写价格。"""
+    tiers = get_registry().get("tiers") or {}
+    knowledge = (tiers.get(tier) or {}).get("knowledge") or {}
+    if knowledge.get("wellness_library") == "full":
+        return "full"
+    return "basic"
+
+
 def family_seats_for_plan(plan_id: str) -> int:
     """可绑定的家人席位数。注册表的 family_members 含购买人自己（免费版是 1；家庭档 3 = 购买人 + 2 位家人），所以席位 = 人数 - 1。"""
     tier = registry_tier_for_plan(plan_id)

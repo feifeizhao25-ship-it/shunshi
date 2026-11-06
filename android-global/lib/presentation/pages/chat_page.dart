@@ -15,6 +15,7 @@ import '../widgets/membership_widgets.dart';
 import 'chat/chat_models.dart';
 import 'chat/chat_topic_cards.dart';
 import '../widgets/chat_sources.dart';
+import '../widgets/companion_session_notice.dart';
 import 'chat/chat_widgets.dart';
 import 'chat/voice_chrome.dart';
 import '../../../core/theme/app_localizations.dart';
@@ -493,6 +494,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
           ),
           PopupMenuButton<String>(icon: Icon(Icons.more_vert, size: 22, color: AppColors.textTertiary(context)), onSelected: (v) { if (v == 'clear') { setState(() => _messages.clear()); _saveConversation(); _initChat(); } }, itemBuilder: (_) => [PopupMenuItem(value: 'clear', child: Text(AppLocalizations.of(context).t('chatpagedart_clear_chat')))]),
         ]),
+        const CompanionSessionNotice(),
       ]),
     );
   }

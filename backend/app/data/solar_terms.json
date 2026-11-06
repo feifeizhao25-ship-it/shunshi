@@ -308,145 +308,193 @@
    "name": "小寒",
    "longitude": 285,
    "date": "2026-01-05",
-   "beijing_time": "2026-01-05 16:22:54"
+   "beijing_time": "2026-01-05 16:23:00",
+   "computed_beijing_time": "2026-01-05 16:22:54",
+   "minute_source": "SS-01+SS-02/SS-03"
   },
   {
    "name": "大寒",
    "longitude": 300,
    "date": "2026-01-20",
-   "beijing_time": "2026-01-20 09:44:41"
+   "beijing_time": "2026-01-20 09:45:00",
+   "computed_beijing_time": "2026-01-20 09:44:41",
+   "minute_source": "SS-01+SS-02/SS-03"
   },
   {
    "name": "立春",
    "longitude": 315,
    "date": "2026-02-04",
-   "beijing_time": "2026-02-04 04:01:54"
+   "beijing_time": "2026-02-04 04:02:00",
+   "computed_beijing_time": "2026-02-04 04:01:54",
+   "minute_source": "SS-01+SS-02/SS-03"
   },
   {
    "name": "雨水",
    "longitude": 330,
    "date": "2026-02-18",
-   "beijing_time": "2026-02-18 23:51:43"
+   "beijing_time": "2026-02-18 23:52:00",
+   "computed_beijing_time": "2026-02-18 23:51:43",
+   "minute_source": "SS-01+SS-02/SS-03"
   },
   {
    "name": "惊蛰",
    "longitude": 345,
    "date": "2026-03-05",
-   "beijing_time": "2026-03-05 21:58:49"
+   "beijing_time": "2026-03-05 21:59:00",
+   "computed_beijing_time": "2026-03-05 21:58:49",
+   "minute_source": "SS-01+SS-02/SS-03"
   },
   {
    "name": "春分",
    "longitude": 0,
    "date": "2026-03-20",
-   "beijing_time": "2026-03-20 22:45:49"
+   "beijing_time": "2026-03-20 22:46:00",
+   "computed_beijing_time": "2026-03-20 22:45:49",
+   "minute_source": "SS-01+SS-02/SS-03"
   },
   {
    "name": "清明",
    "longitude": 15,
    "date": "2026-04-05",
-   "beijing_time": "2026-04-05 02:39:53"
+   "beijing_time": "2026-04-05 02:40:00",
+   "computed_beijing_time": "2026-04-05 02:39:53",
+   "minute_source": "SS-01+SS-02/SS-03"
   },
   {
    "name": "谷雨",
    "longitude": 30,
    "date": "2026-04-20",
-   "beijing_time": "2026-04-20 09:39:03"
+   "beijing_time": "2026-04-20 09:39:00",
+   "computed_beijing_time": "2026-04-20 09:39:03",
+   "minute_source": "SS-01+SS-02/SS-03"
   },
   {
    "name": "立夏",
    "longitude": 45,
    "date": "2026-05-05",
-   "beijing_time": "2026-05-05 19:48:42"
+   "beijing_time": "2026-05-05 19:49:00",
+   "computed_beijing_time": "2026-05-05 19:48:42",
+   "minute_source": "SS-01+SS-02/SS-03"
   },
   {
    "name": "小满",
    "longitude": 60,
    "date": "2026-05-21",
-   "beijing_time": "2026-05-21 08:36:44"
+   "beijing_time": "2026-05-21 08:37:00",
+   "computed_beijing_time": "2026-05-21 08:36:44",
+   "minute_source": "SS-01+SS-02/SS-03"
   },
   {
    "name": "芒种",
    "longitude": 75,
    "date": "2026-06-05",
-   "beijing_time": "2026-06-05 23:48:23"
+   "beijing_time": "2026-06-05 23:48:00",
+   "computed_beijing_time": "2026-06-05 23:48:23",
+   "minute_source": "SS-01+SS-02/SS-03"
   },
   {
    "name": "夏至",
    "longitude": 90,
    "date": "2026-06-21",
-   "beijing_time": "2026-06-21 16:24:31"
+   "beijing_time": "2026-06-21 16:25:00",
+   "computed_beijing_time": "2026-06-21 16:24:31",
+   "minute_source": "SS-01+SS-02/SS-03"
   },
   {
    "name": "小暑",
    "longitude": 105,
    "date": "2026-07-07",
-   "beijing_time": "2026-07-07 09:56:59"
+   "beijing_time": "2026-07-07 09:57:00",
+   "computed_beijing_time": "2026-07-07 09:56:59",
+   "minute_source": "SS-01+SS-02/SS-03"
   },
   {
    "name": "大暑",
    "longitude": 120,
    "date": "2026-07-23",
-   "beijing_time": "2026-07-23 03:13:06"
+   "beijing_time": "2026-07-23 03:13:00",
+   "computed_beijing_time": "2026-07-23 03:13:06",
+   "minute_source": "SS-01+SS-02/SS-03"
   },
   {
    "name": "立秋",
    "longitude": 135,
    "date": "2026-08-07",
-   "beijing_time": "2026-08-07 19:42:45"
+   "beijing_time": "2026-08-07 19:43:00",
+   "computed_beijing_time": "2026-08-07 19:42:45",
+   "minute_source": "SS-01+SS-02/SS-03"
   },
   {
    "name": "处暑",
    "longitude": 150,
    "date": "2026-08-23",
-   "beijing_time": "2026-08-23 10:18:48"
+   "beijing_time": "2026-08-23 10:19:00",
+   "computed_beijing_time": "2026-08-23 10:18:48",
+   "minute_source": "SS-01+SS-02/SS-03"
   },
   {
    "name": "白露",
    "longitude": 165,
    "date": "2026-09-07",
-   "beijing_time": "2026-09-07 22:41:13"
+   "beijing_time": "2026-09-07 22:41:00",
+   "computed_beijing_time": "2026-09-07 22:41:13",
+   "minute_source": "SS-01+SS-02/SS-03"
   },
   {
    "name": "秋分",
    "longitude": 180,
    "date": "2026-09-23",
-   "beijing_time": "2026-09-23 08:05:08"
+   "beijing_time": "2026-09-23 08:05:00",
+   "computed_beijing_time": "2026-09-23 08:05:08",
+   "minute_source": "SS-01+SS-02/SS-03"
   },
   {
    "name": "寒露",
    "longitude": 195,
    "date": "2026-10-08",
-   "beijing_time": "2026-10-08 14:29:10"
+   "beijing_time": "2026-10-08 14:29:00",
+   "computed_beijing_time": "2026-10-08 14:29:10",
+   "minute_source": "SS-01+SS-02/SS-03"
   },
   {
    "name": "霜降",
    "longitude": 210,
    "date": "2026-10-23",
-   "beijing_time": "2026-10-23 17:37:47"
+   "beijing_time": "2026-10-23 17:38:00",
+   "computed_beijing_time": "2026-10-23 17:37:47",
+   "minute_source": "SS-01+SS-02/SS-03"
   },
   {
    "name": "立冬",
    "longitude": 225,
    "date": "2026-11-07",
-   "beijing_time": "2026-11-07 17:51:52"
+   "beijing_time": "2026-11-07 17:52:00",
+   "computed_beijing_time": "2026-11-07 17:51:52",
+   "minute_source": "SS-01+SS-02/SS-03"
   },
   {
    "name": "小雪",
    "longitude": 240,
    "date": "2026-11-22",
-   "beijing_time": "2026-11-22 15:23:07"
+   "beijing_time": "2026-11-22 15:23:00",
+   "computed_beijing_time": "2026-11-22 15:23:07",
+   "minute_source": "SS-01+SS-02/SS-03"
   },
   {
    "name": "大雪",
    "longitude": 255,
    "date": "2026-12-07",
-   "beijing_time": "2026-12-07 10:52:17"
+   "beijing_time": "2026-12-07 10:53:00",
+   "computed_beijing_time": "2026-12-07 10:52:17",
+   "minute_source": "SS-01+SS-02/SS-03"
   },
   {
    "name": "冬至",
    "longitude": 270,
    "date": "2026-12-22",
-   "beijing_time": "2026-12-22 04:49:59"
+   "beijing_time": "2026-12-22 04:50:00",
+   "computed_beijing_time": "2026-12-22 04:49:59",
+   "minute_source": "SS-01+SS-02/SS-03"
   },
   {
    "name": "小寒",
@@ -1744,5 +1792,11 @@
    "date": "2035-12-22",
    "beijing_time": "2035-12-22 09:30:27"
   }
+ ],
+ "minute_rule_2026": "2026 交节分钟以紫金山天文台年历与香港天文台公布值为准，两台一致到分钟。PyEphem 秒级结果保留在 computed_beijing_time，不截断、也不用秒的四舍五入覆盖公布分钟。例：大寒计算值 09:44:41 公布为 09:45；大雪计算值 10:52:17 公布为 10:53。",
+ "minute_sources_2026": [
+  "SS-01 http://www.pmo.cas.cn/xwdt2019/kpdt2019/202203/P020251230620718707826.pdf",
+  "SS-02 https://www.hko.gov.hk/tc/gts/astron2026/files/2026SolarTerms24.pdf",
+  "SS-03 https://www.hko.gov.hk/tc/gts/astronomy/Solar_Term.htm"
  ]
 }

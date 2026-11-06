@@ -16,6 +16,7 @@ import 'chat/chat_history_store.dart';
 import 'chat/chat_membership.dart';
 import 'chat/chat_api.dart';
 import '../widgets/chat_sources.dart';
+import '../widgets/companion_session_notice.dart';
 import 'chat/chat_widgets.dart';
 import 'chat/voice_chrome.dart';
 import '../../core/solar_term/solar_term_table.dart';
@@ -897,6 +898,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
               ),
             ],
           ),
+          const CompanionSessionNotice(),
         ],
       ),
     );

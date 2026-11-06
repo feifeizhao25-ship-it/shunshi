@@ -20,14 +20,14 @@ logger = logging.getLogger(__name__)
 
 SOLAR_TERMS_2026 = [
     {"name": "立春", "name_en": "Beginning of Spring", "month": 2, "day": 4, "emoji": "🌱", "season": "spring"},
-    {"name": "雨水", "name_en": "Rain Water", "month": 2, "day": 19, "emoji": "💧", "season": "spring"},
+    {"name": "雨水", "name_en": "Rain Water", "month": 2, "day": 18, "emoji": "💧", "season": "spring"},
     {"name": "惊蛰", "name_en": "Awakening of Insects", "month": 3, "day": 5, "emoji": "⚡", "season": "spring"},
     {"name": "春分", "name_en": "Spring Equinox", "month": 3, "day": 20, "emoji": "🌸", "season": "spring"},
     {"name": "清明", "name_en": "Clear and Bright", "month": 4, "day": 5, "emoji": "🌿", "season": "spring"},
     {"name": "谷雨", "name_en": "Grain Rain", "month": 4, "day": 20, "emoji": "🌧️", "season": "spring"},
-    {"name": "立夏", "name_en": "Beginning of Summer", "month": 5, "day": 6, "emoji": "☀️", "season": "summer"},
+    {"name": "立夏", "name_en": "Beginning of Summer", "month": 5, "day": 5, "emoji": "☀️", "season": "summer"},
     {"name": "小满", "name_en": "Grain Buds", "month": 5, "day": 21, "emoji": "🌾", "season": "summer"},
-    {"name": "芒种", "name_en": "Grain in Ear", "month": 6, "day": 6, "emoji": "🌾", "season": "summer"},
+    {"name": "芒种", "name_en": "Grain in Ear", "month": 6, "day": 5, "emoji": "🌾", "season": "summer"},
     {"name": "夏至", "name_en": "Summer Solstice", "month": 6, "day": 21, "emoji": "🌞", "season": "summer"},
     {"name": "小暑", "name_en": "Minor Heat", "month": 7, "day": 7, "emoji": "🔥", "season": "summer"},
     {"name": "大暑", "name_en": "Major Heat", "month": 7, "day": 23, "emoji": "🌡️", "season": "summer"},

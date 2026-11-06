@@ -57,12 +57,33 @@ def _source_metadata(path: str | Path) -> dict:
     if not entry:
         raise RuntimeError(f"RAG 来源清单缺少文档: {filename}")
     meta = {"source_file": filename, **entry}
+    manifest = json.loads(_SOURCE_MANIFEST_PATH.read_text(encoding="utf-8"))
+    if manifest.get("knowledge_version"):
+        meta["knowledge_version"] = manifest["knowledge_version"]
     # 过期来源不删除，但打上 stale 标记：检索降权，且不得作为事实陈述（见 retriever）。
     try:
         meta["stale"] = date.fromisoformat(entry["valid_until"]) < date.today()
     except (KeyError, ValueError):
         meta["stale"] = True
     return meta
+
+
+def _apply_section_policies(filename: str, chunk: KnowledgeChunk) -> None:
+    """按清单把膳食指南等条目改成一般原则，并写上复核截止日。"""
+    manifest = json.loads(_SOURCE_MANIFEST_PATH.read_text(encoding="utf-8"))
+    text = "\n".join(chunk.heading_path) + "\n" + chunk.content
+    for policy in manifest.get("section_policies", {}).get(filename, []):
+        needle = policy.get("content_contains")
+        if needle and needle not in text:
+            continue
+        for key in ("valid_until", "principle_only", "medical_efficacy", "review_by", "review_reason"):
+            if key in policy:
+                chunk.metadata[key] = policy[key]
+        until = chunk.metadata.get("valid_until")
+        try:
+            chunk.metadata["stale"] = date.fromisoformat(until) < date.today()
+        except (TypeError, ValueError):
+            chunk.metadata["stale"] = True
 
 # 中文知识库标题 → 分类/季节/节气的映射
 _CN_SEASON_MAP = {
@@ -417,8 +438,10 @@ class KnowledgeBase:
 
         new_chunks = _parse_markdown_into_chunks(text, self.lang, source="main")
         source_metadata = _source_metadata(path)
+        filename = Path(path).name
         for chunk in new_chunks:
             chunk.metadata.update(source_metadata)
+            _apply_section_policies(filename, chunk)
         self.chunks.extend(new_chunks)
         self.loaded = True
         logger.info(f"[KB] {self.lang} 主知识库加载完成: {len(new_chunks)} chunks")
