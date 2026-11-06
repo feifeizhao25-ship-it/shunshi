@@ -86,7 +86,7 @@ class TtsPlayerService extends SpeechPlayback {
   @override
   Future<bool> speak(String text, {String key = 'default'}) async {
     await stop();
-    final spoken = text.trim();
+    final spoken = speakablePlainText(text).trim();
     if (spoken.isEmpty) {
       errorMsg = emptyMessage;
       notifyListeners();
