@@ -1,0 +1,222 @@
+{
+  "product": "shunshi",
+  "catalog_date": "2026-11-06",
+  "cadence": "yearly",
+  "cadence_window": "JAN-02@02:00",
+  "timezone": "Asia/Shanghai",
+  "scheduler_registered": false,
+  "review_status": "待审核",
+  "reviewer": "",
+  "note": "每年节气表与膳食指南修订的人工收获钩子。记录保持未发布。复核人留空。默认不联网，摘录来自本产品已经引用、且资料库标为可用的来源。不注册定时任务，不读取新的云端密钥。LIBRARY_FRESHNESS 与 SIL 保持关闭。",
+  "blocked_urls": [
+    "https://www.ftc.gov/business-guidance/resources/disclosures-101-social-media-influencers",
+    "https://www.ftc.gov/business-guidance/resources/ftcs-endorsement-guides-what-people-are-asking",
+    "https://www.ftc.gov/legal-library/browse/federal-register-notices/16-cfr-part-255-guides-concerning-use-endorsements-testimonials-advertising",
+    "https://developer.apple.com/design/human-interface-guidelines/speech",
+    "https://m3.material.io/foundations/layout/applying-layout/window-size-classes",
+    "https://www.bilibili.com/blackboard/activity-community-rules.html",
+    "https://www.energy.gov/eere/solar/homeowners-guide-federal-tax-credit-solar-photovoltaics",
+    "https://www.gov.uk/guidance/smart-export-guarantee-seg-earn-money-for-exporting-the-renewable-electricity-you-have-generated",
+    "https://www.instagram.com/business/tools/branded-content/",
+    "https://www.gov.cn/zhengce/zhengceku/202302/content_5741176.htm",
+    "https://www.nhc.gov.cn/sps/c100088/202301/f01895a06c5349ef999f25da833c166d.shtml",
+    "https://www.nhc.gov.cn/sps/c100088/202402/9ba512ba8e314a47a181db11d2fa188d/files/1743476134816_82016.pdf",
+    "https://huggingface.co/datasets/svjack/The_24_Solar_Terms_Scene_Caption",
+    "https://snaped.fns.usda.gov/resources/nutrition-education-materials/seasonal-produce-guide",
+    "https://www.eatforhealth.gov.au/",
+    "https://developers.facebook.com/docs/instagram-platform/content-publishing",
+    "https://help.x.com/en/rules-and-policies/authenticity",
+    "https://emp.lbl.gov/queues",
+    "https://www.aemo.com.au/",
+    "https://www.pwc.com/us/en/services/tax/library/pwc-invalidated-irs-notice-202542-creates-uncertainty.html",
+    "https://www.nhc.gov.cn/",
+    "https://law.pkulaw.com/",
+    "https://www.xiaohongshu.com/crown/community/rules"
+  ],
+  "not_in_this_catalog": [
+    {
+      "id": "SS-04",
+      "reason": "香港天文台英文文化说明。ios-global 与 android-global 没有 candidates 目录，本轮不新建英文目录，也不把中文界面译成 SEASONS 文案。只作文化，不作医疗。"
+    },
+    {
+      "id": "SS-12",
+      "reason": "成人疾病食养指南。不进这次收获，也不进顺时主 RAG。"
+    },
+    {
+      "id": "NHC-child-obesity-diet-2024",
+      "reason": "儿童青少年肥胖食养指南。#97 已移出主 RAG，这次收获不收。"
+    },
+    {
+      "id": "SS-19",
+      "reason": "未声明许可的节气图说明。不入库，也不作为运行时模型。"
+    },
+    {
+      "id": "USDA-seasonal-produce",
+      "reason": "第 15 节未能核验，不当作已确认来源。"
+    },
+    {
+      "id": "AU-eat-for-health",
+      "reason": "第 15 节未能核验，不当作已确认来源。"
+    }
+  ],
+  "sections": [
+    {
+      "id": "solar-terms",
+      "title": "节气表",
+      "language": "zh",
+      "note": "每年核对紫金山天文台年历与香港天文台。只记录交节时刻。宜忌、吉凶不发布。第三方截断分钟不入库。"
+    },
+    {
+      "id": "dietary-guidelines",
+      "title": "膳食指南一般原则",
+      "language": "zh",
+      "note": "只保留已经写进顺时 RAG 的一般原则。第五次修订已于 2026 年 6 月启动，复核截止 2026-12-31。不写功效，不收疾病食养指南。"
+    }
+  ],
+  "sources": [
+    {
+      "id": "SS-01",
+      "section": "solar-terms",
+      "product": "shunshi",
+      "title": "二〇二六年日历资料（含24节气交节时刻）",
+      "url": "http://www.pmo.cas.cn/xwdt2019/kpdt2019/202203/P020251230620718707826.pdf",
+      "doi": "",
+      "publisher": "中国科学院紫金山天文台",
+      "excerpt": "按 GB/T 33661-2017 编制的 2026 年二十四节气交节时刻（北京时间，只到分钟）：小寒 2026-01-05 16:23；大寒 2026-01-20 09:45；立春 2026-02-04 04:02；雨水 2026-02-18 23:52；惊蛰 2026-03-05 21:59；春分 2026-03-20 22:46；清明 2026-04-05 02:40；谷雨 2026-04-20 09:39；立夏 2026-05-05 19:49；小满 2026-05-21 08:37；芒种 2026-06-05 23:48；夏至 2026-06-21 16:25；小暑 2026-07-07 09:57；大暑 2026-07-23 03:13；立秋 2026-08-07 19:43；处暑 2026-08-23 10:19；白露 2026-09-07 22:41；秋分 2026-09-23 08:05；寒露 2026-10-08 14:29；霜降 2026-10-23 17:38；立冬 2026-11-07 17:52；小雪 2026-11-22 15:23；大雪 2026-12-07 10:53；冬至 2026-12-22 04:50。公布分钟以紫台与香港天文台为准。大寒计算值 09:44:41 的公布分钟是 09:45；大雪计算值 10:52:17 的公布分钟是 10:53。",
+      "published_at": "2025-03",
+      "effective_at": "2026-01-01",
+      "expires_at": "2026-12-31",
+      "region": "CN",
+      "license": "政府/科研机构公开资料，转载需注明出处",
+      "language": "zh",
+      "principle_only": false,
+      "supersedes": ""
+    },
+    {
+      "id": "SS-02",
+      "section": "solar-terms",
+      "product": "shunshi",
+      "title": "二零二六年二十四節氣（中氣表，含日出日落）",
+      "url": "https://www.hko.gov.hk/tc/gts/astron2026/files/2026SolarTerms24.pdf",
+      "doi": "",
+      "publisher": "香港天文台",
+      "excerpt": "2026 年 12 个中气，时刻与紫台一致到分钟：大寒 2026-01-20 09:45；雨水 2026-02-18 23:52；春分 2026-03-20 22:46；谷雨 2026-04-20 09:39；小满 2026-05-21 08:37；夏至 2026-06-21 16:25；大暑 2026-07-23 03:13；处暑 2026-08-23 10:19；秋分 2026-09-23 08:05；霜降 2026-10-23 17:38；小雪 2026-11-22 15:23；冬至 2026-12-22 04:50。附日出、上中天、日落。只覆盖这 12 个中气。",
+      "published_at": "2026",
+      "effective_at": "2026-01-01",
+      "expires_at": "2026-12-31",
+      "region": "HK",
+      "license": "HKO 版权，引用需注明",
+      "language": "zh-Hant",
+      "principle_only": false,
+      "supersedes": ""
+    },
+    {
+      "id": "SS-03",
+      "section": "solar-terms",
+      "product": "shunshi",
+      "title": "二十四節氣的日期及時間資料",
+      "url": "https://www.hko.gov.hk/tc/gts/astronomy/Solar_Term.htm",
+      "doi": "",
+      "publisher": "香港天文台",
+      "excerpt": "香港天文台历年二十四节气的日期与时间。香港时间与北京时间同为 UTC+8，可直接对照紫台年历。页面持续更新，每年仍以当年公布的分钟为准。",
+      "published_at": "",
+      "effective_at": "",
+      "expires_at": "",
+      "region": "HK",
+      "license": "HKO 版权，引用需注明",
+      "language": "zh-Hant",
+      "principle_only": false,
+      "supersedes": ""
+    },
+    {
+      "id": "SS-11",
+      "section": "dietary-guidelines",
+      "product": "shunshi",
+      "title": "中国居民膳食指南（2022）官网",
+      "url": "http://dg.cnsoc.org/",
+      "doi": "",
+      "publisher": "中国营养学会",
+      "excerpt": "膳食指南官网。2026-06-18 已召开《中国居民膳食指南》第五次修订工作会议。顺时只采用当季、本地、多样食物的一般原则，不写功效。新版发布后须复核。本条复核截止 2026-12-31。",
+      "published_at": "2022",
+      "effective_at": "2022",
+      "expires_at": "2026-12-31",
+      "region": "CN",
+      "license": "学会版权",
+      "language": "zh",
+      "principle_only": true,
+      "supersedes": ""
+    },
+    {
+      "id": "SS-DIET-CORE",
+      "section": "dietary-guidelines",
+      "product": "shunshi",
+      "title": "中国居民膳食指南（2022）核心推荐",
+      "url": "https://wjw.fj.gov.cn/ztzl/jkjy/jkzgxd/202206/t20220615_5930367.htm",
+      "doi": "",
+      "publisher": "中国疾病预防控制中心（福建省卫生健康委员会转载）",
+      "excerpt": "中国居民膳食指南（2022）八项一般原则：食物多样、合理搭配；吃动平衡、保持健康体重；多吃蔬果、奶类、全谷和大豆；适量吃鱼、禽、蛋、瘦肉；少盐少油、控糖限酒；规律进餐、足量饮水；会烹会选并阅读食品标签；使用公筷分餐并减少食物浪费。这些句子不描述医疗功效。第五次修订已于2026年6月启动，复核截止 2026-12-31。",
+      "published_at": "2022-06-15",
+      "effective_at": "2022-06-15",
+      "expires_at": "2026-12-31",
+      "region": "CN",
+      "license": "政府网站转载，引用需注明出处",
+      "language": "zh",
+      "principle_only": true,
+      "supersedes": ""
+    },
+    {
+      "id": "SS-DIET-WATER",
+      "section": "dietary-guidelines",
+      "product": "shunshi",
+      "title": "中国居民膳食指南2022 准则六 规律进餐，足量饮水",
+      "url": "http://dg.cnsoc.org/article/04/wDCyy7cWSJCN6pwKHOo5Dw.html",
+      "doi": "",
+      "publisher": "中国营养学会",
+      "excerpt": "《中国居民膳食指南（2022）》准则六的一般原则：温和气候、低身体活动水平的成年男性每天喝水约1700毫升，成年女性约1500毫升；喝白水或茶水，少喝含糖饮料。不写饮水的医疗功效。复核截止 2026-12-31。",
+      "published_at": "2022-05-06",
+      "effective_at": "2022-05-06",
+      "expires_at": "2026-12-31",
+      "region": "CN",
+      "license": "学会版权",
+      "language": "zh",
+      "principle_only": true,
+      "supersedes": ""
+    },
+    {
+      "id": "SS-DIET-ACTIVITY",
+      "section": "dietary-guidelines",
+      "product": "shunshi",
+      "title": "《中国居民膳食指南（2022）》平衡膳食八准则（身体活动）",
+      "url": "http://dg.cnsoc.org/article/04/J4-AsD_DR3OLQMnHG0-jZA.html",
+      "doi": "",
+      "publisher": "中国营养学会",
+      "excerpt": "《中国居民膳食指南（2022）》准则二的一般原则：每周至少5天中等强度身体活动，累计150分钟以上；主动身体活动最好每天6000步；减少久坐，每小时起来动一动。不把活动写成治疗或功效。复核截止 2026-12-31。",
+      "published_at": "",
+      "effective_at": "",
+      "expires_at": "2026-12-31",
+      "region": "CN",
+      "license": "学会版权",
+      "language": "zh",
+      "principle_only": true,
+      "supersedes": ""
+    },
+    {
+      "id": "SS-DIET-OIL",
+      "section": "dietary-guidelines",
+      "product": "shunshi",
+      "title": "减油、增豆、加奶核心信息",
+      "url": "https://www.nhc.gov.cn/sps/c100087/202404/90c64c79708740a1bca0ee31e524caf7.shtml",
+      "doi": "",
+      "publisher": "国家卫生健康委员会",
+      "excerpt": "国家卫生健康委员会2024年核心信息：培养清淡、不油腻的饮食习惯；成年人平均每天可摄入15至25克大豆或相当量豆制品。这是一般饮食原则，不说明医疗功效。与膳食指南一并在 2026-12-31 前复核。",
+      "published_at": "2024-04-29",
+      "effective_at": "2024-04-29",
+      "expires_at": "2026-12-31",
+      "region": "CN",
+      "license": "政府公开文件",
+      "language": "zh",
+      "principle_only": true,
+      "supersedes": ""
+    }
+  ]
+}
