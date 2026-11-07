@@ -21,6 +21,21 @@ _NUM = re.compile(r"^\s*(?:第[一二三四五六七八九十]+章[:：]\s*|[一
 _PAREN = re.compile(r"[（(].*?[）)]")
 _GENERIC_HEADINGS = frozenset({"说明", "简介", "概述", "注意事项", "总结", "前言", "备注"})
 HEADING_BOOST = 0.5
+# 问「第一个动作」时，标题里的「第一式」应盖过同名功法总述拿到的标题加权。
+SPECIFIC_FORM_BOOST = 0.6
+_SPECIFIC_FORMS = (
+    ("第一个动作", "第一式"),
+    ("第一式", "第一式"),
+    ("第二个动作", "第二式"),
+    ("第二式", "第二式"),
+    ("第三个动作", "第三式"),
+    ("第三式", "第三式"),
+    ("第四个动作", "第四式"),
+    ("第五个动作", "第五式"),
+    ("第六个动作", "第六式"),
+    ("第七个动作", "第七式"),
+    ("第八个动作", "第八式"),
+)
 STALE_PENALTY = 0.5  # kept for callers that import it; expired sources are now dropped, not just down-weighted
 
 
@@ -35,6 +50,14 @@ def is_expired(meta: dict, today: date | None = None) -> bool:
         return date.fromisoformat(str(meta["valid_until"])) < (today or _today())
     except (KeyError, ValueError):
         return True
+
+
+def _specific_form_boost(query: str, heading_path: list[str]) -> float:
+    heading = heading_path[-1] if heading_path else ""
+    for cue, mark in _SPECIFIC_FORMS:
+        if cue in query and mark in heading:
+            return SPECIFIC_FORM_BOOST
+    return 0.0
 
 
 def _heading_topic(heading_path: list[str]) -> str:
@@ -117,6 +140,7 @@ def retrieve(
         topic = _heading_topic(chunk.heading_path)
         if len(topic) >= 2 and topic not in _GENERIC_HEADINGS and topic in query:
             score += HEADING_BOOST
+        score += _specific_form_boost(query, chunk.heading_path)
 
         filtered.append((idx, score))
 
