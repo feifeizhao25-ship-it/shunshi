@@ -234,6 +234,7 @@ class _LoginPageState extends State<LoginPage> {
         data['data']?['token'] as String?;
     if (token != null) {
       await StorageManager.user.saveToken(token);
+      await StorageManager.user.setLoggedIn(true);
     }
     // 保存手机号到本地
     if (phone != null) {

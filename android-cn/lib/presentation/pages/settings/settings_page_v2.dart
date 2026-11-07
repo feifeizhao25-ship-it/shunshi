@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../design_system/theme.dart';
 import '../../../data/services/notification_service.dart';
+import '../../../data/storage/local_session.dart';
 
 class SettingsPageV2 extends StatefulWidget {
   const SettingsPageV2({super.key});
@@ -258,8 +259,7 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
           Center(
             child: GestureDetector(
               onTap: () async {
-                final prefs = await SharedPreferences.getInstance();
-                await prefs.remove('auth_token');
+                await endLocalSession();
                 if (!context.mounted) return;
                 context.go('/login');
               },

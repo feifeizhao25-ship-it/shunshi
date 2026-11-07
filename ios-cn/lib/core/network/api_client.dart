@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import '../config/app_config.dart';
+import 'domestic_headers.dart';
 
 class ApiClient {
   late final Dio _dio;
@@ -27,6 +28,7 @@ class ApiClient {
     _dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) {
+          options.headers.addAll(domesticRequestHeaders());
           if (kDebugMode) {
             print('API Request: ${options.method} ${options.path}');
           }

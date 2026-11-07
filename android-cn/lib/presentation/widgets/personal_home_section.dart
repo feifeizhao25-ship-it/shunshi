@@ -342,9 +342,9 @@ class _PersonalHomeSectionState extends State<PersonalHomeSection> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(_t.heading, style: text.labelMedium?.copyWith(color: scheme.primary, letterSpacing: _t.letterSpacing, fontWeight: FontWeight.w600)),
+        Text(_t.heading, style: text.labelMedium?.copyWith(fontFamily: 'NotoSansSC', color: scheme.primary, letterSpacing: _t.letterSpacing, fontWeight: FontWeight.w600)),
         const SizedBox(height: 6),
-        if (d.greeting.isNotEmpty) Text(d.greeting, key: const Key('personal-home-greeting'), style: text.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+        if (d.greeting.isNotEmpty) Text(d.greeting, key: const Key('personal-home-greeting'), style: text.titleMedium?.copyWith(fontFamily: 'NotoSansSC', fontWeight: FontWeight.w700, color: scheme.onSurface)),
         if (d.headline.isNotEmpty) ...[
           const SizedBox(height: 4),
           Text(d.headline, key: const Key('personal-home-headline'), style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant)),
@@ -552,14 +552,14 @@ class _CardTile extends StatelessWidget {
         const SizedBox(width: 12),
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(card.title, maxLines: 3, overflow: TextOverflow.ellipsis, style: text.bodyLarge?.copyWith(fontWeight: FontWeight.w600, height: 1.3)),
+            Text(card.title, maxLines: 3, overflow: TextOverflow.ellipsis, style: text.bodyLarge?.copyWith(fontFamily: 'NotoSansSC', fontWeight: FontWeight.w600, height: 1.3, color: scheme.onSurface)),
             if (card.body.isNotEmpty) ...[
               const SizedBox(height: 3),
               Text(card.body, maxLines: 2, overflow: TextOverflow.ellipsis, style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
             ],
             if (card.minutes != null) ...[
               const SizedBox(height: 6),
-              Text(strings.minutes(card.minutes!), style: text.labelSmall?.copyWith(color: scheme.primary, fontWeight: FontWeight.w600)),
+              Text(strings.minutes(card.minutes!), style: text.labelSmall?.copyWith(fontFamily: 'NotoSansSC', color: scheme.primary, fontWeight: FontWeight.w600)),
             ],
             if (card.reason.isNotEmpty) ...[
               const SizedBox(height: 8),
@@ -575,7 +575,7 @@ class _CardTile extends StatelessWidget {
                     key: Key('personal-home-why-${card.id}'),
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
-                    style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant, fontSize: 12, height: 1.3),
+                    style: text.bodySmall?.copyWith(fontFamily: 'NotoSansSC', color: scheme.onSurfaceVariant, fontSize: 12, height: 1.3),
                   ),
                 ),
               ]),

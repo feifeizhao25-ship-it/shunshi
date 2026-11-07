@@ -2,6 +2,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../../data/storage/local_session.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../design_system/theme.dart';
@@ -162,7 +163,11 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
           // 退出登录
           Center(
             child: GestureDetector(
-              onTap: () => context.go('/login'),
+              onTap: () async {
+                await endLocalSession();
+                if (!context.mounted) return;
+                context.go('/login');
+              },
               child: Text('退出登录', style: TextStyle(fontSize: 15, color: Colors.red[400])),
             ),
           ),

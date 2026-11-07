@@ -111,6 +111,10 @@ flutter:
     - family: NotoSerifSC
       fonts:
         - asset: assets/fonts/NotoSerifSC-Regular.ttf
+        - asset: assets/fonts/NotoSerifSC-Regular.ttf
+          weight: 500
+        - asset: assets/fonts/NotoSerifSC-Regular.ttf
+          weight: 600
         - asset: assets/fonts/NotoSerifSC-Bold.ttf
           weight: 700
     - family: Manrope
@@ -119,5 +123,9 @@ flutter:
     - family: NotoSansSC
       fonts:
         - asset: assets/fonts/NotoSansSC-Regular.ttf
+        - asset: assets/fonts/NotoSansSC-Regular.ttf
+          weight: 500
+        - asset: assets/fonts/NotoSansSC-Regular.ttf
+          weight: 600
         - asset: assets/fonts/NotoSansSC-Bold.ttf
           weight: 700
