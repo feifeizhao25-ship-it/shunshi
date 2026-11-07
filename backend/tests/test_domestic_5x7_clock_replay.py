@@ -40,6 +40,24 @@ ONBOARD = {
 }
 
 
+def test_clock_header_is_test_env_only():
+    from types import SimpleNamespace
+
+    request = SimpleNamespace(headers={"x-shunshi-test-now": "2026-11-04T21:00:00+08:00"})
+    assert phs.test_clock(request, SimpleNamespace(env="production")) is None
+    assert phs.test_clock(request, SimpleNamespace(env="development")) is None
+    pinned = phs.test_clock(request, SimpleNamespace(env="testing"))
+    assert pinned is not None and pinned.astimezone(SH).hour == 21
+
+
+def test_http_dashboard_uses_test_clock_header(client):
+    headers, _user_id = _guest(client)
+    headers = {**headers, "X-Shunshi-Test-Now": "2026-11-04T21:00:00+08:00"}
+    board = _board(client, headers)
+    assert board["date"] == "2026-11-04"
+    assert board["time_of_day"] == "evening"
+
+
 def _pin_now(is_global, tz, now_utc=None):
     when = PIN[-1]
     return when.astimezone(SH) if not is_global else when
