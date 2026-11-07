@@ -131,6 +131,12 @@ def _restore_domestic_entitlement(request, db, user_id):
             ORDER BY s.rowid DESC LIMIT 1""", (user_id,),
         ).fetchone()
         if row is None:
+            from .refund_settlement import project_after_refund_if_no_paid_source
+            if project_after_refund_if_no_paid_source(request, db, user_id):
+                db.execute("""UPDATE domestic_payment_recovery SET status='done',
+                    attempts=0,next_attempt_at=0,last_error=NULL WHERE user_id=?""", (user_id,))
+                db.commit()
+                return
             raise HTTPException(status_code=409, detail="已付款订单缺少会员记录，请核对")
         latest = dict(row)
         expiry = latest["membership_expires_at"]
