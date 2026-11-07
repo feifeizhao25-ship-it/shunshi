@@ -35,11 +35,13 @@ class Subscription {
   }
 }
 
-/// 席位只读接口的 family_seats。缺字段时为 0，不按 level 猜人数。
+/// 席位只读接口的 family_seats。缺字段、负数、非数或带小数时为 0，不按 level 猜人数。
 int _familySeatsFromServer(Map<String, dynamic> json) {
   final raw = json['family_seats'];
-  if (raw is num && raw.isFinite && raw >= 0) return raw.toInt();
-  return 0;
+  if (raw is! num || !raw.isFinite || raw < 0) return 0;
+  final seats = raw.toInt();
+  if (seats.toDouble() != raw.toDouble()) return 0;
+  return seats;
 }
 
 /// 订阅计划（从前端固定写入，对应后端4个层级）

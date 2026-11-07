@@ -2,6 +2,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shunshi/data/models/subscription.dart';
 import 'package:shunshi/data/services/store_service.dart';
 
+const _omit = Object();
+
 void main() {
   test('0S3 年付唯一：月价为空时显示年价，不把付费档显示成免费', () {
     final plan = SubscriptionPlan.fromJson({
@@ -31,21 +33,30 @@ void main() {
     expect(plan.familySeats, 0);
   });
 
-  test('family_seats 以接口为准，level 不能改写成 4', () {
-    final plan = SubscriptionPlan.fromJson({
-      'id': 'jiahe',
-      'name': '家和版（已停售）',
-      'price_cents': 69900,
-      'level': 3,
-      'family_seats': 2,
-      'on_sale': false,
-    });
-    expect(plan.familySeats, 2);
-    expect(SubscriptionPlan.fromJson({
-      'id': 'jiahe',
-      'level': 3,
-      'price_cents': 69900,
-    }).familySeats, 0);
+  test('family_seats 只接受接口里的非负整数', () {
+    SubscriptionPlan parse(Object? seats) {
+      final json = <String, dynamic>{
+        'id': 'jiahe',
+        'name': '家和版（已停售）',
+        'price_cents': 69900,
+        'level': 3,
+        'on_sale': false,
+      };
+      if (seats != _omit) json['family_seats'] = seats;
+      return SubscriptionPlan.fromJson(json);
+    }
+
+    expect(parse(_omit).familySeats, 0);
+    expect(parse(null).familySeats, 0);
+    expect(parse(0).familySeats, 0);
+    expect(parse(2).familySeats, 2);
+    expect(parse(2.0).familySeats, 2);
+    expect(parse(-1).familySeats, 0);
+    expect(parse(2.9).familySeats, 0);
+    expect(parse(double.nan).familySeats, 0);
+    expect(parse(double.infinity).familySeats, 0);
+    expect(parse('2').familySeats, 0);
+    expect(parse(true).familySeats, 0);
   });
 
   test('商店只拉取两个在售年付商品', () {
