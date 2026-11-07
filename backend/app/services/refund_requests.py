@@ -25,13 +25,17 @@ def _order(db, order_no, user_id):
     return row
 
 
-def _view(row):
-    if row['status'] != 'pending_review':
-        raise HTTPException(status_code=503, detail='退款处理状态需要核对')
-    return {'order_no': row['order_no'], 'refund_no': row['refund_no'],
-        'refund_amount': f"{row['amount_cents'] // 100}.{row['amount_cents'] % 100:02d}",
-        'refund_status': 'PENDING_REVIEW', 'status_label': '待处理',
-        'refund_completed': False, 'created_at': row['created_at']}
+def _view(row, order_status):
+    amount = f"{row['amount_cents'] // 100}.{row['amount_cents'] % 100:02d}"
+    base = {'order_no': row['order_no'], 'refund_no': row['refund_no'],
+        'refund_amount': amount, 'created_at': row['created_at']}
+    if row['status'] == 'pending_review':
+        return {**base, 'refund_status': 'PENDING_REVIEW', 'status_label': '待处理',
+            'refund_completed': False}
+    if row['status'] == 'settled' and order_status == 'refunded':
+        return {**base, 'refund_status': 'REFUND_SUCCESS', 'status_label': '已退款',
+            'refund_completed': True}
+    raise HTTPException(status_code=503, detail='退款处理状态需要核对')
 
 
 def submit_refund_request(order_no, user_id, amount, reason):
@@ -57,14 +61,14 @@ def submit_refund_request(order_no, user_id, amount, reason):
         if existing is not None:
             if existing['amount_cents'] != cents:
                 raise HTTPException(status_code=409, detail='该订单已有退款申请，请先核对原申请')
-            result = _view(existing)
+            result = _view(existing, order['status'])
         else:
             db.execute("""INSERT INTO domestic_refund_requests
                 (order_no,refund_no,user_id,amount_cents,reason,created_at)
                 VALUES (?,?,?,?,?,?)""", (order_no, 'RF' + uuid.uuid4().hex,
                     user_id, cents, reason, datetime.now(timezone.utc).isoformat()))
             result = _view(db.execute('SELECT * FROM domestic_refund_requests WHERE order_no=?',
-                (order_no,)).fetchone())
+                (order_no,)).fetchone(), order['status'])
         db.commit()
         return result
     except Exception:
@@ -83,6 +87,6 @@ def get_refund_request(order_no, user_id):
             (order_no,)).fetchone()
         if row is None:
             raise HTTPException(status_code=404, detail='退款申请不存在')
-        return _view(row)
+        return _view(row, _order(db, order_no, user_id)['status'])
     finally:
         close_test_connection(db)
