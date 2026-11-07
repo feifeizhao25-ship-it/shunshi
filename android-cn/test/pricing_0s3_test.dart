@@ -30,6 +30,23 @@ void main() {
     expect(plan.familySeats, 0);
   });
 
+  test('family_seats 以接口为准，level 不能改写成 4', () {
+    final plan = SubscriptionPlan.fromJson({
+      'id': 'jiahe',
+      'name': '家和版（已停售）',
+      'price_cents': 69900,
+      'level': 3,
+      'family_seats': 2,
+      'on_sale': false,
+    });
+    expect(plan.familySeats, 2);
+    expect(SubscriptionPlan.fromJson({
+      'id': 'jiahe',
+      'level': 3,
+      'price_cents': 69900,
+    }).familySeats, 0);
+  });
+
   test('商店只拉取两个在售年付商品', () {
     expect(StoreService.productIds.values.toSet(),
         {'com.shunshi.content.yearly', 'com.shunshi.member.yearly'});

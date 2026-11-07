@@ -71,14 +71,21 @@ void main() {
       expect(plan.isRecommended, isTrue);
     });
 
-    test('TC-PAY-001g: family plan has 4 seats', () {
+    test('TC-PAY-001g: family seats follow the server field', () {
       final plan = SubscriptionPlan.fromJson({
-        'id': 'family',
-        'name': '家庭版',
-        'price_cents': 59800,
+        'id': 'jiahe',
+        'name': '家和版（已停售）',
+        'price_cents': 69900,
+        'level': 3,
+        'family_seats': 2,
+      });
+      expect(plan.familySeats, 2);
+      final missing = SubscriptionPlan.fromJson({
+        'id': 'jiahe',
+        'name': '家和版（已停售）',
         'level': 3,
       });
-      expect(plan.familySeats, 4);
+      expect(missing.familySeats, 0);
     });
   });
 

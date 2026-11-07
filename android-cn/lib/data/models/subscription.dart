@@ -35,6 +35,13 @@ class Subscription {
   }
 }
 
+/// 席位只读接口的 family_seats。缺字段时为 0，不按 level 猜人数。
+int _familySeatsFromServer(Map<String, dynamic> json) {
+  final raw = json['family_seats'];
+  if (raw is num && raw.isFinite && raw >= 0) return raw.toInt();
+  return 0;
+}
+
 /// 订阅计划（从前端固定写入，对应后端4个层级）
 class SubscriptionPlan {
   final String id;
@@ -139,7 +146,7 @@ class SubscriptionPlan {
         json['features'] ?? featMap[level] ?? {},
       ),
       isCurrent: json['is_current'] ?? json['is_current_tier'] ?? false,
-      familySeats: level == 3 ? 4 : 0,
+      familySeats: _familySeatsFromServer(json),
       isRecommended: recommended || level == 2,
     );
   }
