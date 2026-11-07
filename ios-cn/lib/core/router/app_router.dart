@@ -81,7 +81,7 @@ class AppRouter {
     routes: [
       // Browser URL `/` has an empty hash. HashUrlStrategy reports that as `/`
       // and omits the hash again when the location is `/`, so a missing route
-      // stays on `http://host/` and errorBuilder shows the calm card
+      // stays on the site root with an empty hash, and errorBuilder shows the calm card
       // (GoException: no routes for location: /).
       GoRoute(
         path: '/',

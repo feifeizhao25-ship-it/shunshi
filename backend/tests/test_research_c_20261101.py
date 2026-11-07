@@ -71,6 +71,11 @@ def test_hybrid_beats_tfidf_on_paraphrase_dev(monkeypatch):
     assert on["mrr"] > off["mrr"] and on["recall_at_5"] >= off["recall_at_5"]
 
 
+# 主库不再收录 NHC 儿童肥胖食养指南。原来的 verified_cn.md:cn_0003 因此不存在，
+# 编号也不再复用。这条问法仍留在评测集里，召回不到就计为未命中，不从集里删掉。
+_RETIRED_EXPECTED_IDS = {"verified_cn.md:cn_0003"}
+
+
 def test_paraphrase_expected_ids_exist():
     from app.rag.knowledge_base import cn_kb, gl_kb, load_knowledge_bases
     from app.self_improve import paraphrase_eval as P
@@ -80,7 +85,37 @@ def test_paraphrase_expected_ids_exist():
         ids = {P.chunk_uid(c) for c in kb.chunks}
         for held in (False, True):
             for c in P.load(lang, held):
-                assert set(c["expected"]) <= ids, c["id"]
+                missing = set(c["expected"]) - _RETIRED_EXPECTED_IDS - ids
+                assert not missing, (c["id"], missing)
+
+
+def test_verified_cn_ids_stay_on_the_same_sections():
+    """删掉指南之后，喝水/活动/睡眠仍用原来的 chunk_id，不能指到下一节。"""
+    from app.rag.knowledge_base import cn_kb, load_knowledge_bases
+
+    load_knowledge_bases(include_legacy=True, force=True)
+    titles = {
+        c.chunk_id: c.heading_path[-1]
+        for c in cn_kb.chunks
+        if c.metadata.get("source_file") == "verified_cn.md"
+    }
+    assert titles["cn_0004"] == "每天喝多少水"
+    assert titles["cn_0005"] == "成年人每周动多少"
+    assert titles["cn_0006"] == "成年人睡多久"
+    assert "cn_0003" not in titles
+    text = Path(__file__).resolve().parents[1].joinpath("app/rag/verified_cn.md").read_text("utf-8")
+    assert "肥胖食养指南" not in text
+
+
+def test_specific_form_outranks_the_overview():
+    from app.rag.knowledge_base import load_knowledge_bases
+    from app.rag.retriever import retrieve
+
+    load_knowledge_bases(include_legacy=True, force=True)
+    top = retrieve("想学八段锦第一个动作怎么做", lang="cn", top_k=5)
+    assert top and "第一式" in top[0]["heading_path"][-1]
+    postpartum = retrieve("产后第一周怎么恢复", lang="cn", top_k=3)
+    assert postpartum and all("第一式" not in r["heading_path"][-1] for r in postpartum)
 
 
 # ------------------------------------------------------------------ 节气
