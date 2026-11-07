@@ -137,6 +137,7 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
           'user_constitution', profile['constitution_type'] as String);
       await prefs.setStringList(
           'user_health_concerns', _healthConcerns.toList());
+      await _syncChosenGoal();
       await ProfileSetupPage.markCompleted();
 
       if (mounted) {
@@ -152,9 +153,35 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
           'user_constitution', profile['constitution_type'] as String);
       await prefs.setStringList(
           'user_health_concerns', _healthConcerns.toList());
+      await _syncChosenGoal();
       await ProfileSetupPage.markCompleted();
       if (mounted) context.go('/home');
     }
+  }
+
+  /// 只把用户真正点过的关注交给首页。没选就不写目标，也不补一个默认目标。
+  Future<void> _syncChosenGoal() async {
+    final prefs = await SharedPreferences.getInstance();
+    final earlier = prefs.getStringList('user_concerns') ?? const <String>[];
+    final chosen = <String>{
+      for (final item in earlier)
+        if (item.trim().isNotEmpty) item.trim(),
+      ..._healthConcerns,
+    };
+    final client = ApiClient();
+    if (chosen.isNotEmpty) {
+      try {
+        await client.post('/api/v1/seasons/onboarding/complete', data: {
+          'help_goal': chosen.join(' '),
+        });
+      } catch (_) {}
+    }
+    const known = {'平和', '气虚', '阳虚', '阴虚', '痰湿', '湿热', '血瘀', '气郁'};
+    final label = _constitution.replaceAll('质', '');
+    if (!known.contains(label)) return;
+    try {
+      await client.post('/api/v1/seasons/profile/preferences', data: {'constitution': label});
+    } catch (_) {}
   }
 
   @override

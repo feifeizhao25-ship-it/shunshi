@@ -106,7 +106,7 @@ GOAL_WORDS = (
     (("睡", "失眠", "熬夜", "sleep", "rest"), "sleep"),
     (("压力", "放松", "焦虑", "减压", "stress", "relax", "calm", "anxi"), "breathing"),
     (("情绪", "心情", "mood", "happy"), "mood"),
-    (("精神", "累", "疲劳", "活力", "运动", "energy", "move", "active", "fit"), "exercise"),
+    (("精神", "累", "疲劳", "活力", "运动", "走动", "energy", "move", "active", "fit"), "exercise"),
     (("家人", "家庭", "父母", "孩子", "family"), "family"),
     (("饮食", "吃", "food", "eat", "diet", "nutrition"), "food"),
 )

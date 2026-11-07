@@ -18,6 +18,7 @@ import '../../../core/config/app_config.dart';
 import '../../../design_system/app_colors.dart';
 import '../../../design_system/style_theming.dart';
 import '../../../data/network/session.dart';
+import '../../../core/time/domestic_clock.dart';
 
 // ═══════════════════════════════════════════════════════════════
 // 十二时辰数据模型（本地计算）
@@ -55,7 +56,7 @@ class BentoAction {
 }
 
 ShiChenData getCurrentShiChen() {
-  final hour = DateTime.now().hour;
+  final hour = domesticNow().hour;
   for (final sc in _shiChenList) {
     final parts = sc.timeRange.split('-');
     final start = int.parse(parts[0]);
@@ -209,7 +210,7 @@ const _shiChenList = <ShiChenData>[
 // ═══════════════════════════════════════════════════════════════
 
 String _getCurrentSolarTermInfo() {
-  final now = DateTime.now();
+  final now = domesticNow();
   final month = now.month;
   final day = now.day;
   // 粗略映射

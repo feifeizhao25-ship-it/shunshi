@@ -408,6 +408,7 @@ class ShunShiTheme {
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
+      fontFamily: ShunShiTypography.sansFamily,
       brightness: Brightness.light,
       colorScheme: ColorScheme.light(
         primary: ShunShiColors.primary,
@@ -529,6 +530,7 @@ class ShunShiTheme {
   static ThemeData get darkTheme {
     return ThemeData(
       useMaterial3: true,
+      fontFamily: ShunShiTypography.sansFamily,
       brightness: Brightness.dark,
       colorScheme: ColorScheme.dark(
         primary: ShunShiColors.darkPrimary,

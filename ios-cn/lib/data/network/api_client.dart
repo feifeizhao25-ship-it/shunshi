@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
-import 'dart:io';
 import '../storage/storage_manager.dart';
 import '../../core/config/app_config.dart';
+import '../../core/network/domestic_headers.dart';
 
 /// API 错误类型
 enum ApiErrorType {
@@ -34,17 +34,10 @@ class ApiClient {
   static String baseUrl = _realDeviceUrl;
   static bool _detected = true; // 默认用真机IP，不需要检测
 
-  /// 自动检测网络环境（仅模拟器需要）
+  /// 网页和当前客户端都使用编译时配置的地址，不再探测模拟器网卡。
   static Future<void> detectBaseUrl() async {
-    if (_detected) return;
     _detected = true;
-    try {
-      final socket = await Socket.connect('10.0.2.2', 4000, timeout: const Duration(seconds: 1));
-      socket.destroy();
-      baseUrl = _emulatorUrl;
-    } catch (_) {
-      baseUrl = _realDeviceUrl;
-    }
+    baseUrl = _realDeviceUrl;
   }
   
   late final Dio _dio;
@@ -63,6 +56,7 @@ class ApiClient {
       onRequest: (options, handler) {
         // ngrok 免费版跳过浏览器警告
         options.headers['ngrok-skip-browser-warning'] = 'true';
+        options.headers.addAll(domesticRequestHeaders());
         // 自动添加 Token
         final token = StorageManager.user.getToken();
         if (token != null) {

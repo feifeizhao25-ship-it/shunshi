@@ -15,6 +15,7 @@ import '../../widgets/personal_home_section.dart';
 import '../../../core/solar_term/solar_term_table.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/cache/cache_service.dart';
+import '../../../core/time/domestic_clock.dart';
 
 // ═══════════════════════════════════════════════════════════════
 // 十二时辰数据模型（本地计算）
@@ -52,7 +53,7 @@ class BentoAction {
 }
 
 ShiChenData getCurrentShiChen() {
-  final hour = DateTime.now().hour;
+  final hour = domesticNow().hour;
   for (final sc in _shiChenList) {
     final parts = sc.timeRange.split('-');
     final start = int.parse(parts[0]);
@@ -206,7 +207,7 @@ const _shiChenList = <ShiChenData>[
 // ═══════════════════════════════════════════════════════════════
 
 String _getCurrentSolarTermInfo() {
-  final now = DateTime.now();
+  final now = domesticNow();
   final month = now.month;
   final day = now.day;
   const terms = [
@@ -312,7 +313,7 @@ class TodayRecommendation {
 
 List<TodayRecommendation> _getTodayRecommendations(ShiChenData sc) {
   // 根据时辰给出不同推荐
-  final hour = DateTime.now().hour;
+  final hour = domesticNow().hour;
   if (hour >= 5 && hour < 11) {
     return const [
       TodayRecommendation(icon: Icons.rice_bowl, title: '小米山药粥', subtitle: '温补脾胃，晨起首选', tag: '食物', accentColor: ShunShiColors.apricot, imageAsset: 'assets/images/morning_tea.jpg'),

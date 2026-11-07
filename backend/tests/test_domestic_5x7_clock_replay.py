@@ -50,6 +50,19 @@ def test_clock_header_is_test_env_only():
     assert pinned is not None and pinned.astimezone(SH).hour == 21
 
 
+def test_solar_term_uses_the_same_test_clock(client):
+    from app.utils.solar_term_calendar import beijing_today, term_on
+
+    pinned = client.get(
+        "/api/v1/solar-terms/current",
+        headers={"X-Shunshi-Test-Now": "2026-11-04T21:00:00+08:00"},
+    )
+    assert pinned.status_code == 200, pinned.text
+    assert pinned.json()["data"]["name"] == term_on(datetime(2026, 11, 4).date())
+    live = client.get("/api/v1/solar-terms/current")
+    assert live.json()["data"]["name"] == term_on(beijing_today())
+
+
 def test_http_dashboard_uses_test_clock_header(client):
     headers, _user_id = _guest(client)
     headers = {**headers, "X-Shunshi-Test-Now": "2026-11-04T21:00:00+08:00"}
