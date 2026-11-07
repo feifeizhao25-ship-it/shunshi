@@ -102,16 +102,26 @@ class ApiClient {
   Future<Response> get(
     String path, {
     Map<String, dynamic>? queryParameters,
+    Map<String, dynamic>? headers,
   }) async {
-    return await _dio.get(path, queryParameters: queryParameters);
+    return await _dio.get(
+      path,
+      queryParameters: queryParameters,
+      options: headers == null ? null : Options(headers: headers),
+    );
   }
   
   /// POST 请求
   Future<Response> post(
     String path, {
     dynamic data,
+    Map<String, dynamic>? headers,
   }) async {
-    return await _dio.post(path, data: data);
+    return await _dio.post(
+      path,
+      data: data,
+      options: headers == null ? null : Options(headers: headers),
+    );
   }
   
   /// PUT 请求
