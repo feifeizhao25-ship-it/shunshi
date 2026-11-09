@@ -20,7 +20,7 @@ class WellnessAdvice extends StatelessWidget {
           const SizedBox(height: 16),
           AdviceGroup(icon: '🍵', title: '饮食宜忌', items: term.diet, type: 'food_therapy'),
           const SizedBox(height: 16),
-          AdviceGroup(icon: '💆', title: '穴位调理', items: term.acupoint, type: 'acupoint'),
+          AdviceGroup(icon: '💆', title: '穴位按压', items: term.acupoint, type: 'acupoint'),
           const SizedBox(height: 16),
           AdviceGroup(icon: '🏃', title: '运动建议', items: term.exercise, type: 'exercise'),
           const SizedBox(height: 16),

@@ -657,10 +657,10 @@ class _WellnessAdvice extends StatelessWidget {
             type: 'food_therapy',
           ),
           const SizedBox(height: 16),
-          // 穴位调理
+          // 穴位按压
           _AdviceGroup(
             icon: '💆',
-            title: '穴位调理',
+            title: '穴位按压',
             items: term.acupoint,
             type: 'acupoint',
           ),

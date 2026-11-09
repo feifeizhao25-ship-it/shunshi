@@ -1,5 +1,5 @@
 /// 体质辨识测试页 V3 — 接 API
-/// GET /questions → 25题, POST /submit → 体质结果, GET /types → 9种体质详情
+/// GET /questions → 25题, POST /submit → 体质结果, GET /types → 9种习惯说明
 library;
 
 import 'package:dio/dio.dart';
@@ -220,7 +220,7 @@ class _ConstitutionTestV2State extends State<ConstitutionTestV2> {
                 Text('养生建议', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.white)),
               ]),
               const SizedBox(height: 10),
-              Text('根据您的$typeName特征，建议关注饮食调理和起居养生。具体方案请咨询AI养生助手获取个性化指导。',
+              Text('根据您的$typeName特征，建议关注饮食安排和起居养生。具体方案请咨询AI养生助手获取个性化指导。',
                 style: TextStyle(fontSize: 13, color: Colors.white70, height: 1.6)),
             ]),
           ),

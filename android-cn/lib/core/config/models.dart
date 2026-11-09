@@ -170,7 +170,7 @@ class TCMGlossary {
     '滋阴润燥': 'Nourish Yin, Moisten Dryness - for dry conditions',
     '温阳散寒': 'Warm Yang, Disperse Cold - for cold conditions',
     '活血化瘀': 'Invigorate Blood, Transform Stasis - for blood stasis',
-    '健脾祛湿': 'Strengthen Spleen, Eliminate Dampness - for dampness',
+    '饮食清淡': 'Strengthen Spleen, Eliminate Dampness - for dampness',
     '疏肝解郁': 'Soothe Liver, Relieve Depression - for emotional stress',
     '养心安神': 'Nourish Heart, Calm Mind - for sleep and anxiety',
   };

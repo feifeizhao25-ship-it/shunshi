@@ -721,7 +721,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
                         '情绪低落怎么办',
                         '想学八段锦',
                         '换季喝什么',
-                        '体质测试',
+                        '节气生活习惯自测',
                       ]
                       .map(
                         (t) => ActionChip(

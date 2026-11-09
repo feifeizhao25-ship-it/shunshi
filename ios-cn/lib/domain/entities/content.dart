@@ -8,7 +8,7 @@ enum ContentType {
   exercise,      // 运动导引
   acupoint,      // 穴位保健
   acupressure,   // 穴位按摩
-  sleepTip,      // 睡眠调理
+  sleepTip,      // 睡眠安排
   emotion,       // 情志调摄
   audio,         // 音频冥想
   article,       // 文章
