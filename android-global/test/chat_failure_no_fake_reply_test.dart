@@ -8,6 +8,8 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:seasons/core/theme/app_localizations.dart';
 import 'package:seasons/presentation/pages/chat/chat_failure.dart';
+import 'package:seasons/presentation/pages/chat/chat_page.dart' as legacy_chat;
+import 'package:seasons/presentation/pages/chat/seasons_chat_page.dart';
 import 'package:seasons/presentation/pages/chat_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -65,6 +67,66 @@ void main() {
     expect(find.textContaining('ginger-date tea'), findsNothing);
     expect(find.textContaining('snow fungus'), findsNothing);
     expect(find.textContaining('based on TCM wellness principles'), findsNothing);
+    final field = tester.widget<TextField>(find.byType(TextField).last);
+    expect(field.controller?.text, message);
+    await tester.pumpWidget(const SizedBox());
+  });
+
+  testWidgets('legacy chat page does not invent an offline wellness reply', (tester) async {
+    SharedPreferences.setMockInitialValues({'auth_token': 'local-test'});
+    FlutterSecureStorage.setMockInitialValues({});
+    await tester.pumpWidget(const MaterialApp(
+      locale: Locale('en'),
+      localizationsDelegates: [AppLocalizations.delegate],
+      supportedLocales: [Locale('en')],
+      home: legacy_chat.ChatPage(),
+    ));
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
+
+    const message = "I can't sleep and feel tired";
+    await tester.enterText(find.byType(TextField).last, message);
+    await tester.testTextInput.receiveAction(TextInputAction.send);
+    for (var i = 0; i < 100 && find.byKey(const ValueKey('chat-error')).evaluate().isEmpty; i++) {
+      await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 100)));
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+
+    expect(find.byKey(const ValueKey('chat-error')), findsOneWidget);
+    expect(find.textContaining('soaking your feet'), findsNothing);
+    expect(find.textContaining('ginger-date tea'), findsNothing);
+    expect(find.textContaining('Huangdi Neijing'), findsNothing);
+    expect(find.textContaining('tremella'), findsNothing);
+    expect(find.textContaining('I hear you'), findsNothing);
+    final field = tester.widget<TextField>(find.byType(TextField).last);
+    expect(field.controller?.text, message);
+    await tester.pumpWidget(const SizedBox());
+  });
+
+  testWidgets('seasons chat stream failure adds no assistant bubble', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    FlutterSecureStorage.setMockInitialValues({});
+    await tester.pumpWidget(const MaterialApp(
+      locale: Locale('en'),
+      localizationsDelegates: [AppLocalizations.delegate],
+      supportedLocales: [Locale('en')],
+      home: SeasonsChatPage(),
+    ));
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
+
+    const message = "I can't sleep and feel tired";
+    await tester.enterText(find.byType(TextField).last, message);
+    await tester.testTextInput.receiveAction(TextInputAction.send);
+    for (var i = 0; i < 100 && find.byKey(const ValueKey('chat-error')).evaluate().isEmpty; i++) {
+      await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 100)));
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+
+    expect(find.byKey(const ValueKey('chat-error')), findsOneWidget);
+    expect(find.textContaining('trouble connecting'), findsNothing);
+    expect(find.textContaining("I'm here"), findsNothing);
+    expect(find.textContaining('soaking your feet'), findsNothing);
     final field = tester.widget<TextField>(find.byType(TextField).last);
     expect(field.controller?.text, message);
     await tester.pumpWidget(const SizedBox());

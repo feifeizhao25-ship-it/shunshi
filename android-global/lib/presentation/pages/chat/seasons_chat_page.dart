@@ -14,6 +14,7 @@ import '../../../core/theme/app_localizations.dart';
 import '../../../core/network/api_singleton.dart';
 import '../../../core/config/app_config.dart';
 import '../../../data/network/session.dart';
+import 'chat_failure.dart';
 
 const String _systemPrompt =
     'You are SEASONS, a calm and thoughtful AI companion focused on seasonal '
@@ -40,6 +41,7 @@ class _SeasonsChatPageState extends State<SeasonsChatPage>
   bool _isStreaming = false;
   Object? _sseSubscription;
   String? _conversationId;
+  String? _chatError;
 
   static const int _maxInputLength = 500;
   static const int _maxHistory = 50;
@@ -143,6 +145,7 @@ class _SeasonsChatPageState extends State<SeasonsChatPage>
     final text = _controller.text.trim();
     if (text.isEmpty || _isLoading || _isStreaming) return;
     if (text.length > _maxInputLength) return;
+    if (_chatError != null) setState(() => _chatError = null);
     _controller.clear();
 
     // Safety checks (unchanged)
@@ -223,32 +226,44 @@ class _SeasonsChatPageState extends State<SeasonsChatPage>
             _saveHistory();
             _scrollToBottom();
           case 'error':
+            final failure = event.data['error'] ?? StateError('stream error');
             setState(() {
               _isLoading = false;
               _isStreaming = false;
-              _streamingText = '';
-              _messages.add(_ChatMessage(
-                role: 'assistant',
-                text: "I'm having trouble connecting. Please try again.",
-              ));
+              if (_streamingText.isNotEmpty) {
+                _messages.add(_ChatMessage(role: 'assistant', text: _streamingText));
+                _streamingText = '';
+              } else if (_controller.text.isEmpty) {
+                _controller.text = text;
+              }
+              _chatError = chatFailureMessage(failure);
             });
             _saveHistory();
             _scrollToBottom();
         }
       }
+      if (mounted && (_isLoading || _isStreaming)) {
+        setState(() {
+          _isLoading = false;
+          _isStreaming = false;
+          if (_streamingText.isEmpty && _controller.text.isEmpty) _controller.text = text;
+          _streamingText = '';
+          _chatError = chatFailureMessage(StateError('stream ended'));
+        });
+        _saveHistory();
+      }
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _isLoading = false;
         _isStreaming = false;
         if (_streamingText.isNotEmpty) {
           _messages.add(_ChatMessage(role: 'assistant', text: _streamingText));
           _streamingText = '';
-        } else {
-          _messages.add(_ChatMessage(
-            role: 'assistant',
-            text: "I'm having trouble connecting right now. Please try again in a moment.",
-          ));
+        } else if (_controller.text.isEmpty) {
+          _controller.text = text;
         }
+        _chatError = chatFailureMessage(e);
       });
       _saveHistory();
       _scrollToBottom();
@@ -928,7 +943,10 @@ class _SeasonsChatPageState extends State<SeasonsChatPage>
           top: BorderSide(color: AppColors.divider(context), width: 0.5),
         ),
       ),
-      child: Row(
+      child: Column(mainAxisSize: MainAxisSize.min, children: [
+        if (_chatError != null)
+          Padding(padding: const EdgeInsets.only(bottom: 8), child: Text(_chatError!, key: const ValueKey('chat-error'), style: TextStyle(color: Theme.of(context).colorScheme.error, fontSize: 13))),
+        Row(
         children: [
           Expanded(
             child: Container(
@@ -975,7 +993,8 @@ class _SeasonsChatPageState extends State<SeasonsChatPage>
             ),
           ),
         ],
-      ),
+        ),
+      ]),
     );
   }
 }
