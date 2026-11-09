@@ -43,7 +43,7 @@ class VoiceService implements VoiceInput {
   final _web = WebSpeechSession(
     localeId: 'zh_CN',
     permissionMessage: '请授予麦克风权限',
-    unavailableMessage: '当前浏览器不支持语音识别，请改用文字，或换用 Chrome。',
+    unavailableMessage: '当前浏览器不支持语音识别，请改用文字，或换用支持语音的浏览器。',
     emptyMessage: '未识别到语音内容',
     missedMessage: '没有听清，请再说一遍',
   );
