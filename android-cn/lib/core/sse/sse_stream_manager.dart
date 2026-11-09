@@ -136,11 +136,8 @@ enum ChatStreamState {
 class ChatStreamManager {
   ChatStreamState _state = ChatStreamState.idle;
   String _messageId = '';
-  String _model = '';
   String _content = '';
   final List<Map<String, dynamic>> _cards = [];
-  int _totalTokens = 0;
-  int _durationMs = 0;
   String? _errorMessage;
 
   // 首字超时检测 (§7.2: p95 < 1500ms)
@@ -203,7 +200,6 @@ class ChatStreamManager {
       case SSEEventType.start:
         _firstTokenTimer?.cancel();
         _messageId = event.data?['message_id'] as String? ?? '';
-        _model = event.data?['model'] as String? ?? '';
         _setState(ChatStreamState.streaming);
 
       case SSEEventType.token:
@@ -224,8 +220,6 @@ class ChatStreamManager {
 
       case SSEEventType.done:
         _tokenBuffer.forceFlush();
-        _totalTokens = event.data?['total_tokens'] as int? ?? 0;
-        _durationMs = event.data?['duration_ms'] as int? ?? 0;
         _cleanup();
         _setState(ChatStreamState.completed);
 
@@ -281,11 +275,8 @@ class ChatStreamManager {
   void _reset() {
     _state = ChatStreamState.idle;
     _messageId = '';
-    _model = '';
     _content = '';
     _cards.clear();
-    _totalTokens = 0;
-    _durationMs = 0;
     _errorMessage = null;
   }
 

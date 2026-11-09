@@ -3,7 +3,6 @@
 library;
 
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
 
 class MembershipCenterPage extends StatefulWidget {

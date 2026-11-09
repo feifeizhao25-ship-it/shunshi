@@ -238,17 +238,6 @@ class _WellnessCategoryPageState extends State<WellnessCategoryPage> {
     );
   }
 
-  Widget _buildIconPlaceholder(_Meta meta) {
-    return Container(
-      width: 44,
-      height: 44,
-      decoration: BoxDecoration(
-        color: ShunShiColors.primary.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Icon(meta.icon, size: 22, color: ShunShiColors.primary),
-    );
-  }
 }
 
 // ── Data models ──

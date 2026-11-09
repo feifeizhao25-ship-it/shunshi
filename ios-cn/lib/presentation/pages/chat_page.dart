@@ -10,7 +10,6 @@ import '../../data/services/voice_service.dart';
 import '../../design_system/theme.dart';
 import '../../design_system/theme_helper.dart';
 import '../widgets/feedback_sheet.dart';
-import '../widgets/membership_widgets.dart';
 import 'chat/chat_models.dart';
 import 'chat/chat_history_store.dart';
 import 'chat/chat_membership.dart';
@@ -397,11 +396,11 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
       if (hasRisk) reply = '⚠️ 以下内容仅供作息参考，不能替代医生诊断。如有不适请及时就医。\n\n$reply';
       if (convId != null) _conversationId = convId;
       setState(() {
-        if (usageReminder != null && usageReminder!.trim().isNotEmpty) {
+        if (usageReminder != null && usageReminder.trim().isNotEmpty) {
           _messages.add(
             ChatMessage(
               role: 'ai',
-              text: usageReminder!.trim(),
+              text: usageReminder.trim(),
               time: _fmt(DateTime.now()),
             ),
           );

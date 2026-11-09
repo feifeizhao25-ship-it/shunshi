@@ -11,7 +11,6 @@ import '../../design_system/theme.dart';
 import '../../design_system/theme_helper.dart';
 import '../widgets/feedback_sheet.dart';
 import '../../core/config/app_config.dart';
-import '../widgets/membership_widgets.dart';
 import 'chat/chat_models.dart';
 import 'chat/chat_history_store.dart';
 import 'chat/chat_membership.dart';

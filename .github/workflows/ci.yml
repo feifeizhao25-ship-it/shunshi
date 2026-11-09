@@ -99,7 +99,7 @@ jobs:
       - name: Get deps
         run: flutter pub get
       - name: Analyze
-        run: flutter analyze --no-fatal-warnings --no-fatal-infos
+        run: flutter analyze --no-fatal-infos
       - name: Test
         run: flutter test
       - name: Build APK (debug)
