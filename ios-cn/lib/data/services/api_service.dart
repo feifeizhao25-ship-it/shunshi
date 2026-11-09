@@ -109,25 +109,6 @@ class ApiService {
     ));
   }
   
-  /// 带重试的请求
-  Future<T> _requestWithRetry<T>(
-    Future<T> Function() request,
-  ) async {
-    int attempts = 0;
-    
-    while (true) {
-      try {
-        return await request();
-      } catch (e) {
-        attempts++;
-        if (attempts >= maxRetries) {
-          rethrow;
-        }
-        await Future.delayed(Duration(seconds: attempts));
-      }
-    }
-  }
-  
   // ==================== 路由 ====================
   
   /// 模型路由
