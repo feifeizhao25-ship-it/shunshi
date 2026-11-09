@@ -5,7 +5,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../core/theme/shunshi_colors.dart';
 import '../../../core/theme/shunshi_spacing.dart';
 import '../../../core/theme/shunshi_text_styles.dart';
 import '../../../data/network/api_client.dart';
@@ -23,18 +22,6 @@ const _constitutionTypes = [
   '血瘀质',
   '气郁质',
   '特禀质',
-];
-
-/// 健康关注选项
-const _healthConcerns = [
-  '睡眠',
-  '消化',
-  '情绪',
-  '免疫力',
-  '体重',
-  '皮肤',
-  '月经',
-  '其他',
 ];
 
 class ProfileSetupPage extends StatefulWidget {

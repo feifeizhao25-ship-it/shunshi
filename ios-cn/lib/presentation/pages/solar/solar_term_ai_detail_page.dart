@@ -78,8 +78,6 @@ class SolarTermAIDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? ShunShiColors.darkBackground : ShunShiColors.background;
-    final surfaceLow = isDark ? ShunShiColors.darkSurfaceContainerLow : ShunShiColors.surfaceContainerLow;
     final d = _data;
     return Scaffold(
       backgroundColor: isDark ? ShunShiColors.darkBackground : ShunShiColors.background,

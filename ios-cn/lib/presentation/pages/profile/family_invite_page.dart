@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../design_system/theme.dart';
 import '../../../core/router/safe_pop.dart';
 import '../../../design_system/app_colors.dart';
 
