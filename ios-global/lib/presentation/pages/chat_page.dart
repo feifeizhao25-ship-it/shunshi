@@ -22,6 +22,7 @@ import '../../core/culture/opening_greeting.dart';
 import 'settings/culture_binding.dart';
 import 'chat/chat_widgets.dart';
 import 'chat/voice_chrome.dart';
+import 'chat/chat_failure.dart';
 import '../../core/config/app_config.dart';
 
 const _baseUrl = AppConfig.apiBaseUrl;
@@ -236,6 +237,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
     final text = _controller.text.trim();
     if (text.isEmpty || _isLoading) return;
     if (!_isVip && _quotaRemaining <= 0) { _showUpgradePrompt(); return; }
+    if (_chatError != null) setState(() => _chatError = null);
     _controller.clear();
 
     // Prompt Injection 防护
@@ -328,23 +330,18 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
         }
         final v2Sources = (so?['disclaimer'] != null) ? ['⚠️ ${so?["disclaimer"]}'] : <String>[];
         handleAIReply(aiText, cards: v2Cards, sources: v2Sources, convId: v2Res.data?['conversation_id']);
-      } catch (_) {
-        handleAIReply(_offlineReply(text),
-          cards: [
-            SuggestionCard(type: 'diet', title: 'Eating well', subtitle: 'Moistening foods such as tremella and lily bulb are good choices', icon: Icons.restaurant),
-            SuggestionCard(type: 'rest', title: 'Daily routine', subtitle: 'Sleep early, rise early, follow the season', icon: Icons.bedtime),
-          ],
-          sources: const <String>[], // an offline fallback must never cite sources it did not use
-        );
+      } catch (error) {
+        // No made-up reply: show what went wrong and keep the message so the user can send it again.
+        if (!mounted) return;
+        setState(() {
+          _chatError = chatFailureMessage(error);
+          _isLoading = false;
+          if (_controller.text.isEmpty) _controller.text = text;
+        });
+        _saveConversation();
       }
     }
     _scrollToBottom();
-  }
-
-  String _offlineReply(String msg) {
-    if (msg.contains('sleep') || msg.contains('insomnia')) return 'Sleep trouble often goes with a restless mind. It\'s $_currentSolarTerm: try a 15-minute warm foot soak before bed, put the phone down and let your mind settle.';
-    if (msg.contains('tired') || msg.contains('exhausted')) return 'Feeling tired when the season changes is a normal response. Ease off the workload a little and eat warming foods. A cup of ginger and red date tea in the morning can help you recover.';
-    return 'I hear you. It\'s $_currentSolarTerm and the energy between heaven and earth is shifting. Would you like to talk about what is troubling you?';
   }
 
   String _fmt(DateTime dt) => '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';

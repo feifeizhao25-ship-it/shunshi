@@ -8,6 +8,7 @@ import '../../../design_system/theme.dart';
 import '../../widgets/membership_widgets.dart';
 import '../../../core/network/api_singleton.dart';
 import '../../../core/solar_term/solar_term_en.dart';
+import 'chat_failure.dart';
 /// Chat Page — AI Wellness Assistant
 /// Stripe-inspired messaging with purple accent
 class ChatPage extends StatefulWidget {
@@ -49,6 +50,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
   String _currentSolarTerm = currentSolarTermEn()?.$1 ?? 'this season';
   final String _solarTermDesc = 'The beginning of summer. Nourish the heart, eat lightly, rest properly.';
   String? _conversationId;
+  String? _chatError;
 
   @override
   void initState() {
@@ -152,6 +154,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
       _showUpgradePrompt();
       return;
     }
+    if (_chatError != null) setState(() => _chatError = null);
     _controller.clear();
 
     if (_containsBlocked(text)) {
@@ -182,8 +185,18 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
       // Use structured_output if available (Rule #4: ALWAYS structured)
       final structured = res.data?['structured_output'] as Map<String, dynamic>?;
       final reply = res.data?['reply'] ?? res.data?['text'] ?? '';
-      var aiText = structured?['insight'] ?? reply;
-      if (aiText.isEmpty) aiText = 'I\'m here. Take your time.';
+      var aiText = (structured?['insight'] ?? reply).toString();
+      if (aiText.isEmpty) {
+        if (!mounted) return;
+        setState(() {
+          _chatError = chatFailureMessage(StateError('empty reply'));
+          _isLoading = false;
+          if (_controller.text.isEmpty) _controller.text = text;
+        });
+        _saveConversation();
+        _scrollToBottom();
+        return;
+      }
 
       List<_SuggestionCard> cards = [];
       // Build cards from structured actions
@@ -227,26 +240,13 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
         if (!_isVip) _quotaRemaining--;
       });
       _saveConversation();
-    } catch (_) {
-      var offlineText = _offlineReply(text);
-      if (hasRisk) {
-        offlineText = '⚠️ For reference only. Please consult a doctor if you feel unwell.\n\n$offlineText';
-      }
-      offlineText = '$offlineText\n\n💡 Based on traditional Chinese wellness principles, for reference only';
-
+    } catch (error) {
+      // No made-up reply: the model did not answer. Keep the draft and say why.
+      if (!mounted) return;
       setState(() {
-        _messages.add(_ChatMessage(
-          role: 'ai',
-          text: offlineText,
-          cards: [
-            _SuggestionCard(type: 'diet', title: AppLocalizations.of(context).t('chat_dietary_care'), subtitle: AppLocalizations.of(context).t('chat_nourish_with_tremella_and_lily'), icon: Icons.restaurant),
-            _SuggestionCard(type: 'rest', title: AppLocalizations.of(context).t('chat_rest_suggestions'), subtitle: 'Sleep early, wake early, follow nature\'s rhythm', icon: Icons.bedtime),
-          ],
-          sources: const ['Huangdi Neijing · Suwen', 'Compendium of Materia Medica'],
-          time: _fmt(DateTime.now()),
-        ));
+        _chatError = chatFailureMessage(error);
         _isLoading = false;
-        if (!_isVip) _quotaRemaining--;
+        if (_controller.text.isEmpty) _controller.text = text;
       });
       _saveConversation();
     }
@@ -294,12 +294,6 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
     ));
   }
 
-  String _offlineReply(String msg) {
-    if (msg.contains('sleep') || msg.contains('insomnia') || msg.contains('tired')) return 'Sleep issues often relate to an unsettled mind. During $_currentSolarTerm, try soaking your feet in warm water for 15 minutes before bed, put down your phone, and let your mind quiet down.';
-    if (msg.contains('fatigue') || msg.contains('exhausted') || msg.contains('worn out')) return 'Feeling tired during seasonal transitions is normal. Consider reducing workload and eating warming, nourishing foods. A cup of ginger-date tea in the morning can help restore vitality.';
-    return 'I hear you. During $_currentSolarTerm, the energy between heaven and earth is shifting. Would you like to talk about what specifically concerns you?';
-  }
-
   IconData _iconFor(String? t) {
     switch (t) {
       case 'diet': case 'food': return Icons.restaurant;
@@ -339,7 +333,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
               ),
             ),
           Row(children: [
-        Container(width: 32, height: 32, decoration: BoxDecoration(color: AppColors.primary(context), shape: BoxShape.circle, borderRadius: BorderRadius.circular(16)), child: const Center(child: Text('🌿', style: TextStyle(fontSize: 16)))),
+        Container(width: 32, height: 32, decoration: BoxDecoration(color: AppColors.primary(context), shape: BoxShape.circle), child: const Center(child: Text('🌿', style: TextStyle(fontSize: 16)))),
         const SizedBox(width: 10),
         const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text('SEASONS AI', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary, letterSpacing: 0.3)),
@@ -448,7 +442,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
 
   Widget _buildAI(_ChatMessage m) {
     return Padding(padding: const EdgeInsets.only(bottom: 20), child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Container(width: 32, height: 32, decoration: BoxDecoration(color: AppColors.primary(context), shape: BoxShape.circle, borderRadius: BorderRadius.circular(16)), child: const Center(child: Text('🌿', style: TextStyle(fontSize: 14)))),
+      Container(width: 32, height: 32, decoration: BoxDecoration(color: AppColors.primary(context), shape: BoxShape.circle), child: const Center(child: Text('🌿', style: TextStyle(fontSize: 14)))),
       const SizedBox(width: 10),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(8), border: Border.all(color: AppColors.border(context))),
@@ -503,7 +497,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
 
   Widget _buildTyping() {
     return Padding(padding: const EdgeInsets.only(bottom: 20), child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Container(width: 32, height: 32, decoration: BoxDecoration(color: AppColors.primary(context), shape: BoxShape.circle, borderRadius: BorderRadius.circular(16)), child: const Center(child: Text('🌿', style: TextStyle(fontSize: 14)))),
+      Container(width: 32, height: 32, decoration: BoxDecoration(color: AppColors.primary(context), shape: BoxShape.circle), child: const Center(child: Text('🌿', style: TextStyle(fontSize: 14)))),
       const SizedBox(width: 10),
       Container(padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10), decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(8), border: Border.all(color: AppColors.border(context))),
         child: Row(mainAxisSize: MainAxisSize.min, children: List.generate(3, (i) => Padding(padding: EdgeInsets.only(left: i > 0 ? 4 : 0), child: Container(width: 6, height: 6, decoration: BoxDecoration(shape: BoxShape.circle, color: AppColors.primary(context).withValues(alpha: 0.4))))))),
@@ -514,7 +508,10 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
       decoration: BoxDecoration(color: AppColors.background(context), border: Border(top: BorderSide(color: AppColors.border(context), width: 0.5))),
-      child: Row(children: [
+      child: Column(mainAxisSize: MainAxisSize.min, children: [
+        if (_chatError != null)
+          Padding(padding: const EdgeInsets.only(bottom: 8), child: Text(_chatError!, key: const ValueKey('chat-error'), style: TextStyle(color: Theme.of(context).colorScheme.error, fontSize: 13))),
+        Row(children: [
         GestureDetector(onTap: _showQuickTopics, child: Container(width: 36, height: 36, decoration: BoxDecoration(shape: BoxShape.circle, color: AppColors.surface(context), border: Border.all(color: AppColors.border(context))), child: Icon(Icons.add_circle_outline, size: 18, color: AppColors.textTertiary(context)))),
         const SizedBox(width: 8),
         Expanded(child: Container(constraints: const BoxConstraints(maxHeight: 120), child: TextField(controller: _controller, focusNode: _focusNode, maxLines: null, textInputAction: TextInputAction.send, onSubmitted: (_) => _sendMessage(),
@@ -524,6 +521,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
         InkWell(onTap: _showVoiceInput, borderRadius: BorderRadius.circular(18), child: Container(width: 40, height: 40, decoration: BoxDecoration(shape: BoxShape.circle, color: AppColors.textPrimary(context)), child: const Icon(Icons.mic, color: Colors.white, size: 20))),
         const SizedBox(width: 6),
         GestureDetector(onTap: _sendMessage, child: Container(width: 36, height: 36, decoration: BoxDecoration(shape: BoxShape.circle, color: AppColors.primary(context)), child: const Icon(Icons.send, color: Colors.white, size: 16))),
+        ]),
       ]),
     );
   }

@@ -9,6 +9,7 @@ import '../../widgets/companion_session_notice.dart';
 import '../../widgets/feedback_sheet.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/config/app_config.dart';
+import 'chat_failure.dart';
 
 const String _systemPrompt =
     'You are SEASONS, a calm and thoughtful AI companion focused on seasonal '
@@ -29,6 +30,7 @@ class _SeasonsChatPageState extends State<SeasonsChatPage>
   final _focusNode = FocusNode();
   final List<_ChatMessage> _messages = [];
   bool _isLoading = false;
+  String? _chatError;
   late AnimationController _dotController;
 
   static const int _maxInputLength = 500;
@@ -127,6 +129,7 @@ class _SeasonsChatPageState extends State<SeasonsChatPage>
     final text = _controller.text.trim();
     if (text.isEmpty || _isLoading) return;
     if (text.length > _maxInputLength) return;
+    if (_chatError != null) setState(() => _chatError = null);
     _controller.clear();
 
     if (AISafetyService.isPromptInjection(text)) {
@@ -176,8 +179,18 @@ class _SeasonsChatPageState extends State<SeasonsChatPage>
       final structured =
           response.data?['structured_output'] as Map<String, dynamic>?;
       final reply = response.data?['reply'] ?? '';
-      var aiText = structured?['insight'] ?? reply;
-      if (aiText.isEmpty) aiText = "I'm here. Take your time.";
+      var aiText = (structured?['insight'] ?? reply).toString();
+      if (aiText.isEmpty) {
+        if (!mounted) return;
+        setState(() {
+          _isLoading = false;
+          _chatError = chatFailureMessage(StateError('empty reply'));
+          if (_controller.text.isEmpty) _controller.text = text;
+        });
+        _saveHistory();
+        _scrollToBottom();
+        return;
+      }
 
       final disclaimer = structured?['disclaimer'] ?? '';
       if (disclaimer.isNotEmpty) {
@@ -196,12 +209,11 @@ class _SeasonsChatPageState extends State<SeasonsChatPage>
         _isLoading = false;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() {
-        _messages.add(_ChatMessage(
-          role: 'assistant',
-          text: "I'm having trouble connecting right now. Please try again in a moment.",
-        ));
         _isLoading = false;
+        _chatError = chatFailureMessage(e);
+        if (_controller.text.isEmpty) _controller.text = text;
       });
     }
     _saveHistory();
@@ -808,7 +820,10 @@ class _SeasonsChatPageState extends State<SeasonsChatPage>
           top: BorderSide(color: AppColors.divider(context), width: 0.5),
         ),
       ),
-      child: Row(
+      child: Column(mainAxisSize: MainAxisSize.min, children: [
+        if (_chatError != null)
+          Padding(padding: const EdgeInsets.only(bottom: 8), child: Text(_chatError!, key: const ValueKey('chat-error'), style: TextStyle(color: Theme.of(context).colorScheme.error, fontSize: 13))),
+        Row(
         children: [
           Expanded(
             child: Container(
@@ -855,7 +870,8 @@ class _SeasonsChatPageState extends State<SeasonsChatPage>
             ),
           ),
         ],
-      ),
+        ),
+      ]),
     );
   }
 }
