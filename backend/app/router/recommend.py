@@ -21,6 +21,9 @@ class RecommendRequest(BaseModel):
     limit: int = 5
     offset: int = 0
     locale: str = "zh-CN"
+    # Same fields the profile already stores. Empty means no contraindication filter.
+    life_stage: Optional[str] = None
+    health_concerns: Optional[List[str]] = None
 
 
 def _format_item(r: dict) -> dict:
@@ -48,6 +51,12 @@ def _format_item(r: dict) -> dict:
     }
 
 
+def _request_flags(req: RecommendRequest):
+    from app.safety.contraindications import flags_from_profile
+
+    return flags_from_profile(life_stage=req.life_stage, health_concerns=req.health_concerns)
+
+
 @router.post("/personalized")
 async def personalized_recommendations(req: RecommendRequest):
     """个性化推荐内容列表"""
@@ -60,6 +69,7 @@ async def personalized_recommendations(req: RecommendRequest):
         limit=req.limit,
         offset=req.offset,
         locale=req.locale,
+        profile_flags=_request_flags(req),
     )
     items = [_format_item(r) for r in results]
     return {"success": True, "data": {"items": items, "total": len(items)}}
@@ -73,6 +83,7 @@ async def today_digest(req: RecommendRequest):
         solar_term=req.solar_term,
         season=req.season,
         health_status=req.health_status,
+        profile_flags=_request_flags(req),
     )
     return {"success": True, "data": digest}
 

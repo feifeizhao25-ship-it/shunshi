@@ -148,6 +148,7 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
         await prefs.setString('constitution_scores', jsonEncode(scoreList));
         await prefs.setString('constitution_test_date', DateTime.now().toIso8601String());
         await prefs.setString('constitution_result_id', data['result_id'] as String? ?? '');
+        final profileBits = _profileBits(prefs);
 
         setState(() {
           // 解析后端返回的详细建议
@@ -179,16 +180,16 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
             adviceList.add(HealthAdvice(
               category: meta.$2,
               icon: meta.$1,
-              items: [content],
+              items: [_shownAdvice(content, profileBits)],
             ));
           }
 
           // 如果后端没解析出内容，用本地常量兜底
           if (adviceList.isEmpty) {
             adviceList.addAll([
-              HealthAdvice(category: '饮食调养', icon: '🥗', items: [(kConstitutionAdvice[primaryType]?['饮食'] ?? '')]),
-              HealthAdvice(category: '茶饮推荐', icon: '🍵', items: [(kConstitutionAdvice[primaryType]?['茶饮'] ?? '')]),
-              HealthAdvice(category: '运动建议', icon: '🏃', items: [(kConstitutionAdvice[primaryType]?['运动'] ?? '')]),
+              HealthAdvice(category: '饮食调养', icon: '🥗', items: [_shownAdvice(kConstitutionAdvice[primaryType]?['饮食'] ?? '', profileBits)]),
+              HealthAdvice(category: '茶饮推荐', icon: '🍵', items: [_shownAdvice(kConstitutionAdvice[primaryType]?['茶饮'] ?? '', profileBits)]),
+              HealthAdvice(category: '运动建议', icon: '🏃', items: [_shownAdvice(kConstitutionAdvice[primaryType]?['运动'] ?? '', profileBits)]),
             ]);
           }
 
@@ -221,8 +222,18 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
     }
   }
 
+  List<String> _profileBits(SharedPreferences prefs) => [
+        ...prefs.getStringList('user_health_concerns') ?? const <String>[],
+        prefs.getString('user_life_stage') ?? '',
+        prefs.getString('life_stage') ?? '',
+      ];
+
+  String _shownAdvice(String text, Iterable<String> bits) => filterContraindicatedAdvice(text, bits);
+
   Future<void> _showDetail(String key) async {
     setState(() => _loading = true);
+    final prefs = await SharedPreferences.getInstance();
+    final profileBits = _profileBits(prefs);
     try {
       final res = await _api.get('/api/v1/constitution/types/$key');
       if (res.statusCode == 200 && res.data is Map<String, dynamic>) {
@@ -234,25 +245,25 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
             name: data['name'] as String? ?? '', emoji: kConstitutionEmoji[key] ?? '📋',
             description: data['description'] as String? ?? '', characteristics: chars,
             advice: [
-              HealthAdvice(category: '饮食建议', icon: '🥗', items: [(data['diet_advice'] as String? ?? '').split('：').last]),
-              HealthAdvice(category: '茶饮推荐', icon: '🍵', items: [(data['tea_advice'] as String? ?? '').split('：').last]),
-              HealthAdvice(category: '运动建议', icon: '🏃', items: [(data['exercise_advice'] as String? ?? '').split('：').last]),
+              HealthAdvice(category: '饮食建议', icon: '🥗', items: [_shownAdvice((data['diet_advice'] as String? ?? '').split('：').last, profileBits)]),
+              HealthAdvice(category: '茶饮推荐', icon: '🍵', items: [_shownAdvice((data['tea_advice'] as String? ?? '').split('：').last, profileBits)]),
+              HealthAdvice(category: '运动建议', icon: '🏃', items: [_shownAdvice((data['exercise_advice'] as String? ?? '').split('：').last, profileBits)]),
             ],
             avoidList: avoid.join('、'),
           );
           _view = 'detail';
         });
       } else {
-        _showDetailLocal(key);
+        _showDetailLocal(key, profileBits);
       }
     } catch (_) {
-      _showDetailLocal(key);
+      _showDetailLocal(key, profileBits);
     } finally {
       setState(() => _loading = false);
     }
   }
 
-  void _showDetailLocal(String key) {
+  void _showDetailLocal(String key, Iterable<String> profileBits) {
     final local = kConstitutionTypes.firstWhere((t) => t.key == key, orElse: () => kConstitutionTypes.last);
     final adv = kConstitutionAdvice[key] ?? {};
     setState(() {
@@ -260,9 +271,9 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
         name: local.name, emoji: local.emoji, description: local.description,
         characteristics: kConstitutionChars[key] ?? [],
         advice: [
-          HealthAdvice(category: '饮食建议', icon: '🥗', items: [adv['饮食'] ?? '']),
-          HealthAdvice(category: '茶饮推荐', icon: '🍵', items: [adv['茶饮'] ?? '']),
-          HealthAdvice(category: '运动建议', icon: '🏃', items: [adv['运动'] ?? '']),
+          HealthAdvice(category: '饮食建议', icon: '🥗', items: [_shownAdvice(adv['饮食'] ?? '', profileBits)]),
+          HealthAdvice(category: '茶饮推荐', icon: '🍵', items: [_shownAdvice(adv['茶饮'] ?? '', profileBits)]),
+          HealthAdvice(category: '运动建议', icon: '🏃', items: [_shownAdvice(adv['运动'] ?? '', profileBits)]),
         ],
         avoidList: (kConstitutionAvoid[key] ?? []).join('、'),
       );

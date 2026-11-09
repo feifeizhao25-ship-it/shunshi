@@ -612,24 +612,44 @@ def _get_primary_and_secondary(scores: Dict[str, float], levels: Dict[str, str])
     return primary, secondary
 
 
-def _generate_advice(primary: str, secondary: List[str], levels: Dict[str, str]) -> str:
-    """生成养生建议"""
+def _profile_flags_for_user(db, user_id: str):
+    from app.safety.contraindications import flags_from_profile
+
+    life_stage = None
+    try:
+        row = db.execute("SELECT life_stage FROM users WHERE id = ?", (user_id,)).fetchone()
+        if row is not None:
+            life_stage = row["life_stage"]
+    except Exception:
+        life_stage = None
+    return flags_from_profile(life_stage=life_stage)
+
+
+def _visible(text: str, flags) -> str:
+    from app.safety.contraindications import filter_text
+
+    return filter_text(text, flags)
+
+
+def _generate_advice(primary: str, secondary: List[str], levels: Dict[str, str], flags=frozenset()) -> str:
+    """生成养生建议。已声明孕期/哺乳的用户去掉知识库里写明不宜的条目。"""
     if primary == "pinghe":
         base = CONSTITUTION_TYPES["pinghe"]
-        advice = f"您属于{base['name']}，体质较好。{base['diet_advice']}。继续保持良好的生活习惯。"
+        diet = _visible(base["diet_advice"], flags)
+        advice = f"您属于{base['name']}，体质较好。{diet}。继续保持良好的生活习惯。"
         if secondary:
             names = [CONSTITUTION_TYPES[s]["name"] for s in secondary[:2]]
             advice += f"\n\n有轻微的{'+'.join(names)}倾向，建议适当注意："
             for s in secondary[:2]:
                 t = CONSTITUTION_TYPES[s]
-                advice += f"\n- {t['name']}：{t['diet_advice']}"
+                advice += f"\n- {t['name']}：{_visible(t['diet_advice'], flags)}"
         return advice
 
     primary_info = CONSTITUTION_TYPES[primary]
     advice = f"您的主导体质为【{primary_info['name']}】。\n\n"
     advice += f"**体质特点：** {primary_info['description']}\n\n"
-    advice += f"**饮食建议：** {primary_info['diet_advice']}\n\n"
-    advice += f"**茶饮推荐：** {primary_info['tea_advice']}\n\n"
+    advice += f"**饮食建议：** {_visible(primary_info['diet_advice'], flags)}\n\n"
+    advice += f"**茶饮推荐：** {_visible(primary_info['tea_advice'], flags)}\n\n"
     advice += f"**运动建议：** {primary_info['exercise_advice']}\n\n"
     advice += f"**注意事项：** {'、'.join(primary_info['avoid_list'])}"
 
@@ -722,6 +742,9 @@ async def analyze_constitution(request: AnalyzeRequest):
     sorted_scores = sorted(scores.items(), key=lambda x: x[1], reverse=True)
     primary = sorted_scores[0][0]
     info = CONSTITUTION_TYPES[primary]
+    db = get_db()
+    _ensure_user(db, request.user_id)
+    flags = _profile_flags_for_user(db, request.user_id)
     
     # 计算置信度
     total = sum(scores.values())
@@ -735,8 +758,8 @@ async def analyze_constitution(request: AnalyzeRequest):
             "confidence": confidence,
             "description": info["description"],
             "characteristics": info["characteristics"],
-            "diet_advice": info["diet_advice"],
-            "tea_advice": info["tea_advice"],
+            "diet_advice": _visible(info["diet_advice"], flags),
+            "tea_advice": _visible(info["tea_advice"], flags),
             "exercise_advice": info["exercise_advice"],
             "avoid_list": info["avoid_list"],
             "disclaimer": "此结果为AI轻推断，仅供参考，不能替代专业中医诊断。如有明显不适，请到正规医院中医科就诊。",
@@ -837,7 +860,9 @@ async def submit_questionnaire(request: SubmitRequest):
     raw_scores = _calculate_scores(request.answers)
     levels = _determine_levels(raw_scores)
     primary, secondary = _get_primary_and_secondary(raw_scores, levels)
-    advice = _generate_advice(primary, secondary, levels)
+    db = get_db()
+    _ensure_user(db, request.user_id)
+    advice = _generate_advice(primary, secondary, levels, _profile_flags_for_user(db, request.user_id))
 
     # 构建分数列表
     score_items = []
