@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../../domain/entities/user.dart';
 import '../../../data/storage/storage_manager.dart';
 import '../../data/network/session.dart';
@@ -70,7 +69,6 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
       if (StorageManager.user.isLoggedIn()) {
         // Will be refreshed via API when the user navigates to profile
         // For now, use stored data or defaults
-        final prefs = await SharedPreferences.getInstance();
         final userId = currentUserId() ?? '';
         state = state.copyWith(
           user: User(

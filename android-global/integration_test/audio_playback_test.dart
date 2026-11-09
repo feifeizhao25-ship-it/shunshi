@@ -36,15 +36,8 @@ void main() {
       await tester.pumpAndSettle();
 
       // Look for common playback icons
-      final playIcon = find.byIcon(Icons.play_arrow);
-      final pauseIcon = find.byIcon(Icons.pause);
-      final stopIcon = find.byIcon(Icons.stop);
 
       // At least one playback control should be present on the page
-      final hasControls =
-          playIcon.evaluate().isNotEmpty ||
-          pauseIcon.evaluate().isNotEmpty ||
-          stopIcon.evaluate().isNotEmpty;
 
       // If not on audio page yet, just verify app stability
       expect(find.byType(MaterialApp), findsOneWidget);

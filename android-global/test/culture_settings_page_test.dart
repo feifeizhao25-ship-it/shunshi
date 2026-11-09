@@ -68,7 +68,6 @@ void main() {
   testWidgets('unknown values from the server are ignored, load error retries, save error keeps the choices', (t) async {
     tall(t);
     var calls = 0;
-    var fail = true;
     await t.pumpWidget(host(
       load: () async {
         calls++;
@@ -76,8 +75,7 @@ void main() {
         return {'diet': ['carnivore', 'halal'], 'observances': ['x'], 'units': 'stone', 'hemisphere': 'east'};
       },
       save: (b) async {
-        if (fail) throw Exception('x');
-        return b;
+        throw Exception('x');
       },
     ));
     await t.pumpAndSettle();

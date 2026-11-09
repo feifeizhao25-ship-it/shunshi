@@ -88,11 +88,9 @@ enum AnalyticsEvent {
 
 class AnalyticsService {
   final Dio _dio;
-  final String _baseUrl;
 
   AnalyticsService({String baseUrl = AppConstants.baseUrl})
-      : _baseUrl = baseUrl,
-        _dio = Dio(BaseOptions(
+      : _dio = Dio(BaseOptions(
           baseUrl: baseUrl,
           connectTimeout: const Duration(seconds: 5),
           receiveTimeout: const Duration(seconds: 5),

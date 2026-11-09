@@ -8,7 +8,6 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../design_system/theme.dart';
 import '../../../data/services/notification_service.dart';
-import '../../../core/network/api_singleton.dart';
 
 class SettingsPageV2 extends StatefulWidget {
   const SettingsPageV2({super.key});

@@ -2,7 +2,6 @@ import 'package:go_router/go_router.dart';
 import '../../../design_system/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_localizations.dart';
-import '../../../data/network/api_client.dart';
 import '../../../data/en_content.dart';
 import '../../../design_system/theme.dart';
 import '../../widgets/exercise_demo.dart';
@@ -17,7 +16,6 @@ class ExercisePage extends StatefulWidget {
 }
 
 class _ExercisePageState extends State<ExercisePage> {
-  final _api = ApiClient();
   List<Map<String, dynamic>> _items = [];
   bool _isLoading = true;
   String? _error;
@@ -46,15 +44,6 @@ class _ExercisePageState extends State<ExercisePage> {
     });
   }
 
-  List<Map<String, dynamic>> _parseItems(dynamic data) {
-    if (data is Map && data['items'] != null) {
-      return List<Map<String, dynamic>>.from(data['items']);
-    }
-    if (data is Map && data['data'] != null && data['data']['items'] != null) {
-      return List<Map<String, dynamic>>.from(data['data']['items']);
-    }
-    return <Map<String, dynamic>>[];
-  }
 
   List<Map<String, dynamic>> get _filteredExercises {
     if (_selectedCategory == null) return _items;
@@ -203,7 +192,7 @@ class _ExercisePageState extends State<ExercisePage> {
               Wrap(
                 spacing: 8,
                 children: [
-                  _buildTag(exercise['duration'] ?? '', AppColors.borderGhost(context)!),
+                  _buildTag(exercise['duration'] ?? '', AppColors.borderGhost(context)),
                   _buildTag(exercise['difficulty'] ?? '', Colors.green[100]!),
                   _buildTag(exercise['category'] ?? '', Colors.orange[100]!),
                   ...tags.map((t) => _buildTag(t.toString(), Colors.blue[50]!)),

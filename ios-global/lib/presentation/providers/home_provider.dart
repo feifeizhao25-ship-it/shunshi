@@ -94,10 +94,9 @@ class SeasonCardData {
 
 class HomeNotifier extends StateNotifier<HomeState> {
   final Dio _dio;
-  final String _baseUrl;
 
-  HomeNotifier(this._baseUrl) : _dio = withSessionAuth(Dio(BaseOptions(
-    baseUrl: _baseUrl,
+  HomeNotifier(String baseUrl) : _dio = withSessionAuth(Dio(BaseOptions(
+    baseUrl: baseUrl,
     connectTimeout: const Duration(seconds: 10),
     receiveTimeout: const Duration(seconds: 10),
   ))), super(const HomeState()) {

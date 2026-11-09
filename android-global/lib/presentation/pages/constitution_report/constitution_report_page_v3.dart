@@ -9,7 +9,6 @@ import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
 import '../../../data/network/api_client.dart';
 import '../../../core/theme/app_localizations.dart';
-import '../../../core/network/api_singleton.dart';
 
 class ConstitutionReportPageV3 extends StatefulWidget {
   final String? constitutionType;
@@ -70,7 +69,6 @@ class _ConstitutionReportPageV3State extends State<ConstitutionReportPageV3> {
     final info = _typeInfo[typeCode] ?? _typeInfo['qixu']!;
     final name = info['name'] as String;
     final tags = info['tags'] as List<String>;
-    final typeColor = info['color'] as Color;
 
     return Scaffold(backgroundColor: isDark ? ShunshiDarkColors.background : AppColors.background(context),
       appBar: AppBar(

@@ -1,7 +1,6 @@
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import '../../../core/theme/shunshi_colors.dart';
-import '../../../data/network/api_client.dart';
 import '../../../data/en_content.dart';
 import '../../widgets/food_card.dart';
 import '../../widgets/skeleton_loading.dart';
@@ -16,7 +15,6 @@ class FoodPage extends StatefulWidget {
 }
 
 class _FoodPageState extends State<FoodPage> {
-  final _api = ApiClient();
   List<Map<String, dynamic>> _items = [];
   bool _isLoading = true;
   String? _error;
@@ -51,15 +49,6 @@ class _FoodPageState extends State<FoodPage> {
     });
   }
 
-  List<Map<String, dynamic>> _parseItems(dynamic data) {
-    if (data is Map && data['items'] != null) {
-      return List<Map<String, dynamic>>.from(data['items']);
-    }
-    if (data is Map && data['data'] != null && data['data']['items'] != null) {
-      return List<Map<String, dynamic>>.from(data['data']['items']);
-    }
-    return <Map<String, dynamic>>[];
-  }
 
   List<Map<String, dynamic>> get _filteredFoods {
     return _items.where((food) {

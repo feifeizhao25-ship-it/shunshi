@@ -175,7 +175,6 @@ class _HomePageIntlState extends State<HomePageIntl> {
   Color get _text => _dark ? const Color(0xFFF0F0F5) : const Color(0xFF111111);
   Color get _sub => _dark ? const Color(0xFF8E8E9A) : const Color(0xFF8E8E93);
   Color get _accent => const Color(0xFF533AFD);
-  Color get _mint => const Color(0xFF00C4A7);
   Color get _seasonC => {
     'spring': Color(0xFF34C759), 'summer': Color(0xFFFF9500),
     'autumn': Color(0xFFFF3B30), 'winter': Color(0xFF5856D6),

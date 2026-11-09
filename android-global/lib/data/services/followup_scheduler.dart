@@ -317,9 +317,8 @@ class FollowUpTasksNotifier extends StateNotifier<List<FollowUpTask>> {
 
 /// Follow-up 提醒服务
 class FollowUpReminderService {
-  final FollowUpScheduler _scheduler;
   
-  FollowUpReminderService(this._scheduler);
+  FollowUpReminderService(FollowUpScheduler _);
   
   /// 调度提醒
   Future<void> scheduleReminder({

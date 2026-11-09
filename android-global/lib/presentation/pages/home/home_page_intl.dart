@@ -5,7 +5,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dio/dio.dart';
 import '../../../core/config/api_config.dart';
 import '../../../core/theme/app_localizations.dart';
-import '../../../core/network/api_singleton.dart';
 
 /// SEASONS Home — Pixel-level clone of Apple Health + Calm structure.
 ///
@@ -173,12 +172,10 @@ class _HomePageIntlState extends State<HomePageIntl> {
   static const _radius16 = 16.0;
   static const _radius20 = 20.0;
 
-  Color get _bg => _dark ? const Color(0xFF0A0A14) : const Color(0xFFFAFAFA);
   Color get _surface => _dark ? const Color(0xFF161622) : Colors.white;
   Color get _text => _dark ? const Color(0xFFF0F0F5) : const Color(0xFF111111);
   Color get _sub => _dark ? const Color(0xFF8E8E9A) : const Color(0xFF8E8E93);
   Color get _accent => const Color(0xFF533AFD);
-  Color get _mint => const Color(0xFF00C4A7);
   Color get _seasonC => const {
     'spring': Color(0xFF34C759), 'summer': Color(0xFFFF9500),
     'autumn': Color(0xFFFF3B30), 'winter': Color(0xFF5856D6),

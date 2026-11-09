@@ -88,15 +88,14 @@ final audioBaseUrlProvider = Provider<String>((ref) => AppConstants.baseUrl);
 class AudioNotifier extends StateNotifier<AudioState> {
   final Dio _dio;
 
-  AudioNotifier(this._baseUrl) : _dio = Dio(BaseOptions(
-    baseUrl: _baseUrl,
+  AudioNotifier(String baseUrl) : _dio = Dio(BaseOptions(
+    baseUrl: baseUrl,
     connectTimeout: const Duration(seconds: 10),
     receiveTimeout: const Duration(seconds: 10),
   )), super(const AudioState()) {
     loadAll();
   }
 
-  final String _baseUrl;
 
   Future<void> loadAll() async {
     state = state.copyWith(isLoading: true, error: null);

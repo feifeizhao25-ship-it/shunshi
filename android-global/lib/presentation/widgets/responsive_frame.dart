@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../design_system/theme.dart';
 import '../../design_system/app_colors.dart';
 
 /// Retest N06: on tablets and wide windows the app is no longer stretched edge to edge (1440 px wide).

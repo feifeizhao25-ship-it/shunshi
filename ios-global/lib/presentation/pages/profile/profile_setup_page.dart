@@ -24,16 +24,6 @@ const _constitutionTypes = [
 ];
 
 /// 健康关注选项
-const _healthConcerns = [
-  'Sleep',
-  'Digestion',
-  'Emotions',
-  'Immunity',
-  'Weight',
-  'Skin',
-  'Menstruation',
-  'Other',
-];
 
 class ProfileSetupPage extends StatefulWidget {
   const ProfileSetupPage({super.key});

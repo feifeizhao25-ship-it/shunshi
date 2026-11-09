@@ -11,7 +11,6 @@ import '../../../core/theme/seasons_colors.dart';
 import '../../../core/theme/seasons_spacing.dart';
 import '../../../core/theme/seasons_text_styles.dart';
 import '../../providers/seasons_provider.dart';
-import '../../../core/network/api_singleton.dart';
 
 // ── Season colours: softer gradients ──────────────────────────
 
@@ -131,7 +130,6 @@ class _HeroSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final screenHeight = MediaQuery.of(context).size.height;
     final heroHeight = screenHeight * 0.50;
 

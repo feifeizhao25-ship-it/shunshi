@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../../data/services/subscription_service.dart';
 import '../../core/config/app_config.dart';
 import '../../data/network/session.dart';
@@ -38,7 +37,6 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
 
   Future<void> _loadUserId() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
       _userId = currentUserId() ?? '';
     } catch (_) {
       _userId = '';

@@ -66,7 +66,6 @@ class _ConstitutionReportPageV3State extends State<ConstitutionReportPageV3> {
     final info = _typeInfo[typeCode] ?? _typeInfo['qixu']!;
     final name = info['name'] as String;
     final tags = info['tags'] as List<String>;
-    final typeColor = info['color'] as Color;
 
     return Scaffold(
       backgroundColor: AppColors.background(context),

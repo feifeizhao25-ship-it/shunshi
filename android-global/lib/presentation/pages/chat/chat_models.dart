@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../widgets/chat_sources.dart';
-import '../../../core/network/api_singleton.dart';
 
 /// ChatMessages模型
 class ChatMessage {

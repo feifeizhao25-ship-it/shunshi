@@ -133,7 +133,7 @@ jobs:
               raise SystemExit('Missing Flutter asset directories: ' + ', '.join(missing))
           PY
       - name: Analyze
-        run: flutter analyze --no-fatal-warnings --no-fatal-infos
+        run: flutter analyze --no-fatal-infos
       - name: Test
         run: flutter test
       - name: Build APK (debug)

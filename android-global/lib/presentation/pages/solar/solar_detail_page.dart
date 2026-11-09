@@ -8,7 +8,6 @@ import '../../../core/theme/shunshi_colors.dart';
 import '../../../core/theme/app_localizations.dart';
 import '../../../../design_system/theme.dart';
 import 'package:dio/dio.dart';
-import '../../../core/network/api_singleton.dart';
 import '../../../core/config/app_config.dart';
 
 class SolarDetailPage extends StatefulWidget {

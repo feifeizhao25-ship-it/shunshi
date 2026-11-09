@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../../design_system/app_colors.dart';
-import '../../../design_system/theme.dart';
 import '../../../data/network/api_client.dart';
 
 /// 全局搜索页 — 搜索知识库内容

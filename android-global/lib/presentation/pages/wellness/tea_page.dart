@@ -2,7 +2,6 @@ import 'package:go_router/go_router.dart';
 import '../../../design_system/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../../../../design_system/theme.dart';
-import '../../../data/network/api_client.dart';
 import '../../../data/en_content.dart';
 import '../../widgets/skeleton_loading.dart';
 import '../../widgets/seasons_visual.dart';
@@ -17,7 +16,6 @@ class TeaPage extends StatefulWidget {
 }
 
 class _TeaPageState extends State<TeaPage> {
-  final _api = ApiClient();
   List<Map<String, dynamic>> _items = [];
   bool _isLoading = true;
   String? _error;
@@ -48,15 +46,6 @@ class _TeaPageState extends State<TeaPage> {
     });
   }
 
-  List<Map<String, dynamic>> _parseItems(dynamic data) {
-    if (data is Map && data['items'] != null) {
-      return List<Map<String, dynamic>>.from(data['items']);
-    }
-    if (data is Map && data['data'] != null && data['data']['items'] != null) {
-      return List<Map<String, dynamic>>.from(data['data']['items']);
-    }
-    return <Map<String, dynamic>>[];
-  }
 
   List<Map<String, dynamic>> get _filteredTeas {
     return _items.where((tea) {

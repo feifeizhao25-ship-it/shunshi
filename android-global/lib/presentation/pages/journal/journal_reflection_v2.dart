@@ -7,7 +7,6 @@ import '../../../design_system/app_colors.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
-import '../../../core/network/api_singleton.dart';
 
 class JournalReflectionV2 extends StatelessWidget {
   const JournalReflectionV2({super.key});

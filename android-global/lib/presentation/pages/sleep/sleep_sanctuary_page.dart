@@ -12,7 +12,6 @@ import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/network/api_singleton.dart';
 
 class SleepSanctuaryPage extends StatefulWidget {
   const SleepSanctuaryPage({super.key});
@@ -40,7 +39,6 @@ class _SleepSanctuaryPageState extends State<SleepSanctuaryPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
 
       appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),

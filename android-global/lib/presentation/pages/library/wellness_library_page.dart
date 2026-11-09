@@ -1,7 +1,6 @@
 /// Wellness Library — wired to /intl/contents/recommend API
 library;
 
-import 'package:dio/dio.dart';
 import '../../../design_system/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../../../core/theme/shunshi_colors.dart';
@@ -24,17 +23,16 @@ class _WellnessLibraryPageState extends State<WellnessLibraryPage> {
   List<Map<String, dynamic>> _filtered = [];
   String _activeFilter = 'All';
   bool _loading = true;
-  bool _searching = false;
   final _searchController = TextEditingController();
 
   static const _filters = ['All', 'Sleep', 'Nutrition', 'Movement', 'Mindfulness', 'Seasonal'];
 
   Future<void> _search(String query) async {
     if (query.trim().isEmpty) {
-      setState(() { _searching = false; _filtered = _contents; });
+      setState(() {  _filtered = _contents; });
       return;
     }
-    setState(() => _searching = true);
+    setState(() {});
     try {
       final res = await _dio.get('/api/v1/contents/search', queryParameters: {'q': query.trim()});
       if (!mounted) return;

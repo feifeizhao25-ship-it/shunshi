@@ -14,7 +14,6 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import '../../../core/theme/app_localizations.dart';
 import '../../../design_system/theme.dart';
-import '../../../core/network/api_singleton.dart';
 
 class MeditationFocusPage extends StatefulWidget {
   const MeditationFocusPage({super.key});

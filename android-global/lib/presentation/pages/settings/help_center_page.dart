@@ -5,7 +5,6 @@ import '../../../core/theme/seasons_spacing.dart';
 import '../../../core/theme/seasons_text_styles.dart';
 import '../../widgets/components/soft_card.dart';
 import '../../../core/theme/app_localizations.dart';
-import '../../../core/network/api_singleton.dart';
 
 /// Help Center & Trust FAQ — SEASONS Global
 /// In-app support page for international users
@@ -469,7 +468,6 @@ class _QuickActionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     return SoftCard(
       borderRadius: SeasonsSpacing.radiusLarge,
       padding: const EdgeInsets.all(SeasonsSpacing.md),
@@ -519,7 +517,6 @@ class _FaqExpandableState extends State<_FaqExpandable> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.only(bottom: SeasonsSpacing.sm),
       child: SoftCard(

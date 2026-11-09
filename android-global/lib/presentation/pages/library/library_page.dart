@@ -6,7 +6,6 @@ import '../../../design_system/app_colors.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import '../../../design_system/theme.dart';
 import '../../../data/content/wellness_content.dart';
-import '../../../core/network/api_singleton.dart';
 
 class _CategoryItem {
   final IconData icon;

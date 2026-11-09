@@ -44,7 +44,6 @@ class SubscriptionService {
 
   /// 获取用户当前订阅状态
   static Future<UserSubscriptionStatus> getCurrentStatus() async {
-    final userId = await _getUserId();
     try {
       final res = await _dio.get('/api/v1/subscription/status');
       if (res.data?['success'] == true) {
@@ -122,16 +121,6 @@ class SubscriptionService {
   }
 
   /// 开发模式模拟订单
-  static SubscriptionOrder _mockOrder(String planId) {
-    final plan = _fallbackPlans.firstWhere((p) => p.id == planId, orElse: () => _fallbackPlans.first);
-    return SubscriptionOrder(
-      orderId: 'mock_${DateTime.now().millisecondsSinceEpoch}',
-      planId: planId,
-      amountCents: plan.priceCents,
-      status: 'pending',
-      createdAt: DateTime.now(),
-    );
-  }
 
   /// 后端不可用时的硬编码 plan fallback
   static final List<SubscriptionPlan> _fallbackPlans = [

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../../../design_system/app_colors.dart';
 import '../../../../design_system/theme.dart';
 import '../../../../core/theme/app_localizations.dart';
-import '../../../../core/network/api_singleton.dart';
 
 /// 行动引导断点 — 3-5-10秒法则的核Heart组件
 ///

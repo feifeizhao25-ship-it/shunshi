@@ -3,7 +3,6 @@ library;
 
 import 'package:flutter/material.dart';
 import '../../design_system/app_colors.dart';
-import '../../design_system/theme.dart';
 
 /// 通用错误页面
 class ErrorView extends StatelessWidget {

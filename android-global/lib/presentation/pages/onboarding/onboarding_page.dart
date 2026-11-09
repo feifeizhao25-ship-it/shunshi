@@ -7,7 +7,6 @@
 /// Output: user profile + first daily insight
 library;
 
-import 'package:dio/dio.dart';
 import '../../../design_system/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../../../core/theme/shunshi_colors.dart';
