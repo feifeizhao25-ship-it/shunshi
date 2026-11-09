@@ -99,7 +99,7 @@ jobs:
       - name: Get deps
         run: flutter pub get
       - name: Analyze
-        run: flutter analyze --no-fatal-warnings --no-fatal-infos
+        run: flutter analyze --no-fatal-infos
       - name: Test
         run: flutter test
       # ubuntu-latest's JDK 25 makes Gradle 8.11.1's embedded Kotlin 2.0.20 throw
