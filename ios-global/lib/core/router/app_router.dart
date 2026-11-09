@@ -15,6 +15,7 @@ import '../../presentation/pages/discover/discover_page.dart';
 import '../../presentation/pages/solar/solar_term_page_v2.dart';
 import '../../presentation/pages/solar/solar_term_detail_page.dart';
 import '../../presentation/pages/solar/solar_detail_page.dart';
+import '../../presentation/widgets/weather_source_card.dart';
 import '../../presentation/pages/profile/profile_page_v2.dart';
 import '../../presentation/pages/profile/profile_setup_page.dart';
 import '../../presentation/pages/profile/privacy_page.dart';
@@ -121,6 +122,7 @@ class AppRouter {
         );
       }),
       GoRoute(path: '/solar-wellness', builder: (context, state) => const SolarDetailPage()),
+      GoRoute(path: '/weather', builder: (context, state) => Scaffold(appBar: AppBar(title: const Text('Weather')), body: WeatherBoard(load: fetchLiveWeather))),
       GoRoute(path: '/family', builder: (context, state) => const FamilyPageV2()),
       GoRoute(path: '/food-detail', builder: (context, state) => const FoodDetailPage()),
       GoRoute(path: '/exercise-detail', builder: (context, state) => const ExerciseDetailPage()),
