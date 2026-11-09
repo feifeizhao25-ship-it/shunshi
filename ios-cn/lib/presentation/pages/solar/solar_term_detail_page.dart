@@ -206,8 +206,8 @@ class _SolarTermDetailPageState extends State<SolarTermDetailPage> {
             _sectionCard('运动', exercises.join('、'), Icons.self_improvement_rounded, isDark),
             const SizedBox(height: 10),
 
-            // 穴位调理（真实数据，点击展开穴位列表）
-            _buildExpandableCard('穴位调理', acupoints, Icons.psychology_rounded, isDark),
+            // 穴位按压（真实数据，点击展开穴位列表）
+            _buildExpandableCard('穴位按压', acupoints, Icons.psychology_rounded, isDark),
             const SizedBox(height: 10),
 
             // 情志调养（真实数据）

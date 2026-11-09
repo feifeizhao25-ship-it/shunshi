@@ -16,6 +16,10 @@ import 'widgets/constitution_widgets.dart';
 import '../../../design_system/app_colors.dart';
 import '../../../design_system/style_theming.dart';
 
+/// Result copy must not read as a constitution diagnosis.
+String habitPhrase(String value) =>
+    value.replaceAll('体质', '生活习惯').replaceAll('质', '').replaceAll('证', '');
+
 // Models imported from constitution_data.dart
 
 class ConstitutionPage extends StatefulWidget {
@@ -35,7 +39,7 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
   List<ConstitutionType> _types = kConstitutionTypes;
   String _view = 'home'; // home / quiz / result / detail
   ConstitutionDetail? _detail;
-  bool _reportUnlocked = true; // 调理建议随测试结果给出，不挂未接通的会员锁
+  bool _reportUnlocked = true; // 日常安排随测试结果给出，不挂未接通的会员锁
 
   @override
   void initState() {
@@ -162,7 +166,7 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
           final sectionContents = adviceText.split(sectionRegex).where((s) => s.trim().isNotEmpty).toList();
 
           final sectionMeta = {
-            '体质特点': ('📝', '体质特点'),
+            '习惯特点': ('📝', '习惯特点'),
             '饮食建议': ('🥗', '饮食调养'),
             '茶饮推荐': ('🍵', '茶饮推荐'),
             '运动建议': ('🏃', '运动建议'),
@@ -310,7 +314,7 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
       child: Scaffold(
       backgroundColor: AppColors.background(context),
       appBar: AppBar(
-        title: Text(_view == 'home' ? '体质测试' : _view == 'quiz' ? '体质测试 (${_currentIndex + 1}/${_questions.length})' : _view == 'result' ? '测试结果' : '体质详情', style: ShunshiTextStyles.heading.themed(context)),
+        title: Text(_view == 'home' ? '节气生活习惯自测' : _view == 'quiz' ? '节气生活习惯自测 (${_currentIndex + 1}/${_questions.length})' : _view == 'result' ? '测试结果' : '习惯说明', style: ShunshiTextStyles.heading.themed(context)),
         backgroundColor: AppColors.surface(context), foregroundColor: AppColors.textPrimary(context), elevation: 0,
         leading: IconButton(icon: Icon(Icons.chevron_left, color: AppColors.textPrimary(context)), onPressed: () {
           if (_view == 'quiz') { if (_currentIndex > 0) {
@@ -335,9 +339,9 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text('了解你的体质', style: ShunshiTextStyles.greeting.themed(context)),
+        Text('了解你的生活习惯', style: ShunshiTextStyles.greeting.themed(context)),
         const SizedBox(height: 8),
-        Text('中医体质辨识，找到最适合你的养生之道', style: ShunshiTextStyles.bodySecondary.themed(context)),
+        Text('按节气看生活习惯，找到适合你的日常节奏', style: ShunshiTextStyles.bodySecondary.themed(context)),
         const SizedBox(height: 24),
         SizedBox(width: double.infinity, height: 56, child: ElevatedButton(
           onPressed: _startQuiz,
@@ -345,7 +349,7 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
           child: const Text('开始测试', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
         )),
         const SizedBox(height: 32),
-        Text('九种体质', style: ShunshiTextStyles.heading.themed(context)),
+        Text('几种生活习惯', style: ShunshiTextStyles.heading.themed(context)),
         const SizedBox(height: 16),
         GridView.builder(shrinkWrap: true, physics: const NeverScrollableScrollPhysics(), gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3, childAspectRatio: 0.72, crossAxisSpacing: 12, mainAxisSpacing: 12), itemCount: _types.length, itemBuilder: (context, index) {
           final type = _types[index];
@@ -464,11 +468,11 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
         _buildResultHero(r),
         const SizedBox(height: 20),
 
-        // ── 免费部分：体质概述 + 分数条 ──
-        _buildSection('体质概述', '📋', [
-          Text(r.description, style: TextStyle(fontSize: 14, color: AppColors.textSecondary(context), height: 1.7)),
+        // ── 免费部分：习惯概述 + 分数条 ──
+        _buildSection('习惯概述', '📋', [
+          Text(habitPhrase(r.description), style: TextStyle(fontSize: 14, color: AppColors.textSecondary(context), height: 1.7)),
           const SizedBox(height: 12),
-          Wrap(spacing: 8, runSpacing: 8, children: r.characteristics.map((c) => Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), decoration: BoxDecoration(color: AppColors.primaryLight(context).withValues(alpha: 0.15), borderRadius: BorderRadius.circular(20)), child: Text(c, style: const TextStyle(fontSize: 12, color: ShunshiColors.primaryDark, fontWeight: FontWeight.w500)))).toList()),
+          Wrap(spacing: 8, runSpacing: 8, children: r.characteristics.map((c) => Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), decoration: BoxDecoration(color: AppColors.primaryLight(context).withValues(alpha: 0.15), borderRadius: BorderRadius.circular(20)), child: Text(habitPhrase(c), style: const TextStyle(fontSize: 12, color: ShunshiColors.primaryDark, fontWeight: FontWeight.w500)))).toList()),
         ]),
         _buildScoreBars(r),
         const SizedBox(height: 20),
@@ -495,9 +499,9 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
       child: Column(children: [
         Text(r.emoji, style: const TextStyle(fontSize: 56)),
         const SizedBox(height: 8),
-        Text('你的体质是', style: TextStyle(fontSize: 14, color: Colors.white.withValues(alpha: 0.8))),
+        Text('你的生活习惯倾向', style: TextStyle(fontSize: 14, color: Colors.white.withValues(alpha: 0.8))),
         const SizedBox(height: 4),
-        Text(r.typeName, style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w700, color: Colors.white, letterSpacing: 2)),
+        Text(habitPhrase(r.typeName), style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w700, color: Colors.white, letterSpacing: 2)),
         const SizedBox(height: 12),
         Container(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8), decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(12)),
           child: Text('测试时间: ${DateTime.now().toString().substring(0, 16)}', style: TextStyle(fontSize: 12, color: Colors.white.withValues(alpha: 0.7))),
@@ -519,7 +523,7 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
   Widget _buildScoreBars(ConstitutionResult r) {
     return Container(margin: const EdgeInsets.fromLTRB(20, 0, 20, 0), padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [Text('📊', style: TextStyle(fontSize: 18)), SizedBox(width: 8), Text('体质分数', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context)))]),
+        Row(children: [Text('📊', style: TextStyle(fontSize: 18)), SizedBox(width: 8), Text('习惯倾向', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context)))]),
         const SizedBox(height: 14),
         ...r.scores.map((s) {
           final name = s['name'] as String? ?? '';
@@ -611,11 +615,11 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
   }
 
   Future<void> _shareResult(ConstitutionResult r) async {
-    final text = '【顺时·中医体质报告】\n\n'
-        '我的体质类型：${r.typeName} ${r.emoji}\n'
-        '体质概述：${r.description}\n\n'
-        '体质特点：\n${r.characteristics.map((c) => '  · $c').join('\n')}\n\n'
-        '—— 顺时 AI 养生顾问';
+    final text = '【顺时·节气生活习惯小结】\n\n'
+        '我的生活习惯倾向：${r.typeName} ${r.emoji}\n'
+        '习惯概述：${r.description}\n\n'
+        '习惯特点：\n${r.characteristics.map((c) => '  · $c').join('\n')}\n\n'
+        '—— 顺时 AI 节气生活助手';
     await Clipboard.setData(ClipboardData(text: text));
     _showSnackBar('报告已复制到剪贴板');
   }
@@ -624,25 +628,25 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
     try {
       final buffer = StringBuffer();
       buffer.writeln('╔══════════════════════════════════════╗');
-      buffer.writeln('║        顺时·中医体质评估报告         ║');
+      buffer.writeln('║        顺时·节气生活习惯小结         ║');
       buffer.writeln('╚══════════════════════════════════════╝');
       buffer.writeln();
       buffer.writeln('报告编号：${r.resultId}');
       buffer.writeln('测试时间：${DateTime.now().toString().substring(0, 19)}');
       buffer.writeln();
       buffer.writeln('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-      buffer.writeln('  你的体质类型');
+      buffer.writeln('  你的生活习惯倾向');
       buffer.writeln('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
       buffer.writeln();
       buffer.writeln('  ${r.emoji}  ${r.typeName}');
       buffer.writeln();
       buffer.writeln('  ${r.description}');
       buffer.writeln();
-      buffer.writeln('  体质特点：');
+      buffer.writeln('  习惯特点：');
       for (final c in r.characteristics) { buffer.writeln('    · $c'); }
       buffer.writeln();
       buffer.writeln('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-      buffer.writeln('  体质分数分析');
+      buffer.writeln('  习惯倾向分析');
       buffer.writeln('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
       buffer.writeln();
       for (final s in r.scores) {
@@ -673,7 +677,7 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
       }
       buffer.writeln('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
       buffer.writeln();
-      buffer.writeln('  本报告由「顺时」AI养生顾问生成');
+      buffer.writeln('  本报告由「顺时」AI节气生活助手生成');
       buffer.writeln('  仅供参考，不构成医疗建议');
       buffer.writeln('  如有健康问题请咨询专业中医师');
       buffer.writeln();
@@ -688,7 +692,7 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
     }
   }
 
-  // ── 4. 体质详情 ──
+  // ── 4. 习惯说明 ──
 
   Widget _buildDetailView() {
     if (_detail == null) return const SizedBox.shrink();

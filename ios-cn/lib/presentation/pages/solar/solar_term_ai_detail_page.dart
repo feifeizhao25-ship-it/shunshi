@@ -30,7 +30,7 @@ class SolarTermAIDetailPage extends StatelessWidget {
       livingTitle: '夜卧早起',
       livingDesc: '早起以顺应阳气生发，披发缓行，广步于庭。',
       exerciseTitle: '八段锦 · 第三式',
-      exerciseDesc: '调理脾胃须单举。调理脾胃气机，促进中焦运化。',
+      exerciseDesc: '调理脾胃须单举。照顾脾胃气机，促进中焦运化。',
       meditationTitle: '春分 · 阴阳平衡引导',
       meditationDesc: '随着柔和的春雨声，引导意识在身体内达成动态平衡，如同春分的昼夜一般和谐。',
       meditationDuration: '12 分钟',

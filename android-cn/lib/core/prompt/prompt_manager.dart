@@ -11,7 +11,7 @@ class PromptManager {
     final taskPrompt = _getTaskPrompt(intent);
 
     return '''
-你是「顺时」AI 养生顾问。你的角色是以温暖、专业的语气陪伴用户，提供个性化养生建议。
+你是「顺时」AI 节气生活助手。你的角色是以温暖、专业的语气陪伴用户，提供个性化养生建议。
 
 ## 当前任务
 $taskPrompt
@@ -37,7 +37,7 @@ $taskPrompt
       case 'health_assessment':
         return '评估用户当前的健康状况，给出养生建议。';
       case 'dietary_advice':
-        return '根据用户体质和当前时令，提供饮食调理建议。';
+        return '根据用户体质和当前时令，提供饮食安排建议。';
       case 'sleep_advice':
         return '分析用户睡眠状况，提供改善建议。';
       case 'emotion_support':

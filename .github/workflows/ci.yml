@@ -34,6 +34,8 @@ jobs:
           python-version: '3.12'
       - name: Reject clear-text public mobile API endpoints
         run: python scripts/verify_mobile_network_security.py
+      - name: Reject banned medical claims in CN app copy
+        run: python scripts/verify_banned_claims.py
       - name: Verify mobile API origin/version contract
         run: python scripts/verify_mobile_api_contract.py
       - name: Verify repository and CI integrity

@@ -123,7 +123,7 @@ class DetailListItem extends StatelessWidget {
   }
 }
 
-/// 体质详情页
+/// 习惯说明页
 class ConstitutionDetailView extends StatelessWidget {
   final ConstitutionDetail detail;
   const ConstitutionDetailView({super.key, required this.detail});
@@ -142,7 +142,7 @@ class ConstitutionDetailView extends StatelessWidget {
         ])),
       ]),
       const SizedBox(height: 24),
-      if (d.characteristics.isNotEmpty) ...[_detailSection('体质特点', d.characteristics), const SizedBox(height: 20)],
+      if (d.characteristics.isNotEmpty) ...[_detailSection('习惯特点', d.characteristics), const SizedBox(height: 20)],
       ...d.advice.expand((adv) => [_detailSection('${adv.icon} ${adv.category}', adv.items), const SizedBox(height: 20)]),
       if (d.avoidList.isNotEmpty) Container(width: double.infinity, padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: ShunshiColors.warning.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(16), border: Border.all(color: ShunshiColors.warning.withValues(alpha: 0.3))),
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [

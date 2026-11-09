@@ -691,13 +691,13 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
               children:
                   [
                         '最近睡眠不好',
-                        '换季怎么调理',
+                        '换季怎么安排',
                         '推荐节气食谱',
                         '适合什么运动',
                         '情绪低落怎么办',
                         '想学八段锦',
                         '推荐养生茶饮',
-                        '体质测试',
+                        '节气生活习惯自测',
                       ]
                       .map(
                         (t) => ActionChip(
