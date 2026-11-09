@@ -119,3 +119,43 @@ const Map<String, List<String>> kConstitutionAvoid = {
   'qiyu': ['长期压抑情绪', '过度思虑', '久坐不动', '独处寡言'],
   'tebing': ['已知过敏食物', '花粉环境', '冷空气', '新装修环境', '宠物毛发'],
 };
+
+// Keep aligned with backend/app/safety/contraindications.py.
+// 孕早期禁忌食材：docs/knowledge-base/顺时知识库_补充篇_中文版.md
+// plus maternity.py FORBIDDEN_HERBS_DATA. 麦冬 is not in either list.
+const pregnancyContraindicated = [
+  '藏红花', '薏苡仁', '益母草', '山楂', '薏米', '螃蟹', '甲鱼', '芦荟', '红花',
+  '桃仁', '三棱', '莪术', '丹参', '赤芍', '黄芪', '当归', '肉桂', '干姜', '附子', '麝香', '冰片', '薄荷',
+];
+
+// maternity.py BREASTFEEDING_AVOID_FOODS, named foods only.
+const breastfeedingContraindicated = ['螃蟹', '薏米', '山楂', '柚子', '鸭肉', '薄荷', '人参'];
+
+Set<String> profileSafetyFlags(Iterable<String> bits) {
+  final blob = bits.join(' ').toLowerCase();
+  final flags = <String>{};
+  const pregnancy = ['怀孕', '孕妇', '孕期', '孕早', '孕中', '孕晚', 'pregnant', 'pregnancy'];
+  const nursing = ['哺乳', '母乳', 'breastfeed', 'breastfeeding', 'lactation'];
+  if (pregnancy.any(blob.contains)) flags.add('pregnancy');
+  if (nursing.any(blob.contains)) flags.add('breastfeeding');
+  return flags;
+}
+
+List<String> contraindicatedNamesFor(Iterable<String> bits) {
+  final flags = profileSafetyFlags(bits);
+  final names = <String>{};
+  if (flags.contains('pregnancy')) names.addAll(pregnancyContraindicated);
+  if (flags.contains('breastfeeding')) names.addAll(breastfeedingContraindicated);
+  final ordered = names.toList()..sort((a, b) => b.length.compareTo(a.length));
+  return ordered;
+}
+
+String filterContraindicatedAdvice(String text, Iterable<String> bits) {
+  final names = contraindicatedNamesFor(bits);
+  if (text.isEmpty || names.isEmpty) return text;
+  final kept = text
+      .split(RegExp(r'[、，,；;\n]'))
+      .where((segment) => segment.trim().isNotEmpty && !names.any(segment.contains))
+      .toList();
+  return kept.join('、');
+}
