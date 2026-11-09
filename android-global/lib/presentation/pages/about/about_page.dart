@@ -53,7 +53,7 @@ class AboutPage extends StatelessWidget {
               const Divider(height: 20),
               _featureRow(Icons.schedule, 'Daily rhythm reminders', 'Gentle reminders through the day'),
               const Divider(height: 20),
-              _featureRow(Icons.health_and_safety, 'Body Type Identification', '9 Body Types with Smart Scoring'),
+              _featureRow(Icons.health_and_safety, 'Seasonal habits', 'Food, rest, and movement for the term'),
               const Divider(height: 20),
               _featureRow(Icons.smart_toy, 'AI Advisor', '7x24 Wellness Consultation'),
             ]),

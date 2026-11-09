@@ -253,7 +253,7 @@ class AppLocalizations {
       'home_meridian_active': 'Meridian Active',
 
       // Profile (additional)
-      'profile_brand': 'ShunShi AI',
+      'profile_brand': 'SEASONS',
       'profile_points': 'Points',
       'profile_coupons': 'Coupons',
       'profile_achievements': 'Achievements',
@@ -337,9 +337,9 @@ class AppLocalizations {
       'wellness_editors_picks': "Editor\'s Picks",
 
       // About
-      'about_app_name': 'SEASONS · ShunShi',
+      'about_app_name': 'SEASONS',
       'about_version': 'Version 2.4.0',
-      'about_description': 'SEASONS is an intelligent health companion based on TCM Wellness theory. Combining the 24 Solar Terms, 12 ShiChen periods, and 9 Body Types, it provides personalized wellness tips for every user.',
+      'about_description': 'SEASONS helps you live with the 24 solar terms. It is a seasonal rhythm companion, not a medical service.',
 
       // Meditation (additional)
       'meditation_breathing': 'Breathing into Change',
@@ -416,7 +416,7 @@ class AppLocalizations {
       'checkin_take_a_quiet_moment_to_listen_to_your_interna': 'Take a quiet moment to listen to your internal landscape.',
       'community_search_wellness_content': 'Search wellness content...',
       'community_seasons_ai_guidance': 'SEASONS AI Guidance',
-      'community_seasons_shunshi': 'SEASONS ShunShi',
+      'community_seasons_shunshi': 'SEASONS',
       'community_tip_focus_on_spring_liver_care': 'Tip: Focus on — Spring Liver care',
       'community_wellness_circle': 'Wellness Circle',
       'constitution_constitution_analysis': 'Constitution Analysis',

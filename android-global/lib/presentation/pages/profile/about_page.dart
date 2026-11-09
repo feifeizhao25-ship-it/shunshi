@@ -40,7 +40,7 @@ class AboutPage extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'SEASONS ShunShi',
+              'SEASONS',
               style: TextStyle(
                 fontFamily: ShunShiTypography.serifFamily,
                 fontSize: 24,
@@ -68,7 +68,7 @@ class AboutPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'SEASONS is a smart health app rooted in TCM ShiChen Wellness philosophy. Combining the 24 Solar Terms, 12 ShiChen periods, and your personal Body Type, it delivers personalized wellness suggestions for you.',
+                    'SEASONS helps you live with the 24 solar terms. It is a seasonal rhythm companion, not a medical service.',
                     style: TextStyle(
                       fontSize: 14,
                       color: AppColors.textSecondary(context),
@@ -78,7 +78,7 @@ class AboutPage extends StatelessWidget {
                   const SizedBox(height: 16),
                   _infoRow('Version', 'v1.0.0'),
                   _infoRow('Philosophy', 'Humans integrated with nature, living in harmony with the natural world'),
-                  _infoRow('Features', 'AI + TCMWellness'),
+                  _infoRow('Features', 'Solar terms, daily rhythm, rest'),
                 ],
               ),
             ),

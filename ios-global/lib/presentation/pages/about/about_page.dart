@@ -39,7 +39,7 @@ class AboutPage extends StatelessWidget {
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text('Live in rhythm with the seasons', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.primary(context))),
               const SizedBox(height: 12),
-              Text('SEASONS is a smart wellness companion built on traditional East Asian wellness ideas. It combines the 24 solar terms, daily rhythms and nine constitution types to give you personalised wellness suggestions.', style: TextStyle(fontSize: 14, color: AppColors.textSecondary(context), height: 1.8)),
+              Text('SEASONS helps you live with the 24 solar terms. It is a seasonal rhythm companion, not a medical service.', style: TextStyle(fontSize: 14, color: AppColors.textSecondary(context), height: 1.8)),
             ]),
           ),
           const SizedBox(height: 16),
@@ -51,7 +51,7 @@ class AboutPage extends StatelessWidget {
               const Divider(height: 20),
               _featureRow(Icons.schedule, 'Daily rhythm reminders', 'Gentle reminders through the day'),
               const Divider(height: 20),
-              _featureRow(Icons.health_and_safety, 'Constitution check', 'Smart scoring across nine constitution types'),
+              _featureRow(Icons.health_and_safety, 'Seasonal habits', 'Food, rest, and movement for the term'),
               const Divider(height: 20),
               _featureRow(Icons.smart_toy, 'AI companion', 'Wellness chat, any time'),
             ]),
