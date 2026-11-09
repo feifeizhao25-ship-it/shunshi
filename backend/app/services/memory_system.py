@@ -465,10 +465,17 @@ class MemorySystem:
         """更新单条记忆内容 (仅本人); 返回是否更新成功。"""
         self._ensure_table()
         conn = get_db()
-        cur = conn.execute(
-            "UPDATE user_memory SET content = ?, updated_at = datetime('now') WHERE id = ? AND user_id = ?",
-            (content, memory_id, user_id),
-        )
+        if confidence is None:
+            cur = conn.execute(
+                "UPDATE user_memory SET content = ?, updated_at = datetime('now') WHERE id = ? AND user_id = ?",
+                (content, memory_id, user_id),
+            )
+        else:
+            confidence = max(0.0, min(1.0, float(confidence)))
+            cur = conn.execute(
+                "UPDATE user_memory SET content = ?, confidence = ?, updated_at = datetime('now') WHERE id = ? AND user_id = ?",
+                (content, confidence, memory_id, user_id),
+            )
         conn.commit()
         return (cur.rowcount or 0) > 0
 
@@ -476,9 +483,11 @@ class MemorySystem:
         """按关键词搜索本人记忆 (内容包含)。"""
         self._ensure_table()
         conn = get_db()
+        # 用户输入里的 % / _ 按字面字符搜，不当通配符（否则搜 "%" 会返回全部记忆）。
+        escaped = query.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
         rows = conn.execute(
-            "SELECT * FROM user_memory WHERE user_id = ? AND content LIKE ? ORDER BY created_at DESC LIMIT ?",
-            (user_id, f"%{query}%", limit),
+            "SELECT * FROM user_memory WHERE user_id = ? AND content LIKE ? ESCAPE '\\' ORDER BY created_at DESC LIMIT ?",
+            (user_id, f"%{escaped}%", limit),
         ).fetchall()
         return [dict(r) for r in rows]
 
