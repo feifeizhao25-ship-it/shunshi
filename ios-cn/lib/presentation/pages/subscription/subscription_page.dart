@@ -16,7 +16,7 @@ class SubscriptionPage extends StatefulWidget {
 }
 
 class _SubscriptionPageState extends State<SubscriptionPage> with SingleTickerProviderStateMixin {
-  int _selectedPlan = 1;
+  int _selectedPlan = 0;
   bool _isLoading = false;
   bool _isSubscribed = false;
   bool _hasError = false;
@@ -25,13 +25,11 @@ class _SubscriptionPageState extends State<SubscriptionPage> with SingleTickerPr
   final _dio = withSessionAuth(Dio(BaseOptions(baseUrl: _baseUrl)));
 
   static const _plans = [
-    _Plan('月度会员', '¥28', '/月'),
-    _Plan('季度会员', '¥68', '/季'),
-    _Plan('年度会员', '¥198', '/年'),
+    _Plan('年度会员', '¥888', '/年'),
   ];
 
   static const _coreValues = [
-    ('AI 无限对话', '免费每天3次，SVIP 不限次数'),
+    ('年付对话', '次数以年付档说明为准'),
     ('个性化养生方案', '根据体质、节气、情绪动态调整'),
     ('家庭共享', '最多 3 人（含你自己）共享'),
   ];
@@ -72,13 +70,13 @@ class _SubscriptionPageState extends State<SubscriptionPage> with SingleTickerPr
       final prefs = await SharedPreferences.getInstance();
       final userId = prefs.getString('auth_token') ?? 'guest_\${DateTime.now().millisecondsSinceEpoch}';
       final res = await _dio.post('/api/v1/payment/create', data: {
-        'plan_id': ['monthly', 'quarterly', 'yearly'][_selectedPlan],
+        'plan_id': 'yearly',
         'user_id': userId,
         'payment_method': 'alipay',
       });
       if (res.statusCode == 200 && mounted) {
         await prefs.setBool('is_subscribed', true);
-        await prefs.setString('subscription_plan', ['monthly', 'quarterly', 'yearly'][_selectedPlan]);
+        await prefs.setString('subscription_plan', 'yearly');
         setState(() { _isLoading = false; _isSubscribed = true; });
         _showSuccessDialog();
       }
@@ -186,7 +184,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> with SingleTickerPr
                 child: Column(children: [
                   const Icon(Icons.workspace_premium, size: 48, color: ShunShiColors.goldLight),
                   const SizedBox(height: 10),
-                  Text(_isSubscribed ? '顺时 SVIP 已激活' : '顺时 SVIP', style: const TextStyle(
+                  Text(_isSubscribed ? '顺时年付已开通' : '顺时年付', style: const TextStyle(
                     fontSize: 26, fontWeight: FontWeight.w700, color: Colors.white, fontFamily: ShunShiTypography.serifFamily)),
                   const SizedBox(height: 6),
                   Text(_isSubscribed ? '享受全部养生智慧' : '解锁全部养生智慧 · 7天免费体验',
@@ -243,7 +241,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> with SingleTickerPr
                 padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(color: surface, borderRadius: BorderRadius.circular(16), border: Border.all(color: borderC)),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text('SVIP 专属权益', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, fontFamily: ShunShiTypography.serifFamily, color: tp)),
+                  Text('年付权益', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, fontFamily: ShunShiTypography.serifFamily, color: tp)),
                   const SizedBox(height: 14),
                   ..._coreValues.map((v) => Padding(
                     padding: const EdgeInsets.only(bottom: 12),
@@ -346,7 +344,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> with SingleTickerPr
                 const Icon(Icons.workspace_premium, size: 36, color: ShunShiColors.goldLight),
                 const SizedBox(width: 12),
                 Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(_isSubscribed ? '顺时 SVIP 已激活' : '您当前为免费用户', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.white)),
+                  Text(_isSubscribed ? '顺时年付已开通' : '您当前为免费用户', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.white)),
                   const SizedBox(height: 4),
                   Text(_isSubscribed ? '到期时间：当期结束前可续订' : '订阅解锁全部养生智慧', style: const TextStyle(fontSize: 12, color: Colors.white70)),
                 ])),
@@ -354,7 +352,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> with SingleTickerPr
             ),
             const SizedBox(height: 20),
             // 订阅方案信息
-            _ManagementRow(icon: Icons.calendar_today_outlined, label: '当前方案', value: _isSubscribed ? ['月度会员', '季度会员', '年度会员'][_selectedPlan] : '免费版'),
+            _ManagementRow(icon: Icons.calendar_today_outlined, label: '当前方案', value: _isSubscribed ? '年度会员' : '免费版'),
             _ManagementRow(icon: Icons.payment_outlined, label: '支付方式', value: _isSubscribed ? '支付宝' : '-'),
             _ManagementRow(icon: Icons.access_time, label: '下次扣款', value: _isSubscribed ? '到期自动续费' : '-'),
             const SizedBox(height: 24),

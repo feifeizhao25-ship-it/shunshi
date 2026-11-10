@@ -140,7 +140,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               Icon(Icons.workspace_premium, size: 12, color: ShunShiColors.gold),
                               const SizedBox(width: 4),
                               Text(
-                                'SVIP',
+                                'Yearly',
                                 style: TextStyle(
                                   fontFamily: ShunShiTypography.sansFamily,
                                   fontSize: 10,

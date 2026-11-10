@@ -13,12 +13,11 @@ class MembershipCenterPage extends StatefulWidget {
 }
 
 class _MembershipCenterPageState extends State<MembershipCenterPage> {
-  int _selectedTier = 0; // 0=annual, 1=monthly, 2=family
+  int _selectedTier = 0; // 0=annual, 1=family
 
   static const _tiers = [
-    _Tier('年度会员', '¥199', '¥299', '首年特惠 · 每日仅需 ¥0.54', '年度'),
-    _Tier('月度卡', '¥25', null, '随用随开 · 自由续费', '月度'),
-    _Tier('家庭卡', '¥299', null, '3人共享 · 健康互联', '家庭'),
+    _Tier('年度会员', '¥888', null, '年付', '年度'),
+    _Tier('家庭年付', '¥888', null, '3人（含你自己）', '家庭'),
   ];
 
   @override
@@ -301,7 +300,7 @@ class _MembershipCenterPageState extends State<MembershipCenterPage> {
                   color: ShunShiColors.apricotLight,
                   borderRadius: BorderRadius.circular(999),
                 ),
-                child: const Text('SVIP 尊享', style: TextStyle(
+                child: const Text('年付会员', style: TextStyle(
                   fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 1,
                   color: ShunShiColors.primary,
                 )),
@@ -424,6 +423,46 @@ class _MembershipCenterPageState extends State<MembershipCenterPage> {
           children: [
             Expanded(
               child: GestureDetector(
+                onTap: () => setState(() => _selectedTier = 0),
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: ShunShiColors.surfaceContainerLow,
+                    borderRadius: BorderRadius.circular(16),
+                    border: _selectedTier == 0 ? Border.all(color: ShunShiColors.primary) : null,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(children: [
+                        Radio<int>(value: 0, groupValue: _selectedTier, onChanged: (v) => setState(() => _selectedTier = v!), activeColor: ShunShiColors.primary, visualDensity: VisualDensity.compact),
+                        const Text('年付', style: TextStyle(
+                          fontSize: 18, fontFamily: ShunShiTypography.serifFamily,
+                          color: ShunShiColors.primary,
+                        )),
+                      ]),
+                      const SizedBox(height: 8),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: const [
+                          Text('¥', style: TextStyle(fontSize: 13, color: ShunShiColors.primary)),
+                          Text('888', style: TextStyle(
+                            fontSize: 24, fontFamily: ShunShiTypography.serifFamily,
+                            fontWeight: FontWeight.w700,
+                            color: ShunShiColors.primary,
+                          )),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Text('只卖年付', style: TextStyle(fontSize: 9, color: ShunShiColors.secondary)),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: GestureDetector(
                 onTap: () => setState(() => _selectedTier = 1),
                 child: Container(
                   padding: const EdgeInsets.all(20),
@@ -437,46 +476,6 @@ class _MembershipCenterPageState extends State<MembershipCenterPage> {
                     children: [
                       Row(children: [
                         Radio<int>(value: 1, groupValue: _selectedTier, onChanged: (v) => setState(() => _selectedTier = v!), activeColor: ShunShiColors.primary, visualDensity: VisualDensity.compact),
-                        const Text('月度卡', style: TextStyle(
-                          fontSize: 18, fontFamily: ShunShiTypography.serifFamily,
-                          color: ShunShiColors.primary,
-                        )),
-                      ]),
-                      const SizedBox(height: 8),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: const [
-                          Text('¥', style: TextStyle(fontSize: 13, color: ShunShiColors.primary)),
-                          Text('25', style: TextStyle(
-                            fontSize: 24, fontFamily: ShunShiTypography.serifFamily,
-                            fontWeight: FontWeight.w700,
-                            color: ShunShiColors.primary,
-                          )),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Text('随用随开 · 自由续费', style: TextStyle(fontSize: 9, color: ShunShiColors.secondary)),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: GestureDetector(
-                onTap: () => setState(() => _selectedTier = 2),
-                child: Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: ShunShiColors.surfaceContainerLow,
-                    borderRadius: BorderRadius.circular(16),
-                    border: _selectedTier == 2 ? Border.all(color: ShunShiColors.primary) : null,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(children: [
-                        Radio<int>(value: 2, groupValue: _selectedTier, onChanged: (v) => setState(() => _selectedTier = v!), activeColor: ShunShiColors.primary, visualDensity: VisualDensity.compact),
                         const Text('家庭卡', style: TextStyle(
                           fontSize: 18, fontFamily: ShunShiTypography.serifFamily,
                           color: ShunShiColors.primary,
@@ -495,7 +494,7 @@ class _MembershipCenterPageState extends State<MembershipCenterPage> {
                         ],
                       ),
                       const SizedBox(height: 8),
-                      Text('3人共享 · 健康互联', style: TextStyle(fontSize: 9, color: ShunShiColors.secondary)),
+                      Text('3人（含你自己）', style: TextStyle(fontSize: 9, color: ShunShiColors.secondary)),
                     ],
                   ),
                 ),

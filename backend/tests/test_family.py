@@ -304,7 +304,7 @@ class TestMaxFamilyMembers:
     """家庭成员上限"""
 
     def test_max_family_members(self, client):
-        """家庭成员数量不应超过上限 (4人)"""
+        """家庭成员数量不超过注册表的 3 人（含购买人）"""
         members_to_add = [
             {"name": "成员A", "relation": "child", "age": 15},
             {"name": "成员B", "relation": "child", "age": 12},
@@ -324,8 +324,8 @@ class TestMaxFamilyMembers:
         )
         if family_resp.status_code == 200:
             members = family_resp.json().get("data", {}).get("members", [])
-            assert len(members) <= 4, (
-                f"家庭成员不应超过 4 人，当前: {len(members)}"
+            assert len(members) <= 3, (
+                f"家庭成员不应超过 3 人（含购买人），当前: {len(members)}"
             )
 
     def test_over_limit_returns_400(self, client):

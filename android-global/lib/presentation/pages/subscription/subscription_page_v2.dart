@@ -310,7 +310,7 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
       case 'free': return 'Basic features for daily wellness';
       case 'yangxin': return 'Unlimited Chat + Daily Plan';
       case 'yiyang': return 'Deep advice + weekly summary';
-      case 'jiahe': return 'Family sharing (4 seats)';
+      case 'jiahe': return 'Yearly family plan, 3 people including you';
       default: return '';
     }
   }
