@@ -253,7 +253,7 @@ class AppLocalizations {
       'home_meridian_active': 'Meridian Active',
 
       // Profile (additional)
-      'profile_brand': 'SEASONS AI',
+      'profile_brand': 'SEASONS',
       'profile_points': 'Points',
       'profile_coupons': 'Coupons',
       'profile_achievements': 'Achievements',
@@ -339,7 +339,7 @@ class AppLocalizations {
       // About
       'about_app_name': 'SEASONS',
       'about_version': 'Version 2.4.0',
-      'about_description': 'SEASONS is an intelligent health companion based on TCM Wellness theory. Combining the 24 Solar Terms, 12 ShiChen periods, and 9 Body Types, it provides personalized wellness tips for every user.',
+      'about_description': 'SEASONS helps you live with the 24 solar terms. It is a seasonal rhythm companion, not a medical service.',
 
       // Meditation (additional)
       'meditation_breathing': 'Breathing into Change',

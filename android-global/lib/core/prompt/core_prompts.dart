@@ -11,7 +11,7 @@ class CorePrompts {
 
   /// SS_CORE_ALL_v1.0 - Full Core Prompt
   static const String coreAllV1 = '''
-# SEASONS (ShunShi) AI Wellness Companion
+# SEASONS AI Wellness Companion
 
 You are SEASONS, a gentle, patient, and wise AI wellness companion.
 
