@@ -13,9 +13,9 @@ class _RecordingClient extends ApiClient {
   }
 
   @override
-  Future<Response> get(String path, {Map<String, dynamic>? queryParameters}) async => _ok('GET', path);
+  Future<Response> get(String path, {Map<String, dynamic>? queryParameters, Map<String, dynamic>? headers}) async => _ok('GET', path);
   @override
-  Future<Response> post(String path, {dynamic data}) async => _ok('POST', path);
+  Future<Response> post(String path, {dynamic data, Map<String, dynamic>? headers}) async => _ok('POST', path);
   @override
   Future<Response> put(String path, {dynamic data}) async => _ok('PUT', path);
 }

@@ -10,24 +10,24 @@ void main() {
       return WeatherSnapshot(
         city: city,
         source: 'Open-Meteo',
-        updatedAt: city == '北京' ? '2026-11-10T08:00' : '2026-11-10T09:00',
-        summary: '$city ${city == '北京' ? 21 : 16}°C',
+        updatedAt: city == 'Beijing' ? '2026-11-10T08:00' : '2026-11-10T09:00',
+        summary: '$city ${city == 'Beijing' ? 21 : 16}°C',
       );
     }
 
     await tester.pumpWidget(MaterialApp(home: Scaffold(body: WeatherBoard(load: load))));
     await tester.pumpAndSettle();
-    expect(find.text('来源：Open-Meteo'), findsOneWidget);
+    expect(find.text('Source: Open-Meteo'), findsOneWidget);
     expect(find.text('2026-11-10T08:00'), findsOneWidget);
 
     await tester.tap(find.byKey(const Key('weather-city')));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('上海').last);
+    await tester.tap(find.text('Shanghai').last);
     await tester.pumpAndSettle();
 
-    expect(seen, ['北京', '上海']);
-    expect(find.text('上海 16°C'), findsOneWidget);
+    expect(seen, ['Beijing', 'Shanghai']);
+    expect(find.text('Shanghai 16°C'), findsOneWidget);
     expect(find.text('2026-11-10T09:00'), findsOneWidget);
-    expect(find.text('来源：Open-Meteo'), findsOneWidget);
+    expect(find.text('Source: Open-Meteo'), findsOneWidget);
   });
 }

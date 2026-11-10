@@ -35,7 +35,7 @@ class WeatherBoard extends StatefulWidget {
   const WeatherBoard({
     super.key,
     required this.load,
-    this.cities = const ['北京', '上海'],
+    this.cities = const ['Beijing', 'Shanghai'],
   });
 
   @override
@@ -76,7 +76,7 @@ class _WeatherBoardState extends State<WeatherBoard> {
         ),
         if (snap != null) ...[
           Text(snap.summary, key: const Key('weather-summary')),
-          Text('来源：${snap.source}', key: const Key('weather-source')),
+          Text('Source: ${snap.source}', key: const Key('weather-source')),
           Text(snap.updatedAt, key: const Key('weather-updated')),
         ],
       ],
