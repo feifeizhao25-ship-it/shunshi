@@ -108,7 +108,6 @@ class _DailyCheckinPageState extends State<DailyCheckinPage> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bg = isDark ? ShunShiColors.darkBackground : ShunShiColors.background;
     final textPrimary = isDark ? ShunShiColors.darkTextPrimary : ShunShiColors.textPrimary;
-    final textSecondary = isDark ? ShunShiColors.darkTextSecondary : ShunShiColors.textSecondary;
 
     return Scaffold(
       backgroundColor: bg,

@@ -7,10 +7,17 @@ import 'package:seasons/presentation/widgets/error_boundary.dart';
 
 void main() {
   testWidgets('ErrorWidget.builder shows a calm card instead of a red screen', (tester) async {
+    final previousBuilder = ErrorWidget.builder;
+    final previousOnError = FlutterError.onError;
     AppErrorHandler.init();
-    await tester.pumpWidget(ErrorWidget.builder(FlutterErrorDetails(exception: Exception('boom'))));
-    expect(find.byKey(const Key('calm-error-card')), findsOneWidget);
-    expect(find.textContaining('Go back, then try again'), findsOneWidget);
+    try {
+      await tester.pumpWidget(ErrorWidget.builder(FlutterErrorDetails(exception: Exception('boom'))));
+      expect(find.byKey(const Key('calm-error-card')), findsOneWidget);
+      expect(find.textContaining('Go back, then try again'), findsOneWidget);
+    } finally {
+      ErrorWidget.builder = previousBuilder;
+      FlutterError.onError = previousOnError;
+    }
   });
 
   testWidgets('companion notice names the AI and can show the two-hour reminder', (tester) async {

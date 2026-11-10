@@ -3,7 +3,7 @@ import '../../../../core/theme/shunshi_colors.dart';
 import '../../../../core/theme/shunshi_text_styles.dart';
 import 'constitution_data.dart';
 
-/// 体质测试首页 Widget
+/// 节气生活习惯自测首页 Widget
 class ConstitutionHomeWidget extends StatelessWidget {
   final List<ConstitutionType> types;
   final VoidCallback onStartQuiz;
@@ -23,9 +23,9 @@ class ConstitutionHomeWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('了解你的体质', style: ShunshiTextStyles.greeting),
+          Text('了解你的生活习惯', style: ShunshiTextStyles.greeting),
           const SizedBox(height: 8),
-          Text('中医体质辨识，找到最适合你的养生之道', style: ShunshiTextStyles.bodySecondary),
+          Text('按节气看生活习惯，找到适合你的日常节奏', style: ShunshiTextStyles.bodySecondary),
           const SizedBox(height: 24),
           SizedBox(
             width: double.infinity,
@@ -42,7 +42,7 @@ class ConstitutionHomeWidget extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 32),
-          Text('九种体质', style: ShunshiTextStyles.heading),
+          Text('几种生活习惯', style: ShunshiTextStyles.heading),
           const SizedBox(height: 16),
           GridView.builder(
             shrinkWrap: true,

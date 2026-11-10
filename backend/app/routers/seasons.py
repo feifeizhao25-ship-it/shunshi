@@ -12,7 +12,7 @@
 import json
 import time
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
@@ -44,11 +44,13 @@ def _greeting(now: float | None = None) -> str:
 
 @router.get("/home/dashboard")
 def home_dashboard(
+    request: Request,
     hemisphere: str | None = None,
     tz: str | None = None,
     locale: RequestLocale = Depends(request_locale),
     user_id: str = Depends(current_user),
     session: Session = Depends(get_session),
+    settings: Settings = Depends(get_settings),
 ):
     """Personalised home. Domestic (no locale headers) stays Chinese on Beijing time with the solar-term / holiday anchors;
     the international edition (Accept-Language / X-App-Market) is English, local time from ``tz`` and the hemisphere."""
@@ -59,7 +61,10 @@ def home_dashboard(
     from ..services.culture_profile import effective_hemisphere
 
     hemi, hemi_source = effective_hemisphere(session, user_id, hemisphere)
-    board = phs.build(session, user_id, lang="en" if is_global else "zh", is_global=is_global, hemisphere=hemi, tz_name=tz)
+    board = phs.build(
+        session, user_id, lang="en" if is_global else "zh", is_global=is_global,
+        hemisphere=hemi, tz_name=tz, now_utc=phs.test_clock(request, settings),
+    )
     if not is_global:  # 官方资料库只在国内版；国际版没有这张卡
         board = phs.with_library_card(session, user_id, board)
     out = {

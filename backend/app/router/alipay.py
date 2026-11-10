@@ -137,6 +137,11 @@ async def alipay_notify(request: Request):
     if not out_trade_no or not notify_data.trade_no:
         raise HTTPException(status_code=400, detail="支付宝交易标识缺失")
 
+    from app.services.refund_settlement import is_alipay_refund_notice, apply_verified_alipay_refund
+    if is_alipay_refund_notice(notify_data):
+        apply_verified_alipay_refund(request, notify_data)
+        return PlainTextResponse("success")
+
     if trade_status in {"TRADE_SUCCESS", "TRADE_FINISHED"}:
         from app.services.payment_activation import activate_verified_domestic_payment
         try:

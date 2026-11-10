@@ -3,7 +3,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shunshi/core/theme/theme.dart';
 
 /// 包装 widget 到 MaterialApp 中用于 widget 测试
 Future<void> pumpApp(

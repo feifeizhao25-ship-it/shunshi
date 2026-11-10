@@ -11,7 +11,6 @@ import '../../design_system/theme.dart';
 import '../../design_system/theme_helper.dart';
 import '../widgets/feedback_sheet.dart';
 import '../../core/config/app_config.dart';
-import '../widgets/membership_widgets.dart';
 import 'chat/chat_models.dart';
 import 'chat/chat_history_store.dart';
 import 'chat/chat_membership.dart';
@@ -721,7 +720,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
                         '情绪低落怎么办',
                         '想学八段锦',
                         '换季喝什么',
-                        '体质测试',
+                        '节气生活习惯自测',
                       ]
                       .map(
                         (t) => ActionChip(

@@ -34,6 +34,8 @@ jobs:
           python-version: '3.12'
       - name: Reject clear-text public mobile API endpoints
         run: python scripts/verify_mobile_network_security.py
+      - name: Reject banned medical claims in CN app copy
+        run: python scripts/verify_banned_claims.py
       - name: Verify mobile API origin/version contract
         run: python scripts/verify_mobile_api_contract.py
       - name: Verify repository and CI integrity
@@ -103,9 +105,16 @@ jobs:
       - name: Get deps
         run: flutter pub get
       - name: Analyze
-        run: flutter analyze --no-fatal-warnings --no-fatal-infos
+        run: flutter analyze --no-fatal-infos
       - name: Test
         run: flutter test
+      # ubuntu-latest's JDK 25 makes Gradle 8.11.1's embedded Kotlin 2.0.20 throw
+      # IllegalArgumentException with the java.version string (feature >= 25).
+      # Compile target stays 17; Temurin 21 is a runtime this Gradle can parse.
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
       - name: Build APK (debug)
         run: flutter build apk --debug --dart-define=API_BASE_URL=http://localhost --dart-define=APP_VARIANT=android-cn
 
@@ -140,5 +149,10 @@ jobs:
         run: flutter analyze --no-fatal-warnings --no-fatal-infos
       - name: Test
         run: flutter test
+      # Same Gradle 8.11.1 / JDK 25 failure as flutter-cn. See that job.
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
       - name: Build APK (debug)
         run: flutter build apk --debug --dart-define=API_BASE_URL=http://localhost --dart-define=APP_VARIANT=android-global

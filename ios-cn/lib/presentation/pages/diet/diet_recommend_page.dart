@@ -69,7 +69,7 @@ class _DietRecommendPageState extends State<DietRecommendPage> {
       case 'qixu': return '补气健脾';
       case 'yangxu': return '温阳散寒';
       case 'yinxu': return '滋阴润燥';
-      case 'tanshi': return '化痰祛湿';
+      case 'tanshi': return '少油腻';
       case 'shire': return '清热利湿';
       case 'xueyu': return '活血化瘀';
       case 'qiyu': return '疏肝解郁';

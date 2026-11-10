@@ -32,8 +32,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
     _OnboardingStep(
       icon: Icons.chat_bubble_rounded,
       iconBgGradient: [Color(0xFF4CAF50), Color(0xFF81C784)],
-      title: '你的专属养生顾问',
-      subtitle: '根据你的体质、节气、今日状态，每天给你最合适的养生建议',
+      title: '你的专属节气生活助手',
+      subtitle: '根据节气和今天的状态，安排适合你的作息',
       illustration: _IllustrationType.chat,
     ),
     _OnboardingStep(
@@ -47,7 +47,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
       icon: Icons.family_restroom_rounded,
       iconBgGradient: [Color(0xFFFF7043), Color(0xFFFFAB91)],
       title: '让全家更健康',
-      subtitle: '关心父母体质，共享养生知识，安心守护',
+      subtitle: '关心家人的作息，一起按节气生活',
       illustration: _IllustrationType.family,
     ),
   ];

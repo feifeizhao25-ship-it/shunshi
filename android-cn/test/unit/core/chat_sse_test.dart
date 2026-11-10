@@ -39,14 +39,13 @@ void main() {
     test('TC-CHAT-012: first token latency threshold', () {
       // p50 ≤ 800ms, p95 ≤ 1500ms
       const p50Target = 800;
-      const p95Target = 1500;
       final samples = [650, 720, 750, 790, 850, 1100, 1400];
       samples.sort();
       final p50 = samples[(samples.length * 0.5).floor()];
-      // p95 of 7 samples = last one (index 6)
       final p95 = samples.last;
+      const p95Target = 1500;
       expect(p50, lessThanOrEqualTo(p50Target));
-      // p95=1400 <= 1500 ✓
+      expect(p95, lessThanOrEqualTo(p95Target));
     });
 
     test('TC-CHAT-014: interruption detection', () {

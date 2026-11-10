@@ -1,3 +1,5 @@
+> **历史口径.** 本文中的月付、无限家庭、4 人席位、旧 Tab 数、Antigravity 或 Supabase 方案都不是现行规则。席位人数和年付 SKU 以 `backend/app/entitlements_registry.json` 为准，本文不改这些数字。现行导航是各端 `main_shell.dart` 的 5 项：聊天 / 今日 / 节气 / 养生 / 我的（国际版 Chat / Today / Solar / Wellness / Profile）。
+
 # 顺时 ShunShi 商业计划书专用提示词
 
 你是世界级产品策略师、商业分析师、投资人沟通专家。

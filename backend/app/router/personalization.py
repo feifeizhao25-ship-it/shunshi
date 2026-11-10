@@ -9,10 +9,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Literal
 
-from fastapi import APIRouter, Depends, Header, HTTPException, Query
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request
 from sqlalchemy.orm import Session
 
-from ..deps import current_user, get_session
+from ..config import Settings
+from ..deps import current_user, get_session, get_settings
 from pydantic import BaseModel, Field
 
 
@@ -153,8 +154,10 @@ ACTION_LOG_LIMIT = 200
 @router.post("/action/complete")
 def complete_action(
     body: ActionCompletion,
+    request: Request,
     user_id: str = Depends(current_user),
     session: Session = Depends(get_session),
+    settings: Settings = Depends(get_settings),
 ):
     """记录一次行动完成。以前不落库却回 ``recorded: True``（假回执），换手机后个性化行为全部丢失。
 
@@ -163,6 +166,7 @@ def complete_action(
     import json
     import time
 
+    from ..services.personal_home_service import test_clock
     from ..simple_models import UserSetting
 
     row = session.get(UserSetting, {"user_id": user_id, "key": ACTION_LOG_KEY})
@@ -170,13 +174,14 @@ def complete_action(
         log = json.loads(row.value) if row else []
     except (TypeError, ValueError):
         log = []
+    pinned = test_clock(request, settings)
     log.append({
         "action_type": body.action_type,
         "completed": body.completed,
         "rating": body.rating,
         "skill_name": body.skill_name,
         "duration_seconds": body.duration_seconds,
-        "at": int(time.time()),
+        "at": int(pinned.timestamp() if pinned is not None else time.time()),
     })
     log = log[-ACTION_LOG_LIMIT:]
     session.merge(UserSetting(user_id=user_id, key=ACTION_LOG_KEY, value=json.dumps(log, ensure_ascii=False)))

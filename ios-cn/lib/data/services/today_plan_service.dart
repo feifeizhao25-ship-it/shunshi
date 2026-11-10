@@ -295,7 +295,7 @@ class TodayPlanService {
         name: '春分',
         emoji: '🌱',
         description: '阴阳平衡，昼夜相等',
-        suggestions: ['适当运动', '调理脾胃'],
+        suggestions: ['适当运动', '照顾脾胃'],
         date: DateTime.now(),
       ),
     );

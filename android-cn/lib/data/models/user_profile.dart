@@ -120,7 +120,7 @@ class LifeStageHelper {
       case LifeStage.pressure:
         return '压力与健康管理';
       case LifeStage.health:
-        return '养生与体质调理';
+        return '养生与体质安排';
       case LifeStage.companionship:
         return '生活陪伴';
     }
@@ -134,7 +134,7 @@ class LifeStageHelper {
       case LifeStage.pressure:
         return ['今日洞察', '三件小事', '跟进提醒'];
       case LifeStage.health:
-        return ['节气养生', '今日养生', '体质调理'];
+        return ['节气养生', '今日养生', '体质安排'];
       case LifeStage.companionship:
         return ['今日一句', '语音聊天', '今日建议'];
     }

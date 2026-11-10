@@ -7,6 +7,7 @@ import '../../../core/theme/shunshi_colors.dart';
 import '../../../design_system/theme.dart';
 import '../../../data/content/wellness_content.dart';
 import '../../../core/network/api_singleton.dart';
+import '../../../core/config/app_config.dart';
 
 class _CategoryItem {
   final IconData icon;
@@ -18,7 +19,14 @@ class _CategoryItem {
 }
 
 class LibraryPage extends StatefulWidget {
-  const LibraryPage({super.key});
+  /// Defaults to the international build flag, which is hidden.
+  /// Tests and a future product decision can pass true without deleting the sheets.
+  final bool showBodyTypesAndPressurePoints;
+
+  const LibraryPage({
+    super.key,
+    this.showBodyTypesAndPressurePoints = AppConfig.showTcmLibraryCategories,
+  });
 
   @override
   State<LibraryPage> createState() => _LibraryPageState();
@@ -155,10 +163,12 @@ class _LibraryPageState extends State<LibraryPage> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final categories = [
-      _CategoryItem(Icons.accessibility_new, 'Body Types', 'Discover your wellness profile', AppColors.primary(context), _showBodyTypes),
+      if (widget.showBodyTypesAndPressurePoints)
+        _CategoryItem(Icons.accessibility_new, 'Body Types', 'Discover your wellness profile', AppColors.primary(context), _showBodyTypes),
       _CategoryItem(Icons.restaurant_menu, 'Seasonal Recipes', 'Fresh ingredients by season', ShunShiColors.secondary, _showRecipes),
       _CategoryItem(Icons.local_cafe, 'Herbal Teas', 'Chamomile, Peppermint, Ginger', ShunShiColors.blue, _showHerbalTeas),
-      _CategoryItem(Icons.touch_app, 'Pressure Points', 'Reflexology & acupressure', ShunShiColors.apricot, _showPressurePoints),
+      if (widget.showBodyTypesAndPressurePoints)
+        _CategoryItem(Icons.touch_app, 'Pressure Points', 'Reflexology & acupressure', ShunShiColors.apricot, _showPressurePoints),
       _CategoryItem(Icons.fitness_center, 'Movement', 'Yoga, Tai Chi & Stretching', ShunShiColors.goldLight, _showMovement),
       _CategoryItem(Icons.bedtime, 'Sleep Sounds', 'Nature, white noise & meditation', AppColors.primaryLight(context), _showSleepSounds),
     ];

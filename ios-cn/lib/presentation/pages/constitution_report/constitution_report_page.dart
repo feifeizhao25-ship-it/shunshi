@@ -1,4 +1,4 @@
-/// 体质测试报告页 — 参考UI _9
+/// 节气生活习惯自测报告页 — 参考UI _9
 /// 气虚质（兼有痰湿）· 2024年春分
 ///
 /// 结构:
@@ -51,7 +51,7 @@ class ConstitutionReportPage extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '体质测试报告 · 2024年春分',
+                          '节气生活习惯自测报告 · 2024年春分',
                           style: TextStyle(
                             fontSize: 13, color: Colors.white70,
                             fontFamily: ShunShiTypography.sansFamily,
@@ -69,7 +69,7 @@ class ConstitutionReportPage extends StatelessWidget {
                         Row(children: [
                           _tagChip('补气', ShunShiColors.primary),
                           const SizedBox(width: 8),
-                          _tagChip('祛湿', ShunShiColors.gold),
+                          _tagChip('清淡', ShunShiColors.gold),
                           const SizedBox(width: 8),
                           _tagChip('忌寒凉', ShunShiColors.error),
                         ]),
@@ -140,7 +140,7 @@ class ConstitutionReportPage extends StatelessWidget {
                     child: const Text(
                       '春季生发，您的"气虚"特征表现为易倦乏力，如细雨下的嫩芽需温言呵护。'
                       '结合"痰湿"兼挟，体内水饮运化稍显迟滞。当下应以"温补脾气"为主，'
-                      '辅以"化痰祛湿"。切记，温和的早睡与清淡的饮食，是为您这卷生命画卷注入生气的最佳笔触。',
+                      '辅以"少油腻"。切记，温和的早睡与清淡的饮食，是为您这卷生命画卷注入生气的最佳笔触。',
                       style: TextStyle(
                         fontSize: 14, color: ShunShiColors.textSecondary,
                         height: 1.8, fontFamily: ShunShiTypography.sansFamily,
@@ -178,7 +178,7 @@ class ConstitutionReportPage extends StatelessWidget {
                     Icons.local_cafe,
                     '推荐茶饮',
                     '陈皮普洱茶',
-                    '理气化痰 · 健脾祛湿',
+                    '理气化痰 · 饮食清淡',
                   ),
                   const SizedBox(height: 12),
 
@@ -187,7 +187,7 @@ class ConstitutionReportPage extends StatelessWidget {
                     Icons.self_improvement,
                     '推荐功法',
                     '八段锦 · 调理脾胃须单举',
-                    '调理气机 · 促进运化',
+                    '安排气机 · 促进运化',
                   ),
                   const SizedBox(height: 12),
 
@@ -196,7 +196,7 @@ class ConstitutionReportPage extends StatelessWidget {
                     Icons.healing,
                     '推荐穴位',
                     '足三里 · 三阴交',
-                    '补气健脾 · 化痰祛湿',
+                    '补气健脾 · 少油腻',
                   ),
 
                   const SizedBox(height: 40),

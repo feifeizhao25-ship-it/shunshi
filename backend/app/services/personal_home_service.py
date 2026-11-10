@@ -57,6 +57,28 @@ def preferences(session: Session, user_id: str) -> dict:
 
 
 _FIXED_OFFSET = re.compile(r"^UTC([+-])(\d{2}):(\d{2})$")
+TEST_CLOCK_HEADER = "x-shunshi-test-now"
+_TEST_ENVS = {"test", "testing"}
+
+
+def test_clock(request, settings) -> Optional[datetime]:
+    """测试环境才接受的时钟。生产环境忽略该头，也不提供绕过登录的入口。"""
+    if getattr(settings, "env", "") not in _TEST_ENVS:
+        return None
+    headers = getattr(request, "headers", None)
+    raw = ""
+    if headers is not None:
+        raw = headers.get(TEST_CLOCK_HEADER, "") or ""
+    raw = raw.strip()
+    if not raw:
+        return None
+    try:
+        parsed = datetime.fromisoformat(raw)
+    except ValueError:
+        return None
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=CN_TZ)
+    return parsed.astimezone(timezone.utc)
 
 
 def local_now(is_global: bool, tz_name: Optional[str], now_utc: Optional[datetime] = None) -> datetime:
