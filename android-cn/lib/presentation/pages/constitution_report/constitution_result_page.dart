@@ -1,5 +1,4 @@
-/// 节气生活习惯自测结果页 — 对齐UI参考 _9
-/// TopBar(头像+ShunShi AI+通知) → 标题+标签 → 体质强弱分布(进度条) → AI调养总评(毛玻璃) → 专属调养方案 → 底部CTA
+/// 节气生活习惯自测结果页。没有传入类型和分数时不展示个人结果。
 library;
 
 import 'package:flutter/material.dart';
@@ -7,20 +6,24 @@ import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
 
 class ConstitutionResultPage extends StatelessWidget {
-  final String constitutionType;
+  final String? constitutionType;
   final Map<String, double>? scores;
 
   const ConstitutionResultPage({
     super.key,
-    this.constitutionType = '气虚（兼有痰湿）',
+    this.constitutionType,
     this.scores,
   });
+
+  bool get _hasResult {
+    final type = constitutionType?.trim() ?? '';
+    return type.isNotEmpty && scores != null && scores!.isNotEmpty;
+  }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bg = isDark ? ShunShiColors.darkBackground : ShunShiColors.background;
-
     final now = DateTime.now();
     final seasonLabel = _getSeasonLabel(now.month);
 
@@ -30,7 +33,6 @@ class ConstitutionResultPage extends StatelessWidget {
         physics: const BouncingScrollPhysics(),
         child: Column(
           children: [
-            // ── TopAppBar ──
             SafeArea(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(20, 12, 20, 8),
@@ -60,88 +62,91 @@ class ConstitutionResultPage extends StatelessWidget {
               ),
             ),
             Container(height: 1, color: ShunShiColors.surfaceContainerLow, margin: const EdgeInsets.symmetric(horizontal: 20)),
-
-            // ── Content ──
             Padding(
               padding: const EdgeInsets.fromLTRB(24, 40, 24, 40),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // ── Header ──
-                  Text('节气生活习惯自测报告 · ${now.year}年$seasonLabel', style: TextStyle(
-                    fontSize: 12, fontWeight: FontWeight.w500,
-                    color: ShunShiColors.secondary, letterSpacing: 2,
-                  )),
-                  const SizedBox(height: 12),
-                  const Text('生活习惯倾向：', style: TextStyle(
-                    fontSize: 32, fontWeight: FontWeight.w700,
-                    fontFamily: ShunShiTypography.serifFamily,
-                    color: ShunShiColors.primary, height: 1.3,
-                  )),
-                  Text(constitutionType, style: TextStyle(
-                    fontSize: 32, fontWeight: FontWeight.w700,
-                    fontFamily: ShunShiTypography.serifFamily,
-                    color: ShunShiColors.primary, height: 1.3,
-                  )),
-                  const SizedBox(height: 20),
-                  // Tags
-                  Wrap(
-                    spacing: 8,
-                    children: [
-                      _tagChip('补气', ShunShiColors.apricotLight),
-                      _tagChip('清淡', ShunShiColors.apricotLight),
-                      _tagChip('忌寒凉', ShunShiColors.primaryContainer),
-                    ],
-                  ),
-                  const SizedBox(height: 48),
-
-                  // ── 体质强弱分布 ──
-                  _buildDistributionSection(),
-                  const SizedBox(height: 48),
-
-                  // ── AI 调养总评 ──
-                  _buildAiReview(),
-                  const SizedBox(height: 48),
-
-                  // ── 专属调养方案 ──
-                  _buildSolutions(context),
-                  const SizedBox(height: 40),
-
-                  // ── 底部 CTA ──
-                  Center(
-                    child: Column(
-                      children: [
-                        const Text('"静养其身，动养其气。"', style: TextStyle(
-                          fontSize: 14, fontStyle: FontStyle.italic,
-                          color: ShunShiColors.secondary,
-                        )),
-                        const SizedBox(height: 16),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: () {},
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: ShunShiColors.primary,
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                              elevation: 0,
-                            ),
-                            child: Text('生成详细调养日历', style: TextStyle(
-                              fontSize: 14, fontWeight: FontWeight.w700,
-                              letterSpacing: 3, color: Colors.white,
-                            )),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 80),
-                ],
-              ),
+              child: _hasResult
+                  ? _result(now, seasonLabel)
+                  : _empty(context),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _empty(BuildContext context) {
+    return Column(
+      children: [
+        const SizedBox(height: 48),
+        const Text('还没有你的问卷结果', style: TextStyle(
+          fontSize: 20, fontWeight: FontWeight.w700,
+          fontFamily: ShunShiTypography.serifFamily,
+          color: ShunShiColors.primary,
+        )),
+        const SizedBox(height: 12),
+        TextButton(
+          onPressed: () => context.push('/constitution-test'),
+          child: const Text('去做问卷'),
+        ),
+      ],
+    );
+  }
+
+  Widget _result(DateTime now, String seasonLabel) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('节气生活习惯自测报告 · ${now.year}年$seasonLabel', style: TextStyle(
+          fontSize: 12, fontWeight: FontWeight.w500,
+          color: ShunShiColors.secondary, letterSpacing: 2,
+        )),
+        const SizedBox(height: 12),
+        const Text('生活习惯倾向：', style: TextStyle(
+          fontSize: 32, fontWeight: FontWeight.w700,
+          fontFamily: ShunShiTypography.serifFamily,
+          color: ShunShiColors.primary, height: 1.3,
+        )),
+        Text(constitutionType!.trim(), style: TextStyle(
+          fontSize: 32, fontWeight: FontWeight.w700,
+          fontFamily: ShunShiTypography.serifFamily,
+          color: ShunShiColors.primary, height: 1.3,
+        )),
+        const SizedBox(height: 32),
+        const Text('倾向对照', style: TextStyle(
+          fontSize: 18, fontFamily: ShunShiTypography.serifFamily,
+          color: ShunShiColors.primary,
+        )),
+        const SizedBox(height: 16),
+        ...scores!.entries.map(_bar),
+      ],
+    );
+  }
+
+  Widget _bar(MapEntry<String, double> entry) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(entry.key, style: TextStyle(fontSize: 12, color: ShunShiColors.secondary)),
+              Text('${(entry.value * 100).round()}%', style: TextStyle(
+                fontSize: 12, fontWeight: FontWeight.w700, color: ShunShiColors.secondary,
+              )),
+            ],
+          ),
+          const SizedBox(height: 6),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(999),
+            child: LinearProgressIndicator(
+              value: entry.value.clamp(0.0, 1.0),
+              minHeight: 6,
+              backgroundColor: ShunShiColors.surfaceVariant,
+              valueColor: const AlwaysStoppedAnimation<Color>(ShunShiColors.primary),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -152,319 +157,4 @@ class ConstitutionResultPage extends StatelessWidget {
     if (month >= 9 && month <= 11) return '秋分';
     return '冬至';
   }
-
-  Widget _tagChip(String label, Color bgColor) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Text(label, style: TextStyle(
-        fontSize: 11, fontWeight: FontWeight.w500,
-        letterSpacing: 1,
-        color: bgColor == ShunShiColors.primaryContainer
-            ? ShunShiColors.primary
-            : ShunShiColors.textPrimary,
-      )),
-    );
-  }
-
-  Widget _buildDistributionSection() {
-    final bars = [
-      _BarData('气虚', 0.85, ShunShiColors.primary),
-      _BarData('痰湿', 0.62, ShunShiColors.primaryContainer),
-      _BarData('阳虚', 0.45, ShunShiColors.surfaceVariant),
-      _BarData('平和（基准）', 0.30, ShunShiColors.textTertiary.withValues(alpha: 0.3)),
-    ];
-
-    return Container(
-      padding: const EdgeInsets.all(28),
-      decoration: BoxDecoration(
-        color: ShunShiColors.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(24),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text('倾向对照', style: TextStyle(
-            fontSize: 18, fontFamily: ShunShiTypography.serifFamily,
-            color: ShunShiColors.primary,
-          )),
-          const SizedBox(height: 24),
-          ...bars.map((b) => Padding(
-            padding: const EdgeInsets.only(bottom: 16),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(b.label, style: TextStyle(
-                      fontSize: 12, color: ShunShiColors.secondary,
-                    )),
-                    Text('${(b.fraction * 100).toInt()}%', style: TextStyle(
-                      fontSize: 12, fontWeight: FontWeight.w700,
-                      color: ShunShiColors.secondary,
-                    )),
-                  ],
-                ),
-                const SizedBox(height: 6),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(999),
-                  child: LinearProgressIndicator(
-                    value: b.fraction,
-                    minHeight: 6,
-                    backgroundColor: ShunShiColors.surfaceVariant,
-                    valueColor: AlwaysStoppedAnimation<Color>(b.color),
-                  ),
-                ),
-              ],
-            ),
-          )),
-          const SizedBox(height: 16),
-          Container(height: 1, color: ShunShiColors.textTertiary.withValues(alpha: 0.2)),
-          const SizedBox(height: 16),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Icon(Icons.info_outline, size: 16, color: ShunShiColors.primary),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  '测试结果基于您的近期身心状态。体质受环境与季节影响，建议每24节气重新评估。',
-                  style: TextStyle(
-                    fontSize: 11, height: 1.6,
-                    color: ShunShiColors.secondary.withValues(alpha: 0.8),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAiReview() {
-    return Container(
-      padding: const EdgeInsets.all(28),
-      decoration: BoxDecoration(
-        color: ShunShiColors.surfaceContainerLow.withValues(alpha: 0.8),
-        borderRadius: BorderRadius.circular(24),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(Icons.auto_awesome, size: 20, color: ShunShiColors.secondary),
-              const SizedBox(width: 8),
-              const Text('AI 调养总评', style: TextStyle(
-                fontSize: 20, fontFamily: ShunShiTypography.serifFamily,
-                color: ShunShiColors.primary,
-              )),
-            ],
-          ),
-          const SizedBox(height: 16),
-          const Text(
-            '春季生发，您的"气虚"特征表现为易倦乏力，如细雨下的嫩芽需温言呵护。结合"痰湿"兼挟，体内水饮运化稍显迟滞。当下应以"温补脾气"为主，辅以"少油腻"。切记，温和的早睡与清淡的饮食，是为您这卷生命画卷注入生气的最佳笔触。',
-            style: TextStyle(
-              fontSize: 15, height: 2.0,
-              color: ShunShiColors.textSecondary,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSolutions(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text('专属调养方案', style: TextStyle(
-              fontSize: 24, fontFamily: ShunShiTypography.serifFamily,
-              color: ShunShiColors.primary,
-            )),
-            Text('查看全部', style: TextStyle(
-              fontSize: 12, color: ShunShiColors.secondary,
-              decoration: TextDecoration.underline,
-              decorationColor: ShunShiColors.secondary.withValues(alpha: 0.3),
-            )),
-          ],
-        ),
-        const SizedBox(height: 20),
-        // Recipe card (full width)
-        Container(
-          decoration: BoxDecoration(
-            color: ShunShiColors.surfaceContainerLowest,
-            borderRadius: BorderRadius.circular(24),
-            boxShadow: ShunShiShadows.sm,
-          ),
-          child: Row(
-            children: [
-              // Left image placeholder
-              Container(
-                width: 120, height: 160,
-                decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.horizontal(left: Radius.circular(24)),
-                  gradient: LinearGradient(
-                    colors: [ShunShiColors.apricotLight, ShunShiColors.apricot],
-                  ),
-                ),
-                child: Center(
-                  child: Icon(Icons.soup_kitchen, size: 36, color: Colors.white.withValues(alpha: 0.7)),
-                ),
-              ),
-              // Right content
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text('推荐食谱', style: TextStyle(
-                        fontSize: 10, letterSpacing: 2,
-                        color: ShunShiColors.secondary,
-                      )),
-                      const SizedBox(height: 6),
-                      const Text('黄芪炖鸡汤', style: TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.w700,
-                        fontFamily: ShunShiTypography.serifFamily,
-                        color: ShunShiColors.primary,
-                      )),
-                      const SizedBox(height: 8),
-                      Text('温热的汤羹，适合容易疲乏的日子。这是生活习惯参考，不是诊断。', style: TextStyle(
-                        fontSize: 12, color: ShunShiColors.textSecondary,
-                      )),
-                      const SizedBox(height: 12),
-                      GestureDetector(
-                        onTap: () => context.push('/food/cooking'),
-                        child: Row(
-                          children: const [
-                            Text('开始烹饪', style: TextStyle(
-                              fontSize: 12, fontWeight: FontWeight.w700,
-                              color: ShunShiColors.primary,
-                            )),
-                            SizedBox(width: 4),
-                            Icon(Icons.arrow_forward, size: 14, color: ShunShiColors.primary),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 12),
-        // Two column: acupoints + qigong
-        Row(
-          children: [
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.all(20),
-                height: 160,
-                decoration: BoxDecoration(
-                  color: ShunShiColors.surfaceContainerLow,
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Icon(Icons.spa, size: 28, color: ShunShiColors.primary),
-                        const SizedBox(height: 12),
-                        const Text('推荐穴位', style: TextStyle(
-                          fontSize: 17, fontWeight: FontWeight.w700,
-                          fontFamily: ShunShiTypography.serifFamily,
-                          color: ShunShiColors.primary,
-                        )),
-                        const SizedBox(height: 6),
-                        Text('足三里 · 补中益气', style: TextStyle(
-                          fontSize: 12, color: ShunShiColors.textSecondary,
-                        )),
-                      ],
-                    ),
-                    Align(
-                      alignment: Alignment.bottomRight,
-                      child: Container(
-                        width: 36, height: 36,
-                        decoration: BoxDecoration(
-                          color: ShunShiColors.surfaceContainerLowest,
-                          shape: BoxShape.circle,
-                          boxShadow: ShunShiShadows.sm,
-                        ),
-                        child: const Icon(Icons.play_arrow, size: 18, color: ShunShiColors.primary),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.all(20),
-                height: 160,
-                decoration: BoxDecoration(
-                  color: ShunShiColors.surfaceContainerLow,
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Icon(Icons.self_improvement, size: 28, color: ShunShiColors.primary),
-                        const SizedBox(height: 12),
-                        const Text('推荐功法', style: TextStyle(
-                          fontSize: 17, fontWeight: FontWeight.w700,
-                          fontFamily: ShunShiTypography.serifFamily,
-                          color: ShunShiColors.primary,
-                        )),
-                        const SizedBox(height: 6),
-                        Text('八段锦 · 照顾脾胃', style: TextStyle(
-                          fontSize: 12, color: ShunShiColors.textSecondary,
-                        )),
-                      ],
-                    ),
-                    Align(
-                      alignment: Alignment.bottomRight,
-                      child: Container(
-                        width: 36, height: 36,
-                        decoration: BoxDecoration(
-                          color: ShunShiColors.surfaceContainerLowest,
-                          shape: BoxShape.circle,
-                          boxShadow: ShunShiShadows.sm,
-                        ),
-                        child: const Icon(Icons.play_arrow, size: 18, color: ShunShiColors.primary),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-}
-
-class _BarData {
-  final String label;
-  final double fraction;
-  final Color color;
-  const _BarData(this.label, this.fraction, this.color);
 }

@@ -1,313 +1,79 @@
-/// Body Type Essence Page — Reference: body_type_essence
-/// "Your Essence: Balanced"
-///
-/// Structure:
-/// 1. Header with essence name
-/// 2. 平时可以留意 radar (6 metrics)
-/// 3. Solar Dominance + Terrene Stability cards
-/// 4. Natural Rhythm description
-/// 5. Seasonal Adjustments
+/// 生活习惯倾向页。没有传入类型和分数时不展示个人结果。
 library;
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
 
 class BodyTypeEssencePage extends StatelessWidget {
   final String? bodyType;
-  const BodyTypeEssencePage({super.key, this.bodyType});
+  final Map<String, double>? scores;
+  const BodyTypeEssencePage({super.key, this.bodyType, this.scores});
 
-  static const _metrics = [
-    _Metric('日常作息', 0, Icons.favorite),
-    _Metric('手足冷暖', 0, Icons.water_drop),
-    _Metric('饮食规律', 0, Icons.restaurant),
-    _Metric('换季适应', 0, Icons.shield),
-    _Metric('白天精神', 0, Icons.local_fire_department),
-    _Metric('夜里睡眠', 0, Icons.bedtime),
-  ];
+  bool get _hasResult {
+    final type = bodyType?.trim() ?? '';
+    return type.isNotEmpty && scores != null && scores!.isNotEmpty;
+  }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bg = isDark ? ShunShiColors.darkBackground : ShunShiColors.background;
-
     return Scaffold(
       backgroundColor: bg,
-      body: CustomScrollView(
-        slivers: [
-          // ── Header ──
-          SliverAppBar(
-            expandedHeight: 200,
-            pinned: true,
-            backgroundColor: ShunShiColors.primary,
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
-              onPressed: () => Navigator.pop(context),
-            ),
-            actions: const [],
-            flexibleSpace: FlexibleSpaceBar(
-              background: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      ShunShiColors.primaryContainer,
-                      ShunShiColors.primary,
-                    ],
-                  ),
-                ),
-                child: SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 60, 20, 0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '生活习惯倾向',
-                          style: TextStyle(
-                            fontSize: 13, color: Colors.white70,
-                            fontFamily: ShunShiTypography.sansFamily,
-                            letterSpacing: 1.5,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          '平和 · 一般说明',
-                          style: const TextStyle(
-                            fontSize: 24, fontWeight: FontWeight.w700,
-                            color: Colors.white, fontFamily: ShunShiTypography.serifFamily,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          ''
-                          '下面是平和的一般特点，不是个人检测，也不是诊断。',
-                          style: TextStyle(
-                            fontSize: 13, color: Colors.white.withValues(alpha: 0.8),
-                            height: 1.5, fontFamily: ShunShiTypography.sansFamily,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
+      appBar: AppBar(
+        backgroundColor: ShunShiColors.primary,
+        foregroundColor: Colors.white,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: const Text('生活习惯倾向', style: TextStyle(fontFamily: ShunShiTypography.serifFamily)),
+      ),
+      body: _hasResult ? _result() : _empty(context),
+    );
+  }
 
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // ── 平时可以留意 Metrics ──
-                  _sectionTitle('filter_vintage', '平时可以留意'),
-                  const SizedBox(height: 12),
-                  ..._metrics.map((m) => Padding(
-                    padding: const EdgeInsets.only(bottom: 14),
-                    child: _metricBar(m),
-                  )),
-                  const SizedBox(height: 8),
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: ShunShiColors.surfaceContainerLow,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(children: [
-                      const Icon(Icons.format_quote, size: 20, color: ShunShiColors.primary),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          '「阴阳流转，动态平衡」',
-                          style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.w600,
-                            color: ShunShiColors.primary,
-                            fontFamily: ShunShiTypography.serifFamily, fontStyle: FontStyle.italic,
-                          ),
-                        ),
-                      ),
-                    ]),
-                  ),
-                  const SizedBox(height: 28),
-
-                  // ── Solar Dominance ──
-                  Row(children: [
-                    const Icon(Icons.wb_sunny, size: 20, color: Color(0xFFF59E0B)),
-                    const SizedBox(width: 8),
-                    Text('阳火主导', style: TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.w700,
-                      color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.serifFamily,
-                    )),
-                  ]),
-                  const SizedBox(height: 8),
-                  Text(
-                    '早晨是比较适合活动的时候，可以安排散步或拉伸。',
-                    style: TextStyle(
-                      fontSize: 14, color: ShunShiColors.textSecondary,
-                      height: 1.6, fontFamily: ShunShiTypography.sansFamily,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // ── Terrene Stability ──
-                  Row(children: [
-                    const Icon(Icons.spa, size: 20, color: ShunShiColors.primary),
-                    const SizedBox(width: 8),
-                    Text('大地稳健', style: TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.w700,
-                      color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.serifFamily,
-                    )),
-                  ]),
-                  const SizedBox(height: 8),
-                  Text(
-                    '累了就停下来休息，饮食以温软为主。',
-                    style: TextStyle(
-                      fontSize: 14, color: ShunShiColors.textSecondary,
-                      height: 1.6, fontFamily: ShunShiTypography.sansFamily,
-                    ),
-                  ),
-                  const SizedBox(height: 28),
-
-                  // ── Natural Rhythm ──
-                  _sectionTitle('auto_awesome', '你的自然节律'),
-                  const SizedBox(height: 12),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: ShunShiColors.surfaceContainerLowest,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          '作息比较稳的人平时起伏不大，换季时仍要注意作息。这是生活习惯参考，不是诊断。',
-                          style: TextStyle(
-                            fontSize: 14, color: ShunShiColors.textSecondary,
-                            height: 1.7, fontFamily: ShunShiTypography.sansFamily,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        _checkItem('傍晚宜安静，不必再安排剧烈活动。'),
-                        const SizedBox(height: 8),
-                        _checkItem('午饭前后把正餐吃好。'),
-                        const SizedBox(height: 8),
-                        _checkItem('起床后先活动一下再开始忙碌。'),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 28),
-
-                  // ── Seasonal Adjustments ──
-                  _sectionTitle('eco', '季节调整'),
-                  const SizedBox(height: 12),
-                  _seasonCard('活跃季节', '春季 · 木行',
-                    '春季适合早起走动，别一下安排太满。',
-                    ShunShiColors.primary),
-                  const SizedBox(height: 12),
-                  _seasonCard('休养季节', '长夏 · 土行',
-                    '长夏注意少吃生冷，把觉睡够。',
-                    const Color(0xFFF59E0B)),
-                  const SizedBox(height: 12),
-                  _seasonCard('挑战季节', '冬季 · 水行',
-                    '冬季多休息，喝温热的水，应酬可以少一些。',
-                    const Color(0xFF3B82F6)),
-
-                  const SizedBox(height: 40),
-                ],
-              ),
-            ),
+  Widget _empty(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text('还没有你的问卷结果', style: TextStyle(
+            fontSize: 20, fontWeight: FontWeight.w700, color: ShunShiColors.primary,
+            fontFamily: ShunShiTypography.serifFamily,
+          )),
+          const SizedBox(height: 12),
+          TextButton(
+            onPressed: () => context.push('/constitution-test'),
+            child: const Text('去做问卷'),
           ),
         ],
       ),
     );
   }
 
-  Widget _sectionTitle(String icon, String title) {
-    return Row(children: [
-      Icon(Icons.format_quote, size: 0), // spacer trick
-      Text(title, style: TextStyle(
-        fontSize: 18, fontWeight: FontWeight.w700,
-        color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.serifFamily,
-      )),
-    ]);
-  }
-
-  Widget _metricBar(_Metric m) {
-    return Row(children: [
-      Icon(m.icon, size: 18, color: ShunShiColors.primary),
-      const SizedBox(width: 10),
-      Expanded(child: Text(m.name, style: TextStyle(
-        fontSize: 14, color: ShunShiColors.textSecondary,
-        fontFamily: ShunShiTypography.sansFamily,
-      ))),
-    ]);
-  }
-
-  Widget _checkItem(String text) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _result() {
+    return ListView(
+      padding: const EdgeInsets.all(20),
       children: [
-        const Icon(Icons.check_circle, size: 18, color: ShunShiColors.primary),
-        const SizedBox(width: 10),
-        Expanded(child: Text(text, style: TextStyle(
-          fontSize: 13, color: ShunShiColors.textSecondary,
-          height: 1.5, fontFamily: ShunShiTypography.sansFamily,
-        ))),
+        Text(bodyType!.trim(), style: const TextStyle(
+          fontSize: 24, fontWeight: FontWeight.w700, color: ShunShiColors.primary,
+          fontFamily: ShunShiTypography.serifFamily,
+        )),
+        const SizedBox(height: 8),
+        const Text('这是生活习惯参考，不是诊断。', style: TextStyle(fontSize: 13, color: ShunShiColors.textSecondary)),
+        const SizedBox(height: 20),
+        ...scores!.entries.map((entry) => Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: Row(children: [
+            SizedBox(width: 88, child: Text(entry.key, style: const TextStyle(fontSize: 13, color: ShunShiColors.textSecondary))),
+            Expanded(child: LinearProgressIndicator(value: entry.value.clamp(0.0, 1.0), minHeight: 8, color: ShunShiColors.primary)),
+            const SizedBox(width: 8),
+            Text('${(entry.value * 100).round()}%', style: const TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
+          ]),
+        )),
       ],
     );
   }
-
-  Widget _seasonCard(String title, String subtitle, String desc, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: ShunShiColors.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 4, height: 48,
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: TextStyle(
-                  fontSize: 15, fontWeight: FontWeight.w600,
-                  color: ShunShiColors.textPrimary, fontFamily: ShunShiTypography.sansFamily,
-                )),
-                const SizedBox(height: 2),
-                Text(subtitle, style: TextStyle(
-                  fontSize: 12, color: color, fontFamily: ShunShiTypography.sansFamily,
-                )),
-                const SizedBox(height: 6),
-                Text(desc, style: TextStyle(
-                  fontSize: 13, color: ShunShiColors.textSecondary,
-                  height: 1.5, fontFamily: ShunShiTypography.sansFamily,
-                )),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _Metric {
-  final String name;
-  final double value;
-  final IconData icon;
-  const _Metric(this.name, this.value, this.icon);
 }
