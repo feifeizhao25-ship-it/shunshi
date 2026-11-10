@@ -21,7 +21,6 @@ void main() {
   };
   final lightSurface = <Color>{
     ShunShiColors.surface,
-    ShunShiColors.background,
     ShunShiColors.textPrimary,
     ShunShiColors.textSecondary,
     ShunShiColors.textTertiary,

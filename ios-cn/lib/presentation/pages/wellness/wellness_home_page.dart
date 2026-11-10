@@ -75,7 +75,7 @@ class WellnessHomePage extends StatelessWidget {
                       onTap: () => context.push('/search'),
                       style: TextStyle(color: title, fontSize: 16),
                       decoration: InputDecoration(
-                        hintText: '搜索调理方案、节气食谱...',
+                        hintText: '搜索日常安排、节气食谱...',
                         hintStyle: TextStyle(color: muted, fontSize: 16),
                         prefixIcon: Icon(Icons.search, color: muted, size: 22),
                         border: InputBorder.none,

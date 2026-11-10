@@ -5,14 +5,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../core/theme/shunshi_colors.dart';
 import '../../../core/theme/shunshi_spacing.dart';
 import '../../../core/theme/shunshi_text_styles.dart';
 import '../../../data/network/api_client.dart';
 import '../../../design_system/app_colors.dart';
 import '../../../design_system/style_theming.dart';
 
-/// 中医九种体质
+/// 中医几种生活习惯
 const _constitutionTypes = [
   '平和质',
   '气虚质',
@@ -23,18 +22,6 @@ const _constitutionTypes = [
   '血瘀质',
   '气郁质',
   '特禀质',
-];
-
-/// 健康关注选项
-const _healthConcerns = [
-  '睡眠',
-  '消化',
-  '情绪',
-  '免疫力',
-  '体重',
-  '皮肤',
-  '月经',
-  '其他',
 ];
 
 class ProfileSetupPage extends StatefulWidget {
@@ -475,7 +462,7 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
   Widget _buildConstitutionStep() {
     return _stepWrapper(
       icon: '🌿',
-      title: '了解你的体质类型',
+      title: '了解你的生活习惯类型',
       subtitle: '选择你的中医体质，获得个性化养生建议',
       child: Column(
         children: [
@@ -515,7 +502,7 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
           // "不知道" 按钮
           OutlinedButton.icon(
             onPressed: () async {
-              // 跳转体质测试
+              // 跳转节气生活习惯自测
               context.push('/constitution-test');
             },
             icon: const Icon(Icons.quiz_outlined, size: 18),

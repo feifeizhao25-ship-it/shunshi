@@ -176,42 +176,6 @@ class ReflectionNotifier extends StateNotifier<ReflectionState> {
     }
   }
 
-  String _energyToString(EnergyLevel e) {
-    switch (e) {
-      case EnergyLevel.low: return 'low';
-      case EnergyLevel.medium: return 'medium';
-      case EnergyLevel.high: return 'high';
-    }
-  }
-
-  EnergyLevel _stringToEnergy(String s) {
-    switch (s.toLowerCase()) {
-      case 'low': return EnergyLevel.low;
-      case 'medium': return EnergyLevel.medium;
-      case 'high': return EnergyLevel.high;
-      case 'excellent': return EnergyLevel.high; // map to high
-      default: return EnergyLevel.medium;
-    }
-  }
-
-  String _sleepToString(SleepQuality s) {
-    switch (s) {
-      case SleepQuality.poor: return 'poor';
-      case SleepQuality.fair: return 'fair';
-      case SleepQuality.good: return 'good';
-      case SleepQuality.excellent: return 'excellent';
-    }
-  }
-
-  SleepQuality _stringToSleep(String s) {
-    switch (s.toLowerCase()) {
-      case 'poor': return SleepQuality.poor;
-      case 'fair': return SleepQuality.fair;
-      case 'good': return SleepQuality.good;
-      case 'excellent': return SleepQuality.excellent;
-      default: return SleepQuality.good;
-    }
-  }
 }
 
 final reflectionProvider = StateNotifierProvider<ReflectionNotifier, ReflectionState>((ref) {

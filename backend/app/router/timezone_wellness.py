@@ -184,6 +184,8 @@ class PersonalizedScheduleRequest(BaseModel):
     sleep_target: str = Field(..., description="目标入睡时间 HH:MM 格式，如 23:00")
     timezone_offset: str = Field(default="+8", description="时区偏移，如 +8, -5 等")
     constitution_type: Optional[str] = Field(None, description="体质类型: qi_deficiency/yin_deficiency/damp_heat 等")
+    life_stage: Optional[str] = Field(None, description="用户档案里的生活阶段，如孕期、哺乳期")
+    health_concerns: Optional[List[str]] = Field(None, description="用户档案里的健康关注")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -554,6 +556,13 @@ async def get_personalized_schedule(request: PersonalizedScheduleRequest):
         constitution_advice = "湿热体质建议：清淡饮食，避免油腻；多进行有氧运动；可用薏米、绿豆调理"
     else:
         constitution_advice = "遵循十二时辰作息，顺应自然节律，定期调整以适应季节变化"
+
+    from app.safety.contraindications import filter_text, flags_from_profile
+
+    constitution_advice = filter_text(
+        constitution_advice,
+        flags_from_profile(life_stage=request.life_stage, health_concerns=request.health_concerns),
+    )
 
     return {
         "success": True,

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/theme/shunshi_colors.dart';
 import '../../../core/theme/shunshi_text_styles.dart';
 import '../../../design_system/app_colors.dart';
 import '../../../design_system/style_theming.dart';
@@ -137,7 +136,7 @@ class BoundariesPage extends StatelessWidget {
               emoji: '🌱',
               title: '节气养生指导',
               description:
-                  '24节气的饮食调理、茶饮、运动导引、穴位保健和睡眠起居建议，与自然同步生活。',
+                  '24节气的饮食安排、茶饮、运动导引、穴位保健和睡眠起居建议，与自然同步生活。',
               color: const Color(0xFF81C784),
             ),
             const SizedBox(height: 12),

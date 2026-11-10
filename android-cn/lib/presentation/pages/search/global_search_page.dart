@@ -152,7 +152,7 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
   }
 
   Widget _buildEmpty() {
-    final hotTerms = ['枸杞', '失眠', '疏肝', '脾胃', '八段锦', '祛湿', '安神', '养肝'];
+    final hotTerms = ['枸杞', '失眠', '疏肝', '脾胃', '八段锦', '清淡', '安神', '养肝'];
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Column(

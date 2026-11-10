@@ -189,9 +189,6 @@ class CacheService {
   // 统计
   final CacheStats _stats = CacheStats();
 
-  // L2 最大存储: 10MB
-  static const _maxL2Bytes = 10 * 1024 * 1024;
-
   // ==================== Init ====================
 
   Future<void> init() async {

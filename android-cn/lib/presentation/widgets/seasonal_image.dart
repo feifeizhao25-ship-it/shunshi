@@ -53,7 +53,7 @@ _SeasonInfo _getSeasonInfo(String term) {
     '雨水': _SeasonInfo(
       term: '雨水',
       subtitle: 'Rain Water',
-      description: '春雨润物，养肝健脾。宜食山药薏米，祛湿养胃。',
+      description: '春雨润物，养肝健脾。宜食山药薏米，饮食清淡。',
       gradientTop: Color(0xFF7E9E8B),
       gradientBottom: Color(0xFFA8C7B5),
       seasonIcon: Icons.water_drop,
@@ -85,7 +85,7 @@ _SeasonInfo _getSeasonInfo(String term) {
     '谷雨': _SeasonInfo(
       term: '谷雨',
       subtitle: 'Grain Rain',
-      description: '雨生百谷，春将尽。宜健脾祛湿，食香椿品春茶。',
+      description: '雨生百谷，春将尽。宜饮食清淡，食香椿品春茶。',
       gradientTop: Color(0xFF6B8B5E),
       gradientBottom: Color(0xFF95B888),
       seasonIcon: Icons.grain,

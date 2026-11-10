@@ -1,4 +1,4 @@
-/// 体质测试结果页 — 对齐UI参考 _9
+/// 节气生活习惯自测结果页 — 对齐UI参考 _9
 /// TopBar(头像+ShunShi AI+通知) → 标题+标签 → 体质强弱分布(进度条) → AI调养总评(毛玻璃) → 专属调养方案 → 底部CTA
 library;
 
@@ -64,7 +64,7 @@ class ConstitutionResultPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // ── Header ──
-                  Text('体质测试报告 · ${now.year}年$seasonLabel', style: TextStyle(
+                  Text('节气生活习惯自测报告 · ${now.year}年$seasonLabel', style: TextStyle(
                     fontSize: 12, fontWeight: FontWeight.w500,
                     color: ShunShiColors.secondary, letterSpacing: 2,
                   )),
@@ -85,7 +85,7 @@ class ConstitutionResultPage extends StatelessWidget {
                     spacing: 8,
                     children: [
                       _tagChip('补气', ShunShiColors.apricotLight),
-                      _tagChip('祛湿', ShunShiColors.apricotLight),
+                      _tagChip('清淡', ShunShiColors.apricotLight),
                       _tagChip('忌寒凉', ShunShiColors.primaryContainer),
                     ],
                   ),
@@ -263,7 +263,7 @@ class ConstitutionResultPage extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           const Text(
-            '春季生发，您的"气虚"特征表现为易倦乏力，如细雨下的嫩芽需温言呵护。结合"痰湿"兼挟，体内水饮运化稍显迟滞。当下应以"温补脾气"为主，辅以"化痰祛湿"。切记，温和的早睡与清淡的饮食，是为您这卷生命画卷注入生气的最佳笔触。',
+            '春季生发，您的"气虚"特征表现为易倦乏力，如细雨下的嫩芽需温言呵护。结合"痰湿"兼挟，体内水饮运化稍显迟滞。当下应以"温补脾气"为主，辅以"少油腻"。切记，温和的早睡与清淡的饮食，是为您这卷生命画卷注入生气的最佳笔触。',
             style: TextStyle(
               fontSize: 15, height: 2.0,
               color: ShunShiColors.textSecondary,
@@ -430,7 +430,7 @@ class ConstitutionResultPage extends StatelessWidget {
                           color: ShunShiColors.primary,
                         )),
                         const SizedBox(height: 6),
-                        Text('八段锦 · 调理脾胃', style: TextStyle(
+                        Text('八段锦 · 照顾脾胃', style: TextStyle(
                           fontSize: 12, color: ShunShiColors.textSecondary,
                         )),
                       ],

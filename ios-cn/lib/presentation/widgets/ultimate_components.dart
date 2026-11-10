@@ -89,11 +89,11 @@ List<JourneyDay> getSampleJourney(String solarTerm) {
       ];
     case '雨水':
       return const [
-        JourneyDay(dayNumber: 1, title: '祛湿健脾', description: '喝山药粥'),
-        JourneyDay(dayNumber: 2, title: '按揉阴陵泉', description: '祛湿要穴'),
+        JourneyDay(dayNumber: 1, title: '饮食清淡', description: '喝山药粥'),
+        JourneyDay(dayNumber: 2, title: '按揉阴陵泉', description: '按压要穴'),
         JourneyDay(dayNumber: 3, title: '室内运动', description: '太极或瑜伽'),
         JourneyDay(dayNumber: 4, title: '清淡饮食', description: '少油腻'),
-        JourneyDay(dayNumber: 5, title: '泡杯薏仁茶', description: '祛湿'),
+        JourneyDay(dayNumber: 5, title: '泡杯薏仁茶', description: '清淡'),
         JourneyDay(dayNumber: 6, title: '早睡', description: '23点前'),
         JourneyDay(dayNumber: 7, title: '回顾一周', description: '总结感受', isKeyDay: true),
       ];

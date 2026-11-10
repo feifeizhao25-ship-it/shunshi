@@ -153,7 +153,7 @@ class _ProfilePageState extends State<ProfilePage> {
     final items = [
       _MenuItem(Icons.favorite_rounded, '养生记录', '/records'),
       _MenuItem(Icons.family_restroom, '家庭管理', '/family'),
-      _MenuItem(Icons.assignment, '体质测试', '/constitution'),
+      _MenuItem(Icons.assignment, '节气生活习惯自测', '/constitution'),
       _MenuItem(Icons.emoji_events, '成就勋章', '/achievements'),
       _MenuItem(Icons.bookmark, '收藏内容', null),
       _MenuItem(Icons.group_add, '邀请家人', null),

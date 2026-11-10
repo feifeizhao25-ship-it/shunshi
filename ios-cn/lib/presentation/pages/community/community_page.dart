@@ -174,7 +174,7 @@ class _CommunityPageState extends State<CommunityPage> {
         avatar: Icons.face,
         name: '薄荷微凉',
         tag: '湿热质',
-        content: '自制了清热祛湿的薏仁红豆汤，适合这个季节饮用。详细做法见图。',
+        content: '自制了饮食清淡的薏仁红豆汤，适合这个季节饮用。详细做法见图。',
         imageCount: 3,
         likes: 67,
         comments: 15,

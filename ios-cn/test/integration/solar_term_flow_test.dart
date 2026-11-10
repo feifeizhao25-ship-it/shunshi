@@ -21,17 +21,7 @@ void main() {
       );
       await tester.pumpAndSettle(const Duration(seconds: 3));
 
-      // Solar term card should be visible on home
-      // Look for season-related text
-      final solarTermTexts = ['节气', '立春', '雨水', '惊蛰', '春分'];
-      bool found = false;
-      for (final text in solarTermTexts) {
-        if (find.textContaining(text).evaluate().isNotEmpty) {
-          found = true;
-          break;
-        }
-      }
-      // If app is in non-authenticated state, we check app loaded at least
+      // The home screen may be signed out, so this only checks that the app loaded.
       expect(find.byType(MaterialApp), findsOneWidget);
     });
   });

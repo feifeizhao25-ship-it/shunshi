@@ -1,4 +1,4 @@
-/// 体质测试报告页 V3 — 动态数据驱动
+/// 节气生活习惯自测报告页 V3 — 动态数据驱动
 library;
 
 import 'package:flutter/material.dart';
@@ -24,10 +24,10 @@ class _ConstitutionReportPageV3State extends State<ConstitutionReportPageV3> {
   // 9种体质信息
   static const _typeInfo = {
     'pinghe': {'name': '平和质', 'tags': ['平衡', '健康'], 'color': Color(0xFF4CAF50)},
-    'qixu': {'name': '气虚质', 'tags': ['补气', '祛湿', '忌寒凉'], 'color': Color(0xFFFFB74D)},
+    'qixu': {'name': '气虚质', 'tags': ['补气', '清淡', '忌寒凉'], 'color': Color(0xFFFFB74D)},
     'yangxu': {'name': '阳虚质', 'tags': ['温阳', '避寒', '暖胃'], 'color': Color(0xFF42A5F5)},
     'yinxu': {'name': '阴虚质', 'tags': ['滋阴', '润燥', '忌辛辣'], 'color': Color(0xFFAB47BC)},
-    'tanshi': {'name': '痰湿质', 'tags': ['化痰', '祛湿', '少甜'], 'color': Color(0xFF8D6E63)},
+    'tanshi': {'name': '痰湿质', 'tags': ['化痰', '清淡', '少甜'], 'color': Color(0xFF8D6E63)},
     'shire': {'name': '湿热质', 'tags': ['清热', '利湿', '忌油腻'], 'color': Color(0xFFEF5350)},
     'xueyu': {'name': '血瘀质', 'tags': ['活血', '化瘀', '运动'], 'color': Color(0xFF7E57C2)},
     'qiyu': {'name': '气郁质', 'tags': ['疏肝', '解郁', '调情志'], 'color': Color(0xFF66BB6A)},
@@ -75,7 +75,7 @@ class _ConstitutionReportPageV3State extends State<ConstitutionReportPageV3> {
       appBar: AppBar(
         backgroundColor: bg,
         leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
-        title: Text('体质测试报告',
+        title: Text('节气生活习惯自测报告',
           style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18, fontWeight: FontWeight.w600)),
       ),
       body: _loading
@@ -85,7 +85,7 @@ class _ConstitutionReportPageV3State extends State<ConstitutionReportPageV3> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('体质测试报告 · ${_getCurrentSeason()}',
+                  Text('节气生活习惯自测报告 · ${_getCurrentSeason()}',
                     style: TextStyle(fontSize: 14, color: ShunShiColors.textTertiary)),
                   const SizedBox(height: 16),
 
@@ -148,7 +148,7 @@ class _ConstitutionReportPageV3State extends State<ConstitutionReportPageV3> {
                   const SizedBox(height: 10),
                   _buildPlanCard(Icons.spa, '推荐经络', '$name经络调养', '查看'),
                   const SizedBox(height: 10),
-                  _buildPlanCard(Icons.self_improvement, '推荐功法', '八段锦 · 调理脾胃', '查看'),
+                  _buildPlanCard(Icons.self_improvement, '推荐功法', '八段锦 · 照顾脾胃', '查看'),
                   const SizedBox(height: 20),
 
                   // 引用

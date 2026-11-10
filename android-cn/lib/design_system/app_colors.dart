@@ -32,10 +32,10 @@ class AppColors {
       isDark(context) ? ShunShiColors.darkTextSecondary : ShunShiColors.textSecondary;
 
   static Color textTertiary(BuildContext context) =>
-      isDark(context) ? ShunShiColors.darkTextTertiary ?? ShunShiColors.darkTextSecondary : ShunShiColors.textTertiary;
+      isDark(context) ? ShunShiColors.darkTextTertiary : ShunShiColors.textTertiary;
 
   static Color textDisabled(BuildContext context) =>
-      isDark(context) ? ShunShiColors.darkTextDisabled ?? ShunShiColors.darkTextSecondary : ShunShiColors.textDisabled;
+      isDark(context) ? ShunShiColors.darkTextDisabled : ShunShiColors.textDisabled;
 
   // ── 边框 ──
   static Color border(BuildContext context) =>
