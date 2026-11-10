@@ -123,6 +123,7 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
         Scaffold(
           appBar: AppBar(
             leading: IconButton(
+              tooltip: '返回',
               icon: const Icon(Icons.arrow_back_ios_new),
               onPressed: () => Navigator.of(context).pop(),
             ),

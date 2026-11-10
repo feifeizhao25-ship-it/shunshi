@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
   <!--
     If you are serving your web app in a path other than the root, change the
@@ -45,16 +45,25 @@
 </head>
 <body>
   <script>
-    // Flutter 启动时会重写 viewport，这里把刘海安全区保留下来。
+    // Flutter rewrites the viewport to maximum-scale=1, user-scalable=no.
+    // Put zoom back, and keep the notch inset. Axe treats the locked viewport as critical.
     (function () {
-      var fit = 'viewport-fit=cover';
-      function keepFit() {
+      function keepViewport() {
         document.querySelectorAll('meta[name="viewport"]').forEach(function (meta) {
-          if (meta.content.indexOf(fit) === -1) meta.content = meta.content.replace(/\s+$/, '') + ', ' + fit;
+          var next = meta.content
+            .replace(/user-scalable\s*=\s*no/ig, 'user-scalable=yes')
+            .replace(/maximum-scale\s*=\s*1(\.0+)?/ig, 'maximum-scale=5.0');
+          if (next.indexOf('viewport-fit=cover') === -1) next = next.replace(/\s+$/, '') + ', viewport-fit=cover';
+          if (next !== meta.content) meta.content = next;
+        });
+        document.querySelectorAll('flt-semantics').forEach(function (el) {
+          var style = el.style;
+          var scrolls = style.overflowY === 'scroll' || style.overflowX === 'scroll' || style.overflow === 'scroll';
+          if (scrolls && el.tabIndex < 0) el.tabIndex = 0;
         });
       }
-      keepFit();
-      new MutationObserver(keepFit).observe(document.head, { childList: true, subtree: true, attributes: true, attributeFilter: ['content'] });
+      keepViewport();
+      new MutationObserver(keepViewport).observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ['content'] });
     })();
   </script>
   <script src="flutter_bootstrap.js" async></script>

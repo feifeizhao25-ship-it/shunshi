@@ -715,7 +715,10 @@ class _UltimateHomePageState extends State<UltimateHomePage>
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(children: [
-            GestureDetector(
+            Semantics(
+              button: true,
+              label: '通知',
+              child: GestureDetector(
               onTap: () => context.push('/notifications'),
               child: Container(
                 width: 40, height: 40,
@@ -723,8 +726,9 @@ class _UltimateHomePageState extends State<UltimateHomePage>
                   color: ShunShiColors.surfaceContainerLow,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(Icons.notifications_none, size: 20, color: isDark ? ShunShiColors.darkTextPrimary : ShunShiColors.textPrimary),
+                child: ExcludeSemantics(child: Icon(Icons.notifications_none, size: 20, color: isDark ? ShunShiColors.darkTextPrimary : ShunShiColors.textPrimary)),
               ),
+            ),
             ),
             const SizedBox(width: 12),
             Text(
@@ -737,7 +741,10 @@ class _UltimateHomePageState extends State<UltimateHomePage>
               ),
             ),
           ]),
-          GestureDetector(
+          Semantics(
+            button: true,
+            label: '我的',
+            child: GestureDetector(
             onTap: () => context.push('/profile'),
             child: Container(
               width: 40, height: 40,
@@ -747,9 +754,10 @@ class _UltimateHomePageState extends State<UltimateHomePage>
               ),
               child: const CircleAvatar(
                 backgroundColor: ShunShiColors.surfaceContainerLow,
-                child: Icon(Icons.person, size: 20, color: ShunShiColors.secondary),
+                child: ExcludeSemantics(child: Icon(Icons.person, size: 20, color: ShunShiColors.secondary)),
               ),
             ),
+          ),
           ),
         ],
       ),

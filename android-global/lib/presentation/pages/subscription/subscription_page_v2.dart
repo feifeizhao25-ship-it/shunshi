@@ -158,6 +158,7 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
         backgroundColor: isDark ? ShunShiColors.darkBackground : AppColors.background(context),
         elevation: 0,
         leading: IconButton(
+          tooltip: 'Back',
           icon: Icon(Icons.arrow_back, color: AppColors.textPrimary(context)),
           onPressed: () => context.pop(),
         ),
@@ -212,7 +213,7 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
                           border: Border.all(color: AppColors.primary(context).withOpacity(0.3)),
                         ),
                         child: Row(children: [
-                          Icon(Icons.info_outline, color: AppColors.primary(context), size: 18),
+                          ExcludeSemantics(child: Icon(Icons.info_outline, color: AppColors.primary(context), size: 18)),
                           const SizedBox(width: 10),
                           Expanded(child: Text(_orderMessage!, style: TextStyle(fontSize: 13, color: AppColors.primary(context)))),
                         ]),
@@ -298,7 +299,7 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
     return Padding(
       padding: const EdgeInsets.only(top: 4),
       child: Row(children: [
-        Icon(Icons.check_circle, color: available ? const Color(0xFFE4C285) : Colors.white30, size: 14),
+        ExcludeSemantics(child: Icon(Icons.check_circle, color: available ? const Color(0xFFE4C285) : Colors.white30, size: 14)),
         const SizedBox(width: 6),
         Text(label, style: TextStyle(fontSize: 12, color: available ? Colors.white : Colors.white30)),
       ]),
@@ -471,10 +472,10 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(color: AppColors.surfaceContainerLow(context), borderRadius: BorderRadius.circular(12)),
       child: Row(children: [
-        Icon(Icons.help_outline, color: AppColors.textTertiary(context), size: 18),
+        ExcludeSemantics(child: Icon(Icons.help_outline, color: AppColors.textTertiary(context), size: 18)),
         const SizedBox(width: 8),
         Expanded(child: Text('How to cancel auto-renewal?', style: TextStyle(fontSize: 14, color: AppColors.textSecondary(context)))),
-        Icon(Icons.chevron_right, color: AppColors.textTertiary(context), size: 18),
+        ExcludeSemantics(child: Icon(Icons.chevron_right, color: AppColors.textTertiary(context), size: 18)),
       ]),
     );
   }

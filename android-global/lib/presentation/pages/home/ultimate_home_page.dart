@@ -331,7 +331,10 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
         children: [
           // Left: Menu + Brand
           Row(children: [
-            GestureDetector(
+            Semantics(
+              button: true,
+              label: 'Menu',
+              child: GestureDetector(
               onTap: () => context.push('/profile'),
               child: Container(
                 width: 40, height: 40,
@@ -339,8 +342,9 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
                   color: AppColors.surfaceContainerLow(context),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(Icons.menu, size: 20, color: AppColors.textPrimary(context)),
+                child: ExcludeSemantics(child: Icon(Icons.menu, size: 20, color: AppColors.textPrimary(context))),
               ),
+            ),
             ),
             const SizedBox(width: 12),
             Text(
@@ -353,7 +357,10 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
             ),
           ]),
           // Right: Avatar
-          GestureDetector(
+          Semantics(
+            button: true,
+            label: 'Profile',
+            child: GestureDetector(
             onTap: () => context.push('/profile'),
             child: Container(
               width: 40, height: 40,
@@ -363,9 +370,10 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
               ),
               child: CircleAvatar(
                 backgroundColor: AppColors.surfaceContainerLow(context),
-                child: Icon(Icons.person, size: 20, color: ShunShiColors.secondary),
+                child: ExcludeSemantics(child: Icon(Icons.person, size: 20, color: ShunShiColors.secondary)),
               ),
             ),
+          ),
           ),
         ],
       ),
