@@ -44,6 +44,35 @@ def _dart_files(rel: str):
     yield from path.rglob("*.dart")
 
 
+def test_achievement_tip_badges_and_milestone_are_not_streak_gamification():
+    for rel in (
+        "android-cn/lib/presentation/pages/achievement/achievement_page_v2.dart",
+        "ios-cn/lib/presentation/pages/achievement/achievement_page_v2.dart",
+    ):
+        text = (ROOT / rel).read_text(encoding="utf-8")
+        assert "坚持每天打卡" not in text, rel
+        assert "已记下" in text, rel
+
+    game = (ROOT / "backend/app/router/gamification.py").read_text(encoding="utf-8")
+    visible = [
+        line for line in game.splitlines()
+        if '"description":' in line or "milestone_message =" in line
+    ]
+    assert visible, "expected badge descriptions and a milestone message"
+    for line in visible:
+        assert "连续打卡" not in line, line
+        assert "坚持每天打卡" not in line, line
+    assert any("已记下" in line for line in visible)
+
+    ai = (ROOT / "backend/app/router/ai_content.py").read_text(encoding="utf-8")
+    start = ai.index('"id": "tpl_milestone"')
+    block = ai[start:ai.index('"tone":', start)]
+    template = block[block.index('"template_cn"'):block.index('"template_en"')]
+    assert "连续打卡" not in template
+    assert "体质调理" not in template
+    assert "已记下" in template or "记下" in template
+
+
 def test_profile_streak_matches_achievement_wording():
     profile = (ROOT / "android-cn/lib/presentation/pages/profile/profile_page_v2.dart").read_text(encoding="utf-8")
     achievement = (ROOT / "android-cn/lib/presentation/pages/achievement/achievement_page_v2.dart").read_text(encoding="utf-8")
