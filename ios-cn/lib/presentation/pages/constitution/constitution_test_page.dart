@@ -244,15 +244,15 @@ class _ConstitutionTestFlowPageState extends State<ConstitutionTestFlowPage> {
     final maxScore = sorted.isNotEmpty ? sorted[0].value.toDouble() : 1.0;
 
     final descriptions = {
-      '平和': '阴阳气血调和，体态适中，面色润泽，精力充沛。这是最健康的体质类型。',
-      '气虚': '元气不足，疲乏气短，容易感冒，面色偏白。需补气健脾。',
-      '阳虚': '阳气不足，手足不温，怕冷喜暖。需温阳散寒。',
-      '阴虚': '阴液亏少，口燥咽干，手足心热。需滋阴降火。',
-      '痰湿': '痰湿凝聚，形体肥胖，腹部松软。需少油腻。',
-      '湿热': '湿热内蕴，面垢油光，口苦口干。需清热利湿。',
-      '血瘀': '血行不畅，肤色晦暗，容易出现瘀斑。需活血化瘀。',
-      '气郁': '气机郁滞，情绪低落，胸胁胀痛。需疏肝解郁。',
-      '特禀': '先天禀赋不足，容易过敏。需益气固表。',
+      '平和': '作息和饮食比较稳。这是生活习惯参考，不是诊断。',
+      '气虚': '容易疲乏、气短。这是生活习惯参考，不是诊断。',
+      '阳虚': '比较怕冷，手脚容易凉。这是生活习惯参考，不是诊断。',
+      '阴虚': '容易口干、觉得热。这是生活习惯参考，不是诊断。',
+      '痰湿': '容易觉得沉重、不想动。这是生活习惯参考，不是诊断。',
+      '湿热': '容易觉得闷、口苦。这是生活习惯参考，不是诊断。',
+      '血瘀': '容易觉得不舒展。这是生活习惯参考，不是诊断。',
+      '气郁': '情绪容易闷住。这是生活习惯参考，不是诊断。',
+      '特禀': '对环境比较敏感。这是生活习惯参考，不是诊断。',
     };
 
     final dietAdvice = {
@@ -306,21 +306,21 @@ class _ConstitutionTestFlowPageState extends State<ConstitutionTestFlowPage> {
               child: Column(children: [
                 const Icon(Icons.spa, size: 48, color: Colors.white70),
                 const SizedBox(height: 12),
-                Text('$primary质',
+                Text(primary,
                     style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w700,
                         color: Colors.white, fontFamily: ShunShiTypography.serifFamily)),
                 const SizedBox(height: 8),
-                const Text('您的主要体质类型', style: TextStyle(fontSize: 13, color: Colors.white60)),
+                const Text('生活习惯倾向', style: TextStyle(fontSize: 13, color: Colors.white60)),
                 if (secondary != null) ...[
                   const SizedBox(height: 16),
-                  Text('兼有 $secondary质倾向',
+                  Text('兼有$secondary倾向',
                       style: const TextStyle(fontSize: 14, color: Colors.white70)),
                 ],
               ]),
             ),
             const SizedBox(height: 24),
 
-            _sectionTitle('体质分布'),
+            _sectionTitle('倾向对照'),
             const SizedBox(height: 12),
             ...sorted.map((e) {
               final ratio = e.value / maxScore;

@@ -98,7 +98,7 @@ class _ConstitutionReportPageV3State extends State<ConstitutionReportPageV3> {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text('您的体质：$name',
+                      Text('生活习惯倾向：${name.replaceAll('质', '')}',
                         style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
                       const SizedBox(height: 12),
                       Wrap(spacing: 8, children: tags.map((t) => _buildTag(t, const Color(0xFFE4C285))).toList()),
@@ -108,7 +108,7 @@ class _ConstitutionReportPageV3State extends State<ConstitutionReportPageV3> {
 
                   // 体质评分柱状图
                   if (widget.scores != null && widget.scores!.isNotEmpty) ...[
-                    Text('体质评分分布', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+                    Text('倾向对照', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
                     const SizedBox(height: 12),
                     ..._sortedScoreBars(),
                     const SizedBox(height: 8),
@@ -188,7 +188,7 @@ class _ConstitutionReportPageV3State extends State<ConstitutionReportPageV3> {
     final sorted = widget.scores!.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value));
     return sorted.map((e) => _buildBar(
-      _typeInfo[e.key]?['name'] as String? ?? e.key,
+      ((_typeInfo[e.key]?['name'] as String?) ?? e.key).replaceAll('质', ''),
       e.value,
       _typeInfo[e.key]?['color'] as Color? ?? ShunShiColors.textTertiary,
     )).toList();

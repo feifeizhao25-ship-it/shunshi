@@ -37,25 +37,25 @@ class ConstitutionTestPage extends StatelessWidget {
                 children: [
                   const Icon(Icons.spa, size: 48, color: Colors.white70),
                   const SizedBox(height: 12),
-                  Text(constitutionType ?? '气虚质', style: const TextStyle(
+                  Text(constitutionType ?? '气虚倾向', style: const TextStyle(
                     fontSize: 26, fontWeight: FontWeight.w700, color: Colors.white, fontFamily: ShunShiTypography.serifFamily,
                   )),
                   const SizedBox(height: 8),
-                  const Text('您的体质类型', style: TextStyle(fontSize: 13, color: Colors.white60)),
+                  const Text('生活习惯倾向', style: TextStyle(fontSize: 13, color: Colors.white60)),
                 ],
               ),
             ),
             const SizedBox(height: 24),
 
             // ── 体质特征 ──
-            _sectionTitle('体质特征'),
+            _sectionTitle('常见描述'),
             const SizedBox(height: 8),
             Container(
               width: double.infinity, padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(color: ShunShiColors.surfaceContainerLowest, borderRadius: BorderRadius.circular(12), border: Border.all(color: ShunShiColors.borderGhost)),
               child: const Text(
-                '气虚质人群常表现为疲乏无力、气短懒言、易出汗、面色偏白。'
-                '抵抗力较弱，容易感冒，恢复较慢。舌淡苔白，脉象虚弱。',
+                '气虚倾向的常见描述是容易疲乏、气短、声音偏低。'
+                '这是生活习惯参考，不是诊断。',
                 style: TextStyle(fontSize: 14, color: ShunShiColors.textSecondary, height: 1.7),
               ),
             ),
@@ -63,7 +63,7 @@ class ConstitutionTestPage extends StatelessWidget {
 
             // ── 升级提示 Banner ──
             const PaywallBanner(
-              message: '解锁详细体质分析',
+              message: '解锁更细的生活习惯说明',
               icon: Icons.analytics_outlined,
             ),
             const SizedBox(height: 20),

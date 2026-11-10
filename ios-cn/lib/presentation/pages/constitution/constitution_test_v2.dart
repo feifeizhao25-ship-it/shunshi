@@ -185,20 +185,20 @@ class _ConstitutionTestV2State extends State<ConstitutionTestV2> {
               borderRadius: BorderRadius.circular(20)),
               child: Icon(Icons.self_improvement, color: Colors.white, size: 36)),
             const SizedBox(height: 16),
-            Text('您的体质类型', style: TextStyle(fontSize: 14, color: AppColors.textTertiary(context))),
+            Text('生活习惯倾向', style: TextStyle(fontSize: 14, color: AppColors.textTertiary(context))),
             const SizedBox(height: 4),
-            Text(typeName, style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 28, fontWeight: FontWeight.bold, color: AppColors.primary(context))),
+            Text(typeName.replaceAll('质', ''), style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 28, fontWeight: FontWeight.bold, color: AppColors.primary(context))),
           ])),
           const SizedBox(height: 24),
           // Score chart
           Container(padding: const EdgeInsets.all(20), decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(16)),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('体质得分', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
+              Text('倾向对照', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
               const SizedBox(height: 16),
               ...scores.entries.map((e) => Padding(
                 padding: const EdgeInsets.only(bottom: 8),
                 child: Row(children: [
-                  SizedBox(width: 60, child: Text(e.key, style: TextStyle(fontSize: 12, color: AppColors.textSecondary(context)))),
+                  SizedBox(width: 60, child: Text(e.key.replaceAll('质', ''), style: TextStyle(fontSize: 12, color: AppColors.textSecondary(context)))),
                   Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(4),
                     child: LinearProgressIndicator(value: (e.value as int) / 15,
                       backgroundColor: AppColors.surfaceContainerLow(context), color: e.key == typeName ? AppColors.primary(context) : AppColors.textTertiary(context).withOpacity(0.3), minHeight: 8))),

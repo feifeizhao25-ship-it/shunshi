@@ -32,14 +32,14 @@ class BodyTypeEssenceV2 extends StatelessWidget {
           SliverToBoxAlternate(child: Padding(
             padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('你的体质本质', style: TextStyle(fontSize: 12, color: Color(0xFF533afd), fontWeight: FontWeight.w500, letterSpacing: 1.5)),
+              Text('生活习惯倾向', style: TextStyle(fontSize: 12, color: Color(0xFF533afd), fontWeight: FontWeight.w500, letterSpacing: 1.5)),
               const SizedBox(height: 4),
-              Text('你的季节体质：平和质', style: TextStyle(
+              Text('生活习惯倾向：平和', style: TextStyle(
                 fontFamily: ShunShiTypography.serifFamily,
                 fontSize: 24, fontWeight: FontWeight.bold, color: ShunShiColors.textPrimary,
               )),
               const SizedBox(height: 8),
-              Text('您的体质如同春秋之交，内核坚韧，同时具备灵活适应外部变化的能力。',
+              Text('作息跟着季节走。这是生活习惯参考，不是诊断。',
                 style: TextStyle(fontSize: 13, color: ShunShiColors.textTertiary, height: 1.5)),
             ]),
           )),

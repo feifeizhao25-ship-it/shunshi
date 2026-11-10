@@ -12,7 +12,7 @@ class ConstitutionResultPage extends StatelessWidget {
 
   const ConstitutionResultPage({
     super.key,
-    this.constitutionType = '气虚质（兼有痰湿）',
+    this.constitutionType = '气虚（兼有痰湿）',
     this.scores,
   });
 
@@ -73,7 +73,7 @@ class ConstitutionResultPage extends StatelessWidget {
                     color: ShunShiColors.secondary, letterSpacing: 2,
                   )),
                   const SizedBox(height: 12),
-                  const Text('您的体质：', style: TextStyle(
+                  const Text('生活习惯倾向：', style: TextStyle(
                     fontSize: 32, fontWeight: FontWeight.w700,
                     fontFamily: ShunShiTypography.serifFamily,
                     color: ShunShiColors.primary, height: 1.3,
@@ -172,10 +172,10 @@ class ConstitutionResultPage extends StatelessWidget {
 
   Widget _buildDistributionSection() {
     final bars = [
-      _BarData('气虚质', 0.85, ShunShiColors.primary),
-      _BarData('痰湿质', 0.62, ShunShiColors.primaryContainer),
-      _BarData('阳虚质', 0.45, ShunShiColors.surfaceVariant),
-      _BarData('平和质（基准）', 0.30, ShunShiColors.textTertiary.withValues(alpha: 0.3)),
+      _BarData('气虚', 0.85, ShunShiColors.primary),
+      _BarData('痰湿', 0.62, ShunShiColors.primaryContainer),
+      _BarData('阳虚', 0.45, ShunShiColors.surfaceVariant),
+      _BarData('平和（基准）', 0.30, ShunShiColors.textTertiary.withValues(alpha: 0.3)),
     ];
 
     return Container(
@@ -187,7 +187,7 @@ class ConstitutionResultPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('体质强弱分布', style: TextStyle(
+          const Text('倾向对照', style: TextStyle(
             fontSize: 18, fontFamily: ShunShiTypography.serifFamily,
             color: ShunShiColors.primary,
           )),
@@ -338,7 +338,7 @@ class ConstitutionResultPage extends StatelessWidget {
                         color: ShunShiColors.primary,
                       )),
                       const SizedBox(height: 8),
-                      Text('益气固表，温中补虚，适合气虚质人群。', style: TextStyle(
+                      Text('温热的汤羹，适合容易疲乏的日子。这是生活习惯参考，不是诊断。', style: TextStyle(
                         fontSize: 12, color: ShunShiColors.textSecondary,
                       )),
                       const SizedBox(height: 12),

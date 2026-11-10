@@ -61,7 +61,7 @@ class BodyTypeEssencePage extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '体质说明',
+                          '生活习惯倾向',
                           style: TextStyle(
                             fontSize: 13, color: Colors.white70,
                             fontFamily: ShunShiTypography.sansFamily,
@@ -70,7 +70,7 @@ class BodyTypeEssencePage extends StatelessWidget {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          '平和质 · 一般说明',
+                          '平和 · 一般说明',
                           style: const TextStyle(
                             fontSize: 24, fontWeight: FontWeight.w700,
                             color: Colors.white, fontFamily: ShunShiTypography.serifFamily,
@@ -79,7 +79,7 @@ class BodyTypeEssencePage extends StatelessWidget {
                         const SizedBox(height: 8),
                         Text(
                           ''
-                          '下面是平和质的一般特点，不是个人检测结果。完成体质问卷后，才会显示你自己的情况。',
+                          '下面是平和的一般特点，不是个人检测，也不是诊断。',
                           style: TextStyle(
                             fontSize: 13, color: Colors.white.withValues(alpha: 0.8),
                             height: 1.5, fontFamily: ShunShiTypography.sansFamily,
@@ -182,7 +182,7 @@ class BodyTypeEssencePage extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '平和质的人平时起伏不大，换季时仍要注意作息。',
+                          '作息比较稳的人平时起伏不大，换季时仍要注意作息。这是生活习惯参考，不是诊断。',
                           style: TextStyle(
                             fontSize: 14, color: AppColors.textSecondary(context),
                             height: 1.7, fontFamily: ShunShiTypography.sansFamily,

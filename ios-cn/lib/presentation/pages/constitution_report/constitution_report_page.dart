@@ -59,7 +59,7 @@ class ConstitutionReportPage extends StatelessWidget {
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          '您的体质：气虚质（兼有痰湿）',
+                          '生活习惯倾向：气虚（兼有痰湿）',
                           style: const TextStyle(
                             fontSize: 22, fontWeight: FontWeight.w700,
                             color: Colors.white, fontFamily: ShunShiTypography.serifFamily,
@@ -88,15 +88,15 @@ class ConstitutionReportPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // ── 体质强弱分布 ──
-                  _sectionTitle('体质强弱分布'),
+                  _sectionTitle('倾向对照'),
                   const SizedBox(height: 16),
-                  _scoreBar('气虚质', 0.85, ShunShiColors.error, '85%'),
+                  _scoreBar('气虚', 0.85, ShunShiColors.error, '85%'),
                   const SizedBox(height: 10),
-                  _scoreBar('痰湿质', 0.62, ShunShiColors.gold, '62%'),
+                  _scoreBar('痰湿', 0.62, ShunShiColors.gold, '62%'),
                   const SizedBox(height: 10),
-                  _scoreBar('阳虚质', 0.45, const Color(0xFF3B82F6), '45%'),
+                  _scoreBar('阳虚', 0.45, const Color(0xFF3B82F6), '45%'),
                   const SizedBox(height: 10),
-                  _scoreBar('平和质（基准）', 0.30, ShunShiColors.primary, '30%'),
+                  _scoreBar('平和（基准）', 0.30, ShunShiColors.primary, '30%'),
                   const SizedBox(height: 16),
                   Container(
                     padding: const EdgeInsets.all(12),
@@ -109,7 +109,7 @@ class ConstitutionReportPage extends StatelessWidget {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          '测试结果基于您的近期身心状态。体质受环境与季节影响，建议每 24 节气重新评估。',
+                          '这些建议只是生活方式提示，不是诊断。',
                           style: TextStyle(
                             fontSize: 12, color: ShunShiColors.textTertiary,
                             height: 1.5, fontFamily: ShunShiTypography.sansFamily,
