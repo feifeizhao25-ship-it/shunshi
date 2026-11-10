@@ -7,7 +7,7 @@
 
 | 任务 | 命令 | 时间 | 做什么 | 产物 |
 |---|---|---|---|---|
-| 陈旧扫描 | `run stale` | 每日 02:30 | 扫资料库 + 暂存区 + RAG 来源清单 + 金标准出处：过期 / 45 天内到期 / 超 180 天没复核 / 待审核超 45 天 / 征求意见稿超 30 天 / 缺出处 | `stale_report.json`；新出现的“高”级项进 `worklist.jsonl` |
+| 陈旧扫描 | `run stale` | 每日 02:30 | 扫资料库 + 暂存区 + RAG 来源清单 + 金标准出处：过期 / 14 天内到期 / 超 180 天没复核 / 待审核超 45 天 / 征求意见稿超 30 天 / 缺出处 | `stale_report.json`；新出现的“高”级项进 `worklist.jsonl` |
 | 金标准评测 | `run golden` | 每周日 03:30 | 跑 `data/golden_shunshi_zh.jsonl`（46 题，每题带出处），对比上次；上次过、这次不过 = 退步 | `golden/golden_YYYY-MM-DD.json`、`golden/last.json`；退步题进 `worklist.jsonl` |
 | 研究雷达 | `run radar` | 每周三 05:00 | 只访问白名单（arXiv / GitHub / Hugging Face），只写摘要和结构化线索 | `radar/digest_*.md`、`radar/items_*.json` |
 | 雷达暂存 | `run radar-stage` | 每周三 06:00 | 把相关线索写成“待审核”的**线索**（不是条目），去重、丢弃注入、标许可证类别 | `library_staged.jsonl` |

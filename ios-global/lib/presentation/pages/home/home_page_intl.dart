@@ -44,7 +44,7 @@ class _HomePageIntlState extends State<HomePageIntl> {
   String _primaryDuration = '';
   String _season = '';
   String _userName = 'Friend';
-  String _hemisphere = 'north';
+  String? _hemisphere;
   String _secondary1Title = '';
   String _secondary1Subtitle = '';
   String _secondary2Title = '';
@@ -61,11 +61,28 @@ class _HomePageIntlState extends State<HomePageIntl> {
   Future<void> _load() async {
     final prefs = await SharedPreferences.getInstance();
     _userName = prefs.getString('user_name') ?? 'Friend';
-    _hemisphere = prefs.getString('hemisphere') ?? 'north';
+    final saved = prefs.getString('hemisphere');
+    _hemisphere = saved == 'north' || saved == 'south' ? saved : null;
 
     if (!(prefs.getBool('onboarding_completed') ?? false)) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) context.go('/onboarding');
+      });
+      return;
+    }
+
+    if (_hemisphere == null) {
+      if (!mounted) return;
+      setState(() {
+        _greeting = 'Hemisphere not set';
+        _season = '';
+        _primaryTitle = 'Choose north or south';
+        _primaryReason = 'This home does not assume the northern hemisphere. Set it in Culture & units.';
+        _primaryAction = 'Open Culture & units';
+        _primaryDuration = '';
+        _secondary1Title = '';
+        _secondary2Title = '';
+        _state = _PageState.loaded;
       });
       return;
     }
@@ -87,7 +104,7 @@ class _HomePageIntlState extends State<HomePageIntl> {
 
     try {
       final res = await _dio.get('/api/v1/intl/home/dashboard',
-          queryParameters: {'hemisphere': _hemisphere});
+          queryParameters: {'hemisphere': _hemisphere!});
       final d = res.data;
       if (!mounted) return;
 
@@ -272,7 +289,7 @@ class _HomePageIntlState extends State<HomePageIntl> {
   // ── Primary Focus Card — Apple Health style ──
 
   Widget get _primaryCard => GestureDetector(
-    onTap: () => context.push('/chat'),
+    onTap: () => context.push(_hemisphere == null ? '/culture-settings' : '/chat'),
     child: Container(
       width: double.infinity,
       padding: const EdgeInsets.all(_spacing24),

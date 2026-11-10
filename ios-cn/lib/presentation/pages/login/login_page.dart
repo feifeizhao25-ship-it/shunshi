@@ -290,7 +290,7 @@ class _LoginPageState extends State<LoginPage> {
                     const SizedBox(height: 16),
                     Text('顺时', style: ShunshiTextStyles.greeting.copyWith(color: AppColors.textPrimary(context))),
                     const SizedBox(height: 4),
-                    Text('顺应时节，养生有道', style: ShunshiTextStyles.bodySecondary.copyWith(color: AppColors.textSecondary(context))),
+                    Text('顺应时节，安排作息', style: ShunshiTextStyles.bodySecondary.copyWith(color: AppColors.textSecondary(context))),
                   ],
                 ),
               ),

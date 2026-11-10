@@ -59,7 +59,7 @@ class _AchievementPageV2State extends State<AchievementPageV2> {
   int get _nextLevelPoints => _progress?.nextLevelPoints ?? 0;
 
   List<_Badge> get _badges => [
-    _Badge(Icons.wb_sunny, '早起达人', '连续打卡$_checkinStreak/10天', _checkinStreak >= 10, _checkinStreak / 10, ShunShiColors.primary),
+    _Badge(Icons.wb_sunny, '早起达人', '已记下 $_checkinStreak/10 天', _checkinStreak >= 10, _checkinStreak / 10, ShunShiColors.primary),
     _Badge(Icons.eco, '节气使者', '顺时而养', _checkinStreak >= 3, _checkinStreak / 3, const Color(0xFF2D7A4A)),
     _Badge(Icons.storm, '养生先锋', '聊天$_chatCount/50次', _chatCount >= 50, _chatCount / 50, const Color(0xFF74593C)),
     _Badge(Icons.auto_stories, '日记达人', '日记$_diaryCount/30篇', _diaryCount >= 30, _diaryCount / 30, const Color(0xFF7c5cfc)),

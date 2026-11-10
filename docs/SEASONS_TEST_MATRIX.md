@@ -184,7 +184,7 @@ curl -s "http://localhost:4000/api/v1/seasons/audio/recommended?time_of_day=even
 | SUB-03 | 购买流程 | 点击购买 | 打开Stripe Checkout | ⏳ |
 | SUB-04 | Restore | 点击Restore | 恢复购买 | ⏳ |
 | SUB-05 | 过期降级 | 订阅过期 | 降级到Free | ⏳ |
-| SUB-06 | Family Plan | 4个账号 | 家庭成员都能用 | ⏳ |
+| SUB-06 | Family Plan | 3 人，含购买人 | 家庭成员都能用 | ⏳ |
 | SUB-07 | 订阅状态API | 打开订阅页 | 从API加载真实订阅状态 | ⏳ |
 | SUB-08 | Restore调用API | 点击Restore | 调用后端restore接口 | ⏳ |
 | SUB-09 | Premium内容锁定 | 免费用户访问 | Premium内容显示锁定图标 | ⏳ |

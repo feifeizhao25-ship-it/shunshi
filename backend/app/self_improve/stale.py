@@ -9,7 +9,7 @@
   superseded_live    写了 superseded_by 但仍在展示
   golden_source_old  金标准题的出处读取日期超过 golden_source_age_days，或题自带 valid_until 已过
   no_source          条目没有出处网址
-  expiring_soon      valid_until 在 expiring_days（默认 45）天内到期：趁早安排复核，别等过期
+  expiring_soon      valid_until 在 expiring_days（默认 14）天内到期：趁早安排复核，别等过期
 """
 
 from __future__ import annotations
@@ -52,7 +52,7 @@ def _f(kind: str, ident: str, title: str, severity: str, reason: str, days: Opti
 
 def scan(entries: Iterable[Mapping], golden_cases: Iterable[Mapping] = (), *, today: Optional[date] = None,
          max_review_age_days: int = 180, pending_age_days: int = 45, draft_age_days: int = 30,
-         golden_source_age_days: int = 180, expiring_days: int = 45, lang: str = "zh") -> dict:
+         golden_source_age_days: int = 180, expiring_days: int = 14, lang: str = "zh") -> dict:
     today = today or date.today()
     out: list[dict] = []
     n_entries = 0

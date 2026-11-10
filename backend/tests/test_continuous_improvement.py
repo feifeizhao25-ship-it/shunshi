@@ -65,12 +65,12 @@ def test_golden_regression_goes_to_worklist(tmp_path):
 
 
 def test_stale_flags_expired_expiring_and_unreviewed_manifest(tmp_path):
-    out = C.run_stale(datetime(2027, 2, 10, tzinfo=TZ), force=True, cfg=cfg(tmp_path))
+    out = C.run_stale(datetime(2027, 2, 16, tzinfo=TZ), force=True, cfg=cfg(tmp_path))
     assert out["status"] == "ok"
     rep = json.loads((tmp_path / "sil" / "stale_report.json").read_text("utf-8"))
     kinds = {(f["kind"], f["id"]) for f in rep["findings"]}
     # B13：旧的 4 份 legacy 文档已从清单撤下，清单里不再有 2026-11-30 到期的来源；
-    # 现在最早到期的是已核验文稿（2027-02-28），20 天内到期要被提前发现
+    # 已核验文稿 2027-02-28 到期。扫描日 2027-02-16 还剩 12 天，落在 14 天窗口内。
     assert any(k == "expiring_soon" and i == "rag:verified_cn.md" for k, i in kinds)
     assert not any(i.startswith("rag:顺时知识库") for _, i in kinds)
     # 暂存区条目都在“待审核”里被统计，但没有进入用户可见资料库

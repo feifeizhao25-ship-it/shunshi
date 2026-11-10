@@ -41,7 +41,7 @@ class ConstitutionReportPageV2 extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('您的体质：气虚质（兼有痰湿）', style: TextStyle(
+                  Text('生活习惯倾向：气虚（兼有痰湿）', style: TextStyle(
                     fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white,
                   )),
                   const SizedBox(height: 12),
@@ -56,12 +56,12 @@ class ConstitutionReportPageV2 extends StatelessWidget {
             const SizedBox(height: 20),
 
             // 体质强弱分布
-            Text('体质强弱分布', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+            Text('习惯倾向', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
             const SizedBox(height: 12),
-            _buildBar('气虚质', 0.85, ShunShiColors.primary),
-            _buildBar('痰湿质', 0.62, Color(0xFF74593C)),
-            _buildBar('阳虚质', 0.45, Color(0xFF9BB8C9)),
-            _buildBar('平和质（基准）', 0.30, ShunShiColors.textTertiary),
+            _buildBar('气虚倾向', 0.85, ShunShiColors.primary),
+            _buildBar('痰湿倾向', 0.62, Color(0xFF74593C)),
+            _buildBar('阳虚倾向', 0.45, Color(0xFF9BB8C9)),
+            _buildBar('平和（参照）', 0.30, ShunShiColors.textTertiary),
             const SizedBox(height: 8),
             Container(
               padding: const EdgeInsets.all(12),
@@ -103,7 +103,7 @@ class ConstitutionReportPageV2 extends StatelessWidget {
             const SizedBox(height: 12),
 
             // 推荐食谱
-            _buildPlanCard(Icons.restaurant, '推荐食谱', '黄芪炖鸡汤', '益气固表，温中补虚，适合气虚质人群。', '开始烹饪'),
+            _buildPlanCard(Icons.restaurant, '推荐食谱', '黄芪炖鸡汤', '清淡温热的汤。这是生活习惯参考，不是诊断。', '开始烹饪'),
             const SizedBox(height: 10),
             // 推荐穴位
             _buildPlanCard(Icons.spa, '推荐穴位', '足三里 · 补中益气', '', '查看'),

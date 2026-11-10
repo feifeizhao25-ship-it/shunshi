@@ -22,7 +22,7 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
   int _wellnessDays = 0;
   int _points = 0;
   bool _loggedIn = false;
-  String _userName = '顺时小朋友';
+  String _userName = '';
   int _checkinDays = 0;
   String _constitution = '';
 
@@ -209,7 +209,7 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(_userName,
+                      Text(_userName.isEmpty ? (_loggedIn ? '未填写名字' : '未登录') : _userName,
                           style: TextStyle(
                             fontFamily: ShunShiTypography.serifFamily,
                             fontSize: 24,
