@@ -8,7 +8,6 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../design_system/theme.dart';
 import '../../../data/network/api_client.dart';
-import '../../../core/network/api_singleton.dart';
 import '../../../data/network/session.dart';
 import '../../../data/network/progress_api.dart';
 import '../../../data/storage/storage_manager.dart';

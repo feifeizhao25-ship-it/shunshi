@@ -1,7 +1,6 @@
 import 'dart:async';
 import '../../../design_system/app_colors.dart';
 import 'dart:convert';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -11,14 +10,10 @@ import '../../widgets/companion_session_notice.dart';
 import '../../widgets/feedback_sheet.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
-import '../../../core/network/api_singleton.dart';
 import '../../../core/config/app_config.dart';
 import '../../../data/network/session.dart';
 import 'chat_failure.dart';
 
-const String _systemPrompt =
-    'You are SEASONS, a calm and thoughtful AI companion focused on seasonal '
-    'living, gentle rituals, and emotional well-being.';
 
 enum _Confidence { high, medium, low }
 
@@ -39,7 +34,6 @@ class _SeasonsChatPageState extends State<SeasonsChatPage>
   late AnimationController _cursorController;
   String _streamingText = ''; // Current SSE streaming text
   bool _isStreaming = false;
-  Object? _sseSubscription;
   String? _conversationId;
   String? _chatError;
 
@@ -67,7 +61,6 @@ class _SeasonsChatPageState extends State<SeasonsChatPage>
     _focusNode.dispose();
     _dotController.dispose();
     _cursorController.dispose();
-    _sseSubscription = null;
     super.dispose();
   }
 
@@ -124,22 +117,6 @@ class _SeasonsChatPageState extends State<SeasonsChatPage>
     });
   }
 
-  Map<String, dynamic>? _tryParseStructured(String text) {
-    final patterns = [
-      RegExp(r'\{[^{}]*"insight"[^{}]*\}', dotAll: true),
-      RegExp(r'```json\s*(\{[^}]+\})\s*```', dotAll: true),
-      RegExp(r'```\s*(\{[^}]+\})\s*```', dotAll: true),
-    ];
-    for (final p in patterns) {
-      final m = p.firstMatch(text);
-      if (m != null) {
-        try {
-          return jsonDecode(m.group(1) ?? '{}') as Map<String, dynamic>;
-        } catch (_) {}
-      }
-    }
-    return null;
-  }
 
   Future<void> _sendMessage() async {
     final text = _controller.text.trim();

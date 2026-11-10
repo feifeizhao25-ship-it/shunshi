@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../widgets/seasons_visual.dart';
 
 /// Photo cards shown under the first assistant greeting, so a new conversation
 /// starts from something to tap instead of an empty screen.

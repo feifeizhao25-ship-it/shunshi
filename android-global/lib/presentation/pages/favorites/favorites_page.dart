@@ -9,7 +9,6 @@ import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
 import '../../../data/network/api_client.dart';
 import '../../widgets/state_view.dart';
-import '../../../core/network/api_singleton.dart';
 import '../../../data/network/session.dart';
 
 class FavoritesPage extends StatefulWidget {

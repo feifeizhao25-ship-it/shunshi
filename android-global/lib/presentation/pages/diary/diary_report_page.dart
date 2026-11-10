@@ -8,7 +8,6 @@ import '../../../core/network/locale_headers.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
-import '../../../core/network/api_singleton.dart';
 
 /// Journalweek报页 — 7 day趋势 + 观察suggestion: 
 class DiaryReportPage extends StatefulWidget {

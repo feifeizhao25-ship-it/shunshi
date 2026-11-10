@@ -4,7 +4,6 @@ import '../../../../core/theme/shunshi_colors.dart';
 import '../../../../core/theme/shunshi_text_styles.dart';
 import 'solar_term_data.dart';
 import '../../../../core/theme/app_localizations.dart';
-import '../../../../core/network/api_singleton.dart';
 
 class SolarTermTimeline extends StatelessWidget {
   final List<SolarTermInfo> allTerms;

@@ -8,7 +8,6 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
-import '../../../core/network/api_singleton.dart';
 
 class WellnessDashboardPage extends StatelessWidget {
   const WellnessDashboardPage({super.key});

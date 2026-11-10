@@ -6,11 +6,9 @@ import '../../../data/network/session.dart';
 import '../../../core/network/locale_headers.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import 'package:go_router/go_router.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
-import '../../../core/network/api_singleton.dart';
 import '../../../core/config/app_config.dart';
 
 /// Sleep Report页 — 7天柱状图 + AI趋势分析 + 建议

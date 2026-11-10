@@ -43,7 +43,6 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Future<void> _loadUserId() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
       setState(() {
         _userId = currentUserId() ?? '';
       });

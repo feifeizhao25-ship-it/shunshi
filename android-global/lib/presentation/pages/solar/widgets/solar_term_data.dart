@@ -2,7 +2,6 @@
 // Extracted from solar_term_page.dart for maintainability
 
 import 'package:flutter/material.dart';
-import '../../../../core/network/api_singleton.dart';
 
 class SolarTermInfo {
   final String name;

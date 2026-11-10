@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../../design_system/app_colors.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/router/safe_pop.dart';
-import '../../../core/network/api_singleton.dart';
 
 class TermsPage extends StatelessWidget {
   const TermsPage({super.key});

@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/shunshi_colors.dart';
 import 'constitution_data.dart';
 import '../../../../core/theme/app_localizations.dart';
-import '../../../../core/network/api_singleton.dart';
 
 /// Body TypeResults Widget
 class ConstitutionResultWidget extends StatelessWidget {
@@ -27,7 +26,6 @@ class ConstitutionResultWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final isFree = !reportUnlocked;
 
     return Stack(children: [

@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import '../../../design_system/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_localizations.dart';
@@ -45,7 +44,6 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
   int _quotaRemaining = 10;
   int _quotaLimit = 10;
   bool _isVip = false;
-  String _userName = '';
   String _token = '';
   String _currentSolarTerm = currentSolarTermEn()?.$1 ?? 'this season';
   final String _solarTermDesc = 'The beginning of summer. Nourish the heart, eat lightly, rest properly.';
@@ -63,7 +61,6 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       _token = prefs.getString('auth_token') ?? '';
-      _userName = prefs.getString('user_name') ?? 'Friend';
     });
     if (_token.isEmpty) {
       try {
@@ -368,35 +365,6 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
     );
   }
 
-  void _showCrisisResources() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (_) => Container(
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: AppColors.surface(context),
-          borderRadius: ShunShiRadius.bottomSheetRadius,
-        ),
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-          Container(width: 40, height: 4, decoration: BoxDecoration(color: AppColors.border(context), borderRadius: BorderRadius.circular(2))),
-          const SizedBox(height: 20),
-          const Icon(Icons.phone_in_talk, size: 36, color: ShunShiColors.error),
-          const SizedBox(height: 12),
-          const Text('If you\'re in crisis:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: ShunShiColors.textPrimary)),
-          const SizedBox(height: 12),
-          const Text('US & Canada: 988 Suicide & Crisis Lifeline\nUK & Ireland: Samaritans 116 123\nAU: Lifeline 13 11 14\nInternational: findahelpline.com', style: TextStyle(fontSize: 14, color: ShunShiColors.textSecondary, height: 1.8)),
-          const SizedBox(height: 20),
-          SizedBox(width: double.infinity, child: ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary(context), foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: ShunShiRadius.buttonRadius)),
-            onPressed: () => Navigator.pop(context),
-            child: const Text('I understand', style: TextStyle(fontSize: 15)),
-          )),
-          const SizedBox(height: 8),
-        ]),
-      ),
-    );
-  }
 
   int get _aiMessageCount => _messages.where((m) => m.role == 'ai').length;
 

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../../../design_system/app_colors.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../design_system/theme.dart';
-import '../../../../core/network/api_singleton.dart';
 
 class TodayActionCard extends StatelessWidget {
   final String currentTerm;
@@ -46,7 +45,6 @@ class TodayActionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final h = DateTime.now().hour;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     var (title, icon, color, actionLabel, actionRoute) = _getTodayFocus(h);
 
     // If route goes to meridian detail, add the correct meridian ID

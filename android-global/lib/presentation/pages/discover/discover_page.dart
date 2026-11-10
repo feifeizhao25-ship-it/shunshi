@@ -384,11 +384,3 @@ class _Category {
   const _Category(this.icon, this.title, this.bgColor, this.route);
 }
 
-class _Article {
-  final String tag;
-  final String readTime;
-  final String title;
-  final String excerpt;
-  final String likes;
-  const _Article(this.tag, this.readTime, this.title, this.excerpt, this.likes);
-}

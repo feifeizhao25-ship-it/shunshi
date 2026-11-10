@@ -4,7 +4,6 @@ import '../../../../design_system/theme.dart';
 import '../../widgets/paywall_banner.dart';
 import '../../widgets/seasons_visual.dart';
 import '../../../core/theme/app_localizations.dart';
-import '../../../core/network/api_singleton.dart';
 
 /// Mindful Breathing Guide Data
 final List<Map<String, String>> _breathingSteps = [

@@ -3,11 +3,9 @@ library;
 
 import 'package:flutter/material.dart';
 import '../../../../design_system/app_colors.dart';
-import '../../../../design_system/theme.dart';
 import 'package:go_router/go_router.dart';
 import 'package:dio/dio.dart';
 import '../../../../core/theme/app_localizations.dart';
-import '../../../../core/network/api_singleton.dart';
 import '../../../../core/config/app_config.dart';
 
 class SolarWellnessCard extends StatefulWidget {

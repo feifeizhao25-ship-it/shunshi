@@ -12,7 +12,6 @@ import '../../../core/theme/shunshi_spacing.dart';
 import '../../../core/theme/shunshi_text_styles.dart';
 import '../../../core/theme/shunshi_animations.dart';
 import '../../../core/theme/app_localizations.dart';
-import '../../../core/network/api_singleton.dart';
 
 /// 音频播放器 — 沉浸式设计
 ///

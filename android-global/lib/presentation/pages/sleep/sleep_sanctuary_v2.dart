@@ -5,7 +5,6 @@ library;
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
-import '../../../core/network/api_singleton.dart';
 
 class SleepSanctuaryV2 extends StatefulWidget {
   const SleepSanctuaryV2({super.key});
@@ -19,7 +18,6 @@ class _SleepSanctuaryV2State extends State<SleepSanctuaryV2> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       backgroundColor: const Color(0xFF0d1117),
       body: SafeArea(

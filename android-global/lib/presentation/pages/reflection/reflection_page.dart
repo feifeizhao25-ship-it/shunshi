@@ -13,8 +13,6 @@ import '../../../core/theme/seasons_text_styles.dart';
 import '../../../domain/entities/reflection.dart';
 import '../../providers/reflection_provider.dart';
 import '../../widgets/components/gentle_button.dart';
-import '../../../core/theme/app_localizations.dart';
-import '../../../core/network/api_singleton.dart';
 
 // ── Emotions选项 (5个) ────────────────────────────────────
 

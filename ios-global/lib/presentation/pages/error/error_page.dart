@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../design_system/app_colors.dart';
 import 'package:go_router/go_router.dart';
-import '../../../design_system/theme.dart';
 
 class ErrorPage extends StatelessWidget {
   final Exception? error;

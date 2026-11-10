@@ -11,7 +11,6 @@ import '../../../core/theme/seasons_spacing.dart';
 import '../../../core/theme/seasons_text_styles.dart';
 import '../../widgets/components/soft_card.dart';
 import '../../../core/theme/app_localizations.dart';
-import '../../../core/network/api_singleton.dart';
 import '../../../data/network/session.dart';
 
 /// Settings / Privacy Page — SEASONS Global
@@ -45,7 +44,6 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Future<void> _loadUserId() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
       setState(() {
         _userId = currentUserId() ?? '';
       });

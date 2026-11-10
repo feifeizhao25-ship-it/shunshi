@@ -11,9 +11,6 @@ import '../../../design_system/theme.dart';
 import '../../../core/config/app_config.dart';
 import 'chat_failure.dart';
 
-const String _systemPrompt =
-    'You are SEASONS, a calm and thoughtful AI companion focused on seasonal '
-    'living, gentle rituals, and emotional well-being.';
 
 enum _Confidence { high, medium, low }
 

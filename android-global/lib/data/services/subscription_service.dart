@@ -193,14 +193,12 @@ class SubscriptionState {
 
 class SubscriptionService {
   final Dio _dio;
-  final String _baseUrl;
   final String _userId;
 
   SubscriptionService({
     String baseUrl = AppConfig.baseUrl,
     required String userId,
-  })  : _baseUrl = baseUrl,
-        _userId = userId,
+  })  : _userId = userId,
         _dio = Dio(BaseOptions(
           baseUrl: baseUrl,
           connectTimeout: const Duration(seconds: 10),

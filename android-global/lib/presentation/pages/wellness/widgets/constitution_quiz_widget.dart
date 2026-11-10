@@ -4,7 +4,6 @@ import '../../../../core/theme/shunshi_text_styles.dart';
 import 'constitution_data.dart';
 import 'constitution_widgets.dart';
 import '../../../../core/theme/app_localizations.dart';
-import '../../../../core/network/api_singleton.dart';
 
 /// Body Type测试问卷 Widget
 class ConstitutionQuizWidget extends StatelessWidget {

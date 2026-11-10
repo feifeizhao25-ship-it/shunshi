@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import '../../design_system/theme.dart';
 import '../../design_system/app_colors.dart';
 import 'shell/desktop_shell.dart';
 

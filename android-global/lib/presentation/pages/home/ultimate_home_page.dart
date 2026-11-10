@@ -7,7 +7,6 @@ import 'dart:math';
 import '../../../design_system/app_colors.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import '../../../data/storage/storage_manager.dart';
 import '../../../design_system/theme.dart';
 import 'package:go_router/go_router.dart';
 import 'widgets/home_skeleton.dart';

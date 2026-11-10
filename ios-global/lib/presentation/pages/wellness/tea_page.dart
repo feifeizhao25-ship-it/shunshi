@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../../design_system/app_colors.dart';
 
 import '../../../core/router/safe_pop.dart';
-import '../../../design_system/theme.dart';
 import '../../widgets/seasons_visual.dart';
 
 /// Seasonal warm drinks: a short, plain list of everyday drinks by season.

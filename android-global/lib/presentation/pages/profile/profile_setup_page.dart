@@ -10,7 +10,6 @@ import '../../../core/theme/shunshi_spacing.dart';
 import '../../../core/theme/shunshi_text_styles.dart';
 import '../../../data/network/api_client.dart';
 import '../../../core/theme/app_localizations.dart';
-import '../../../core/network/api_singleton.dart';
 
 /// TCM九种Body Type
 const _constitutionTypes = [
@@ -26,16 +25,6 @@ const _constitutionTypes = [
 ];
 
 /// 健康关注选项
-const _healthConcerns = [
-  'Sleep',
-  'Digestion',
-  'Emotions',
-  'Immunity',
-  'Weight',
-  'Skin',
-  'Menstruation',
-  'Other',
-];
 
 class ProfileSetupPage extends StatefulWidget {
   const ProfileSetupPage({super.key});

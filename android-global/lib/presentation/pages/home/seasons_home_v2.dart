@@ -6,7 +6,6 @@ import 'package:dio/dio.dart';
 import '../../../design_system/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../../../core/theme/shunshi_colors.dart';
-import '../../../data/storage/storage_manager.dart';
 import '../../../design_system/theme.dart';
 import '../solar/widgets/solar_wellness_card.dart';
 import '../../../core/theme/app_localizations.dart';
@@ -25,7 +24,6 @@ class _SeasonsHomeV2State extends State<SeasonsHomeV2> {
 
   String _greeting = 'Good Morning';
   String _season = 'Spring';
-  String _timeOfDay = '';
   String _wisdomTitle = 'Nurturing Renewal';
   String _wisdomBody = 'Focus on light, bitter greens and mindful movement to align with the awakening earth.';
   String _companionTip = 'Welcome to SEASONS. How are you feeling today?';
@@ -87,7 +85,6 @@ class _SeasonsHomeV2State extends State<SeasonsHomeV2> {
         } else {
           _companionTip = d['daily_tip']?.toString() ?? dashData['daily_insight']?.toString() ?? _companionTip;
         }
-        if (dashData['time_of_day'] != null) _timeOfDay = dashData['time_of_day'].toString();
         _season = dashData['season']?.toString() ?? _season;
       }
 

@@ -1,7 +1,6 @@
 // Follow-up recommendation card for home page
 import 'package:flutter/material.dart';
 import '../../design_system/app_colors.dart';
-import '../../../design_system/theme.dart';
 
 class FollowUpCard extends StatelessWidget {
   final String title;

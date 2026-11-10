@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 
 import '../../../core/router/safe_pop.dart';
 import '../../../core/safety/crisis_resources.dart';
-import '../../../design_system/theme.dart';
 import '../../widgets/seasons_visual.dart';
 
 /// Mood check-in: pick how you feel, get one small, practical idea, and see where to find

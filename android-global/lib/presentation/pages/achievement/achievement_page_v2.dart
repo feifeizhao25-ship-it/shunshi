@@ -14,7 +14,6 @@ import '../../../data/network/progress_api.dart';
 import '../../../data/network/session.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
-import '../../../core/network/api_singleton.dart';
 
 class AchievementPageV2 extends StatefulWidget {
   const AchievementPageV2({super.key});

@@ -326,7 +326,6 @@ class ImageUploadButton extends ConsumerWidget {
                 : () async {
                     final success = await notifier.uploadImages();
                     if (success && onImagesUploaded != null) {
-                      final uploadState = ref.read(imageUploadProvider);
                       final notifierState = notifier.uploadedImages;
                       final urls = notifierState.map((img) => img.url).toList();
                       onImagesUploaded!(urls);

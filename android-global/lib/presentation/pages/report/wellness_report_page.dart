@@ -15,7 +15,6 @@ import '../../../core/theme/shunshi_colors.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/network/api_singleton.dart';
 
 class WellnessReportPage extends StatelessWidget {
   const WellnessReportPage({super.key});

@@ -1,6 +1,5 @@
 import 'locale_headers.dart';
 import '../config/app_config.dart';
-import '../constants/app_constants.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 

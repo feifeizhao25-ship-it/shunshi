@@ -1,6 +1,5 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
-import '../../../core/theme/seasons_colors.dart';
 import '../../../core/theme/seasons_spacing.dart';
 
 /// Offline banner — shows at top when no network

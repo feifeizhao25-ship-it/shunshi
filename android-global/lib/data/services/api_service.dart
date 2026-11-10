@@ -110,23 +110,6 @@ class ApiService {
   }
   
   /// 带Retry的请求
-  Future<T> _requestWithRetry<T>(
-    Future<T> Function() request,
-  ) async {
-    int attempts = 0;
-    
-    while (true) {
-      try {
-        return await request();
-      } catch (e) {
-        attempts++;
-        if (attempts >= maxRetries) {
-          rethrow;
-        }
-        await Future.delayed(Duration(seconds: attempts));
-      }
-    }
-  }
   
   // ==================== 路由 ====================
   
@@ -221,11 +204,6 @@ class ApiService {
 /// 用户服务
 class UserService {
   final ApiService _api = ApiService();
-  final Dio _dio = Dio(BaseOptions(
-    baseUrl: ApiClient.baseUrl,
-    connectTimeout: const Duration(seconds: 10),
-    headers: {'Content-Type': 'application/json'},
-  ));
   
   // 模拟用户数据
   Map<String, dynamic>? _currentUser;

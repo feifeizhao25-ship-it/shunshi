@@ -4,8 +4,6 @@ library;
 
 import 'package:dio/dio.dart';
 import '../../../design_system/app_colors.dart';
-import '../../../data/storage/storage_manager.dart';
-import '../../widgets/state_view.dart';
 import 'package:flutter/material.dart';
 import '../../widgets/seasons_visual.dart';
 import '../../../core/theme/shunshi_colors.dart';
@@ -30,7 +28,6 @@ class _RecordsPageV2State extends State<RecordsPageV2> {
   int _todayTotal = 3;
   List<Map<String, dynamic>> _emotionTrends = [];
   Map<String, dynamic> _sleepStats = {};
-  bool _loading = true;
   String? _token;
 
   @override
@@ -50,7 +47,10 @@ class _RecordsPageV2State extends State<RecordsPageV2> {
   }
 
   Future<void> _fetchData() async {
-    if (_token == null) { setState(() => _loading = false); return; }
+    if (_token == null) {
+      setState(() {});
+      return;
+    }
     final headers = {'Authorization': 'Bearer $_token'};
     try {
       final results = await Future.wait([
@@ -85,7 +85,7 @@ class _RecordsPageV2State extends State<RecordsPageV2> {
         _sleepStats = Map<String, dynamic>.from(sleep['data'] as Map);
       }
     } catch (_) {}
-    setState(() => _loading = false);
+    setState(() {});
   }
 
   @override

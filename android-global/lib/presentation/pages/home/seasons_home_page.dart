@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../design_system/typography.dart';
 import '../../../core/theme/app_localizations.dart';
-import '../../../core/network/api_singleton.dart';
 
 class SeasonsHomePage extends StatefulWidget {
   const SeasonsHomePage({super.key});
@@ -98,7 +97,6 @@ class _SeasonsHomePageState extends State<SeasonsHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     if (_isLoading) {
       return Scaffold(
         backgroundColor: _warmCream,

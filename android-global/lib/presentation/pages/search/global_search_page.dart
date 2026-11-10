@@ -3,9 +3,7 @@ import '../../../design_system/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import '../../../core/theme/app_localizations.dart';
-import '../../../design_system/theme.dart';
 import '../../../data/network/api_client.dart';
-import '../../../core/network/api_singleton.dart';
 
 /// 全局Search页 — Search知识库内容
 class GlobalSearchPage extends StatefulWidget {
@@ -22,7 +20,6 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
   bool _loading = false;
   String? _selectedType;
   Timer? _debounce;
-  List<String> _suggestions = [];
 
   static const _types = [
     ('All', null),

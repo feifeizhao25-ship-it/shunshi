@@ -8,7 +8,6 @@ import '../../../core/theme/shunshi_colors.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
-import '../../../core/network/api_singleton.dart';
 import '../../../core/config/app_config.dart';
 import '../../../data/en_content.dart';
 
@@ -96,7 +95,7 @@ class _SolarTermDetailPageState extends State<SolarTermDetailPage> {
   Widget _buildSkeleton() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Shimmer.fromColors(
-      baseColor: isDark ? Colors.grey[800]! : AppColors.borderGhost(context)!,
+      baseColor: isDark ? Colors.grey[800]! : AppColors.borderGhost(context),
       highlightColor: isDark ? Colors.grey[700]! : Colors.grey[100]!,
       child: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20),

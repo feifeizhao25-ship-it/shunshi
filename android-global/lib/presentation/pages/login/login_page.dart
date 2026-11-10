@@ -13,7 +13,6 @@ import '../../../data/storage/storage_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dio/dio.dart';
 import '../../../core/theme/app_localizations.dart';
-import '../../../core/network/api_singleton.dart';
 
 /// Login mode
 enum _LoginMode { password, register }
@@ -214,7 +213,6 @@ class _LoginPageState extends State<LoginPage> {
     if (user != null) {
       await StorageManager.user.saveUserInfo(user);
       // Persist user_id for providers that read it from SharedPreferences
-      final prefs = StorageManager.user;
       // Store user_id in SharedPreferences for other providers
       final userId = user['id'] as String?;
       if (userId != null) {
