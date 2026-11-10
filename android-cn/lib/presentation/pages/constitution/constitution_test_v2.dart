@@ -1,5 +1,5 @@
 /// 体质辨识测试页 V3 — 接 API
-/// GET /questions → 25题, POST /submit → 体质结果, GET /types → 9种体质详情
+/// GET /questions → 25题, POST /submit → 体质结果, GET /types → 9种习惯说明
 library;
 
 import 'package:dio/dio.dart';
@@ -296,10 +296,10 @@ class _ConstitutionTestV2State extends State<ConstitutionTestV2> {
       ],
       '痰湿质': [
         {'title': '饮食调养', 'desc': '健脾化痰：薏米、冬瓜、陈皮茶，少甜腻。忌肥甘厚味。', 'icon': Icons.restaurant, 'color': Color(0xFF795548)},
-        {'title': '运动调养', 'desc': '有氧运动为主，跑步、快走。梅雨季节注意祛湿。', 'icon': Icons.directions_run, 'color': Color(0xFF4CAF50)},
+        {'title': '运动调养', 'desc': '有氧运动为主，跑步、快走。梅雨季节注意清淡。', 'icon': Icons.directions_run, 'color': Color(0xFF4CAF50)},
       ],
       '湿热质': [
-        {'title': '饮食调养', 'desc': '清热祛湿：绿豆、薏米、苦瓜、菊花茶。忌辛辣油腻。', 'icon': Icons.restaurant, 'color': Color(0xFFFF5722)},
+        {'title': '饮食调养', 'desc': '饮食清淡：绿豆、薏米、苦瓜、菊花茶。忌辛辣油腻。', 'icon': Icons.restaurant, 'color': Color(0xFFFF5722)},
         {'title': '运动调养', 'desc': '游泳、中强度运动排汗。夏季重点清热，避免潮湿环境。', 'icon': Icons.pool, 'color': Color(0xFF2196F3)},
       ],
       '血瘀质': [

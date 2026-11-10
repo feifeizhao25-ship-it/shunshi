@@ -14,7 +14,7 @@ const String _w = 'assets/images/wellness/';
 
 const Map<String, List<WellnessEntry>> kWellnessEntries = {
   'constitution': [
-    WellnessEntry('平和质', '九种体质分类中的平和状态：体态适中，精力充沛，作息饮食规律。', '保持规律作息，饮食均衡，适度运动。', '${_w}cat_con_pinghe.webp'),
+    WellnessEntry('平和质', '几种生活习惯分类中的平和状态：体态适中，精力充沛，作息饮食规律。', '保持规律作息，饮食均衡，适度运动。', '${_w}cat_con_pinghe.webp'),
     WellnessEntry('气虚质', '传统体质分类之一，常见描述为容易疲乏、气短、声音偏低。', '作息规律，量力运动，避免过度劳累。', '${_w}cat_con_qixu.webp'),
     WellnessEntry('阳虚质', '传统体质分类之一，常见描述为手足偏凉、比较怕冷。', '注意保暖，饮食温热适量。', '${_w}cat_con_yangxu.webp'),
     WellnessEntry('阴虚质', '传统体质分类之一，常见描述为口干、手足心偏热、体型偏瘦。', '避免熬夜，饮食清淡，多补充水分。', '${_w}cat_con_yinxu.webp'),

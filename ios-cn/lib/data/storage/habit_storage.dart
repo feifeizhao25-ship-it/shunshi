@@ -4,7 +4,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// 习惯数据本地存储
 class HabitStorage {
   static const String _keyHabits = 'habits';
-  static const String _keyCheckins = 'checkins';
   
   final SharedPreferences _prefs;
   

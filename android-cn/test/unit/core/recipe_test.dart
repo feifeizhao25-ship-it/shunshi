@@ -60,7 +60,6 @@ void main() {
     });
 
     test('TC-RECIPE-011c: 200ms debounce on rapid clicks', () {
-      const debounceMs = 200;
       var clickCount = 0;
       var requestCount = 0;
 

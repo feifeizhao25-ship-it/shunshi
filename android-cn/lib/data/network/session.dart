@@ -63,7 +63,7 @@ Future<String?>? _pendingSession;
 /// 1. 本机已有令牌（登录账号或之前建立的游客会话）→ 直接用；
 /// 2. 都没有 → 只建立**一个**游客会话并保存下来，之后所有页面共用。
 ///
-/// 以前「记录」「体质测试」等页面每次打开都调一次 guest-login，等于每次换一个全新的空账号，
+/// 以前「记录」「节气生活习惯自测」等页面每次打开都调一次 guest-login，等于每次换一个全新的空账号，
 /// 用户自己写的日记、积分、成就永远查不到（复测 B03）。
 Future<String?> ensureSessionToken(Dio dio) {
   return _pendingSession ??= _ensure(dio).whenComplete(() => _pendingSession = null);

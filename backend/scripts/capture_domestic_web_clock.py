@@ -393,7 +393,7 @@ def _guest_from_login(page, nickname: str) -> None:
     if "睡眠" in _copy(page):
         _click(page, "睡眠")
     _click(page, "下一步")
-    _wait_copy(page, "了解你的体质类型")
+    _wait_copy(page, "了解你的生活习惯类型")
     _click(page, "平和质")
     _click(page, "完成")
     try:

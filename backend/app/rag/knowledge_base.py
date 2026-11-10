@@ -50,6 +50,30 @@ _LEGACY_EVAL_SOURCES = {
 }
 
 
+# #97 从主库删掉「儿童青少年体重管理」（NHC 肥胖食养指南，见 source_manifest
+# excluded_from_main_rag 的 NHC-child-obesity-diet-2024）。顺序编号因此前移，
+# 后面的已核验节被指到别的 chunk_id。评测仍用原来的编号，所以这里按标题钉住，
+# cn_0003 空着，不把那份指南写回 verified_cn.md。
+_VERIFIED_CN_CHUNK_IDS = {
+    "平衡膳食八项基本原则": "cn_0001",
+    "减油、增豆、加奶": "cn_0002",
+    "每天喝多少水": "cn_0004",
+    "成年人每周动多少": "cn_0005",
+    "成年人睡多久": "cn_0006",
+}
+
+
+def _apply_stable_chunk_ids(filename: str, chunks: list) -> None:
+    if filename != "verified_cn.md":
+        return
+    for chunk in chunks:
+        title = chunk.heading_path[-1] if chunk.heading_path else ""
+        for needle, cid in _VERIFIED_CN_CHUNK_IDS.items():
+            if needle in title:
+                chunk.chunk_id = cid
+                break
+
+
 def _source_metadata(path: str | Path) -> dict:
     manifest = json.loads(_SOURCE_MANIFEST_PATH.read_text(encoding="utf-8"))
     filename = Path(path).name
@@ -439,6 +463,7 @@ class KnowledgeBase:
         new_chunks = _parse_markdown_into_chunks(text, self.lang, source="main")
         source_metadata = _source_metadata(path)
         filename = Path(path).name
+        _apply_stable_chunk_ids(filename, new_chunks)
         for chunk in new_chunks:
             chunk.metadata.update(source_metadata)
             _apply_section_policies(filename, chunk)

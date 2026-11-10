@@ -34,9 +34,11 @@ import os
 import pathlib
 import re
 import shutil
+import socket
 import subprocess
 import sys
 import tempfile
+from contextlib import contextmanager
 
 REPO = pathlib.Path(__file__).resolve().parent.parent
 SITES = REPO / "docker" / "nginx" / "conf.d"
@@ -46,6 +48,10 @@ FOREIGN_DOMAINS = ("seasons.care", "shunshiapp.com")
 SSL_SITE = "shunshi-ssl.conf"
 DOMAIN_VARS = ("SHUNSHI_WEB_DOMAIN", "SHUNSHI_API_DOMAIN", "SHUNSHI_ADMIN_DOMAIN")
 HOSTNAME = re.compile(r"^(?=.{1,253}$)([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$")
+# docker-compose.yml 里 nginx 反代的服务名。nginx -t 会在启动时解析 upstream；
+# CI 没有这张 Docker 网络。只给这些名字补 127.0.0.1，拼错的主机名仍然失败。
+COMPOSE_UPSTREAM_HOSTS = frozenset({"backend", "admin", "web-cn"})
+_SERVER_HOST = re.compile(r"\bserver\s+([A-Za-z0-9.-]+)(?::\d+)")
 
 
 def _strip_comments(text: str) -> str:
@@ -127,6 +133,49 @@ def render(template: str, env: dict[str, str]) -> str:
     return re.sub(r"\$\{(\w+)\}", lambda m: env[m.group(1)] if m.group(1) in env else m.group(0), template)
 
 
+def _unprivileged_listeners(text: str) -> str:
+    """nginx -t 会真的 bind。测试副本改到本机高端口，仓库里的 80/443 不变。"""
+    text = re.sub(r"\blisten\s+80\b", "listen 127.0.0.1:18080", text)
+    return re.sub(r"\blisten\s+443\b", "listen 127.0.0.1:18443", text)
+
+
+def compose_upstream_hosts(text: str) -> set[str]:
+    return set(_SERVER_HOST.findall(text)) & COMPOSE_UPSTREAM_HOSTS
+
+
+def _resolves(host: str) -> bool:
+    try:
+        socket.getaddrinfo(host, None)
+    except OSError:
+        return False
+    return True
+
+
+def _write_hosts(text: str) -> None:
+    path = pathlib.Path("/etc/hosts")
+    try:
+        path.write_text(text)
+        return
+    except OSError:
+        subprocess.run(["sudo", "-n", "tee", str(path)], input=text, text=True, check=True, capture_output=True)
+
+
+@contextmanager
+def _loopback_for_unresolved(hosts: set[str]):
+    missing = sorted(host for host in hosts if not _resolves(host))
+    if not missing:
+        yield
+        return
+    path = pathlib.Path("/etc/hosts")
+    original = path.read_text(encoding="utf-8")
+    extra = "".join(f"127.0.0.1 {host}\n" for host in missing)
+    _write_hosts(original + ("" if original.endswith("\n") else "\n") + extra)
+    try:
+        yield
+    finally:
+        _write_hosts(original)
+
+
 def nginx_test(site: pathlib.Path, env: dict[str, str]) -> tuple[bool, str]:
     nginx = shutil.which("nginx")
     if not nginx:
@@ -157,10 +206,27 @@ def nginx_test(site: pathlib.Path, env: dict[str, str]) -> tuple[bool, str]:
 
         for snippet in SNIPPETS.glob("*.conf"):
             (prefix / "snippets" / snippet.name).write_text(localize(snippet.read_text(encoding="utf-8")))
-        (prefix / "nginx.conf").write_text(localize(NGINX_CONF.read_text(encoding="utf-8")))
-        (prefix / "conf.d" / "default.conf").write_text(localize(render(site.read_text(encoding="utf-8"), env)))
-        result = subprocess.run([nginx, "-t", "-c", str(prefix / "nginx.conf"), "-p", str(prefix)],
-                                capture_output=True, text=True)
+        temp_root = prefix / "temp"
+        for name in ("body", "proxy", "fastcgi", "uwsgi", "scgi"):
+            (temp_root / name).mkdir(parents=True)
+        # 测试副本把临时目录指到可写路径。发行配置仍用 nginx 自己的目录。
+        # 否则 nginx -t 在非 root 的 CI 上会因 /var/lib/nginx/body 权限失败。
+        conf = localize(NGINX_CONF.read_text(encoding="utf-8")).replace(
+            "http {\n",
+            "http {\n"
+            f"    client_body_temp_path {temp_root}/body;\n"
+            f"    proxy_temp_path {temp_root}/proxy;\n"
+            f"    fastcgi_temp_path {temp_root}/fastcgi;\n"
+            f"    uwsgi_temp_path {temp_root}/uwsgi;\n"
+            f"    scgi_temp_path {temp_root}/scgi;\n",
+            1,
+        )
+        (prefix / "nginx.conf").write_text(conf)
+        rendered = _unprivileged_listeners(localize(render(site.read_text(encoding="utf-8"), env)))
+        (prefix / "conf.d" / "default.conf").write_text(rendered)
+        with _loopback_for_unresolved(compose_upstream_hosts(rendered)):
+            result = subprocess.run([nginx, "-t", "-c", str(prefix / "nginx.conf"), "-p", str(prefix)],
+                                    capture_output=True, text=True)
         return result.returncode == 0, (result.stderr or result.stdout).strip()
 
 

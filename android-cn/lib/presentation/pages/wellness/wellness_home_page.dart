@@ -230,7 +230,7 @@ class _WellnessHomePageState extends State<WellnessHomePage>
                       readOnly: true,
                       onTap: () => context.push('/search'),
                       decoration: const InputDecoration(
-                        hintText: '搜索调理方案、节气食谱...',
+                        hintText: '搜索日常安排、节气食谱...',
                         hintStyle: TextStyle(
                           color: ShunShiColors.textTertiary,
                           fontSize: 14,

@@ -26,7 +26,7 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
 
   static const _concerns = [
     _Concern('睡眠', '😴', '改善睡眠质量'),
-    _Concern('饮食', '🍵', '饮食调理养生'),
+    _Concern('饮食', '🍵', '饮食安排养生'),
     _Concern('运动', '🏃', '走动拉伸'),
     _Concern('情绪', '🧘', '情绪管理减压'),
   ];

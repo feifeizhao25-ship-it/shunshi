@@ -20,7 +20,7 @@ class _BaDuanJinStep {
 const List<_BaDuanJinStep> _kSteps = [
   _BaDuanJinStep(
     name: '两手托天理三焦',
-    description: '双手交叉上托，拉伸脊柱，调理三焦气机',
+    description: '双手交叉上托，拉伸脊柱，安排三焦气机',
     icon: Icons.arrow_upward,
     duration: '30秒',
   ),
@@ -32,7 +32,7 @@ const List<_BaDuanJinStep> _kSteps = [
   ),
   _BaDuanJinStep(
     name: '调理脾胃须单举',
-    description: '左右交替上举，调理脾胃升降功能',
+    description: '左右交替上举，照顾脾胃升降功能',
     icon: Icons.vertical_align_top,
     duration: '30秒',
   ),
