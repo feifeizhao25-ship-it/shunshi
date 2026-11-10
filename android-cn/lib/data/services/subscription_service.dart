@@ -78,7 +78,7 @@ class SubscriptionProducts {
     yearlyPriceUSD: 79.99,
     trialDays: 7,
     features: [
-      'Unlimited AI conversations',
+      'AI conversations on the yearly plan',
       'Full content library',
       'Audio guides & soundscapes',
       'Weekly reflection summaries',
@@ -139,22 +139,22 @@ class SubscriptionProducts {
         SubscriptionPlan(
           id: 'serenity',
           name: 'Serenity',
-          priceDisplay: '\$9.99',
-          period: 'month',
+          priceDisplay: '\$79.99',
+          period: 'year',
           features: serenity.features,
         ),
         SubscriptionPlan(
           id: 'harmony',
           name: 'Harmony',
-          priceDisplay: '\$14.99',
-          period: 'month',
+          priceDisplay: '\$119.99',
+          period: 'year',
           features: harmony.features,
         ),
         SubscriptionPlan(
           id: 'family',
           name: 'Family',
-          priceDisplay: '\$19.99',
-          period: 'month',
+          priceDisplay: '\$159.99',
+          period: 'year',
           features: family.features,
         ),
       ];

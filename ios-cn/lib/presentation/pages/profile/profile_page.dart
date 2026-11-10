@@ -83,7 +83,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 borderRadius: BorderRadius.circular(10),
               ),
               child: const Text(
-                'SVIP',
+                '年付',
                 style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
               ),
             ),
@@ -125,7 +125,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   const Icon(Icons.diamond, color: Color(0xFFFFD700), size: 22),
                   const SizedBox(width: 8),
                   Text(
-                    '顺时SVIP尊享',
+                    '顺时年付',
                     style: TextStyle(
                       fontFamily: ShunShiTypography.serifFamily,
                       color: Colors.white,

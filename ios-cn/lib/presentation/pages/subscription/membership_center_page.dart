@@ -229,7 +229,7 @@ class MembershipCenterPage extends StatelessWidget {
                   color: ShunShiColors.apricotLight,
                   borderRadius: BorderRadius.circular(999),
                 ),
-                child: const Text('SVIP 尊享', style: TextStyle(
+                child: const Text('年付会员', style: TextStyle(
                   fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 1,
                   color: ShunShiColors.primary,
                 )),
@@ -363,7 +363,7 @@ class MembershipCenterPage extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('月度卡', style: TextStyle(
+                      const Text('只卖年付', style: TextStyle(
                         fontSize: 18, fontFamily: ShunShiTypography.serifFamily,
                         color: ShunShiColors.primary,
                       )),
@@ -372,7 +372,7 @@ class MembershipCenterPage extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: const [
                           Text('¥', style: TextStyle(fontSize: 13, color: ShunShiColors.primary)),
-                          Text('25', style: TextStyle(
+                          Text('888', style: TextStyle(
                             fontSize: 24, fontFamily: ShunShiTypography.serifFamily,
                             fontWeight: FontWeight.w700,
                             color: ShunShiColors.primary,
@@ -380,7 +380,7 @@ class MembershipCenterPage extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 8),
-                      Text('随用随开 · 自由续费', style: TextStyle(
+                      Text('只按年开通', style: TextStyle(
                         fontSize: 9, color: ShunShiColors.secondary,
                       )),
                     ],

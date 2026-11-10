@@ -182,7 +182,7 @@ class _FamilyPageState extends State<FamilyPage> {
                   const SizedBox(height: ShunShiSpacing.sm),
                   _buildActionButtons(),
                   const SizedBox(height: ShunShiSpacing.lg),
-                  const PaywallBanner(message: '家庭共享需要SVIP', icon: Icons.family_restroom),
+                  const PaywallBanner(message: '家庭共享随家庭年付档开通，人数以账户席位为准', icon: Icons.family_restroom),
                   const SizedBox(height: ShunShiSpacing.xl),
                 ],
               ),
