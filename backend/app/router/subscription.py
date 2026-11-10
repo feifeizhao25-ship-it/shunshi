@@ -1217,6 +1217,9 @@ async def create_order(
     3. 创建 pending 订单
     4. 返回支付参数
     """
+    from app.services.payment_licence import paid_checkout_open, license_granted_from_env
+    if not paid_checkout_open(license_granted_from_env()):
+        raise HTTPException(status_code=403, detail="经营许可未取得，收费入口关闭")
     matching_products = [
         product
         for product in SUBSCRIPTION_PRODUCTS

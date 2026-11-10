@@ -113,6 +113,8 @@ services:
       SHUNSHI_KNOWLEDGE_DIR: /app/knowledge
       SHUNSHI_APPROVED_KB_DIR: /app/data/self_improve/approved
       SHUNSHI_REDIS_URL: redis://:${REDIS_PASSWORD:?REDIS_PASSWORD is required}@redis:6379/0
+      # Paid checkout stays closed until an operator sets BUSINESS_LICENSE_GRANTED=1.
+      # Do not default it on here. Refunds of stored orders do not need the flag.
     depends_on:
       postgres:
         condition: service_healthy

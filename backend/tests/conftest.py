@@ -7,6 +7,9 @@ import pytest
 from fastapi.testclient import TestClient
 
 os.environ.setdefault("APP_ENV", "testing")
+# Production compose leaves BUSINESS_LICENSE_GRANTED unset, so paid checkout stays closed.
+# Tests that place an order need the flag. The closed-checkout test deletes it.
+os.environ.setdefault("BUSINESS_LICENSE_GRANTED", "1")
 os.environ.setdefault("DATABASE_URL", "sqlite:////tmp/shunshi-pytest-product.db")
 os.environ.setdefault("REDIS_URL", "redis://localhost")
 os.environ.setdefault("SHUNSHI_JWT_SECRET", "s" * 48)

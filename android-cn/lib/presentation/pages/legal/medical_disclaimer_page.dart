@@ -27,7 +27,7 @@ class MedicalDisclaimerPage extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         children: [
           _sectionTitle('医疗免责声明'),
-          _body('最后更新日期：2025年5月', textColor),
+          _body('最后更新日期：2026年11月10日', textColor),
           const SizedBox(height: 16),
           _warningCard(),
           const SizedBox(height: 16),
