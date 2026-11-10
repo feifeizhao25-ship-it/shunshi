@@ -133,15 +133,24 @@ def onboarding_complete(
     user_id: str = Depends(current_user),
     session: Session = Depends(get_session),
 ):
-    profile = body.model_dump(exclude_none=True)
+    incoming = body.model_dump(exclude_none=True)
+    existing = session.get(UserSetting, {"user_id": user_id, "key": ONBOARDING_KEY})
+    try:
+        stored = json.loads(existing.value) if existing and existing.value else {}
+    except (TypeError, ValueError):
+        stored = {}
+    if not isinstance(stored, dict):
+        stored = {}
+    # 只更新这次带来的字段。跳过目标的人不会把已经写下的目标清掉。
+    stored.update(incoming)
     session.merge(
         UserSetting(
             user_id=user_id,
             key=ONBOARDING_KEY,
-            value=json.dumps(profile, ensure_ascii=False),
+            value=json.dumps(stored, ensure_ascii=False),
         )
     )
-    return {"saved": True, "profile": profile}
+    return {"saved": True, "profile": stored}
 
 
 class AudioProgressBody(BaseModel):

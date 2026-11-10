@@ -93,6 +93,13 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
     });
   }
 
+  Future<void> _skipConcern() async {
+    setState(() => _selectedConcern = null);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('user_concerns');
+    if (mounted) _nextPage();
+  }
+
   Future<void> _finish() async {
     _confettiAnim.forward();
     final prefs = await SharedPreferences.getInstance();
@@ -344,6 +351,13 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
             ),
           ),
         ),
+        TextButton(
+          onPressed: _skipConcern,
+          child: Text(
+            '先跳过',
+            style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 15, color: tertiary),
+          ),
+        ),
       ],
     );
   }
@@ -353,7 +367,7 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final text = isDark ? ShunShiColors.darkTextPrimary : ShunShiColors.textPrimary;
     final secondary = isDark ? ShunShiColors.darkTextSecondary : ShunShiColors.textSecondary;
-    final concern = _selectedConcern ?? '作息';
+    final concern = _selectedConcern;
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -382,7 +396,7 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
         ),
         const SizedBox(height: 16),
         Text(
-          '我们将围绕「$concern」为你安排\n这一季的作息',
+          concern == null ? '先看看今天的安排，想说的时候再告诉我' : '我们将围绕「$concern」为你安排\n这一季的作息',
           textAlign: TextAlign.center,
           style: TextStyle(
             fontFamily: ShunShiTypography.sansFamily,

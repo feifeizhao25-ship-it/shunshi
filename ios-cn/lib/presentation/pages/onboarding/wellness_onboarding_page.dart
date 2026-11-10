@@ -73,6 +73,13 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
     });
   }
 
+  Future<void> _skipConcern() async {
+    setState(() => _selectedConcern = null);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('user_concerns');
+    if (mounted) _nextPage();
+  }
+
   Future<void> _finish() async {
     final prefs = await SharedPreferences.getInstance();
     if (_selectedConcern != null) {
@@ -252,13 +259,17 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
             ),
           ),
         )),
+        TextButton(
+          onPressed: _skipConcern,
+          child: Text('先跳过', style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: _wide ? 18 : 15, color: _textTertiary)),
+        ),
       ],
     );
   }
 
   // ── Page 3: 准备就绪 (5秒) ──
   Widget _page3() {
-    final concern = _selectedConcern ?? '养生';
+    final concern = _selectedConcern;
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -281,7 +292,7 @@ class _WellnessOnboardingPageState extends State<WellnessOnboardingPage>
         ),
         const SizedBox(height: 16),
         Text(
-          '我们将围绕「$concern」为你定制\n个性化养生方案',
+          concern == null ? '先看看今天的安排，想说的时候再告诉我' : '我们将围绕「$concern」为你定制\n个性化养生方案',
           textAlign: TextAlign.center,
           style: TextStyle(
             fontFamily: ShunShiTypography.sansFamily,

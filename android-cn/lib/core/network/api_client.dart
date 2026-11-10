@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import '../../data/storage/storage_manager.dart';
 import '../config/app_config.dart';
 import '../storage/token_storage.dart';
+import 'domestic_headers.dart';
 
 // ==================== Speed Level ====================
 
@@ -144,6 +145,7 @@ class ApiClient {
     if (token != null && token.isNotEmpty) {
       options.headers['Authorization'] = 'Bearer $token';
     }
+    options.headers.addAll(domesticRequestHeaders());
 
     // 2. 根据速度级别设置超时 (UX_API_SPEC §2.4)
     final level = _extractLevel(options);

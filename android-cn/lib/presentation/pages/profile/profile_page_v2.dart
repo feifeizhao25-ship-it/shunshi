@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../design_system/theme.dart';
 import '../../../data/network/api_client.dart';
+import '../../../data/storage/local_session.dart';
 import '../../../data/network/progress_api.dart';
 
 class ProfilePageV2 extends StatefulWidget {
@@ -475,7 +476,11 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
                       )),
                   trailing: Icon(Icons.chevron_right,
                       color: ShunShiColors.error.withValues(alpha: 0.5), size: 20),
-                  onTap: () => context.go('/login'),
+                  onTap: () async {
+                    await endLocalSession();
+                    if (!context.mounted) return;
+                    context.go('/login');
+                  },
                 ),
               ),
             ),

@@ -269,6 +269,25 @@ def test_api_preferences_switch_off_and_constitution_validation(client, monkeypa
     assert client.post("/api/v1/seasons/profile/preferences", json={"clear_constitution": True}, headers=h).json()["constitution"] is None
 
 
+def test_onboarding_keeps_unspecified_fields_and_maps_the_walk_word(client):
+    h = _guest(client)
+    first = client.post(
+        "/api/v1/seasons/onboarding/complete",
+        json={"help_goal": "睡得更好", "support_time": "晚上"},
+        headers=h,
+    )
+    assert first.status_code == 200
+    second = client.post(
+        "/api/v1/seasons/onboarding/complete",
+        json={"help_goal": "走动"},
+        headers=h,
+    )
+    assert second.json()["profile"]["support_time"] == "晚上"
+    assert second.json()["profile"]["help_goal"] == "走动"
+    assert ph.goals_from_text("走动") == frozenset({"exercise"})
+    assert ph.goals_from_text("") == frozenset()
+
+
 def test_api_actions_drive_the_streak(client, monkeypatch):
     h = _guest(client)
     import time as _t
@@ -286,6 +305,30 @@ def test_fixed_utc_offset_timezone_for_apps_without_an_iana_name():
     assert phs.local_now(True, "UTC+99:00", now).hour == 20  # nonsense falls back to UTC
     assert phs.local_now(True, "Europe/Berlin", now).hour == 21
     assert phs.local_now(False, "UTC+05:30", now).hour == 4  # domestic stays on Beijing time
+
+
+def test_cn_market_stays_chinese_when_accept_language_is_english(client):
+    h = _guest(client)
+    chinese = client.get(
+        "/api/v1/seasons/home/dashboard",
+        headers={**h, "Accept-Language": "en-US", "X-App-Market": "cn"},
+    ).json()
+    english = client.get(
+        "/api/v1/seasons/home/dashboard",
+        headers={**h, "Accept-Language": "en-US"},
+    ).json()
+    assert CJK.search(chinese["greeting"])
+    assert not CJK.search(english["greeting"])
+
+
+def test_global_market_stays_english_when_accept_language_is_chinese(client):
+    h = _guest(client)
+    data = client.get(
+        "/api/v1/seasons/home/dashboard",
+        headers={**h, "Accept-Language": "zh-CN", "X-App-Market": "global"},
+    ).json()
+    assert not CJK.search(data["greeting"])
+    assert data["greeting"]
 
 
 def test_api_global_market_header_alone_is_enough_for_english_home(client, monkeypatch):

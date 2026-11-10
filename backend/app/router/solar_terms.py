@@ -1,5 +1,5 @@
 # 节气系统 API 路由
-from fastapi import APIRouter, Depends, Query, HTTPException
+from fastapi import APIRouter, Depends, Query, HTTPException, Request
 from ..locale_context import RequestLocale, request_locale
 from pydantic import BaseModel
 from typing import List, Optional
@@ -629,15 +629,27 @@ SOLAR_TERMS = [
 
 # ============ Helper Functions ============
 
-def get_current_solar_term():
+def get_current_solar_term(day: date | None = None):
     """获取当前节气：查天文计算的节气表（北京时间）。
 
     以前按「每月 15 日换节气」近似，2026-10-01 至 10-07 会提前显示寒露（实际 10-08 交节）。
+    ``day`` 只由测试时钟传入；不传时用北京时间的今天。
     """
     from app.utils import solar_term_calendar
 
-    name = solar_term_calendar.current_term()
+    name = solar_term_calendar.term_on(day) if day is not None else solar_term_calendar.current_term()
     return get_solar_term_by_name(name) or SOLAR_TERMS[0]
+
+
+def _test_clock_day(request: Request):
+    from ..deps import get_settings
+    from ..services.personal_home_service import test_clock
+    from app.utils.solar_term_calendar import BEIJING
+
+    pinned = test_clock(request, get_settings(request))
+    if pinned is None:
+        return None
+    return pinned.astimezone(BEIJING).date()
 
 def get_solar_term_by_name(name: str):
     """根据名称获取节气"""
@@ -691,15 +703,15 @@ async def get_solar_terms(
     }
 
 @router.get("/current", response_model=dict, summary="当前节气", description="返回当前所处的节气信息")
-async def get_current(locale: str = Depends(_request_term_locale)):
-    """获取当前节气"""
-    current = get_current_solar_term()
+async def get_current(request: Request, locale: str = Depends(_request_term_locale)):
+    """获取当前节气。测试环境可被 X-Shunshi-Test-Now 钉住；其他环境忽略该头。"""
+    current = get_current_solar_term(_test_clock_day(request))
     return {"success": True, "data": _localize_term(current, locale)}
 
 @router.get("/today", response_model=dict, summary="今日节气建议", description="返回当前节气及前后节气信息，附带七日养生建议")
-async def get_today_solar_term(locale: str = Depends(_request_term_locale)):
-    """获取今日节气和建议"""
-    current = get_current_solar_term()
+async def get_today_solar_term(request: Request, locale: str = Depends(_request_term_locale)):
+    """获取今日节气和建议。测试环境的「今天」跟随测试时钟。"""
+    current = get_current_solar_term(_test_clock_day(request))
     
     # 获取前后两个节气
     current_idx = SOLAR_TERMS.index(current)
@@ -709,7 +721,7 @@ async def get_today_solar_term(locale: str = Depends(_request_term_locale)):
     # 生成七日养生建议：每一天按节气表查当天所处的节气（以前是一天换一个节气）
     from app.utils import solar_term_calendar
 
-    today = solar_term_calendar.beijing_today()
+    today = _test_clock_day(request) or solar_term_calendar.beijing_today()
     seven_day_suggestions = []
     for i in range(7):
         day_term = get_solar_term_by_name(solar_term_calendar.term_on(today + timedelta(days=i))) or current

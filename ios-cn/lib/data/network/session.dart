@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../storage/storage_manager.dart';
+import '../../core/network/domestic_headers.dart';
 
 /// 当前登录账号（或游客会话）的用户 id；没有登录、或本地存储还没初始化时返回 null。
 ///
@@ -122,6 +123,7 @@ Dio withSessionAuth(Dio dio) {
       } catch (_) {}
       if (token != null && token.trim().isNotEmpty) options.headers['Authorization'] = 'Bearer $token';
     }
+    options.headers.addAll(domesticRequestHeaders());
     handler.next(options);
   }));
   return dio;

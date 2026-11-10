@@ -53,7 +53,7 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
   }
 
   Future<void> _loadData() async {
-    final loggedIn = StorageManager.user.isLoggedIn();
+    final loggedIn = StorageManager.user.isLoggedIn() || (StorageManager.user.getToken() ?? '').isNotEmpty;
     final info = StorageManager.user.getUserInfo();
     final sub = StorageManager.user.getSubscription();
 

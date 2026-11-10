@@ -91,7 +91,7 @@ def _run(browser, args, out: Path, report: dict) -> None:
     context = browser.new_context(locale="zh-CN", viewport={"width": 375, "height": 812})
     page = context.new_page()
     _attach(page, report)
-    _guest_home(page, args.web, CAUSAL, "回放甲", out, report, "sleeper-ui")
+    _guest_home(page, args.web, CAUSAL, "回放甲", out, report, "sleeper-ui", concern="睡眠")
     _board, token = _open_board(page, args.web, CAUSAL)
     if not token:
         token = _token(page)
@@ -100,8 +100,7 @@ def _run(browser, args, out: Path, report: dict) -> None:
         raise RuntimeError(f"游客登录后没有可用令牌，键：{keys}")
     me = _api(args.api, "GET", "/api/v1/auth/me", token, CAUSAL)
     report["sleeper_user_id"] = (me.get("data") or {}).get("id") or (me.get("id"))
-    before_api = _api(args.api, "POST", "/api/v1/seasons/onboarding/complete", token, CAUSAL, ONBOARD["sleeper"])
-    report["sleeper_onboarding_saved"] = before_api.get("saved")
+    report["goal_source"] = "引导页点了「睡眠」，资料向导提交时写入 help_goal。脚本不再另写画像。"
     before_board, _ = _open_board(page, args.web, CAUSAL)
     _bring_into_view(page, "今天为你准备的")
     before_text = _save_text(page, out, "sleeper-before")
@@ -113,6 +112,9 @@ def _run(browser, args, out: Path, report: dict) -> None:
     _bring_into_view(page, REINFORCE)
     after_text = _save_text(page, out, "sleeper-after")
     _shot(page, out, report, "sleeper-after", 375)
+    report["sleeper_after_visible"] = _visible_text(out / "sleeper-after-375.png")
+    if not any(piece in report["sleeper_after_visible"] for piece in ("分钟", "为什么", "泡脚", "好觉", "同类")):
+        raise RuntimeError(f"截图里读不到卡片正文。识别结果：{report['sleeper_after_visible'][:180]}")
     report["sleeper_after"] = _brief(after_board)
     report["sleeper_after_page_has_reasons"] = _reasons_on_page(after_board, after_text)
     report["sleeper_after_page_has_reinforce"] = REINFORCE in after_text
@@ -141,7 +143,14 @@ def _run(browser, args, out: Path, report: dict) -> None:
         page.wait_for_timeout(250)
     report["off_control_in_page_text"] = "关闭个性化" in _copy(page)
     if report["off_control_in_page_text"]:
-        _click(page, "关闭个性化")
+        try:
+            _click(page, "关闭个性化")
+        except Exception:
+            nodes = page.locator("flt-semantics").filter(has_text="关闭个性化")
+            if nodes.count() == 0:
+                raise
+            nodes.last.click(force=True)
+            page.wait_for_timeout(400)
         _wait_copy(page, "关闭个性化推荐")
         _shot(page, out, report, "sleeper-off-dialog", 375)
         _click(page, "关闭")
@@ -171,29 +180,31 @@ def _run(browser, args, out: Path, report: dict) -> None:
 
     report["cells"] = []
     page.set_viewport_size({"width": 375, "height": 812})
-    _capture_week(page, args, out, report, "sleeper", token)
+    _capture_week(page, args, out, report, "睡眠", token)
 
-    control_context = browser.new_context(locale="zh-CN", viewport={"width": 375, "height": 812})
+    control_context = browser.new_context(locale="en-US", viewport={"width": 375, "height": 812})
     control = control_context.new_page()
     _attach(control, report)
-    _guest_home(control, args.web, CAUSAL, "对照", out, report, "control-ui")
+    _guest_home(control, args.web, CAUSAL, "对照", out, report, "control-ui", concern=None)
     _, control_token = _open_board(control, args.web, CAUSAL)
-    _api(args.api, "POST", "/api/v1/seasons/onboarding/complete", control_token, CAUSAL, ONBOARD["newcomer"])
     control_board, _ = _open_board(control, args.web, CAUSAL)
     _bring_into_view(control, "今天为你准备的")
     control_text = _save_text(control, out, "control-same-instant")
     _shot(control, out, report, "control-same-instant", 375)
     report["control_has_reinforce"] = REINFORCE in control_text
+    report["english_browser_still_chinese"] = "今天为你准备的" in control_text and "Good " not in control_text
+    if not report["english_browser_still_chinese"]:
+        raise RuntimeError("英文浏览器语言下，国内包首页不是中文")
     report["control"] = _brief(control_board)
     for width in (768, 1280):
         control.set_viewport_size({"width": width, "height": 900})
         control.wait_for_timeout(400)
         _shot(control, out, report, "control-same-instant", width)
     control.set_viewport_size({"width": 375, "height": 812})
-    _capture_week(control, args, out, report, "newcomer", control_token)
+    _capture_week(control, args, out, report, "跳过", control_token)
     control_context.close()
 
-    for name in ("walker", "caregiver", "stressed"):
+    for name, concern in (("饮食", "饮食"), ("运动", "运动"), ("情绪", "情绪")):
         failure = None
         for _attempt in (1, 2):
             report["cells"] = [cell for cell in report["cells"] if cell["user"] != name]
@@ -201,7 +212,7 @@ def _run(browser, args, out: Path, report: dict) -> None:
             try:
                 cell_page = cell_context.new_page()
                 _attach(cell_page, report)
-                _guest_home(cell_page, args.web, CLOCKS[0], name, out, report, f"{name}-ui")
+                _guest_home(cell_page, args.web, CLOCKS[0], name, out, report, f"{name}-ui", concern=concern)
                 _, cell_token = _open_board(cell_page, args.web, CLOCKS[0])
                 _capture_week(cell_page, args, out, report, name, cell_token)
                 failure = None
@@ -214,24 +225,27 @@ def _run(browser, args, out: Path, report: dict) -> None:
             report["blockers"].append(f"{name}: {type(failure).__name__}: {failure}")
 
     _click(page, "我的")
-    for _ in range(8):
-        if "退出登录" in _copy(page):
-            break
-        page.mouse.move(180, 500)
-        page.mouse.wheel(0, 600)
-        page.wait_for_timeout(250)
-    _wait_copy(page, "退出登录", timeout=8000)
+    page.wait_for_timeout(800)
     mine = _copy(page)
     report["profile_shows_nickname"] = "回放甲" in mine
+    if not report["profile_shows_nickname"]:
+        raise RuntimeError(f"资料页没有显示刚填写的昵称。当前文字：{mine[:240]}")
+    _wheel_canvas(page, 1200)
+    page.wait_for_timeout(400)
+    if "退出登录" not in _copy(page) and "设置" in _copy(page):
+        _click(page, "设置")
+        page.wait_for_timeout(600)
+        _wheel_canvas(page, 900)
+    _wait_copy(page, "退出登录", timeout=10000)
     _save_text(page, out, "sleeper-profile")
     _shot(page, out, report, "sleeper-profile", 375)
     _click(page, "退出登录")
-    _wait_copy(page, "游客体验")
-    _click(page, "游客体验")
+    _wait_guest_entry(page)
+    _click_guest(page)
     try:
         _wait_copy(page, "怎么称呼", timeout=8000)
     except Exception:
-        _click(page, "游客体验")
+        _click_guest(page)
     _guest_from_login(page, "回放乙")
     _open_board(page, args.web, CAUSAL)
     switched = _save_text(page, out, "switched-home")
@@ -243,7 +257,6 @@ def _run(browser, args, out: Path, report: dict) -> None:
 
 
 def _capture_week(page, args, out: Path, report: dict, name: str, token: str) -> None:
-    _api(args.api, "POST", "/api/v1/seasons/onboarding/complete", token, CLOCKS[0], ONBOARD[name])
     for clock in CLOCKS:
         board, _ = _open_board(page, args.web, clock)
         _bring_into_view(page, "今天为你准备的")
@@ -305,28 +318,63 @@ def _reasons_on_page(board: dict, text: str) -> bool:
     return all((card.get("reason") or "") in text for card in board.get("suggestions") or [])
 
 
-def _guest_home(page, web, clock, nickname, out, report, label) -> None:
+def _guest_home(page, web, clock, nickname, out, report, label, concern: str | None = "睡眠") -> None:
     _open(page, web, clock, "/splash")
     _wait_copy(page, "开始使用", timeout=30000)
     _shot(page, out, report, f"{label}-onboarding", 375)
     _click(page, "开始使用")
     _wait_copy(page, "你最关注什么")
-    _click(page, "睡眠")
+    if concern:
+        _click(page, concern)
+    else:
+        _click(page, "先跳过")
     _wait_copy(page, "开始体验")
     _click(page, "开始体验")
     _wait_copy(page, "我的", timeout=20000)
     _click(page, "我的")
-    try:
-        _wait_copy(page, "去登录", timeout=6000)
-    except Exception:
+    page.wait_for_timeout(800)
+    text = _copy(page)
+    if "去登录" in text:
+        _click(page, "去登录")
+    elif "登录后查看" in text:
+        _click(page, "登录后查看我的收藏与订阅")
+    else:
         page.mouse.click(337, 780)
-        _wait_copy(page, "去登录", timeout=8000)
+        page.wait_for_timeout(500)
+        text = _copy(page)
+        if "去登录" in text:
+            _click(page, "去登录")
+        elif "登录后查看" in text:
+            _click(page, "登录后查看我的收藏与订阅")
+        else:
+            raise RuntimeError(f"个人页没有登录入口。当前文字：{text[:240]}")
     _shot(page, out, report, f"{label}-profile-logged-out", 375)
-    _click(page, "去登录")
-    _wait_copy(page, "游客体验")
+    _wait_guest_entry(page)
     _shot(page, out, report, f"{label}-login", 375)
-    _click(page, "游客体验")
+    _click_guest(page)
     _guest_from_login(page, nickname)
+
+
+def _wait_guest_entry(page) -> None:
+    page.wait_for_function(
+        """() => {
+          const text = document.querySelector('#app-readable-copy')?.textContent || '';
+          return text.includes('游客体验') || text.includes('体验模式') || text.includes('免登录直接体验');
+        }""",
+        timeout=20000,
+    )
+
+
+def _click_guest(page) -> None:
+    text = _copy(page)
+    if "游客体验" in text:
+        _click(page, "游客体验")
+    elif "体验模式" in text:
+        _click(page, "体验模式")
+    elif "免登录直接体验" in text:
+        _click(page, "免登录直接体验")
+    else:
+        raise RuntimeError(f"登录页没有游客入口。当前文字：{text[:240]}")
 
 
 def _guest_from_login(page, nickname: str) -> None:
@@ -342,9 +390,10 @@ def _guest_from_login(page, nickname: str) -> None:
     _click(page, "女")
     _click(page, "下一步")
     _wait_copy(page, "你出生在哪一年")
-    _click(page, "睡眠")
+    if "睡眠" in _copy(page):
+        _click(page, "睡眠")
     _click(page, "下一步")
-    _wait_copy(page, "了解你的体质类型")
+    _wait_copy(page, "了解你的生活习惯类型")
     _click(page, "平和质")
     _click(page, "完成")
     try:
@@ -406,6 +455,18 @@ def _collect_text(page) -> str:
     return "\n".join(seen)
 
 
+def _visible_text(path: Path) -> str:
+    import subprocess
+    try:
+        out = subprocess.check_output(
+            ["tesseract", str(path), "stdout", "-l", "chi_sim", "--psm", "6"],
+            stderr=subprocess.DEVNULL,
+        )
+    except (OSError, subprocess.CalledProcessError) as exc:
+        return f"ocr-failed:{exc}"
+    return out.decode("utf-8", "replace")
+
+
 def _copy(page) -> str:
     return page.evaluate("() => document.querySelector('#app-readable-copy')?.textContent || ''")
 
@@ -422,9 +483,13 @@ def _click(page, text: str) -> None:
     buttons = page.get_by_role("button").locator("visible=true")
     chosen = None
     chosen_len = 10**9
-    for i in range(buttons.count()):
+    total = min(buttons.count(), 16)
+    for i in range(total):
         item = buttons.nth(i)
-        label = " ".join(item.inner_text().split())
+        try:
+            label = " ".join(item.inner_text(timeout=1500).split())
+        except Exception:
+            continue
         if text == label or text in label:
             if len(label) < chosen_len:
                 chosen = item

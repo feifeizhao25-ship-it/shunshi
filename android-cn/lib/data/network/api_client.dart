@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import '../storage/storage_manager.dart';
 import '../../core/config/app_config.dart';
+import '../../core/network/domestic_headers.dart';
 
 /// API 错误类型
 enum ApiErrorType { network, server, unauthorized, timeout, unknown }
@@ -63,6 +64,7 @@ class ApiClient {
         onRequest: (options, handler) {
           // ngrok 免费版跳过浏览器警告
           options.headers['ngrok-skip-browser-warning'] = 'true';
+          options.headers.addAll(domesticRequestHeaders());
           // 自动添加 Token
           final token = StorageManager.user.getToken();
           if (token != null) {
