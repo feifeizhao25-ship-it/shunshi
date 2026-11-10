@@ -1,4 +1,4 @@
-/// 体质测试报告页 — 参考UI _9
+/// 节气生活习惯自测报告页 — 参考UI _9
 library;
 
 import 'package:flutter/material.dart';
@@ -15,7 +15,7 @@ class ConstitutionReportPageV2 extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: ShunShiColors.background,
         leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
-        title: Text('体质测试报告', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18, fontWeight: FontWeight.w600)),
+        title: Text('节气生活习惯自测报告', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18, fontWeight: FontWeight.w600)),
         actions: [IconButton(icon: const Icon(Icons.notifications_outlined), onPressed: () {})],
       ),
       body: SingleChildScrollView(
@@ -24,7 +24,7 @@ class ConstitutionReportPageV2 extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // 报告标题
-            Text('体质测试报告 · 2024年春分', style: TextStyle(fontSize: 14, color: ShunShiColors.textTertiary)),
+            Text('节气生活习惯自测报告 · 2024年春分', style: TextStyle(fontSize: 14, color: ShunShiColors.textTertiary)),
             const SizedBox(height: 16),
 
             // 体质结果
@@ -44,7 +44,7 @@ class ConstitutionReportPageV2 extends StatelessWidget {
                   const SizedBox(height: 12),
                   Wrap(spacing: 8, children: [
                     _buildTag('补气', Color(0xFFE4C285)),
-                    _buildTag('祛湿', Color(0xFFE4C285)),
+                    _buildTag('清淡', Color(0xFFE4C285)),
                     _buildTag('忌寒凉', Color(0xFFE4C285)),
                   ]),
                 ],
@@ -88,7 +88,7 @@ class ConstitutionReportPageV2 extends StatelessWidget {
                 ]),
                 const SizedBox(height: 12),
                 Text(
-                  '春季生发，您的"气虚"特征表现为易倦乏力，如细雨下的嫩芽需温言呵护。结合"痰湿"兼挟，体内水饮运化稍显迟滞。当下应以"温补脾气"为主，辅以"化痰祛湿"。切记，温和的早睡与清淡的饮食，是为您这卷生命画卷注入生气的最佳笔触。',
+                  '春季生发，您的"气虚"特征表现为易倦乏力，如细雨下的嫩芽需温言呵护。结合"痰湿"兼挟，体内水饮运化稍显迟滞。当下应以"温补脾气"为主，辅以"少油腻"。切记，温和的早睡与清淡的饮食，是为您这卷生命画卷注入生气的最佳笔触。',
                   style: TextStyle(fontSize: 14, color: ShunShiColors.textSecondary, height: 1.8),
                 ),
               ]),
@@ -106,7 +106,7 @@ class ConstitutionReportPageV2 extends StatelessWidget {
             _buildPlanCard(Icons.spa, '推荐穴位', '足三里 · 补中益气', '', '查看'),
             const SizedBox(height: 10),
             // 推荐功法
-            _buildPlanCard(Icons.self_improvement, '推荐功法', '八段锦 · 调理脾胃', '', '查看'),
+            _buildPlanCard(Icons.self_improvement, '推荐功法', '八段锦 · 照顾脾胃', '', '查看'),
             const SizedBox(height: 16),
 
             // Quote

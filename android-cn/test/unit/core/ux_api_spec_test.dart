@@ -257,7 +257,6 @@ void main() {
     });
 
     test('§6.4 debounce 300ms for rapid clicks', () {
-      const debounceMs = 300;
       var clicks = 0;
       var requests = 0;
       for (int i = 0; i < 5; i++) clicks++;

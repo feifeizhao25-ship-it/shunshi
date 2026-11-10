@@ -59,7 +59,6 @@ class _GrowthMilestonesV2State extends State<GrowthMilestonesV2> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final bg = AppColors.background(context);
 
     return Scaffold(

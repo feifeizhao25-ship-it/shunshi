@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import '../../../data/network/session.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/config/app_config.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../../design_system/theme.dart';
 

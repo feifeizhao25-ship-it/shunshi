@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
 import '../../widgets/paywall_banner.dart';
 
-/// 体质测试结果页
+/// 节气生活习惯自测结果页
 class ConstitutionTestPage extends StatelessWidget {
   final String? constitutionType;
   const ConstitutionTestPage({super.key, this.constitutionType});
@@ -13,7 +13,7 @@ class ConstitutionTestPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: ShunShiColors.background,
       appBar: AppBar(
-        title: const Text('体质测试结果', style: TextStyle(fontFamily: ShunShiTypography.serifFamily)),
+        title: const Text('节气生活习惯自测结果', style: TextStyle(fontFamily: ShunShiTypography.serifFamily)),
         backgroundColor: ShunShiColors.background,
         elevation: 0,
         leading: IconButton(icon: const Icon(Icons.arrow_back_ios, size: 20), onPressed: () => safePop(context)),

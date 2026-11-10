@@ -71,7 +71,6 @@ class _SolarTermPageV2State extends State<SolarTermPageV2> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bg = isDark ? ShunShiColors.darkBackground : AppColors.background(context);
     final surfaceLow = isDark ? ShunShiColors.darkSurfaceContainerLow : AppColors.surfaceContainerLow(context);
-    final surface = isDark ? ShunShiColors.darkSurface : AppColors.surface(context);
     final textPrimary = isDark ? ShunShiColors.darkTextPrimary : AppColors.textPrimary(context);
 
     return Scaffold(

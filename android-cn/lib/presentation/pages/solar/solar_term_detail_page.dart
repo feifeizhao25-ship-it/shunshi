@@ -146,8 +146,6 @@ class _SolarTermDetailPageState extends State<SolarTermDetailPage> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bg = isDark ? ShunShiColors.darkBackground : ShunShiColors.background;
-    final surface = isDark ? ShunShiColors.darkSurface : ShunShiColors.surface;
-    final borderColor = isDark ? ShunShiColors.darkBorder : ShunShiColors.border;
 
     if (_isLoading && _showLoading) {
       return Scaffold(backgroundColor: bg, body: SafeArea(child: _buildSkeleton()));
@@ -238,8 +236,8 @@ class _SolarTermDetailPageState extends State<SolarTermDetailPage> {
             _sectionCard('运动', exercises.join('、'), Icons.self_improvement_rounded, isDark),
             const SizedBox(height: 10),
 
-            // 穴位调理（真实数据，点击展开穴位列表）
-            _buildExpandableCard('穴位调理', acupoints, Icons.psychology_rounded, isDark),
+            // 穴位按压（真实数据，点击展开穴位列表）
+            _buildExpandableCard('穴位按压', acupoints, Icons.psychology_rounded, isDark),
             const SizedBox(height: 10),
 
             // 情志调养（真实数据）
@@ -335,7 +333,6 @@ class _SolarTermDetailPageState extends State<SolarTermDetailPage> {
     final borderColor = isDark ? ShunShiColors.darkBorder : ShunShiColors.border;
     final primaryColor = isDark ? ShunShiColors.darkPrimary : ShunShiColors.primary;
     final textPrimary = isDark ? ShunShiColors.darkTextPrimary : ShunShiColors.textPrimary;
-    final textTertiary = isDark ? ShunShiColors.darkTextTertiary : ShunShiColors.textTertiary;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),

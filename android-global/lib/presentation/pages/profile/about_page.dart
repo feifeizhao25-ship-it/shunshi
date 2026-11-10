@@ -40,7 +40,7 @@ class AboutPage extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'SEASONS ShunShi',
+              'SEASONS',
               style: TextStyle(
                 fontFamily: ShunShiTypography.serifFamily,
                 fontSize: 24,

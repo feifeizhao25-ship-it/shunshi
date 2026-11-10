@@ -238,17 +238,6 @@ class _WellnessCategoryPageState extends State<WellnessCategoryPage> {
     );
   }
 
-  Widget _buildIconPlaceholder(_Meta meta) {
-    return Container(
-      width: 44,
-      height: 44,
-      decoration: BoxDecoration(
-        color: ShunShiColors.primary.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Icon(meta.icon, size: 22, color: ShunShiColors.primary),
-    );
-  }
 }
 
 // ── Data models ──
@@ -280,7 +269,7 @@ class _Item {
 // ── Static metadata ──
 
 const _categoryMeta = {
-  'constitution': _Meta(Icons.favorite_rounded, '体质调养', '传统九种体质分类，仅供了解、不作诊断'),
+  'constitution': _Meta(Icons.favorite_rounded, '体质调养', '传统几种生活习惯分类，仅供了解、不作诊断'),
   'food_therapy': _Meta(Icons.restaurant_menu, '节气食谱', '顺应节气，食时令'),
   'tea': _Meta(Icons.emoji_food_beverage, '养生茶饮', '一杯清茶，慢享时令'),
   'acupressure': _Meta(Icons.accessibility_new, '经络穴位', '认识常用穴位，传统按揉保健'),

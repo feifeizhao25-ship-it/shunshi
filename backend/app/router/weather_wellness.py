@@ -3,9 +3,13 @@
 根据天气条件提供个性化养生建议
 """
 
+import json
+from typing import Callable, Optional
+from urllib.parse import urlencode
+from urllib.request import urlopen
+
 from fastapi import APIRouter, Query
 from pydantic import BaseModel, Field
-from typing import Optional
 
 router = APIRouter(prefix="/api/v1/weather-wellness", tags=["weather-wellness"])
 
@@ -174,3 +178,47 @@ async def get_aqi_guide():
         {"range": ">200", "level": "重度污染", "outdoor": "避免户外，关窗"}
     ]
     return {"success": True, "data": {"aqi_levels": levels}}
+
+
+# Chosen observation source. No CMA key is configured, so both editions
+# name Open-Meteo instead of pretending the reading came from 气象局.
+CITY_COORDS = {
+    "北京": (39.9042, 116.4074),
+    "上海": (31.2304, 121.4737),
+    "广州": (23.1291, 113.2644),
+    "深圳": (22.5431, 114.0579),
+    "London": (51.5072, -0.1276),
+    "New York": (40.7128, -74.0060),
+}
+
+
+def fetch_open_meteo(lat: float, lon: float) -> dict:
+    query = urlencode({
+        "latitude": lat,
+        "longitude": lon,
+        "current": "temperature_2m",
+        "timezone": "auto",
+    })
+    with urlopen(f"https://api.open-meteo.com/v1/forecast?{query}", timeout=8) as resp:
+        body = json.loads(resp.read().decode())
+    current = body["current"]
+    return {"temperature_c": current["temperature_2m"], "updated_at": current["time"]}
+
+
+def live_snapshot(city: str, fetch: Callable[[float, float], dict] | None = None) -> dict:
+    lat, lon = CITY_COORDS.get(city, CITY_COORDS["北京"])
+    obs = (fetch or fetch_open_meteo)(lat, lon)
+    return {
+        "city": city,
+        "latitude": lat,
+        "longitude": lon,
+        "source": "Open-Meteo",
+        "updated_at": obs["updated_at"],
+        "temperature_c": obs["temperature_c"],
+        "summary": f"{city} {obs['temperature_c']}°C",
+    }
+
+
+@router.get("/live", summary="当前城市的天气来源和时间")
+async def live_weather(city: str = Query("北京")):
+    return {"success": True, "data": live_snapshot(city)}

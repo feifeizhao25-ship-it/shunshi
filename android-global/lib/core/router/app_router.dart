@@ -15,6 +15,7 @@ import '../../presentation/pages/discover/discover_page.dart';
 import '../../presentation/pages/solar/solar_term_page_v2.dart';
 import '../../presentation/pages/solar/solar_term_detail_page.dart';
 import '../../presentation/pages/solar/solar_detail_page.dart';
+import '../../presentation/widgets/weather_source_card.dart';
 import '../../presentation/pages/profile/profile_page_v2.dart';
 import '../../presentation/pages/profile/profile_setup_page.dart';
 import '../../presentation/pages/profile/privacy_page.dart';
@@ -25,11 +26,8 @@ import '../../presentation/pages/settings/plan_usage_binding.dart';
 import '../../presentation/pages/settings/culture_settings_page.dart';
 import '../../presentation/pages/settings/culture_binding.dart';
 import '../../presentation/pages/settings/notification_settings_page.dart';
-import '../../presentation/pages/constitution/constitution_test_v2.dart';
-import '../../presentation/pages/constitution_report/constitution_report_page_v3.dart';
 import '../../presentation/pages/wellness/wellness_category_page.dart';
 import '../../presentation/pages/wellness/wellness_home_page.dart';
-import '../../presentation/pages/wellness/constitution_page.dart';
 import '../../presentation/pages/wellness/boundaries_page.dart';
 import '../../presentation/pages/records/records_page_v2.dart';
 import '../../presentation/pages/subscription/subscription_page_v2.dart';
@@ -113,7 +111,7 @@ class AppRouter {
       GoRoute(path: '/records', builder: (context, state) => const RecordsPageV2()),
       GoRoute(path: '/settings', builder: (context, state) => const SettingsPageV2()),
       GoRoute(path: '/boundaries', builder: (context, state) => const BoundariesPage()),
-      GoRoute(path: '/constitution', builder: (context, state) => const ConstitutionPage()),
+      GoRoute(path: '/constitution', redirect: (context, state) => '/home'),
       GoRoute(path: '/wellness-category/:type', builder: (context, state) {
         return WellnessCategoryPage(type: state.pathParameters['type'] ?? 'food_therapy');
       }),
@@ -124,10 +122,11 @@ class AppRouter {
         );
       }),
       GoRoute(path: '/solar-wellness', builder: (context, state) => const SolarDetailPage()),
+      GoRoute(path: '/weather', builder: (context, state) => Scaffold(appBar: AppBar(title: const Text('Weather')), body: WeatherBoard(load: fetchLiveWeather))),
       GoRoute(path: '/family', builder: (context, state) => const FamilyPageV2()),
       GoRoute(path: '/food-detail', builder: (context, state) => const FoodDetailPage()),
       GoRoute(path: '/exercise-detail', builder: (context, state) => const ExerciseDetailPage()),
-      GoRoute(path: '/constitution-test', builder: (context, state) => const ConstitutionTestV2()),
+      GoRoute(path: '/constitution-test', redirect: (context, state) => '/home'),
       GoRoute(path: '/diary', builder: (context, state) => const DiaryPageV2()),
       GoRoute(path: '/diary-report', builder: (context, state) => const DiaryReportPage()),
       GoRoute(path: '/sleep-report', builder: (context, state) => const SleepReportPage()),
@@ -141,13 +140,7 @@ class AppRouter {
       GoRoute(path: '/wellness-dashboard', builder: (context, state) => const WellnessDashboardPage()),
       GoRoute(path: '/community', builder: (context, state) => const CommunityPageV2()),
       GoRoute(path: '/achievement', builder: (context, state) => const AchievementPageV2()),
-      GoRoute(path: '/constitution-report', builder: (context, state) {
-        final extra = state.extra as Map<String, dynamic>?;
-        return ConstitutionReportPageV3(
-          constitutionType: extra?['constitutionType'] as String?,
-          scores: extra?['scores'] as Map<String, double>?,
-        );
-      }),
+      GoRoute(path: '/constitution-report', redirect: (context, state) => '/home'),
       GoRoute(path: '/diet-recommend', builder: (context, state) {
         final extra = state.extra as Map<String, dynamic>?;
         return DietRecommendPage(
@@ -190,7 +183,7 @@ class AppRouter {
       GoRoute(path: '/wellness-hub', redirect: (context, state) => '/wellness'),
       GoRoute(path: '/gdpr', builder: (context, state) => const GdprPage()),
       GoRoute(path: '/skills', builder: (context, state) => const SkillsPage()),
-      GoRoute(path: '/wellness/constitution', redirect: (context, state) => '/constitution'),
+      GoRoute(path: '/wellness/constitution', redirect: (context, state) => '/home'),
       GoRoute(path: '/wellness/tea', redirect: (context, state) => '/tea'),
       GoRoute(path: '/wellness/food_therapy', redirect: (context, state) => '/wellness-category/food_therapy'),
       GoRoute(path: '/wellness/acupressure', redirect: (context, state) => '/wellness-category/acupressure'),

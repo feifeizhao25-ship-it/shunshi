@@ -57,7 +57,6 @@ class _SolarDetailPageState extends State<SolarDetailPage> {
     final nextTerm = _data!['next_term'] as String? ?? '';
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final cardText = isDark ? ShunShiColors.darkTextPrimary : AppColors.textPrimary(context);
     final cardBg = isDark ? ShunShiColors.darkSurface : AppColors.background(context);
 
     return Scaffold(

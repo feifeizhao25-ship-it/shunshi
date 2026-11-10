@@ -20,7 +20,6 @@ class _CommunityPageV2State extends State<CommunityPageV2> with SingleTickerProv
   final _dio = withSessionAuth(Dio(BaseOptions(baseUrl: AppConfig.apiBaseUrl.replaceAll('/api/v1', ''), connectTimeout: const Duration(seconds: 8))));
   List<Map<String, dynamic>> _posts = [];
   bool _loading = true;
-  String? _error;
   int _currentTab = 0;
   final _tabs = ['精选', '动态', '挑战打卡', '食疗分享'];
 

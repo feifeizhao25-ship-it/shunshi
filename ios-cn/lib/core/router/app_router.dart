@@ -9,12 +9,12 @@ import '../../presentation/pages/onboarding/wellness_onboarding_page.dart';
 import '../../presentation/pages/login/login_page.dart';
 import '../../presentation/pages/home/ultimate_home_page.dart';
 import '../../presentation/pages/home/daily_checkin_page.dart';
-import '../../presentation/pages/home/wellness_dashboard_page.dart';
 import '../../presentation/pages/chat_page.dart';
 import '../../presentation/pages/discover/discover_page.dart';
 import '../../presentation/pages/solar/solar_term_page_v2.dart';
 import '../../presentation/pages/solar/solar_term_detail_page.dart';
 import '../../presentation/pages/solar/solar_detail_page.dart';
+import '../../presentation/widgets/weather_source_card.dart';
 import '../../presentation/pages/profile/profile_page_v2.dart';
 import '../../presentation/pages/profile/profile_setup_page.dart';
 import '../../presentation/pages/profile/privacy_page.dart';
@@ -32,7 +32,6 @@ import '../../presentation/pages/wellness/boundaries_page.dart';
 import '../../presentation/pages/records/records_page_v2.dart';
 import '../../presentation/pages/subscription/subscription_page_v2.dart';
 import '../../presentation/pages/reflection/reflection_page.dart';
-import '../../presentation/pages/community/community_page_v2.dart';
 import '../../presentation/pages/achievement/achievement_page_v2.dart';
 import '../../presentation/pages/diet/diet_recommend_page.dart';
 import '../../presentation/pages/meridian/meridian_detail_page.dart';
@@ -42,10 +41,7 @@ import '../../presentation/pages/search/global_search_page.dart';
 import '../../presentation/pages/notifications/notifications_page.dart';
 import '../../presentation/pages/feedback/feedback_page.dart' as fb;
 import '../../presentation/pages/family/family_page_v2.dart';
-import '../../presentation/pages/family/family_home_page.dart';
 import '../../presentation/pages/family/family_member_detail_page.dart';
-import '../../presentation/pages/food/food_detail_page.dart';
-import '../../presentation/pages/exercise/exercise_detail_page.dart';
 import '../../presentation/pages/diary/diary_page_v2.dart';
 import '../../presentation/pages/diary/diary_report_page.dart';
 import '../../presentation/pages/diary/sleep_report_page.dart';
@@ -81,7 +77,7 @@ class AppRouter {
     routes: [
       // Browser URL `/` has an empty hash. HashUrlStrategy reports that as `/`
       // and omits the hash again when the location is `/`, so a missing route
-      // stays on `http://host/` and errorBuilder shows the calm card
+      // stays on `https://host/` with an empty hash, and errorBuilder shows the calm card
       // (GoException: no routes for location: /).
       GoRoute(
         path: '/',
@@ -116,6 +112,7 @@ class AppRouter {
         );
       }),
       GoRoute(path: '/solar-wellness', builder: (context, state) => const SolarDetailPage()),
+      GoRoute(path: '/weather', builder: (context, state) => Scaffold(appBar: AppBar(title: const Text('天气')), body: WeatherBoard(load: fetchLiveWeather))),
       GoRoute(path: '/family', builder: (context, state) => const FamilyPageV2()),
       GoRoute(path: '/food-detail', redirect: (context, state) => '/wellness-category/food_therapy'),
       GoRoute(path: '/exercise-detail', redirect: (context, state) => '/wellness-category/exercise'),
