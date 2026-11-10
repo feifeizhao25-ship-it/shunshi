@@ -83,6 +83,9 @@ class AppRouter {
       return null;
     },
     routes: [
+      // Browser URL `/` is the guest welcome. A missing route stays on `/` and
+      // shows the calm error card.
+      GoRoute(path: '/', builder: (context, state) => const OnboardingPage()),
       GoRoute(path: '/splash', builder: (context, state) => const SplashPage()),
       GoRoute(path: '/onboarding', builder: (context, state) => const OnboardingPage()),
       GoRoute(path: '/profile-setup', builder: (context, state) => const ProfileSetupPage()),

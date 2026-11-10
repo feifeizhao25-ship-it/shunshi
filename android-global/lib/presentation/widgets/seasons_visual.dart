@@ -17,6 +17,8 @@ Widget _sgImg(String asset, {double? w, double? h, BoxFit fit = BoxFit.cover}) =
       width: w,
       height: h,
       fit: fit,
+      // The title next to the photo is the accessible name. The bitmap is decoration.
+      excludeFromSemantics: true,
       errorBuilder: (_, _, _) => Container(width: w, height: h, color: const Color(0xFFE8E4D8)),
     );
 

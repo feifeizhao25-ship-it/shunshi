@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <!--
     If you are serving your web app in a path other than the root, change the
@@ -18,7 +18,8 @@
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  <meta name="description" content="SEASONS helps you live with the 24 solar terms. It is a seasonal rhythm companion, not a medical service.">
 
   <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
@@ -29,10 +30,31 @@
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
 
-  <title>seasons</title>
+  <title>SEASONS</title>
   <link rel="manifest" href="manifest.json">
 </head>
 <body>
+  <script>
+    // Flutter rewrites the viewport to maximum-scale=1, user-scalable=no.
+    // Put zoom back. Axe treats the locked viewport as critical.
+    (function () {
+      function keepViewport() {
+        document.querySelectorAll('meta[name="viewport"]').forEach(function (meta) {
+          var next = meta.content
+            .replace(/user-scalable\s*=\s*no/ig, 'user-scalable=yes')
+            .replace(/maximum-scale\s*=\s*1(\.0+)?/ig, 'maximum-scale=5.0');
+          if (next !== meta.content) meta.content = next;
+        });
+        document.querySelectorAll('flt-semantics').forEach(function (el) {
+          var style = el.style;
+          var scrolls = style.overflowY === 'scroll' || style.overflowX === 'scroll' || style.overflow === 'scroll';
+          if (scrolls && el.tabIndex < 0) el.tabIndex = 0;
+        });
+      }
+      keepViewport();
+      new MutationObserver(keepViewport).observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ['content'] });
+    })();
+  </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>

@@ -241,6 +241,7 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
         backgroundColor: bg,
         elevation: 0,
         leading: IconButton(
+          tooltip: '返回',
           icon: const Icon(Icons.arrow_back, color: ShunShiColors.textPrimary),
           onPressed: () => context.pop(),
         ),
