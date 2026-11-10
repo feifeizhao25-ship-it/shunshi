@@ -14,7 +14,7 @@ WIDGET_TYPES = [
     {"id": "daily_tip", "name": "每日养生提示", "sizes": ["small", "medium", "large"], "description": "每日一条养生小知识"},
     {"id": "water_tracker", "name": "饮水进度", "sizes": ["small"], "description": "显示今日饮水量进度"},
     {"id": "constitution_tip", "name": "体质养生", "sizes": ["medium"], "description": "根据体质显示当日养生建议"},
-    {"id": "checkin_streak", "name": "打卡连续天数", "sizes": ["small"], "description": "显示连续打卡天数"},
+    {"id": "checkin_streak", "name": "已记下的天数", "sizes": ["small"], "description": "显示已记下的天数"},
     {"id": "shichen", "name": "时辰养生", "sizes": ["small", "medium"], "description": "当前时辰的养生建议"},
 ]
 
@@ -139,7 +139,7 @@ async def get_water_widget(
     }
 
 
-@router.get("/data/checkin-streak", summary="打卡连续天数小组件")
+@router.get("/data/checkin-streak", summary="已记下天数小组件")
 async def get_checkin_widget(
     user_id: str = Query(...),
     streak_days: int = Query(0)

@@ -73,6 +73,23 @@ def test_achievement_tip_badges_and_milestone_are_not_streak_gamification():
     assert "已记下" in template or "记下" in template
 
 
+def test_widget_catalog_uses_noted_days_not_streak_gamification():
+    text = (ROOT / "backend/app/router/widget.py").read_text(encoding="utf-8")
+    start = text.index('"id": "checkin_streak"')
+    entry = text[start:text.index("}", start)]
+    assert "连续打卡" not in entry
+    assert "打卡连续天数" not in entry
+    assert "已记下" in entry
+    summary = text[text.index('"/data/checkin-streak"'):text.index("async def get_checkin_widget")]
+    assert "连续打卡" not in summary
+    assert "打卡连续天数" not in summary
+    assert "已记下" in summary
+    assert '"id": "checkin_streak"' in text
+    assert '"/data/checkin-streak"' in text
+    assert "DAILY_TIPS" in text
+    assert "立春之后，肝气升发" in text
+
+
 def test_profile_streak_matches_achievement_wording():
     profile = (ROOT / "android-cn/lib/presentation/pages/profile/profile_page_v2.dart").read_text(encoding="utf-8")
     achievement = (ROOT / "android-cn/lib/presentation/pages/achievement/achievement_page_v2.dart").read_text(encoding="utf-8")
