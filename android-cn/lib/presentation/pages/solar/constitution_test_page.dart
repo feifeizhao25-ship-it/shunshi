@@ -1,12 +1,18 @@
 import '../../../core/router/safe_pop.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
-import '../../widgets/paywall_banner.dart';
 
-/// 节气生活习惯自测结果页
+/// 节气生活习惯自测结果页。类型或分数缺失时不展示个人结果。
 class ConstitutionTestPage extends StatelessWidget {
   final String? constitutionType;
-  const ConstitutionTestPage({super.key, this.constitutionType});
+  final Map<String, double>? scores;
+  const ConstitutionTestPage({super.key, this.constitutionType, this.scores});
+
+  bool get _hasResult {
+    final type = constitutionType?.trim() ?? '';
+    return type.isNotEmpty && scores != null && scores!.isNotEmpty;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,120 +29,71 @@ class ConstitutionTestPage extends StatelessWidget {
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            // ── 体质类型卡片 ──
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(colors: [ShunShiColors.primary, Color(0xFF2D5A3D)]),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Column(
-                children: [
-                  const Icon(Icons.spa, size: 48, color: Colors.white70),
-                  const SizedBox(height: 12),
-                  Text(constitutionType ?? '气虚质', style: const TextStyle(
-                    fontSize: 26, fontWeight: FontWeight.w700, color: Colors.white, fontFamily: ShunShiTypography.serifFamily,
-                  )),
-                  const SizedBox(height: 8),
-                  const Text('您的体质类型', style: TextStyle(fontSize: 13, color: Colors.white60)),
-                ],
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            // ── 体质特征 ──
-            _sectionTitle('体质特征'),
-            const SizedBox(height: 8),
-            Container(
-              width: double.infinity, padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(color: ShunShiColors.surfaceContainerLowest, borderRadius: BorderRadius.circular(12), border: Border.all(color: ShunShiColors.borderGhost)),
-              child: const Text(
-                '气虚质人群常表现为疲乏无力、气短懒言、易出汗、面色偏白。'
-                '抵抗力较弱，容易感冒，恢复较慢。舌淡苔白，脉象虚弱。',
-                style: TextStyle(fontSize: 14, color: ShunShiColors.textSecondary, height: 1.7),
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            // ── 升级提示 Banner ──
-            const PaywallBanner(
-              message: '解锁详细体质分析',
-              icon: Icons.analytics_outlined,
-            ),
-            const SizedBox(height: 20),
-
-            // ── 调养建议 ──
-            _sectionTitle('调养建议'),
-            const SizedBox(height: 12),
-            _adviceCard('饮食调养', '宜食补气食物：山药、黄芪、红枣、小米粥。忌生冷寒凉。', Icons.restaurant, ShunShiColors.primary),
-            const SizedBox(height: 12),
-            _adviceCard('运动调养', '适宜柔和运动：散步、太极拳、八段锦。避免剧烈运动耗气。', Icons.self_improvement, ShunShiColors.secondary),
-            const SizedBox(height: 12),
-            _adviceCard('起居调养', '保证充足睡眠，避免过度劳累。午间小憩有益补气。', Icons.bedtime, ShunShiColors.blue),
-            const SizedBox(height: 32),
-
-            // ── 按钮 ──
-            SizedBox(
-              width: double.infinity, height: 50,
-              child: ElevatedButton.icon(
-                onPressed: () { ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('已复制分享链接'), duration: Duration(seconds: 1))); },
-                icon: const Icon(Icons.share, size: 18),
-                label: const Text('分享结果'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: ShunShiColors.primary, foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity, height: 50,
-              child: OutlinedButton(
-                onPressed: () => Navigator.pop(context),
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: ShunShiColors.border),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                ),
-                child: const Text('重新测试'),
-              ),
-            ),
-          ],
-        ),
+        child: _hasResult ? _result() : _empty(context),
       ),
     );
   }
 
-  Widget _sectionTitle(String t) => Align(
-    alignment: Alignment.centerLeft,
-    child: Text(t, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700, fontFamily: ShunShiTypography.serifFamily, color: ShunShiColors.textPrimary)),
-  );
+  Widget _empty(BuildContext context) {
+    return Column(
+      children: [
+        const SizedBox(height: 48),
+        const Text('还没有你的问卷结果', style: TextStyle(
+          fontSize: 20, fontWeight: FontWeight.w700,
+          fontFamily: ShunShiTypography.serifFamily, color: ShunShiColors.textPrimary,
+        )),
+        const SizedBox(height: 12),
+        TextButton(
+          onPressed: () => context.push('/constitution-test'),
+          child: const Text('去做问卷'),
+        ),
+      ],
+    );
+  }
 
-  Widget _adviceCard(String title, String desc, IconData icon, Color color) => Container(
-    padding: const EdgeInsets.all(16),
-    decoration: BoxDecoration(color: ShunShiColors.surfaceContainerLowest, borderRadius: BorderRadius.circular(12), border: Border.all(color: ShunShiColors.borderGhost)),
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _result() {
+    return Column(
       children: [
         Container(
-          width: 40, height: 40,
-          decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)),
-          child: Icon(icon, size: 20, color: color),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(colors: [ShunShiColors.primary, Color(0xFF2D5A3D)]),
+            borderRadius: BorderRadius.circular(20),
+          ),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: color, fontFamily: ShunShiTypography.serifFamily)),
-              const SizedBox(height: 4),
-              Text(desc, style: const TextStyle(fontSize: 13, color: ShunShiColors.textSecondary, height: 1.5)),
+              const Icon(Icons.spa, size: 48, color: Colors.white70),
+              const SizedBox(height: 12),
+              Text(constitutionType!.trim(), style: const TextStyle(
+                fontSize: 26, fontWeight: FontWeight.w700, color: Colors.white, fontFamily: ShunShiTypography.serifFamily,
+              )),
+              const SizedBox(height: 8),
+              const Text('生活习惯倾向', style: TextStyle(fontSize: 13, color: Colors.white60)),
             ],
           ),
         ),
+        const SizedBox(height: 24),
+        const Align(
+          alignment: Alignment.centerLeft,
+          child: Text('倾向对照', style: TextStyle(
+            fontSize: 18, fontWeight: FontWeight.w700,
+            fontFamily: ShunShiTypography.serifFamily, color: ShunShiColors.textPrimary,
+          )),
+        ),
+        const SizedBox(height: 12),
+        ...scores!.entries.map((entry) => Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: Row(
+            children: [
+              SizedBox(width: 72, child: Text(entry.key, style: const TextStyle(fontSize: 13, color: ShunShiColors.textSecondary))),
+              Expanded(child: LinearProgressIndicator(value: entry.value.clamp(0.0, 1.0), minHeight: 8)),
+              const SizedBox(width: 8),
+              Text('${(entry.value * 100).round()}%', style: const TextStyle(fontSize: 12, color: ShunShiColors.textTertiary)),
+            ],
+          ),
+        )),
       ],
-    ),
-  );
+    );
+  }
 }

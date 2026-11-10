@@ -29,7 +29,7 @@ class PrivacyPolicyPage extends StatelessWidget {
         children: [
           _sectionTitle(context, '顺时隐私政策'),
           _body(
-            '最后更新日期：2026年10月23日\n'
+            '最后更新日期：2026年11月10日\n'
             '运营者：北京艾瑞见时科技有限公司。个人信息存放在中国境内。\n'
             '这是上线前按代码事实改过的稿子，律师定稿之前不能当成已经审过的法律文本。',
             textColor,

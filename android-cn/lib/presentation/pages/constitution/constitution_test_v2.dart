@@ -211,16 +211,16 @@ class _ConstitutionTestV2State extends State<ConstitutionTestV2> {
               borderRadius: BorderRadius.circular(20)),
               child: const Icon(Icons.self_improvement, color: Colors.white, size: 36)),
             const SizedBox(height: 16),
-            Text('您的体质类型', style: TextStyle(fontSize: 14, color: ShunShiColors.textTertiary)),
+            Text('生活习惯倾向', style: TextStyle(fontSize: 14, color: ShunShiColors.textTertiary)),
             const SizedBox(height: 4),
-            Text(typeName, style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 28, fontWeight: FontWeight.bold, color: ShunShiColors.primary)),
+            Text(typeName.replaceAll('质', ''), style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 28, fontWeight: FontWeight.bold, color: ShunShiColors.primary)),
           ])),
           const SizedBox(height: 24),
 
           // Score chart
           Container(padding: const EdgeInsets.all(20), decoration: BoxDecoration(color: ShunShiColors.surface, borderRadius: BorderRadius.circular(16)),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('体质得分', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
+              Text('倾向对照', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: ShunShiColors.textPrimary)),
               const SizedBox(height: 16),
               ...scores.entries.map((e) {
                 final val = (e.value is int) ? (e.value as int) : ((e.value as num?)?.toInt() ?? 0);
@@ -228,7 +228,7 @@ class _ConstitutionTestV2State extends State<ConstitutionTestV2> {
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 8),
                   child: Row(children: [
-                    SizedBox(width: 60, child: Text(e.key, style: TextStyle(fontSize: 12, color: ShunShiColors.textSecondary))),
+                    SizedBox(width: 60, child: Text(e.key.replaceAll('质', ''), style: TextStyle(fontSize: 12, color: ShunShiColors.textSecondary))),
                     Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(4),
                       child: LinearProgressIndicator(value: (val / maxVal).clamp(0.0, 1.0),
                         backgroundColor: ShunShiColors.surfaceContainerLow, color: e.key == typeName ? ShunShiColors.primary : ShunShiColors.textTertiary.withOpacity(0.3), minHeight: 8))),

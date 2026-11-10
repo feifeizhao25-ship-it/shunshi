@@ -255,7 +255,7 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
                       ),
                     ),
 
-                  // 连续打卡天数
+                  // 已记下天数
                   const SizedBox(height: 6),
                   Container(
                     padding:
@@ -269,7 +269,7 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
                       children: [
                         Text('🔥', style: TextStyle(fontSize: 11)),
                         const SizedBox(width: 3),
-                        Text('连续打卡 $_checkinDays 天',
+                        Text('已记下 $_checkinDays 天',
                             style: TextStyle(
                               fontSize: 11,
                               color: ShunShiColors.secondary,

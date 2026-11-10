@@ -20,7 +20,12 @@ class ConstitutionReportPageV3 extends StatefulWidget {
 
 class _ConstitutionReportPageV3State extends State<ConstitutionReportPageV3> {
   Map<String, dynamic>? _advice;
-  bool _loading = true;
+  bool _loading = false;
+
+  bool get _hasResult {
+    final type = widget.constitutionType?.trim() ?? '';
+    return type.isNotEmpty && widget.scores != null && widget.scores!.isNotEmpty;
+  }
 
   // 9种体质信息
   static const _typeInfo = {
@@ -38,17 +43,15 @@ class _ConstitutionReportPageV3State extends State<ConstitutionReportPageV3> {
   @override
   void initState() {
     super.initState();
-    _loadAdvice();
+    if (_hasResult) _loadAdvice();
   }
 
   Future<void> _loadAdvice() async {
-    if (widget.constitutionType == null) {
-      setState(() => _loading = false);
-      return;
-    }
+    if (!_hasResult) return;
     try {
       final resp = await ApiClient().get('/api/v1/constitution/advice/${widget.constitutionType}');
       final data = resp.data;
+      if (!mounted) return;
       if (data != null && data['success'] == true) {
         setState(() {
           _advice = data['data'];
@@ -56,16 +59,18 @@ class _ConstitutionReportPageV3State extends State<ConstitutionReportPageV3> {
         });
       }
     } catch (_) {
-      setState(() => _loading = false);
+      if (mounted) setState(() => _loading = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final typeCode = widget.constitutionType ?? 'qixu';
-    final info = _typeInfo[typeCode] ?? _typeInfo['qixu']!;
-    final name = info['name'] as String;
-    final tags = info['tags'] as List<String>;
+    final typeCode = widget.constitutionType?.trim() ?? '';
+    final info = _typeInfo[typeCode];
+    final name = ((info?['name'] as String?) ?? typeCode).replaceAll('质', '');
+    final tags = (info?['tags'] as List<String>?) ?? const <String>[];
+    final diet = _advice?['advice']?['diet'];
+    final dietText = diet is String ? diet.trim() : '';
 
 
     return Scaffold(
@@ -76,7 +81,9 @@ class _ConstitutionReportPageV3State extends State<ConstitutionReportPageV3> {
         title: Text('节气生活习惯自测报告',
           style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18, fontWeight: FontWeight.w600)),
       ),
-      body: _loading
+      body: !_hasResult
+          ? _empty(context)
+          : _loading
           ? const LoadingSkeleton()
           : SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -96,7 +103,7 @@ class _ConstitutionReportPageV3State extends State<ConstitutionReportPageV3> {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text('您的体质：$name',
+                      Text('生活习惯倾向：$name',
                         style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
                       const SizedBox(height: 12),
                       Wrap(spacing: 8, children: tags.map((t) => _buildTag(t, const Color(0xFFE4C285))).toList()),
@@ -106,7 +113,7 @@ class _ConstitutionReportPageV3State extends State<ConstitutionReportPageV3> {
 
                   // 体质评分柱状图
                   if (widget.scores != null && widget.scores!.isNotEmpty) ...[
-                    Text('体质评分分布', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
+                    Text('倾向对照', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
                     const SizedBox(height: 12),
                     ..._sortedScoreBars(),
                     const SizedBox(height: 8),
@@ -139,15 +146,12 @@ class _ConstitutionReportPageV3State extends State<ConstitutionReportPageV3> {
                     const SizedBox(height: 20),
                   ],
 
-                  // 推荐内容卡片（从API获取相关内容）
-                  Text('专属调养方案', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
-                  const SizedBox(height: 12),
-                  _buildPlanCard(Icons.restaurant, '推荐食谱', _advice?['advice']?['diet'] ?? '补气养血食谱', '查看'),
-                  const SizedBox(height: 10),
-                  _buildPlanCard(Icons.spa, '推荐经络', '$name经络调养', '查看'),
-                  const SizedBox(height: 10),
-                  _buildPlanCard(Icons.self_improvement, '推荐功法', '八段锦 · 照顾脾胃', '查看'),
-                  const SizedBox(height: 20),
+                  if (dietText.isNotEmpty) ...[
+                    Text('专属调养方案', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
+                    const SizedBox(height: 12),
+                    _buildPlanCard(Icons.restaurant, '推荐食谱', dietText, '查看'),
+                    const SizedBox(height: 20),
+                  ],
 
                   // 引用
                   Center(child: Text('"静养其身，动养其气。"',
@@ -181,12 +185,31 @@ class _ConstitutionReportPageV3State extends State<ConstitutionReportPageV3> {
     );
   }
 
+  Widget _empty(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text('还没有你的问卷结果', style: TextStyle(
+            fontSize: 20, fontWeight: FontWeight.w700, color: AppColors.primary(context),
+            fontFamily: ShunShiTypography.serifFamily,
+          )),
+          const SizedBox(height: 12),
+          TextButton(
+            onPressed: () => context.push('/constitution-test'),
+            child: const Text('去做问卷'),
+          ),
+        ],
+      ),
+    );
+  }
+
   List<Widget> _sortedScoreBars() {
     if (widget.scores == null || widget.scores!.isEmpty) return [];
     final sorted = widget.scores!.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value));
     return sorted.map((e) => _buildBar(
-      _typeInfo[e.key]?['name'] as String? ?? e.key,
+      ((_typeInfo[e.key]?['name'] as String?) ?? e.key).replaceAll('质', ''),
       e.value,
       _typeInfo[e.key]?['color'] as Color? ?? AppColors.textTertiary(context),
     )).toList();

@@ -346,7 +346,7 @@ class _LoginPageState extends State<LoginPage>
                         ),
                       ),
                       const SizedBox(height: 4),
-                      Text('顺应时节，安排作息', style: ShunshiTextStyles.bodySecondary),
+                      Text('跟着节气，把日子过得舒服一点', style: ShunshiTextStyles.bodySecondary),
                     ],
                   ),
                 ),
