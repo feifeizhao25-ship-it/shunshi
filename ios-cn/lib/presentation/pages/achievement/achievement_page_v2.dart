@@ -206,7 +206,7 @@ class _AchievementPageV2State extends State<AchievementPageV2> {
   String _getAITip() {
     if (_checkinStreak >= 7) return '本节气你做了$_checkinStreak件小事';
     if (_chatCount < 10) return '再和顺时AI聊${10 - _chatCount}次，即可解锁更多养生建议。';
-    return '坚持每天打卡、写日记、和顺时聊聊，解锁更多成就勋章。';
+    return '已记下 $_checkinStreak 天';
   }
 
   Widget _statCard(String label, int value, IconData icon) {

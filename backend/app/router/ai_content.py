@@ -184,9 +184,9 @@ TEMPLATES = [
     {
         "id": "tpl_milestone",
         "scene": "progress_celebration",
-        "template_cn": "太棒了！你已经连续打卡{days}天！这说明你正在{constitution}体质调理上做出真正的承诺。再坚持，改变就在眼前！",
-        "template_en": "{days} days streak! You're truly committed to improving your {constitution} constitution. Keep it up!",
-        "variables_required": ["days", "constitution"],
+        "template_cn": "太棒了！你已经记下{days}天。",
+        "template_en": "{days} days noted.",
+        "variables_required": ["days"],
         "variables_optional": [],
         "tone": "warm",
     },

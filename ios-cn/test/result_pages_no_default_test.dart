@@ -7,6 +7,7 @@ import 'package:shunshi/presentation/pages/constitution_report/constitution_repo
 import 'package:shunshi/presentation/pages/constitution_report/constitution_report_page_v2.dart';
 import 'package:shunshi/presentation/pages/constitution_report/constitution_report_page_v3.dart';
 import 'package:shunshi/presentation/pages/constitution_report/constitution_result_page.dart';
+import 'package:shunshi/presentation/pages/food/food_detail_page.dart';
 import 'package:shunshi/presentation/pages/solar/constitution_test_page.dart';
 
 const _scores = {'阳虚': 0.42, '平和': 0.2};
@@ -54,6 +55,15 @@ void main() {
       await tester.pump(const Duration(seconds: 40));
     });
   }
+
+  testWidgets('food detail without a questionnaire does not assign 气虚', (tester) async {
+    await _pump(tester, const FoodDetailPage());
+    expect(find.text('还没有你的问卷结果'), findsOneWidget);
+    expect(find.textContaining('步数下降及心率监测'), findsNothing);
+    expect(find.textContaining('您可能处于'), findsNothing);
+    expect(find.text('适合体质'), findsNothing);
+    expect(find.textContaining('气虚'), findsNothing);
+  });
 
   testWidgets('type without scores is still empty', (tester) async {
     await _pump(tester, const ConstitutionTestPage(constitutionType: '阳虚'));

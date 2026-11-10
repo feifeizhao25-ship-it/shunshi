@@ -12,12 +12,15 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
 import '../../../design_system/app_colors.dart';
 
 class FoodDetailPage extends StatelessWidget {
   final String? foodName;
-  const FoodDetailPage({super.key, this.foodName});
+  /// 已有问卷字段。未传入时不把当前用户写成某种体质。
+  final String? questionnaireResult;
+  const FoodDetailPage({super.key, this.foodName, this.questionnaireResult});
 
   @override
   Widget build(BuildContext context) {
@@ -106,11 +109,7 @@ class FoodDetailPage extends StatelessWidget {
                         ),
                         const SizedBox(height: 12),
                         // Quick info
-                        Row(children: [
-                          _infoChip('适合体质', '气虚质'),
-                          const SizedBox(width: 16),
-                          _infoChip('烹饪时长', '120 分钟'),
-                        ]),
+                        _infoChip('烹饪时长', '120 分钟'),
                       ],
                     ),
                   ),
@@ -145,30 +144,7 @@ class FoodDetailPage extends StatelessWidget {
                           )),
                         ]),
                         const SizedBox(height: 12),
-                        Text(
-                          '基于您近期的步数下降及心率监测，我们察觉到您可能处于"气虚"状态。'
-                          '此方中黄芪为补气圣药，配合温中的母鸡，能从根源固本。建议在辰时（早7-9点）饮用，效果最佳。',
-                          style: TextStyle(
-                            fontSize: 13, color: AppColors.textSecondary(context),
-                            height: 1.7, fontFamily: ShunShiTypography.sansFamily,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: ShunShiColors.goldLight.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Row(children: [
-                            const Icon(Icons.auto_awesome, size: 14, color: ShunShiColors.gold),
-                            const SizedBox(width: 6),
-                            Text('AI 指点："春季多风，固表防感。"', style: TextStyle(
-                              fontSize: 12, color: ShunShiColors.gold,
-                              fontFamily: ShunShiTypography.sansFamily, fontStyle: FontStyle.italic,
-                            )),
-                          ]),
-                        ),
+                        _questionnaireNote(context),
                       ],
                     ),
                   ),
@@ -223,7 +199,7 @@ class FoodDetailPage extends StatelessWidget {
                   // ── 适宜人群 ──
                   _sectionTitle(context, '适宜人群'),
                   const SizedBox(height: 8),
-                  _tagList(context, ['气虚质', '阳虚质', '易感冒', '免疫力低下', '疲劳乏力']),
+                  _tagList(context, ['易感冒', '疲劳乏力']),
                   const SizedBox(height: 16),
 
                   // ── 不宜人群 ──
@@ -311,6 +287,30 @@ class FoodDetailPage extends StatelessWidget {
       letterSpacing: 0.5, fontFamily: ShunShiTypography.sansFamily,
     )),
   );
+
+  Widget _questionnaireNote(BuildContext context) {
+    final result = questionnaireResult?.trim() ?? '';
+    if (result.isEmpty) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('还没有你的问卷结果', style: TextStyle(
+            fontSize: 15, fontWeight: FontWeight.w700,
+            color: AppColors.textPrimary(context), fontFamily: ShunShiTypography.serifFamily,
+          )),
+          TextButton(
+            onPressed: () => context.push('/constitution-test'),
+            style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: Size.zero, tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+            child: const Text('去做问卷'),
+          ),
+        ],
+      );
+    }
+    return Text('生活习惯倾向：$result', style: TextStyle(
+      fontSize: 13, color: AppColors.textSecondary(context), height: 1.7,
+      fontFamily: ShunShiTypography.sansFamily,
+    ));
+  }
 
   Widget _infoChip(String label, String value) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,

@@ -39,10 +39,10 @@ class CheckInRequest(BaseModel):
 # ─────────────────────────────────────────────────────────────────────────────
 
 BADGES = {
-    "checkin_7": {"id": "checkin_7", "name": "春芽勋章", "description": "连续打卡7天", "category": "checkin", "icon_hint": "🌱", "points": 50, "rarity": "common"},
-    "checkin_30": {"id": "checkin_30", "name": "夏荷勋章", "description": "连续打卡30天", "category": "checkin", "icon_hint": "🌸", "points": 200, "rarity": "rare"},
-    "checkin_100": {"id": "checkin_100", "name": "秋月勋章", "description": "连续打卡100天", "category": "checkin", "icon_hint": "🍂", "points": 500, "rarity": "epic"},
-    "checkin_365": {"id": "checkin_365", "name": "冬雪勋章", "description": "连续打卡365天", "category": "checkin", "icon_hint": "❄️", "points": 1000, "rarity": "legendary"},
+    "checkin_7": {"id": "checkin_7", "name": "春芽勋章", "description": "已记下7天", "category": "checkin", "icon_hint": "🌱", "points": 50, "rarity": "common"},
+    "checkin_30": {"id": "checkin_30", "name": "夏荷勋章", "description": "已记下30天", "category": "checkin", "icon_hint": "🌸", "points": 200, "rarity": "rare"},
+    "checkin_100": {"id": "checkin_100", "name": "秋月勋章", "description": "已记下100天", "category": "checkin", "icon_hint": "🍂", "points": 500, "rarity": "epic"},
+    "checkin_365": {"id": "checkin_365", "name": "冬雪勋章", "description": "已记下365天", "category": "checkin", "icon_hint": "❄️", "points": 1000, "rarity": "legendary"},
     "solar_term_first": {"id": "solar_term_first", "name": "节气探索者", "description": "探索第一个节气", "category": "solar_term", "icon_hint": "🌍", "points": 30, "rarity": "common"},
     "solar_term_all": {"id": "solar_term_all", "name": "四季旅人", "description": "探索全部24个节气", "category": "solar_term", "icon_hint": "🌏", "points": 500, "rarity": "epic"},
     "constitution_test": {"id": "constitution_test", "name": "知己知彼", "description": "完成体质测试", "category": "constitution", "icon_hint": "🔍", "points": 50, "rarity": "common"},
@@ -50,8 +50,8 @@ BADGES = {
     "exercise_first": {"id": "exercise_first", "name": "运动开启者", "description": "完成第一个运动", "category": "exercise", "icon_hint": "🏃", "points": 30, "rarity": "common"},
     "meditation_first": {"id": "meditation_first", "name": "冥想初心者", "description": "第一次冥想", "category": "meditation", "icon_hint": "🧘‍♀️", "points": 25, "rarity": "common"},
     "meditation_sage": {"id": "meditation_sage", "name": "冥想大师", "description": "完成100次冥想", "category": "meditation", "icon_hint": "🌟", "points": 400, "rarity": "legendary"},
-    "checkin_14": {"id": "checkin_14", "name": "两周相伴", "description": "连续打卡14天", "category": "checkin", "icon_hint": "🌿", "points": 90, "rarity": "common"},
-    "checkin_60": {"id": "checkin_60", "name": "习惯守护者", "description": "连续打卡60天", "category": "checkin", "icon_hint": "🪴", "points": 320, "rarity": "rare"},
+    "checkin_14": {"id": "checkin_14", "name": "两周相伴", "description": "已记下14天", "category": "checkin", "icon_hint": "🌿", "points": 90, "rarity": "common"},
+    "checkin_60": {"id": "checkin_60", "name": "习惯守护者", "description": "已记下60天", "category": "checkin", "icon_hint": "🪴", "points": 320, "rarity": "rare"},
     "solar_term_6": {"id": "solar_term_6", "name": "一季观察者", "description": "完成6个节气主题浏览", "category": "solar_term", "icon_hint": "🌤️", "points": 90, "rarity": "common"},
     "solar_term_12": {"id": "solar_term_12", "name": "半岁旅人", "description": "完成12个节气主题浏览", "category": "solar_term", "icon_hint": "🌓", "points": 180, "rarity": "rare"},
     "constitution_review": {"id": "constitution_review", "name": "自我复核", "description": "查看并确认一次体质问卷结果及其限制说明", "category": "constitution", "icon_hint": "📝", "points": 35, "rarity": "common"},
@@ -429,7 +429,7 @@ async def daily_checkin(request: CheckInRequest, db: Session = Depends(get_db), 
         milestone_message = f"Amazing! {streak} days in a row!" if milestone else ""
         message = f"Checked in! +{r['points_earned']} points, {streak}-day streak."
     else:
-        milestone_message = f"太棒了！你已连续打卡 {streak} 天！" if milestone else ""
+        milestone_message = f"太棒了！你已记下 {streak} 天！" if milestone else ""
         message = f"打卡成功！获得 {r['points_earned']} 积分，连续 {streak} 天。"
     return {"success": True, "data": {**r, "milestone_message": milestone_message, "message": message}}
 
