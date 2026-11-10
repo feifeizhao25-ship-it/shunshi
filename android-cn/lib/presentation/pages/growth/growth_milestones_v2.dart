@@ -110,7 +110,7 @@ class _GrowthMilestonesV2State extends State<GrowthMilestonesV2> {
                 const SizedBox(height: 4),
                 Text('春分调养', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
                 const SizedBox(height: 8),
-                Text("你已连续早起 $_checkinStreak 天。内在的清晰正在绽放。",
+                Text("本节气你做了$_checkinStreak件小事",
                   style: TextStyle(fontSize: 13, color: Colors.white70, height: 1.5)),
                 const SizedBox(height: 12),
                 ClipRRect(
@@ -127,7 +127,7 @@ class _GrowthMilestonesV2State extends State<GrowthMilestonesV2> {
           SliverToBoxAlternate(child: Padding(
             padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
             child: Row(children: [
-              Expanded(child: _buildStatBox(Icons.local_fire_department, '$_checkinStreak', '天连续打卡')),
+              Expanded(child: _buildStatBox(Icons.local_fire_department, '$_checkinStreak', '件小事')),
               const SizedBox(width: 8),
               Expanded(child: _buildStatBox(Icons.chat, '$_chatCount', '次AI对话')),
               const SizedBox(width: 8),

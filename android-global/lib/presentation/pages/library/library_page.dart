@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 import '../../../design_system/app_colors.dart';
+import '../../../core/theme/edition_tokens.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import '../../../design_system/theme.dart';
 import '../../../data/content/wellness_content.dart';
@@ -33,7 +34,7 @@ class LibraryPage extends StatefulWidget {
 
 class _LibraryPageState extends State<LibraryPage> {
   void _showBodyTypes() {
-    _showCategorySheet('Body Types', Icons.accessibility_new, AppColors.primary(context),
+    _showCategorySheet('Daily Rhythm', Icons.accessibility_new, AppColors.primary(context),
       WellnessContent.bodyTypes.map((b) => _ContentItem(
         emoji: b.emoji,
         title: b.name,
@@ -44,7 +45,7 @@ class _LibraryPageState extends State<LibraryPage> {
   }
 
   void _showRecipes() {
-    _showCategorySheet('Seasonal Recipes', Icons.restaurant_menu, ShunShiColors.secondary,
+    _showCategorySheet('Seasonal Food', Icons.restaurant_menu, ShunShiColors.secondary,
       WellnessContent.recipes.map((r) => _ContentItem(
         emoji: r.emoji,
         title: r.name,
@@ -55,7 +56,7 @@ class _LibraryPageState extends State<LibraryPage> {
   }
 
   void _showHerbalTeas() {
-    _showCategorySheet('Herbal Teas', Icons.local_cafe, ShunShiColors.blue,
+    _showCategorySheet('Warm Cups', Icons.local_cafe, ShunShiColors.blue,
       WellnessContent.herbalTeas.map((t) => _ContentItem(
         emoji: t.emoji,
         title: t.name,
@@ -66,7 +67,7 @@ class _LibraryPageState extends State<LibraryPage> {
   }
 
   void _showPressurePoints() {
-    _showCategorySheet('Pressure Points', Icons.touch_app, ShunShiColors.apricot,
+    _showCategorySheet('Calm Touch', Icons.touch_app, ShunShiColors.apricot,
       WellnessContent.pressurePoints.map((p) => _ContentItem(
         emoji: '📍',
         title: p.name,
@@ -77,7 +78,7 @@ class _LibraryPageState extends State<LibraryPage> {
   }
 
   void _showMovement() {
-    _showCategorySheet('Movement', Icons.fitness_center, ShunShiColors.goldLight,
+    _showCategorySheet('Easy Movement', Icons.fitness_center, ShunShiColors.goldLight,
       WellnessContent.movements.map((m) => _ContentItem(
         emoji: m.emoji,
         title: m.name,
@@ -88,7 +89,7 @@ class _LibraryPageState extends State<LibraryPage> {
   }
 
   void _showSleepSounds() {
-    _showCategorySheet('Sleep Sounds', Icons.bedtime, AppColors.primaryLight(context),
+    _showCategorySheet('Light & Sleep', Icons.bedtime, AppColors.primaryLight(context),
       WellnessContent.sleepSounds.map((s) => _ContentItem(
         emoji: s.emoji,
         title: s.name,
@@ -163,19 +164,19 @@ class _LibraryPageState extends State<LibraryPage> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final categories = [
       if (widget.showBodyTypesAndPressurePoints)
-        _CategoryItem(Icons.accessibility_new, 'Body Types', 'Discover your wellness profile', AppColors.primary(context), _showBodyTypes),
-      _CategoryItem(Icons.restaurant_menu, 'Seasonal Recipes', 'Fresh ingredients by season', ShunShiColors.secondary, _showRecipes),
-      _CategoryItem(Icons.local_cafe, 'Herbal Teas', 'Chamomile, Peppermint, Ginger', ShunShiColors.blue, _showHerbalTeas),
+        _CategoryItem(Icons.accessibility_new, 'Daily Rhythm', 'A day that follows the season', AppColors.primary(context), _showBodyTypes),
+      _CategoryItem(Icons.restaurant_menu, 'Seasonal Food', 'Fresh ingredients by season', ShunShiColors.secondary, _showRecipes),
+      _CategoryItem(Icons.local_cafe, 'Warm Cups', 'Gentle cups for the weather', ShunShiColors.blue, _showHerbalTeas),
       if (widget.showBodyTypesAndPressurePoints)
-        _CategoryItem(Icons.touch_app, 'Pressure Points', 'Reflexology & acupressure', ShunShiColors.apricot, _showPressurePoints),
-      _CategoryItem(Icons.fitness_center, 'Movement', 'Yoga, Tai Chi & Stretching', ShunShiColors.goldLight, _showMovement),
-      _CategoryItem(Icons.bedtime, 'Sleep Sounds', 'Nature, white noise & meditation', AppColors.primaryLight(context), _showSleepSounds),
+        _CategoryItem(Icons.touch_app, 'Calm Touch', 'Easy holds for tired spots', ShunShiColors.apricot, _showPressurePoints),
+      _CategoryItem(Icons.fitness_center, 'Easy Movement', 'Yoga, Tai Chi & Stretching', ShunShiColors.goldLight, _showMovement),
+      _CategoryItem(Icons.bedtime, 'Light & Sleep', 'Dim light, quiet sound, rest', AppColors.primaryLight(context), _showSleepSounds),
     ];
 
     return Scaffold(
 
 
-      appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),backgroundColor: isDark ? ShunshiDarkColors.background : AppColors.background(context),
+      appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),backgroundColor: isDark ? ShunshiDarkColors.background : EditionTokens.surface,
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [

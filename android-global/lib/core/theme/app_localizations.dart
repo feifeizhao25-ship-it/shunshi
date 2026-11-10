@@ -876,6 +876,7 @@ class AppLocalizations {
   };
 
   String get(String key) {
+    // Missing locale copy falls back to English. A missing English key fails the i18n build gate.
     return _localizedValues[locale.languageCode]?[key] ?? _localizedValues['en']?[key] ?? key;
   }
 
