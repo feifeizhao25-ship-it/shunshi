@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import '../../../design_system/app_colors.dart';
 import '../../../core/theme/edition_tokens.dart';
+import '../../../core/theme/shunshi_colors.dart';
 import '../../../design_system/theme.dart';
 import '../../../data/content/wellness_content.dart';
 import '../../../core/config/app_config.dart';
@@ -160,6 +161,7 @@ class _LibraryPageState extends State<LibraryPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final categories = [
       if (widget.showBodyTypesAndPressurePoints)
         _CategoryItem(Icons.accessibility_new, 'Daily Rhythm', 'A day that follows the season', AppColors.primary(context), _showBodyTypes),
@@ -172,7 +174,7 @@ class _LibraryPageState extends State<LibraryPage> {
     ];
 
     return Scaffold(
-      backgroundColor: EditionTokens.surface,
+      backgroundColor: isDark ? ShunshiDarkColors.background : EditionTokens.surface,
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [

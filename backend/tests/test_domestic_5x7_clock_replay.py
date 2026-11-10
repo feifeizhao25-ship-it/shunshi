@@ -336,7 +336,8 @@ def test_chat_quota_uses_configured_tiers_and_isolates_users(chat_redis_url, mon
     assert tier_for_product("does-not-exist") == "free"
 
     class Clock(datetime):
-        fixed = datetime(2026, 11, 7, 23, 30, tzinfo=SH)
+        # 过期时间必须晚于 Redis 的真实时钟，否则 EXPIREAT 会立刻删掉计数。
+        fixed = (datetime.now(SH) + timedelta(days=1)).replace(hour=23, minute=30, second=0, microsecond=0)
 
         @classmethod
         def now(cls, tz=None):
@@ -365,7 +366,7 @@ def test_chat_quota_uses_configured_tiers_and_isolates_users(chat_redis_url, mon
             await chat_quota.reserve(chat_redis_url, "quota-free-a", "free")
         assert denied.value.status_code == 429
         assert await chat_quota.used_today(chat_redis_url, "quota-free-b") == 2
-        Clock.fixed = datetime(2026, 11, 8, 0, 30, tzinfo=SH)
+        Clock.fixed = (Clock.fixed + timedelta(hours=1)).replace(minute=30)
         await chat_quota.reserve(chat_redis_url, "quota-free-a", "free")
         assert await chat_quota.used_today(chat_redis_url, "quota-free-a") == 1
 

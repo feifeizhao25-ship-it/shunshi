@@ -19,14 +19,20 @@ from app.locale_context import bind_request_locale, tr
 router = APIRouter(prefix="/api/v1/family", tags=["家庭"], dependencies=[Depends(bind_request_locale)])
 
 
-def _family_people_cap() -> int:
+def _family_people_including_buyer() -> int:
     """家庭档人数含购买人，唯一来源是权益注册表。"""
     from app.entitlements import get_registry
     return int(get_registry()["tiers"]["family"]["collaboration"]["family_members"])
 
 
+def _family_relation_cap() -> int:
+    """family_relations 里是绑定的家人，不含购买人。3 人（含你自己）= 2 条关系。"""
+    people = _family_people_including_buyer()
+    return 0 if people < 0 else max(0, people - 1)
+
+
 def _family_full_detail():
-    people = _family_people_cap()
+    people = _family_people_including_buyer()
     return tr(
         f"家庭成员数量已达上限（{people}人，含你自己）",
         f"The family is full ({people} people, including you)",
@@ -151,7 +157,7 @@ async def add_member(
             (family_id,)
         ).fetchone()[0]
 
-        if count >= _family_people_cap():
+        if count >= _family_relation_cap():
             raise HTTPException(status_code=400, detail=_family_full_detail())
 
         member_id = f"member_{uuid.uuid4().hex}"
@@ -294,7 +300,7 @@ async def join_family(code: str, user_id: str = Query(..., description="用户ID
             raise HTTPException(status_code=409, detail=tr("当前已有家庭关系，请先退出或移除现有关系", "You are already in a family. Leave or remove the current one first."))
         family_id = invite["family_id"]
         count = db.execute("SELECT count(*) FROM family_relations WHERE family_id = ?", (family_id,)).fetchone()[0]
-        if count >= _family_people_cap():
+        if count >= _family_relation_cap():
             raise HTTPException(status_code=400, detail=_family_full_detail())
         db.execute(
             "UPDATE family_invites SET used = 1, used_by = ?, used_at = ? WHERE code = ? AND used = 0",

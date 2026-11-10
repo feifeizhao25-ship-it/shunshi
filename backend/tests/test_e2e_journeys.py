@@ -318,6 +318,8 @@ def _create_test_app(db_conn):
         version="test",
         lifespan=_empty_lifespan,
     )
+    from app.config import Settings
+    test_app.state.settings = Settings(_env_file=None)
 
     # 按照和 main.py 相同的方式注册路由
     test_app.include_router(auth.router)

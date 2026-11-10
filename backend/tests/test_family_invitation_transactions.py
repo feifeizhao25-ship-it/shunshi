@@ -4,8 +4,13 @@ from threading import Barrier
 
 import pytest
 from fastapi.testclient import TestClient
+from app.entitlements import family_seats_for_plan
 from app.main import create_app
 from app.database.db import get_db, close_test_connection
+
+
+def _relation_cap() -> int:
+    return family_seats_for_plan("jiahe")
 
 
 def login(client):
@@ -67,10 +72,10 @@ def test_relations_have_distinct_invites_and_same_relation_reuses(client, auth_h
 
 
 def test_full_family_blocks_join_without_consuming_invite(client, auth_headers):
-    for i in range(4):
+    for i in range(_relation_cap()):
         response = client.post('/api/v1/family/members', headers=auth_headers,
             json={'name': f'成员{i}', 'relation': 'parent', 'age': 60})
-        assert response.status_code == 200
+        assert response.status_code == 200, response.text
     code = invite(client, auth_headers)
     assert join(client, login(client), code).status_code == 400
     assert state(code)['used'] == 0
@@ -137,7 +142,7 @@ def test_expired_invite_is_not_consumed(client, auth_headers):
 
 
 def test_add_and_join_compete_for_last_slot(client, auth_headers, settings):
-    for i in range(3):
+    for i in range(_relation_cap() - 1):
         assert client.post('/api/v1/family/members', headers=auth_headers,
             json={'name': f'成员{i}', 'relation': 'parent', 'age': 60}).status_code == 200
     code = invite(client, auth_headers)
@@ -159,6 +164,6 @@ def test_add_and_join_compete_for_last_slot(client, auth_headers, settings):
     assert invitation['used'] == int(join_result == 200)
     db = get_db()
     try:
-        assert db.execute('SELECT count(*) FROM family_relations WHERE family_id = ?', (invitation['family_id'],)).fetchone()[0] == 4
+        assert db.execute('SELECT count(*) FROM family_relations WHERE family_id = ?', (invitation['family_id'],)).fetchone()[0] == _relation_cap()
     finally:
         close_test_connection(db)

@@ -24,19 +24,13 @@ class ApiException implements Exception {
   String toString() => message;
 }
 
-/// 自动检测 baseUrl：模拟器用 10.0.2.2，真机用局域网 IP
+/// 网页和当前客户端都使用编译时配置的地址。
 class ApiClient {
-  // 模拟器地址（Android emulator → host localhost）
-  static const _emulatorUrl = 'http://10.0.2.2:4000';
-  // 真机：优先公网直连
   static const _realDeviceUrl = AppConfig.apiBaseUrl;
 
   static String baseUrl = _realDeviceUrl;
-  static bool _detected = true; // 默认用真机IP，不需要检测
 
-  /// 网页和当前客户端都使用编译时配置的地址，不再探测模拟器网卡。
   static Future<void> detectBaseUrl() async {
-    _detected = true;
     baseUrl = _realDeviceUrl;
   }
   
