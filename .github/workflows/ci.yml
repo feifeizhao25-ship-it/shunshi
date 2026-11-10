@@ -40,6 +40,10 @@ jobs:
         run: python scripts/verify_mobile_api_contract.py
       - name: Verify repository and CI integrity
         run: python scripts/verify_repository_integrity.py
+      - name: Domestic Flutter UI is Chinese only
+        run: python scripts/verify_zh_ui_dart.py --app android-cn --app ios-cn --allow scripts/zh_ui_allow.json
+      - name: Personal home section keeps domestic Chinese and international English apart
+        run: python scripts/verify_personal_home_language.py
       - name: Verify backend image and storage contract
         run: |
           python -m pip install PyYAML==6.0.3
