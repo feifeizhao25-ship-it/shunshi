@@ -89,10 +89,8 @@ class SSEChatService {
         }
       }
     } on DioException catch (e) {
-      yield SSEEvent(
-        type: 'error',
-        data: {'code': 'NETWORK_ERROR', 'message': e.message ?? 'Connection failed'},
-      );
+      // The page maps this exception to an honest error. It must not invent a reply.
+      yield SSEEvent(type: 'error', data: {'error': e});
     }
   }
 

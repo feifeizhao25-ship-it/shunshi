@@ -18,6 +18,7 @@ import '../widgets/chat_sources.dart';
 import '../widgets/companion_session_notice.dart';
 import 'chat/chat_widgets.dart';
 import 'chat/voice_chrome.dart';
+import 'chat/chat_failure.dart';
 import '../../../core/theme/app_localizations.dart';
 import '../../../core/network/api_singleton.dart';
 import '../../core/config/app_config.dart';
@@ -249,6 +250,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
     final text = _controller.text.trim();
     if (text.isEmpty || _isLoading) return;
     if (!_isVip && _quotaRemaining <= 0) { _showUpgradePrompt(); return; }
+    if (_chatError != null) setState(() => _chatError = null);
     _controller.clear();
 
     // Prompt Injection 防护
@@ -341,23 +343,18 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
         }
         final v2Sources = (so?['disclaimer'] != null) ? ['⚠️ ${so?["disclaimer"]}'] : <String>[];
         handleAIReply(aiText, cards: v2Cards, sources: v2Sources, convId: v2Res.data?['conversation_id']);
-      } catch (_) {
-        handleAIReply(_offlineReply(text),
-          cards: [
-            SuggestionCard(type: 'diet', title: AppLocalizations.of(context).t('solar_dietary_care'), subtitle: AppLocalizations.of(context).t('chatpagedart_try_snow_fungus_and_lily_bulb_to_moisten_dryn'), icon: Icons.restaurant),
-            SuggestionCard(type: 'rest', title: AppLocalizations.of(context).t('chatpagedart_rest_routine'), subtitle: AppLocalizations.of(context).t('chatpagedart_sleep_early_rise_early_follow_natural_rhythms'), icon: Icons.bedtime),
-          ],
-          sources: const <String>[], // an offline fallback must never cite sources it did not use
-        );
+      } catch (error) {
+        // No made-up reply: show what went wrong and keep the message so the user can send it again.
+        if (!mounted) return;
+        setState(() {
+          _chatError = chatFailureMessage(error);
+          _isLoading = false;
+          if (_controller.text.isEmpty) _controller.text = text;
+        });
+        _saveConversation();
       }
     }
     _scrollToBottom();
-  }
-
-  String _offlineReply(String msg) {
-    if (msg.contains('sleep') || msg.contains('insomnia')) return 'Sleep issues often relate to an unsettled mind. During $_currentSolarTerm, try soaking your feet in warm water for 15 minutes before bed, put down your phone, and let your mind quiet down.';
-    if (msg.contains('tired') || msg.contains('fatigue')) return 'Feeling tired during seasonal transitions is normal. Consider reducing workload and eating warming, nourishing foods. A cup of ginger-date tea in the morning can help restore vitality.';
-    return 'I hear you. During $_currentSolarTerm, the energy between heaven and earth is shifting. Would you like to talk about what specifically concerns you?';
   }
 
   String _fmt(DateTime dt) => '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';

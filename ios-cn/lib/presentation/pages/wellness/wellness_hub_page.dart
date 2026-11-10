@@ -94,7 +94,7 @@ class _WellnessHubPageState extends State<WellnessHubPage> {
   static const _picks = [
     _Pick('春季疏肝茶', '玫瑰花 · 陈皮 · 枸杞', '茶饮'),
     _Pick('八段锦入门', '传统养生功法 · 15分钟', '功法'),
-    _Pick('子午觉指南', '顺应天时的睡眠调理', '起居'),
+    _Pick('子午觉指南', '顺应天时的睡眠安排', '起居'),
   ];
 
   Widget _buildContent() {
@@ -299,7 +299,7 @@ class _WellnessHubPageState extends State<WellnessHubPage> {
                         children: [
                           Text('想深入了解您的体质？', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: ShunShiColors.primary)),
                           const SizedBox(height: 2),
-                          Text('完成体质测试，获取AI个性化养生方案', style: TextStyle(fontSize: 12, color: ShunShiColors.textSecondary)),
+                          Text('完成节气生活习惯自测，获取AI个性化养生方案', style: TextStyle(fontSize: 12, color: ShunShiColors.textSecondary)),
                         ],
                       )),
                       const Icon(Icons.arrow_forward_ios, size: 16, color: ShunShiColors.primary),

@@ -178,7 +178,7 @@ class AlipayRefundResult(BaseModel):
 
 
 class AlipayNotifyData(BaseModel):
-    """支付宝回调数据"""
+    """支付宝回调数据。refund_fee / gmt_refund / out_biz_no 来自同一份已验签参数。"""
     out_trade_no: str
     trade_no: str
     trade_status: str
@@ -186,6 +186,9 @@ class AlipayNotifyData(BaseModel):
     buyer_id: str
     passback_params: str = ""
     gmt_payment: str = ""
+    refund_fee: str = ""
+    gmt_refund: str = ""
+    out_biz_no: str = ""
 
 
 # ==================== 服务实现 ====================
@@ -341,6 +344,9 @@ class AlipayService:
             buyer_id=params.get("buyer_id", ""),
             passback_params=params.get("passback_params", ""),
             gmt_payment=params.get("gmt_payment", ""),
+            refund_fee=str(params.get("refund_fee") or ""),
+            gmt_refund=str(params.get("gmt_refund") or ""),
+            out_biz_no=str(params.get("out_biz_no") or ""),
         )
 
 

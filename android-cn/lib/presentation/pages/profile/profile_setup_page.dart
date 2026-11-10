@@ -10,7 +10,7 @@ import '../../../core/theme/shunshi_spacing.dart';
 import '../../../core/theme/shunshi_text_styles.dart';
 import '../../../data/network/api_client.dart';
 
-/// 中医九种体质
+/// 中医几种生活习惯
 const _healthConcernOptions = ['睡眠', '饮食', '走动', '情绪'];
 
 const _constitutionTypes = [
@@ -465,7 +465,7 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
   Widget _buildConstitutionStep() {
     return _stepWrapper(
       icon: '🌿',
-      title: '了解你的体质类型',
+      title: '了解你的生活习惯类型',
       subtitle: '选一个体质标签，只用于作息安排，不是诊断',
       child: Column(
         children: [
@@ -505,7 +505,7 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
           // "不知道" 按钮
           OutlinedButton.icon(
             onPressed: () async {
-              // 跳转体质测试
+              // 跳转节气生活习惯自测
               context.push('/constitution-test');
             },
             icon: const Icon(Icons.quiz_outlined, size: 18),

@@ -4,7 +4,7 @@ import '../../../../core/theme/shunshi_text_styles.dart';
 import 'constitution_data.dart';
 import 'constitution_widgets.dart';
 
-/// 体质测试问卷 Widget
+/// 节气生活习惯自测问卷 Widget
 class ConstitutionQuizWidget extends StatelessWidget {
   final List<Question> questions;
   final int currentIndex;

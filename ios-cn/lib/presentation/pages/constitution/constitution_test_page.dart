@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/config/app_config.dart';
 
-/// 体质测试页 — 20 题 5 选项问卷 + 结果页
+/// 节气生活习惯自测页 — 20 题 5 选项问卷 + 结果页
 class ConstitutionTestFlowPage extends StatefulWidget {
   const ConstitutionTestFlowPage({super.key});
 
@@ -114,7 +114,7 @@ class _ConstitutionTestFlowPageState extends State<ConstitutionTestFlowPage> {
             }
           },
         ),
-        title: Text('体质测试 ${_current + 1}/20',
+        title: Text('节气生活习惯自测 ${_current + 1}/20',
             style: const TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 16)),
       ),
       body: Column(
@@ -248,7 +248,7 @@ class _ConstitutionTestFlowPageState extends State<ConstitutionTestFlowPage> {
       '气虚': '元气不足，疲乏气短，容易感冒，面色偏白。需补气健脾。',
       '阳虚': '阳气不足，手足不温，怕冷喜暖。需温阳散寒。',
       '阴虚': '阴液亏少，口燥咽干，手足心热。需滋阴降火。',
-      '痰湿': '痰湿凝聚，形体肥胖，腹部松软。需化痰祛湿。',
+      '痰湿': '痰湿凝聚，形体肥胖，腹部松软。需少油腻。',
       '湿热': '湿热内蕴，面垢油光，口苦口干。需清热利湿。',
       '血瘀': '血行不畅，肤色晦暗，容易出现瘀斑。需活血化瘀。',
       '气郁': '气机郁滞，情绪低落，胸胁胀痛。需疏肝解郁。',
@@ -288,7 +288,7 @@ class _ConstitutionTestFlowPageState extends State<ConstitutionTestFlowPage> {
           icon: const Icon(Icons.arrow_back_ios_new, size: 20),
           onPressed: () => context.pop(),
         ),
-        title: const Text('体质测试结果',
+        title: const Text('节气生活习惯自测结果',
             style: TextStyle(fontFamily: ShunShiTypography.serifFamily)),
       ),
       body: SingleChildScrollView(

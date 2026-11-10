@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/shunshi_colors.dart';
 import 'constitution_data.dart';
 
-/// 体质测试结果 Widget
+/// 节气生活习惯自测结果 Widget
 class ConstitutionResultWidget extends StatelessWidget {
   final ConstitutionResult result;
   final bool reportUnlocked;
@@ -56,7 +56,7 @@ class ConstitutionResultWidget extends StatelessWidget {
       child: Column(children: [
         Text(result.emoji, style: const TextStyle(fontSize: 56)),
         const SizedBox(height: 8),
-        Text('你的体质是',
+        Text('你的生活习惯倾向',
             style: TextStyle(fontSize: 14, color: Colors.white.withValues(alpha: 0.8))),
         const SizedBox(height: 4),
         Text(result.typeName,
@@ -102,7 +102,7 @@ class ConstitutionResultWidget extends StatelessWidget {
       const Row(children: [
         Text('📊', style: TextStyle(fontSize: 18)),
         SizedBox(width: 8),
-        Text('体质分数',
+        Text('习惯倾向',
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: ShunshiColors.textPrimary))
       ]),
       const SizedBox(height: 14),
@@ -260,10 +260,10 @@ class ConstitutionResultWidget extends StatelessWidget {
                 const Text('👑', style: TextStyle(fontSize: 20)),
                 const SizedBox(width: 10),
                 const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text('查看调理建议',
+                  Text('查看日常安排',
                       style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF92400E))),
                   SizedBox(height: 2),
-                  Text('饮食·茶饮·运动·穴位·四季调理方案',
+                  Text('饮食·茶饮·运动·穴位·四季日常安排',
                       style: TextStyle(fontSize: 11, color: Color(0xFFB07937))),
                 ])),
                 Icon(Icons.chevron_right, color: const Color(0xFFD4956A).withValues(alpha: 0.6)),

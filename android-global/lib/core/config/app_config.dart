@@ -25,6 +25,14 @@ class AppConfig {
     defaultValue: 'android-global',
   );
 
+  /// Body Types and Pressure Points stay in the international library code,
+  /// but are hidden until a product decision turns this on.
+  /// `--dart-define=SHOW_TCM_LIBRARY_CATEGORIES=true`
+  static const bool showTcmLibraryCategories = bool.fromEnvironment(
+    'SHOW_TCM_LIBRARY_CATEGORIES',
+    defaultValue: false,
+  );
+
   // ─── 环境 ──────────────────────────────────────────────────────────────────
   /// 是否为正式发布（AOT 编译）
   static const bool isProduction = bool.fromEnvironment('dart.vm.product');

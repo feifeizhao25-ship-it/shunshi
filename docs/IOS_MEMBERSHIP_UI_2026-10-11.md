@@ -1,3 +1,5 @@
+> **历史口径.** 本文中的月付、无限家庭、4 人席位、旧 Tab 数、Antigravity 或 Supabase 方案都不是现行规则。席位人数和年付 SKU 以 `backend/app/entitlements_registry.json` 为准，本文不改这些数字。现行导航是各端 `main_shell.dart` 的 5 项：聊天 / 今日 / 节气 / 养生 / 我的（国际版 Chat / Today / Solar / Wellness / Profile）。
+
 # 国内 iOS 主会员页面修复（2026-10-11）
 
 当前路由 /subscription 指向 SubscriptionPageV2。原页面没有查询当前账号会员状态，固定显示 SVIP、399 元等价格，月付/家庭卡不能选择，购买固定发送颐养年付，且包含英文推荐标记、支付宝单次购买说明及未实现的帮助入口。

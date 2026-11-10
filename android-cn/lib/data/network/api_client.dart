@@ -29,12 +29,10 @@ class ApiClient {
   );
 
   static String baseUrl = _realDeviceUrl;
-  static bool _detected = true; // 默认用真机IP，不需要检测
 
   /// 自动检测网络环境（仅模拟器需要）
   static Future<void> detectBaseUrl() async {
     // 网页和当前客户端都使用编译时配置的地址，不再探测模拟器网卡。
-    _detected = true;
     baseUrl = _realDeviceUrl;
   }
 
@@ -111,16 +109,22 @@ class ApiClient {
   Future<Response> get(
     String path, {
     Map<String, dynamic>? queryParameters,
+    Map<String, dynamic>? headers,
   }) async {
     return await _dio.get(
       _versionedPath(path),
       queryParameters: queryParameters,
+      options: headers == null ? null : Options(headers: headers),
     );
   }
 
   /// POST 请求
-  Future<Response> post(String path, {dynamic data}) async {
-    return await _dio.post(_versionedPath(path), data: data);
+  Future<Response> post(String path, {dynamic data, Map<String, dynamic>? headers}) async {
+    return await _dio.post(
+      _versionedPath(path),
+      data: data,
+      options: headers == null ? null : Options(headers: headers),
+    );
   }
 
   /// PUT 请求

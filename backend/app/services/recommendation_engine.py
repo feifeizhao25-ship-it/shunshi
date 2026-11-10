@@ -208,6 +208,7 @@ def get_personalized_recommendations(
     limit: int = 5,
     offset: int = 0,
     locale: str = "zh-CN",
+    profile_flags: Optional[frozenset] = None,
 ) -> List[Dict[str, Any]]:
     """
     获取个性化推荐内容
@@ -233,6 +234,21 @@ def get_personalized_recommendations(
     if categories:
         all_items = [i for i in all_items if i["type"] in categories]
 
+    from app.safety.contraindications import names_for
+
+    blocked = names_for(profile_flags or frozenset())
+
+    def _blocked(item: Dict[str, Any]) -> bool:
+        if not blocked:
+            return False
+        blob = " ".join(
+            str(item.get(key) or "")
+            for key in ("title", "description", "tags", "ingredients", "effect")
+        )
+        return any(name in blob for name in blocked)
+
+    all_items = [item for item in all_items if not _blocked(item)]
+
     # 计算每项匹配度
     scored = []
     for item in all_items:
@@ -252,6 +268,7 @@ def get_today_digest(
     solar_term: str = "",
     season: str = "",
     health_status: Optional[Dict[str, float]] = None,
+    profile_flags: Optional[frozenset] = None,
 ) -> Dict[str, Any]:
     """
     获取今日个性化养生摘要 (首页用)
@@ -278,6 +295,7 @@ def get_today_digest(
             solar_term=solar_term,
             season=season,
             health_status=health_status,
+            profile_flags=profile_flags,
             categories=[cat],
             limit=3,
         )

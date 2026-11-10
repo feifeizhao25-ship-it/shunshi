@@ -14,7 +14,10 @@ class PersonalHomeBinding {
 
   static PersonalHomeApi api() => PersonalHomeApi(
         load: () async {
-          final res = await ApiClient().get('/api/v1/seasons/home/dashboard');
+          final res = await ApiClient().get(
+            '/api/v1/seasons/home/dashboard',
+            headers: testClockHeaders(),
+          );
           final data = res.data;
           if (data is! Map) throw StateError('unexpected response');
           return Map<String, dynamic>.from(data);
@@ -25,6 +28,15 @@ class PersonalHomeBinding {
       );
 
   /// 首页卡片带站内路径（目前只有资料库那张：/reference-library）时跳转；只接受 app 内路径，不接受外链。
+  /// 仅当构建传入 `--dart-define=SHUNSHI_TEST_CLOCK=true` 时发送。正式包不带这个开关。
+  static Map<String, dynamic>? testClockHeaders() {
+    const enabled = bool.fromEnvironment('SHUNSHI_TEST_CLOCK');
+    if (!enabled) return null;
+    final raw = Uri.base.queryParameters['test_now'];
+    if (raw == null || raw.isEmpty) return null;
+    return {'X-Shunshi-Test-Now': raw};
+  }
+
   static void open(BuildContext context, PersonalHomeCard card) {
     final href = card.href;
     if (href == null || !href.startsWith('/') || href.startsWith('//')) return;

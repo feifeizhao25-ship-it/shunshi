@@ -102,12 +102,12 @@ const List<WellnessItem> _kWellnessItems = [
   ),
   WellnessItem(
     title: '红豆薏米粥',
-    subtitle: '健脾祛湿',
+    subtitle: '饮食清淡',
     emoji: '🫘',
     category: 'food',
     duration: '1h',
     difficulty: '简单',
-    tags: ['祛湿', '健脾', '清淡'],
+    tags: ['清淡', '健脾', '清淡'],
     ingredients: ['红豆 50g', '薏米 50g', '粳米 50g'],
     steps: [
       '红豆、薏米提前浸泡4小时',

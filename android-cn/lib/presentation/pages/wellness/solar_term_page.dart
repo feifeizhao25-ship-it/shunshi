@@ -9,11 +9,11 @@ class SolarTermPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final solarTerms = [
       {'name': '立春', 'date': '2月3-5日', 'tip': '养肝护肝', 'food': '菠菜、豆芽', 'color': Colors.green, 'desc': '东风解冻，万物复苏，宜早睡早起，舒展身体'},
-      {'name': '雨水', 'date': '2月18-20日', 'tip': '健脾祛湿', 'food': '山药、薏米', 'color': Colors.blue, 'desc': '降雨增多，空气湿润，宜调理脾胃'},
+      {'name': '雨水', 'date': '2月18-20日', 'tip': '饮食清淡', 'food': '山药、薏米', 'color': Colors.blue, 'desc': '降雨增多，空气湿润，宜照顾脾胃'},
       {'name': '惊蛰', 'date': '3月5-7日', 'tip': '春捂防寒', 'food': '梨、蜂蜜', 'color': Colors.orange, 'desc': '春雷始鸣，宜保护阳气，预防感冒'},
       {'name': '春分', 'date': '3月20-22日', 'tip': '阴阳平衡', 'food': '银耳、百合', 'color': Colors.purple, 'desc': '昼夜相等，宜调和阴阳，适当运动'},
       {'name': '清明', 'date': '4月4-6日', 'tip': '踏青养心', 'food': '艾草、青团', 'color': Colors.green, 'desc': '气清景明，宜外出踏青，调畅情志'},
-      {'name': '谷雨', 'date': '4月19-21日', 'tip': '祛湿健脾', 'food': '香椿、枸杞', 'color': Colors.teal, 'desc': '雨生百谷，宜健脾祛湿，保养皮肤'},
+      {'name': '谷雨', 'date': '4月19-21日', 'tip': '饮食清淡', 'food': '香椿、枸杞', 'color': Colors.teal, 'desc': '雨生百谷，宜饮食清淡，保养皮肤'},
     ];
     
     return Scaffold(
