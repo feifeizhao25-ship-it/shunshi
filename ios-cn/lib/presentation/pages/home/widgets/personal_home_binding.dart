@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 
@@ -14,13 +15,17 @@ class PersonalHomeBinding {
 
   static PersonalHomeApi api() => PersonalHomeApi(
         load: () async {
-          final res = await ApiClient().get(
-            '/api/v1/seasons/home/dashboard',
-            headers: testClockHeaders(),
-          );
-          final data = res.data;
-          if (data is! Map) throw StateError('unexpected response');
-          return Map<String, dynamic>.from(data);
+          try {
+            final res = await ApiClient().get(
+              '/api/v1/seasons/home/dashboard',
+              headers: testClockHeaders(),
+            );
+            final data = res.data;
+            if (data is! Map) throw StateError('unexpected response');
+            return Map<String, dynamic>.from(data);
+          } on DioException catch (error) {
+            throw mapPersonalHomeError(error, statusCode: error.response?.statusCode);
+          }
         },
         setEnabled: (enabled) async {
           await ApiClient().post('/api/v1/seasons/profile/preferences', data: {'personalization_enabled': enabled});

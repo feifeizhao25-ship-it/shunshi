@@ -99,6 +99,13 @@ def local_now(is_global: bool, tz_name: Optional[str], now_utc: Optional[datetim
         return now_utc
 
 
+def domestic_season(day: date) -> str:
+    """Solar-term season for the domestic home. Same table as the client capsule."""
+    term = solar_term_calendar.term_on(day)
+    label = solar_term_calendar.season_of(term)
+    return {"春": "spring", "夏": "summer", "秋": "autumn", "冬": "winter"}[label]
+
+
 def load_profile(session: Session, user_id: str, *, lang: str, is_global: bool, day: date, hemisphere: str) -> ph.Profile:
     onboarding = _read(session, user_id, home_cards.ONBOARDING_KEY) or {}
     goals = ph.goals_from_text(" ".join(str(onboarding.get(k) or "") for k in ("help_goal", "feeling")))
@@ -107,7 +114,8 @@ def load_profile(session: Session, user_id: str, *, lang: str, is_global: bool, 
     if is_global:
         season = ph.season_of(day, hemisphere)
     else:
-        season = ph.season_of(day)
+        # 国内季节跟节气表走（立冬起算冬），不用公历月份桶（11 月仍会被算成秋）。
+        season = domestic_season(day)
     from .age_policy import read_group
 
     return ph.Profile(

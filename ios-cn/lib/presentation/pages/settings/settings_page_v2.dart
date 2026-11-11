@@ -8,9 +8,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../design_system/theme.dart';
 import '../../../data/services/notification_service.dart';
 import '../../../design_system/app_colors.dart';
+import '../../account/account_surface.dart';
+import '../../account/settings_account.dart';
 
 class SettingsPageV2 extends StatefulWidget {
-  const SettingsPageV2({super.key});
+  const SettingsPageV2({super.key, this.loadAccount});
+
+  /// Defaults to the account record, entitlement status, and solar-term table.
+  final Future<AccountSurface> Function()? loadAccount;
 
   @override
   State<SettingsPageV2> createState() => _SettingsPageV2State();
@@ -21,6 +26,7 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
   bool _shichenReminder = true;
   bool _checkinReminder = false;
   bool _elderMode = false;
+  AccountSurface? _account;
 
   @override
   void initState() {
@@ -37,6 +43,14 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
       _checkinReminder = prefs.getBool('checkin_reminder') ?? false;
       _elderMode = prefs.getBool('elder_mode') ?? false;
     });
+    }
+    try {
+      final account = await (widget.loadAccount ?? loadSettingsAccount)();
+      if (mounted) setState(() => _account = account);
+    } catch (_) {
+      if (mounted) {
+        setState(() => _account = accountSurface(loggedIn: false, beijingDay: DateTime.now()));
+      }
     }
   }
 
@@ -66,10 +80,12 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
                 shape: BoxShape.circle, color: ShunShiColors.primaryContainer,
               ), child: Icon(Icons.person, color: AppColors.primary(context))),
               const SizedBox(width: 12),
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('云水禅心', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
-                Text('账号信息见「我的」页', style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context))),
-              ]),
+              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(_account?.name ?? '未登录', key: const Key('settings-account-name'), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
+                Text(_account?.membership ?? '', key: const Key('settings-account-membership'), style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context))),
+                if ((_account?.seasonText ?? '').isNotEmpty)
+                  Text(_account!.seasonText, key: const Key('settings-account-season'), style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context))),
+              ])),
             ]),
           ),
           const SizedBox(height: 16),

@@ -30,6 +30,7 @@ import '../../../data/network/api_client.dart';
 import '../../../data/network/progress_api.dart';
 import '../../../data/storage/storage_manager.dart';
 import '../../../design_system/app_colors.dart';
+import '../../account/account_surface.dart';
 
 class ProfilePageV2 extends StatefulWidget {
   const ProfilePageV2({super.key});
@@ -180,7 +181,7 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
                   // 没有任何认证数据源，给每个人（包括未登录）挂一个蓝勾
                   // 是在暗示一个不存在的状态。
                   Text(
-                    _loggedIn ? (_userName?.isNotEmpty == true ? _userName! : '顺时用户') : '未登录',
+                    accountName(loggedIn: _loggedIn, nickname: _userName),
                     style: TextStyle(
                       fontFamily: ShunShiTypography.serifFamily,
                       fontSize: 22, fontWeight: FontWeight.bold,
