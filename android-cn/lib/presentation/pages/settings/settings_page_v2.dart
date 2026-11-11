@@ -7,9 +7,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../design_system/theme.dart';
 import '../../../data/services/notification_service.dart';
 import '../../../data/storage/local_session.dart';
+import '../../account/account_surface.dart';
+import '../../account/settings_account.dart';
 
 class SettingsPageV2 extends StatefulWidget {
-  const SettingsPageV2({super.key});
+  const SettingsPageV2({super.key, this.loadAccount});
+
+  /// Defaults to the account record, entitlement status, and solar-term table.
+  final Future<AccountSurface> Function()? loadAccount;
 
   @override
   State<SettingsPageV2> createState() => _SettingsPageV2State();
@@ -20,8 +25,7 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
   bool _shichenReminder = true;
   bool _checkinReminder = false;
   bool _elderMode = false;
-  String _displayName = '朋友';
-  String _accountLine = '未登录';
+  AccountSurface _account = const AccountSurface(name: '未登录', membership: '未登录', seasonText: '');
   bool _loggedIn = false;
 
   @override
@@ -38,15 +42,13 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
         _shichenReminder = prefs.getBool('shichen_reminder') ?? true;
         _checkinReminder = prefs.getBool('checkin_reminder') ?? false;
         _elderMode = prefs.getBool('elder_mode') ?? false;
-        _displayName = prefs.getString('user_name') ?? '朋友';
-        final token = prefs.getString('auth_token') ?? '';
-        final phone = prefs.getString('user_phone') ?? '';
-        _loggedIn = token.isNotEmpty;
-        _accountLine = phone.isNotEmpty
-            ? '已绑定手机号'
-            : (token.isNotEmpty ? '游客体验' : '未登录');
+        _loggedIn = (prefs.getString('auth_token') ?? '').isNotEmpty;
       });
     }
+    try {
+      final account = await (widget.loadAccount ?? loadSettingsAccount)();
+      if (mounted) setState(() => _account = account);
+    } catch (_) {}
   }
 
   Future<void> _savePref(String key, bool value) async {
@@ -108,15 +110,21 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                  Text(_displayName,
+                  Text(_account.name,
+                      key: const Key('settings-account-name'),
                       style: TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w600,
                           fontFamily: ShunShiTypography.serifFamily,
                           color: textPrimary)),
                   const SizedBox(height: 2),
-                  Text(_accountLine,
+                  Text(_account.membership,
+                      key: const Key('settings-account-membership'),
                       style: TextStyle(fontSize: 12, color: textTertiary)),
+                  if (_account.seasonText.isNotEmpty)
+                    Text(_account.seasonText,
+                        key: const Key('settings-account-season'),
+                        style: TextStyle(fontSize: 12, color: textTertiary)),
                 ]),
               ),
               Icon(Icons.chevron_right, color: textTertiary, size: 20),

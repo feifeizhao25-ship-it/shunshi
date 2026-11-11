@@ -9,6 +9,7 @@ import '../../../design_system/theme.dart';
 import '../../../data/network/api_client.dart';
 import '../../../data/storage/local_session.dart';
 import '../../../data/network/progress_api.dart';
+import '../../account/account_surface.dart';
 
 class ProfilePageV2 extends StatefulWidget {
   const ProfilePageV2({super.key});
@@ -209,16 +210,14 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(_userName.isEmpty ? (_loggedIn ? '未填写名字' : '未登录') : _userName,
+                      Text(accountName(loggedIn: _loggedIn, nickname: _userName.isEmpty ? null : _userName),
+                          key: const Key('profile-account-name'),
                           style: TextStyle(
                             fontFamily: ShunShiTypography.serifFamily,
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
                             color: textPrimary,
                           )),
-                      const SizedBox(width: 6),
-                      Icon(Icons.verified,
-                          size: 18, color: primaryColor),
                     ],
                   ),
                   const SizedBox(height: 8),

@@ -28,6 +28,9 @@ class PersonalHomeStrings {
     required this.errorTitle,
     required this.errorBody,
     required this.retry,
+    required this.loginTitle,
+    required this.loginBody,
+    required this.loginAction,
     required this.emptyTitle,
     required this.emptyBody,
     required this.saveFailed,
@@ -56,6 +59,9 @@ class PersonalHomeStrings {
   final String errorTitle;
   final String errorBody;
   final String retry;
+  final String loginTitle;
+  final String loginBody;
+  final String loginAction;
   final String emptyTitle;
   final String emptyBody;
   final String saveFailed;
@@ -200,10 +206,23 @@ class PersonalHomeData {
   }
 }
 
-enum _Phase { loading, ready, empty, off, error }
+enum _Phase { loading, ready, empty, off, error, login }
+
+/// 401 is not a network failure. The home block asks the user to log in.
+class PersonalHomeAuthRequired implements Exception {
+  const PersonalHomeAuthRequired();
+}
+
+/// Maps a failed load to [PersonalHomeAuthRequired] when the status is 401.
+Object mapPersonalHomeError(Object error, {int? statusCode}) {
+  if (error is PersonalHomeAuthRequired || statusCode == 401) {
+    return const PersonalHomeAuthRequired();
+  }
+  return error;
+}
 
 class PersonalHomeSection extends StatefulWidget {
-  const PersonalHomeSection({super.key, required this.api, required this.strings, this.onOpen, this.margin = const EdgeInsets.symmetric(horizontal: 20, vertical: 8)});
+  const PersonalHomeSection({super.key, required this.api, required this.strings, this.onOpen, this.onLogin, this.margin = const EdgeInsets.symmetric(horizontal: 20, vertical: 8)});
 
   final PersonalHomeApi api;
 
@@ -215,6 +234,9 @@ class PersonalHomeSection extends StatefulWidget {
 
   /// Called with a card's in-app link (Energy Intelligence only) when the card is tapped.
   final void Function(PersonalHomeCard card)? onOpen;
+
+  /// Opens the login page. Awaited so the block can reload after the user comes back.
+  final Future<void> Function()? onLogin;
 
   @override
   State<PersonalHomeSection> createState() => _PersonalHomeSectionState();
@@ -242,8 +264,12 @@ class _PersonalHomeSectionState extends State<PersonalHomeSection> {
         _data = data;
         _phase = !data.enabled ? _Phase.off : (data.cards.isEmpty ? _Phase.empty : _Phase.ready);
       });
-    } catch (_) {
-      if (mounted) setState(() => _phase = _Phase.error);
+    } on PersonalHomeAuthRequired {
+      if (mounted) setState(() => _phase = _Phase.login);
+    } catch (error) {
+      final mapped = mapPersonalHomeError(error);
+      if (!mounted) return;
+      setState(() => _phase = mapped is PersonalHomeAuthRequired ? _Phase.login : _Phase.error);
     }
   }
 
@@ -311,6 +337,21 @@ class _PersonalHomeSectionState extends State<PersonalHomeSection> {
           title: _t.errorTitle,
           body: _t.errorBody,
           action: TextButton(key: const Key('personal-home-retry'), onPressed: _load, child: Text(_t.retry)),
+        );
+      case _Phase.login:
+        return _Message(
+          key: const Key('personal-home-login'),
+          icon: Icons.lock_outline_rounded,
+          title: _t.loginTitle,
+          body: _t.loginBody,
+          action: TextButton(
+            key: const Key('personal-home-login-action'),
+            onPressed: () async {
+              await widget.onLogin?.call();
+              if (mounted) await _load();
+            },
+            child: Text(_t.loginAction),
+          ),
         );
       case _Phase.off:
         return _Message(

@@ -9,6 +9,7 @@ import '../../../data/network/api_client.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import '../../../core/theme/shunshi_text_styles.dart';
 
+import '../constitution/constitution_questions.dart';
 import 'widgets/constitution_data.dart';
 import 'widgets/constitution_widgets.dart';
 
@@ -79,17 +80,12 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
   Future<void> _startQuiz() async {
     setState(() => _loading = true);
     try {
-      final res = await _api.get('/api/v1/constitution/questions').timeout(const Duration(seconds: 15));
-      if (res.statusCode == 200 && res.data is List) {
-        final list = res.data as List;
-        if (list.isEmpty) {
-          _showSnackBar('题目为空，请稍后重试');
-          return;
-        }
+      final res = await _api.get(kConstitutionQuestionsPath).timeout(const Duration(seconds: 15));
+      final questions = parseConstitutionQuestions(res.data);
+      if (res.statusCode == 200 && questions.isNotEmpty) {
         setState(() {
-          _questions = list.map((e) {
-            final m = e as Map<String, dynamic>;
-            final opts = (m['options'] as List<dynamic>? ?? []).cast<String>();
+          _questions = questions.map((m) {
+            final opts = (m['options'] as List).cast<String>();
             final scores = [5, 3, 1];
             return Question(
               id: m['id'] as int? ?? 0,

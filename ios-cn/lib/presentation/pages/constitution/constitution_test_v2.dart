@@ -1,5 +1,5 @@
 /// 体质辨识测试页 V3 — 接 API
-/// GET /questions → 25题, POST /submit → 体质结果, GET /types → 9种习惯说明
+/// GET /api/v1/constitution/questions → 问卷, POST /submit → 结果
 library;
 
 import 'package:dio/dio.dart';
@@ -8,9 +8,13 @@ import '../../../design_system/theme.dart';
 import '../../../core/config/app_config.dart';
 import '../../../design_system/app_colors.dart';
 import '../../../data/network/session.dart';
+import 'constitution_questions.dart';
 
 class ConstitutionTestV2 extends StatefulWidget {
-  const ConstitutionTestV2({super.key});
+  const ConstitutionTestV2({super.key, this.loadQuestions});
+
+  /// Test hook. Production loads [kConstitutionQuestionsPath].
+  final Future<List<Map<String, dynamic>>> Function()? loadQuestions;
 
   @override
   State<ConstitutionTestV2> createState() => _ConstitutionTestV2State();
@@ -35,12 +39,14 @@ class _ConstitutionTestV2State extends State<ConstitutionTestV2> {
 
   Future<void> _loadQuestions() async {
     try {
-      final res = await _dio.get('/questions');
-      if (res.data is List) {
-        _questions = (res.data as List).cast<Map<String, dynamic>>();
+      if (widget.loadQuestions != null) {
+        _questions = await widget.loadQuestions!();
+      } else {
+        final res = await _dio.get(kConstitutionQuestionsPath);
+        _questions = parseConstitutionQuestions(res.data);
       }
     } catch (_) {}
-    setState(() => _loading = false);
+    if (mounted) setState(() => _loading = false);
   }
 
   Future<void> _submit() async {

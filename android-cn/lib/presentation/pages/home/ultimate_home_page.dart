@@ -12,7 +12,7 @@ import 'widgets/home_skeleton.dart';
 import 'widgets/today_voice_bar.dart';
 import 'widgets/personal_home_binding.dart';
 import '../../widgets/personal_home_section.dart';
-import '../../../core/solar_term/solar_term_table.dart';
+import '../../account/account_surface.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/cache/cache_service.dart';
 import '../../../core/time/domestic_clock.dart';
@@ -206,44 +206,7 @@ const _shiChenList = <ShiChenData>[
 // 节气名称映射（根据月份大致推算）
 // ═══════════════════════════════════════════════════════════════
 
-String _getCurrentSolarTermInfo() {
-  final now = domesticNow();
-  final month = now.month;
-  final day = now.day;
-  const terms = [
-    (1, 6, '小寒', '季冬'), (1, 20, '大寒', '季冬'),
-    (2, 4, '立春', '孟春'), (2, 19, '雨水', '孟春'),
-    (3, 6, '惊蛰', '仲春'), (3, 21, '春分', '仲春'),
-    (4, 5, '清明', '季春'), (4, 20, '谷雨', '季春'),
-    (5, 6, '立夏', '孟夏'), (5, 21, '小满', '孟夏'),
-    (6, 6, '芒种', '仲夏'), (6, 21, '夏至', '仲夏'),
-    (7, 7, '小暑', '季夏'), (7, 23, '大暑', '季夏'),
-    (8, 7, '立秋', '孟秋'), (8, 23, '处暑', '孟秋'),
-    (9, 8, '白露', '仲秋'), (9, 23, '秋分', '仲秋'),
-    (10, 8, '寒露', '季秋'), (10, 23, '霜降', '季秋'),
-    (11, 7, '立冬', '孟冬'), (11, 22, '小雪', '孟冬'),
-    (12, 7, '大雪', '仲冬'), (12, 22, '冬至', '仲冬'),
-  ];
-  String termName = '清明';
-  String season = '季春';
-  for (final t in terms) {
-    if (month < t.$1 || (month == t.$1 && day < t.$2)) break;
-    termName = t.$3;
-    season = t.$4;
-  }
-  // 节气以天文计算的节气表为准（与后端同一份数据）；上面的固定月日只在超出表的年份时兜底。
-  // 固定月日会差一天（如 2026 惊蛰 3-5、春分 3-20），1 月 1-5 日还会落到「清明」。
-  final fromTable = currentSolarTermName();
-  if (fromTable != null) {
-    for (final t in terms) {
-      if (t.$3 == fromTable) {
-        termName = t.$3;
-        season = t.$4;
-      }
-    }
-  }
-  return '$termName · $season之节';
-}
+String _getCurrentSolarTermInfo() => solarTermSeasonLine();
 
 // ═══════════════════════════════════════════════════════════════
 // 今日推荐数据
@@ -494,31 +457,14 @@ class _UltimateHomePageState extends State<UltimateHomePage>
     } catch (_) {}
 
     try {
-      final results = await Future.wait([
-        _api.get('/seasons/home/dashboard', queryParameters: {'locale': 'zh-CN'}, level: SpeedLevel.s1),
-        _api.get('/solar-terms/current', level: SpeedLevel.s1),
-      ]);
+      final dashRes = await _api.get('/seasons/home/dashboard', queryParameters: {'locale': 'zh-CN'}, level: SpeedLevel.s1);
 
       if (!mounted) return;
 
-      final dash = results[0].data;
+      final dash = dashRes.data;
       if (dash is Map) {
         await _cache.set(CacheKeys.today(), Map<String, dynamic>.from(dash), config: CacheConfig.today);
         _applyData(Map<String, dynamic>.from(dash));
-      }
-
-      final solar = results[1].data;
-      if (solar is Map && solar['success'] == true && solar['data'] is Map) {
-        final data = solar['data'] as Map;
-        final name = data['name']?.toString();
-        final description = data['description']?.toString();
-        if (name != null && name.isNotEmpty && mounted) {
-          setState(() {
-            _solarTermInfo = description == null || description.isEmpty
-                ? name
-                : '$name · $description';
-          });
-        }
       }
 
       setState(() => _loading = false);
@@ -630,7 +576,12 @@ class _UltimateHomePageState extends State<UltimateHomePage>
 
               const SliverToBoxAdapter(child: SizedBox(height: 28)),
               // ═══════════════ 今天为你准备的 ═══════════════
-              SliverToBoxAdapter(child: PersonalHomeSection(api: PersonalHomeBinding.api(), strings: PersonalHomeBinding.strings, onOpen: (card) => PersonalHomeBinding.open(context, card))),
+              SliverToBoxAdapter(child: PersonalHomeSection(
+                api: PersonalHomeBinding.api(),
+                strings: PersonalHomeBinding.strings,
+                onOpen: (card) => PersonalHomeBinding.open(context, card),
+                onLogin: () => context.push('/login'),
+              )),
               const SliverToBoxAdapter(child: SizedBox(height: 20)),
 
               // ═══════════════ Hero 经络意境区 ═══════════════

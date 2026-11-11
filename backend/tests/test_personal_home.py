@@ -331,6 +331,13 @@ def test_global_market_stays_english_when_accept_language_is_chinese(client):
     assert data["greeting"]
 
 
+def test_domestic_season_follows_the_solar_term_table():
+    """2026-11-11 is 立冬, so the domestic home is winter. A month bucket still says autumn."""
+    assert ph.season_of(date(2026, 11, 11)) == "autumn"
+    assert phs.domestic_season(date(2026, 11, 11)) == "winter"
+    assert phs.domestic_season(date(2026, 11, 3)) == "autumn"  # 霜降, still autumn
+
+
 def test_api_global_market_header_alone_is_enough_for_english_home(client, monkeypatch):
     """The international app sends Accept-Language and X-App-Market; a client that only sends the market header
     must still get an all-English board (greeting, hero, cards, personalization note), including after some activity."""
