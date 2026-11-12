@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'core/l10n/cn_tooltips.dart';
 import 'core/router/app_router.dart';
 import 'data/storage/storage_manager.dart';
 import 'data/services/notification_service.dart';
@@ -52,6 +53,7 @@ class _ShunshiAppState extends State<ShunshiApp> {
           routerConfig: AppRouter.router,
           title: '顺时',
           debugShowCheckedModeBanner: false,
+          localizationsDelegates: cnLocalizationsDelegates,
           theme: ShunShiTheme.lightTheme,
           darkTheme: ShunShiTheme.darkTheme,
           themeMode: _themeNotifier.mode,
