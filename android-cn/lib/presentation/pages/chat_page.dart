@@ -761,14 +761,6 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
         child: Column(
           children: [
             _buildTopBar(),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 6, 16, 2),
-              child: Text(
-                '你在和人工智能对话，不是真人',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 12, color: AppColors.textSecondary(context)),
-              ),
-            ),
             Expanded(child: _buildList()),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -900,7 +892,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
                 ),
               ),
               PopupMenuButton<String>(
-                tooltip: '更多',
+                tooltip: '打开菜单',
                 icon: const Icon(
                   Icons.more_vert,
                   size: 22,

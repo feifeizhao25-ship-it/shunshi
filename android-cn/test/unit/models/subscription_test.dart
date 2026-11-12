@@ -128,5 +128,25 @@ void main() {
       expect(status.isActive, isFalse);
       expect(status.dayRemaining, 0);
     });
+
+    test('GET /api/v1/subscription/status features keep bools when daily_chat_limit is an int', () {
+      final status = UserSubscriptionStatus.fromJson({
+        'plan_id': 'free',
+        'plan_name': '免费版',
+        'is_active': true,
+        'features': {
+          'basic_chat': true,
+          'solar_terms': true,
+          'daily_chat_limit': 20,
+          'unlimited_chat': false,
+        },
+      });
+      expect(status.features, {
+        'basic_chat': true,
+        'solar_terms': true,
+        'unlimited_chat': false,
+      });
+      expect(status.features.containsKey('daily_chat_limit'), isFalse);
+    });
   });
 }

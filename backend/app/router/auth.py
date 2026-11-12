@@ -904,14 +904,28 @@ async def get_me(
         }
     }
 
+def _bearer_token(*candidates: Optional[str]) -> Optional[str]:
+    """从 Authorization 头或旧的查询参数里取出令牌。头优先。"""
+    for raw in candidates:
+        if not raw:
+            continue
+        text = raw.strip()
+        if text.lower().startswith("bearer "):
+            token = text[7:].strip()
+            if token:
+                return token
+    return None
+
+
 @router.post("/logout", response_model=dict, summary="退出登录", description="使当前Token立即失效（加入黑名单）")
 async def logout(
+    request: Request,
     authorization: str = Query(None),
     settings: Settings = Depends(get_settings),
 ):
     """退出登录（使当前 token 立即失效）"""
-    if authorization and authorization.startswith("Bearer "):
-        token = authorization.replace("Bearer ", "")
+    token = _bearer_token(request.headers.get("authorization"), authorization)
+    if token:
         revoke_core_token(settings, token)
         
         # JWT: 加入黑名单

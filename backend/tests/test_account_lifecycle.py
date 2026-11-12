@@ -554,6 +554,23 @@ class TestTokenManagement:
         # 然后回退到 DB token 查找，如果也没找到则 401
         assert resp2.status_code == 401
 
+    @pytest.mark.asyncio
+    async def test_logout_authorization_header_blacklists_token(self, client, db):
+        """客户端用 Authorization 头注销时，令牌同样进入黑名单。"""
+        token, _, _ = await _register_and_get_tokens(client, "headerlogout@test.com", "Pass1")
+
+        resp = await client.post(
+            "/api/v1/auth/logout",
+            headers={"Authorization": f"Bearer {token}"},
+        )
+        assert resp.status_code == 200
+
+        resp2 = await client.get(
+            "/api/v1/auth/devices",
+            headers={"Authorization": f"Bearer {token}"},
+        )
+        assert resp2.status_code == 401
+
 
 # ============================================================
 # 4. 多设备管理 TestMultiDevice
