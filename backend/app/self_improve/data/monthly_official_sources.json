@@ -1,0 +1,105 @@
+{
+  "product": "shunshi",
+  "catalog_date": "2026-11-13",
+  "cadence": "monthly",
+  "cadence_window": "15@03:00",
+  "timezone": "Asia/Shanghai",
+  "scheduler_registered": false,
+  "review_status": "待审核",
+  "reviewer": "",
+  "note": "每月由人执行的官方清单核对：中国营养学会膳食指南、国家卫生健康委食品司、市场监管总局特殊食品司。只写候选和差异报告。不注册定时任务，不读取云端密钥。LIBRARY_FRESHNESS 与 SIL 保持关闭。摘录只复述已标明可用的公开来源，不提前引用未发布的新版膳食指南，不新增功效声称，不改禁推名单。复核人留空。",
+  "sections": [
+    {
+      "id": "cnsoc-dg",
+      "title": "中国营养学会·膳食指南",
+      "listing_url": "http://dg.cnsoc.org/",
+      "note": "盯膳食指南新版是否发布。修订中的报道只记状态，不把未发布的新版写成现行条文。"
+    },
+    {
+      "id": "nhc-sps",
+      "title": "国家卫生健康委·食品安全标准与监测评估",
+      "listing_url": "https://www.nhc.gov.cn/sps/new_index.shtml",
+      "note": "核对食药物质公告。只记录公告里已经写明的物质名称，不改禁推名单，不写用量。"
+    },
+    {
+      "id": "samr-tssps",
+      "title": "市场监管总局·特殊食品",
+      "listing_url": "https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/tssps/index.html",
+      "note": "核对目录数量和备案试点的公开答复。不把答复写成新的功效声称。"
+    }
+  ],
+  "sources": [
+    {
+      "id": "ss-dg-revision-2026",
+      "section": "cnsoc-dg",
+      "product": "shunshi",
+      "title": "《中国居民膳食指南》第五次修订工作会议在沪召开",
+      "url": "http://dg.cnsoc.org/article/04/waGfsQ0aR9-yPu6Y_ebl5A.html",
+      "publisher": "中国营养学会",
+      "license": "政府/学会公开（引用）",
+      "published_at": "2026-06-18",
+      "excerpt": "第五次修订进行中：25个证据报告团队；强调地域、民族、城乡差异。只作修订中状态，不提前引用新版内容。",
+      "language": "zh",
+      "region": "CN",
+      "principle_only": true,
+      "edition_status": "修订中"
+    },
+    {
+      "id": "ss-dg-meeting-1029",
+      "section": "cnsoc-dg",
+      "product": "shunshi",
+      "title": "中国居民膳食指南系列研究科学会议（2026-10-29）",
+      "url": "https://en.cnsoc.org/news/512601201.html",
+      "publisher": "中国营养学会",
+      "license": "学会公开（引用）",
+      "published_at": "2026-11-02",
+      "excerpt": "第11次证据报告会：特殊人群、外卖消费、超重肥胖。",
+      "language": "zh",
+      "region": "CN",
+      "principle_only": true,
+      "edition_status": "修订中"
+    },
+    {
+      "id": "ss-nhc-dangshen-9",
+      "section": "nhc-sps",
+      "product": "shunshi",
+      "title": "关于党参等9种新增按照传统既是食品又是中药材的物质公告",
+      "url": "https://www.nhc.gov.cn/sps/c100088/202311/5b062dd13fe646198b56c7d76a99aab4.shtml",
+      "publisher": "国家卫生健康委员会",
+      "license": "政府公开文件（引用）",
+      "published_at": "2023-11",
+      "excerpt": "党参、黄芪等 9 种物质及限制条件。只核对公告，不改禁推名单，不写用量。",
+      "language": "zh",
+      "region": "CN",
+      "principle_only": true
+    },
+    {
+      "id": "ss-nhc-dihuang-4",
+      "section": "nhc-sps",
+      "product": "shunshi",
+      "title": "关于地黄等4种按照传统既是食品又是中药材的物质的公告",
+      "url": "https://www.nhc.gov.cn/sps/c100088/202408/53150d0918ec40899b5293147ec0dd01.shtml",
+      "publisher": "国家卫生健康委员会",
+      "license": "政府公开文件（引用）",
+      "published_at": "2024-08",
+      "excerpt": "地黄、麦冬、天冬、化橘红纳入目录及其使用限制。只核对，不改禁推名单。",
+      "language": "zh",
+      "region": "CN",
+      "principle_only": true
+    },
+    {
+      "id": "ss-samr-yaoshi-2026",
+      "section": "samr-tssps",
+      "product": "shunshi",
+      "title": "关于全国政协十四届四次会议第03459号提案答复的函",
+      "url": "https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/tssps/art/2026/art_fcdb8ed8982e45ed8250cdb0adcdb586.html",
+      "publisher": "国家市场监督管理总局",
+      "license": "政府公开文件（引用）",
+      "published_at": "2026-10-16",
+      "excerpt": "食药物质目录 106 种；国产复方配伍保健食品备案试点（市监特食发〔2025〕82号）36 种；《食品声称通用标准》立项；严打“神医神药”广告。目录仍以卫健委公告为准，不新增功效声称。",
+      "language": "zh",
+      "region": "CN",
+      "principle_only": true
+    }
+  ]
+}
