@@ -119,9 +119,28 @@ def _card(card_id: str, category: str, title: str, reason: str, basis: str, minu
         "title": title,
         "description": title,
         "reason": reason,
+        "why_label": "为什么推荐",
         "basis": basis,
         "duration_min": minutes,
     }
+
+
+def term_card(today: date) -> dict:
+    term = solar_term_calendar.term_on(today)
+    starts_today = solar_term_calendar.term_start(today) == today
+    term_reason = f"今天{term}交节" if starts_today else f"现在是{term}节气"
+    return _card("term", "seasonal", f"{term}：{TERM_TIPS[term]}", term_reason, "solar_term")
+
+
+def nonpersonalized_cards(today: Optional[date] = None) -> list[dict]:
+    """不看地区、年龄、目标、行动记录。同一天每个用户拿到的卡片相同。"""
+    today = today or solar_term_calendar.beijing_today()
+    cards: list[dict] = []
+    special_day = day_card(today)
+    if special_day:
+        cards.append(special_day)
+    cards.append(term_card(today))
+    return cards
 
 
 def day_card(today: date) -> Optional[dict]:
@@ -156,7 +175,7 @@ def build_dashboard(session: Session, user_id: str, today: Optional[date] = None
     special_day = day_card(today)
     if special_day:
         cards.append(special_day)
-    cards.append(_card("term", "seasonal", f"{term}：{TERM_TIPS[term]}", term_reason, "solar_term"))
+    cards.append(term_card(today))
 
     region = _read_json(session, user_id, REGION_KEY) or {}
     province = region.get("province")

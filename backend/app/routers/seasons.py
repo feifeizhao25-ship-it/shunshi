@@ -67,6 +67,10 @@ def home_dashboard(
     )
     if not is_global:  # 官方资料库只在国内版；国际版没有这张卡
         board = phs.with_library_card(session, user_id, board)
+        board = phs.hide_not_recommended(board, phs.not_recommend_ids(session, user_id))
+        board["cards"] = [{**card, "why_label": "为什么推荐"} for card in board["cards"]]
+        if isinstance(board.get("hero"), dict):
+            board["hero"] = {**board["hero"], "why_label": "为什么推荐"}
     out = {
         "greeting": board["greeting"],
         "hero": board["hero"],
@@ -115,6 +119,27 @@ def set_preferences(body: PreferencesBody, user_id: str = Depends(current_user),
     try:
         return phs.set_preferences(session, user_id, enabled=body.personalization_enabled, constitution=body.constitution,
                                    clear_constitution=body.clear_constitution)
+    except ValueError as err:
+        raise HTTPException(status_code=422, detail=str(err)) from err
+
+
+class NotRecommendBody(BaseModel):
+    card_id: str = Field(min_length=1, max_length=64)
+
+
+@router.post("/home/not-recommend")
+def home_not_recommend(
+    body: NotRecommendBody,
+    user_id: str = Depends(current_user),
+    session: Session = Depends(get_session),
+):
+    """「不再推荐」这张首页卡。只影响当前用户的个性化首页。"""
+    from fastapi import HTTPException
+
+    from ..services import personal_home_service as phs
+
+    try:
+        return phs.not_recommend(session, user_id, body.card_id)
     except ValueError as err:
         raise HTTPException(status_code=422, detail=str(err)) from err
 

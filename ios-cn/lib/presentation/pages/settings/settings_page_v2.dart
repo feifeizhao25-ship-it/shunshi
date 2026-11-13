@@ -12,10 +12,16 @@ import '../../account/account_surface.dart';
 import '../../account/settings_account.dart';
 
 class SettingsPageV2 extends StatefulWidget {
-  const SettingsPageV2({super.key, this.loadAccount});
+  const SettingsPageV2({super.key, this.loadAccount, this.loadPersonalization, this.savePersonalization});
 
   /// Defaults to the account record, entitlement status, and solar-term table.
   final Future<AccountSurface> Function()? loadAccount;
+
+  /// 读「个性化推荐」开关。测试可以换成假的，避免请求网络。
+  final Future<bool> Function()? loadPersonalization;
+
+  /// 保存开关。关闭后首页卡片应和没开个性化时一样。
+  final Future<void> Function(bool enabled)? savePersonalization;
 
   @override
   State<SettingsPageV2> createState() => _SettingsPageV2State();
@@ -26,6 +32,8 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
   bool _shichenReminder = true;
   bool _checkinReminder = false;
   bool _elderMode = false;
+  bool _personalization = true;
+  bool _savingPersonalization = false;
   AccountSurface? _account;
 
   @override
@@ -44,6 +52,12 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
       _elderMode = prefs.getBool('elder_mode') ?? false;
     });
     }
+    if (widget.loadPersonalization != null) {
+      try {
+        final on = await widget.loadPersonalization!();
+        if (mounted) setState(() => _personalization = on);
+      } catch (_) {}
+    }
     try {
       final account = await (widget.loadAccount ?? loadSettingsAccount)();
       if (mounted) setState(() => _account = account);
@@ -58,6 +72,26 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(key, value);
     if (value && key == 'shichen_reminder') NotificationService().askForPermissionInContext();
+  }
+
+  Future<void> _setPersonalization(bool value) async {
+    if (_savingPersonalization) return;
+    final previous = _personalization;
+    setState(() {
+      _personalization = value;
+      _savingPersonalization = true;
+    });
+    try {
+      await widget.savePersonalization?.call(value);
+      if (mounted) setState(() => _savingPersonalization = false);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _personalization = previous;
+        _savingPersonalization = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('没能保存设置，请稍后再试')));
+    }
   }
   @override
   Widget build(BuildContext context) {
@@ -97,11 +131,38 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
           ]),
           const SizedBox(height: 16),
 
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(16)),
+            child: Material(
+              color: Colors.transparent,
+              child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('推荐', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
+                const SizedBox(height: 4),
+                SwitchListTile(
+                  key: const Key('settings-personalization'),
+                  value: _personalization,
+                  onChanged: _savingPersonalization ? null : _setPersonalization,
+                  title: Text('个性化推荐', style: TextStyle(fontSize: 15, color: AppColors.textPrimary(context))),
+                  subtitle: Text('关掉之后，首页不再按你的目标和地区来排，卡片和大家看到的一样。', style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context))),
+                  activeThumbColor: AppColors.primary(context),
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ],
+            ),
+            ),
+          ),
+          const SizedBox(height: 16),
+
           // 消息推送
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(16)),
-            child: Column(
+            child: Material(
+              color: Colors.transparent,
+              child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('消息推送', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
@@ -111,6 +172,7 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
                 _buildSwitchTile('打卡提醒', '每日养生任务完成提醒', Icons.done_all, _checkinReminder, (v) { setState(() => _checkinReminder = v); _savePref('checkin_reminder', v); }),
               ],
             ),
+            ),
           ),
           const SizedBox(height: 16),
 
@@ -118,7 +180,7 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(16)),
-            child: Column(children: [
+            child: Material(color: Colors.transparent, child: Column(children: [
               SwitchListTile(
                 value: _elderMode,
                 onChanged: (v) { setState(() => _elderMode = v); _savePref('elder_mode', v); },
@@ -139,6 +201,7 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
                 ),
               ),
             ]),
+            ),
           ),
           const SizedBox(height: 16),
 
@@ -198,7 +261,7 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
   Widget _buildSectionCard(List<Widget> children) {
     return Container(
       decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(16)),
-      child: Column(children: children),
+      child: Material(color: Colors.transparent, child: Column(children: children)),
     );
   }
 
