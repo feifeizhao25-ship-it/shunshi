@@ -17,6 +17,7 @@ from . import home_cards, personal_home as ph
 SEEN_KEY = "behavior:seen_cards"
 PERSONALIZATION_KEY = "profile:personalization"
 CONSTITUTION_KEY = "profile:constitution"
+NOT_RECOMMEND_KEY = "profile:not_recommend"
 SEEN_KEEP_DAYS = 30
 CN_TZ = ZoneInfo("Asia/Shanghai")
 
@@ -47,6 +48,35 @@ def set_preferences(session: Session, user_id: str, *, enabled: Optional[bool] =
         _write(session, user_id, CONSTITUTION_KEY, {"label": constitution})
     session.commit()
     return preferences(session, user_id)
+
+
+def not_recommend(session: Session, user_id: str, card_id: str) -> dict:
+    """用户点「不再推荐」：只记下这张卡，下次个性化首页不再放它。"""
+    card_id = (card_id or "").strip()
+    if not card_id or len(card_id) > 64:
+        raise ValueError("unknown card")
+    current = [item for item in (_read(session, user_id, NOT_RECOMMEND_KEY) or []) if isinstance(item, str)]
+    if card_id not in current:
+        current.append(card_id)
+    _write(session, user_id, NOT_RECOMMEND_KEY, current)
+    session.commit()
+    return {"not_recommend": current}
+
+
+def not_recommend_ids(session: Session, user_id: str) -> set[str]:
+    raw = _read(session, user_id, NOT_RECOMMEND_KEY) or []
+    return {item for item in raw if isinstance(item, str)}
+
+
+def hide_not_recommended(board: dict, hidden: set[str]) -> dict:
+    """关掉个性化之后不在这里过滤，好让首页和那套非个性化默认卡片保持一致。"""
+    if not hidden or not (board.get("personalization") or {}).get("enabled"):
+        return board
+    cards = [card for card in board.get("cards") or [] if card.get("id") not in hidden]
+    hero = board.get("hero")
+    if isinstance(hero, dict) and hero.get("id") in hidden:
+        hero = cards[0] if cards else None
+    return dict(board, cards=cards, hero=hero)
 
 
 def preferences(session: Session, user_id: str) -> dict:
@@ -172,11 +202,13 @@ def build(session: Session, user_id: str, *, lang: str, is_global: bool, hemisph
     daytype = "weekend" if day.weekday() >= 5 else "weekday"
     if not is_global:
         base = home_cards.build_dashboard(session, user_id, day)
-        anchors = [c for c in base["suggestions"] if c["id"] in ("day_makeup", "day_back_to_work", "day_holiday", "day_first_workday", "term", "region")]
         kind, _ = cn_calendar.day_kind(day)
         daytype = "weekend" if kind in (cn_calendar.HOLIDAY, "weekend") else "weekday"
-        if not profile.enabled:
-            anchors = base["suggestions"]
+        if profile.enabled:
+            anchors = [c for c in base["suggestions"] if c["id"] in ("day_makeup", "day_back_to_work", "day_holiday", "day_first_workday", "term", "region")]
+        else:
+            # 算法推荐规定第 17 条：关闭后不再按个人特征给卡片，只留当天的通用节气/假期卡。
+            anchors = home_cards.nonpersonalized_cards(day)
     board = ph.compose(profile, activity, user_id, now, daytype, extra_cards=anchors)
     if record and profile.enabled:
         remember_shown(session, user_id, day, [c["id"] for c in board["cards"]])

@@ -8,11 +8,13 @@ String _weekNone(String d) => '$d 没有记录';
 
 const PersonalHomeStrings kPersonalHomeStringsZh = PersonalHomeStrings(
   heading: '今天为你准备的',
-  why: '为什么看到这个',
+  why: '为什么推荐',
+  notRecommend: '不再推荐',
   turnOff: '关闭个性化',
   turnOn: '重新打开',
   offTitle: '个性化已关闭',
   offBody: '现在显示的是通用内容，你的记录没有被删除。',
+  offSame: '个性化推荐已关闭。下面的卡片和大家看到的一样。',
   confirmTitle: '关闭个性化推荐？',
   confirmBody: '关闭后首页只显示通用内容，之前的记录不会被删除，随时可以重新打开。',
   cancel: '取消',

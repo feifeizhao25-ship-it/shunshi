@@ -61,6 +61,15 @@ String allText(WidgetTester t) => t
     .map((w) => w.data ?? w.textSpan?.toPlainText() ?? '')
     .join(' ');
 
+Map<String, dynamic> defaultHomeJson() => {
+      'greeting': '早上好，今天从一件小事开始',
+      'hero': null,
+      'personalization': {'enabled': false, 'note': '个性化已关闭，显示通用提示。'},
+      'suggestions': [
+        {'id': 'term', 'category': 'seasonal', 'title': '立冬：早睡晚起，注意保暖', 'reason': '现在是立冬节气', 'basis': 'solar_term'},
+      ],
+    };
+
 const strings = kPersonalHomeStringsZh;
 
 void main() {
@@ -100,7 +109,8 @@ void main() {
       expect(find.byKey(Key('personal-home-card-c$i')), findsOneWidget);
       expect(find.byKey(Key('personal-home-why-c$i')), findsOneWidget);
     }
-    expect(find.textContaining(zh ? '为什么看到这个' : 'Why you see this'), findsNWidgets(3));
+    expect(find.textContaining(zh ? '为什么推荐' : 'Why you see this'), findsNWidgets(3));
+    expect(find.text(zh ? '不再推荐' : '不再推荐'), findsNWidgets(3));
     expect(find.byKey(const Key('personal-home-streak')), findsOneWidget);
     expect(find.byKey(const Key('personal-home-turn-off')), findsOneWidget);
   });
@@ -126,11 +136,11 @@ void main() {
     expect(find.byKey(const Key('personal-home-empty')), findsOneWidget);
   });
 
-  testWidgets('turning off asks first, saves, and shows the off state; turning on restores', (tester) async {
+  testWidgets('turning off asks first, saves, and shows the shared cards; turning on restores', (tester) async {
     var enabled = true;
     final saved = <bool>[];
     await tester.pumpWidget(host(PersonalHomeSection(
-      strings: strings, api: fake(() async => shunshiJson(enabled: enabled), (v) async {
+      strings: strings, api: fake(() async => enabled ? shunshiJson() : defaultHomeJson(), (v) async {
         saved.add(v);
         enabled = v;
       }),
@@ -147,11 +157,37 @@ void main() {
     await tester.tap(find.byKey(const Key('personal-home-confirm')));
     await tester.pumpAndSettle();
     expect(saved, [false]);
-    expect(find.byKey(const Key('personal-home-off')), findsOneWidget);
+    expect(find.byKey(const Key('personal-home-off-note')), findsOneWidget);
+    expect(find.byKey(const Key('personal-home-card-term')), findsOneWidget);
     expect(find.byKey(const Key('personal-home-card-c0')), findsNothing);
+    expect(find.text('不再推荐'), findsNothing);
+    expect(find.textContaining('为什么推荐'), findsOneWidget);
     await tester.tap(find.byKey(const Key('personal-home-turn-on')));
     await tester.pumpAndSettle();
     expect(saved, [false, true]);
+    expect(find.byKey(const Key('personal-home-card-c0')), findsOneWidget);
+  });
+
+  testWidgets('不再推荐 removes that card and tells the backend', (tester) async {
+    final hidden = <String>[];
+    var cards = shunshiJson();
+    await tester.pumpWidget(host(PersonalHomeSection(
+      strings: strings,
+      api: PersonalHomeApi(
+        load: () async => cards,
+        setEnabled: (_) async {},
+        dismiss: (id) async {
+          hidden.add(id);
+          final list = (cards['suggestions'] as List).where((item) => item['id'] != id).toList();
+          cards = {...cards, 'suggestions': list};
+        },
+      ),
+    )));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('personal-home-not-recommend-c1')));
+    await tester.pumpAndSettle();
+    expect(hidden, ['c1']);
+    expect(find.byKey(const Key('personal-home-card-c1')), findsNothing);
     expect(find.byKey(const Key('personal-home-card-c0')), findsOneWidget);
   });
 

@@ -11,10 +11,16 @@ import '../../account/account_surface.dart';
 import '../../account/settings_account.dart';
 
 class SettingsPageV2 extends StatefulWidget {
-  const SettingsPageV2({super.key, this.loadAccount});
+  const SettingsPageV2({super.key, this.loadAccount, this.loadPersonalization, this.savePersonalization});
 
   /// Defaults to the account record, entitlement status, and solar-term table.
   final Future<AccountSurface> Function()? loadAccount;
+
+  /// 读「个性化推荐」开关。测试可以换成假的，避免请求网络。
+  final Future<bool> Function()? loadPersonalization;
+
+  /// 保存开关。关闭后首页卡片应和没开个性化时一样。
+  final Future<void> Function(bool enabled)? savePersonalization;
 
   @override
   State<SettingsPageV2> createState() => _SettingsPageV2State();
@@ -25,6 +31,8 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
   bool _shichenReminder = true;
   bool _checkinReminder = false;
   bool _elderMode = false;
+  bool _personalization = true;
+  bool _savingPersonalization = false;
   AccountSurface _account = const AccountSurface(name: '未登录', membership: '未登录', seasonText: '');
   bool _loggedIn = false;
 
@@ -45,6 +53,12 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
         _loggedIn = (prefs.getString('auth_token') ?? '').isNotEmpty;
       });
     }
+    if (widget.loadPersonalization != null) {
+      try {
+        final on = await widget.loadPersonalization!();
+        if (mounted) setState(() => _personalization = on);
+      } catch (_) {}
+    }
     try {
       final account = await (widget.loadAccount ?? loadSettingsAccount)();
       if (mounted) setState(() => _account = account);
@@ -55,6 +69,26 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(key, value);
     if (value && key == 'shichen_reminder') NotificationService().askForPermissionInContext();
+  }
+
+  Future<void> _setPersonalization(bool value) async {
+    if (_savingPersonalization) return;
+    final previous = _personalization;
+    setState(() {
+      _personalization = value;
+      _savingPersonalization = true;
+    });
+    try {
+      await widget.savePersonalization?.call(value);
+      if (mounted) setState(() => _savingPersonalization = false);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _personalization = previous;
+        _savingPersonalization = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('没能保存设置，请稍后再试')));
+    }
   }
 
   @override
@@ -150,6 +184,28 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
                   const [Color(0xFF4DB6AC), Color(0xFF80CBC4)],
                   onTap: () => context.push('/privacy-policy')),
             ]),
+          ),
+          const SizedBox(height: 24),
+
+          // ── 分组标题：推荐 ──
+          _buildSectionTitle('推荐', isDark),
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: cardColor,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: isDark ? [] : ShunShiShadows.sm,
+            ),
+            child: _buildSwitchTile(
+              context,
+              '个性化推荐',
+              '关掉之后，首页不再按你的目标和地区来排，卡片和大家看到的一样。',
+              Icons.tune,
+              _personalization,
+              _setPersonalization,
+              toggleKey: const Key('settings-personalization'),
+            ),
           ),
           const SizedBox(height: 24),
 
@@ -327,7 +383,9 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
         isDark ? ShunShiColors.darkTextPrimary : ShunShiColors.textPrimary;
     final textTertiary =
         isDark ? ShunShiColors.darkTextTertiary : ShunShiColors.textTertiary;
-    return ListTile(
+    return Material(
+      color: Colors.transparent,
+      child: ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 16),
       leading: Container(
         width: 34,
@@ -347,12 +405,13 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
       trailing: trailing ??
           Icon(Icons.chevron_right, color: textTertiary, size: 20),
       onTap: onTap ?? () {},
+    ),
     );
   }
 
   /// 自定义墨绿 toggle 开关项
   Widget _buildSwitchTile(BuildContext context, String title, String subtitle,
-      IconData icon, bool value, ValueChanged<bool> onChanged) {
+      IconData icon, bool value, ValueChanged<bool> onChanged, {Key? toggleKey}) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textPrimary =
         isDark ? ShunShiColors.darkTextPrimary : ShunShiColors.textPrimary;
@@ -392,6 +451,7 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
         const SizedBox(width: 8),
         // 自定义墨绿 toggle
         GestureDetector(
+          key: toggleKey,
           onTap: () => onChanged(!value),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 250),

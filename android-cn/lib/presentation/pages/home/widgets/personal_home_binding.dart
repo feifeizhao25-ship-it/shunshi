@@ -27,10 +27,22 @@ class PersonalHomeBinding {
             throw mapPersonalHomeError(error, statusCode: error.response?.statusCode);
           }
         },
-        setEnabled: (enabled) async {
-          await ApiClient().post('/api/v1/seasons/profile/preferences', data: {'personalization_enabled': enabled});
+        setEnabled: saveEnabled,
+        dismiss: (cardId) async {
+          await ApiClient().post('/api/v1/seasons/home/not-recommend', data: {'card_id': cardId});
         },
       );
+
+  static Future<bool> loadEnabled() async {
+    final res = await ApiClient().get('/api/v1/seasons/profile/preferences');
+    final data = res.data;
+    if (data is Map && data['personalization_enabled'] is bool) return data['personalization_enabled'] as bool;
+    return true;
+  }
+
+  static Future<void> saveEnabled(bool enabled) async {
+    await ApiClient().post('/api/v1/seasons/profile/preferences', data: {'personalization_enabled': enabled});
+  }
 
   /// 首页卡片带站内路径（目前只有资料库那张：/reference-library）时跳转；只接受 app 内路径，不接受外链。
   /// 仅当构建传入 `--dart-define=SHUNSHI_TEST_CLOCK=true` 时，把页面查询串

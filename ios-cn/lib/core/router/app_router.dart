@@ -19,6 +19,7 @@ import '../../presentation/pages/profile/profile_page_v2.dart';
 import '../../presentation/pages/profile/profile_setup_page.dart';
 import '../../presentation/pages/profile/privacy_page.dart';
 import '../../presentation/pages/profile/family_invite_page.dart';
+import '../../presentation/pages/home/widgets/personal_home_binding.dart';
 import '../../presentation/pages/settings/settings_page_v2.dart';
 import '../../presentation/pages/settings/plan_usage_page.dart';
 import '../../presentation/pages/settings/plan_usage_binding.dart';
@@ -99,7 +100,10 @@ class AppRouter {
         return ContentDetailPage(contentId: state.pathParameters['id']!);
       }),
       GoRoute(path: '/records', builder: (context, state) => const RecordsPageV2()),
-      GoRoute(path: '/settings', builder: (context, state) => const SettingsPageV2()),
+      GoRoute(path: '/settings', builder: (context, state) => SettingsPageV2(
+        loadPersonalization: PersonalHomeBinding.loadEnabled,
+        savePersonalization: PersonalHomeBinding.saveEnabled,
+      )),
       GoRoute(path: '/boundaries', builder: (context, state) => const BoundariesPage()),
       GoRoute(path: '/constitution', builder: (context, state) => const ConstitutionPage()),
       GoRoute(path: '/wellness-category/:type', builder: (context, state) {

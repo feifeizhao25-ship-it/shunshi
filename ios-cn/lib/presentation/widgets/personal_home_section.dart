@@ -17,10 +17,12 @@ class PersonalHomeStrings {
   const PersonalHomeStrings({
     required this.heading,
     required this.why,
+    required this.notRecommend,
     required this.turnOff,
     required this.turnOn,
     required this.offTitle,
     required this.offBody,
+    required this.offSame,
     required this.confirmTitle,
     required this.confirmBody,
     required this.cancel,
@@ -48,10 +50,12 @@ class PersonalHomeStrings {
 
   final String heading;
   final String why;
+  final String notRecommend;
   final String turnOff;
   final String turnOn;
   final String offTitle;
   final String offBody;
+  final String offSame;
   final String confirmTitle;
   final String confirmBody;
   final String cancel;
@@ -79,13 +83,16 @@ class PersonalHomeStrings {
 
 /// What the screen needs from the network; the page supplies the real calls, tests supply fakes.
 class PersonalHomeApi {
-  const PersonalHomeApi({required this.load, required this.setEnabled});
+  const PersonalHomeApi({required this.load, required this.setEnabled, this.dismiss});
 
   /// Returns the dashboard JSON exactly as the backend sends it.
   final Future<Map<String, dynamic>> Function() load;
 
   /// Saves the on/off switch.
   final Future<void> Function(bool enabled) setEnabled;
+
+  /// 「不再推荐」这张卡。没接后端时按钮仍会刷新列表。
+  final Future<void> Function(String cardId)? dismiss;
 }
 
 class PersonalHomeCard {
@@ -262,7 +269,11 @@ class _PersonalHomeSectionState extends State<PersonalHomeSection> {
       if (!mounted) return;
       setState(() {
         _data = data;
-        _phase = !data.enabled ? _Phase.off : (data.cards.isEmpty ? _Phase.empty : _Phase.ready);
+        if (data.cards.isEmpty) {
+          _phase = data.enabled ? _Phase.empty : _Phase.off;
+        } else {
+          _phase = _Phase.ready;
+        }
       });
     } on PersonalHomeAuthRequired {
       if (mounted) setState(() => _phase = _Phase.login);
@@ -301,6 +312,21 @@ class _PersonalHomeSectionState extends State<PersonalHomeSection> {
       ),
     );
     if (ok == true) await _toggle(false);
+  }
+
+  Future<void> _hideCard(String id) async {
+    if (_saving) return;
+    setState(() => _saving = true);
+    try {
+      await widget.api.dismiss?.call(id);
+      if (!mounted) return;
+      setState(() => _saving = false);
+      await _load();
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _saving = false);
+      ScaffoldMessenger.maybeOf(context)?.showSnackBar(SnackBar(content: Text(_t.saveFailed)));
+    }
   }
 
   @override
@@ -384,6 +410,10 @@ class _PersonalHomeSectionState extends State<PersonalHomeSection> {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(_t.heading, style: text.labelMedium?.copyWith(fontFamily: 'NotoSansSC', color: scheme.primary, letterSpacing: _t.letterSpacing, fontWeight: FontWeight.w600)),
+        if (!d.enabled) ...[
+          const SizedBox(height: 6),
+          Text(_t.offSame, key: const Key('personal-home-off-note'), style: text.bodyMedium?.copyWith(fontFamily: 'NotoSansSC', color: scheme.onSurfaceVariant, height: 1.35)),
+        ],
         const SizedBox(height: 6),
         if (d.greeting.isNotEmpty) Text(d.greeting, key: const Key('personal-home-greeting'), style: text.titleMedium?.copyWith(fontFamily: 'NotoSansSC', fontWeight: FontWeight.w700, color: scheme.onSurface)),
         if (d.headline.isNotEmpty) ...[
@@ -407,7 +437,13 @@ class _PersonalHomeSectionState extends State<PersonalHomeSection> {
         ],
         const SizedBox(height: 12),
         for (var i = 0; i < d.cards.length; i++) ...[
-          _CardTile(card: d.cards[i], strings: _t, featured: i == 0, onTap: widget.onOpen == null || d.cards[i].href == null ? null : () => widget.onOpen!(d.cards[i])),
+          _CardTile(
+            card: d.cards[i],
+            strings: _t,
+            featured: i == 0,
+            onTap: widget.onOpen == null || d.cards[i].href == null ? null : () => widget.onOpen!(d.cards[i]),
+            onDismiss: d.enabled ? () => _hideCard(d.cards[i].id) : null,
+          ),
           const SizedBox(height: 8),
         ],
         const Divider(height: 16),
@@ -416,7 +452,16 @@ class _PersonalHomeSectionState extends State<PersonalHomeSection> {
             padding: const EdgeInsets.only(bottom: 2),
             child: Text(d.note, key: const Key('personal-home-note'), style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
           ),
-        Align(alignment: AlignmentDirectional.centerEnd, child: _offButton()),
+        Align(
+          alignment: AlignmentDirectional.centerEnd,
+          child: d.enabled
+              ? _offButton()
+              : FilledButton.tonal(
+                  key: const Key('personal-home-turn-on'),
+                  onPressed: _saving ? null : () => _toggle(true),
+                  child: Text(_t.turnOn),
+                ),
+        ),
       ],
     );
   }
@@ -565,11 +610,12 @@ IconData _iconFor(String kind) {
 }
 
 class _CardTile extends StatelessWidget {
-  const _CardTile({required this.card, required this.strings, required this.featured, this.onTap});
+  const _CardTile({required this.card, required this.strings, required this.featured, this.onTap, this.onDismiss});
   final PersonalHomeCard card;
   final PersonalHomeStrings strings;
   final bool featured;
   final VoidCallback? onTap;
+  final VoidCallback? onDismiss;
 
   @override
   Widget build(BuildContext context) {
@@ -626,10 +672,27 @@ class _CardTile extends StatelessWidget {
         if (onTap != null) Icon(Icons.chevron_right_rounded, color: scheme.onSurfaceVariant),
       ]),
     );
-    if (onTap == null) return tile;
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(borderRadius: BorderRadius.circular(16), onTap: onTap, child: tile),
+    final body = onTap == null
+        ? tile
+        : Material(
+            color: Colors.transparent,
+            child: InkWell(borderRadius: BorderRadius.circular(16), onTap: onTap, child: tile),
+          );
+    if (onDismiss == null) return body;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        body,
+        Align(
+          alignment: Alignment.centerLeft,
+          child: TextButton(
+            key: Key('personal-home-not-recommend-${card.id}'),
+            onPressed: onDismiss,
+            style: TextButton.styleFrom(visualDensity: VisualDensity.compact, padding: const EdgeInsets.symmetric(horizontal: 8)),
+            child: Text(strings.notRecommend),
+          ),
+        ),
+      ],
     );
   }
 }
