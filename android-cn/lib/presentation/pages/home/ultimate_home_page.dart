@@ -209,6 +209,9 @@ const _shiChenList = <ShiChenData>[
   ),
 ];
 
+/// 首页卡片和「完整时辰养生表」共用这一份十二时辰，避免两处文案各写各的。
+List<ShiChenData> homeShiChenTable() => _shiChenList;
+
 String shiChenTimeDisplay(ShiChenData sc) => '${sc.timeRange.replaceAll('-', ':00 - ')}:00';
 
 /// 大标题写时辰名和短句，不写经络。
