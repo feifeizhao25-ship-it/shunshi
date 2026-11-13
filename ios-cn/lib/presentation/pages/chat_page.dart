@@ -202,7 +202,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
         _messages.add(
           ChatMessage(
             role: 'ai',
-            text: '$_currentSolarTerm时节，大地之气正在变化。你近来身心感觉如何？',
+            text: '$_currentSolarTerm到了。按这个节气，把作息放慢一点就好。',
             cards: [
               SuggestionCard(
                 type: 'greeting',

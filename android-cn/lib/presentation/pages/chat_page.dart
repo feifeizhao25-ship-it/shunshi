@@ -110,7 +110,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
   String _token = '';
   // 先用节气表（与后端同一份数据）给出当前节气，接口返回后再以接口为准
   String _currentSolarTerm = currentSolarTermName() ?? '立夏';
-  String _solarTermDesc = '按这个节气把作息放慢一点。';
+  final String _solarTermDesc = '按这个节气把作息放慢一点。';
   String? _conversationId;
 
   @override
@@ -144,7 +144,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
         if (mounted)
           setState(() {
             _currentSolarTerm = data['name']?.toString() ?? '立夏';
-            _solarTermDesc = data['description']?.toString() ?? _solarTermDesc;
+            // 节气说明里的「温补肾阳」一类句子不进开场白。开场只说季节，不说养生功效。
           });
       }
     } catch (_) {}
@@ -221,7 +221,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
         _messages.add(
           ChatMessage(
             role: 'ai',
-            text: '$_currentSolarTerm时节，大地之气正在变化。你近来身心感觉如何？',
+            text: '$_currentSolarTerm到了。按这个节气，把作息放慢一点就好。',
             cards: [
               SuggestionCard(
                 type: 'greeting',

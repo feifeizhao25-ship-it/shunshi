@@ -522,7 +522,7 @@ SOLAR_TERMS = [
         "name": "立冬",
         "emoji": "❄️",
         "alias": "冬藏开始",
-        "description": "立冬是冬季的第一个节气，万物收藏。养生重在温补肾阳。",
+        "description": "立冬到了，天黑得更早。按这个节气，把作息放慢一点就好。",
         "start_date": "11-07",
         "end_date": "11-21",
         "suggestions": [
