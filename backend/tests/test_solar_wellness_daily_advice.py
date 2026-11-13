@@ -8,6 +8,16 @@ from app.services import shichen_table as table
 from app.services.home_recommend import text_blocked_for_stage
 
 NAMES = ("子时", "丑时", "寅时", "卯时", "辰时", "巳时", "午时", "未时", "申时", "酉时", "戌时", "亥时")
+LEGACY_DAILY_ADVICE = {
+    "success": True,
+    "data": {
+        "morning": "晨起喝一杯温水，舒展筋骨",
+        "noon": "午餐后小憩15分钟，养心安神",
+        "evening": "晚餐清淡，避免油腻，助眠安神",
+        "diet": "宜食当季蔬果，少食生冷",
+        "exercise": "推荐八段锦或散步30分钟",
+    },
+}
 MERIDIANS = ("经络", "经活跃", "当令", "胆经", "肝经", "肺经", "大肠经", "胃经", "脾经", "心经", "小肠经", "膀胱经", "肾经", "心包经", "三焦经", "养百脉")
 
 
@@ -124,8 +134,10 @@ def test_stage_filter_drops_a_forbidden_food_that_replaces_an_allowlisted_line()
 def test_daily_advice_anonymous_gets_the_plain_table_and_a_token_does_not_echo_life_stage(client):
     anonymous = client.get("/api/v1/solar-wellness/daily-advice")
     assert anonymous.status_code == 200, anonymous.text
-    _assert_plain(anonymous.json())
-    assert "life_stage" not in list(_keys(anonymous.json()))
+    assert anonymous.json() == LEGACY_DAILY_ADVICE
+    localized = client.get("/api/v1/solar-wellness/daily-advice", params={"locale": "en-US"})
+    assert localized.status_code == 200, localized.text
+    assert localized.json() == LEGACY_DAILY_ADVICE
 
     headers = _guest(client)
     general = _advice(client, headers)
@@ -204,9 +216,9 @@ def test_daily_advice_does_not_reveal_another_users_life_stage(client, monkeypat
 
     anonymous = client.get("/api/v1/solar-wellness/daily-advice")
     assert anonymous.status_code == 200, anonymous.text
-    assert anonymous.json()["data"]["filtered"] is False
-    assert "zi" in [row["id"] for row in anonymous.json()["data"]["entries"]]
-    assert "life_stage" not in anonymous.json()["data"]
+    assert anonymous.json() == LEGACY_DAILY_ADVICE
+    assert "entries" not in anonymous.json()["data"]
+    assert "filtered" not in anonymous.json()["data"]
 
     own = client.get("/api/v1/solar-wellness/daily-advice", params={"user_id": owner_id}, headers=owner_headers)
     assert own.status_code == 200, own.text

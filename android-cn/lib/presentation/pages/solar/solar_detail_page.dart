@@ -5,27 +5,48 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/network/api_client.dart';
+import '../../../core/storage/token_storage.dart';
+import '../../../data/storage/storage_manager.dart';
 import '../../../design_system/theme.dart';
 import '../../widgets/empty_state.dart';
 import '../home/ultimate_home_page.dart';
 import 'solar_wellness_copy.dart';
 
-Future<SolarWellnessLoad> loadSolarWellnessAdvice() async {
+Future<String?> readSolarWellnessToken() async {
   try {
-    final res = await ApiClient().get(
-      '/solar-wellness/daily-advice',
-      level: SpeedLevel.s2,
-    );
-    return solarWellnessLoadFromResponse(res.statusCode, res.data);
-  } on DioException catch (error) {
-    return solarWellnessLoadFromResponse(
-      error.response?.statusCode,
-      error.response?.data,
-      failed: true,
-    );
-  } catch (_) {
-    return const SolarWellnessLoad(entries: [], error: kSolarWellnessErrorBody);
-  }
+    final stored = await tokenStorage.getAccessToken();
+    if (stored != null && stored.trim().isNotEmpty) return stored.trim();
+  } catch (_) {}
+  try {
+    final fallback = StorageManager.user.getToken();
+    if (fallback != null && fallback.trim().isNotEmpty) return fallback.trim();
+  } catch (_) {}
+  return null;
+}
+
+Future<SolarWellnessLoad> loadSolarWellnessAdvice() {
+  return fetchSolarWellnessAdvice(
+    readToken: readSolarWellnessToken,
+    send: (token) async {
+      try {
+        final res = await ApiClient().get(
+          '/solar-wellness/daily-advice',
+          options: Options(headers: {'Authorization': 'Bearer $token'}),
+          level: SpeedLevel.s2,
+        );
+        return SolarWellnessHttpResult(
+          statusCode: res.statusCode,
+          data: res.data,
+        );
+      } on DioException catch (error) {
+        return SolarWellnessHttpResult(
+          statusCode: error.response?.statusCode,
+          data: error.response?.data,
+          failed: true,
+        );
+      }
+    },
+  );
 }
 
 class SolarDetailPage extends StatefulWidget {

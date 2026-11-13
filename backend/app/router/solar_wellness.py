@@ -87,12 +87,19 @@ async def get_daily_advice(
 
     claimed = _claimed_user_ids(request)
     if viewer is None:
-        # 没带令牌就不能按别人的 user_id 去查档案。国际版不带身份，只拿公开的白话表。
+        # 没带令牌就不能按别人的 user_id 去查档案。
+        # 国际版不带令牌，继续拿改版前的那五个字段，避免他们的解析被换掉。
         if claimed:
             raise HTTPException(status_code=401, detail="请先登录")
         return {
             "success": True,
-            "data": {"filtered": False, "entries": select_shichen_entries(None)},
+            "data": {
+                "morning": "晨起喝一杯温水，舒展筋骨",
+                "noon": "午餐后小憩15分钟，养心安神",
+                "evening": "晚餐清淡，避免油腻，助眠安神",
+                "diet": "宜食当季蔬果，少食生冷",
+                "exercise": "推荐八段锦或散步30分钟",
+            },
         }
     if any(value != viewer for value in claimed):
         raise HTTPException(status_code=403, detail="只能访问自己的数据")

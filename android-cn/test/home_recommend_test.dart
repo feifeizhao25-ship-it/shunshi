@@ -452,6 +452,46 @@ void main() {
     },
   );
 
+  test(
+    'solar wellness request always carries a token and ignores legacy keys',
+    () async {
+      const legacy = {
+        'success': true,
+        'data': {
+          'morning': '晨起喝一杯温水，舒展筋骨',
+          'noon': '午餐后小憩15分钟，养心安神',
+          'evening': '晚餐清淡，避免油腻，助眠安神',
+          'diet': '宜食当季蔬果，少食生冷',
+          'exercise': '推荐八段锦或散步30分钟',
+        },
+      };
+      var calls = 0;
+      final signedOut = await fetchSolarWellnessAdvice(
+        readToken: () async => '  ',
+        send: (_) async {
+          calls += 1;
+          return const SolarWellnessHttpResult(statusCode: 200, data: legacy);
+        },
+      );
+      expect(calls, 0);
+      expect(signedOut.needsLogin, isTrue);
+      expect(signedOut.entries, isEmpty);
+
+      String? sent;
+      final ignored = await fetchSolarWellnessAdvice(
+        readToken: () async => 'session-token',
+        send: (token) async {
+          sent = token;
+          return const SolarWellnessHttpResult(statusCode: 200, data: legacy);
+        },
+      );
+      expect(sent, 'session-token');
+      expect(ignored.failed, isFalse);
+      expect(ignored.entries, isEmpty);
+      expect(solarWellnessEntriesFromBody(legacy), isEmpty);
+    },
+  );
+
   testWidgets(
     'solar wellness page shows twelve entries, or an empty or error state',
     (tester) async {
@@ -485,12 +525,21 @@ void main() {
       await pump(
         () async => solarWellnessLoadFromResponse(200, {
           'success': true,
-          'data': {'noon': '午餐后小憩15分钟，养心安神', 'evening': '助眠安神'},
+          'data': {
+            'morning': '晨起喝一杯温水，舒展筋骨',
+            'noon': '午餐后小憩15分钟，养心安神',
+            'evening': '晚餐清淡，避免油腻，助眠安神',
+            'diet': '宜食当季蔬果，少食生冷',
+            'exercise': '推荐八段锦或散步30分钟',
+          },
         }),
       );
       expect(find.text(kSolarWellnessEmptyTitle), findsOneWidget);
       expect(find.textContaining('经当令'), findsNothing);
       expect(find.textContaining('养心安神'), findsNothing);
+      expect(find.textContaining('助眠安神'), findsNothing);
+      expect(find.textContaining('八段锦'), findsNothing);
+      expect(find.textContaining('宜食当季'), findsNothing);
 
       await pump(
         () async => solarWellnessLoadFromResponse(401, {'detail': '请先登录'}),

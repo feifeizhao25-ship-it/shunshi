@@ -134,7 +134,53 @@ SolarWellnessLoad solarWellnessLoadFromResponse(
   if (body['success'] != true) {
     return const SolarWellnessLoad(entries: [], error: kSolarWellnessErrorBody);
   }
+  final data = body['data'];
+  if (data is! Map || data['entries'] is! List) {
+    return const SolarWellnessLoad(entries: []);
+  }
   return SolarWellnessLoad(entries: solarWellnessEntriesFromBody(body));
+}
+
+class SolarWellnessHttpResult {
+  const SolarWellnessHttpResult({
+    this.statusCode,
+    this.data,
+    this.failed = false,
+  });
+
+  final int? statusCode;
+  final dynamic data;
+  final bool failed;
+}
+
+/// 没有令牌就不发请求。有令牌就把令牌交给 [send]。没有 entries 的响应不当成时辰表。
+Future<SolarWellnessLoad> fetchSolarWellnessAdvice({
+  required Future<String?> Function() readToken,
+  required Future<SolarWellnessHttpResult> Function(String token) send,
+}) async {
+  String? token;
+  try {
+    token = (await readToken())?.trim();
+  } catch (_) {
+    token = null;
+  }
+  if (token == null || token.isEmpty) {
+    return const SolarWellnessLoad(
+      entries: [],
+      needsLogin: true,
+      error: kSolarWellnessLoginBody,
+    );
+  }
+  try {
+    final result = await send(token);
+    return solarWellnessLoadFromResponse(
+      result.statusCode,
+      result.data,
+      failed: result.failed,
+    );
+  } catch (_) {
+    return const SolarWellnessLoad(entries: [], error: kSolarWellnessErrorBody);
+  }
 }
 
 Map<String, dynamic> solarWellnessApiBodyFor(

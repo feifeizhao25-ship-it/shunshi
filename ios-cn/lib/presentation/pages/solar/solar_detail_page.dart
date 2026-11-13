@@ -6,34 +6,50 @@ import 'package:flutter/material.dart';
 
 import '../../../core/config/app_config.dart';
 import '../../../data/network/session.dart';
+import '../../../data/storage/storage_manager.dart';
 import '../../../design_system/app_colors.dart';
 import '../../../design_system/theme.dart';
 import '../../widgets/empty_state.dart';
 import '../home/ultimate_home_page.dart';
 import 'solar_wellness_copy.dart';
 
-Future<SolarWellnessLoad> loadSolarWellnessAdvice() async {
+Future<String?> readSolarWellnessToken() async {
   try {
-    final dio = withSessionAuth(
-      Dio(
-        BaseOptions(
-          baseUrl: AppConfig.apiBaseUrl,
-          connectTimeout: const Duration(seconds: 8),
-          receiveTimeout: const Duration(seconds: 8),
-        ),
-      ),
-    );
-    final res = await dio.get('/api/v1/solar-wellness/daily-advice');
-    return solarWellnessLoadFromResponse(res.statusCode, res.data);
-  } on DioException catch (error) {
-    return solarWellnessLoadFromResponse(
-      error.response?.statusCode,
-      error.response?.data,
-      failed: true,
-    );
-  } catch (_) {
-    return const SolarWellnessLoad(entries: [], error: kSolarWellnessErrorBody);
-  }
+    final token = StorageManager.user.getToken();
+    if (token != null && token.trim().isNotEmpty) return token.trim();
+  } catch (_) {}
+  return null;
+}
+
+Future<SolarWellnessLoad> loadSolarWellnessAdvice() {
+  return fetchSolarWellnessAdvice(
+    readToken: readSolarWellnessToken,
+    send: (token) async {
+      try {
+        final dio = withSessionAuth(
+          Dio(
+            BaseOptions(
+              baseUrl: AppConfig.apiBaseUrl,
+              connectTimeout: const Duration(seconds: 8),
+              receiveTimeout: const Duration(seconds: 8),
+              headers: {'Authorization': 'Bearer $token'},
+            ),
+          ),
+        );
+        final res = await dio.get('/api/v1/solar-wellness/daily-advice');
+        return SolarWellnessHttpResult(
+          statusCode: res.statusCode,
+          data: res.data,
+        );
+      } on DioException catch (error) {
+        return SolarWellnessHttpResult(
+          statusCode: error.response?.statusCode,
+          data: error.response?.data,
+          failed: true,
+        );
+      }
+    },
+  );
 }
 
 class SolarDetailPage extends StatefulWidget {
