@@ -88,7 +88,10 @@ def home_dashboard(
         "updated_at": int(time.time()),
     }
     if not is_global:
-        legacy = build_dashboard(session, user_id)
+        from datetime import date as date_cls
+
+        # 节气芯片和卡片用同一天（含测试时钟注入的日期），不要另取墙上的今天。
+        legacy = build_dashboard(session, user_id, date_cls.fromisoformat(board["date"]))
         out["solar_term"] = legacy["solar_term"]
         out["day_type"] = legacy["day_type"]
         out["daily_insight"] = legacy["daily_insight"]
