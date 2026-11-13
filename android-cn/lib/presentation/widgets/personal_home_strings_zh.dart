@@ -2,7 +2,7 @@
 import 'personal_home_section.dart';
 
 String _minutes(int n) => '$n 分钟';
-String _days(int n) => '已连续 $n 天打开';
+String _days(int n) => '已经连续 $n 天做小行动，保持这个节奏就好';
 String _weekDone(String d) => '$d 做了小行动';
 String _weekNone(String d) => '$d 没有记录';
 

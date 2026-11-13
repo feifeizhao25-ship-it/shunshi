@@ -1,10 +1,12 @@
 # 内容系统 API 路由
-from fastapi import APIRouter, Query, HTTPException
+from fastapi import APIRouter, Depends, Query, HTTPException, Request
 from pydantic import BaseModel
 from typing import List, Optional
-from datetime import datetime
+from sqlalchemy.orm import Session
 
 from app.database.db import get_db
+from app.deps import get_session, get_settings
+from app.config import Settings
 
 router = APIRouter(prefix="/api/v1/contents", tags=["内容"])
 
@@ -188,24 +190,27 @@ async def search(
 
 @router.get("/recommend", response_model=dict)
 async def get_recommend(
+    request: Request,
     user_id: str = Query(..., description="用户ID；不传由服务端按令牌补上本人"),
     type: Optional[str] = Query(None, description="内容类型过滤"),
-    season: Optional[str] = Query(None, description="季节过滤: spring/summer/autumn/winter"),
+    season: Optional[str] = Query(None, description="已忽略：首页按北京时间的节气季节，不按传入值"),
     locale: str = Query("zh-CN", description="语言: zh-CN/en-US"),
-    limit: int = Query(10, ge=1, le=20)
+    limit: int = Query(10, ge=1, le=20),
+    session: Session = Depends(get_session),
+    settings: Settings = Depends(get_settings),
 ):
-    """个性化推荐内容 - 基于用户偏好 + 当前季节 + 随机探索
-    
-    推荐权重: 用户偏好60% + 季节相关30% + 随机探索10%
+    """首页今日推荐。季节跟北京时间的节气走，不展示药效、主治和穴位适应症。
+
+    候选仍按偏好和当季内容来取，返回前会丢掉不安全的句子。
+    ``season`` 查询参数不再放宽季节，避免 11 月仍推出春夏内容。
     """
-    import random
+    from app.services.home_recommend import life_stage_for, recommend_day, season_on, select_home_items
+
     db = get_db()
-    
-    # 确定当前季节
-    month = datetime.now().month
-    season_map = {1: "winter", 2: "spring", 3: "spring", 4: "spring", 5: "spring", 6: "summer",
-                  7: "summer", 8: "summer", 9: "autumn", 10: "autumn", 11: "autumn", 12: "winter"}
-    current_season = season or season_map.get(month, "spring")
+    day = recommend_day(request, settings)
+    # 节气季节（立冬后是冬）。不用公历月份，也不采用调用方传入的 season。
+    current_season = season_on(day)
+    _ = season  # 保留查询参数，避免旧客户端 422；不拿它放宽季节
     
     # 1. 用户偏好 (60%) - 查询用户最近的care_records中最常查看的type
     user_pref_types = []
@@ -291,12 +296,15 @@ async def get_recommend(
     # 如果类型过滤，额外筛选
     if type:
         merged = [item for item in merged if item.get("type") == type]
-    
+
+    stage = life_stage_for(session, user_id)
+    items = select_home_items(merged, day, life_stage=stage, limit=limit)
+
     return {
         "success": True,
         "data": {
-            "items": merged[:limit],
-            "total": len(merged[:limit]),
+            "items": items,
+            "total": len(items),
             "season": current_season,
             "user_preferences": user_pref_types[:3] if user_pref_types else [],
         }

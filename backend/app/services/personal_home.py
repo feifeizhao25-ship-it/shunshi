@@ -312,6 +312,8 @@ def compose(profile: Profile, activity: Activity, user_key: str, now: datetime, 
     for card in LIBRARY:
         if (card["seasons"] and profile.season not in card["seasons"]) or (card["day"] and card["day"] != daytype):
             continue  # a weekend card on a Wednesday, or a winter card in summer, is simply wrong
+        if _blocked_for_life_stage(card.get(lang, ""), profile.life_stage):
+            continue
         s, parts = score_card(card, profile, activity, user_key, day, bucket, daytype, recent_cats)
         scored.append((s, card, parts))
     scored.sort(key=lambda t: (-t[0], t[1]["id"]))
@@ -334,12 +336,23 @@ def compose(profile: Profile, activity: Activity, user_key: str, now: datetime, 
     if len(picked) < 3:
         take(-1, 3)
 
-    anchors = [dict(c, bases=[c.get("basis", "calendar")]) for c in extra_cards][:2]
+    anchors = [
+        dict(c, bases=[c.get("basis", "calendar")])
+        for c in extra_cards
+        if not _blocked_for_life_stage(str(c.get("title") or "") + str(c.get("description") or ""), profile.life_stage)
+    ][:2]
     cards = anchors + picked[: max(1, 5 - len(anchors))]
     hero = next((c for c in cards if str(c.get("id", "")).startswith("day_")), picked[0] if picked else (cards[0] if cards else None))
     streak_card = _streak_card(streak, activity, day, lang)
     lightest = min(picked, key=lambda c: (c["duration_min"], c["id"])) if picked else None
-    used = sorted({b for c in cards for b in c.get("bases", [c.get("basis")])} | ({"activity"} if (activity.completed or activity.seen) else set()))
+    from ..safety.contraindications import flags_from_profile
+
+    stage_used = bool(flags_from_profile(life_stage=profile.life_stage))
+    used = sorted(
+        {b for c in cards for b in c.get("bases", [c.get("basis")])}
+        | ({"activity"} if (activity.completed or activity.seen) else set())
+        | ({"life_stage"} if stage_used else set())
+    )
     return {
         "greeting": greeting(bucket, lang),
         "hero": hero,
@@ -370,10 +383,19 @@ def milestone(streak: int, lang: str) -> dict:
     """
     reached = max((m for m in MILESTONE_DAYS if streak >= m), default=0)
     nxt = next((m for m in MILESTONE_DAYS if streak < m), None)
-    if reached == 3:
-        text = ("连续 3 天了，好习惯已经起步" if lang == "zh" else "Three days in a row. A habit is getting started.")
-    elif reached >= 7:
-        text = ("连续 7 天，一整周的小行动，辛苦了" if lang == "zh" else "Seven days in a row, a full week of small actions.")
+    # 天数和连续记录用同一个数字。连续 4、5、6 天时不能还写「连续 3 天」。
+    if streak >= 7:
+        if lang == "zh":
+            tail = "，一整周了，辛苦了" if streak == 7 else "，保持这个节奏就好"
+            text = f"已经连续 {streak} 天做小行动{tail}"
+        else:
+            text = "Seven days in a row, a full week of small actions." if streak == 7 else f"{streak} days in a row. Keep that pace."
+    elif streak >= 3:
+        if lang == "zh":
+            tail = "，好习惯已经起步" if streak == 3 else "，保持这个节奏就好"
+            text = f"已经连续 {streak} 天做小行动{tail}"
+        else:
+            text = "Three days in a row. A habit is getting started." if streak == 3 else f"{streak} days in a row. Keep that pace."
     elif streak >= 1 and nxt:
         left = nxt - streak
         text = (f"再坚持 {left} 天就是第 {nxt} 天" if lang == "zh" else f"{left} more day{'s' if left != 1 else ''} to reach day {nxt}.")
@@ -433,6 +455,15 @@ def _on_note(lang: str) -> str:
 
 def _off_note(lang: str) -> str:
     return "个性化已关闭，显示通用提示。" if lang == "zh" else "Personalisation is off; showing general tips."
+
+
+def _blocked_for_life_stage(text: str, life_stage: str | None) -> bool:
+    """孕期 / 哺乳期不推荐点到禁忌名单的卡片。名单在 home_recommend 里读现有表，这里不改表。"""
+    if not text or not life_stage:
+        return False
+    from .home_recommend import text_blocked_for_stage
+
+    return text_blocked_for_stage(text, life_stage)
 
 
 def forbidden_hits(text: str, lang: str) -> list:

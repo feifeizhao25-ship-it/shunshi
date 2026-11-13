@@ -6,6 +6,7 @@ library;
 import 'dart:math';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../design_system/theme.dart';
 import 'package:go_router/go_router.dart';
 import 'widgets/home_skeleton.dart';
@@ -19,6 +20,8 @@ import '../../../design_system/app_colors.dart';
 import '../../../design_system/style_theming.dart';
 import '../../../data/network/session.dart';
 import '../../../core/time/domestic_clock.dart';
+import 'elder_home_text.dart';
+import 'home_clock.dart';
 
 // ═══════════════════════════════════════════════════════════════
 // 十二时辰数据模型（本地计算）
@@ -209,7 +212,7 @@ const _shiChenList = <ShiChenData>[
 // 节气名称映射（根据月份大致推算）
 // ═══════════════════════════════════════════════════════════════
 
-String _getCurrentSolarTermInfo() => solarTermSeasonLine();
+String _getCurrentSolarTermInfo([DateTime? day]) => solarTermSeasonLine(day ?? homeClockDayFromApp());
 
 // ═══════════════════════════════════════════════════════════════
 // 首页 Widget
@@ -275,6 +278,8 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
   // ignore: unused_field
   List<Map<String, dynamic>> _apiSuggestions = [];
   bool _loading = true;
+  bool _elderMode = false;
+  DateTime? _boardDay;
 
   Map<String, dynamic> _followUp = {};
   bool _hasFollowUp = false;
@@ -283,7 +288,9 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
   void initState() {
     super.initState();
     _currentShiChen = getCurrentShiChen();
-    _solarTermInfo = _getCurrentSolarTermInfo();
+    _boardDay = homeClockDayFromApp();
+    _solarTermInfo = _getCurrentSolarTermInfo(_boardDay);
+    _loadHomePrefs();
     _fetchDashboard();
   }
 
@@ -299,6 +306,12 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
         data: const {'due_followups': []},
       );
     }
+  }
+
+  Future<void> _loadHomePrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!mounted) return;
+    setState(() => _elderMode = prefs.getBool('elder_mode') ?? false);
   }
 
   Future<void> _fetchDashboard() async {
@@ -348,6 +361,12 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
   }
 
   void _applyData(Map dash) {
+    final rawDate = dash['date']?.toString();
+    final parsed = rawDate == null ? null : DateTime.tryParse(rawDate);
+    if (parsed != null) {
+      _boardDay = DateTime(parsed.year, parsed.month, parsed.day);
+      _solarTermInfo = _getCurrentSolarTermInfo(_boardDay);
+    }
     final insight = dash['daily_insight'];
     if (insight is Map) {
       _dailyInsight = insight['text']?.toString() ?? _dailyInsight;
@@ -366,9 +385,13 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bg = isDark ? ShunShiColors.darkBackground : AppColors.background(context);
 
-    if (_loading) return const HomeSkeleton();
+    if (_loading) {
+      return ElderHomeScope(enabled: _elderMode, child: const HomeSkeleton());
+    }
 
-    return Scaffold(
+    return ElderHomeScope(
+      enabled: _elderMode,
+      child: Scaffold(
       backgroundColor: bg,
       body: SafeArea(
         child: CustomScrollView(
@@ -460,6 +483,7 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
             const SliverToBoxAdapter(child: SizedBox(height: 48)),
           ],
         ),
+      ),
       ),
     );
   }

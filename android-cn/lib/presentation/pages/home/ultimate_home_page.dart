@@ -6,6 +6,7 @@ library;
 import 'dart:math';
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../design_system/theme.dart';
 import 'package:go_router/go_router.dart';
 import 'widgets/home_skeleton.dart';
@@ -16,6 +17,9 @@ import '../../account/account_surface.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/cache/cache_service.dart';
 import '../../../core/time/domestic_clock.dart';
+import 'elder_home_text.dart';
+import 'home_clock.dart';
+import 'home_recommend.dart';
 
 // ═══════════════════════════════════════════════════════════════
 // 十二时辰数据模型（本地计算）
@@ -206,7 +210,7 @@ const _shiChenList = <ShiChenData>[
 // 节气名称映射（根据月份大致推算）
 // ═══════════════════════════════════════════════════════════════
 
-String _getCurrentSolarTermInfo() => solarTermSeasonLine();
+String _getCurrentSolarTermInfo([DateTime? day]) => solarTermSeasonLine(day ?? homeClockDayFromApp());
 
 // ═══════════════════════════════════════════════════════════════
 // 今日推荐数据
@@ -274,31 +278,18 @@ class TodayRecommendation {
   }
 }
 
-List<TodayRecommendation> _getTodayRecommendations(ShiChenData sc) {
-  // 根据时辰给出不同推荐
-  final hour = domesticNow().hour;
-  if (hour >= 5 && hour < 11) {
-    return const [
-      TodayRecommendation(icon: Icons.rice_bowl, title: '小米山药粥', subtitle: '温补脾胃，晨起首选', tag: '食物', accentColor: ShunShiColors.apricot, imageAsset: 'assets/images/morning_tea.jpg'),
-      TodayRecommendation(icon: Icons.local_cafe, title: '陈皮普洱茶', subtitle: '理气健脾，助消化', tag: '茶饮', accentColor: ShunShiColors.warm, imageAsset: 'assets/images/herbal_soup.jpg'),
-      TodayRecommendation(icon: Icons.self_improvement, title: '八段锦晨练', subtitle: '舒展筋骨，调和气血', tag: '运动', accentColor: ShunShiColors.primaryLight, imageAsset: 'assets/images/breathing.jpg'),
-      TodayRecommendation(icon: Icons.spa, title: '穴位按压', subtitle: '足三里·健脾胃', tag: '养生', accentColor: ShunShiColors.calm, imageAsset: 'assets/images/evening_yoga.jpg'),
-    ];
-  } else if (hour >= 11 && hour < 17) {
-    return const [
-      TodayRecommendation(icon: Icons.set_meal, title: '莲子百合汤', subtitle: '清心安神，午间滋养', tag: '食物', accentColor: ShunShiColors.apricot, imageAsset: 'assets/images/herbal_soup.jpg'),
-      TodayRecommendation(icon: Icons.emoji_food_beverage, title: '菊花枸杞茶', subtitle: '清肝明目，下午提神', tag: '茶饮', accentColor: ShunShiColors.warm, imageAsset: 'assets/images/seasonal_fruit.jpg'),
-      TodayRecommendation(icon: Icons.directions_walk, title: '午后散步', subtitle: '消食化积，通调腑气', tag: '运动', accentColor: ShunShiColors.primaryLight, imageAsset: 'assets/images/breathing.jpg'),
-      TodayRecommendation(icon: Icons.nights_stay, title: '静坐冥想', subtitle: '收敛心神，养心安神', tag: '养生', accentColor: ShunShiColors.calm, imageAsset: 'assets/images/meditation.jpg'),
-    ];
-  } else {
-    return const [
-      TodayRecommendation(icon: Icons.soup_kitchen, title: '银耳红枣羹', subtitle: '滋阴润燥，晚间养颜', tag: '食物', accentColor: ShunShiColors.apricot, imageAsset: 'assets/images/herbal_soup.jpg'),
-      TodayRecommendation(icon: Icons.local_cafe, title: '玫瑰花茶', subtitle: '疏肝理气，宁心安神', tag: '茶饮', accentColor: ShunShiColors.warm, imageAsset: 'assets/images/bedtime_tea.jpg'),
-      TodayRecommendation(icon: Icons.hot_tub, title: '温水泡脚', subtitle: '引火归元，助眠安神', tag: '运动', accentColor: ShunShiColors.primaryLight, imageAsset: 'assets/images/evening_yoga.jpg'),
-      TodayRecommendation(icon: Icons.menu_book, title: '静心阅读', subtitle: '放下手机，养百脉', tag: '养生', accentColor: ShunShiColors.calm, imageAsset: 'assets/images/bedtime_tea.jpg'),
-    ];
-  }
+List<TodayRecommendation> plainTodayRecommendations(DateTime day, {String? lifeStage}) {
+  final season = seasonKeyOn(day);
+  return homeSuggestionsFor(season: season, lifeStage: lifeStage).map((item) {
+    final food = item.tag == '饮食';
+    return TodayRecommendation(
+      icon: food ? Icons.rice_bowl : Icons.nightlight_round,
+      title: item.title,
+      subtitle: item.subtitle,
+      tag: food ? '食物' : '作息',
+      accentColor: food ? ShunShiColors.apricot : ShunShiColors.calm,
+    );
+  }).toList();
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -386,6 +377,9 @@ class _UltimateHomePageState extends State<UltimateHomePage>
   // ignore: unused_field
   List<Map<String, dynamic>> _apiSuggestions = [];
   bool _loading = true;
+  bool _elderMode = false;
+  String? _lifeStage;
+  DateTime? _boardDay;
 
   Map<String, dynamic> _followUp = {};
   bool _hasFollowUp = false;
@@ -401,7 +395,9 @@ class _UltimateHomePageState extends State<UltimateHomePage>
   void initState() {
     super.initState();
     _currentShiChen = getCurrentShiChen();
-    _solarTermInfo = _getCurrentSolarTermInfo();
+    _boardDay = homeClockDayFromApp();
+    _solarTermInfo = _getCurrentSolarTermInfo(_boardDay);
+    _loadHomePrefs();
 
     // 呼吸动画 (节气胶囊)
     _breathController = AnimationController(
@@ -442,6 +438,18 @@ class _UltimateHomePageState extends State<UltimateHomePage>
       c.dispose();
     }
     super.dispose();
+  }
+
+  DateTime get _cardDay => _boardDay ?? homeClockDayFromApp();
+
+  Future<void> _loadHomePrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!mounted) return;
+    final stage = prefs.getString('life_stage') ?? prefs.getString('user_life_stage') ?? '';
+    setState(() {
+      _elderMode = prefs.getBool('elder_mode') ?? false;
+      _lifeStage = stage.isEmpty ? null : stage;
+    });
   }
 
   Future<void> _fetchDashboard() async {
@@ -485,18 +493,21 @@ class _UltimateHomePageState extends State<UltimateHomePage>
       final data = raw is Map && raw['data'] is Map ? raw['data'] as Map : raw;
       if (data is Map && data['items'] is List) {
         final items = (data['items'] as List).cast<Map<String, dynamic>>();
-        if (items.isNotEmpty) {
+        final kept = items.where((item) => keepHomePayload(item, season: seasonKeyOn(_cardDay), lifeStage: _lifeStage)).toList();
+        if (kept.isNotEmpty) {
           setState(() {
-            _todayRecs = items.map((item) => TodayRecommendation.fromApi(item, isDark)).toList();
+            _todayRecs = kept.map((item) => TodayRecommendation.fromApi(item, isDark)).toList();
           });
           return;
         }
       }
       if (data is List && data.isNotEmpty) {
-        final items = data.cast<Map<String, dynamic>>();
-        setState(() {
-          _todayRecs = items.map((item) => TodayRecommendation.fromApi(item, isDark)).toList();
-        });
+        final items = data.cast<Map<String, dynamic>>().where((item) => keepHomePayload(item, season: seasonKeyOn(_cardDay), lifeStage: _lifeStage)).toList();
+        if (items.isNotEmpty) {
+          setState(() {
+            _todayRecs = items.map((item) => TodayRecommendation.fromApi(item, isDark)).toList();
+          });
+        }
       }
     } catch (_) {
       // Keep fallback recommendations
@@ -504,6 +515,12 @@ class _UltimateHomePageState extends State<UltimateHomePage>
   }
 
   void _applyData(Map dash) {
+    final rawDate = dash['date']?.toString();
+    final parsed = rawDate == null ? null : DateTime.tryParse(rawDate);
+    if (parsed != null) {
+      _boardDay = DateTime(parsed.year, parsed.month, parsed.day);
+      _solarTermInfo = _getCurrentSolarTermInfo(_boardDay);
+    }
     final insight = dash['daily_insight'];
     if (insight is Map) {
       _dailyInsight = insight['text']?.toString() ?? _dailyInsight;
@@ -545,9 +562,13 @@ class _UltimateHomePageState extends State<UltimateHomePage>
     final timeDisplay = '${sc.timeRange.replaceAll('-', ':00 - ')}:00';
     final bg = isDark ? ShunShiColors.darkBackground : ShunShiColors.background;
 
-    if (_loading) return const HomeSkeleton();
+    if (_loading) {
+      return ElderHomeScope(enabled: _elderMode, child: const HomeSkeleton());
+    }
 
-    return Scaffold(
+    return ElderHomeScope(
+      enabled: _elderMode,
+      child: Scaffold(
       backgroundColor: bg,
       body: SafeArea(
         child: RefreshIndicator(
@@ -616,7 +637,7 @@ class _UltimateHomePageState extends State<UltimateHomePage>
 
               // ═══════════════ 今日推荐 横向滚动 ═══════════════
               SliverToBoxAdapter(
-                child: _staggerWrap(5, _buildTodayRecommendations(sc)),
+                child: _staggerWrap(5, _buildTodayRecommendations()),
               ),
 
               // ═══════════════ 今日洞察 (如有) ═══════════════
@@ -654,6 +675,7 @@ class _UltimateHomePageState extends State<UltimateHomePage>
             ],
           ),
         ),
+      ),
       ),
     );
   }
@@ -1230,8 +1252,8 @@ class _UltimateHomePageState extends State<UltimateHomePage>
   }
 
   // ─── 今日推荐 横向滚动 ───
-  Widget _buildTodayRecommendations(ShiChenData sc) {
-    final recs = _todayRecs.isNotEmpty ? _todayRecs : _getTodayRecommendations(sc);
+  Widget _buildTodayRecommendations() {
+    final recs = _todayRecs.isNotEmpty ? _todayRecs : plainTodayRecommendations(_cardDay, lifeStage: _lifeStage);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
