@@ -1,0 +1,86 @@
+{
+  "task": "SS-5",
+  "title": "检索离线对比：BM25 基线 与 bge-m3 + 重排",
+  "default_unchanged": true,
+  "default_retrieval": {
+    "entry": "app.rag.retriever.retrieve",
+    "hybrid_default_on": true,
+    "rrf_k": 60,
+    "pool": 60,
+    "bm25_k1": 1.4,
+    "bm25_b": 0.75,
+    "heading_weight": 3,
+    "lexical_embedder": "TFIDFEmbedder",
+    "dense_model": null,
+    "reranker": null,
+    "retrieve_calls_dense": false,
+    "embedder_api_local_model": "BAAI/bge-small-zh-v1.5",
+    "embedder_api_default_providers": [
+      "bailian",
+      "siliconflow",
+      "local"
+    ]
+  },
+  "note": "只出对比报告，不切换线上默认检索。BM25 用现有词面索引，食材名和节气名仍走这条精确匹配。",
+  "k": 8,
+  "corpus_entries": 16,
+  "sets": {
+    "golden": {
+      "n": 165,
+      "file": "golden_shunshi_zh.jsonl",
+      "bm25": {
+        "status": "ran",
+        "n_scored": 120,
+        "hits": 120,
+        "recall_at_1": 0.975,
+        "recall_at_8": 1.0,
+        "misses": []
+      },
+      "bge_m3_reranker": {
+        "status": "skipped",
+        "ran": false,
+        "recall_at_1": null,
+        "recall_at_8": null,
+        "n_scored": 120,
+        "hits": null,
+        "misses": []
+      }
+    },
+    "heldout": {
+      "n": 60,
+      "file": "golden_shunshi_zh_heldout.jsonl",
+      "bm25": {
+        "status": "ran",
+        "n_scored": 60,
+        "hits": 60,
+        "recall_at_1": 0.9667,
+        "recall_at_8": 1.0,
+        "misses": []
+      },
+      "bge_m3_reranker": {
+        "status": "skipped",
+        "ran": false,
+        "recall_at_1": null,
+        "recall_at_8": null,
+        "n_scored": 60,
+        "hits": null,
+        "misses": []
+      }
+    }
+  },
+  "dense": {
+    "status": "skipped",
+    "model": "BAAI/bge-m3",
+    "reranker": "BAAI/bge-reranker-v2-m3",
+    "device": "cpu",
+    "offline_only": true,
+    "reason": "离线 CPU 上跑不了：没有推理库（sentence_transformers、FlagEmbedding、torch）；没有 bge-m3 与 bge-reranker-v2-m3 的本地权重。不联网下载，也不调用模型接口。",
+    "missing_modules": [
+      "sentence_transformers",
+      "FlagEmbedding",
+      "torch"
+    ],
+    "local_weights": [],
+    "ran": false
+  }
+}
