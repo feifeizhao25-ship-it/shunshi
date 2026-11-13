@@ -3,10 +3,12 @@ Solar Wellness API — 顺时养生 wellness endpoints
 Provides: current solar term, daily advice, shichen info, context
 """
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Depends, Query, Request
 from typing import Optional
 from datetime import datetime
-from sqlalchemy import text
+from sqlalchemy.orm import Session
+
+from app.deps import get_session
 
 router = APIRouter(prefix="/api/v1/solar-wellness", tags=["solar-wellness"])
 
@@ -51,19 +53,23 @@ async def get_current_solar_wellness():
 
 @router.get("/daily-advice")
 async def get_daily_advice(
-    user_id: Optional[str] = Query(None, description="用户ID"),
-    constitution: Optional[str] = Query(None, description="体质类型"),
+    request: Request,
+    user_id: str = Query(..., description="用户ID；不传由服务端按令牌补上本人"),
+    constitution: Optional[str] = Query(None, description="体质类型，不参与这张表的文案"),
+    session: Session = Depends(get_session),
 ):
-    """获取每日养生建议"""
+    """十二时辰白话表。只返回首页同一份允许名单，并按人生阶段丢掉禁忌食材。"""
+    _ = (request, constitution)
+    from app.services.home_recommend import life_stage_for
+    from app.services.shichen_table import select_shichen_entries
+
+    stage = life_stage_for(session, user_id)
     return {
         "success": True,
         "data": {
-            "morning": "晨起喝一杯温水，舒展筋骨",
-            "noon": "午餐后小憩15分钟，养心安神",
-            "evening": "晚餐清淡，避免油腻，助眠安神",
-            "diet": "宜食当季蔬果，少食生冷",
-            "exercise": "推荐八段锦或散步30分钟",
-        }
+            "life_stage": stage,
+            "entries": select_shichen_entries(stage),
+        },
     }
 
 

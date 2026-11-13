@@ -5,6 +5,8 @@ import 'package:shunshi/presentation/pages/home/elder_home_text.dart';
 import 'package:shunshi/presentation/pages/home/home_clock.dart';
 import 'package:shunshi/presentation/pages/home/home_recommend.dart';
 import 'package:shunshi/presentation/pages/home/ultimate_home_page.dart';
+import 'package:shunshi/presentation/pages/solar/solar_detail_page.dart';
+import 'package:shunshi/presentation/pages/solar/solar_wellness_copy.dart';
 import 'package:shunshi/presentation/widgets/personal_home_strings_zh.dart';
 
 void main() {
@@ -19,12 +21,50 @@ void main() {
     final winter = homeSuggestionsFor(
       season: 'winter',
       extra: const [
-        HomeSuggest(id: 'spring-greens', title: '春菜', subtitle: '午饭加一盘青菜。', tag: '饮食', season: 'spring'),
-        HomeSuggest(id: 'lettuce', title: '莴笋', subtitle: '通乳汁。', tag: '饮食', season: 'summer'),
-        HomeSuggest(id: 'almond', title: '苦杏仁', subtitle: '有毒需炮制。', tag: '饮食', season: 'autumn'),
-        HomeSuggest(id: 'angelica', title: '当归', subtitle: '补血活血、调经止痛。', tag: '饮食', season: 'winter', homeSafe: true),
-        HomeSuggest(id: 'porridge', title: '热粥', subtitle: '晚饭喝一碗热粥。', tag: '饮食', season: 'winter', homeSafe: true),
-        HomeSuggest(id: 'unmarked', title: '晚饭加一碗热汤', subtitle: '晚饭喝一碗热汤，别吃得太晚。', tag: '饮食', season: 'winter'),
+        HomeSuggest(
+          id: 'spring-greens',
+          title: '春菜',
+          subtitle: '午饭加一盘青菜。',
+          tag: '饮食',
+          season: 'spring',
+        ),
+        HomeSuggest(
+          id: 'lettuce',
+          title: '莴笋',
+          subtitle: '通乳汁。',
+          tag: '饮食',
+          season: 'summer',
+        ),
+        HomeSuggest(
+          id: 'almond',
+          title: '苦杏仁',
+          subtitle: '有毒需炮制。',
+          tag: '饮食',
+          season: 'autumn',
+        ),
+        HomeSuggest(
+          id: 'angelica',
+          title: '当归',
+          subtitle: '补血活血、调经止痛。',
+          tag: '饮食',
+          season: 'winter',
+          homeSafe: true,
+        ),
+        HomeSuggest(
+          id: 'porridge',
+          title: '热粥',
+          subtitle: '晚饭喝一碗热粥。',
+          tag: '饮食',
+          season: 'winter',
+          homeSafe: true,
+        ),
+        HomeSuggest(
+          id: 'unmarked',
+          title: '晚饭加一碗热汤',
+          subtitle: '晚饭喝一碗热汤，别吃得太晚。',
+          tag: '饮食',
+          season: 'winter',
+        ),
       ],
     );
     final blob = winter.map((item) => item.blob).join();
@@ -39,17 +79,34 @@ void main() {
     }
     expect(winter.every((item) => item.season == 'winter'), isTrue);
 
-    final payload = keepHomePayload(
-      {'title': '肩井穴', 'description': '乳汁不下。孕妇禁用。', 'type': 'acupressure', 'season': 'winter'},
-      season: 'winter',
-    );
+    final payload = keepHomePayload({
+      'title': '肩井穴',
+      'description': '乳汁不下。孕妇禁用。',
+      'type': 'acupressure',
+      'season': 'winter',
+    }, season: 'winter');
     expect(payload, isFalse);
   });
 
   test('a breastfeeding profile does not see listed foods', () {
-    const mint = HomeSuggest(id: 'mint-tea', title: '热茶', subtitle: '下午喝一杯薄荷茶。', tag: '饮食', season: 'winter', homeSafe: true);
-    final nursing = homeSuggestionsFor(season: 'winter', lifeStage: '哺乳期', extra: const [mint]);
-    final general = homeSuggestionsFor(season: 'winter', lifeStage: '上班', extra: const [mint]);
+    const mint = HomeSuggest(
+      id: 'mint-tea',
+      title: '热茶',
+      subtitle: '下午喝一杯薄荷茶。',
+      tag: '饮食',
+      season: 'winter',
+      homeSafe: true,
+    );
+    final nursing = homeSuggestionsFor(
+      season: 'winter',
+      lifeStage: '哺乳期',
+      extra: const [mint],
+    );
+    final general = homeSuggestionsFor(
+      season: 'winter',
+      lifeStage: '上班',
+      extra: const [mint],
+    );
     expect(nursing.map((item) => item.id), isNot(contains('mint-tea')));
     expect(general.map((item) => item.id), contains('mint-tea'));
     expect(nursing.any((item) => item.blob.contains('薄荷')), isFalse);
@@ -91,12 +148,26 @@ void main() {
       ),
     ];
     for (final stage in [null, '上班', '孕期', '哺乳期']) {
-      final shown = homeSuggestionsFor(season: 'winter', lifeStage: stage, extra: teas);
+      final shown = homeSuggestionsFor(
+        season: 'winter',
+        lifeStage: stage,
+        extra: teas,
+      );
       final blob = shown.map((item) => item.blob).join();
       for (final tea in teas) {
         expect(shown.map((item) => item.id), isNot(contains(tea.id)));
       }
-      for (final term in ['补中益气', '滋补肝肾', '补肾固精', '润肠通便', '风寒感冒初期尤宜', '引火归元', '滋养气血', '运化', '清心导浊']) {
+      for (final term in [
+        '补中益气',
+        '滋补肝肾',
+        '补肾固精',
+        '润肠通便',
+        '风寒感冒初期尤宜',
+        '引火归元',
+        '滋养气血',
+        '运化',
+        '清心导浊',
+      ]) {
         expect(blob.contains(term), isFalse, reason: term);
       }
       expect(homeDosagePattern.hasMatch(blob), isFalse);
@@ -139,14 +210,25 @@ void main() {
         'tags': ['home_safe'],
       },
     ]) {
-      expect(keepHomePayload(tea, season: 'winter'), isFalse, reason: tea['id'] as String);
+      expect(
+        keepHomePayload(tea, season: 'winter'),
+        isFalse,
+        reason: tea['id'] as String,
+      );
       expect(keepHomePayload(tea, season: 'winter', lifeStage: '孕期'), isFalse);
       expect(keepHomePayload(tea, season: 'winter', lifeStage: '哺乳期'), isFalse);
     }
 
     expect(
       keepHomePayload(
-        {'id': 'porridge', 'title': '热粥', 'description': '晚饭喝一碗热粥。', 'type': 'food_therapy', 'season': 'winter', 'home_safe': true},
+        {
+          'id': 'porridge',
+          'title': '热粥',
+          'description': '晚饭喝一碗热粥。',
+          'type': 'food_therapy',
+          'season': 'winter',
+          'home_safe': true,
+        },
         season: 'winter',
         lifeStage: '孕期',
       ),
@@ -154,7 +236,14 @@ void main() {
     );
     expect(
       keepHomePayload(
-        {'id': 'porridge', 'title': '热粥', 'description': '晚饭喝一碗热粥。', 'type': 'food_therapy', 'season': 'winter', 'home_safe': true},
+        {
+          'id': 'porridge',
+          'title': '热粥',
+          'description': '晚饭喝一碗热粥。',
+          'type': 'food_therapy',
+          'season': 'winter',
+          'home_safe': true,
+        },
         season: 'winter',
         lifeStage: '哺乳期',
       ),
@@ -162,17 +251,27 @@ void main() {
     );
     expect(
       keepHomePayload(
-        {'id': 'dg', 'title': '当归蛋汤', 'description': '晚饭喝一碗热汤。', 'type': 'food_therapy', 'season': 'winter', 'home_safe': true},
+        {
+          'id': 'dg',
+          'title': '当归蛋汤',
+          'description': '晚饭喝一碗热汤。',
+          'type': 'food_therapy',
+          'season': 'winter',
+          'home_safe': true,
+        },
         season: 'winter',
         lifeStage: '孕期',
       ),
       isFalse,
     );
     expect(
-      keepHomePayload(
-        {'id': 'unmarked', 'title': '晚饭加一碗热汤', 'description': '晚饭喝一碗热汤，别吃得太晚。', 'type': 'food_therapy', 'season': 'winter'},
-        season: 'winter',
-      ),
+      keepHomePayload({
+        'id': 'unmarked',
+        'title': '晚饭加一碗热汤',
+        'description': '晚饭喝一碗热汤，别吃得太晚。',
+        'type': 'food_therapy',
+        'season': 'winter',
+      }, season: 'winter'),
       isFalse,
     );
   });
@@ -203,48 +302,220 @@ void main() {
     }
   });
 
-  test('whole home static copy has no efficacy, dosage, tea, or listed foods', () {
-    final copy = visibleHomeCopy();
-    expect(copy.length, greaterThan(visibleHomeTimeOfDayCopy().length));
-    expect(visibleHomeTimeOfDayCopy().where((line) => line == '子时'), isNotEmpty);
-    expect(visibleHomeTimeOfDayCopy().where((line) => line == '亥时'), isNotEmpty);
-    expect(visibleHomeTimeOfDayCopy().join().contains('补充水分'), isTrue);
-    for (final line in copy) {
-      expect(homeVisibleTextHasEfficacy(line), isFalse, reason: line);
-      expect(homeDosagePattern.hasMatch(line), isFalse, reason: line);
-    }
-    final joined = copy.join('\n');
-    expect(joined.contains('茶'), isFalse);
-    for (final stage in ['孕期', '哺乳期']) {
-      for (final name in homeExclusionNames(stage)) {
-        expect(joined.contains(name), isFalse, reason: '$stage $name');
+  test(
+    'whole home static copy has no efficacy, dosage, tea, or listed foods',
+    () {
+      final copy = visibleHomeCopy();
+      expect(copy.length, greaterThan(visibleHomeTimeOfDayCopy().length));
+      expect(
+        visibleHomeTimeOfDayCopy().where((line) => line == '子时'),
+        isNotEmpty,
+      );
+      expect(
+        visibleHomeTimeOfDayCopy().where((line) => line == '亥时'),
+        isNotEmpty,
+      );
+      expect(visibleHomeTimeOfDayCopy().join().contains('补充水分'), isTrue);
+      for (final line in copy) {
+        expect(homeVisibleTextHasEfficacy(line), isFalse, reason: line);
+        expect(homeDosagePattern.hasMatch(line), isFalse, reason: line);
       }
-    }
-    for (final term in [
-      '经络',
-      '经活跃',
-      '当令',
-      '胆经',
-      '肝经',
-      '肺经',
-      '大肠经',
-      '胃经',
-      '脾经',
-      '心经',
-      '小肠经',
-      '膀胱经',
-      '肾经',
-      '心包经',
-      '三焦经',
-      '养百脉',
-    ]) {
-      expect(joined.contains(term), isFalse, reason: term);
-    }
-  });
+      final joined = copy.join('\n');
+      expect(joined.contains('茶'), isFalse);
+      for (final stage in ['孕期', '哺乳期']) {
+        for (final name in homeExclusionNames(stage)) {
+          expect(joined.contains(name), isFalse, reason: '$stage $name');
+        }
+      }
+      for (final term in [
+        '经络',
+        '经活跃',
+        '当令',
+        '胆经',
+        '肝经',
+        '肺经',
+        '大肠经',
+        '胃经',
+        '脾经',
+        '心经',
+        '小肠经',
+        '膀胱经',
+        '肾经',
+        '心包经',
+        '三焦经',
+        '养百脉',
+      ]) {
+        expect(joined.contains(term), isFalse, reason: term);
+      }
+
+      final page = visibleSolarWellnessCopy();
+      expect(page.length, greaterThan(visibleHomeTimeOfDayCopy().length));
+      expect(page.where((line) => line == '子时'), isNotEmpty);
+      expect(page.where((line) => line == '亥时'), isNotEmpty);
+      expect(page.join().contains('补充水分'), isTrue);
+      expect(page.join().contains('时辰养生表'), isTrue);
+      expect(page.join().contains('经当令'), isFalse);
+      for (final line in page) {
+        expect(homeVisibleTextHasEfficacy(line), isFalse, reason: line);
+        expect(homeDosagePattern.hasMatch(line), isFalse, reason: line);
+      }
+      final pageJoined = page.join('\n');
+      expect(pageJoined.contains('茶'), isFalse);
+      for (final stage in ['孕期', '哺乳期']) {
+        for (final name in homeExclusionNames(stage)) {
+          expect(pageJoined.contains(name), isFalse, reason: '$stage $name');
+        }
+      }
+      for (final term in solarWellnessMeridianTerms) {
+        expect(pageJoined.contains(term), isFalse, reason: term);
+      }
+    },
+  );
+
+  test(
+    'solar wellness keeps the twelve home entries and drops unsafe api copy',
+    () {
+      final table = homeShiChenTable();
+      expect(table, hasLength(12));
+      expect(table.first.name, '子时');
+      expect(table.last.name, '亥时');
+
+      for (final stage in [null, '上班', '孕期', '哺乳期']) {
+        final shown = solarWellnessEntriesFromBody(
+          solarWellnessApiBodyFor(table, lifeStage: stage),
+        );
+        expect(shown.map((item) => item.name), table.map((item) => item.name));
+        final blob = shown.map(shichenEntryBlob).join('\n');
+        expect(blob.contains('补充水分'), isTrue);
+        expect(homeVisibleTextHasEfficacy(blob), isFalse);
+        expect(homeDosagePattern.hasMatch(blob), isFalse);
+        expect(blob.contains('茶'), isFalse);
+        for (final term in solarWellnessMeridianTerms) {
+          expect(blob.contains(term), isFalse, reason: term);
+        }
+        for (final name in homeExclusionNames(stage)) {
+          expect(blob.contains(name), isFalse, reason: '$stage $name');
+        }
+      }
+
+      final legacy = solarWellnessLoadFromResponse(200, {
+        'success': true,
+        'data': {
+          'morning': '晨起喝一杯温水，舒展筋骨',
+          'noon': '午餐后小憩15分钟，养心安神',
+          'evening': '晚餐清淡，避免油腻，助眠安神',
+        },
+      });
+      expect(legacy.failed, isFalse);
+      expect(legacy.entries, isEmpty);
+      expect(
+        solarWellnessLoadFromResponse(401, {'detail': '请先登录'}).needsLogin,
+        isTrue,
+      );
+      expect(
+        solarWellnessLoadFromResponse(500, {
+          'success': false,
+        }, failed: true).failed,
+        isTrue,
+      );
+
+      final poisoned = solarWellnessApiBodyFor(table, lifeStage: '孕期');
+      final entries = (poisoned['data'] as Map)['entries'] as List;
+      (entries.first as Map)['advice'] = '晚饭喝当归汤';
+      (entries.first as Map)['organ'] = '胆经';
+      (entries[1] as Map)['advice'] = '下午吃一点薄荷';
+      (entries[1] as Map)['quote'] = '养心安神';
+      final pregnant = solarWellnessEntriesFromBody(poisoned);
+      expect(pregnant.map((item) => item.name), isNot(contains('子时')));
+      expect(pregnant.map((item) => item.name), isNot(contains('丑时')));
+      expect(pregnant.map(shichenEntryBlob).join().contains('当归'), isFalse);
+      expect(pregnant.map(shichenEntryBlob).join().contains('薄荷'), isFalse);
+      expect(pregnant.map(shichenEntryBlob).join().contains('养心安神'), isFalse);
+      expect(pregnant.map(shichenEntryBlob).join().contains('胆经'), isFalse);
+
+      final nursingBody = solarWellnessApiBodyFor(table, lifeStage: '哺乳期');
+      final nursingEntries = (nursingBody['data'] as Map)['entries'] as List;
+      (nursingEntries[1] as Map)['advice'] = '下午吃一点薄荷';
+      final nursing = solarWellnessEntriesFromBody(nursingBody);
+      expect(nursing.map((item) => item.name), isNot(contains('丑时')));
+      expect(nursing.map(shichenEntryBlob).join().contains('薄荷'), isFalse);
+
+      final generalBody = solarWellnessApiBodyFor(table, lifeStage: '上班');
+      final generalEntries = (generalBody['data'] as Map)['entries'] as List;
+      (generalEntries.first as Map)['advice'] = '晚饭喝当归汤';
+      final general = solarWellnessEntriesFromBody(generalBody);
+      expect(general.map((item) => item.name), isNot(contains('子时')));
+      expect(solarWellnessTextBlocked('晚饭喝当归汤', lifeStage: '孕期'), isTrue);
+      expect(solarWellnessTextBlocked('下午吃一点薄荷', lifeStage: '哺乳期'), isTrue);
+      expect(solarWellnessTextBlocked('晚饭喝当归汤', lifeStage: '上班'), isFalse);
+      expect(solarWellnessTextBlocked('午后记得小口多喝水，补充水分'), isFalse);
+    },
+  );
+
+  testWidgets(
+    'solar wellness page shows twelve entries, or an empty or error state',
+    (tester) async {
+      var generation = 0;
+      Future<void> pump(Future<SolarWellnessLoad> Function() load) async {
+        generation += 1;
+        await tester.pumpWidget(
+          MaterialApp(
+            home: SolarDetailPage(key: ValueKey(generation), load: load),
+          ),
+        );
+        await tester.pump();
+        await tester.pump();
+      }
+
+      await pump(
+        () async => SolarWellnessLoad(
+          entries: solarWellnessEntriesFromBody(
+            solarWellnessApiBodyFor(homeShiChenTable(), lifeStage: '孕期'),
+          ),
+        ),
+      );
+      expect(find.text('时辰养生表'), findsOneWidget);
+      expect(find.text('子时 · 早点睡'), findsOneWidget);
+      expect(find.text('亥时 · 准备睡'), findsOneWidget);
+      expect(find.textContaining('补充水分'), findsOneWidget);
+      expect(find.textContaining('经当令'), findsNothing);
+      expect(find.textContaining('养心安神'), findsNothing);
+      expect(find.textContaining('助眠安神'), findsNothing);
+
+      await pump(
+        () async => solarWellnessLoadFromResponse(200, {
+          'success': true,
+          'data': {'noon': '午餐后小憩15分钟，养心安神', 'evening': '助眠安神'},
+        }),
+      );
+      expect(find.text(kSolarWellnessEmptyTitle), findsOneWidget);
+      expect(find.textContaining('经当令'), findsNothing);
+      expect(find.textContaining('养心安神'), findsNothing);
+
+      await pump(
+        () async => solarWellnessLoadFromResponse(401, {'detail': '请先登录'}),
+      );
+      expect(find.text(kSolarWellnessLoginTitle), findsOneWidget);
+      expect(find.text(kSolarWellnessLoginBody), findsOneWidget);
+      expect(find.textContaining('经当令'), findsNothing);
+
+      await pump(
+        () async => const SolarWellnessLoad(
+          entries: [],
+          error: kSolarWellnessErrorBody,
+        ),
+      );
+      expect(find.text(kSolarWellnessErrorTitle), findsOneWidget);
+      expect(find.text(kSolarWellnessRetry), findsOneWidget);
+    },
+  );
 
   test('节气 chip date matches an injected card date', () {
     final live = DateTime(2026, 11, 13);
-    final injected = homeClockDay(deviceNow: live, injectedTestNow: '2026-11-04T21:00:00+08:00');
+    final injected = homeClockDay(
+      deviceNow: live,
+      injectedTestNow: '2026-11-04T21:00:00+08:00',
+    );
     expect(injected, DateTime(2026, 11, 4));
     expect(solarTermSeasonLine(injected), '霜降 · 季秋之节');
     expect(solarTermSeasonLine(live), '立冬 · 孟冬之节');
@@ -257,20 +528,18 @@ void main() {
   });
 
   testWidgets('elder mode enlarges home text', (tester) async {
-    await tester.pumpWidget(const MaterialApp(
-      home: ElderHomeScope(
-        enabled: true,
-        child: _ScaleProbe(),
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: ElderHomeScope(enabled: true, child: _ScaleProbe()),
       ),
-    ));
+    );
     expect(find.text('20.0'), findsOneWidget);
 
-    await tester.pumpWidget(const MaterialApp(
-      home: ElderHomeScope(
-        enabled: false,
-        child: _ScaleProbe(),
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: ElderHomeScope(enabled: false, child: _ScaleProbe()),
       ),
-    ));
+    );
     expect(find.text('16.0'), findsOneWidget);
   });
 }
