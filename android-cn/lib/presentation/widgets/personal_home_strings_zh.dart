@@ -39,3 +39,40 @@ const PersonalHomeStrings kPersonalHomeStringsZh = PersonalHomeStrings(
   recallDismiss: '知道了',
   recallLabel: '欢迎回来',
 );
+
+/// 首页个性化区块里写死的句子，含带数字的那几条模板。
+List<String> visiblePersonalHomeStaticCopy() {
+  const s = kPersonalHomeStringsZh;
+  return [
+    s.heading,
+    s.why,
+    s.notRecommend,
+    s.turnOff,
+    s.turnOn,
+    s.offTitle,
+    s.offBody,
+    s.offSame,
+    s.confirmTitle,
+    s.confirmBody,
+    s.cancel,
+    s.confirm,
+    s.errorTitle,
+    s.errorBody,
+    s.retry,
+    s.loginTitle,
+    s.loginBody,
+    s.loginAction,
+    s.emptyTitle,
+    s.emptyBody,
+    s.saveFailed,
+    s.loading,
+    s.weekHeading,
+    s.weekdays,
+    s.recallDismiss,
+    s.recallLabel,
+    s.minutes(10),
+    s.days(3),
+    s.weekDone('03-01'),
+    s.weekNone('03-02'),
+  ];
+}

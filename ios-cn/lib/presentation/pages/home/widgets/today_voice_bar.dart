@@ -5,6 +5,22 @@ import '../../../../data/services/tts_player_service.dart';
 import '../../../../data/services/voice_service.dart';
 import '../../chat/voice_chrome.dart';
 
+const kTodayVoiceReadLabel = '朗读今日';
+const kTodayVoiceStopLabel = '停止';
+const kTodayVoiceMicLabel = '用语音说';
+const kTodayVoiceStopMicLabel = '停止并转写';
+const kTodayVoiceListeningHint = '正在听。说完后再点一次，文字会留在这里。';
+const kTodayVoiceEmptyHint = '没有识别到语音。可以再试一次，或改用文字。';
+
+const kTodayVoiceStaticCopy = <String>[
+  kTodayVoiceReadLabel,
+  kTodayVoiceStopLabel,
+  kTodayVoiceMicLabel,
+  kTodayVoiceStopMicLabel,
+  kTodayVoiceListeningHint,
+  kTodayVoiceEmptyHint,
+];
+
 /// Voice input and a tap-to-speak control for Today.
 ///
 /// Web uses the labeled browser chrome from chat. The phone uses a tooltip
@@ -19,12 +35,12 @@ class TodayVoiceBar extends StatefulWidget {
     this.playback,
     this.chrome,
     this.onTranscript,
-    this.readLabel = '朗读今日',
-    this.stopLabel = '停止',
-    this.micLabel = '用语音说',
-    this.stopMicLabel = '停止并转写',
-    this.listeningHint = '正在听。说完后再点一次，文字会留在这里。',
-    this.emptyHint = '没有识别到语音。可以再试一次，或改用文字。',
+    this.readLabel = kTodayVoiceReadLabel,
+    this.stopLabel = kTodayVoiceStopLabel,
+    this.micLabel = kTodayVoiceMicLabel,
+    this.stopMicLabel = kTodayVoiceStopMicLabel,
+    this.listeningHint = kTodayVoiceListeningHint,
+    this.emptyHint = kTodayVoiceEmptyHint,
   });
 
   final String spokenText;

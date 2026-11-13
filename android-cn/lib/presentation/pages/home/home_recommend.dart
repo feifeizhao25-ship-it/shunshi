@@ -46,6 +46,16 @@ final homeDosagePattern = RegExp(
   caseSensitive: false,
 );
 
+/// 整页首页静态文案的药效类。比推荐接口更宽，时辰卡片上的健脾、安神、养心也算。
+/// 「补充水分」这种白话不按补X处理。
+final homeVisibleEfficacyPattern = RegExp(
+  r'补(?!充)[\u4e00-\u9fff]|滋[\u4e00-\u9fff]|益[\u4e00-\u9fff]'
+  r'|健脾|理气|疏肝|安神|养心|通调|驱寒|暖胃|经活跃|精华|糟粕'
+  r'|固精|润肠|通便|感冒|尤宜|引火归元|运化|清心导浊',
+);
+
+bool homeVisibleTextHasEfficacy(String text) => homeVisibleEfficacyPattern.hasMatch(text);
+
 const _pregnancyNames = <String>[
   '藏红花',
   '薏苡仁',
