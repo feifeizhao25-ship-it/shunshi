@@ -120,7 +120,7 @@ const _shiChenList = <ShiChenData>[
     name: '辰时', timeRange: '7-9', meridian: '胃经',
     principle: '朝食养胃', principleShort: '补气血',
     wellnessPrinciple: '温胃健脾，补中益气',
-    aiQuote: '辰时胃经最旺，是吃早餐的黄金时间。温热、营养的早餐能为一整天提供充足能量，滋养气血。',
+    aiQuote: '辰时适合吃早餐。吃一顿温热、好消化的早餐，够上午用就好。',
     icon: Icons.breakfast_dining,
     actions: [
       BentoAction(icon: Icons.rice_bowl, title: '温热早餐', description: '吃温热、易消化的早餐养胃气。'),
@@ -129,8 +129,8 @@ const _shiChenList = <ShiChenData>[
   ),
   ShiChenData(
     name: '巳时', timeRange: '9-11', meridian: '脾经',
-    principle: '运化水谷', principleShort: '健脾土',
-    wellnessPrinciple: '健脾益气，运化水湿',
+    principle: '细嚼慢咽', principleShort: '健脾土',
+    wellnessPrinciple: '午饭细嚼慢咽，吃完走一走',
     aiQuote: '巳时脾经当令，消化吸收最佳时段。此时精力旺盛，适合高效工作。脾为后天之本，宜细嚼慢咽。',
     icon: Icons.psychology,
     actions: [
@@ -152,11 +152,11 @@ const _shiChenList = <ShiChenData>[
   ShiChenData(
     name: '未时', timeRange: '13-15', meridian: '小肠经',
     principle: '分清泌浊', principleShort: '利消化',
-    wellnessPrinciple: '清心导浊，调和肠胃',
+    wellnessPrinciple: '午饭后走一走，小口喝点水',
     aiQuote: '未时小肠经活跃，负责将食物精华吸收、糟粕排出。适度活动和补充水分有助于消化吸收。',
     icon: Icons.filter_alt,
     actions: [
-      BentoAction(icon: Icons.directions_walk, title: '午后散步', description: '轻度活动帮助消化吸收，促进运化。'),
+      BentoAction(icon: Icons.directions_walk, title: '午后散步', description: '午饭后出去走十分钟。'),
       BentoAction(icon: Icons.water_drop, title: '补充水分', description: '午后记得小口多喝水。'),
     ],
   ),
@@ -200,11 +200,24 @@ const _shiChenList = <ShiChenData>[
     aiQuote: '亥时三焦经当令，是百脉通调的时刻。温水泡脚、静心阅读，放下全日奔忙，为优质睡眠做最后准备。',
     icon: Icons.nights_stay,
     actions: [
-      BentoAction(icon: Icons.spa, title: '温水泡脚', description: '亥时泡脚引火归元助眠，温通经络。'),
+      BentoAction(icon: Icons.spa, title: '温水泡脚', description: '睡前用温水泡泡脚，然后放下手机。'),
       BentoAction(icon: Icons.menu_book, title: '静心阅读', description: '放下手机，静心准备入睡，养百脉。'),
     ],
   ),
 ];
+
+/// 首页时辰卡片上会念出来、写出来的句子。测试用它确认没有药效说法。
+List<String> visibleHomeTimeOfDayCopy() {
+  return [
+    for (final sc in _shiChenList) ...[
+      sc.principle,
+      sc.principleShort,
+      sc.wellnessPrinciple,
+      sc.aiQuote,
+      for (final action in sc.actions) ...[action.title, action.description],
+    ],
+  ];
+}
 
 // ═══════════════════════════════════════════════════════════════
 // 节气名称映射（根据月份大致推算）
@@ -380,6 +393,7 @@ class _UltimateHomePageState extends State<UltimateHomePage>
   bool _elderMode = false;
   String? _lifeStage;
   DateTime? _boardDay;
+  late final Future<void> _homePrefsReady;
 
   Map<String, dynamic> _followUp = {};
   bool _hasFollowUp = false;
@@ -397,7 +411,7 @@ class _UltimateHomePageState extends State<UltimateHomePage>
     _currentShiChen = getCurrentShiChen();
     _boardDay = homeClockDayFromApp();
     _solarTermInfo = _getCurrentSolarTermInfo(_boardDay);
-    _loadHomePrefs();
+    _homePrefsReady = _loadHomePrefs();
 
     // 呼吸动画 (节气胶囊)
     _breathController = AnimationController(
@@ -487,6 +501,7 @@ class _UltimateHomePageState extends State<UltimateHomePage>
 
   Future<void> _fetchRecommendations() async {
     try {
+      await _homePrefsReady;
       final res = await _api.get('/contents/recommend', queryParameters: {'limit': 6}, level: SpeedLevel.s1);
       if (!mounted) return;
       final raw = res.data;

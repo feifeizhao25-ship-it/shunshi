@@ -1,14 +1,18 @@
 """首页「今日推荐」。
 
-只给当下节气的日常饮食和作息，用白话。不展示药效、主治、毒性，也不展示穴位主治。
+只给当下节气的日常饮食和作息，用白话。名单按允许来：节气白话条目，
+再加上明确标了 home_safe 的内容。没有这道标记的种子内容不会进首页。
+药效说法和克数、剂量是第二道：命中就整条丢掉，不截半句来凑。
 季节按北京时间的节气表，不用公历月份（11 月立冬后是冬，不是秋）。
 孕期 / 哺乳期排除名单直接读现有的 FORBIDDEN_HERBS_DATA、孕期名单和哺乳期忌口，不改那些表。
-一条内容写不出安全的白话，就丢掉，改用下面的日常建议。
+这两类人生阶段里，没核对过的条目（茶饮、带配料、说不清安不安全）直接丢掉。
+热粥这类白话、又没有点到禁忌食材的，保留。
 """
 
 from __future__ import annotations
 
 import json
+import re
 from datetime import date
 from typing import Any
 
@@ -33,11 +37,31 @@ EFFICACY_TERMS = (
     "本草",
     "穴位",
     "温补肾阳",
+    "补中益气",
+    "滋补",
+    "固精",
+    "润肠",
+    "通便",
+    "感冒",
+    "尤宜",
+    "引火归元",
+    "滋养气血",
+    "运化",
+    "清心导浊",
 )
+
+# 补X / 滋X / 益X，以及同一类药效说法。词表没写全的句子也靠这里丢掉。
+_EFFICACY_CLASS = re.compile(
+    r"补[\u4e00-\u9fff]|滋[\u4e00-\u9fff]|益[\u4e00-\u9fff]"
+    r"|固精|润肠|通便|感冒|尤宜|引火归元|滋养气血|运化|清心导浊"
+)
+# 克数和剂量。时长（10分钟）不算。
+_DOSAGE = re.compile(r"\d+\s*(?:mg|ml|g|毫克|毫升|克|片|颗|枚|勺)", re.IGNORECASE)
 
 _ACUPOINT_TYPES = frozenset({"acupressure", "acupoint", "穴位"})
 _FOOD_REST_TYPES = frozenset({"food_therapy", "recipe", "food", "tea", "sleep_tip", "sleep", "rest", "tips"})
 _VAGUE_FOODS = ("辛辣", "油腻", "咖啡因", "酒精", "腌制", "烧烤", "冷饮", "冰镇")
+_HOME_SAFE_FLAGS = frozenset({"1", "true", "yes"})
 
 # 白话的饮食 / 作息。不含药效，也不点名禁忌食材。
 PLAIN_BY_SEASON: dict[str, tuple[dict[str, str], ...]] = {
@@ -117,18 +141,29 @@ def _is_acupoint(item: dict) -> bool:
     return kind in _ACUPOINT_TYPES or title.endswith("穴")
 
 
+def _as_list(value: Any) -> list:
+    if isinstance(value, list):
+        return value
+    if isinstance(value, str) and value.strip():
+        try:
+            parsed = json.loads(value)
+        except (TypeError, ValueError, json.JSONDecodeError):
+            return [value]
+        if isinstance(parsed, list):
+            return parsed
+    return []
+
+
 def _pieces(item: dict) -> list[str]:
     parts: list[str] = []
-    for key in ("title", "description", "subtitle", "effect", "reason"):
+    for key in ("title", "description", "subtitle", "effect", "reason", "method"):
         value = item.get(key)
         if isinstance(value, str) and value:
             parts.append(value)
-    for key in ("benefits", "tags", "ingredients"):
-        value = item.get(key)
-        if isinstance(value, str):
-            parts.append(value)
-        elif isinstance(value, list):
-            parts.extend(str(piece) for piece in value if piece)
+    for key in ("benefits", "tags", "ingredients", "steps"):
+        for piece in _as_list(item.get(key)):
+            if piece:
+                parts.append(str(piece))
     return parts
 
 
@@ -137,7 +172,37 @@ def _blob(item: dict) -> str:
 
 
 def _has_efficacy(text: str) -> bool:
-    return any(term in text for term in EFFICACY_TERMS)
+    if not text:
+        return False
+    if any(term in text for term in EFFICACY_TERMS):
+        return True
+    return _EFFICACY_CLASS.search(text) is not None
+
+
+def _has_dosage(text: str) -> bool:
+    return bool(text) and _DOSAGE.search(text) is not None
+
+
+def _curated_ids(season: str) -> frozenset[str]:
+    return frozenset(row["id"] for row in PLAIN_BY_SEASON.get(season, ()))
+
+
+def _is_curated(item: dict, season: str) -> bool:
+    return str(item.get("id") or "") in _curated_ids(season)
+
+
+def _marked_home_safe(item: dict) -> bool:
+    """内容要进首页，必须显式标成 home_safe。节气白话条目不用这道标记。"""
+    flag = item.get("home_safe")
+    if flag is True or flag == 1:
+        return True
+    if isinstance(flag, str) and flag.strip().lower() in _HOME_SAFE_FLAGS:
+        return True
+    return any(str(tag) == "home_safe" for tag in _as_list(item.get("tags")))
+
+
+def _allowlisted(item: dict, season: str) -> bool:
+    return _is_curated(item, season) or _marked_home_safe(item)
 
 
 def _item_season(item: dict) -> str | None:
@@ -148,8 +213,37 @@ def _item_season(item: dict) -> str | None:
     return None
 
 
+def _looks_like_tea(item: dict) -> bool:
+    kind = f"{item.get('type') or ''}{item.get('category') or ''}"
+    title = str(item.get("title") or "")
+    return kind in {"tea", "茶", "茶饮"} or "tea" in kind or "茶" in kind or "茶" in title
+
+
+def _has_ingredients(item: dict) -> bool:
+    return any(str(piece).strip() for piece in _as_list(item.get("ingredients")))
+
+
+def _stage_allows(item: dict, blob: str, life_stage: str | None, *, curated: bool) -> bool:
+    """孕期 / 哺乳期：点到禁忌名就丢。不是节气白话、又像茶饮或带了配料，算没核对过，也丢。
+
+    热粥这种没有点名禁忌食材的白话留下。
+    """
+    flags = flags_from_profile(life_stage=life_stage)
+    if not flags:
+        return True
+    if any(name in blob for name in exclusion_names(flags)):
+        return False
+    if curated:
+        return True
+    if _looks_like_tea(item) or _has_ingredients(item) or _has_efficacy(blob) or _has_dosage(blob):
+        return False
+    return True
+
+
 def _plain_copy(item: dict, season: str) -> dict | None:
-    """没有安全白话就不返回。药效、穴位主治、季不对、禁忌名都丢掉。"""
+    """不在允许名单里、写了药效或剂量、是穴位、季节不对，都不返回。"""
+    if not _allowlisted(item, season):
+        return None
     if _is_acupoint(item):
         return None
     kind = str(item.get("type") or "")
@@ -163,7 +257,7 @@ def _plain_copy(item: dict, season: str) -> dict | None:
     if not title or not description:
         return None
     blob = _blob(item)
-    if _has_efficacy(blob):
+    if _has_efficacy(blob) or _has_dosage(blob):
         return None
     category = item.get("category") if item.get("category") in {"饮食", "作息"} else ("饮食" if kind in {"food", "food_therapy", "recipe", "tea"} else "作息")
     return {
@@ -176,6 +270,7 @@ def _plain_copy(item: dict, season: str) -> dict | None:
         "tags": [],
         "benefits": [],
         "effect": None,
+        "home_safe": True,
     }
 
 
@@ -206,25 +301,20 @@ def select_home_items(
     life_stage: str | None = None,
     limit: int = 6,
 ) -> list[dict]:
-    """当前节气的白话饮食和作息。不安全的条目丢掉，不够就用日常建议补上。"""
+    """当前节气的白话饮食和作息。只收允许名单里的条目，不够也不用种子茶饮去补。"""
     season = season_on(day)
-    flags = flags_from_profile(life_stage=life_stage)
-    blocked = exclusion_names(flags)
-
-    def allowed(text: str) -> bool:
-        return not any(name in text for name in blocked)
-
     picked: list[dict] = []
     seen: set[str] = set()
 
     def take(item: dict, rank: int) -> None:
         if len(picked) >= limit:
             return
+        curated = _is_curated(item, season)
         safe = _plain_copy(item, season)
         if safe is None:
             return
-        blob = f"{safe['title']}{safe['description']}"
-        if not allowed(blob):
+        blob = _blob(item) + f"{safe['title']}{safe['description']}"
+        if not _stage_allows(item, blob, life_stage, curated=curated):
             return
         key = str(safe["id"] or safe["title"])
         if key in seen:
@@ -235,9 +325,7 @@ def select_home_items(
     for plain in PLAIN_BY_SEASON[season]:
         take({**plain, "season": season}, 0)
     for item in items:
-        kind = str(item.get("type") or "")
-        rank = 1 if kind in {"food_therapy", "recipe", "food", "tea", "sleep_tip", "sleep", "rest"} else 2
-        take(item, rank)
+        take(item, 1)
     picked.sort(key=lambda row: (row["_rank"], str(row["id"])))
     out = []
     for row in picked[:limit]:
