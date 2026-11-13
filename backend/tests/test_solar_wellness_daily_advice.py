@@ -1,5 +1,7 @@
 """完整时辰养生表：允许名单、不带药效，孕期和哺乳期按现有禁忌名单过滤。"""
+import base64
 import copy
+import json
 
 from app.router.maternity import FORBIDDEN_HERBS_DATA
 from app.services import shichen_table as table
@@ -10,9 +12,33 @@ MERIDIANS = ("经络", "经活跃", "当令", "胆经", "肝经", "肺经", "大
 
 
 def _guest(client):
+    headers, _user_id = _guest_identity(client)
+    return headers
+
+
+def _token_sub(token: str) -> str:
+    payload = token.split(".")[1]
+    payload += "=" * (-len(payload) % 4)
+    return json.loads(base64.urlsafe_b64decode(payload))["sub"]
+
+
+def _guest_identity(client):
     created = client.post("/api/v1/auth/guest-login", json={}).json()
     token = created.get("access_token") or created["data"]["token"]
-    return {"Authorization": f"Bearer {token}"}
+    user = (created.get("data") or {}).get("user") or {}
+    user_id = user.get("id") or _token_sub(token)
+    assert user_id, created
+    return {"Authorization": f"Bearer {token}"}, user_id
+
+
+def _keys(value):
+    if isinstance(value, dict):
+        for key, item in value.items():
+            yield str(key)
+            yield from _keys(item)
+    elif isinstance(value, list):
+        for item in value:
+            yield from _keys(item)
 
 
 def _strings(value):
@@ -54,6 +80,8 @@ def _assert_plain(payload):
         }
         assert row["headline"] == f"{row['name']} · {row['principle_short']}"
     assert "morning" not in data and "noon" not in data and "evening" not in data
+    assert "life_stage" not in data
+    assert data["filtered"] is False
 
 
 def test_allowlist_keeps_plain_water_and_blocks_efficacy_words():
@@ -93,28 +121,29 @@ def test_stage_filter_drops_a_forbidden_food_that_replaces_an_allowlisted_line()
     assert "wei" in pregnant and "wei" in nursing
 
 
-def test_daily_advice_requires_a_token_and_returns_the_same_twelve_entries(client):
+def test_daily_advice_anonymous_gets_the_plain_table_and_a_token_does_not_echo_life_stage(client):
     anonymous = client.get("/api/v1/solar-wellness/daily-advice")
-    assert anonymous.status_code == 401
+    assert anonymous.status_code == 200, anonymous.text
+    _assert_plain(anonymous.json())
+    assert "life_stage" not in list(_keys(anonymous.json()))
 
     headers = _guest(client)
     general = _advice(client, headers)
-    assert general["data"]["life_stage"] in (None, "")
     _assert_plain(general)
 
     saved = client.post("/api/v1/seasons/onboarding/complete", json={"life_stage": "孕期"}, headers=headers)
     assert saved.status_code == 200, saved.text
     pregnant = _advice(client, headers)
-    assert pregnant["data"]["life_stage"] == "孕期"
     _assert_plain(pregnant)
+    assert pregnant["data"]["filtered"] is False
+    assert "孕期" not in client.get("/api/v1/solar-wellness/daily-advice", headers=headers).text
 
     saved = client.post("/api/v1/seasons/onboarding/complete", json={"life_stage": "哺乳期"}, headers=headers)
     assert saved.status_code == 200, saved.text
     nursing = _advice(client, headers)
-    assert nursing["data"]["life_stage"] == "哺乳期"
     _assert_plain(nursing)
     assert pregnant["data"]["entries"] == nursing["data"]["entries"] == general["data"]["entries"]
-    assert pregnant["data"]["life_stage"] != nursing["data"]["life_stage"]
+    assert "life_stage" not in pregnant["data"] and "life_stage" not in nursing["data"]
 
 
 def test_daily_advice_http_drops_forbidden_foods_for_the_signed_in_stage(client, monkeypatch):
@@ -133,12 +162,13 @@ def test_daily_advice_http_drops_forbidden_foods_for_the_signed_in_stage(client,
         blob = "".join(_strings(rows))
         assert "养心安神" not in blob and "助眠安神" not in blob
         assert "茶" not in blob
-        return payload["data"]["life_stage"], [row["id"] for row in rows], blob
+        assert "life_stage" not in payload["data"]
+        return payload["data"]["filtered"], [row["id"] for row in rows], blob
 
-    general_stage, general_ids, general_blob = names_for("上班")
-    pregnant_stage, pregnant_ids, pregnant_blob = names_for("孕期")
-    nursing_stage, nursing_ids, nursing_blob = names_for("哺乳期")
-    assert general_stage == "上班" and pregnant_stage == "孕期" and nursing_stage == "哺乳期"
+    general_filtered, general_ids, general_blob = names_for("上班")
+    pregnant_filtered, pregnant_ids, pregnant_blob = names_for("孕期")
+    nursing_filtered, nursing_ids, nursing_blob = names_for("哺乳期")
+    assert general_filtered is False and pregnant_filtered is True and nursing_filtered is True
     assert "zi" in general_ids and "chou" in general_ids
     assert "当归" in general_blob and "薄荷" in general_blob
     assert "zi" not in pregnant_ids and "当归" not in pregnant_blob
@@ -146,3 +176,46 @@ def test_daily_advice_http_drops_forbidden_foods_for_the_signed_in_stage(client,
     assert "zi" in nursing_ids and "当归" in nursing_blob
     assert "chou" not in nursing_ids and "薄荷" not in nursing_blob
     assert "wei" in pregnant_ids and "补充水分" in pregnant_blob
+
+
+def test_daily_advice_does_not_reveal_another_users_life_stage(client, monkeypatch):
+    poisoned = copy.deepcopy(table.SHICHEN_ENTRIES)
+    poisoned[0]["advice"] = "晚饭喝当归汤"
+    monkeypatch.setattr(table, "SHICHEN_ENTRIES", tuple(poisoned))
+
+    owner_headers, owner_id = _guest_identity(client)
+    saved = client.post("/api/v1/seasons/onboarding/complete", json={"life_stage": "孕期"}, headers=owner_headers)
+    assert saved.status_code == 200, saved.text
+
+    stranger_headers, _stranger_id = _guest_identity(client)
+    stolen = client.get("/api/v1/solar-wellness/daily-advice", params={"user_id": owner_id}, headers=stranger_headers)
+    assert stolen.status_code == 403, stolen.text
+    assert "孕期" not in stolen.text
+    assert "当归" not in stolen.text
+    assert "life_stage" not in stolen.text
+
+    camel = client.get("/api/v1/solar-wellness/daily-advice", params={"userId": owner_id}, headers=stranger_headers)
+    assert camel.status_code == 403, camel.text
+
+    anonymous_named = client.get("/api/v1/solar-wellness/daily-advice", params={"user_id": owner_id})
+    assert anonymous_named.status_code == 401, anonymous_named.text
+    assert "孕期" not in anonymous_named.text
+    assert "当归" not in anonymous_named.text
+
+    anonymous = client.get("/api/v1/solar-wellness/daily-advice")
+    assert anonymous.status_code == 200, anonymous.text
+    assert anonymous.json()["data"]["filtered"] is False
+    assert "zi" in [row["id"] for row in anonymous.json()["data"]["entries"]]
+    assert "life_stage" not in anonymous.json()["data"]
+
+    own = client.get("/api/v1/solar-wellness/daily-advice", params={"user_id": owner_id}, headers=owner_headers)
+    assert own.status_code == 200, own.text
+    body = own.json()["data"]
+    assert body["filtered"] is True
+    assert "zi" not in [row["id"] for row in body["entries"]]
+    assert "当归" not in own.text
+    assert "life_stage" not in body
+    assert "孕期" not in own.text
+
+    invalid = client.get("/api/v1/solar-wellness/daily-advice", headers={"Authorization": "Bearer not-a-token"})
+    assert invalid.status_code == 401

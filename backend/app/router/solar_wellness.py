@@ -3,12 +3,13 @@ Solar Wellness API — 顺时养生 wellness endpoints
 Provides: current solar term, daily advice, shichen info, context
 """
 
-from fastapi import APIRouter, Depends, Query, Request
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request
 from typing import Optional
 from datetime import datetime
 from sqlalchemy.orm import Session
 
-from app.deps import get_session
+from app.config import Settings
+from app.deps import current_user, get_session, get_settings
 
 router = APIRouter(prefix="/api/v1/solar-wellness", tags=["solar-wellness"])
 
@@ -51,24 +52,59 @@ async def get_current_solar_wellness():
     }
 
 
+_USER_QUERY_KEYS = ("user_id", "userId")
+
+
+def _authenticated_user(
+    request: Request,
+    authorization: str | None = Header(default=None),
+    settings: Settings = Depends(get_settings),
+) -> str | None:
+    """没有 Authorization 就是匿名。带了令牌就按现有登录依赖核验，无效则 401。"""
+    if authorization is None or not authorization.strip():
+        return None
+    return current_user(request, authorization, settings)
+
+
+def _claimed_user_ids(request: Request) -> list[str]:
+    found: list[str] = []
+    for key in _USER_QUERY_KEYS:
+        found.extend(request.query_params.getlist(key))
+    return [str(value) for value in found if value not in (None, "")]
+
+
 @router.get("/daily-advice")
 async def get_daily_advice(
     request: Request,
-    user_id: str = Query(..., description="用户ID；不传由服务端按令牌补上本人"),
     constitution: Optional[str] = Query(None, description="体质类型，不参与这张表的文案"),
     session: Session = Depends(get_session),
+    viewer: str | None = Depends(_authenticated_user),
 ):
-    """十二时辰白话表。只返回首页同一份允许名单，并按人生阶段丢掉禁忌食材。"""
-    _ = (request, constitution)
+    """十二时辰白话表。登录用户按令牌里的本人过滤；不把人生阶段写回响应。"""
+    _ = constitution
     from app.services.home_recommend import life_stage_for
     from app.services.shichen_table import select_shichen_entries
 
-    stage = life_stage_for(session, user_id)
+    claimed = _claimed_user_ids(request)
+    if viewer is None:
+        # 没带令牌就不能按别人的 user_id 去查档案。国际版不带身份，只拿公开的白话表。
+        if claimed:
+            raise HTTPException(status_code=401, detail="请先登录")
+        return {
+            "success": True,
+            "data": {"filtered": False, "entries": select_shichen_entries(None)},
+        }
+    if any(value != viewer for value in claimed):
+        raise HTTPException(status_code=403, detail="只能访问自己的数据")
+
+    stage = life_stage_for(session, viewer)
+    plain = select_shichen_entries(None)
+    entries = select_shichen_entries(stage)
     return {
         "success": True,
         "data": {
-            "life_stage": stage,
-            "entries": select_shichen_entries(stage),
+            "filtered": [row["id"] for row in entries] != [row["id"] for row in plain],
+            "entries": entries,
         },
     }
 
