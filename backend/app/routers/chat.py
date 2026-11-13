@@ -294,7 +294,12 @@ async def chat(
                         "The following is verified, unexpired official reference material. Answer only within its scope "
                         "and never extend it into diagnosis, prescriptions or treatment claims:\n"
                         if is_global
-                        else "以下是已核验且未过期的官方参考资料。只能按资料范围回答，不得扩展为诊断、处方或疗效承诺：\n"
+                        else (
+                            "新版修订中，以下为 2022 版。过了复核截止日的段落不能当作现行唯一依据。"
+                            "后面若还有资料，才是仍在有效期内的已核验内容。不得扩展为诊断、处方或疗效承诺：\n"
+                            if rag_context.startswith("新版修订中，以下为 2022 版")
+                            else "以下是已核验且未过期的官方参考资料。只能按资料范围回答，不得扩展为诊断、处方或疗效承诺：\n"
+                        )
                     )
                     + rag_context
                 ),

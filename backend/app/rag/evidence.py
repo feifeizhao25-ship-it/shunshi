@@ -14,6 +14,8 @@ from functools import lru_cache
 from pathlib import Path
 
 from .embedder import get_embedder
+from .freshness_gate import MIN_RELEVANCE as _GATE_MIN_RELEVANCE
+from .freshness_gate import REVISION_NOTICE, edition_of, select_verified
 from .knowledge_base import cn_kb, gl_kb
 
 _MANIFEST = Path(__file__).with_name("source_manifest.json")
@@ -24,7 +26,7 @@ def knowledge_version() -> str:
     data = json.loads(_MANIFEST.read_text(encoding="utf-8"))
     return str(data.get("knowledge_version") or "")
 
-MIN_RELEVANCE = 0.06  # TF-IDF 余弦相似度下限：低于它的片段不当作来源
+MIN_RELEVANCE = _GATE_MIN_RELEVANCE  # TF-IDF 余弦相似度下限：低于它的片段不当作来源
 
 
 def _verified_chunks(lang: str, query: str, top_k: int) -> list[tuple[object, float]]:
@@ -82,6 +84,7 @@ def _details(picked, default_title: str, today: date | None = None, citation_dep
             "principle_only": bool(meta.get("principle_only")),
             "review_status": meta.get("review_status") or "",
             "citation_depth": citation_depth,
+            "edition": edition_of(chunk.content, meta),
         }
         if citation_depth == "full":
             item["excerpt"] = chunk.content[:180]
@@ -99,6 +102,8 @@ def _first_link(content: str) -> str | None:
 
 def _label_cn(item: dict) -> str:
     text = f"{item['title']}｜官方资料已核验｜复核日期 {item['reviewed_at']}"
+    if item.get("edition"):
+        text += f"｜{item['edition']}版"
     if item["freshness"] == "review_due":
         text += f"｜即将到期，需重新复核（有效期至 {item['valid_until']}）"
     return text
@@ -111,11 +116,18 @@ def _label_en(item: dict) -> str:
     return text
 
 
-def verified_cn_context(query: str, top_k: int = 3, citation_depth: str = "basic") -> tuple[str, list[str], list[dict]]:
-    picked = _verified_chunks("cn", query, top_k)
-    context = "\n\n".join(chunk.content[:900] for chunk, _ in picked)
-    details = _details(picked, "官方健康资料", citation_depth=citation_depth)
+def verified_cn_context(
+    query: str,
+    top_k: int = 3,
+    citation_depth: str = "basic",
+    today: date | None = None,
+) -> tuple[str, list[str], list[dict]]:
+    picked = select_verified(query, today=today or date.today(), top_k=top_k, lang="cn")
+    context = picked["text"]
+    details = _details(picked["current"], "官方健康资料", today=today, citation_depth=citation_depth)
     labels = [_label_cn(item) for item in details]
+    if picked["notice"] and not context.startswith(REVISION_NOTICE):
+        context = picked["notice"] + ("\n" + context if context else "")
     return context, labels, details
 
 

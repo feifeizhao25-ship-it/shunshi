@@ -71,6 +71,7 @@ def retrieve(
     lang: str = "cn",
     top_k: int = 5,
     filters: Optional[dict] = None,
+    today: date | None = None,
 ) -> list[dict]:
     """
     检索知识库
@@ -133,7 +134,7 @@ def retrieve(
             if not content_has and chunk_const != filter_const:
                 score *= 0.3
 
-        if is_expired(meta):
+        if is_expired(meta, today):
             # 来源已过期：不再引用（复测 B13：以前只降权，过期的 legacy 文档仍会被检索进回答）。
             continue
 
