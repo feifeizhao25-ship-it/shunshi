@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+const kHomeLoadingExplain = '正在准备今日。如果一直停在这里，返回后再打开一次。';
+
 class HomeSkeleton extends StatelessWidget {
   const HomeSkeleton({super.key});
 
@@ -13,7 +15,7 @@ class HomeSkeleton extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              '正在准备今日。如果一直停在这里，返回后再打开一次。',
+              kHomeLoadingExplain,
               key: Key('home-loading-explain'),
             ),
             const SizedBox(height: 12),

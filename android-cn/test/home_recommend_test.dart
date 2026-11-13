@@ -177,10 +177,68 @@ void main() {
     );
   });
 
-  test('home time-of-day cards use plain rest and food copy', () {
-    final blob = visibleHomeTimeOfDayCopy().join();
-    for (final term in ['引火归元', '滋养气血', '运化', '清心导浊']) {
-      expect(blob.contains(term), isFalse, reason: term);
+  test('home efficacy class allows plain 补充 and blocks the scan terms', () {
+    expect(homeVisibleTextHasEfficacy('午后记得小口多喝水，补充水分'), isFalse);
+    expect(homeDosagePattern.hasMatch('歇一会儿'), isFalse);
+    expect(homeDosagePattern.hasMatch('生姜3片、红枣5颗'), isTrue);
+    for (final sample in [
+      '温胃健脾，补中益气',
+      '生姜红枣泡水暖胃驱寒，调和脾胃',
+      '玫瑰花茶疏肝理气，宁心安神',
+      '小肠经活跃，负责将食物精华吸收、糟粕排出',
+      '养心安神',
+      '百脉通调',
+      '陈皮普洱健脾理气',
+      '健脾土',
+      '引火归元',
+      '滋养气血',
+      '运化',
+      '清心导浊',
+      '固精',
+      '润肠通便',
+      '感冒',
+      '尤宜',
+    ]) {
+      expect(homeVisibleTextHasEfficacy(sample), isTrue, reason: sample);
+    }
+  });
+
+  test('whole home static copy has no efficacy, dosage, tea, or listed foods', () {
+    final copy = visibleHomeCopy();
+    expect(copy.length, greaterThan(visibleHomeTimeOfDayCopy().length));
+    expect(visibleHomeTimeOfDayCopy().where((line) => line == '子时'), isNotEmpty);
+    expect(visibleHomeTimeOfDayCopy().where((line) => line == '亥时'), isNotEmpty);
+    expect(visibleHomeTimeOfDayCopy().join().contains('补充水分'), isTrue);
+    for (final line in copy) {
+      expect(homeVisibleTextHasEfficacy(line), isFalse, reason: line);
+      expect(homeDosagePattern.hasMatch(line), isFalse, reason: line);
+    }
+    final joined = copy.join('\n');
+    expect(joined.contains('茶'), isFalse);
+    for (final stage in ['孕期', '哺乳期']) {
+      for (final name in homeExclusionNames(stage)) {
+        expect(joined.contains(name), isFalse, reason: '$stage $name');
+      }
+    }
+    for (final term in [
+      '经络',
+      '经活跃',
+      '当令',
+      '胆经',
+      '肝经',
+      '肺经',
+      '大肠经',
+      '胃经',
+      '脾经',
+      '心经',
+      '小肠经',
+      '膀胱经',
+      '肾经',
+      '心包经',
+      '三焦经',
+      '养百脉',
+    ]) {
+      expect(joined.contains(term), isFalse, reason: term);
     }
   });
 

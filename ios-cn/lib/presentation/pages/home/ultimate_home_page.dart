@@ -22,6 +22,7 @@ import '../../../data/network/session.dart';
 import '../../../core/time/domestic_clock.dart';
 import 'elder_home_text.dart';
 import 'home_clock.dart';
+import '../../widgets/personal_home_strings_zh.dart';
 
 // ═══════════════════════════════════════════════════════════════
 // 十二时辰数据模型（本地计算）
@@ -31,9 +32,9 @@ class ShiChenData {
   final String name;
   final String timeRange;
   final String meridian;
-  final String principle;       // 如 "万籁俱寂·养胆气"
-  final String principleShort;  // 如 "养胆气" (用于标题)
-  final String wellnessPrinciple; // 养生精要 如 "滋阴补肾，清热降火"
+  final String principle;       // 这一时辰做什么，如 "该睡觉了"
+  final String principleShort;  // 标题短句，如 "早点睡"
+  final String wellnessPrinciple; // 卡片上的日常提醒，如 "把灯调暗，放下手机"
   final String aiQuote;         // AI引言
   final IconData icon;           // Material icon
   final List<BentoAction> actions;
@@ -73,89 +74,91 @@ ShiChenData getCurrentShiChen() {
   return _shiChenList[0];
 }
 
+// 十二个时辰只写休息和吃饭，孕期、哺乳期看到的也是这同一段话。
+// 不写药效，不写经络或脏腑功能，不出现茶饮、草药名或剂量。
 const _shiChenList = <ShiChenData>[
   ShiChenData(
-    name: '子时', timeRange: '23-1', meridian: '胆经',
-    principle: '万籁俱寂', principleShort: '养胆气',
-    wellnessPrinciple: '安神定志，温养胆气',
-    aiQuote: '子时是人体阳气初生的时刻，万物归寂。此时应熟睡，让胆经得以修复，为明日精力储备打下根基。',
+    name: '子时', timeRange: '23-1', meridian: '深夜',
+    principle: '该睡觉了', principleShort: '早点睡',
+    wellnessPrinciple: '把灯调暗，放下手机',
+    aiQuote: '这个点适合睡觉。把灯调暗，手机放远一点，好好睡一觉。',
     icon: Icons.dark_mode,
     actions: [
-      BentoAction(icon: Icons.nightlight_round, title: '熟睡养胆', description: '子时深睡可助胆汁新陈代谢，完成夜间修复。'),
-      BentoAction(icon: Icons.air, title: '静卧养神', description: '保持安静，不扰动阳气初生，宜右侧卧。'),
+      BentoAction(icon: Icons.nightlight_round, title: '准备睡觉', description: '把灯调暗，躺下休息。'),
+      BentoAction(icon: Icons.phone_disabled, title: '放下手机', description: '不再看屏幕，让自己慢慢睡着。'),
     ],
   ),
   ShiChenData(
-    name: '丑时', timeRange: '1-3', meridian: '肝经',
-    principle: '肝血归藏', principleShort: '养肝阴',
-    wellnessPrinciple: '养血柔肝，滋阴润燥',
-    aiQuote: '丑时肝经活跃，是肝脏解毒和藏血的关键时段。深度睡眠能帮助肝脏完成代谢修复，让面色红润。',
+    name: '丑时', timeRange: '1-3', meridian: '凌晨',
+    principle: '继续睡觉', principleShort: '接着睡',
+    wellnessPrinciple: '夜还很长，接着睡',
+    aiQuote: '夜还很长。继续睡，明天再处理事情。',
     icon: Icons.night_shelter,
     actions: [
-      BentoAction(icon: Icons.bedtime, title: '深度睡眠', description: '丑时肝经当令，深度睡眠养肝血。'),
-      BentoAction(icon: Icons.local_florist, title: '养肝护肝', description: '今晚尽量别熬夜，早点休息。'),
+      BentoAction(icon: Icons.bedtime, title: '继续睡觉', description: '这个点还早，接着睡。'),
+      BentoAction(icon: Icons.phone_disabled, title: '别看手机', description: '屏幕亮着容易醒，把手机扣过去。'),
     ],
   ),
   ShiChenData(
-    name: '寅时', timeRange: '3-5', meridian: '肺经',
-    principle: '气血布散', principleShort: '养肺气',
-    wellnessPrinciple: '润肺益气，调和营卫',
-    aiQuote: '寅时是肺经输布气血的时刻，全身经络得以濡养。此时应安睡，让肺脏将气血分配到全身。',
+    name: '寅时', timeRange: '3-5', meridian: '黎明',
+    principle: '再睡一会儿', principleShort: '再睡会',
+    wellnessPrinciple: '天还没亮，可以再躺一会儿',
+    aiQuote: '天还没亮。醒了也没关系，再躺一会儿，不必马上起床。',
     icon: Icons.cloud,
     actions: [
-      BentoAction(icon: Icons.air, title: '深呼吸养肺', description: '寅时肺经当令，宜保持深长呼吸。'),
-      BentoAction(icon: Icons.spa, title: '安睡养气', description: '让肺脏完成气血分配，莫要惊醒。'),
+      BentoAction(icon: Icons.hotel, title: '接着躺着', description: '天没亮就再睡一会儿。'),
+      BentoAction(icon: Icons.airline_seat_flat, title: '慢一点起', description: '要起床的话，先坐一会儿再下床。'),
     ],
   ),
   ShiChenData(
-    name: '卯时', timeRange: '5-7', meridian: '大肠经',
-    principle: '天明排便', principleShort: '通肠腑',
-    wellnessPrinciple: '润肠通便，清理积滞',
+    name: '卯时', timeRange: '5-7', meridian: '清晨',
+    principle: '起床喝水', principleShort: '喝温水',
+    wellnessPrinciple: '起床后先喝一杯温水，再活动一下',
     aiQuote: '清晨起床后喝一杯温水，做几分钟舒展，给新的一天一个轻松的开始。',
     icon: Icons.light_mode,
     actions: [
-      BentoAction(icon: Icons.water_drop, title: '晨起温水', description: '起床后先喝一杯温水。'),
-      BentoAction(icon: Icons.directions_walk, title: '晨起活动', description: '轻度活动促进肠蠕动，通调腑气。'),
+      BentoAction(icon: Icons.water_drop, title: '喝杯温水', description: '起床后先喝一杯温水。'),
+      BentoAction(icon: Icons.directions_walk, title: '起来走走', description: '在屋里走几步，伸个懒腰。'),
     ],
   ),
   ShiChenData(
-    name: '辰时', timeRange: '7-9', meridian: '胃经',
-    principle: '朝食养胃', principleShort: '补气血',
-    wellnessPrinciple: '温胃健脾，补中益气',
-    aiQuote: '辰时适合吃早餐。吃一顿温热、好消化的早餐，够上午用就好。',
+    name: '辰时', timeRange: '7-9', meridian: '早上',
+    principle: '吃早餐', principleShort: '吃早餐',
+    wellnessPrinciple: '吃一顿温热、好消化的早餐',
+    aiQuote: '这个点适合吃早餐。吃一顿温热、好消化的早餐，够上午用就好。',
     icon: Icons.breakfast_dining,
     actions: [
-      BentoAction(icon: Icons.rice_bowl, title: '温热早餐', description: '吃温热、易消化的早餐养胃气。'),
-      BentoAction(icon: Icons.local_cafe, title: '姜枣茶饮', description: '生姜红枣泡水暖胃驱寒，调和脾胃。'),
+      BentoAction(icon: Icons.rice_bowl, title: '热粥面条', description: '可以吃热粥或热面条，坐下来吃完。'),
+      BentoAction(icon: Icons.restaurant, title: '先吃再出门', description: '上午要出门的话，先把早餐吃上。'),
     ],
   ),
   ShiChenData(
-    name: '巳时', timeRange: '9-11', meridian: '脾经',
-    principle: '细嚼慢咽', principleShort: '健脾土',
+    name: '巳时', timeRange: '9-11', meridian: '上午',
+    principle: '慢慢吃午饭', principleShort: '慢慢吃',
     wellnessPrinciple: '午饭细嚼慢咽，吃完走一走',
-    aiQuote: '巳时脾经当令，消化吸收最佳时段。此时精力旺盛，适合高效工作。脾为后天之本，宜细嚼慢咽。',
+    aiQuote: '上午适合把要紧的事做一做。午饭时慢慢吃，别吃太快。',
     icon: Icons.psychology,
     actions: [
-      BentoAction(icon: Icons.work, title: '高效工作', description: '巳时精力充沛，适合处理重要事务。'),
-      BentoAction(icon: Icons.emoji_food_beverage, title: '健脾茶饮', description: '陈皮普洱健脾理气，助消化。'),
+      BentoAction(icon: Icons.work, title: '做手头事', description: '上午把要紧的事做一做。'),
+      BentoAction(icon: Icons.directions_walk, title: '午饭慢吃', description: '细嚼慢咽，吃完出去走十分钟。'),
     ],
   ),
   ShiChenData(
-    name: '午时', timeRange: '11-13', meridian: '心经',
-    principle: '日中养心', principleShort: '调阴阳',
-    wellnessPrinciple: '养心安神，交通心肾',
-    aiQuote: '午时心经最旺，阴阳交替之际。午餐后小憩片刻，有助于养心安神，下午更有精力应对万事。',
+    name: '午时', timeRange: '11-13', meridian: '中午',
+    principle: '午饭后歇会儿', principleShort: '歇一会',
+    wellnessPrinciple: '午饭后闭眼歇一会儿',
+    aiQuote: '午饭后可以闭眼歇一会儿，下午会舒服一些。',
     icon: Icons.wb_sunny,
     actions: [
-      BentoAction(icon: Icons.hotel, title: '午间小憩', description: '午时小睡15-30分钟养心安神。'),
-      BentoAction(icon: Icons.favorite, title: '养心静坐', description: '闭目静坐调养心神，平复心火。'),
+      BentoAction(icon: Icons.hotel, title: '闭眼歇歇', description: '午饭后把手机放下，闭眼歇一会儿。'),
+      BentoAction(icon: Icons.self_improvement, title: '坐着休息', description: '找个地方坐一会儿，不必一直忙。'),
     ],
   ),
   ShiChenData(
-    name: '未时', timeRange: '13-15', meridian: '小肠经',
-    principle: '分清泌浊', principleShort: '利消化',
+    name: '未时', timeRange: '13-15', meridian: '午后',
+    principle: '饭后走走', principleShort: '走一走',
     wellnessPrinciple: '午饭后走一走，小口喝点水',
-    aiQuote: '未时小肠经活跃，负责将食物精华吸收、糟粕排出。适度活动和补充水分有助于消化吸收。',
+    aiQuote: '午饭过后，出去走十分钟，回来小口喝点水。',
     icon: Icons.filter_alt,
     actions: [
       BentoAction(icon: Icons.directions_walk, title: '午后散步', description: '午饭后出去走十分钟。'),
@@ -163,61 +166,115 @@ const _shiChenList = <ShiChenData>[
     ],
   ),
   ShiChenData(
-    name: '申时', timeRange: '15-17', meridian: '膀胱经',
-    principle: '多喝温水', principleShort: '起身走动',
-    wellnessPrinciple: '通利水道，清热解毒',
+    name: '申时', timeRange: '15-17', meridian: '下午',
+    principle: '起来活动', principleShort: '活动下',
+    wellnessPrinciple: '起来走一走，喝点温水',
     aiQuote: '下午容易犯困，起身活动几分钟、喝点温水，精神会好一些。',
     icon: Icons.wb_cloudy,
     actions: [
-      BentoAction(icon: Icons.directions_run, title: '适度运动', description: '下午适合安排一次轻松的运动。'),
-      BentoAction(icon: Icons.water_drop, title: '多饮温水', description: '多喝温水，少吃咸。'),
+      BentoAction(icon: Icons.directions_walk, title: '起来走走', description: '下午适合起来走一走。'),
+      BentoAction(icon: Icons.water_drop, title: '喝点温水', description: '喝点温水，少吃太咸的。'),
     ],
   ),
   ShiChenData(
-    name: '酉时', timeRange: '17-19', meridian: '肾经',
-    principle: '藏精纳气', principleShort: '养肾元',
-    wellnessPrinciple: '滋阴补肾，清热降火',
-    aiQuote: '酉时肾经当令，是储藏精华的时刻。最宜收敛心神，让身体在安静中完成一次深度的自我修复。',
+    name: '酉时', timeRange: '17-19', meridian: '傍晚',
+    principle: '晚饭清淡', principleShort: '清淡饭',
+    wellnessPrinciple: '晚饭清淡一点，别吃得太晚',
+    aiQuote: '傍晚喝点温水，晚饭清淡一些，别吃得太晚。',
     icon: Icons.auto_awesome,
     actions: [
-      BentoAction(icon: Icons.water_drop, title: '补充水分', description: '傍晚适量喝点温水，晚饭清淡些。'),
-      BentoAction(icon: Icons.accessibility_new, title: '轻拍足跟', description: '足少阴肾经起于足底，轻拍足跟激发肾经经气。'),
+      BentoAction(icon: Icons.water_drop, title: '喝点温水', description: '晚饭前喝点温水。'),
+      BentoAction(icon: Icons.restaurant, title: '晚饭清淡', description: '晚饭少油少盐，吃完可以坐一会儿。'),
     ],
   ),
   ShiChenData(
-    name: '戌时', timeRange: '19-21', meridian: '心包经',
-    principle: '护心减压', principleShort: '畅情志',
-    wellnessPrinciple: '宽胸理气，疏解郁结',
-    aiQuote: '戌时心包经当令，是护心减压的时刻。适合休闲娱乐、与家人交流，让心情愉悦放松，心胸开阔。',
+    name: '戌时', timeRange: '19-21', meridian: '晚上',
+    principle: '放松一下', principleShort: '放松下',
+    wellnessPrinciple: '听听音乐，和家里人说说话',
+    aiQuote: '晚饭后适合歇下来。听听音乐，或者和家里人说说话。',
     icon: Icons.music_note,
     actions: [
-      BentoAction(icon: Icons.music_note, title: '听音乐放松', description: '戌时宜放松心情，舒缓一天的压力。'),
-      BentoAction(icon: Icons.local_cafe, title: '花茶安神', description: '玫瑰花茶疏肝理气，宁心安神。'),
+      BentoAction(icon: Icons.music_note, title: '听听音乐', description: '放点喜欢的音乐，把一天放下。'),
+      BentoAction(icon: Icons.visibility_off, title: '少看屏幕', description: '少刷手机，让眼睛歇一会儿。'),
     ],
   ),
   ShiChenData(
-    name: '亥时', timeRange: '21-23', meridian: '三焦经',
-    principle: '百脉通调', principleShort: '备入眠',
-    wellnessPrinciple: '通调三焦，安神助眠',
-    aiQuote: '亥时三焦经当令，是百脉通调的时刻。温水泡脚、静心阅读，放下全日奔忙，为优质睡眠做最后准备。',
+    name: '亥时', timeRange: '21-23', meridian: '夜间',
+    principle: '准备睡觉', principleShort: '准备睡',
+    wellnessPrinciple: '温水泡脚，然后放下手机',
+    aiQuote: '睡前用温水泡泡脚，看一会儿书，然后放下手机准备睡。',
     icon: Icons.nights_stay,
     actions: [
       BentoAction(icon: Icons.spa, title: '温水泡脚', description: '睡前用温水泡泡脚，然后放下手机。'),
-      BentoAction(icon: Icons.menu_book, title: '静心阅读', description: '放下手机，静心准备入睡，养百脉。'),
+      BentoAction(icon: Icons.menu_book, title: '看看书', description: '放下手机，看一会儿书再睡。'),
     ],
   ),
 ];
+
+String shiChenTimeDisplay(ShiChenData sc) => '${sc.timeRange.replaceAll('-', ':00 - ')}:00';
+
+/// 大标题写时辰名和短句，不写经络。
+String shiChenHeadline(ShiChenData sc) => '${sc.name} · ${sc.principleShort}';
+
+String shiChenSpoken(ShiChenData sc, {required String timeDisplay, required String solarTerm}) =>
+    '$timeDisplay。${sc.name}，${sc.principleShort}。$solarTerm。${sc.wellnessPrinciple}';
 
 /// 首页时辰卡片上会念出来、写出来的句子。测试用它确认没有药效说法。
 List<String> visibleHomeTimeOfDayCopy() {
   return [
     for (final sc in _shiChenList) ...[
+      sc.name,
+      sc.meridian,
+      shiChenHeadline(sc),
+      shiChenTimeDisplay(sc),
       sc.principle,
       sc.principleShort,
       sc.wellnessPrinciple,
       sc.aiQuote,
       for (final action in sc.actions) ...[action.title, action.description],
     ],
+  ];
+}
+
+const kHomeBrand = '顺时';
+const kHomeWellnessHeading = '养生精要';
+const kHomeAssistantTitle = '顺时 AI 助手';
+const kHomeInsightHeading = '今日洞察';
+const kHomeReminderHeading = '顺时提醒';
+const kHomeCtaLabel = '查看完整时辰养生表';
+
+const kHomeChromeCopy = <String>[
+  kHomeBrand,
+  kHomeWellnessHeading,
+  kHomeAssistantTitle,
+  kHomeInsightHeading,
+  kHomeReminderHeading,
+  kHomeCtaLabel,
+];
+
+List<String> visibleHomeSolarTermLines() {
+  final lines = <String>{};
+  for (var month = 1; month <= 12; month++) {
+    for (var day = 1; day <= 28; day++) {
+      lines.add(solarTermSeasonLine(DateTime(2026, month, day)));
+    }
+  }
+  return lines.toList();
+}
+
+/// 首页上写死的字：时辰卡片、栏目标题、语音按钮、节气胶囊。
+List<String> visibleHomeCopy() {
+  final solar = visibleHomeSolarTermLines();
+  return [
+    ...visibleHomeTimeOfDayCopy(),
+    ...kHomeChromeCopy,
+    ...kTodayVoiceStaticCopy,
+    kHomeLoadingExplain,
+    ...visiblePersonalHomeStaticCopy(),
+    ...solar,
+    for (final sc in _shiChenList)
+      for (final term in solar)
+        shiChenSpoken(sc, timeDisplay: shiChenTimeDisplay(sc), solarTerm: term),
   ];
 }
 
@@ -393,7 +450,7 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
   @override
   Widget build(BuildContext context) {
     final sc = _currentShiChen;
-    final timeDisplay = '${sc.timeRange.replaceAll('-', ':00 - ')}:00';
+    final timeDisplay = shiChenTimeDisplay(sc);
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bg = isDark ? ShunShiColors.darkBackground : AppColors.background(context);
@@ -523,7 +580,7 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
             ),
             const SizedBox(width: 12),
             Text(
-              '顺时',
+              kHomeBrand,
               style: ShunShiTypography.headlineSmall.copyWith(
                 fontFamily: ShunShiTypography.serifFamily,
                 fontWeight: FontWeight.w700,
@@ -577,7 +634,7 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
             children: [
               TextSpan(text: '${sc.name} · '),
               TextSpan(
-                text: '${sc.meridian}当令',
+                text: sc.principleShort,
                 style: TextStyle(color: AppColors.secondary(context)),
               ),
             ],
@@ -590,7 +647,7 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
         ),
         const SizedBox(height: 12),
         TodayVoiceBar(
-          spokenText: '$timeDisplay。${sc.name}，${sc.meridian}当令。$_solarTermInfo。${sc.wellnessPrinciple}',
+          spokenText: shiChenSpoken(sc, timeDisplay: timeDisplay, solarTerm: _solarTermInfo),
           onTranscript: (text) => context.go('/chat?draft=${Uri.encodeQueryComponent(text)}'),
         ),
       ],
@@ -677,7 +734,7 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '养生精要',
+                    kHomeWellnessHeading,
                     style: ShunShiTypography.caption.copyWith(
                       color: AppColors.secondary(context),
                       fontWeight: FontWeight.w500,
@@ -816,7 +873,7 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '顺时 AI 助手',
+                  kHomeAssistantTitle,
                   style: ShunShiTypography.titleMedium.copyWith(
                     fontFamily: ShunShiTypography.serifFamily,
                     fontSize: 16,
@@ -857,7 +914,7 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '今日洞察',
+            kHomeInsightHeading,
             style: ShunShiTypography.caption.copyWith(
               color: Colors.white70,
               fontWeight: FontWeight.w500,
@@ -900,7 +957,7 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('顺时提醒', style: ShunShiTypography.labelMedium.copyWith(
+                Text(kHomeReminderHeading, style: ShunShiTypography.labelMedium.copyWith(
                   color: AppColors.primary(context), fontWeight: FontWeight.w600,
                 )),
                 const SizedBox(height: 2),
@@ -925,7 +982,7 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
       child: ElevatedButton.icon(
         onPressed: () => context.push('/solar-wellness'),
         icon: const Icon(Icons.arrow_forward, size: 20),
-        label: const Text('查看完整时辰养生表'),
+        label: const Text(kHomeCtaLabel),
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary(context),
           foregroundColor: Colors.white,
