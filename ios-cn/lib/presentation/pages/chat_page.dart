@@ -26,6 +26,26 @@ const _baseUrl = AppConfig.apiBaseUrl;
 /// 没有网络时的唯一提示：不生成、不缓存任何本地「健康建议」，输入原样保留。
 const _offlineChatNotice = '当前处于离线状态。离线状态不生成健康建议，输入已保留，请联网后重试。';
 
+/// 节气表没有这一天时，开场用的节气名。
+const chatOpeningTermFallback = '清明';
+
+/// 对话开场。节气名随日期变，句子本身不变，也不写功效。
+class ChatOpening {
+  const ChatOpening({required this.text, required this.cardTitle, required this.cardSubtitle});
+
+  final String text;
+  final String cardTitle;
+  final String cardSubtitle;
+}
+
+ChatOpening chatOpeningFor(String solarTerm) {
+  return ChatOpening(
+    text: '$solarTerm到了。按这个节气，把作息放慢一点就好。',
+    cardTitle: '当前：$solarTerm',
+    cardSubtitle: '按这个节气把作息放慢一点。',
+  );
+}
+
 class ChatPage extends StatefulWidget {
   final String? conversationId;
   final Dio? client;
@@ -109,8 +129,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
   String _userName = '';
   String _token = '';
   // 以前写死「清明」，全年对话开场都说「清明时节」；改为查节气表（与后端同一份数据）
-  final String _currentSolarTerm = currentSolarTermName() ?? '清明';
-  final String _solarTermDesc = '按这个节气把作息放慢一点。';
+  final String _currentSolarTerm = currentSolarTermName() ?? chatOpeningTermFallback;
   String? _conversationId;
 
   @override
@@ -199,15 +218,16 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
     await _loadConversation(prefs);
     if (_messages.isEmpty && mounted) {
       setState(() {
+        final opening = chatOpeningFor(_currentSolarTerm);
         _messages.add(
           ChatMessage(
             role: 'ai',
-            text: '$_currentSolarTerm到了。按这个节气，把作息放慢一点就好。',
+            text: opening.text,
             cards: [
               SuggestionCard(
                 type: 'greeting',
-                title: '当前：$_currentSolarTerm',
-                subtitle: _solarTermDesc,
+                title: opening.cardTitle,
+                subtitle: opening.cardSubtitle,
               ),
             ],
             time: _fmt(DateTime.now()),
