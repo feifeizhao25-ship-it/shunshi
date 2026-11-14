@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shunshi/core/solar_term/solar_term_table.dart';
+import 'package:shunshi/data/services/speech_text.dart';
 import 'package:shunshi/data/services/tts_player_service.dart';
 import 'package:shunshi/data/services/voice_service.dart';
 import 'package:shunshi/presentation/pages/chat/voice_chrome.dart';
@@ -67,7 +69,8 @@ void main() {
     await tester.tap(find.byTooltip('朗读回复').first);
     await tester.pump();
     expect(playback.speaks, 1);
-    expect(playback.lastText, contains('身心感觉如何'));
+    final opening = chatOpeningFor(currentSolarTermName() ?? chatOpeningTermFallback);
+    expect(playback.lastText, speakableReply(opening.text, [opening.cardTitle, opening.cardSubtitle]));
     expect(find.byIcon(Icons.stop_circle), findsWidgets);
     await tester.tap(find.byTooltip('停止朗读').first);
     await tester.pump();
