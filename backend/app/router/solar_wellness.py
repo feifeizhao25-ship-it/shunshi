@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 
 from app.config import Settings
 from app.deps import current_user, get_session, get_settings
+from app.locale_context import default_market, resolve_locale
 
 router = APIRouter(prefix="/api/v1/solar-wellness", tags=["solar-wellness"])
 
@@ -54,6 +55,61 @@ async def get_current_solar_wellness():
 
 _USER_QUERY_KEYS = ("user_id", "userId")
 
+# 国际版匿名客户端仍解析这五个字段。国内市场和国内域名不再下发里面的药效说法。
+_LEGACY_ANONYMOUS_ADVICE = {
+    "success": True,
+    "data": {
+        "morning": "晨起喝一杯温水，舒展筋骨",
+        "noon": "午餐后小憩15分钟，养心安神",
+        "evening": "晚餐清淡，避免油腻，助眠安神",
+        "diet": "宜食当季蔬果，少食生冷",
+        "exercise": "推荐八段锦或散步30分钟",
+    },
+}
+
+
+def _hostname_is_cn(value: str | None) -> bool:
+    host = (value or "").split(",")[0].strip().lower().rstrip(".")
+    if not host:
+        return False
+    if host.startswith("["):
+        end = host.find("]")
+        host = host[1:end] if end > 1 else ""
+    elif host.count(":") == 1:
+        host = host.split(":", 1)[0]
+    return host.endswith(".cn")
+
+
+def _host_is_cn(request: Request) -> bool:
+    """国内域名（请求实际到达的主机，或代理转来的原主机）不走国际版五个字段。"""
+    forwarded = request.headers.get("x-forwarded-host")
+    return any(
+        _hostname_is_cn(value)
+        for value in (request.url.hostname, request.headers.get("host"), forwarded)
+    )
+
+
+def _anonymous_keeps_legacy(request: Request) -> bool:
+    """国际版匿名请求继续拿改版前的五个字段。国内市场或国内域名改为登录后才给时辰表。"""
+    if _host_is_cn(request):
+        return False
+    market = (request.headers.get("x-app-market") or "").strip().lower()
+    if market == "cn":
+        return False
+    if market == "global":
+        return True
+    accept = request.headers.get("accept-language")
+    if accept:
+        return resolve_locale(accept, None, request.headers.get("x-region")).is_global
+    locale_query = (request.query_params.get("locale") or "").strip().lower()
+    locale_primary = locale_query.replace("_", "-").split("-", 1)[0]
+    if locale_primary == "en":
+        return True
+    if locale_primary == "zh":
+        return False
+    # 没有市场头时跟部署走：国内部署缺省 cn，国际部署把 SHUNSHI_DEFAULT_MARKET 设成 global。
+    return default_market() == "global"
+
 
 def _authenticated_user(
     request: Request,
@@ -89,18 +145,10 @@ async def get_daily_advice(
     if viewer is None:
         # 没带令牌就不能按别人的 user_id 去查档案。
         # 国际版不带令牌，继续拿改版前的那五个字段，避免他们的解析被换掉。
-        if claimed:
+        # 国内市场、中文请求和国内域名不带令牌时不返回药效说法，跟客户端已有的「请先登录」一致。
+        if claimed or not _anonymous_keeps_legacy(request):
             raise HTTPException(status_code=401, detail="请先登录")
-        return {
-            "success": True,
-            "data": {
-                "morning": "晨起喝一杯温水，舒展筋骨",
-                "noon": "午餐后小憩15分钟，养心安神",
-                "evening": "晚餐清淡，避免油腻，助眠安神",
-                "diet": "宜食当季蔬果，少食生冷",
-                "exercise": "推荐八段锦或散步30分钟",
-            },
-        }
+        return _LEGACY_ANONYMOUS_ADVICE
     if any(value != viewer for value in claimed):
         raise HTTPException(status_code=403, detail="只能访问自己的数据")
 
