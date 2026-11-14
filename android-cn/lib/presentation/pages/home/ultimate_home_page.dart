@@ -1340,117 +1340,9 @@ class _UltimateHomePageState extends State<UltimateHomePage>
   // ─── 今日推荐 横向滚动 ───
   Widget _buildTodayRecommendations() {
     final recs = _todayRecs.isNotEmpty ? _todayRecs : plainTodayRecommendations(_cardDay, lifeStage: _lifeStage);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Text(
-            kHomeRecommendHeading,
-            style: ShunShiTypography.titleMedium.copyWith(
-              fontFamily: ShunShiTypography.serifFamily,
-              fontSize: 18,
-              color: isDark ? ShunShiColors.darkTextPrimary : ShunShiColors.textPrimary,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
-        const SizedBox(height: 14),
-        SizedBox(
-          height: 150,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            itemCount: recs.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 14),
-            itemBuilder: (context, index) {
-              final rec = recs[index];
-              return _PressScale(
-                onTap: rec.route != null ? () => context.push(rec.route!) : null,
-                child: Container(
-                  width: 140,
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: isDark ? ShunShiColors.darkSurfaceContainerLowest : ShunShiColors.surfaceContainerLowest,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: rec.accentColor.withValues(alpha: 0.12),
-                      width: 1,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.03),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // ── Image or icon ──
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: SizedBox(
-                          width: 36,
-                          height: 36,
-                          child: rec.imageAsset != null
-                              ? Image.asset(rec.imageAsset!, fit: BoxFit.cover)
-                              : Container(
-                                  decoration: BoxDecoration(
-                                    color: rec.accentColor.withValues(alpha: 0.1),
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: Icon(rec.icon, size: 18, color: rec.accentColor),
-                                ),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        rec.title,
-                        style: ShunShiTypography.titleMedium.copyWith(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: isDark ? ShunShiColors.darkTextPrimary : ShunShiColors.textPrimary,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        rec.subtitle,
-                        style: ShunShiTypography.bodySmall.copyWith(
-                          fontSize: 11,
-                          color: isDark ? ShunShiColors.darkTextTertiary : ShunShiColors.textTertiary,
-                          height: 1.4,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const Spacer(),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: rec.accentColor.withValues(alpha: 0.08),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text(
-                          rec.tag,
-                          style: ShunShiTypography.caption.copyWith(
-                            fontSize: 10,
-                            color: rec.accentColor,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-      ],
+    return TodayRecommendationsSection(
+      recommendations: recs,
+      onOpen: (route) => context.push(route),
     );
   }
 
@@ -1556,6 +1448,174 @@ class _UltimateHomePageState extends State<UltimateHomePage>
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
           elevation: 0,
+        ),
+      ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 今日推荐横滑卡片
+// ═══════════════════════════════════════════════════════════════
+
+/// 首页「今日推荐」横滑卡片。
+///
+/// 高度按卡片内容测量，不写死。固定 150 还要再扣掉四周 16 的内边距和 1 的描边，
+/// 剩下的高度装不下图标、两行说明和底部标签，默认字号会在底部溢出 4px。
+/// 系统字号再放大（例如 1.3）差得更多。
+class TodayRecommendationsSection extends StatelessWidget {
+  const TodayRecommendationsSection({
+    super.key,
+    required this.recommendations,
+    this.onOpen,
+  });
+
+  final List<TodayRecommendation> recommendations;
+  final ValueChanged<String>? onOpen;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Text(
+            kHomeRecommendHeading,
+            style: ShunShiTypography.titleMedium.copyWith(
+              fontFamily: ShunShiTypography.serifFamily,
+              fontSize: 18,
+              color: isDark ? ShunShiColors.darkTextPrimary : ShunShiColors.textPrimary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        const SizedBox(height: 14),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                for (var i = 0; i < recommendations.length; i++) ...[
+                  if (i > 0) const SizedBox(width: 14),
+                  _TodayRecommendationCard(
+                    recommendation: recommendations[i],
+                    isDark: isDark,
+                    onTap: _tapFor(recommendations[i]),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  VoidCallback? _tapFor(TodayRecommendation rec) {
+    final route = rec.route;
+    final open = onOpen;
+    if (route == null || open == null) return null;
+    return () => open(route);
+  }
+}
+
+class _TodayRecommendationCard extends StatelessWidget {
+  const _TodayRecommendationCard({
+    required this.recommendation,
+    required this.isDark,
+    this.onTap,
+  });
+
+  final TodayRecommendation recommendation;
+  final bool isDark;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final rec = recommendation;
+    return _PressScale(
+      onTap: onTap,
+      child: Container(
+        width: 140,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: isDark ? ShunShiColors.darkSurfaceContainerLowest : ShunShiColors.surfaceContainerLowest,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: rec.accentColor.withValues(alpha: 0.12),
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.03),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ── Image or icon ──
+            ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: SizedBox(
+                width: 36,
+                height: 36,
+                child: rec.imageAsset != null
+                    ? Image.asset(rec.imageAsset!, fit: BoxFit.cover)
+                    : Container(
+                        decoration: BoxDecoration(
+                          color: rec.accentColor.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Icon(rec.icon, size: 18, color: rec.accentColor),
+                      ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              rec.title,
+              style: ShunShiTypography.titleMedium.copyWith(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: isDark ? ShunShiColors.darkTextPrimary : ShunShiColors.textPrimary,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              rec.subtitle,
+              style: ShunShiTypography.bodySmall.copyWith(
+                fontSize: 11,
+                color: isDark ? ShunShiColors.darkTextTertiary : ShunShiColors.textTertiary,
+                height: 1.4,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const Spacer(),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(
+                color: rec.accentColor.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Text(
+                rec.tag,
+                style: ShunShiTypography.caption.copyWith(
+                  fontSize: 10,
+                  color: rec.accentColor,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
