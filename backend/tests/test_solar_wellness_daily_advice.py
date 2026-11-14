@@ -3,7 +3,10 @@ import base64
 import copy
 import json
 
+from fastapi.testclient import TestClient
+
 from app.router.maternity import FORBIDDEN_HERBS_DATA
+from app.router.solar_wellness import _hostname_is_cn
 from app.services import shichen_table as table
 from app.services.home_recommend import text_blocked_for_stage
 
@@ -132,9 +135,11 @@ def test_stage_filter_drops_a_forbidden_food_that_replaces_an_allowlisted_line()
 
 
 def test_daily_advice_anonymous_gets_the_plain_table_and_a_token_does_not_echo_life_stage(client):
+    # 测试进程的部署缺省是国内。不带令牌不再下发药效句；locale=en-US 仍是国际版五个字段。
     anonymous = client.get("/api/v1/solar-wellness/daily-advice")
-    assert anonymous.status_code == 200, anonymous.text
-    assert anonymous.json() == LEGACY_DAILY_ADVICE
+    assert anonymous.status_code == 401, anonymous.text
+    assert anonymous.json()["detail"] == "请先登录"
+    assert "养心安神" not in anonymous.text and "助眠安神" not in anonymous.text
     localized = client.get("/api/v1/solar-wellness/daily-advice", params={"locale": "en-US"})
     assert localized.status_code == 200, localized.text
     assert localized.json() == LEGACY_DAILY_ADVICE
@@ -215,10 +220,11 @@ def test_daily_advice_does_not_reveal_another_users_life_stage(client, monkeypat
     assert "当归" not in anonymous_named.text
 
     anonymous = client.get("/api/v1/solar-wellness/daily-advice")
-    assert anonymous.status_code == 200, anonymous.text
-    assert anonymous.json() == LEGACY_DAILY_ADVICE
-    assert "entries" not in anonymous.json()["data"]
-    assert "filtered" not in anonymous.json()["data"]
+    assert anonymous.status_code == 401, anonymous.text
+    assert "孕期" not in anonymous.text
+    assert "当归" not in anonymous.text
+    assert "养心安神" not in anonymous.text and "助眠安神" not in anonymous.text
+    assert "entries" not in anonymous.text
 
     own = client.get("/api/v1/solar-wellness/daily-advice", params={"user_id": owner_id}, headers=owner_headers)
     assert own.status_code == 200, own.text
@@ -231,3 +237,90 @@ def test_daily_advice_does_not_reveal_another_users_life_stage(client, monkeypat
 
     invalid = client.get("/api/v1/solar-wellness/daily-advice", headers={"Authorization": "Bearer not-a-token"})
     assert invalid.status_code == 401
+
+
+def _assert_no_efficacy(response):
+    assert "养心安神" not in response.text
+    assert "助眠安神" not in response.text
+    body = response.json()
+    data = body.get("data") if isinstance(body, dict) else None
+    if isinstance(data, dict):
+        assert "morning" not in data and "noon" not in data and "evening" not in data
+        assert "diet" not in data and "exercise" not in data
+
+
+def test_daily_advice_cn_no_token_never_returns_efficacy_wording(client):
+    """国内市场、中文请求、国内部署缺省、国内域名：没令牌只返回已有的登录提示。"""
+    cases = (
+        {"X-App-Market": "cn"},
+        {"X-App-Market": "cn", "Accept-Language": "en-US"},
+        {"Accept-Language": "zh-CN,zh;q=0.9"},
+        {},
+    )
+    for headers in cases:
+        response = client.get("/api/v1/solar-wellness/daily-advice", headers=headers)
+        assert response.status_code == 401, response.text
+        assert response.json()["detail"] == "请先登录"
+        _assert_no_efficacy(response)
+
+    hosted = TestClient(client.app, base_url="http://api.shunshi.example.cn")
+    on_cn_host = hosted.get(
+        "/api/v1/solar-wellness/daily-advice",
+        headers={"X-App-Market": "global", "Accept-Language": "en-US"},
+    )
+    assert on_cn_host.status_code == 401, on_cn_host.text
+    _assert_no_efficacy(on_cn_host)
+    forwarded = client.get(
+        "/api/v1/solar-wellness/daily-advice",
+        headers={"X-Forwarded-Host": "api.shunshi.example.cn", "X-App-Market": "global"},
+    )
+    assert forwarded.status_code == 401, forwarded.text
+    _assert_no_efficacy(forwarded)
+    assert _hostname_is_cn("api.shunshi.example.cn") is True
+    assert _hostname_is_cn("api.seasonsapp.com") is False
+    assert _hostname_is_cn("testserver") is False
+
+
+def test_daily_advice_cn_with_token_returns_the_plain_table(client):
+    headers = {**_guest(client), "X-App-Market": "cn", "Accept-Language": "zh-CN"}
+    response = client.get("/api/v1/solar-wellness/daily-advice", headers=headers)
+    assert response.status_code == 200, response.text
+    _assert_plain(response.json())
+    _assert_no_efficacy(response)
+    saved = client.post("/api/v1/seasons/onboarding/complete", json={"life_stage": "孕期"}, headers=headers)
+    assert saved.status_code == 200, saved.text
+    again = client.get("/api/v1/solar-wellness/daily-advice", headers=headers)
+    assert again.status_code == 200, again.text
+    _assert_plain(again.json())
+    assert "孕期" not in again.text
+    assert "养心安神" not in again.text and "助眠安神" not in again.text
+
+
+def test_daily_advice_intl_no_token_keeps_the_legacy_five_fields(client, monkeypatch):
+    intl = client.get(
+        "/api/v1/solar-wellness/daily-advice",
+        headers={"X-App-Market": "global", "Accept-Language": "en-US"},
+    )
+    assert intl.status_code == 200, intl.text
+    assert intl.json() == LEGACY_DAILY_ADVICE
+
+    english = client.get("/api/v1/solar-wellness/daily-advice", headers={"Accept-Language": "en-GB"})
+    assert english.status_code == 200, english.text
+    assert english.json() == LEGACY_DAILY_ADVICE
+
+    # 市场头优先于中文语言：国际版客户端即使用中文系统语言，也仍是原来的五个字段。
+    global_in_chinese = client.get(
+        "/api/v1/solar-wellness/daily-advice",
+        headers={"X-App-Market": "global", "Accept-Language": "zh-CN"},
+    )
+    assert global_in_chinese.status_code == 200, global_in_chinese.text
+    assert global_in_chinese.json() == LEGACY_DAILY_ADVICE
+
+    monkeypatch.setenv("SHUNSHI_DEFAULT_MARKET", "global")
+    deployed = client.get("/api/v1/solar-wellness/daily-advice")
+    assert deployed.status_code == 200, deployed.text
+    assert deployed.json() == LEGACY_DAILY_ADVICE
+    # 国内部署头仍盖过国际部署缺省。
+    domestic = client.get("/api/v1/solar-wellness/daily-advice", headers={"X-App-Market": "cn"})
+    assert domestic.status_code == 401, domestic.text
+    _assert_no_efficacy(domestic)
