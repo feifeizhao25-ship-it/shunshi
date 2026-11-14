@@ -4,9 +4,11 @@
 // 设计风格: ShunshiColors (鼠尾草绿, 米白), 大留白, 柔和输入框
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../account/auth_session.dart';
 import '../../../design_system/app_colors.dart';
 import '../../../core/theme/shunshi_spacing.dart';
 import '../../../core/theme/shunshi_text_styles.dart';
@@ -235,6 +237,9 @@ class _LoginPageState extends State<LoginPage> {
     if (token != null) {
       await StorageManager.user.saveToken(token);
       await StorageManager.user.setLoggedIn(true);
+      if (mounted) {
+        ProviderScope.containerOf(context).read(authSessionProvider).markLoggedIn();
+      }
     }
     // 保存手机号到本地
     if (phone != null) {

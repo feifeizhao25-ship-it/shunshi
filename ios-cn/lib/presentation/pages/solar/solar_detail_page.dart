@@ -29,7 +29,7 @@ Future<SolarWellnessLoad> loadSolarWellnessAdvice() {
         final dio = withSessionAuth(
           Dio(
             BaseOptions(
-              baseUrl: AppConfig.apiBaseUrl,
+              baseUrl: normalizeApiBaseUrl(AppConfig.apiBaseUrl),
               connectTimeout: const Duration(seconds: 8),
               receiveTimeout: const Duration(seconds: 8),
               headers: {'Authorization': 'Bearer $token'},

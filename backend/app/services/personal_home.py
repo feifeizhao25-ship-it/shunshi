@@ -458,7 +458,7 @@ def _off_note(lang: str) -> str:
 
 
 def _blocked_for_life_stage(text: str, life_stage: str | None) -> bool:
-    """孕期 / 哺乳期不推荐点到禁忌名单的卡片。名单在 home_recommend 里读现有表，这里不改表。"""
+    """孕期 / 哺乳期不推荐点到禁忌名单、或写了茶的卡片。名单在 home_recommend 里读现有表，这里不改表。"""
     if not text or not life_stage:
         return False
     from .home_recommend import text_blocked_for_stage

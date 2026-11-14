@@ -229,9 +229,14 @@ Object mapPersonalHomeError(Object error, {int? statusCode}) {
 }
 
 class PersonalHomeSection extends StatefulWidget {
-  const PersonalHomeSection({super.key, required this.api, required this.strings, this.onOpen, this.onLogin, this.margin = const EdgeInsets.symmetric(horizontal: 20, vertical: 8)});
+  const PersonalHomeSection({super.key, required this.api, required this.strings, this.onOpen, this.onLogin, this.auth, this.margin = const EdgeInsets.symmetric(horizontal: 20, vertical: 8)});
 
   final PersonalHomeApi api;
+
+  /// Notifies when a login token is stored. The shell route stays mounted across
+  /// `context.go('/home')`, so the block reloads from this instead of waiting
+  /// for a cold start.
+  final Listenable? auth;
 
   /// The edition's text (personal_home_strings_zh.dart or personal_home_strings_en.dart).
   final PersonalHomeStrings strings;
@@ -255,18 +260,40 @@ class _PersonalHomeSectionState extends State<PersonalHomeSection> {
   PersonalHomeData? _data;
   bool _saving = false;
   bool _recallDismissed = false;
+  int _loadGen = 0;
 
   @override
   void initState() {
     super.initState();
+    widget.auth?.addListener(_onAuthChanged);
+    _load();
+  }
+
+  @override
+  void didUpdateWidget(PersonalHomeSection oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!identical(oldWidget.auth, widget.auth)) {
+      oldWidget.auth?.removeListener(_onAuthChanged);
+      widget.auth?.addListener(_onAuthChanged);
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.auth?.removeListener(_onAuthChanged);
+    super.dispose();
+  }
+
+  void _onAuthChanged() {
     _load();
   }
 
   Future<void> _load() async {
+    final gen = ++_loadGen;
     if (mounted) setState(() => _phase = _Phase.loading);
     try {
       final data = PersonalHomeData.fromJson(await widget.api.load(), widget.strings);
-      if (!mounted) return;
+      if (!mounted || gen != _loadGen) return;
       setState(() {
         _data = data;
         if (data.cards.isEmpty) {
@@ -276,10 +303,10 @@ class _PersonalHomeSectionState extends State<PersonalHomeSection> {
         }
       });
     } on PersonalHomeAuthRequired {
-      if (mounted) setState(() => _phase = _Phase.login);
+      if (mounted && gen == _loadGen) setState(() => _phase = _Phase.login);
     } catch (error) {
       final mapped = mapPersonalHomeError(error);
-      if (!mounted) return;
+      if (!mounted || gen != _loadGen) return;
       setState(() => _phase = mapped is PersonalHomeAuthRequired ? _Phase.login : _Phase.error);
     }
   }

@@ -36,3 +36,42 @@ class AppConfig {
   static const Duration receiveTimeout = Duration(seconds: 30);
   static const Duration sendTimeout = Duration(seconds: 30);
 }
+
+const _apiVersionPrefix = '/api/v1';
+
+/// Origin without a trailing slash or a trailing `/api/v1`.
+///
+/// `http://host:4000`, `http://host:4000/`, `http://host:4000/api/v1` and
+/// `http://host:4000/api/v1/` all become `http://host:4000`.
+String normalizeApiBaseUrl(String base) {
+  var value = base.trim();
+  while (value.endsWith('/')) {
+    value = value.substring(0, value.length - 1);
+  }
+  if (value.endsWith(_apiVersionPrefix)) {
+    value = value.substring(0, value.length - _apiVersionPrefix.length);
+    while (value.endsWith('/')) {
+      value = value.substring(0, value.length - 1);
+    }
+  }
+  return value;
+}
+
+/// Path that starts with `/api/v1` once. A path that already has the prefix is left as-is.
+String versionedApiPath(String path) {
+  if (path.isEmpty) return _apiVersionPrefix;
+  final value = path.startsWith('/') ? path : '/$path';
+  if (value == _apiVersionPrefix || value.startsWith('$_apiVersionPrefix/')) {
+    return value;
+  }
+  return '$_apiVersionPrefix$value';
+}
+
+/// Full request URL. Joining is idempotent for a base with or without `/api/v1`
+/// and with or without a trailing slash.
+String resolveVersionedApiUrl(String base, String path) {
+  final origin = normalizeApiBaseUrl(base);
+  final versioned = versionedApiPath(path);
+  if (origin.isEmpty) return versioned;
+  return '$origin$versioned';
+}

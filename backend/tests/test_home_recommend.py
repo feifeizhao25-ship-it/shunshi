@@ -134,6 +134,57 @@ def test_home_cards_use_life_stage_to_drop_a_forbidden_name():
     assert "薄荷" not in "".join(card["title"] for card in nursing["cards"])
 
 
+def test_pregnancy_and_nursing_drop_tea_wording_and_keep_other_plain_cards():
+    tip = {
+        "id": "caffeine-tip",
+        "title": "下午少喝浓的",
+        "description": "下午不再喝咖啡和浓茶，晚上更容易入睡",
+        "type": "sleep_tip",
+        "season_tag": "winter",
+        "home_safe": True,
+    }
+    caffeine = ph.BY_ID["sleep_caffeine"]["zh"]
+    sugar = ph.BY_ID["food_sugar"]["zh"]
+    assert "茶" in caffeine and "茶" in sugar
+    assert hr.text_blocked_for_stage(caffeine, None) is False
+    assert hr.text_blocked_for_stage(caffeine, "上班") is False
+    now = datetime(2026, 11, 13, 15, 0, tzinfo=SH)
+    for stage in ("孕期", "哺乳期"):
+        assert hr.text_blocked_for_stage(caffeine, stage) is True
+        assert hr.text_blocked_for_stage(ph.BY_ID["sleep_caffeine"]["en"], stage) is True
+        assert hr.text_blocked_for_stage(sugar, stage) is True
+        picked = hr.select_home_items([tip], NOVEMBER, life_stage=stage)
+        ids = [item["id"] for item in picked]
+        blob = "".join(item["title"] + item["description"] for item in picked)
+        assert "caffeine-tip" not in ids
+        assert "茶" not in blob
+        assert any("热粥" in item["title"] + item["description"] for item in picked)
+        board = ph.compose(
+            ph.Profile(lang="zh", season="winter", life_stage=stage, goals=frozenset({"sleep"})),
+            ph.Activity(),
+            "stage-user",
+            now,
+            "weekday",
+        )
+        titles = "".join(card["title"] for card in board["cards"])
+        card_ids = [card["id"] for card in board["cards"]]
+        assert "sleep_caffeine" not in card_ids
+        assert "food_sugar" not in card_ids
+        assert "茶" not in titles
+        assert card_ids
+        assert all(card_id in ph.BY_ID for card_id in card_ids)
+    general_items = hr.select_home_items([tip], NOVEMBER, life_stage="上班")
+    assert "caffeine-tip" in [item["id"] for item in general_items]
+    general = ph.compose(
+        ph.Profile(lang="zh", season="winter", life_stage="上班", goals=frozenset({"sleep"})),
+        ph.Activity(),
+        "stage-user",
+        now,
+        "weekday",
+    )
+    assert "sleep_caffeine" in [card["id"] for card in general["cards"]]
+
+
 def test_streak_and_milestone_use_the_same_day_count():
     from app.services.personal_home import milestone
 

@@ -101,7 +101,7 @@ class ApiClient {
   ApiClient({String? baseUrl}) {
     _dio = Dio(
       BaseOptions(
-        baseUrl: baseUrl ?? AppConfig.apiBaseUrl,
+        baseUrl: normalizeApiBaseUrl(baseUrl ?? AppConfig.apiBaseUrl),
         connectTimeout: AppConfig.connectTimeout,
         receiveTimeout: AppConfig.receiveTimeout,
         sendTimeout: AppConfig.sendTimeout,
@@ -352,13 +352,14 @@ class ApiClient {
 
   // ==================== Public API ====================
 
-  /// Accept both legacy `/api/v1/...` paths and concise `/...` paths while
-  /// keeping API_BASE_URL an origin. This prevents missing or duplicated
-  /// version prefixes across mobile and Web release builds.
-  String _versionedPath(String path) {
-    if (path == '/api/v1' || path.startsWith('/api/v1/')) return path;
-    return '/api/v1${path.startsWith('/') ? path : '/$path'}';
-  }
+  /// Accept both legacy `/api/v1/...` paths and concise `/...` paths.
+  /// The Dio base is already an origin ([normalizeApiBaseUrl]), so this prefix
+  /// is added at most once even when API_BASE_URL itself ends in `/api/v1`.
+  String _versionedPath(String path) => versionedApiPath(path);
+
+  /// Origin actually used for requests. Exposed so tests can see a trailing
+  /// `/api/v1` was stripped before the path prefix is applied.
+  String get resolvedBaseUrl => _dio.options.baseUrl;
 
   /// GET 请求（带请求去重）
   Future<Response<T>> get<T>(

@@ -26,12 +26,12 @@ class ApiException implements Exception {
 
 /// 网页和当前客户端都使用编译时配置的地址。
 class ApiClient {
-  static const _realDeviceUrl = AppConfig.apiBaseUrl;
+  static final String _realDeviceUrl = normalizeApiBaseUrl(AppConfig.apiBaseUrl);
 
   static String baseUrl = _realDeviceUrl;
 
   static Future<void> detectBaseUrl() async {
-    baseUrl = _realDeviceUrl;
+    baseUrl = normalizeApiBaseUrl(AppConfig.apiBaseUrl);
   }
   
   late final Dio _dio;
