@@ -28,7 +28,7 @@ class _SolarWellnessCardState extends State<SolarWellnessCard> {
     try {
       // 使用 Dio 直接请求
       final dio = Dio(BaseOptions(
-        baseUrl: AppConfig.apiBaseUrl,
+        baseUrl: normalizeApiBaseUrl(AppConfig.apiBaseUrl),
         connectTimeout: const Duration(seconds: 5),
       ));
       final res = await dio.get('/api/v1/solar-wellness/daily-advice');

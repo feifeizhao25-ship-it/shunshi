@@ -6,6 +6,7 @@ library;
 import 'dart:math';
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../design_system/theme.dart';
 import 'package:go_router/go_router.dart';
@@ -14,6 +15,7 @@ import 'widgets/today_voice_bar.dart';
 import 'widgets/personal_home_binding.dart';
 import '../../widgets/personal_home_section.dart';
 import '../../account/account_surface.dart';
+import '../../account/auth_session.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/cache/cache_service.dart';
 import '../../../core/time/domestic_clock.dart';
@@ -686,6 +688,7 @@ class _UltimateHomePageState extends State<UltimateHomePage>
               SliverToBoxAdapter(child: PersonalHomeSection(
                 api: PersonalHomeBinding.api(),
                 strings: PersonalHomeBinding.strings,
+                auth: ProviderScope.containerOf(context, listen: false).read(authSessionProvider),
                 onOpen: (card) => PersonalHomeBinding.open(context, card),
                 onLogin: () => context.push('/login'),
               )),

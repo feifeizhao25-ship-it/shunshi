@@ -6,15 +6,15 @@ import 'domestic_headers.dart';
 class ApiClient {
   late final Dio _dio;
 
-  String _versionedPath(String path) {
-    if (path == '/api/v1' || path.startsWith('/api/v1/')) return path;
-    return '/api/v1${path.startsWith('/') ? path : '/$path'}';
-  }
+  String _versionedPath(String path) => versionedApiPath(path);
+
+  /// Origin actually used for requests.
+  String get resolvedBaseUrl => _dio.options.baseUrl;
 
   ApiClient({String? baseUrl, String? authToken}) {
     _dio = Dio(
       BaseOptions(
-        baseUrl: baseUrl ?? AppConfig.apiBaseUrl,
+        baseUrl: normalizeApiBaseUrl(baseUrl ?? AppConfig.apiBaseUrl),
         connectTimeout: const Duration(seconds: 30),
         receiveTimeout: const Duration(seconds: 30),
         headers: {

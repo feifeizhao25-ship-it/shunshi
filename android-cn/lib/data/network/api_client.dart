@@ -24,10 +24,7 @@ class ApiException implements Exception {
 
 /// 自动检测 baseUrl：模拟器用 10.0.2.2，真机用局域网 IP
 class ApiClient {
-  static final String _realDeviceUrl = AppConfig.apiBaseUrl.replaceAll(
-    '/api/v1',
-    '',
-  );
+  static final String _realDeviceUrl = normalizeApiBaseUrl(AppConfig.apiBaseUrl);
 
   static String baseUrl = _realDeviceUrl;
 
@@ -39,10 +36,7 @@ class ApiClient {
 
   late final Dio _dio;
 
-  static String _versionedPath(String path) {
-    if (path == '/api/v1' || path.startsWith('/api/v1/')) return path;
-    return '/api/v1${path.startsWith('/') ? path : '/$path'}';
-  }
+  static String _versionedPath(String path) => versionedApiPath(path);
 
   ApiClient() {
     // baseUrl 可能在 main() 中已通过 detectBaseUrl() 设置

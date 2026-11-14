@@ -112,6 +112,36 @@ void main() {
     expect(nursing.any((item) => item.blob.contains('薄荷')), isFalse);
   });
 
+  test('pregnancy and breastfeeding drop tea wording and keep the plain porridge', () {
+    const tip = HomeSuggest(
+      id: 'caffeine-tip',
+      title: '下午少喝浓的',
+      subtitle: '下午不再喝咖啡和浓茶，晚上更容易入睡',
+      tag: '作息',
+      season: 'winter',
+      homeSafe: true,
+    );
+    final payload = <String, dynamic>{
+      'id': 'caffeine-tip',
+      'title': '下午少喝浓的',
+      'description': '下午不再喝咖啡和浓茶，晚上更容易入睡',
+      'type': 'sleep_tip',
+      'season': 'winter',
+      'home_safe': true,
+    };
+    for (final stage in ['孕期', '哺乳期']) {
+      final shown = homeSuggestionsFor(season: 'winter', lifeStage: stage, extra: const [tip]);
+      final blob = shown.map((item) => item.blob).join();
+      expect(shown.map((item) => item.id), isNot(contains('caffeine-tip')));
+      expect(blob.contains('茶'), isFalse);
+      expect(blob.contains('热粥'), isTrue);
+      expect(keepHomePayload(payload, season: 'winter', lifeStage: stage), isFalse);
+    }
+    final general = homeSuggestionsFor(season: 'winter', lifeStage: '上班', extra: const [tip]);
+    expect(general.map((item) => item.id), contains('caffeine-tip'));
+    expect(keepHomePayload(payload, season: 'winter', lifeStage: '上班'), isTrue);
+  });
+
   test('seed teas with efficacy or grams stay off the home list', () {
     const teas = [
       HomeSuggest(

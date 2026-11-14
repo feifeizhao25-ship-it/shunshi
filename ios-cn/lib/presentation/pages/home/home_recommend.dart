@@ -5,7 +5,7 @@ import '../../account/account_surface.dart';
 /// 允许名单是节气白话，加上明确标了 home_safe 的内容。
 /// 药效、剂量、穴位适应症不展示。没有这道标记的种子内容不进首页。
 /// 孕期 / 哺乳期名字与 backend `contraindications.py` 读到的现有名单一致，这里不改那些表。
-/// 这两类阶段里，茶饮、带配料、或说不清安不安全的条目丢掉。热粥没有点到禁忌食材就留下。
+/// 这两类阶段里，茶饮、句子里的茶、带配料、或说不清安不安全的条目丢掉。热粥没有点到禁忌食材就留下。
 
 const homeEfficacyTerms = <String>[
   '补血',
@@ -152,7 +152,9 @@ Set<String> homeExclusionNames(String? lifeStage) {
 bool homeTextBlockedForStage(String text, String? lifeStage) {
   final names = homeExclusionNames(lifeStage);
   if (names.isEmpty || text.isEmpty) return false;
-  return names.any(text.contains);
+  if (names.any(text.contains)) return true;
+  // 和时辰表一样：孕期 / 哺乳期整句含「茶」就不要。不新写一句来换。
+  return text.contains('茶');
 }
 
 bool _curatedHomeId(String id) => plainHomeSuggestions.any((item) => item.id == id);

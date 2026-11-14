@@ -6,6 +6,7 @@
 季节按北京时间的节气表，不用公历月份（11 月立冬后是冬，不是秋）。
 孕期 / 哺乳期排除名单直接读现有的 FORBIDDEN_HERBS_DATA、孕期名单和哺乳期忌口，不改那些表。
 这两类人生阶段里，没核对过的条目（茶饮、带配料、说不清安不安全）直接丢掉。
+句子里写了茶，也整句丢掉，和时辰表一样，不改写成新文案。
 热粥这类白话、又没有点到禁忌食材的，保留。
 """
 
@@ -58,6 +59,7 @@ _EFFICACY_CLASS = re.compile(
 # 克数和剂量。时长（10分钟）不算。
 _DOSAGE = re.compile(r"\d+\s*(?:mg|ml|g|毫克|毫升|克|片|颗|枚|勺)", re.IGNORECASE)
 
+_TEA_WORD = re.compile(r"\btea\b", re.IGNORECASE)
 _ACUPOINT_TYPES = frozenset({"acupressure", "acupoint", "穴位"})
 _FOOD_REST_TYPES = frozenset({"food_therapy", "recipe", "food", "tea", "sleep_tip", "sleep", "rest", "tips"})
 _VAGUE_FOODS = ("辛辣", "油腻", "咖啡因", "酒精", "腌制", "烧烤", "冷饮", "冰镇")
@@ -128,11 +130,22 @@ def exclusion_names(flags: frozenset[str]) -> tuple[str, ...]:
     return tuple(sorted({name for name in names if name}, key=len, reverse=True))
 
 
+def text_has_tea_wording(text: str) -> bool:
+    """茶，或英文单词 tea。时辰表对孕期 / 哺乳期也不留茶饮说法。"""
+    if not text:
+        return False
+    if "茶" in text:
+        return True
+    return _TEA_WORD.search(text) is not None
+
+
 def text_blocked_for_stage(text: str, life_stage: str | None) -> bool:
     flags = flags_from_profile(life_stage=life_stage)
     if not flags or not text:
         return False
-    return any(name in text for name in exclusion_names(flags))
+    if any(name in text for name in exclusion_names(flags)):
+        return True
+    return text_has_tea_wording(text)
 
 
 def _is_acupoint(item: dict) -> bool:
@@ -231,7 +244,7 @@ def _stage_allows(item: dict, blob: str, life_stage: str | None, *, curated: boo
     flags = flags_from_profile(life_stage=life_stage)
     if not flags:
         return True
-    if any(name in blob for name in exclusion_names(flags)):
+    if text_blocked_for_stage(blob, life_stage):
         return False
     if curated:
         return True

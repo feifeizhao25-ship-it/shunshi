@@ -4,9 +4,11 @@
 // V2: 墨绿下划线Tab, 圆角16输入框, 渐变登录按钮, 虚线游客按钮, 圆形第三方图标
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../account/auth_session.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import '../../../core/theme/shunshi_spacing.dart';
 import '../../../core/theme/shunshi_text_styles.dart';
@@ -265,6 +267,9 @@ class _LoginPageState extends State<LoginPage>
         data['data']?['token'] as String?;
     if (token != null) {
       await StorageManager.user.saveToken(token);
+      if (mounted) {
+        ProviderScope.containerOf(context).read(authSessionProvider).markLoggedIn();
+      }
     }
     if (phone != null) {
       final prefs = await SharedPreferences.getInstance();

@@ -6,6 +6,7 @@ library;
 import 'dart:math';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../design_system/theme.dart';
 import 'package:go_router/go_router.dart';
@@ -14,6 +15,7 @@ import 'widgets/today_voice_bar.dart';
 import 'widgets/personal_home_binding.dart';
 import '../../widgets/personal_home_section.dart';
 import '../../account/account_surface.dart';
+import '../../account/auth_session.dart';
 import '../../../data/services/offline_cache.dart';
 import '../../../core/config/app_config.dart';
 import '../../../design_system/app_colors.dart';
@@ -338,7 +340,7 @@ class UltimateHomePage extends StatefulWidget {
 }
 
 class _UltimateHomePageState extends State<UltimateHomePage> {
-  static const _baseUrl = AppConfig.apiBaseUrl;
+  static final _baseUrl = normalizeApiBaseUrl(AppConfig.apiBaseUrl);
   final _dio = withSessionAuth(Dio(BaseOptions(
     baseUrl: _baseUrl,
     connectTimeout: const Duration(seconds: 8),
@@ -489,6 +491,7 @@ class _UltimateHomePageState extends State<UltimateHomePage> {
             SliverToBoxAdapter(child: PersonalHomeSection(
               api: PersonalHomeBinding.api(),
               strings: PersonalHomeBinding.strings,
+              auth: ProviderScope.containerOf(context, listen: false).read(authSessionProvider),
               onOpen: (card) => PersonalHomeBinding.open(context, card),
               onLogin: () => context.push('/login'),
             )),
