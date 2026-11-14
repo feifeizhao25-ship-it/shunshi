@@ -33,62 +33,12 @@ jobs:
           cd android-cn
           flutter pub get
 
-      - name: Verify domestic Android repositories fall back to canonical hosts
+      - name: Verify canonical Android repositories
         run: |
-          python - <<'PY'
-          from pathlib import Path
-
-          def blocks(text: str) -> list[str]:
-              found = []
-              key = "repositories {"
-              start = 0
-              while True:
-                  i = text.find(key, start)
-                  if i < 0:
-                      break
-                  depth = 0
-                  for j in range(i, len(text)):
-                      if text[j] == "{":
-                          depth += 1
-                      elif text[j] == "}":
-                          depth -= 1
-                          if depth == 0:
-                              found.append(text[i : j + 1])
-                              start = j + 1
-                              break
-                  else:
-                      raise SystemExit("unbalanced repositories block")
-              return found
-
-          def check(name: str, block: str, portal: bool) -> None:
-              aliyun = block.find("maven.aliyun.com")
-              google = block.find("google()")
-              central = block.find("mavenCentral()")
-              if min(aliyun, google, central) < 0:
-                  raise SystemExit(f"{name} must list Aliyun, then google() and mavenCentral()")
-              if not (aliyun < google < central):
-                  raise SystemExit(f"{name} must try Aliyun before google() and mavenCentral()")
-              if portal:
-                  portal_at = block.find("gradlePluginPortal()")
-                  if portal_at < central:
-                      raise SystemExit(f"{name} must keep gradlePluginPortal() after the mirror")
-
-          for rel in ("android-cn/android", "ios-cn/android"):
-              root = Path(rel)
-              settings = (root / "settings.gradle.kts").read_text()
-              build = (root / "build.gradle.kts").read_text()
-              if "dependencyResolutionManagement" not in settings:
-                  raise SystemExit(f"{rel}/settings.gradle.kts missing dependencyResolutionManagement")
-              settings_blocks = blocks(settings)
-              if len(settings_blocks) < 2:
-                  raise SystemExit(f"{rel} needs pluginManagement and dependencyResolutionManagement repositories")
-              check(f"{rel} pluginManagement", settings_blocks[0], portal=True)
-              check(f"{rel} dependencyResolutionManagement", settings_blocks[1], portal=False)
-              build_blocks = blocks(build)
-              if len(build_blocks) != 1:
-                  raise SystemExit(f"{rel}/build.gradle.kts expected one repositories block")
-              check(f"{rel} build.gradle.kts", build_blocks[0], portal=False)
-          PY
+          if grep -R "maven.aliyun.com" android-cn/android --include='*.gradle' --include='*.gradle.kts'; then
+            echo "Domestic Android build must use canonical Google/Maven Central repositories" >&2
+            exit 1
+          fi
 
       - name: Build debug APK
         run: |
