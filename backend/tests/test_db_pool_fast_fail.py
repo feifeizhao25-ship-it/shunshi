@@ -25,6 +25,20 @@ def test_postgres_engine_uses_a_short_pool_timeout(monkeypatch):
         engine.dispose()
 
 
+def test_file_sqlite_engine_does_not_keep_the_30s_pool_timeout(tmp_path, monkeypatch):
+    monkeypatch.setenv("SHUNSHI_DB_POOL_TIMEOUT", "2")
+    engine = make_engine(f"sqlite:///{tmp_path}/core.db")
+    try:
+        assert engine.pool.timeout() <= 2
+    finally:
+        engine.dispose()
+
+
+def test_memory_sqlite_engine_still_builds():
+    engine = make_engine("sqlite://")
+    engine.dispose()
+
+
 def test_queue_checkout_returns_before_the_old_30s_wait():
     from sqlalchemy import create_engine
 

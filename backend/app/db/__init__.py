@@ -20,11 +20,11 @@ def make_engine(database_url: str) -> Engine:
     database_url = normalize_database_url(database_url)
     connect_args = {"check_same_thread": False} if database_url.startswith("sqlite") else {}
     kwargs = {"connect_args": connect_args, "pool_pre_ping": True}
-    # QueuePool's default wait is 30s (pool_size defaults to 5). Fail fast instead.
-    if not database_url.startswith("sqlite"):
-        from app.database.pool import postgres_pool_timeout
+    # QueuePool's default wait is 30s (pool_size defaults to 5). File SQLite is
+    # a QueuePool in SQLAlchemy 2, so it needs the same short wait as Postgres.
+    from app.database.pool import queue_pool_timeout_kwargs
 
-        kwargs["pool_timeout"] = postgres_pool_timeout()
+    kwargs.update(queue_pool_timeout_kwargs(database_url))
     return create_engine(database_url, **kwargs)
 
 
