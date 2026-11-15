@@ -6,7 +6,7 @@ import '../../../design_system/theme.dart';
 import '../../../core/config/app_config.dart';
 import '../../../design_system/app_colors.dart';
 
-const _baseUrl = AppConfig.apiBaseUrl;
+final _baseUrl = normalizeApiBaseUrl(AppConfig.apiBaseUrl);
 
 class DailyCheckinPage extends StatefulWidget {
   const DailyCheckinPage({super.key});

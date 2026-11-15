@@ -10,7 +10,7 @@ class SubscriptionService {
   // 页面因此显示“查询失败”（国内）或回退成假的“Free · ACTIVE”（国际）。
   static final Dio _dio = _withAuth(Dio(
     BaseOptions(
-      baseUrl: AppConfig.apiBaseUrl.replaceAll('/api/v1', ''),
+      baseUrl: normalizeApiBaseUrl(AppConfig.apiBaseUrl),
       connectTimeout: const Duration(seconds: 8),
       receiveTimeout: const Duration(seconds: 10),
     ),

@@ -35,7 +35,7 @@ class _SleepReportPageState extends State<SleepReportPage> {
       return;
     }
     try {
-      final dio = withSessionAuth(Dio(BaseOptions(baseUrl: AppConfig.apiBaseUrl, connectTimeout: const Duration(seconds: 8))));
+      final dio = withSessionAuth(Dio(BaseOptions(baseUrl: normalizeApiBaseUrl(AppConfig.apiBaseUrl), connectTimeout: const Duration(seconds: 8))));
       final enc = Uri.encodeComponent(uid);
       final results = await Future.wait([
         dio.get('/api/v1/journal/insights/$enc'),

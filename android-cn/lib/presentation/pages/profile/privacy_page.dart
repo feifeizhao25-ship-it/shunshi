@@ -30,7 +30,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
     if (token == null || token.isEmpty) throw StateError('请先登录');
     final dio = Dio(
       BaseOptions(
-        baseUrl: AppConfig.apiBaseUrl,
+        baseUrl: normalizeApiBaseUrl(AppConfig.apiBaseUrl),
         connectTimeout: const Duration(seconds: 15),
         receiveTimeout: const Duration(seconds: 30),
         headers: {'Authorization': 'Bearer $token'},

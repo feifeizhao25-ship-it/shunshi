@@ -18,7 +18,7 @@ class VoiceService implements VoiceInput {
   VoiceService._();
 
   final _recorder = AudioRecorder();
-  static const String _baseUrl = AppConfig.apiBaseUrl;
+  static final String _baseUrl = normalizeApiBaseUrl(AppConfig.apiBaseUrl);
   final _dio = Dio(BaseOptions(
     baseUrl: _baseUrl,
     connectTimeout: const Duration(seconds: 10),

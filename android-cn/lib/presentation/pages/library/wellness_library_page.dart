@@ -18,7 +18,7 @@ class WellnessLibraryPage extends StatefulWidget {
 }
 
 class _WellnessLibraryPageState extends State<WellnessLibraryPage> {
-  static final String _baseUrl = AppConfig.apiBaseUrl.replaceAll('/api/v1', '');
+  static final String _baseUrl = normalizeApiBaseUrl(AppConfig.apiBaseUrl);
   final _dio = Dio(BaseOptions(
     baseUrl: _baseUrl,
     connectTimeout: const Duration(seconds: 8),

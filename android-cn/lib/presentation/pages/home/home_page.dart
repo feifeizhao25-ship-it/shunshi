@@ -33,7 +33,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final _dio = Dio(BaseOptions(
-    baseUrl: AppConfig.apiBaseUrl.replaceAll('/api/v1', ''),
+    baseUrl: normalizeApiBaseUrl(AppConfig.apiBaseUrl),
     connectTimeout: const Duration(seconds: 5),
     receiveTimeout: const Duration(seconds: 8),
   ));

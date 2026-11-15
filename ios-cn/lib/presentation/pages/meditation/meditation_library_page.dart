@@ -26,7 +26,7 @@ class MeditationLibraryPage extends StatefulWidget {
 class _MeditationLibraryPageState extends State<MeditationLibraryPage> {
   late final Dio _dio = widget.dio ??
       Dio(BaseOptions(
-        baseUrl: AppConfig.apiBaseUrl,
+        baseUrl: normalizeApiBaseUrl(AppConfig.apiBaseUrl),
         connectTimeout: const Duration(seconds: 8),
         receiveTimeout: const Duration(seconds: 15),
       ));

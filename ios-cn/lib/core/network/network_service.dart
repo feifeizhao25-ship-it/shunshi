@@ -38,7 +38,7 @@ class NetworkService {
   
   Dio _createDio() {
     final dio = Dio(BaseOptions(
-      baseUrl: AppConfig.apiBaseUrl,
+      baseUrl: normalizeApiBaseUrl(AppConfig.apiBaseUrl),
       connectTimeout: const Duration(seconds: 5),
       receiveTimeout: const Duration(seconds: 15),
       sendTimeout: const Duration(seconds: 15),
@@ -122,7 +122,7 @@ class _AuthInterceptor extends Interceptor {
         // Call refresh endpoint
         final dio = Dio();
         final response = await dio.post(
-          '${AppConfig.apiBaseUrl}/auth/refresh',
+          resolveVersionedApiUrl(AppConfig.apiBaseUrl, '/auth/refresh'),
           data: {'refresh_token': refreshToken},
         );
         return response.data as Map<String, String>;

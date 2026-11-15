@@ -6,7 +6,7 @@ import '../../core/config/app_config.dart';
 /// Follow-up 跟进服务 - AI 主动关怀系统
 class FollowUpService {
   static final _dio = Dio(BaseOptions(
-    baseUrl: AppConfig.apiBaseUrl.replaceAll('/api/v1', ''),
+    baseUrl: normalizeApiBaseUrl(AppConfig.apiBaseUrl),
     connectTimeout: const Duration(seconds: 8),
   ));
 

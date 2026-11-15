@@ -122,7 +122,7 @@ class ImageUploadService {
       
       final baseUrl = _getBaseUrl();
       final response = await dio.post(
-        '$baseUrl/api/v1/upload/image',
+        resolveVersionedApiUrl(baseUrl, '/upload/image'),
         data: formData,
         options: options,
         onSendProgress: (sent, total) {
@@ -154,10 +154,7 @@ class ImageUploadService {
   }
   
   // 获取 API Base URL
-  static String _getBaseUrl() {
-    // 从环境或默认配置获取
-    return AppConfig.apiBaseUrl;
-  }
+  static String _getBaseUrl() => normalizeApiBaseUrl(AppConfig.apiBaseUrl);
   
   // 获取存储的 Token
   static String? _getToken() {

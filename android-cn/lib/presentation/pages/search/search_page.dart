@@ -21,7 +21,7 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
   final _controller = TextEditingController();
-  final _dio = Dio(BaseOptions(baseUrl: AppConfig.apiBaseUrl.replaceAll('/api/v1', ''), connectTimeout: const Duration(seconds: 8)));
+  final _dio = Dio(BaseOptions(baseUrl: normalizeApiBaseUrl(AppConfig.apiBaseUrl), connectTimeout: const Duration(seconds: 8)));
   List<Map<String, dynamic>> _results = [];
   bool _loading = false;
   String _query = '';

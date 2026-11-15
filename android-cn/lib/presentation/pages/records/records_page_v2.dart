@@ -19,7 +19,7 @@ class RecordsPageV2 extends StatefulWidget {
 }
 
 class _RecordsPageV2State extends State<RecordsPageV2> {
-  static final String _baseUrl = AppConfig.apiBaseUrl.replaceAll('/api/v1', '');
+  static final String _baseUrl = normalizeApiBaseUrl(AppConfig.apiBaseUrl);
   final _dio = Dio(BaseOptions(baseUrl: _baseUrl, connectTimeout: const Duration(seconds: 8)));
   
   int _weekStreak = 0;

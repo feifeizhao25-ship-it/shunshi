@@ -41,7 +41,7 @@ class _DiaryPageState extends State<DiaryPage> {
     try {
       final prefs = await SharedPreferences.getInstance();
       final userId = prefs.getString('user_id') ?? '';
-      final dio = Dio(BaseOptions(baseUrl: AppConfig.apiBaseUrl));
+      final dio = Dio(BaseOptions(baseUrl: normalizeApiBaseUrl(AppConfig.apiBaseUrl)));
       final res = await dio.get('/api/v1/journal/entries/$userId', queryParameters: {'user_id': userId});
       if (res.data is List) {
         setState(() => _entries = List<Map<String, dynamic>>.from(res.data));
@@ -73,7 +73,7 @@ class _DiaryPageState extends State<DiaryPage> {
     try {
       final prefs = await SharedPreferences.getInstance();
       final userId = prefs.getString('user_id') ?? '';
-      final dio = Dio(BaseOptions(baseUrl: AppConfig.apiBaseUrl));
+      final dio = Dio(BaseOptions(baseUrl: normalizeApiBaseUrl(AppConfig.apiBaseUrl)));
       await dio.post('/api/v1/journal/entry', data: {...data, 'user_id': userId});
     } catch (_) {
       // Save locally

@@ -46,15 +46,17 @@ Future<void> endLocalSession({Dio? client}) async {
 Future<void> revokeServerSession({Dio? client}) async {
   final token = StorageManager.user.getToken();
   if (token == null || token.trim().isEmpty) return;
+  // 与 ApiClient 一样先归一成源站。基址已含 /api/v1 时不能再拼一次，否则注销 404，令牌不会作废。
+  final origin = normalizeApiBaseUrl(client?.options.baseUrl ?? AppConfig.apiBaseUrl);
   final dio = withSessionAuth(
     client ??
         Dio(
           BaseOptions(
-            baseUrl: AppConfig.apiBaseUrl,
+            baseUrl: origin,
             connectTimeout: const Duration(seconds: 8),
             receiveTimeout: const Duration(seconds: 8),
           ),
         ),
   );
-  await dio.post('/api/v1/auth/logout');
+  await dio.post(resolveVersionedApiUrl(origin, '/auth/logout'));
 }

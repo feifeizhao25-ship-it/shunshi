@@ -6,7 +6,7 @@ import '../data/network/session.dart';
 /// 反馈服务
 
 class FeedbackService {
-  static final _dio = withSessionAuth(Dio(BaseOptions(baseUrl: AppConfig.apiBaseUrl, connectTimeout: const Duration(seconds: 8))));
+  static final _dio = withSessionAuth(Dio(BaseOptions(baseUrl: normalizeApiBaseUrl(AppConfig.apiBaseUrl), connectTimeout: const Duration(seconds: 8))));
 
   /// 提交反馈
   static Future<bool> submitFeedback({
