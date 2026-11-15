@@ -5,8 +5,11 @@
 
 import hashlib
 import json
+import os
 import secrets
+import sqlite3
 import time
+from contextlib import contextmanager
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
@@ -18,6 +21,7 @@ from sqlalchemy.orm import Session
 
 from ..config import Settings
 from ..deps import current_user, get_session, get_settings
+from ..middleware.user_concurrency import InflightGate
 from ..simple_models import (
     AccountErasureJob,
     AudioProgress,
@@ -261,13 +265,53 @@ def sms_verify(
     return issue_token(settings, user.id)
 
 
+def max_concurrent_exports() -> int:
+    """How many exports one account may hold at once.
+
+    Above the 10-wide case that already finishes sub-second, and under the
+    per-caller HTTP cap. Extra exports return 429 instead of queueing on a pool.
+    """
+    raw = os.getenv("SHUNSHI_MAX_CONCURRENT_EXPORTS", "16")
+    try:
+        value = int(raw)
+    except ValueError:
+        return 16
+    return value if value > 0 else 16
+
+
+_export_gate = InflightGate(max_concurrent_exports())
+
+
+def raise_sqlite_busy(exc: BaseException) -> None:
+    text = str(exc).lower()
+    if "locked" in text or "busy" in text:
+        raise HTTPException(
+            status_code=503,
+            detail="服务繁忙，请稍后再试",
+            headers={"Retry-After": "1"},
+        ) from None
+    raise exc
+
+
+@contextmanager
+def _export_slot(user_id: str):
+    if not _export_gate.acquire(user_id):
+        raise HTTPException(
+            status_code=429,
+            detail="导出请求过于密集，请稍后再试",
+            headers={"Retry-After": "1"},
+        )
+    try:
+        yield
+    finally:
+        _export_gate.release(user_id)
+
+
 def _collect_user_data(session: Session, user_id: str) -> dict:
-    """归集核心账号数据及国内付款、退款申请记录。"""
+    """归集核心账号数据。账单和另外两个库在这条连接归还之后再读。"""
     user = session.get(User, user_id)
     if user is None:
         raise HTTPException(status_code=401, detail="账号已不存在，请重新登录")
-    from ..services.billing_data import collect_domestic_billing_data
-    billing = collect_domestic_billing_data(user_id)
     settings_rows = session.scalars(
         select(UserSetting).where(UserSetting.user_id == user_id)
     ).all()
@@ -287,7 +331,6 @@ def _collect_user_data(session: Session, user_id: str) -> dict:
     return {
         "product": "shunshi",
         "exported_at": int(time.time()),
-        "domestic_billing": billing,
         "user": (
             {
                 "id": user.id,
@@ -363,25 +406,57 @@ def _collect_user_data(session: Session, user_id: str) -> dict:
     }
 
 
+def _load_core_export(request: Request, user_id: str) -> dict:
+    """Read the core tables and return the connection before any other store is opened."""
+    session = request.app.state.session_factory()
+    try:
+        data = _collect_user_data(session, user_id)
+        session.commit()
+        return data
+    except Exception:
+        session.rollback()
+        raise
+    finally:
+        session.close()
+
+
+def _attach_external_export(data: dict, user_id: str) -> None:
+    """Record store and product store. Must run after the core session is closed.
+
+    The old handler kept the core connection checked out while it opened the
+    record-store SQLite (30s busy timeout in tests, twice) and while
+    export_product_store checked out a second connection from the product
+    QueuePool. That pool still had SQLAlchemy's 30s default, so the requests
+    that already held a core connection bypassed the 2s → 503 path.
+    """
+    from ..database.db import record_store_read
+    from ..services.account_erasure import export_product_store, export_record_store
+    from ..services.billing_data import collect_domestic_billing_data
+
+    try:
+        with record_store_read() as db:
+            data["domestic_billing"] = collect_domestic_billing_data(user_id, db=db)
+            data["record_store"] = export_record_store(db, user_id)
+    except sqlite3.OperationalError as exc:
+        raise_sqlite_busy(exc)
+    data["product_store"] = export_product_store(user_id)
+
+
+def export_account_data(request: Request, user_id: str) -> dict:
+    with _export_slot(user_id):
+        data = _load_core_export(request, user_id)
+        _attach_external_export(data, user_id)
+        return data
+
+
 @router.post("/data/export")
 @router.get("/data/export")
 def export_data(
+    request: Request,
     user_id: str = Depends(current_user),
-    session: Session = Depends(get_session),
 ):
     """数据导出：真实读库返回该用户全部数据的 JSON。客户端实际用 POST，GET 为等价别名。"""
-    data = _collect_user_data(session, user_id)
-    # 产品模块的数据（家庭成员、饮水、日记……）原来不在导出里；范围与注销时删除的一致。
-    from ..database.db import close_test_connection, get_db
-    from ..services.account_erasure import export_product_store, export_record_store
-
-    db = get_db()
-    try:
-        data["record_store"] = export_record_store(db, user_id)
-    finally:
-        close_test_connection(db)
-    data["product_store"] = export_product_store(user_id)
-    return data
+    return export_account_data(request, user_id)
 
 
 @router.post("/account/cancel-delete")

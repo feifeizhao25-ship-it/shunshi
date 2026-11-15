@@ -4,8 +4,10 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy.orm import Session
 from app.config import Settings
 from app.deps import current_user, get_session, get_settings
-from app.database.db import get_db, close_test_connection
-from app.routers.user import _collect_user_data, delete_account
+import sqlite3
+
+from app.database.db import record_store_read
+from app.routers.user import delete_account, export_account_data, raise_sqlite_busy
 
 router = APIRouter(prefix="/api/v1/users", tags=["用户管理"])
 
@@ -35,23 +37,24 @@ def delete_user(user_id: str, request: Request,
 
 
 @router.get("/{user_id}/export")
-def export_user_data(user_id: str, actor: str = Depends(current_user), session: Session = Depends(get_session)):
+def export_user_data(user_id: str, request: Request, actor: str = Depends(current_user)):
     _require_owner(user_id, actor)
-    data = _collect_user_data(session, actor)
-    db = get_db()
+    # Core session is closed inside export_account_data before the record store opens.
+    data = export_account_data(request, actor)
     try:
-        tables = {row[0] for row in db.execute("SELECT name FROM sqlite_master WHERE type='table'")}
-        missing = []
-        for key, table in (("profile", "user_profiles"), ("subscriptions", "subscriptions"),
-                           ("memories", "memory_items"), ("conversations", "conversations")):
-            if table not in tables:
-                data[key] = []
-                missing.append(key)
-                continue
-            rows = db.execute(f'SELECT * FROM "{table}" WHERE user_id = ?', (actor,)).fetchall()
-            data[key] = [dict(row) for row in rows]
-        data.update(user_id=actor, exported_at=datetime.now(timezone.utc).isoformat(), unavailable_legacy_sections=missing,
-                    export_scope="核心账号及已列出的历史记录，不代表全部产品模块数据")
-        return data
-    finally:
-        close_test_connection(db)
+        with record_store_read() as db:
+            tables = {row[0] for row in db.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+            missing = []
+            for key, table in (("profile", "user_profiles"), ("subscriptions", "subscriptions"),
+                               ("memories", "memory_items"), ("conversations", "conversations")):
+                if table not in tables:
+                    data[key] = []
+                    missing.append(key)
+                    continue
+                rows = db.execute(f'SELECT * FROM "{table}" WHERE user_id = ?', (actor,)).fetchall()
+                data[key] = [dict(row) for row in rows]
+            data.update(user_id=actor, exported_at=datetime.now(timezone.utc).isoformat(), unavailable_legacy_sections=missing,
+                        export_scope="核心账号及已列出的历史记录，不代表全部产品模块数据")
+            return data
+    except sqlite3.OperationalError as exc:
+        raise_sqlite_busy(exc)

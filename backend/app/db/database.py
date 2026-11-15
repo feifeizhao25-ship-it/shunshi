@@ -19,14 +19,17 @@ else:
 
 _engine_kwargs = {"pool_pre_ping": True, "echo": False}
 if DATABASE_URL.startswith("postgresql"):
-    from app.database.pool import postgres_pool_timeout
-
-    _engine_kwargs.update(pool_size=10, max_overflow=20, pool_timeout=postgres_pool_timeout())
+    _engine_kwargs.update(pool_size=10, max_overflow=20)
     if PRODUCT_SCHEMA:
         # 产品模型与核心模型都有 users 表（列不同），同库时必须分 schema。
         _engine_kwargs["connect_args"] = {"options": f"-csearch_path={PRODUCT_SCHEMA}"}
 elif DATABASE_URL.startswith("sqlite"):
     _engine_kwargs["connect_args"] = {"check_same_thread": False}
+# File SQLite is a QueuePool. Without this it waits the 30s default, which is
+# the wait data export hit while the core Postgres pool already failed in 2s.
+from app.database.pool import queue_pool_timeout_kwargs
+
+_engine_kwargs.update(queue_pool_timeout_kwargs(DATABASE_URL))
 
 engine = create_engine(DATABASE_URL, **_engine_kwargs)
 

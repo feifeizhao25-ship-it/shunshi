@@ -226,25 +226,53 @@ def export_record_store(db, user_id: str) -> dict[str, list[dict]]:
 
 def export_product_store(user_id: str) -> dict[str, list[dict]]:
     from sqlalchemy import inspect, text
+    from sqlalchemy.exc import OperationalError
 
     from ..db.database import engine
 
     out: dict[str, list[dict]] = {}
-    inspector = inspect(engine)
-    with engine.connect() as connection:
-        for table in inspector.get_table_names():
-            columns = [column["name"] for column in inspector.get_columns(table)]
-            user_columns = user_columns_of(table, columns)
-            clauses = [f'CAST("{c}" AS TEXT) = :uid' for c in user_columns]
-            if table == "users" and "id" in columns:
-                clauses.append('CAST("id" AS TEXT) = :uid')
-            if not clauses:
-                continue
-            result = connection.execute(
-                text(f'SELECT * FROM "{table}" WHERE {" OR ".join(clauses)}'), {"uid": user_id}
-            )
-            keys = list(result.keys())
-            rows = result.fetchall()
-            if rows:
-                out[table] = [_row_dict(keys, tuple(r)) for r in rows]
+    try:
+        with engine.connect() as connection:
+            # inspect(engine) checks out a second connection while this one is
+            # still held. On the SQLite product engine that pool kept the 30s
+            # default, so every in-flight export waited on a connection it
+            # already owned. Reflect through the connection we have.
+            inspector = inspect(connection)
+            if connection.dialect.name == "sqlite":
+                from ..database.db import export_record_timeout_seconds
+
+                connection.exec_driver_sql(
+                    f"PRAGMA busy_timeout={int(export_record_timeout_seconds() * 1000)}"
+                )
+            tables = inspector.get_table_names()
+            columns_by_table = {
+                table: [column["name"] for column in inspector.get_columns(table)]
+                for table in tables
+            }
+            for table, columns in columns_by_table.items():
+                user_columns = user_columns_of(table, columns)
+                clauses = [f'CAST("{c}" AS TEXT) = :uid' for c in user_columns]
+                if table == "users" and "id" in columns:
+                    clauses.append('CAST("id" AS TEXT) = :uid')
+                if not clauses:
+                    continue
+                result = connection.execute(
+                    text(f'SELECT * FROM "{table}" WHERE {" OR ".join(clauses)}'),
+                    {"uid": user_id},
+                )
+                keys = list(result.keys())
+                rows = result.fetchall()
+                if rows:
+                    out[table] = [_row_dict(keys, tuple(r)) for r in rows]
+    except OperationalError as exc:
+        message = str(getattr(exc, "orig", exc)).lower()
+        if "locked" in message or "busy" in message:
+            from fastapi import HTTPException
+
+            raise HTTPException(
+                status_code=503,
+                detail="服务繁忙，请稍后再试",
+                headers={"Retry-After": "1"},
+            ) from None
+        raise
     return out
