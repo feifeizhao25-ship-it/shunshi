@@ -74,7 +74,12 @@ def test_subscription_status_tier_from_registry(settings):
             "store": "app_store",
             "expires_at": int(time.time()) + 30 * 86400,
             "original_transaction_id": "txn-registry-1",
+            "order_no": "order-registry-1",
+            "amount_cents": 9900,
         }
+        from .test_subscription import _insert_pending_order
+
+        _insert_pending_order(user_id, body["product_id"], body["order_no"], body["amount_cents"])
         raw = json.dumps(body).encode()
         signature = hmac.new(b"callback-secret", raw, hashlib.sha256).hexdigest()
         assert client.post(

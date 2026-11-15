@@ -70,7 +70,12 @@ def get_engine():
     if _engine is None:
         url = get_database_url()
         connect_args = {"check_same_thread": False} if "sqlite" in url else {}
-        _engine = create_engine(url, echo=False, pool_pre_ping=True, connect_args=connect_args)
+        kwargs = {"echo": False, "pool_pre_ping": True, "connect_args": connect_args}
+        if "sqlite" not in url:
+            from .pool import postgres_pool_timeout
+
+            kwargs["pool_timeout"] = postgres_pool_timeout()
+        _engine = create_engine(url, **kwargs)
 
         # SQLite 启用 WAL 模式和外键
         if "sqlite" in url:
@@ -87,13 +92,18 @@ def get_async_engine():
     """获取异步引擎 (延迟创建)"""
     global _async_engine
     if _async_engine is None:
-        _async_engine = create_async_engine(
-            get_async_database_url(),
-            echo=False,
-            pool_pre_ping=True,
-            pool_size=5,
-            max_overflow=10,
-        )
+        async_url = get_async_database_url()
+        async_kwargs = {
+            "echo": False,
+            "pool_pre_ping": True,
+            "pool_size": 5,
+            "max_overflow": 10,
+        }
+        if "sqlite" not in async_url:
+            from .pool import postgres_pool_timeout
+
+            async_kwargs["pool_timeout"] = postgres_pool_timeout()
+        _async_engine = create_async_engine(async_url, **async_kwargs)
     return _async_engine
 
 

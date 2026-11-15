@@ -38,6 +38,16 @@ init_product_db()
 
 
 @pytest.fixture(autouse=True)
+def _reset_login_failure_counters():
+    """Login lockouts are per process. Keep one test's failures from blocking the next."""
+    from app.services.login_rate_limit import memory_store
+
+    memory_store.clear()
+    yield
+    memory_store.clear()
+
+
+@pytest.fixture(autouse=True)
 def _drop_legacy_jwt_secret_env(monkeypatch):
     """CI exports the legacy JWT_SECRET next to SHUNSHI_JWT_SECRET.
 
