@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../data/network/api_client.dart';
 import '../../widgets/skeleton_loading.dart';
+import '../../widgets/cn_back_button.dart';
 /// 茶饮推荐页面
 class TeaPage extends StatefulWidget {
   const TeaPage({super.key});
@@ -87,7 +88,7 @@ class _TeaPageState extends State<TeaPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
+        leading: CnBackButton(
             icon: const Icon(Icons.arrow_back_ios, size: 20),
             onPressed: () => safePop(context)),
         title: const Text('茶饮推荐'),
@@ -248,6 +249,7 @@ class _TeaPageState extends State<TeaPage> {
                         style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
                   ),
                   IconButton(
+                    tooltip: '关闭',
                     icon: const Icon(Icons.close),
                     onPressed: () => Navigator.pop(context),
                   ),

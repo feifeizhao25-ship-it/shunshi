@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/config/app_config.dart';
 import '../../../design_system/theme.dart';
+import '../../widgets/cn_back_button.dart';
 
 class DiscoverPage extends StatefulWidget {
   const DiscoverPage({super.key});
@@ -108,7 +109,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
     final bg = isDark ? ShunShiColors.darkBackground : ShunShiColors.background;
 
     return Scaffold(
-  appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
+  appBar: AppBar(leading: CnBackButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
       backgroundColor: bg,
       body: RefreshIndicator(
         color: ShunShiColors.primary,
@@ -127,6 +128,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
             )),
             actions: [
               IconButton(
+                tooltip: '通知',
                 icon: const Icon(Icons.notifications_outlined, size: 24),
                 color: ShunShiColors.textSecondary,
                 onPressed: () => context.push('/notifications'),
@@ -154,6 +156,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
                     border: InputBorder.none,
                     icon: Icon(Icons.search, size: 20, color: ShunShiColors.textTertiary),
                     suffixIcon: _searchController.text.isNotEmpty ? IconButton(
+                      tooltip: '清除',
                       icon: Icon(Icons.clear, size: 18, color: ShunShiColors.textTertiary),
                       onPressed: () { _searchController.clear(); setState(() { _searchResults = []; _searching = false; }); },
                     ) : null,

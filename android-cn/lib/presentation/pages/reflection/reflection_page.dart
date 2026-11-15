@@ -10,6 +10,7 @@ import '../../../core/theme/shunshi_colors.dart';
 import '../../../core/theme/shunshi_spacing.dart';
 import '../../../core/theme/shunshi_text_styles.dart';
 import '../../widgets/components/gentle_button.dart';
+import '../../widgets/cn_back_button.dart';
 
 //
 
@@ -277,7 +278,7 @@ class _SuccessView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-  appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
+  appBar: AppBar(leading: CnBackButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
       backgroundColor: ShunshiColors.background,
       body: Center(
         child: Column(

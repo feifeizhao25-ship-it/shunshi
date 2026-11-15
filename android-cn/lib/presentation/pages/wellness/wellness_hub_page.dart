@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
 import '../../../design_system/theme_helper.dart';
+import '../../widgets/cn_back_button.dart';
 
 class WellnessHubPage extends StatefulWidget {
   const WellnessHubPage({super.key});
@@ -99,7 +100,7 @@ class _WellnessHubPageState extends State<WellnessHubPage> {
 
   Widget _buildContent() {
     return Scaffold(
-  appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
+  appBar: AppBar(leading: CnBackButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
       backgroundColor: AppColors.background(context),
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
@@ -118,8 +119,8 @@ class _WellnessHubPageState extends State<WellnessHubPage> {
                       color: ShunShiColors.primary,
                     )),
                     Row(children: [
-                      IconButton(icon: const Icon(Icons.search), color: ShunShiColors.textTertiary, onPressed: () { ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('搜索功能开发中'), duration: Duration(seconds: 1))); }),
-                      IconButton(icon: const Icon(Icons.notifications_outlined), color: ShunShiColors.textTertiary, onPressed: () { ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('暂无新通知'), duration: Duration(seconds: 1))); }),
+                      IconButton(tooltip: '搜索', icon: const Icon(Icons.search), color: ShunShiColors.textTertiary, onPressed: () { ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('搜索功能开发中'), duration: Duration(seconds: 1))); }),
+                      IconButton(tooltip: '通知', icon: const Icon(Icons.notifications_outlined), color: ShunShiColors.textTertiary, onPressed: () { ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('暂无新通知'), duration: Duration(seconds: 1))); }),
                     ]),
                   ],
                 ),

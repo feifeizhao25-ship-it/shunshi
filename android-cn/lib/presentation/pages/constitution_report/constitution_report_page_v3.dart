@@ -6,6 +6,7 @@ import '../../widgets/state_view.dart';
 import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
 import '../../../data/network/api_client.dart';
+import '../../widgets/cn_back_button.dart';
 
 class ConstitutionReportPageV3 extends StatefulWidget {
   final String? constitutionType;
@@ -79,7 +80,7 @@ class _ConstitutionReportPageV3State extends State<ConstitutionReportPageV3> {
       backgroundColor: bg,
       appBar: AppBar(
         backgroundColor: bg,
-        leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
+        leading: CnBackButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
         title: Text('节气生活习惯自测报告',
           style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18, fontWeight: FontWeight.w600)),
       ),

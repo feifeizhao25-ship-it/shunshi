@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/compliance/operator.dart';
 import '../../../design_system/theme.dart';
+import '../../widgets/cn_back_button.dart';
 
 class AboutPage extends StatelessWidget {
   const AboutPage({super.key});
@@ -18,7 +19,7 @@ class AboutPage extends StatelessWidget {
       backgroundColor: bg,
       appBar: AppBar(
         backgroundColor: bg,
-        leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
+        leading: CnBackButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
         title: Text('关于顺时', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18, fontWeight: FontWeight.w600)),
       ),
       body: ListView(

@@ -7,6 +7,7 @@ import '../../../data/network/api_client.dart';
 import '../../../design_system/theme.dart';
 import '../../widgets/exercise_demo.dart';
 import '../../widgets/skeleton_loading.dart';
+import '../../widgets/cn_back_button.dart';
 
 /// 运动功法页面
 class ExercisePage extends StatefulWidget {
@@ -86,7 +87,7 @@ class _ExercisePageState extends State<ExercisePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
+        leading: CnBackButton(
             icon: const Icon(Icons.arrow_back_ios, size: 20),
             onPressed: () => safePop(context)),
         title: const Text('运动功法'),
@@ -241,6 +242,7 @@ class _ExercisePageState extends State<ExercisePage> {
                     ),
                   ),
                   IconButton(
+                    tooltip: '关闭',
                     icon: const Icon(Icons.close),
                     onPressed: () => Navigator.pop(context),
                   ),

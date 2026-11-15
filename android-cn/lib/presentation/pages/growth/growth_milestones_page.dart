@@ -11,6 +11,7 @@ library;
 import 'package:flutter/material.dart';
 import '../../../design_system/app_colors.dart';
 import '../../../design_system/theme.dart';
+import '../../widgets/cn_back_button.dart';
 
 class GrowthMilestonesPage extends StatelessWidget {
   const GrowthMilestonesPage({super.key});
@@ -37,7 +38,7 @@ class GrowthMilestonesPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: bg,
       appBar: AppBar(
-        leading: IconButton(
+        leading: CnBackButton(
           icon: const Icon(Icons.arrow_back_ios_new, size: 20),
           onPressed: () => Navigator.pop(context),
         ),

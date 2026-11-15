@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
 import '../../../data/network/api_client.dart';
 import '../../widgets/state_view.dart';
+import '../../widgets/cn_back_button.dart';
 
 class MeridianDetailPage extends StatefulWidget {
   final String meridianId;
@@ -48,7 +49,7 @@ class _MeridianDetailPageState extends State<MeridianDetailPage> {
       backgroundColor: bg,
       appBar: AppBar(
         backgroundColor: bg,
-        leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
+        leading: CnBackButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
         title: Text(_data?['title'] ?? '经络详情',
           style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18, fontWeight: FontWeight.w600)),
       ),

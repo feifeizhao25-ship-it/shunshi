@@ -1,5 +1,6 @@
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
+import '../../widgets/cn_back_button.dart';
 
 /// 节气养生页面
 class SolarTermPage extends StatelessWidget {
@@ -18,7 +19,7 @@ class SolarTermPage extends StatelessWidget {
     
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(icon: const Icon(Icons.arrow_back_ios, size: 20), onPressed: () => context.pop()),
+        leading: CnBackButton(icon: const Icon(Icons.arrow_back_ios, size: 20), onPressed: () => context.pop()),
         title: const Text('节气养生'),
         centerTitle: true,
         backgroundColor: Colors.green[50],

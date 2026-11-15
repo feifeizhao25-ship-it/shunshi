@@ -11,6 +11,7 @@ library;
 
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
+import '../../widgets/cn_back_button.dart';
 
 class JournalReflectionPage extends StatefulWidget {
   const JournalReflectionPage({super.key});
@@ -50,7 +51,7 @@ class _JournalReflectionPageState extends State<JournalReflectionPage> {
       backgroundColor: bg,
       appBar: AppBar(
         backgroundColor: bg,
-        leading: IconButton(
+        leading: CnBackButton(
           icon: Icon(Icons.arrow_back_ios_new, size: 20, color: isDark ? ShunShiColors.darkTextPrimary : ShunShiColors.textPrimary),
           onPressed: () => Navigator.pop(context),
         ),

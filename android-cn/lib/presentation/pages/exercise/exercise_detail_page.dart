@@ -15,6 +15,7 @@ library;
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
+import '../../widgets/cn_back_button.dart';
 
 class ExerciseDetailPage extends StatefulWidget {
   final String? exerciseName;
@@ -71,7 +72,7 @@ class _ExerciseDetailPageState extends State<ExerciseDetailPage>
     final bg = isDark ? ShunShiColors.darkBackground : ShunShiColors.background;
 
     return Scaffold(
-  appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
+  appBar: AppBar(leading: CnBackButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
       backgroundColor: bg,
       body: CustomScrollView(
         slivers: [
@@ -80,7 +81,7 @@ class _ExerciseDetailPageState extends State<ExerciseDetailPage>
             expandedHeight: 280,
             pinned: true,
             backgroundColor: ShunShiColors.primary,
-            leading: IconButton(
+            leading: CnBackButton(
               icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
               onPressed: () => Navigator.pop(context),
             ),

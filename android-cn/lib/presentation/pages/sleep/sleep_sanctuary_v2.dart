@@ -58,7 +58,7 @@ class _SleepSanctuaryV2State extends State<SleepSanctuaryV2> {
 
             // Controls
             Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              IconButton(onPressed: () {}, icon: Icon(Icons.replay_10, color: Colors.white38, size: 28)),
+              IconButton(tooltip: '后退 10 秒', onPressed: () {}, icon: Icon(Icons.replay_10, color: Colors.white38, size: 28)),
               const SizedBox(width: 24),
               GestureDetector(
                 onTap: () => setState(() => _isPlaying = !_isPlaying),
@@ -69,7 +69,7 @@ class _SleepSanctuaryV2State extends State<SleepSanctuaryV2> {
                 ),
               ),
               const SizedBox(width: 24),
-              IconButton(onPressed: () {}, icon: Icon(Icons.forward_10, color: Colors.white38, size: 28)),
+              IconButton(tooltip: '前进 10 秒', onPressed: () {}, icon: Icon(Icons.forward_10, color: Colors.white38, size: 28)),
             ]),
 
             const Spacer(),

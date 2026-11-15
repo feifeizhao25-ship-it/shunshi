@@ -2,6 +2,7 @@ import '../../../core/router/safe_pop.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../data/network/api_client.dart';
+import '../../widgets/cn_back_button.dart';
 /// 正念呼吸引导数据
 final List<Map<String, String>> _breathingSteps = [
   {'title': '调整姿势', 'desc': '找一个舒适的坐姿或仰卧位，轻轻闭上双眼'},
@@ -152,7 +153,7 @@ class _MoodPageState extends State<MoodPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(icon: const Icon(Icons.arrow_back_ios, size: 20), onPressed: () => safePop(context)),
+        leading: CnBackButton(icon: const Icon(Icons.arrow_back_ios, size: 20), onPressed: () => safePop(context)),
         title: const Text('情绪陪伴'),
         backgroundColor: Colors.pink[50],
       ),

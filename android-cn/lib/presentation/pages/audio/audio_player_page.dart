@@ -11,6 +11,7 @@ import '../../../core/theme/shunshi_colors.dart';
 import '../../../core/theme/shunshi_spacing.dart';
 import '../../../core/theme/shunshi_text_styles.dart';
 import '../../../core/theme/shunshi_animations.dart';
+import '../../widgets/cn_back_button.dart';
 
 /// 音频播放器 — 沉浸式设计
 ///
@@ -261,7 +262,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-  appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
+  appBar: AppBar(leading: CnBackButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -306,6 +307,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
             child: Padding(
               padding: const EdgeInsets.all(ShunshiSpacing.md),
               child: IconButton(
+                tooltip: '关闭',
                 icon: const Icon(Icons.close, size: 22),
                 onPressed: () => safePop(context),
                 color: ShunshiDarkColors.textSecondary,
@@ -348,6 +350,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
           child: Padding(
             padding: const EdgeInsets.all(ShunshiSpacing.md),
             child: IconButton(
+              tooltip: '关闭',
               icon: const Icon(Icons.close, size: 22),
               onPressed: () => safePop(context),
               color: ShunshiDarkColors.textSecondary,
@@ -459,6 +462,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             IconButton(
+              tooltip: '后退 10 秒',
               icon: const Icon(Icons.skip_previous, size: 28),
               onPressed: () => _seekRelative(-10),
               color: ShunshiDarkColors.textSecondary,
@@ -487,6 +491,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
             ),
             const SizedBox(width: ShunshiSpacing.lg),
             IconButton(
+              tooltip: '前进 30 秒',
               icon: const Icon(Icons.skip_next, size: 28),
               onPressed: () => _seekRelative(30),
               color: ShunshiDarkColors.textSecondary,

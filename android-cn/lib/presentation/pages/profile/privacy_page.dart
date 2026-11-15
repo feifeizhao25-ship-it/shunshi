@@ -8,6 +8,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/config/app_config.dart';
+import '../../widgets/cn_back_button.dart';
 
 /// 隐私数据页 — 导出/删除/清空
 class PrivacyPage extends StatefulWidget {
@@ -175,7 +176,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
       appBar: AppBar(
         backgroundColor: bg,
         elevation: 0,
-        leading: IconButton(
+        leading: CnBackButton(
           icon: const Icon(Icons.arrow_back_ios_new, size: 20),
           onPressed: () => safePop(context),
         ),

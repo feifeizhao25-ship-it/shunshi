@@ -47,6 +47,7 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
         backgroundColor: bg,
         elevation: 0,
         leading: IconButton(
+          tooltip: '关闭',
           icon: const Icon(Icons.close, size: 24),
           onPressed: () => Navigator.pop(context),
         ),

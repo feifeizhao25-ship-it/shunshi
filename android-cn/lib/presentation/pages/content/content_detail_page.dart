@@ -9,6 +9,7 @@ import '../../../data/network/api_client.dart';
 import '../../widgets/state_view.dart';
 import '../../widgets/acupoint_timer_sheet.dart';
 import '../../../data/network/session.dart';
+import '../../widgets/cn_back_button.dart';
 
 class ContentDetailPage extends StatefulWidget {
   final String contentId;
@@ -62,14 +63,16 @@ class _ContentDetailPageState extends State<ContentDetailPage> {
       backgroundColor: bg,
       appBar: AppBar(
         backgroundColor: bg,
-        leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
+        leading: CnBackButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
         actions: [
           IconButton(
+            tooltip: _isFavorited ? '取消收藏' : '收藏',
             icon: Icon(_isFavorited ? Icons.favorite : Icons.favorite_border,
               color: _isFavorited ? Colors.red : null),
             onPressed: _toggleFavorite,
           ),
           IconButton(
+            tooltip: '分享',
             icon: const Icon(Icons.share_outlined),
             onPressed: () => _shareContent(),
           ),

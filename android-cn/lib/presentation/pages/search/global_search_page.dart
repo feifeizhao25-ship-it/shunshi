@@ -111,6 +111,7 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
         border: InputBorder.none,
         suffixIcon: _controller.text.isNotEmpty
             ? IconButton(
+                tooltip: '清除',
                 icon: Icon(Icons.clear, color: ShunShiColors.textTertiary),
                 onPressed: () {
                   _controller.clear();

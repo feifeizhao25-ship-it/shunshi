@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/config/app_config.dart';
+import '../../widgets/cn_back_button.dart';
 
 /// 家庭成员详情页 — 仅显示状态级别信息（隐私优先）
 class FamilyMemberDetailPage extends StatefulWidget {
@@ -87,7 +88,7 @@ class _FamilyMemberDetailPageState extends State<FamilyMemberDetailPage> {
       appBar: AppBar(
         backgroundColor: bg,
         elevation: 0,
-        leading: IconButton(
+        leading: CnBackButton(
           icon: const Icon(Icons.arrow_back_ios_new, size: 20),
           onPressed: () => safePop(context),
         ),

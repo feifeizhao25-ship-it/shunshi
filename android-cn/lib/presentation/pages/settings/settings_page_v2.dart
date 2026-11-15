@@ -9,6 +9,7 @@ import '../../../data/services/notification_service.dart';
 import '../../../data/storage/local_session.dart';
 import '../../account/account_surface.dart';
 import '../../account/settings_account.dart';
+import '../../widgets/cn_back_button.dart';
 
 class SettingsPageV2 extends StatefulWidget {
   const SettingsPageV2({super.key, this.loadAccount, this.loadPersonalization, this.savePersonalization});
@@ -104,7 +105,7 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
       backgroundColor: bg,
       appBar: AppBar(
         backgroundColor: bg,
-        leading: IconButton(
+        leading: CnBackButton(
             icon: Icon(Icons.arrow_back, color: textPrimary),
             onPressed: () => context.pop()),
         title: Text('设置',

@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../data/network/api_client.dart';
 import '../../widgets/food_card.dart';
 import '../../widgets/skeleton_loading.dart';
+import '../../widgets/cn_back_button.dart';
 
 /// 食疗推荐页面
 class FoodPage extends StatefulWidget {
@@ -127,7 +128,7 @@ class _FoodPageState extends State<FoodPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
+        leading: CnBackButton(
             icon: const Icon(Icons.arrow_back_ios, size: 20),
             onPressed: () => safePop(context)),
         title: const Text('食疗推荐'),

@@ -400,6 +400,7 @@ class ShunShiNoticeCard extends StatelessWidget {
           ),
           if (onDismiss != null)
             IconButton(
+              tooltip: '关闭',
               icon: Icon(Icons.close, size: 20),
               onPressed: onDismiss,
               color: ShunShiColors.textSecondary,

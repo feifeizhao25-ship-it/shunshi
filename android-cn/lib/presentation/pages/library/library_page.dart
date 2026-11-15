@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../design_system/app_colors.dart';
 import '../../../design_system/theme.dart';
 import '../../../data/content/wellness_content.dart';
+import '../../widgets/cn_back_button.dart';
 
 class _CategoryItem {
   final IconData icon;
@@ -164,7 +165,7 @@ class _LibraryPageState extends State<LibraryPage> {
     ];
 
     return Scaffold(
-  appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
+  appBar: AppBar(leading: CnBackButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
       backgroundColor: bg,
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),

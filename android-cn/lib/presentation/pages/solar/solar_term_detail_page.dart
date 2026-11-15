@@ -6,6 +6,7 @@ import '../../../core/network/api_client.dart';
 import '../../../core/cache/cache_service.dart';
 import '../../../core/loading/loading_state_manager.dart';
 import '../../../design_system/theme.dart';
+import '../../widgets/cn_back_button.dart';
 
 class SolarTermDetailPage extends StatefulWidget {
   final String termName;
@@ -162,7 +163,7 @@ class _SolarTermDetailPageState extends State<SolarTermDetailPage> {
     final recommendedFoods = _getList(_termDetail['recommended_foods'], ['当季蔬果', '温润食物']);
 
     return Scaffold(
-  appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
+  appBar: AppBar(leading: CnBackButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
       backgroundColor: bg,
       body: SafeArea(
         child: SingleChildScrollView(
@@ -173,9 +174,9 @@ class _SolarTermDetailPageState extends State<SolarTermDetailPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                IconButton(onPressed: () => safePop(context), icon: Icon(Icons.arrow_back_ios_new_rounded, color: isDark ? ShunShiColors.darkTextPrimary : ShunShiColors.textPrimary, size: 22)),
+                CnBackButton(onPressed: () => safePop(context), icon: Icon(Icons.arrow_back_ios_new_rounded, color: isDark ? ShunShiColors.darkTextPrimary : ShunShiColors.textPrimary, size: 22)),
                 Text('顺时 AI', style: TextStyle(fontFamily: ShunShiTypography.sansFamily, fontSize: 16, fontWeight: FontWeight.w600, color: ShunShiColors.textSecondary)),
-                IconButton(onPressed: () { ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('已复制分享链接'), duration: Duration(seconds: 1))); }, icon: Icon(Icons.share_rounded, color: isDark ? ShunShiColors.darkTextSecondary : ShunShiColors.textSecondary, size: 22)),
+                IconButton(tooltip: '分享', onPressed: () { ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('已复制分享链接'), duration: Duration(seconds: 1))); }, icon: Icon(Icons.share_rounded, color: isDark ? ShunShiColors.darkTextSecondary : ShunShiColors.textSecondary, size: 22)),
               ],
             ),
             const SizedBox(height: 24),

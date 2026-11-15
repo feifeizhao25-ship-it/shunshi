@@ -164,6 +164,7 @@ class _RateAppDialogState extends State<RateAppDialog> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: List.generate(5, (i) => IconButton(
+              tooltip: '评为 ${i + 1} 星',
               icon: Icon(
                 i < _rating ? Icons.star : Icons.star_border,
                 color: Colors.amber,

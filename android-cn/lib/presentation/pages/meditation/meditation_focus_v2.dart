@@ -176,7 +176,7 @@ class _MeditationFocusV2State extends State<MeditationFocusV2>
 
             // Controls
             Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              IconButton(onPressed: () {
+              IconButton(tooltip: '后退 10 秒', onPressed: () {
                 setState(() {
                   _elapsedSeconds = (_elapsedSeconds - 10).clamp(0, _totalSeconds);
                 });
@@ -194,7 +194,7 @@ class _MeditationFocusV2State extends State<MeditationFocusV2>
                 ),
               ),
               const SizedBox(width: 20),
-              IconButton(onPressed: () {
+              IconButton(tooltip: '前进 10 秒', onPressed: () {
                 setState(() {
                   _elapsedSeconds = (_elapsedSeconds + 10).clamp(0, _totalSeconds);
                 });

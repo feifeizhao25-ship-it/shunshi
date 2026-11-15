@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
 import '../../../data/network/session.dart';
+import '../../widgets/cn_back_button.dart';
 
 class RecordsPageV2 extends StatefulWidget {
   const RecordsPageV2({super.key});
@@ -98,7 +99,7 @@ class _RecordsPageV2State extends State<RecordsPageV2> {
       backgroundColor: bg,
       appBar: AppBar(
         backgroundColor: bg,
-        leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
+        leading: CnBackButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
         title: Text('养生记录', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18, fontWeight: FontWeight.w600)),
       ),
       body: RefreshIndicator(

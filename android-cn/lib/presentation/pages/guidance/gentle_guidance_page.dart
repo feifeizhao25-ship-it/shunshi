@@ -9,6 +9,7 @@ library;
 
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
+import '../../widgets/cn_back_button.dart';
 
 class GentleGuidancePage extends StatelessWidget {
   const GentleGuidancePage({super.key});
@@ -22,7 +23,7 @@ class GentleGuidancePage extends StatelessWidget {
       backgroundColor: bg,
       appBar: AppBar(
         backgroundColor: bg,
-        leading: IconButton(
+        leading: CnBackButton(
           icon: const Icon(Icons.arrow_back_ios_new, size: 20),
           onPressed: () => Navigator.pop(context),
         ),

@@ -7,6 +7,7 @@ import '../../../design_system/theme.dart';
 import '../../../data/network/api_client.dart';
 import '../../widgets/state_view.dart';
 import '../../widgets/illustrated_widgets.dart';
+import '../../widgets/cn_back_button.dart';
 
 class DietRecommendPage extends StatefulWidget {
   final String? constitutionType;
@@ -136,7 +137,7 @@ class _DietRecommendPageState extends State<DietRecommendPage> {
       backgroundColor: bg,
       appBar: AppBar(
         backgroundColor: bg,
-        leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
+        leading: CnBackButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
         title: Text('饮食推荐', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18, fontWeight: FontWeight.w600)),
       ),
       body: Column(children: [

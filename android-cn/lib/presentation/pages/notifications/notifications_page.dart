@@ -7,6 +7,7 @@ import '../../../design_system/theme.dart';
 import '../../../data/network/api_client.dart';
 import '../../widgets/state_view.dart';
 import '../../../data/network/session.dart';
+import '../../widgets/cn_back_button.dart';
 
 class NotificationsPage extends StatefulWidget {
   const NotificationsPage({super.key});
@@ -60,7 +61,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
       backgroundColor: bg,
       appBar: AppBar(
         backgroundColor: bg,
-        leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
+        leading: CnBackButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
         title: Text('通知', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18, fontWeight: FontWeight.w600)),
       ),
       body: StateView<List<dynamic>>(
