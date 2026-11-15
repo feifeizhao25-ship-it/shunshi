@@ -2,6 +2,7 @@ import '../../../core/router/safe_pop.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
+import '../../widgets/cn_back_button.dart';
 
 /// 节气生活习惯自测结果页。类型或分数缺失时不展示个人结果。
 class ConstitutionTestPage extends StatelessWidget {
@@ -25,7 +26,7 @@ class ConstitutionTestPage extends StatelessWidget {
         title: const Text('节气生活习惯自测结果', style: TextStyle(fontFamily: ShunShiTypography.serifFamily)),
         backgroundColor: bg,
         elevation: 0,
-        leading: IconButton(icon: const Icon(Icons.arrow_back_ios, size: 20), onPressed: () => safePop(context)),
+        leading: CnBackButton(icon: const Icon(Icons.arrow_back_ios, size: 20), onPressed: () => safePop(context)),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),

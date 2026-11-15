@@ -379,6 +379,7 @@ class FamilyStatusCard extends StatelessWidget {
               // Contact button
               if (onContact != null)
                 IconButton(
+                  tooltip: '联系家人',
                   onPressed: onContact,
                   icon: const Icon(Icons.phone),
                   color: const Color(0xFF4CAF50),

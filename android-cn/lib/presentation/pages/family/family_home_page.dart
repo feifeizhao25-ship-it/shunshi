@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../data/network/api_client.dart';
 import '../../../design_system/theme.dart';
+import '../../widgets/cn_back_button.dart';
 
 /// 家庭主页 — 隐私优先，仅显示状态级别信息
 class FamilyHomePage extends StatefulWidget {
@@ -82,7 +83,7 @@ class _FamilyHomePageState extends State<FamilyHomePage> {
       appBar: AppBar(
         backgroundColor: bg,
         elevation: 0,
-        leading: IconButton(
+        leading: CnBackButton(
           icon: const Icon(Icons.arrow_back_ios_new, size: 20),
           onPressed: () => safePop(context),
         ),
@@ -90,6 +91,7 @@ class _FamilyHomePageState extends State<FamilyHomePage> {
             style: TextStyle(fontFamily: ShunShiTypography.serifFamily)),
         actions: [
           IconButton(
+            tooltip: '邀请家人',
             icon: const Icon(Icons.person_add_rounded, size: 22),
             onPressed: () => context.push('/family-invite'),
           ),

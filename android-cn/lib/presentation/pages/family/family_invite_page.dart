@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/router/safe_pop.dart';
 import '../../../core/config/app_config.dart';
+import '../../widgets/cn_back_button.dart';
 
 class FamilyInvitePage extends StatefulWidget {
   const FamilyInvitePage({super.key});
@@ -100,7 +101,7 @@ class _FamilyInvitePageState extends State<FamilyInvitePage> {
       appBar: AppBar(
         backgroundColor: bg,
         elevation: 0,
-        leading: IconButton(
+        leading: CnBackButton(
           icon: const Icon(Icons.arrow_back_ios_new, size: 20),
           onPressed: () => safePop(context),
         ),

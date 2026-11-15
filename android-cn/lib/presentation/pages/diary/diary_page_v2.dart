@@ -11,6 +11,7 @@ import '../../../core/solar_term/solar_term_table.dart';
 import '../../../data/network/session.dart';
 import '../../../data/network/journal_payload.dart';
 import 'journal_score_row.dart';
+import '../../widgets/cn_back_button.dart';
 
 class DiaryPageV2 extends StatefulWidget {
   const DiaryPageV2({super.key});
@@ -116,7 +117,7 @@ class _DiaryPageV2State extends State<DiaryPageV2> {
     final termName = currentSolarTermName() ?? solarTerms[approxIdx];
     
     return Scaffold(
-  appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
+  appBar: AppBar(leading: CnBackButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
       backgroundColor: bg,
       body: RefreshIndicator(
         onRefresh: _fetchEntries,

@@ -10,6 +10,7 @@ library;
 
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
+import '../../widgets/cn_back_button.dart';
 
 class SeasonalShoppingPage extends StatefulWidget {
   const SeasonalShoppingPage({super.key});
@@ -65,7 +66,7 @@ class _SeasonalShoppingPageState extends State<SeasonalShoppingPage> {
       backgroundColor: bg,
       appBar: AppBar(
         backgroundColor: bg,
-        leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new, size: 20), onPressed: () => Navigator.pop(context)),
+        leading: CnBackButton(icon: const Icon(Icons.arrow_back_ios_new, size: 20), onPressed: () => Navigator.pop(context)),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

@@ -8,6 +8,7 @@ import '../../../core/config/app_config.dart';
 import '../../../design_system/app_colors.dart';
 import '../../../design_system/theme.dart';
 import 'wellness_library_parse.dart';
+import '../../widgets/cn_back_button.dart';
 
 class WellnessLibraryPage extends StatefulWidget {
   const WellnessLibraryPage({super.key});
@@ -122,7 +123,7 @@ class _WellnessLibraryPageState extends State<WellnessLibraryPage> {
                       child: Padding(
                         padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
                         child: Row(children: [
-                          IconButton(
+                          CnBackButton(
                             padding: EdgeInsets.zero,
                             constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
                             icon: Icon(Icons.arrow_back_ios_new, color: AppColors.primary(context), size: 18),
@@ -169,6 +170,7 @@ class _WellnessLibraryPageState extends State<WellnessLibraryPage> {
                             border: InputBorder.none,
                             icon: Icon(Icons.search, color: AppColors.textTertiary(context), size: 20),
                             suffixIcon: _searchController.text.isNotEmpty ? IconButton(
+                              tooltip: '清除',
                               icon: Icon(Icons.clear, size: 18, color: AppColors.textTertiary(context)),
                               onPressed: () { _searchController.clear(); _search(''); },
                             ) : null,

@@ -12,6 +12,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../../design_system/app_colors.dart';
 import '../../../design_system/theme.dart';
+import '../../widgets/cn_back_button.dart';
 
 class MeditationFocusPage extends StatefulWidget {
   const MeditationFocusPage({super.key});
@@ -84,7 +85,7 @@ class _MeditationFocusPageState extends State<MeditationFocusPage>
     final surfaceLow = AppColors.surfaceContainerLow(context);
 
     return Scaffold(
-  appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
+  appBar: AppBar(leading: CnBackButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
       backgroundColor: bg,
       body: SafeArea(
         child: Column(
@@ -102,6 +103,7 @@ class _MeditationFocusPageState extends State<MeditationFocusPage>
                     )),
                   ]),
                   IconButton(
+                    tooltip: '设置',
                     icon: const Icon(Icons.settings_outlined, size: 22),
                     color: AppColors.textSecondary(context),
                     onPressed: () {},

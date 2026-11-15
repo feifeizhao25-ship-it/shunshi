@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../data/network/api_client.dart';
 import '../../widgets/acupoint_diagram.dart';
 import '../../widgets/skeleton_loading.dart';
+import '../../widgets/cn_back_button.dart';
 
 /// 穴位保健页面
 class AcupressurePage extends StatefulWidget {
@@ -86,7 +87,7 @@ class _AcupressurePageState extends State<AcupressurePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
+        leading: CnBackButton(
             icon: const Icon(Icons.arrow_back_ios, size: 20),
             onPressed: () => safePop(context)),
         title: const Text('穴位保健'),

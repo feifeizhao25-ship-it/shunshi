@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../../../data/network/session.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/config/app_config.dart';
+import '../../widgets/cn_back_button.dart';
 
 final String _baseUrl = AppConfig.apiBaseUrl.replaceAll('/api/v1', '');
 
@@ -114,7 +115,7 @@ class _DailyCheckinPageState extends State<DailyCheckinPage> {
       appBar: AppBar(
         backgroundColor: bg,
         elevation: 0,
-        leading: IconButton(icon: Icon(Icons.arrow_back_ios, size: 20, color: textPrimary), onPressed: () => safePop(context)),
+        leading: CnBackButton(icon: Icon(Icons.arrow_back_ios, size: 20, color: textPrimary), onPressed: () => safePop(context)),
         title: Text('每日打卡', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18, fontWeight: FontWeight.w600, color: textPrimary)),
       ),
       body: SingleChildScrollView(

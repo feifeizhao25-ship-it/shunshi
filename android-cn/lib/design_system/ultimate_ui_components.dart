@@ -481,6 +481,7 @@ class FollowUpCard extends StatelessWidget {
           ),
           if (onDismiss != null)
             IconButton(
+              tooltip: '关闭',
               icon: const Icon(Icons.close, size: 18),
               onPressed: onDismiss,
               color: ShunShiColors.textHint,

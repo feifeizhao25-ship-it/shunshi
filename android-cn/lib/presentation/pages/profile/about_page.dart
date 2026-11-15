@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/router/safe_pop.dart';
+import '../../widgets/cn_back_button.dart';
 
 class AboutPage extends StatelessWidget {
   const AboutPage({super.key});
@@ -15,7 +16,7 @@ class AboutPage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: bg,
         elevation: 0,
-        leading: IconButton(
+        leading: CnBackButton(
           icon: const Icon(Icons.arrow_back_ios_new, size: 20),
           onPressed: () => safePop(context),
         ),

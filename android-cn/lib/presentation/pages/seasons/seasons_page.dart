@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/seasons_colors.dart';
 import '../../../core/theme/seasons_spacing.dart';
 import '../../../core/theme/seasons_text_styles.dart';
+import '../../widgets/cn_back_button.dart';
 
 //
 
@@ -94,7 +95,7 @@ class _SeasonsPageState extends State<SeasonsPage> {
   Widget build(BuildContext context) {
     final currentSeason = _getCurrentSeason();
     return Scaffold(
-  appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
+  appBar: AppBar(leading: CnBackButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
       backgroundColor: SeasonsColors.background,
       body: SingleChildScrollView(
         child: Column(

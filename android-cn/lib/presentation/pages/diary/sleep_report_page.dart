@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/config/app_config.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../../design_system/theme.dart';
+import '../../widgets/cn_back_button.dart';
 
 /// 睡眠报告页 — 7天柱状图 + AI趋势分析 + 建议
 class SleepReportPage extends StatefulWidget {
@@ -102,7 +103,7 @@ class _SleepReportPageState extends State<SleepReportPage> {
       appBar: AppBar(
         backgroundColor: bg,
         elevation: 0,
-        leading: IconButton(
+        leading: CnBackButton(
           icon: const Icon(Icons.arrow_back_ios_new, size: 20),
           onPressed: () => safePop(context),
         ),

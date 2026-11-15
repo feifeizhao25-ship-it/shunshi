@@ -12,6 +12,7 @@ library;
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
+import '../../widgets/cn_back_button.dart';
 
 class MovementPlayerPage extends StatefulWidget {
   const MovementPlayerPage({super.key});
@@ -58,7 +59,7 @@ class _MovementPlayerPageState extends State<MovementPlayerPage> {
     final bg = isDark ? ShunShiColors.darkBackground : ShunShiColors.background;
 
     return Scaffold(
-  appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
+  appBar: AppBar(leading: CnBackButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
       backgroundColor: bg,
       body: SafeArea(
         child: Column(
@@ -67,7 +68,7 @@ class _MovementPlayerPageState extends State<MovementPlayerPage> {
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
               child: Row(children: [
-                IconButton(
+                CnBackButton(
                   icon: const Icon(Icons.arrow_back_ios_new, size: 20),
                   onPressed: () => Navigator.pop(context),
                 ),

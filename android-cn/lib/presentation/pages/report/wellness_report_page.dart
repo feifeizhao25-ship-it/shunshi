@@ -4,6 +4,7 @@ library;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
+import '../../widgets/cn_back_button.dart';
 
 class WellnessReportPage extends StatelessWidget {
   const WellnessReportPage({super.key});
@@ -22,7 +23,7 @@ class WellnessReportPage extends StatelessWidget {
         backgroundColor: bg,
         foregroundColor: title,
         elevation: 0,
-        leading: IconButton(
+        leading: CnBackButton(
           icon: const Icon(Icons.arrow_back_ios_new),
           onPressed: () => Navigator.of(context).maybePop(),
         ),

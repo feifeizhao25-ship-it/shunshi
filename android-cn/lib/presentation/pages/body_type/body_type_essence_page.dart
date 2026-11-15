@@ -4,6 +4,7 @@ library;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
+import '../../widgets/cn_back_button.dart';
 
 class BodyTypeEssencePage extends StatelessWidget {
   final String? bodyType;
@@ -24,7 +25,7 @@ class BodyTypeEssencePage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: ShunShiColors.primary,
         foregroundColor: Colors.white,
-        leading: IconButton(
+        leading: CnBackButton(
           icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),

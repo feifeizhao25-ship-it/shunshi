@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../data/network/api_client.dart';
 import '../../../core/solar_term/solar_term_table.dart';
 import '../../../design_system/theme.dart';
+import '../../widgets/cn_back_button.dart';
 
 /// 养生馆 - 分类详情页
 /// 根据 type 展示具体内容列表，支持 API 获取 + 个性化 + fallback
@@ -190,7 +191,7 @@ class _WellnessCategoryPageState extends State<WellnessCategoryPage> {
         title: Text(meta.title, style: const TextStyle(fontFamily: ShunShiTypography.serifFamily)),
         backgroundColor: bg,
         elevation: 0,
-        leading: IconButton(
+        leading: CnBackButton(
           icon: const Icon(Icons.arrow_back_ios, size: 20),
           onPressed: () => safePop(context),
         ),

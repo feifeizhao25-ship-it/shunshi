@@ -13,6 +13,7 @@ import '../../../design_system/theme.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/cache/cache_service.dart';
 import '../../../core/loading/loading_state_manager.dart';
+import '../../widgets/cn_back_button.dart';
 
 // ── 季节渐变色配置 ──
 class _SeasonColors {
@@ -228,7 +229,7 @@ class _SolarTermPageV2State extends State<SolarTermPageV2>
 
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
+        leading: CnBackButton(
           icon: const Icon(Icons.arrow_back_ios_new),
           onPressed: () => Navigator.of(context).pop(),
         ),

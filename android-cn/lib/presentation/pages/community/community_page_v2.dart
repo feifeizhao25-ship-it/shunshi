@@ -8,6 +8,7 @@ import '../../../core/config/app_config.dart';
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
 import '../../../data/network/session.dart';
+import '../../widgets/cn_back_button.dart';
 
 class CommunityPageV2 extends StatefulWidget {
   const CommunityPageV2({super.key});
@@ -70,7 +71,7 @@ class _CommunityPageV2State extends State<CommunityPageV2> with SingleTickerProv
     final posts = _filteredPosts;
 
     return Scaffold(
-  appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
+  appBar: AppBar(leading: CnBackButton(icon: const Icon(Icons.arrow_back_ios_new), onPressed: () => Navigator.of(context).pop()), elevation: 0),
       backgroundColor: bg,
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
@@ -139,7 +140,7 @@ class _CommunityPageV2State extends State<CommunityPageV2> with SingleTickerProv
           shape: BoxShape.circle,
           boxShadow: [BoxShadow(color: ShunShiColors.primary.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 4))],
         ),
-        child: IconButton(onPressed: () => _showPostDialog(context), icon: const Icon(Icons.add, color: Colors.white, size: 28)),
+        child: IconButton(tooltip: '发帖', onPressed: () => _showPostDialog(context), icon: const Icon(Icons.add, color: Colors.white, size: 28)),
       ),
     );
   }

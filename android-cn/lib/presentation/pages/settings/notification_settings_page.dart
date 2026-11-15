@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../design_system/theme.dart';
 import '../../../data/services/notification_service.dart';
+import '../../widgets/cn_back_button.dart';
 
 /// 通知设置页
 class NotificationSettingsPage extends StatefulWidget {
@@ -64,7 +65,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
     return Scaffold(
       backgroundColor: isDark ? ShunShiColors.darkBackground : ShunShiColors.background,
       appBar: AppBar(
-        leading: IconButton(
+        leading: CnBackButton(
           icon: const Icon(Icons.arrow_back_ios_new, size: 20),
           onPressed: () => safePop(context),
         ),

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/router/safe_pop.dart';
+import '../../widgets/cn_back_button.dart';
 
 class FamilyInvitePage extends StatefulWidget {
   const FamilyInvitePage({super.key});
@@ -61,7 +62,7 @@ class _FamilyInvitePageState extends State<FamilyInvitePage> {
       appBar: AppBar(
         backgroundColor: bg,
         elevation: 0,
-        leading: IconButton(icon: const Icon(Icons.arrow_back, color: ShunShiColors.textPrimary), onPressed: () => safePop(context)),
+        leading: CnBackButton(icon: const Icon(Icons.arrow_back, color: ShunShiColors.textPrimary), onPressed: () => safePop(context)),
         title: const Text('家人管理', style: TextStyle(color: ShunShiColors.textPrimary, fontSize: 18, fontWeight: FontWeight.w600)),
       ),
       body: _loading
@@ -93,7 +94,7 @@ class _FamilyInvitePageState extends State<FamilyInvitePage> {
                           child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                             Text(_inviteCode, style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 4)),
                             const SizedBox(width: 12),
-                            IconButton(icon: const Icon(Icons.copy, color: Colors.white), onPressed: _copyCode),
+                            IconButton(tooltip: '复制邀请码', icon: const Icon(Icons.copy, color: Colors.white), onPressed: _copyCode),
                           ]),
                         ),
                         const SizedBox(height: 16),

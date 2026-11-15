@@ -12,6 +12,7 @@ import '../../../core/theme/shunshi_text_styles.dart';
 import '../constitution/constitution_questions.dart';
 import 'widgets/constitution_data.dart';
 import 'widgets/constitution_widgets.dart';
+import '../../widgets/cn_back_button.dart';
 
 /// Result copy must not read as a constitution diagnosis.
 String habitPhrase(String value) =>
@@ -305,7 +306,7 @@ class _ConstitutionPageState extends State<ConstitutionPage> {
       appBar: AppBar(
         title: Text(_view == 'home' ? '节气生活习惯自测' : _view == 'quiz' ? '节气生活习惯自测 (${_currentIndex + 1}/${_questions.length})' : _view == 'result' ? '测试结果' : '习惯说明', style: ShunshiTextStyles.heading),
         backgroundColor: ShunshiColors.surface, foregroundColor: ShunshiColors.textPrimary, elevation: 0,
-        leading: IconButton(icon: Icon(Icons.chevron_left, color: ShunshiColors.textPrimary), onPressed: () {
+        leading: CnBackButton(icon: Icon(Icons.chevron_left, color: ShunshiColors.textPrimary), onPressed: () {
           if (_view == 'quiz') { if (_currentIndex > 0) setState(() => _currentIndex--); else setState(() => _view = 'home'); }
           else if (_view == 'home') context.go('/home');
           else setState(() => _view = 'home');

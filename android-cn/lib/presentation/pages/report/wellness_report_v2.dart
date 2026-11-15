@@ -4,6 +4,7 @@ library;
 
 import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
+import '../../widgets/cn_back_button.dart';
 
 class WellnessReportV2 extends StatelessWidget {
   const WellnessReportV2({super.key});
@@ -22,7 +23,7 @@ class WellnessReportV2 extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
               child: Row(children: [
-                IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => Navigator.pop(context)),
+                CnBackButton(icon: const Icon(Icons.arrow_back), onPressed: () => Navigator.pop(context)),
                 const Spacer(),
                 Text('顺时', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18, fontWeight: FontWeight.w600, color: Color(0xFF533afd))),
                 const Spacer(),

@@ -11,6 +11,7 @@ import '../../../core/config/app_config.dart';
 import '../../../data/network/progress_api.dart';
 import '../../../data/network/session.dart';
 import '../../../design_system/theme.dart';
+import '../../widgets/cn_back_button.dart';
 
 class AchievementPageV2 extends StatefulWidget {
   const AchievementPageV2({super.key});
@@ -80,7 +81,7 @@ class _AchievementPageV2State extends State<AchievementPageV2> {
       backgroundColor: bg,
       appBar: AppBar(
         backgroundColor: bg,
-        leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
+        leading: CnBackButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
         title: Text('成就勋章', style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18, fontWeight: FontWeight.w600)),
       ),
       body: SingleChildScrollView(

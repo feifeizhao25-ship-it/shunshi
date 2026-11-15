@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import '../../../core/theme/shunshi_text_styles.dart';
+import '../../widgets/cn_back_button.dart';
 
 /// 顺时边界公示页 — 清楚告知用户产品边界
 class BoundariesPage extends StatelessWidget {
@@ -15,7 +16,7 @@ class BoundariesPage extends StatelessWidget {
         backgroundColor: ShunshiColors.background,
         foregroundColor: ShunshiColors.textPrimary,
         elevation: 0,
-        leading: IconButton(
+        leading: CnBackButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go('/home'),
         ),

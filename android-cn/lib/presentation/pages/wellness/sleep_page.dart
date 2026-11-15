@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../data/network/api_client.dart';
 import '../../widgets/skeleton_loading.dart';
+import '../../widgets/cn_back_button.dart';
 
 /// 睡眠改善页面
 class SleepPage extends StatefulWidget {
@@ -84,7 +85,7 @@ class _SleepPageState extends State<SleepPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
+        leading: CnBackButton(
             icon: const Icon(Icons.arrow_back_ios, size: 20),
             onPressed: () => safePop(context)),
         title: const Text('睡眠改善'),
@@ -294,6 +295,7 @@ class _SleepPageState extends State<SleepPage> {
                             fontSize: 20, fontWeight: FontWeight.bold)),
                   ),
                   IconButton(
+                    tooltip: '关闭',
                     icon: const Icon(Icons.close),
                     onPressed: () => Navigator.pop(context),
                   ),
