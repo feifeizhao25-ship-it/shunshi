@@ -105,6 +105,7 @@ def test_only_compose_service_names_are_loopback_for_nginx_test():
     assert gate.compose_upstream_hosts("server not-a-service:4000;\n") == set()
 
 
+@pytest.mark.skipif(shutil.which("nginx") is None, reason="nginx not installed")
 def test_nginx_refuses_ssl_site_without_domains():
     ok, _ = gate.nginx_test(gate.SITES / "shunshi-ssl.conf", {"SHUNSHI_WEB_DOMAIN": "", "SHUNSHI_API_DOMAIN": "", "SHUNSHI_ADMIN_DOMAIN": ""})
     assert not ok
