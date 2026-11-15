@@ -91,6 +91,34 @@ void main() {
     expect((await SharedPreferences.getInstance()).getString('user_name'), isNull);
   });
 
+  test('logout posts exactly one /api/v1/auth/logout with or without /api/v1 on the base', () async {
+    const bases = <String>[
+      'http://x.test',
+      'http://x.test/',
+      'http://x.test/api/v1',
+      'http://x.test/api/v1/',
+    ];
+    for (final base in bases) {
+      final token = _jwt('u-base');
+      await boot({'auth_token': token, 'user_name': '丁'});
+      final adapter = _Adapter();
+      final dio = Dio(BaseOptions(baseUrl: base))..httpClientAdapter = adapter;
+
+      await endLocalSession(client: dio);
+
+      expect(adapter.calls, hasLength(1), reason: base);
+      expect(adapter.calls.single.method, 'POST', reason: base);
+      expect(adapter.calls.single.uri.path, '/api/v1/auth/logout', reason: base);
+      expect(
+        adapter.calls.single.uri.toString(),
+        'http://x.test/api/v1/auth/logout',
+        reason: base,
+      );
+      expect(adapter.calls.single.uri.toString(), isNot(contains('/api/v1/api/v1')), reason: base);
+      expect(StorageManager.user.getToken(), isNull, reason: base);
+    }
+  });
+
   test('no local token skips the logout request and still clears account keys', () async {
     await boot({'user_name': '丙'});
     final adapter = _Adapter();

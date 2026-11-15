@@ -62,8 +62,10 @@ class _SolarTermDetailPageState extends State<SolarTermDetailPage> {
     try {
       // Use the base URL from app config or default to ECS
       // In production this should come from app_constants
-      final baseUrl = AppConfig.apiBaseUrl;
-      final url = '$baseUrl/api/v1/solar-terms/detail/${Uri.encodeComponent(widget.termName)}';
+      final url = resolveVersionedApiUrl(
+        AppConfig.apiBaseUrl,
+        '/solar-terms/detail/${Uri.encodeComponent(widget.termName)}',
+      );
       final resp = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 8));
       if (resp.statusCode == 200 && mounted) {
         final data = jsonDecode(utf8.decode(resp.bodyBytes)) as Map<String, dynamic>;

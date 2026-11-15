@@ -32,7 +32,7 @@ class _DiaryReportPageState extends State<DiaryReportPage> {
       return;
     }
     try {
-      final dio = withSessionAuth(Dio(BaseOptions(baseUrl: AppConfig.apiBaseUrl, connectTimeout: const Duration(seconds: 8))));
+      final dio = withSessionAuth(Dio(BaseOptions(baseUrl: normalizeApiBaseUrl(AppConfig.apiBaseUrl), connectTimeout: const Duration(seconds: 8))));
       final res = await dio.get('/api/v1/journal/entries/${Uri.encodeComponent(uid)}', queryParameters: {'limit': 7});
       final entries = journalEntriesFromBody(res.data) ?? const <Map<String, dynamic>>[];
       final rows = entries.reversed.map((e) {

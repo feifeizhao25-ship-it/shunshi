@@ -318,7 +318,7 @@ class ApiClient {
         ),
       );
       final response = await dio.post(
-        '/auth/refresh',
+        versionedApiPath('/auth/refresh'),
         data: {'refresh_token': refreshToken},
       );
 

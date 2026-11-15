@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/config/app_config.dart';
 
 Future<WeatherSnapshot> fetchLiveWeather(String city) async {
-  final dio = Dio(BaseOptions(baseUrl: AppConfig.apiBaseUrl));
+  final dio = Dio(BaseOptions(baseUrl: normalizeApiBaseUrl(AppConfig.apiBaseUrl)));
   final res = await dio.get('/api/v1/weather-wellness/live', queryParameters: {'city': city});
   final data = Map<String, dynamic>.from(res.data['data'] as Map);
   return WeatherSnapshot(

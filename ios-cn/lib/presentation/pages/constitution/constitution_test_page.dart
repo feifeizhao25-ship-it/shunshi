@@ -70,7 +70,7 @@ class _ConstitutionTestFlowPageState extends State<ConstitutionTestFlowPage> {
     try {
       final prefs = await SharedPreferences.getInstance();
       final userId = prefs.getString('user_id') ?? '';
-      final dio = Dio(BaseOptions(baseUrl: AppConfig.apiBaseUrl));
+      final dio = Dio(BaseOptions(baseUrl: normalizeApiBaseUrl(AppConfig.apiBaseUrl)));
       await dio.post('/api/v1/constitution/submit', data: {
         'user_id': userId,
         'primary_type': primary,

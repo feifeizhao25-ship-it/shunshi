@@ -224,7 +224,7 @@ class SubscriptionService {
     required String userId,
   })  : _userId = userId,
         _dio = Dio(BaseOptions(
-          baseUrl: baseUrl,
+          baseUrl: normalizeApiBaseUrl(baseUrl),
           connectTimeout: const Duration(seconds: 10),
         ));
 

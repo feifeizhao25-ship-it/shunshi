@@ -20,7 +20,7 @@ class ConstitutionTestV2 extends StatefulWidget {
 }
 
 class _ConstitutionTestV2State extends State<ConstitutionTestV2> {
-  static final String _baseUrl = AppConfig.apiBaseUrl.replaceAll('/api/v1', '');
+  static final String _baseUrl = normalizeApiBaseUrl(AppConfig.apiBaseUrl);
   final _dio = Dio(BaseOptions(baseUrl: _baseUrl, connectTimeout: const Duration(seconds: 8)));
 
   List<Map<String, dynamic>> _questions = [];

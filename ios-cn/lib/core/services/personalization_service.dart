@@ -4,7 +4,7 @@ import '../config/app_config.dart';
 import '../../data/network/session.dart';
 
 class PersonalizationService {
-  static final String _baseUrl = '${AppConfig.apiBaseUrl}/api/v1/personalization';
+  static final String _baseUrl = resolveVersionedApiUrl(AppConfig.apiBaseUrl, '/personalization');
   static final _dio = withSessionAuth(Dio(BaseOptions(
     baseUrl: _baseUrl,
     connectTimeout: const Duration(seconds: 10),

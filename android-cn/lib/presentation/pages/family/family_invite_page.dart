@@ -28,7 +28,7 @@ class _FamilyInvitePageState extends State<FamilyInvitePage> {
   Future<void> _generateCode() async {
     try {
       final dio = Dio();
-      final res = await dio.post('${AppConfig.apiBaseUrl}/api/v1/family/invite');
+      final res = await dio.post(resolveVersionedApiUrl(AppConfig.apiBaseUrl, '/family/invite'));
       if (res.data?['code'] != null) {
         setState(() {
           _code = res.data['code'];
@@ -50,7 +50,7 @@ class _FamilyInvitePageState extends State<FamilyInvitePage> {
     // Try backend first, fallback to demo
     try {
       final dio = Dio();
-      final res = await dio.get('${AppConfig.apiBaseUrl}/api/v1/family/members');
+      final res = await dio.get(resolveVersionedApiUrl(AppConfig.apiBaseUrl, '/family/members'));
       if (res.data?['members'] != null) {
         final members = (res.data['members'] as List)
             .map((m) => Map<String, String>.from(m as Map))

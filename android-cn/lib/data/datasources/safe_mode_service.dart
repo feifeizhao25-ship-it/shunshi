@@ -6,7 +6,7 @@ import '../../core/config/app_config.dart';
 /// SafeMode 安全模式 - 异常情绪检测与处理
 class SafeModeService {
   static final _dio = Dio(BaseOptions(
-    baseUrl: AppConfig.apiBaseUrl.replaceAll('/api/v1', ''),
+    baseUrl: normalizeApiBaseUrl(AppConfig.apiBaseUrl),
     connectTimeout: const Duration(seconds: 8),
   ));
 

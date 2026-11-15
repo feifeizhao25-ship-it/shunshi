@@ -36,7 +36,7 @@ class _MeditationPlayerPageState extends State<MeditationPlayerPage> {
   String _absoluteUrl() {
     final url = '${widget.track['audio_url'] ?? ''}';
     if (url.startsWith('http://') || url.startsWith('https://')) return url;
-    return '${AppConfig.apiBaseUrl}$url';
+    return '${normalizeApiBaseUrl(AppConfig.apiBaseUrl)}$url';
   }
 
   @override
@@ -75,7 +75,7 @@ class _MeditationPlayerPageState extends State<MeditationPlayerPage> {
   Future<void> _loadTranscript() async {
     try {
       final dio = Dio(BaseOptions(
-        baseUrl: AppConfig.apiBaseUrl,
+        baseUrl: normalizeApiBaseUrl(AppConfig.apiBaseUrl),
         connectTimeout: const Duration(seconds: 8),
         receiveTimeout: const Duration(seconds: 15),
       ));

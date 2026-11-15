@@ -35,6 +35,8 @@ class ApiClient {
   }
   
   late final Dio _dio;
+
+  static String _versionedPath(String path) => versionedApiPath(path);
   
   ApiClient() {
     // baseUrl 可能在 main() 中已通过 detectBaseUrl() 设置
@@ -93,7 +95,7 @@ class ApiClient {
     Map<String, dynamic>? headers,
   }) async {
     return await _dio.get(
-      path,
+      _versionedPath(path),
       queryParameters: queryParameters,
       options: headers == null ? null : Options(headers: headers),
     );
@@ -106,7 +108,7 @@ class ApiClient {
     Map<String, dynamic>? headers,
   }) async {
     return await _dio.post(
-      path,
+      _versionedPath(path),
       data: data,
       options: headers == null ? null : Options(headers: headers),
     );
@@ -117,12 +119,12 @@ class ApiClient {
     String path, {
     dynamic data,
   }) async {
-    return await _dio.put(path, data: data);
+    return await _dio.put(_versionedPath(path), data: data);
   }
   
   /// DELETE 请求
   Future<Response> delete(String path) async {
-    return await _dio.delete(path);
+    return await _dio.delete(_versionedPath(path));
   }
 }
 

@@ -38,7 +38,7 @@ class _AchievementPageV2State extends State<AchievementPageV2> {
   /// 数字全部来自服务端（打卡 / 日记 / 收藏 / 聊天写入接口留下的记录），不再读本地从来没人写过的计数，
   /// 也不再用「聊天×10 + 日记×20…」自己拼一个积分（复测 B03：成就页永远 0）。
   Future<void> _loadStats() async {
-    final dio = Dio(BaseOptions(baseUrl: AppConfig.apiBaseUrl, connectTimeout: const Duration(seconds: 8)));
+    final dio = Dio(BaseOptions(baseUrl: normalizeApiBaseUrl(AppConfig.apiBaseUrl), connectTimeout: const Duration(seconds: 8)));
     final token = await ensureSessionToken(dio);
     final p = token == null ? null : await fetchUserProgress(dio, token: token);
     if (!mounted) return;

@@ -8,7 +8,7 @@ import '../storage/storage_manager.dart';
 class SubscriptionService {
   static final _dio = Dio(
     BaseOptions(
-      baseUrl: AppConfig.apiBaseUrl.replaceAll('/api/v1', ''),
+      baseUrl: normalizeApiBaseUrl(AppConfig.apiBaseUrl),
       connectTimeout: const Duration(seconds: 8),
       receiveTimeout: const Duration(seconds: 10),
     ),

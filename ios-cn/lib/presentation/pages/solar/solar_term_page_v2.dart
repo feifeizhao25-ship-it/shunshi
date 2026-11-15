@@ -21,7 +21,7 @@ class SolarTermPageV2 extends StatefulWidget {
 }
 
 class _SolarTermPageV2State extends State<SolarTermPageV2> {
-  static const _baseUrl = AppConfig.apiBaseUrl;
+  static final _baseUrl = normalizeApiBaseUrl(AppConfig.apiBaseUrl);
   final _dio = Dio(BaseOptions(
     baseUrl: _baseUrl,
     connectTimeout: const Duration(seconds: 8),
