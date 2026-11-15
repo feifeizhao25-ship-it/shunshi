@@ -266,14 +266,19 @@ def test_repeated_store_callback_does_not_add_a_second_term(settings):
         user_id = pyjwt.decode(
             login.json()["access_token"], settings.jwt_secret, algorithms=["HS256"]
         )["sub"]
-        first_expiry = int(time.time()) + 365 * 86400
+        first_expiry = int(time.time()) + 10 * 86400
         body = {
             "user_id": user_id,
             "product_id": "shunshi_yangxin_monthly",
             "store": "app_store",
             "expires_at": first_expiry,
             "original_transaction_id": "txn-stack-1",
+            "order_no": "order-stack-1",
+            "amount_cents": 2900,
         }
+        from .test_subscription import _insert_pending_order
+
+        _insert_pending_order(user_id, body["product_id"], body["order_no"], body["amount_cents"])
         for _ in range(2):
             raw, signature = _signed("callback-secret", body)
             response = client.post(
@@ -284,8 +289,14 @@ def test_repeated_store_callback_does_not_add_a_second_term(settings):
             assert response.status_code == 200
             assert _expiry(client.app, user_id) == first_expiry
 
-        renewed = first_expiry + 365 * 86400
-        renewed_body = {**body, "expires_at": renewed, "original_transaction_id": "txn-stack-2"}
+        renewed = first_expiry + 10 * 86400
+        renewed_body = {
+            **body,
+            "expires_at": renewed,
+            "original_transaction_id": "txn-stack-2",
+            "order_no": "order-stack-2",
+        }
+        _insert_pending_order(user_id, renewed_body["product_id"], renewed_body["order_no"], renewed_body["amount_cents"])
         for _ in range(2):
             raw, signature = _signed("callback-secret", renewed_body)
             assert client.post(

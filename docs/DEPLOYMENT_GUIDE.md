@@ -341,8 +341,8 @@ curl http://localhost:4000/health
 ### Docker 环境完整备份
 
 ```bash
-# 1. 备份数据库
-docker compose exec mysql pg_dump -u root -p shunshi > backup_postgres_$(date +%Y%m%d_%H%M%S).sql
+# 1. 备份数据库（PostgreSQL；服务名与根目录、backend/docker-compose.yml 一致）
+docker compose exec -T postgres sh -c 'pg_dump -U "$POSTGRES_USER" -d "$POSTGRES_DB"' > backup_postgres_$(date +%Y%m%d_%H%M%S).sql
 
 # 2. 备份 Redis
 docker compose exec redis redis-cli BGSAVE
@@ -356,7 +356,7 @@ docker run --rm -v shunshi_postgres_data:/data -v $(pwd):/backup alpine tar czf 
 
 ```bash
 # 恢复 PostgreSQL
-docker compose exec -T mysql psql -U "${DB_USER}" shunshi < backup_postgres_20260317.sql
+docker compose exec -T postgres sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB"' < backup_postgres_20260317.sql
 
 # 恢复 Redis
 docker cp backup_redis.rdb shunshi-redis:/data/dump.rdb

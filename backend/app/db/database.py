@@ -19,7 +19,9 @@ else:
 
 _engine_kwargs = {"pool_pre_ping": True, "echo": False}
 if DATABASE_URL.startswith("postgresql"):
-    _engine_kwargs.update(pool_size=10, max_overflow=20)
+    from app.database.pool import postgres_pool_timeout
+
+    _engine_kwargs.update(pool_size=10, max_overflow=20, pool_timeout=postgres_pool_timeout())
     if PRODUCT_SCHEMA:
         # 产品模型与核心模型都有 users 表（列不同），同库时必须分 schema。
         _engine_kwargs["connect_args"] = {"options": f"-csearch_path={PRODUCT_SCHEMA}"}

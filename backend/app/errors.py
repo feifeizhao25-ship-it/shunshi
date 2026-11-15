@@ -167,6 +167,20 @@ def _validation_message(error_type: str) -> str:
 
 
 def install_chinese_error_handlers(app: FastAPI) -> None:
+    from sqlalchemy.exc import TimeoutError as PoolTimeout
+
+    @app.exception_handler(PoolTimeout)
+    async def pool_timeout_handler(request: Request, exc: PoolTimeout):
+        # 不把异常文本返回给客户端：连接串里可能有口令。
+        logger.warning("数据库连接池耗尽: %s %s", request.method, request.url.path)
+        del exc
+        detail = (
+            "The service is busy. Please try again shortly."
+            if _is_global(request)
+            else "服务繁忙，请稍后再试"
+        )
+        return JSONResponse({"detail": detail}, status_code=503, headers={"Retry-After": "1"})
+
     @app.exception_handler(StarletteHTTPException)
     async def http_exception_handler(request: Request, exc: StarletteHTTPException):
         clean = _clean_en if _is_global(request) else _clean
