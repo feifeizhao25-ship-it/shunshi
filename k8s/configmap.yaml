@@ -12,6 +12,9 @@ data:
   DB_USER: "shunshi"
   REDIS_URL: "redis://redis:6379/0"
   SHUNSHI_ENV: "production"
+  # 国内部署只回中文：不看浏览器语言头（见 backend/app/locale_context.py 的 market_lock）。
+  # 如果这套部署还要同时服务国际版客户端，删掉这一行。
+  SHUNSHI_MARKET_LOCK: "cn"
   SHUNSHI_REDIS_URL: "redis://redis:6379/0"
   SHUNSHI_CORS_ORIGINS: "https://shunshi.app,https://www.shunshi.app"
   CORS_ALLOWED_ORIGINS: "https://shunshi.app,https://www.shunshi.app"

@@ -289,6 +289,7 @@ jobs:
           # docker/metadata-action is configured with prefix=, so the
           # immutable image tag is the bare seven-character SHA (not sha-<SHA>).
           sed -i.bak "s|shunshi/backend:latest|${{ env.IMAGE_PREFIX }}/backend:${SHORT_SHA}|g" backend-deployment.yaml
+          sed -i.bak "s|shunshi/backend:latest|${{ env.IMAGE_PREFIX }}/backend:${SHORT_SHA}|g" self-improve-deployment.yaml
           sed -i.bak "s|shunshi/admin:latest|${{ env.IMAGE_PREFIX }}/admin:${SHORT_SHA}|g" admin-deployment.yaml
           sed -i.bak "s|shunshi/web-cn:latest|${{ env.IMAGE_PREFIX }}/web-cn:${SHORT_SHA}|g" web-cn-deployment.yaml
           rm -f -- ./*.bak
@@ -316,10 +317,13 @@ jobs:
           kubectl apply -f k8s/postgres-statefulset.yaml
           kubectl apply -f k8s/redis-deployment.yaml
           kubectl apply -f k8s/redis-service.yaml
+          kubectl apply -f k8s/redis-networkpolicy.yaml
           kubectl apply -f k8s/backend-pvc.yaml
           kubectl apply -f k8s/hpa.yaml
           kubectl apply -f k8s/backend-deployment.yaml
           kubectl apply -f k8s/backend-service.yaml
+          # replicas: 0 and SIL_ENABLED=0 in the manifest: applying it starts nothing.
+          kubectl apply -f k8s/self-improve-deployment.yaml
           kubectl apply -f k8s/admin-deployment.yaml
           kubectl apply -f k8s/web-cn-deployment.yaml
           kubectl apply -f k8s/nginx-configmap.yaml

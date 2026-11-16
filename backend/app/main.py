@@ -164,6 +164,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         title="顺时 API",
         version="0.1.0",
         docs_url=None if settings.env == "production" else "/docs",
+        # 生产环境同时关掉 /redoc 和 /openapi.json：只关 /docs 的话接口清单照样能被拿到。
+        redoc_url=None if settings.env == "production" else "/redoc",
+        openapi_url=None if settings.env == "production" else "/openapi.json",
         lifespan=lifespan,
     )
     from .errors import install_chinese_error_handlers

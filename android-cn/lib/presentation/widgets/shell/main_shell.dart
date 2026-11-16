@@ -282,19 +282,18 @@ class _CenterNavTab extends StatelessWidget {
               ),
             ),
           ),
-          // Label below
-          Transform.translate(
-            offset: const Offset(0, -6),
-            child: AnimatedDefaultTextStyle(
-              duration: const Duration(milliseconds: 250),
-              style: TextStyle(
-                fontFamily: ShunShiTypography.sansFamily,
-                fontSize: 10,
-                fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
-                color: isActive ? ShunShiColors.primary : ShunShiColors.textTertiary,
-              ),
-              child: Text(label),
+          // Label below. No upward shift: a -6 offset slid the label under the
+          // circle, and same-colour text on the gradient lost its top half.
+          const SizedBox(height: 2),
+          AnimatedDefaultTextStyle(
+            duration: const Duration(milliseconds: 250),
+            style: TextStyle(
+              fontFamily: ShunShiTypography.sansFamily,
+              fontSize: 10,
+              fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
+              color: isActive ? ShunShiColors.primary : ShunShiColors.textTertiary,
             ),
+            child: Text(label),
           ),
         ],
       ),
