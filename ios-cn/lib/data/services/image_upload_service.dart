@@ -156,7 +156,7 @@ class ImageUploadService {
   // 获取 API Base URL
   static String _getBaseUrl() {
     // 从环境或默认配置获取
-    return AppConfig.apiBaseUrl;
+    return normalizeApiBaseUrl(AppConfig.apiBaseUrl);
   }
   
   // 获取存储的 Token

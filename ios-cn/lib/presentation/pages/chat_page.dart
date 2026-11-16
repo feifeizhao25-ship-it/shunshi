@@ -21,7 +21,7 @@ import 'chat/voice_chrome.dart';
 import '../../core/solar_term/solar_term_table.dart';
 import '../../core/config/app_config.dart';
 
-const _baseUrl = AppConfig.apiBaseUrl;
+final String _baseUrl = normalizeApiBaseUrl(AppConfig.apiBaseUrl);
 
 /// 没有网络时的唯一提示：不生成、不缓存任何本地「健康建议」，输入原样保留。
 const _offlineChatNotice = '当前处于离线状态。离线状态不生成健康建议，输入已保留，请联网后重试。';

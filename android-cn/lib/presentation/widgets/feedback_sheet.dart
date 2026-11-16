@@ -43,7 +43,7 @@ class _FeedbackSheetState extends State<FeedbackSheet> {
       final prefs = await SharedPreferences.getInstance();
       final userId = currentUserId() ?? '';
       await withSessionAuth(Dio()).post(
-        '${AppConfig.apiBaseUrl}/api/v1/feedback/submit',
+        '${normalizeApiBaseUrl(AppConfig.apiBaseUrl)}/api/v1/feedback/submit',
         data: {
           'user_id': userId,
           'type': widget.type,

@@ -77,6 +77,31 @@ void main() {
     expect(prefs.getString('theme_mode'), 'dark');
   });
 
+  test('default logout client never doubles /api/v1, whatever API_BASE_URL looks like', () async {
+    const bases = <String>[
+      'http://10.0.2.2:4002',
+      'http://10.0.2.2:4002/',
+      'http://10.0.2.2:4002/api/v1',
+      'http://10.0.2.2:4002/api/v1/',
+    ];
+    for (final base in bases) {
+      final token = _jwt('u-base');
+      await boot({'auth_token': token});
+      final adapter = _Adapter();
+      final dio = logoutClient(base)..httpClientAdapter = adapter;
+
+      await endLocalSession(client: dio);
+
+      expect(adapter.calls, hasLength(1), reason: base);
+      expect(
+        adapter.calls.single.uri.toString(),
+        'http://10.0.2.2:4002/api/v1/auth/logout',
+        reason: base,
+      );
+      expect(StorageManager.user.getToken(), isNull, reason: base);
+    }
+  });
+
   test('network failure still clears the local session', () async {
     final token = _jwt('u-2');
     await boot({'auth_token': token, 'user_name': '乙'});

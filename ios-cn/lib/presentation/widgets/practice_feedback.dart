@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
 import '../../core/config/app_config.dart';
 
-const _baseUrl = AppConfig.apiBaseUrl;
+final String _baseUrl = normalizeApiBaseUrl(AppConfig.apiBaseUrl);
 
 /// Show practice completion dialog with rating
 Future<void> showPracticeFeedback(BuildContext context, {

@@ -220,11 +220,11 @@ class SubscriptionService {
   final String _userId;
 
   SubscriptionService({
-    String baseUrl = AppConfig.apiBaseUrl,
+    String? baseUrl,
     required String userId,
   })  : _userId = userId,
         _dio = Dio(BaseOptions(
-          baseUrl: baseUrl,
+          baseUrl: normalizeApiBaseUrl(baseUrl ?? AppConfig.apiBaseUrl),
           connectTimeout: const Duration(seconds: 10),
         ));
 
