@@ -5,7 +5,7 @@ import 'package:dio/dio.dart';
 import '../../core/config/app_config.dart';
 
 class SolarWellnessService {
-  static final String _baseUrl = AppConfig.apiBaseUrl.replaceAll('/api/v1', '');
+  static final String _baseUrl = normalizeApiBaseUrl(AppConfig.apiBaseUrl);
   final _dio = Dio(BaseOptions(
     baseUrl: _baseUrl,
     connectTimeout: const Duration(seconds: 8),

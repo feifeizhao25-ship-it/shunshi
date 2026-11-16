@@ -4,6 +4,7 @@
 import ast
 import json
 import os
+import sys
 from pathlib import Path
 import subprocess
 
@@ -210,6 +211,19 @@ for entry in entries:
         errors.append(f"{relative}: tracked symlink must be relative")
     elif not link.exists():
         errors.append(f"{relative}: tracked symlink target is missing ({target})")
+
+secret_scan = subprocess.run(
+    [sys.executable, str(ROOT / "scripts/check_docs_for_sk_keys.py")],
+    cwd=ROOT,
+    check=False,
+    capture_output=True,
+    text=True,
+)
+if secret_scan.returncode != 0:
+    # The scanner prints locations only. Do not append captured key material
+    # from anywhere else; this stdout is the location list.
+    summary = (secret_scan.stdout or secret_scan.stderr or "docs secret scan failed").strip()
+    errors.append(summary)
 
 if errors:
     raise SystemExit("Repository integrity gate failed:\n- " + "\n- ".join(errors))

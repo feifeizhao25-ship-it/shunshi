@@ -62,7 +62,7 @@ class TtsPlayerService extends SpeechPlayback {
         _injectedTts = tts,
         _player = player;
 
-  static String _root(String url) => url.replaceAll(RegExp(r'/api/v1/?$'), '');
+  static String _root(String url) => normalizeApiBaseUrl(url);
 
   final Dio _dio;
   final String language;

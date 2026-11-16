@@ -19,7 +19,13 @@ def make_engine(database_url: str) -> Engine:
     # postgresql:// 与 postgresql+psycopg2:// 都会选到没安装的 psycopg2，统一到 psycopg（3）。
     database_url = normalize_database_url(database_url)
     connect_args = {"check_same_thread": False} if database_url.startswith("sqlite") else {}
-    return create_engine(database_url, connect_args=connect_args, pool_pre_ping=True)
+    kwargs = {"connect_args": connect_args, "pool_pre_ping": True}
+    # QueuePool's default wait is 30s (pool_size defaults to 5). File SQLite is
+    # a QueuePool in SQLAlchemy 2, so it needs the same short wait as Postgres.
+    from app.database.pool import queue_pool_timeout_kwargs
+
+    kwargs.update(queue_pool_timeout_kwargs(database_url))
+    return create_engine(database_url, **kwargs)
 
 
 def make_session_factory(engine: Engine) -> sessionmaker[Session]:

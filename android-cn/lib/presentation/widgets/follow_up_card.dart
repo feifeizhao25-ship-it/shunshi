@@ -24,7 +24,7 @@ class _FollowUpCardState extends State<FollowUpCard> {
   Future<void> _loadFollowUps() async {
     try {
       final dio = Dio();
-      final res = await dio.get('${normalizeApiBaseUrl(AppConfig.apiBaseUrl)}/api/v1/followup/list');
+      final res = await dio.get(resolveVersionedApiUrl(AppConfig.apiBaseUrl, '/followup/list'));
       if (res.data is List) {
         setState(() => _items = List<Map<String, dynamic>>.from(res.data));
       }
@@ -41,7 +41,7 @@ class _FollowUpCardState extends State<FollowUpCard> {
   Future<void> _complete(String id) async {
     try {
       final dio = Dio();
-      await dio.post('${normalizeApiBaseUrl(AppConfig.apiBaseUrl)}/api/v1/user/feedback', data: {
+      await dio.post(resolveVersionedApiUrl(AppConfig.apiBaseUrl, '/user/feedback'), data: {
         'followup_id': id, 'action': 'completed',
       });
     } catch (_) {}

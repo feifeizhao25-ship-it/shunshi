@@ -7,7 +7,7 @@ import '../../../design_system/theme_helper.dart';
 import '../../../core/config/app_config.dart';
 import '../../../data/network/session.dart';
 
-final String _baseUrl = normalizeApiBaseUrl(AppConfig.apiBaseUrl);
+final _baseUrl = normalizeApiBaseUrl(AppConfig.apiBaseUrl);
 
 class SubscriptionPage extends StatefulWidget {
   const SubscriptionPage({super.key});

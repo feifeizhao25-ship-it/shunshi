@@ -15,6 +15,7 @@ void main() {
       'replaceFirst(RegExp(',
       '_root(',
       '= AppConfig.apiBaseUrl]', // 可选参数默认值，函数体内归一化（logoutClient）
+      'String baseUrl = AppConfig.apiBaseUrl,', // 命名参数默认值，构造函数初始化列表里归一化（SubscriptionService）
     ];
     final offenders = <String>[];
     final files = Directory('lib')
@@ -29,6 +30,9 @@ void main() {
         if (!line.contains('AppConfig.apiBaseUrl')) continue;
         if (line.trimLeft().startsWith('//')) continue;
         if (allowed.any(line.contains)) continue;
+        // 调用被格式化成多行时，归一化函数名在上一行：resolveVersionedApiUrl(\n AppConfig.apiBaseUrl,
+        final prev = i > 0 ? lines[i - 1] : '';
+        if (allowed.any(prev.contains)) continue;
         offenders.add('${file.path}:${i + 1}: ${line.trim()}');
       }
     }

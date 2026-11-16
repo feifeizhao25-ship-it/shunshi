@@ -46,20 +46,17 @@ Future<void> endLocalSession({Dio? client}) async {
 Future<void> revokeServerSession({Dio? client}) async {
   final token = StorageManager.user.getToken();
   if (token == null || token.trim().isEmpty) return;
-  final dio = withSessionAuth(client ?? logoutClient());
-  await dio.post('/api/v1/auth/logout');
-}
-
-/// 退出登录用的默认客户端。
-///
-/// [base] 带不带 `/api/v1`、带不带结尾斜杠都可以，统一成源地址，
-/// 避免请求变成 `/api/v1/api/v1/auth/logout`（服务端 404，令牌没有作废）。
-Dio logoutClient([String base = AppConfig.apiBaseUrl]) {
-  return Dio(
-    BaseOptions(
-      baseUrl: normalizeApiBaseUrl(base),
-      connectTimeout: const Duration(seconds: 8),
-      receiveTimeout: const Duration(seconds: 8),
-    ),
+  // 与 ApiClient 一样先归一成源站。基址已含 /api/v1 时不能再拼一次，否则注销 404，令牌不会作废。
+  final origin = normalizeApiBaseUrl(client?.options.baseUrl ?? AppConfig.apiBaseUrl);
+  final dio = withSessionAuth(
+    client ??
+        Dio(
+          BaseOptions(
+            baseUrl: origin,
+            connectTimeout: const Duration(seconds: 8),
+            receiveTimeout: const Duration(seconds: 8),
+          ),
+        ),
   );
+  await dio.post(resolveVersionedApiUrl(origin, '/auth/logout'));
 }

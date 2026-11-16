@@ -20,7 +20,7 @@ class DiaryPageV2 extends StatefulWidget {
 }
 
 class _DiaryPageV2State extends State<DiaryPageV2> {
-  static final String _baseUrl = normalizeApiBaseUrl(AppConfig.apiBaseUrl);
+  static final _baseUrl = normalizeApiBaseUrl(AppConfig.apiBaseUrl);
   final _dio = withSessionAuth(Dio(BaseOptions(baseUrl: _baseUrl, connectTimeout: const Duration(seconds: 8))));
   final _noteController = TextEditingController();
   

@@ -2,8 +2,10 @@
 from app.database.db import get_db, close_test_connection
 
 
-def collect_domestic_billing_data(user_id):
-    db = get_db()
+def collect_domestic_billing_data(user_id, db=None):
+    owns_connection = db is None
+    if owns_connection:
+        db = get_db()
     try:
         tables = {row[0] for row in db.execute(
             "SELECT name FROM sqlite_master WHERE type='table'").fetchall()}
@@ -22,4 +24,5 @@ def collect_domestic_billing_data(user_id):
                     (user_id, user_id)).fetchall()]
         return {'payment_orders': orders, 'refund_requests': refunds}
     finally:
-        close_test_connection(db)
+        if owns_connection:
+            close_test_connection(db)

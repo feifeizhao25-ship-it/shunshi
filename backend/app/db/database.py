@@ -25,6 +25,11 @@ if DATABASE_URL.startswith("postgresql"):
         _engine_kwargs["connect_args"] = {"options": f"-csearch_path={PRODUCT_SCHEMA}"}
 elif DATABASE_URL.startswith("sqlite"):
     _engine_kwargs["connect_args"] = {"check_same_thread": False}
+# File SQLite is a QueuePool. Without this it waits the 30s default, which is
+# the wait data export hit while the core Postgres pool already failed in 2s.
+from app.database.pool import queue_pool_timeout_kwargs
+
+_engine_kwargs.update(queue_pool_timeout_kwargs(DATABASE_URL))
 
 engine = create_engine(DATABASE_URL, **_engine_kwargs)
 

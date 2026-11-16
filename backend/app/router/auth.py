@@ -732,6 +732,22 @@ async def register(request: RegisterRequest, settings: Settings = Depends(get_se
 @router.post("/login", response_model=dict, summary="用户登录", description="邮箱密码登录，返回JWT access_token和refresh_token")
 async def login(request: LoginRequest, settings: Settings = Depends(get_settings), http_request: Request = None):
     """用户登录"""
+    from app.services.login_rate_limit import (
+        account_identity,
+        assert_login_allowed,
+        clear_login_failures,
+        client_ip,
+        record_login_failure,
+    )
+
+    identity = account_identity(request.email, request.phone)
+    source_ip = client_ip(http_request)
+    assert_login_allowed(identity, source_ip, redis_url=settings.redis_url)
+
+    def _reject_credentials() -> None:
+        record_login_failure(identity, source_ip, redis_url=settings.redis_url)
+        raise HTTPException(status_code=401, detail="账号或密码错误")
+
     db = get_db()
     
     identifier_column = "email" if request.email else "phone"
@@ -741,7 +757,7 @@ async def login(request: LoginRequest, settings: Settings = Depends(get_settings
     ).fetchone()
     
     if not row:
-        raise HTTPException(status_code=401, detail="账号或密码错误")
+        _reject_credentials()
     user_id = row["id"]
     name = row["name"]
     life_stage = row["life_stage"]
@@ -755,8 +771,9 @@ async def login(request: LoginRequest, settings: Settings = Depends(get_settings
     # 同样任意口令可登，所有人共用一个号。
     # 错误提示与「账号不存在」一致，避免被用来探测哪些邮箱注册过。
     if not pw_hash or not verify_password(request.password, pw_hash):
-        raise HTTPException(status_code=401, detail="账号或密码错误")
+        _reject_credentials()
 
+    clear_login_failures(identity, source_ip, redis_url=settings.redis_url)
     from app.services.erasure_recovery import reject_erased_account
     reject_erased_account(http_request, user_id)
     from app.services.account_identity import ensure_core_identity

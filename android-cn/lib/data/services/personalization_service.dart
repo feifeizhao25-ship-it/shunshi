@@ -60,7 +60,7 @@ class ConstitutionExercise {
 }
 
 class PersonalizationService {
-  static final String _baseUrl = AppConfig.apiBaseUrl.replaceAll('/api/v1', '');
+  static final String _baseUrl = normalizeApiBaseUrl(AppConfig.apiBaseUrl);
 
   static final _dio = Dio(BaseOptions(
     baseUrl: _baseUrl,

@@ -19,7 +19,7 @@ class _SkillsPageState extends State<SkillsPage> {
       widget.client ??
       Dio(
         BaseOptions(
-          baseUrl: AppConfig.apiBaseUrl.replaceFirst(RegExp(r'/api/v1/?$'), ''),
+          baseUrl: normalizeApiBaseUrl(AppConfig.apiBaseUrl),
           connectTimeout: const Duration(seconds: 10),
           receiveTimeout: const Duration(seconds: 90),
         ),

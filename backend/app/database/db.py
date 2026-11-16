@@ -87,6 +87,66 @@ def close_test_connection(db) -> None:
         _test_connections.remove(raw_connection)
 
 
+def export_record_timeout_seconds() -> float:
+    """Busy-wait cap for one data export. Independent of the 30s test default.
+
+    Two record-store opens inside one export used to stack that 30s wait.
+    Non-positive, non-numeric, or larger values fall back to 2s.
+    """
+    raw = os.getenv("SHUNSHI_EXPORT_DB_TIMEOUT", "2")
+    try:
+        value = float(raw)
+    except ValueError:
+        return 2.0
+    if value <= 0 or value > 2:
+        return 2.0
+    return value
+
+
+class record_store_read:
+    """Short-lived read of the record store that cannot sit on the 30s busy timeout."""
+
+    def __init__(self, timeout_seconds: float | None = None) -> None:
+        self.timeout_seconds = (
+            export_record_timeout_seconds() if timeout_seconds is None else timeout_seconds
+        )
+        self._conn: sqlite3.Connection | None = None
+        self._tracked = False
+
+    def __enter__(self):
+        if not _initialized:
+            init_db()
+        timeout_seconds = self.timeout_seconds if self.timeout_seconds > 0 else 2.0
+        conn = sqlite3.connect(
+            str(DB_PATH), check_same_thread=False, timeout=timeout_seconds
+        )
+        self._conn = conn
+        try:
+            conn.row_factory = sqlite3.Row
+            conn.execute(f"PRAGMA busy_timeout={int(timeout_seconds * 1000)}")
+            # journal_mode is already set at init. Setting it again takes an exclusive
+            # lock and is what made concurrent opens wait out the busy timeout.
+            conn.execute("PRAGMA foreign_keys=ON")
+            conn.execute("PRAGMA query_only=ON")
+        except Exception:
+            conn.close()
+            self._conn = None
+            raise
+        if os.environ.get("APP_ENV") == "testing":
+            _test_connections.append(conn)
+            self._tracked = True
+        return _TextCompatibleConnection(conn)
+
+    def __exit__(self, exc_type, exc, tb) -> None:
+        conn = self._conn
+        if conn is None:
+            return
+        if self._tracked and conn in _test_connections:
+            _test_connections.remove(conn)
+        conn.close()
+        self._conn = None
+
+
 class _TextCompatibleConnection:
     """包装 sqlite3.Connection，兼容 SQLAlchemy text() 对象"""
     def __init__(self, conn: sqlite3.Connection):

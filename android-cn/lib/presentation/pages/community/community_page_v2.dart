@@ -18,7 +18,7 @@ class CommunityPageV2 extends StatefulWidget {
 }
 
 class _CommunityPageV2State extends State<CommunityPageV2> with SingleTickerProviderStateMixin {
-  final _dio = withSessionAuth(Dio(BaseOptions(baseUrl: AppConfig.apiBaseUrl.replaceAll('/api/v1', ''), connectTimeout: const Duration(seconds: 8))));
+  final _dio = withSessionAuth(Dio(BaseOptions(baseUrl: normalizeApiBaseUrl(AppConfig.apiBaseUrl), connectTimeout: const Duration(seconds: 8))));
   List<Map<String, dynamic>> _posts = [];
   bool _loading = true;
   int _currentTab = 0;

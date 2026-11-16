@@ -226,7 +226,7 @@ kubectl apply -f k8s/ --recursive
 | `DB_PORT`        | 数据库端口           | `5432`                        | 是    |
 | `DB_USER`        | 数据库用户           | `shunshi`                     | 是    |
 | `DB_PASSWORD`    | 数据库密码           | *(需修改)*                     | 是    |
-| `MYSQL_DATABASE`    | 数据库名              | `shunshi`                     | 是    |
+| `DB_NAME`           | 数据库名              | `shunshi`                     | 是    |
 | `REDIS_URL`         | Redis 连接           | `redis://redis:6379/0`       | 是    |
 | `JWT_SECRET`        | JWT 签名密钥          | *(需修改)*                     | 是    |
 | `SILICONFLOW_API_KEY`| SiliconFlow API Key | *(需修改)*                     | 是    |
@@ -248,28 +248,28 @@ PostgreSQL 容器首次启动时会自动执行 `backend/migrations/init.sql`。
 # Docker 环境
 docker compose exec postgres psql -U shunshi -d shunshi -f /docker-entrypoint-initdb.d/init.sql
 
-# K8s 环境
-kubectl -n shunshi exec -it mysql-0 -- psql -U "${DB_USER}" shunshi < init.sql
+# K8s 环境（StatefulSet 名是 postgres，Pod 为 postgres-0）
+kubectl -n shunshi exec -i postgres-0 -- sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB"' < init.sql
 ```
 
 ### 数据备份
 
 ```bash
-# Docker
-docker compose exec mysql pg_dump -u root -p shunshi > backup_$(date +%Y%m%d).sql
+# Docker（与第 8 节相同：compose 服务名 postgres，口令用容器里的 POSTGRES_*）
+docker compose exec -T postgres sh -c 'pg_dump -U "$POSTGRES_USER" -d "$POSTGRES_DB"' > backup_$(date +%Y%m%d).sql
 
 # K8s
-kubectl -n shunshi exec mysql-0 -- pg_dump -u root -p shunshi > backup.sql
+kubectl -n shunshi exec postgres-0 -- sh -c 'pg_dump -U "$POSTGRES_USER" -d "$POSTGRES_DB"' > backup.sql
 ```
 
 ### 数据恢复
 
 ```bash
 # Docker
-docker compose exec -T mysql psql -U "${DB_USER}" shunshi < backup.sql
+docker compose exec -T postgres sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB"' < backup.sql
 
 # K8s
-kubectl -n shunshi exec -i mysql-0 -- psql -U "${DB_USER}" shunshi < backup.sql
+kubectl -n shunshi exec -i postgres-0 -- sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB"' < backup.sql
 ```
 
 ---
@@ -346,8 +346,8 @@ curl http://localhost:4000/health
 ### Docker 环境完整备份
 
 ```bash
-# 1. 备份数据库
-docker compose exec mysql pg_dump -u root -p shunshi > backup_postgres_$(date +%Y%m%d_%H%M%S).sql
+# 1. 备份数据库（PostgreSQL；服务名与根目录、backend/docker-compose.yml 一致）
+docker compose exec -T postgres sh -c 'pg_dump -U "$POSTGRES_USER" -d "$POSTGRES_DB"' > backup_postgres_$(date +%Y%m%d_%H%M%S).sql
 
 # 2. 备份 Redis
 docker compose exec redis redis-cli BGSAVE
@@ -361,7 +361,7 @@ docker run --rm -v shunshi_postgres_data:/data -v $(pwd):/backup alpine tar czf 
 
 ```bash
 # 恢复 PostgreSQL
-docker compose exec -T mysql psql -U "${DB_USER}" shunshi < backup_postgres_20260317.sql
+docker compose exec -T postgres sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB"' < backup_postgres_20260317.sql
 
 # 恢复 Redis
 docker cp backup_redis.rdb shunshi-redis:/data/dump.rdb
@@ -388,7 +388,7 @@ docker compose logs backend --tail=100
 
 ```bash
 # 检查 PostgreSQL 是否健康
-docker compose exec mysql pg_isready -u root -p
+docker compose exec postgres sh -c 'pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"'
 
 # 检查网络连通性
 docker compose exec backend python -c "

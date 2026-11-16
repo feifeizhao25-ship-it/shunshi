@@ -6,7 +6,7 @@ import '../../../design_system/theme.dart';
 import '../../../core/config/app_config.dart';
 import '../../widgets/cn_back_button.dart';
 
-final String _baseUrl = AppConfig.apiBaseUrl.replaceAll('/api/v1', '');
+final String _baseUrl = normalizeApiBaseUrl(AppConfig.apiBaseUrl);
 
 class DailyCheckinPage extends StatefulWidget {
   const DailyCheckinPage({super.key});
