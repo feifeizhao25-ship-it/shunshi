@@ -30,12 +30,44 @@ ALLOWED_HOSTS = frozenset({"export.arxiv.org", "api.github.com", "huggingface.co
 MAX_BYTES = 400_000
 UA = "Mozilla/5.0 (compatible; SelfImproveRadar/1.0; allowlist-only; digest-only)"
 
+# 2026-11 调研后扩充。arXiv 走整句精确匹配、Hugging Face 走名称子串匹配，
+# 所以新增的词都用两三个单词的短语；每个产品不超过 5 个，一周一次共 20 个请求。
 DEFAULT_QUERIES: dict[str, tuple[str, ...]] = {
-    "shunshi": ("traditional chinese medicine LLM", "health chatbot safety medical boundary"),
-    "jianji": ("AI companion safety", "psychological support LLM evaluation"),
-    "fenfaxia": ("AIGC content label compliance", "content moderation LLM"),
-    "contentflow": ("AIGC content label compliance", "content moderation LLM"),
-    "energy": ("photovoltaic forecasting", "renewable energy policy retrieval"),
+    "shunshi": (
+        "traditional chinese medicine LLM",
+        "health chatbot safety medical boundary",
+        "TCM benchmark",
+        "medical hallucination detection",
+        "temporal retrieval augmented generation",
+    ),
+    "jianji": (
+        "AI companion safety",
+        "psychological support LLM evaluation",
+        "mental health chatbot safety",
+        "companion chatbot dependency",
+        "crisis detection LLM",
+    ),
+    "fenfaxia": (
+        "AIGC content label compliance",
+        "content moderation LLM",
+        "generative engine optimization",
+        "AI-generated content watermark",
+        "agent skills",
+    ),
+    "contentflow": (
+        "AIGC content label compliance",
+        "content moderation LLM",
+        "generative engine optimization",
+        "AI-generated content watermark",
+        "agent skills",
+    ),
+    "energy": (
+        "photovoltaic forecasting",
+        "renewable energy policy retrieval",
+        "electricity question answering",
+        "energy LLM benchmark",
+        "contextual retrieval",
+    ),
 }
 
 _NC = re.compile(r"(^|[-_:])nc([-_.]|$)|noncommercial|non-commercial", re.I)
