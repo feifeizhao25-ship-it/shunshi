@@ -163,8 +163,10 @@ kubectl apply -f k8s/configmap.yaml
 # 4. 部署 PostgreSQL (StatefulSet)
 kubectl apply -f k8s/postgres-statefulset.yaml
 
-# 5. 部署 Redis
+# 5. 部署 Redis（Redis 未设密码，用网络策略限制只有后端能连）
 kubectl apply -f k8s/redis-deployment.yaml
+kubectl apply -f k8s/redis-service.yaml
+kubectl apply -f k8s/redis-networkpolicy.yaml
 
 # 6. 等待数据库就绪
 kubectl -n shunshi rollout status statefulset/postgres --timeout=300s
@@ -175,6 +177,9 @@ kubectl apply -f k8s/backend-pvc.yaml
 kubectl apply -f k8s/hpa.yaml
 kubectl apply -f k8s/backend-deployment.yaml
 kubectl apply -f k8s/backend-service.yaml
+# 自我改进任务：清单里副本数为 0、SIL_ENABLED 为 0，应用后不会启动任何东西。
+# 启用步骤写在 k8s/self-improve-deployment.yaml 文件头。
+kubectl apply -f k8s/self-improve-deployment.yaml
 
 # 8. 部署 Web 管理后台
 kubectl apply -f k8s/admin-deployment.yaml

@@ -346,13 +346,29 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
                 ),
               ),
             ),
-      bottomNavigationBar: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
-          child: Text(
-            '支付安全由支付宝/微信支付提供保障',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 11, color: ShunShiColors.textTertiary),
+      // 底栏和正文之间留出分隔线和上边距：原来上边距为 0，滚动时被裁掉一半的
+      // 正文紧贴着这行字，看起来像两行字叠在一起。
+      bottomNavigationBar: DecoratedBox(
+        decoration: BoxDecoration(
+          color: bg,
+          border: Border(
+            top: BorderSide(
+              color: isDark
+                  ? ShunShiColors.darkBorderGhost
+                  : ShunShiColors.borderGhost,
+              width: 0.5,
+            ),
+          ),
+        ),
+        child: SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 10, 20, 12),
+            child: Text(
+              '支付安全由支付宝/微信支付提供保障',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 11, color: ShunShiColors.textTertiary),
+            ),
           ),
         ),
       ),

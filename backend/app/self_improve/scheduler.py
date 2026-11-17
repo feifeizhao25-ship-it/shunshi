@@ -8,6 +8,7 @@
 
 from __future__ import annotations
 
+import logging
 import re
 import time
 from datetime import datetime, timedelta
@@ -15,6 +16,7 @@ from typing import Callable
 from zoneinfo import ZoneInfo
 
 TZ = ZoneInfo("Asia/Shanghai")
+log = logging.getLogger(__name__)
 _DAYS = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]
 
 SCHEDULE_DEFAULTS = {
@@ -66,8 +68,9 @@ def run_forever(jobs: dict[str, tuple[str, Callable[[datetime], object]]], *, sl
             if now >= due[name]:
                 try:
                     fn(now)
-                except Exception:  # noqa: BLE001 — 任务失败不能拖垮调度；各任务自己写日志
-                    pass
+                except Exception:  # noqa: BLE001 — 任务失败不能拖垮调度
+                    # 以前这里直接 pass：任务每周都失败也没有任何痕迹。至少留一条带堆栈的日志。
+                    log.exception("self_improve job failed: %s (%s)", name, spec)
                 due[name] = next_run(spec, now)
         nxt = min(due.values())
         sleep(max(1.0, min(60.0, (nxt - clock()).total_seconds())))

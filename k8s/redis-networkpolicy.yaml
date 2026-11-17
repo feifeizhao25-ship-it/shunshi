@@ -1,0 +1,28 @@
+# Redis 没有设密码（k8s/redis-deployment.yaml），所以用网络策略把入口收窄：
+# 只有后端和自我改进任务这两类 Pod 能连 6379，命名空间里其它 Pod 和其它命名空间都连不上。
+# 前提：集群的网络插件支持 NetworkPolicy（Calico / Cilium / 阿里云 Terway 等）；
+# 不支持时这份清单不会报错，但也不生效——上线前用
+#   kubectl -n shunshi run np-test --rm -it --image=redis:7-alpine -- redis-cli -h redis ping
+# 验证：应当连不上（超时），而后端 /healthz 仍然正常。
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: redis-ingress
+  namespace: shunshi
+spec:
+  podSelector:
+    matchLabels:
+      app: redis
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: backend
+        - podSelector:
+            matchLabels:
+              app: self-improve
+      ports:
+        - protocol: TCP
+          port: 6379

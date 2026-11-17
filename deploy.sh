@@ -39,7 +39,7 @@ case "$ACTION" in
     log "Checking SEASONS backend status..."
     ssh_cmd "echo '=== Service Status ===' && systemctl status shunshi --no-pager -l | head -20"
     ssh_cmd "echo '=== Port Check ===' && ss -tlnp | grep -E '4000|4001|6379'"
-    ssh_cmd "echo '=== API Health ===' && curl -s http://127.0.0.1:4000/health && echo ''"
+    ssh_cmd "echo '=== API Health ===' && curl -s http://127.0.0.1:4000/healthz && echo ''"
     ssh_cmd "echo '=== Redis ===' && redis-cli ping"
     ssh_cmd "echo '=== Disk/Memory ===' && df -h / && free -h"
     ssh_cmd "echo '=== Recent Logs ===' && journalctl -u shunshi --no-pager -n 10"
@@ -110,7 +110,7 @@ log "  Service restarted"
 # Step 6: Verify
 log "Step 6/6: Verifying deployment..."
 sleep 2
-API_STATUS=$(ssh_cmd "curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:4000/health")
+API_STATUS=$(ssh_cmd "curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:4000/healthz")
 if [ "$API_STATUS" = "200" ]; then
     log "  API health check: ${GREEN}OK ($API_STATUS)${NC}"
 else

@@ -50,6 +50,16 @@ def default_market() -> str:
     return "global" if value == "global" else "cn"
 
 
+def market_lock() -> str | None:
+    """部署级市场锁：``SHUNSHI_MARKET_LOCK`` 设为 cn / global 时，不再看请求头，整个部署只按这个市场回答。
+
+    国内部署设成 ``cn``：网页端浏览器会自动带 ``Accept-Language``，英文系统的浏览器不带
+    ``X-App-Market`` 时会被判成国际版、回英文；锁住以后国内部署一律中文。不设 = 行为不变。
+    """
+    value = os.environ.get("SHUNSHI_MARKET_LOCK", "").strip().lower()
+    return value if value in ("global", "cn") else None
+
+
 def resolve_locale(
     accept_language: str | None = None,
     app_market: str | None = None,
@@ -64,7 +74,10 @@ def resolve_locale(
                 tag_region = part.upper()
                 break
     market_header = (app_market or "").strip().lower()
-    if market_header in ("global", "cn"):
+    locked = market_lock()
+    if locked is not None:
+        market = locked
+    elif market_header in ("global", "cn"):
         market = market_header
     elif primary and primary != "zh":
         market = "global"

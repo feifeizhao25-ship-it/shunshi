@@ -34,7 +34,7 @@ data:
 
         # 健康检查
         location /health {
-            proxy_pass http://backend/health;
+            proxy_pass http://backend/healthz;
             access_log off;
         }
 
