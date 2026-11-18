@@ -30,6 +30,9 @@ class Settings(BaseSettings):
     growth_allow_app_push: bool = False
     # 打开后增长发布全部停住。默认关着，表示没有急停。
     kill_switch: bool = False
+    # 自有网站发布接收口 POST /api/v1/growth/publish/website（环境变量 SHUNSHI_GROWTH_PUBLISH_RECEIVER_ENABLED）。
+    # 默认关闭；令牌另读 OPENCLAW_SHUNSHI_PUBLISH_TOKEN。见 docs/GROWTH_PUBLISH_WEBSITE_RECEIVER_2026-11-19.md
+    growth_publish_receiver_enabled: bool = False
 
     def cors_origin_list(self) -> list[str]:
         return [item.strip() for item in self.cors_origins.split(",") if item.strip()]

@@ -165,6 +165,35 @@ class GrowthDraft(Base):
     created_at: Mapped[int] = mapped_column(Integer, default=now_ts)
 
 
+class GrowthWebsiteSubmission(Base):
+    """运营中枢推来的自有网站内容（POST /api/v1/growth/publish/website）。
+
+    只存，不自动上线，不转发到任何外部平台。只追加：同一份内容（content_sha256 相同）重复推送不覆盖。
+    """
+
+    __tablename__ = "growth_website_submission"
+
+    id: Mapped[str] = mapped_column(String(64), primary_key=True, default=new_id)
+    content_sha256: Mapped[str] = mapped_column(String(64), unique=True, index=True)
+    approval_id: Mapped[str] = mapped_column(String(120), default="")
+    title: Mapped[str] = mapped_column(String(200), default="")
+    body: Mapped[str] = mapped_column(Text, default="")
+    url: Mapped[str] = mapped_column(String(500), default="")
+    content_json: Mapped[str] = mapped_column(Text, default="{}")
+    status: Mapped[str] = mapped_column(String(32), default="received", index=True)
+    received_at: Mapped[int] = mapped_column(Integer, default=now_ts, index=True)
+
+
+@event.listens_for(GrowthWebsiteSubmission, "before_update")
+def _refuse_submission_update(mapper, connection, target) -> None:  # noqa: ARG001
+    raise RuntimeError("growth_website_submission is append-only")
+
+
+@event.listens_for(GrowthWebsiteSubmission, "before_delete")
+def _refuse_submission_delete(mapper, connection, target) -> None:  # noqa: ARG001
+    raise RuntimeError("growth_website_submission is append-only")
+
+
 @event.listens_for(GrowthAuditLog, "before_update")
 def _refuse_audit_update(mapper, connection, target) -> None:  # noqa: ARG001
     raise RuntimeError("growth_audit_log is append-only")
