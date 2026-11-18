@@ -109,6 +109,18 @@ def _ops_hub_token_ok(token: str) -> bool:
     )
 
 
+def _readonly_funnel_allowed(request: Request, method: str, path: str) -> bool:
+    """只读漏斗令牌（``SHUNSHI_FUNNEL_READONLY_TOKEN``）只放行一条路由的 GET。
+
+    它不是管理员令牌：别的后台接口、写操作、普通用户接口都不认它。环境变量没设就关闭。
+    """
+    from .growth.weekly_funnel import WEEKLY_PATH, readonly_token_ok
+
+    if method != "GET" or path != WEEKLY_PATH:
+        return False
+    return readonly_token_ok(_bearer(request))
+
+
 def _is_admin(request: Request) -> bool:
     from .router.admin_auth import _verify_token, _token
 
@@ -188,6 +200,8 @@ async def product_access_guard(request: Request) -> None:
     path = request.scope.get("path") or request.url.path
     method = request.method.upper()
     if is_public(path):
+        return
+    if _readonly_funnel_allowed(request, method, path):
         return
 
     admin = _is_admin(request)
