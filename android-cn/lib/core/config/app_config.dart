@@ -41,8 +41,10 @@ const _apiVersionPrefix = '/api/v1';
 
 /// Origin without a trailing slash or a trailing `/api/v1`.
 ///
-/// `http://host:4000`, `http://host:4000/`, `http://host:4000/api/v1` and
-/// `http://host:4000/api/v1/` all become `http://host:4000`.
+/// `https://api.example.com`, `https://api.example.com/`,
+/// `https://api.example.com/api/v1` and `https://api.example.com/api/v1/`
+/// all become `https://api.example.com`. The local default
+/// (`http://127.0.0.1:4000`) is normalised the same way.
 String normalizeApiBaseUrl(String base) {
   var value = base.trim();
   while (value.endsWith('/')) {

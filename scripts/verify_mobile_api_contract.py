@@ -66,6 +66,23 @@ for client in (
     "ios-global/lib/core/network/api_client.dart",
 ):
     source = (ROOT / client).read_text(encoding="utf-8")
-    require("/api/v1" in source and "startsWith('/api/v1/')" in source, f"{client}: version-prefix normalization missing")
+    inline = "/api/v1" in source and "startsWith('/api/v1/')" in source
+    # 国内版把前缀处理集中到了 lib/core/config/app_config.dart（normalizeApiBaseUrl / versionedApiPath），
+    # 客户端只调用这两个函数。这种写法要求：客户端的 baseUrl 经过 normalizeApiBaseUrl，路径经过
+    # versionedApiPath 或 resolveVersionedApiUrl，并且同一 App 的 app_config.dart 里真的实现了「只加一次」。
+    variant = client.split("/", 1)[0]
+    shared = (ROOT / variant / "lib/core/config/app_config.dart").read_text(encoding="utf-8")
+    shared_ok = (
+        "String normalizeApiBaseUrl(" in shared
+        and "String versionedApiPath(" in shared
+        and "_apiVersionPrefix = '/api/v1'" in shared
+        and "startsWith('$_apiVersionPrefix/')" in shared
+    )
+    delegated = (
+        shared_ok
+        and "normalizeApiBaseUrl(" in source
+        and ("versionedApiPath(" in source or "resolveVersionedApiUrl(" in source)
+    )
+    require(inline or delegated, f"{client}: version-prefix normalization missing")
 
 print("Mobile API origin/version contract verified for four variants")
