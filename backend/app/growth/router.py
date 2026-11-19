@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from typing import Any
+
+from fastapi import APIRouter, Body, Depends, HTTPException, Request
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
@@ -16,7 +19,8 @@ from app.growth.funnel import summarize
 from app.growth.weekly_funnel import WEEKLY_PATH, WeekError, build_report
 from app.growth.kb.sources import REGISTRY
 from app.growth.models import GrowthAuditLog, GrowthDraft, GrowthInAppCard, GrowthKbChunk
-from app.growth.ops import OpsRefused, publish, read_opt_in, record_approval, write_opt_in
+from app.growth.ops import OpsRefused, kill_switch_on, publish, read_opt_in, record_approval, write_opt_in
+from app.growth import website_receiver
 from app.growth.skills.library import list_skills
 from app.growth import signup_source
 
@@ -104,6 +108,42 @@ def get_cards(user_id: str = Depends(current_user), session: Session = Depends(g
         "success": True,
         "data": [{"id": row.id, "title": row.title, "body": row.body} for row in rows],
     }
+
+
+@events_router.post(
+    website_receiver.RECEIVER_PATH.removeprefix("/api/v1/growth"),
+    summary="运营中枢推送自有网站内容（只存不上线；默认关闭）",
+)
+def post_publish_website(
+    request: Request,
+    payload: Any = Body(default=None),
+    session: Session = Depends(get_session),
+):
+    """批准单哈希、上海时间 08:00–21:30、人工智能生成标识、只追加审计，四项都满足才接收。
+
+    开关 ``SHUNSHI_GROWTH_PUBLISH_RECEIVER_ENABLED``（默认关）；令牌 ``OPENCLAW_SHUNSHI_PUBLISH_TOKEN``，
+    不认管理员令牌、运营中枢后台令牌或登录态。见 ``app/growth/website_receiver.py``。
+    """
+    settings = request.app.state.settings
+
+    def refuse(reason: str) -> JSONResponse:
+        verdict = website_receiver.Verdict(False, reason, [reason])
+        return JSONResponse(verdict.body(), status_code=verdict.status_code, headers={"Cache-Control": "no-store"})
+
+    if not getattr(settings, "growth_publish_receiver_enabled", False):
+        return refuse("disabled")
+    expected = website_receiver.configured_token()
+    if not expected:
+        return refuse("token_not_configured")
+    if not website_receiver.token_ok(website_receiver.bearer(request.headers.get("authorization")), expected):
+        return refuse("unauthorized")
+    verdict = website_receiver.receive(
+        session,
+        payload if isinstance(payload, dict) else {},
+        now=website_receiver.now_utc(),
+        kill_switch=kill_switch_on(_config(request)),
+    )
+    return JSONResponse(verdict.body(), status_code=verdict.status_code, headers={"Cache-Control": "no-store"})
 
 
 @events_router.post("/events", summary="记录流量漏斗事件")

@@ -48,6 +48,9 @@ PUBLIC_PREFIXES: tuple[str, ...] = (
     "/api/v1/payments/wechat/notify",
     # 落地页曝光发生在注册之前。付费和注册事件在处理函数里另行核对登录凭证。
     "/api/v1/growth/events",
+    # 运营中枢推自有网站内容。只认专用令牌 OPENCLAW_SHUNSHI_PUBLISH_TOKEN，处理函数里核对；
+    # 开关默认关。见 app/growth/website_receiver.py。
+    "/api/v1/growth/publish/website",
 )
 
 # 仅管理员。(方法集合或 None=全部方法, 路径正则)
