@@ -13,6 +13,7 @@ from app.growth.audit import append_audit
 from app.growth.events import record_event
 from app.growth.kb.ingest import IngestRefused, activate_source
 from app.growth.funnel import summarize
+from app.growth.weekly_funnel import WEEKLY_PATH, WeekError, build_report
 from app.growth.kb.sources import REGISTRY
 from app.growth.models import GrowthAuditLog, GrowthDraft, GrowthInAppCard, GrowthKbChunk
 from app.growth.ops import OpsRefused, publish, read_opt_in, record_approval, write_opt_in
@@ -167,6 +168,26 @@ def get_sources(session: Session = Depends(get_session)):
 def get_funnel(request: Request, session: Session = Depends(get_session)):
     config = _config(request)
     return {"success": True, "data": summarize(session, config.arpu_yuan)}
+
+
+@admin_router.get(
+    WEEKLY_PATH.removeprefix("/api/v1/admin/growth"),
+    summary="每周漏斗汇总（上海时间周日至周六，只读、只出聚合）",
+)
+def get_weekly_funnel(
+    week_start: str | None = None,
+    weeks: int = 4,
+    session: Session = Depends(get_session),
+):
+    """管理员令牌或只读漏斗令牌（``SHUNSHI_FUNNEL_READONLY_TOKEN``）可调。
+
+    ``week_start``：最后一周的周日（YYYY-MM-DD，上海时间），不传则为本周；``weeks``：往前共几周（1–26）。
+    """
+    try:
+        report = build_report(session, week_start=week_start, weeks=weeks)
+    except WeekError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from None
+    return {"success": True, "data": report}
 
 
 @admin_router.get("/queue", summary="待人工确认的草稿")
