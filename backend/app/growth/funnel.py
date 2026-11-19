@@ -28,8 +28,12 @@ def summarize(session: Session, arpu_yuan: float) -> dict:
         .scalar()
     )
     paid = counts["subscription_paid"]
+    from app.growth.signup_source import count_by_source
+
     return {
         "counts": counts,
+        # 只有聚合计数，没有任何用户级数据。
+        "signup_sources": count_by_source(session),
         "attributed_signups": int(attributed or 0),
         "arpu_yuan": arpu_yuan,
         "projected_revenue_yuan": paid * arpu_yuan,
