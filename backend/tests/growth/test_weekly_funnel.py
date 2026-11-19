@@ -194,6 +194,9 @@ def test_each_field_counts_the_right_rows(growth_session, records):
 
 
 def test_signup_source_breakdown_is_null_with_note_when_table_missing(growth_session, records):
+    # 注册来源题合入后 init_db 会建这张表；这里显式删掉，模拟线上还没跑迁移的库。
+    growth_session.execute(text("DROP TABLE IF EXISTS growth_signup_source"))
+    growth_session.commit()
     week_a, _ = _two_weeks(growth_session, records)
     assert week_a["signups_by_source"] is None
     assert "growth_signup_source" in week_a["signups_by_source_note"]
