@@ -58,6 +58,20 @@ class GrowthEvent(Base):
     created_at: Mapped[int] = mapped_column(Integer, default=now_ts, index=True)
 
 
+class GrowthSignupSource(Base):
+    """注册来源题的作答，一条 signup 事件最多一行。
+
+    只存枚举代码，不存用户 id、手机号、昵称或任何自由文本；
+    用 event_id 关联 growth_event。新表由 create_all 建出，不改旧表结构。
+    """
+
+    __tablename__ = "growth_signup_source"
+
+    event_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    source: Mapped[str] = mapped_column(String(16), index=True)
+    created_at: Mapped[int] = mapped_column(Integer, default=now_ts)
+
+
 class GrowthKbChunk(Base):
     __tablename__ = "growth_kb_chunk"
 

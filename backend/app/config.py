@@ -28,6 +28,8 @@ class Settings(BaseSettings):
     growth_allow_paid_ads: bool = False
     growth_allow_in_app_cards: bool = False
     growth_allow_app_push: bool = False
+    # 注册来源题「从哪知道我们」。环境变量 SHUNSHI_GROWTH_SIGNUP_SOURCE_ENABLED，默认关闭。
+    growth_signup_source_enabled: bool = False
     # 打开后增长发布全部停住。默认关着，表示没有急停。
     kill_switch: bool = False
     # 自有网站发布接收口 POST /api/v1/growth/publish/website（环境变量 SHUNSHI_GROWTH_PUBLISH_RECEIVER_ENABLED）。

@@ -16,11 +16,13 @@ from app.growth.audit import append_audit
 from app.growth.events import record_event
 from app.growth.kb.ingest import IngestRefused, activate_source
 from app.growth.funnel import summarize
+from app.growth.weekly_funnel import WEEKLY_PATH, WeekError, build_report
 from app.growth.kb.sources import REGISTRY
 from app.growth.models import GrowthAuditLog, GrowthDraft, GrowthInAppCard, GrowthKbChunk
 from app.growth.ops import OpsRefused, kill_switch_on, publish, read_opt_in, record_approval, write_opt_in
 from app.growth import website_receiver
 from app.growth.skills.library import list_skills
+from app.growth import signup_source
 
 events_router = APIRouter(prefix="/api/v1/growth", tags=["growth"])
 admin_router = APIRouter(prefix="/api/v1/admin/growth", tags=["growth-admin"])
@@ -36,6 +38,12 @@ class EventIn(BaseModel):
     utm_campaign: str = ""
     content_id: str = ""
     amount_yuan: float = 0
+    # 注册来源题的枚举代码，只对 signup 事件、且开关打开时生效；未知值丢弃。
+    signup_source: str = ""
+
+
+class SignupSourceIn(BaseModel):
+    source: str = ""
 
 
 class CycleIn(BaseModel):
@@ -144,11 +152,33 @@ def post_event(
     request: Request,
     session: Session = Depends(get_session),
 ):
-    row = record_event(session, request, body.model_dump())
+    payload = body.model_dump()
+    source = payload.pop("signup_source", "")
+    row = record_event(session, request, payload)
+    # 来源不回显，响应里只有事件本身的字段。
+    signup_source.attach_to_event(session, request.app.state.settings, row, source)
     return {
         "success": True,
         "data": {"id": row.id, "event_type": row.event_type, "inviter_user_id": row.inviter_user_id},
     }
+
+
+@events_router.get("/signup-source", summary="注册来源题是否开启及选项（公开，不含任何用户数据）")
+def get_signup_source(request: Request):
+    return {"success": True, "data": signup_source.public_options(request.app.state.settings)}
+
+
+@events_router.post("/signup-source", summary="提交注册来源（可跳过；只存枚举代码，不回显）")
+def post_signup_source(
+    body: SignupSourceIn,
+    request: Request,
+    user_id: str = Depends(current_user),
+    session: Session = Depends(get_session),
+):
+    recorded = signup_source.record_for_user(
+        session, request.app.state.settings, user_id, body.source
+    )
+    return {"success": True, "data": {"recorded": recorded}}
 
 
 @admin_router.get("/skills", summary="流量技能和版本")
@@ -178,6 +208,26 @@ def get_sources(session: Session = Depends(get_session)):
 def get_funnel(request: Request, session: Session = Depends(get_session)):
     config = _config(request)
     return {"success": True, "data": summarize(session, config.arpu_yuan)}
+
+
+@admin_router.get(
+    WEEKLY_PATH.removeprefix("/api/v1/admin/growth"),
+    summary="每周漏斗汇总（上海时间周日至周六，只读、只出聚合）",
+)
+def get_weekly_funnel(
+    week_start: str | None = None,
+    weeks: int = 4,
+    session: Session = Depends(get_session),
+):
+    """管理员令牌或只读漏斗令牌（``SHUNSHI_FUNNEL_READONLY_TOKEN``）可调。
+
+    ``week_start``：最后一周的周日（YYYY-MM-DD，上海时间），不传则为本周；``weeks``：往前共几周（1–26）。
+    """
+    try:
+        report = build_report(session, week_start=week_start, weeks=weeks)
+    except WeekError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from None
+    return {"success": True, "data": report}
 
 
 @admin_router.get("/queue", summary="待人工确认的草稿")

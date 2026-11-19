@@ -9,6 +9,7 @@ import '../../../core/theme/shunshi_colors.dart';
 import '../../../core/theme/shunshi_spacing.dart';
 import '../../../core/theme/shunshi_text_styles.dart';
 import '../../../data/network/api_client.dart';
+import '../../widgets/signup_source_card.dart';
 import '../../widgets/cn_back_button.dart';
 
 /// 中医几种生活习惯
@@ -574,6 +575,8 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
               ),
             ),
           ),
+          // 注册来源题（选填、可跳过）。后端开关默认关闭，关着时这里不占位。
+          const SignupSourceCard(),
         ],
       ),
     );
