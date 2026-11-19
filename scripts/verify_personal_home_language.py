@@ -89,7 +89,9 @@ def main(argv=None) -> int:
             bad.append(f"{app}: 缺少 personal_home_strings_zh.dart")
             continue
         for lit in literals(zh.read_text("utf-8")):
-            if lit and not lit.endswith(".dart") and not CJK.search(lit) and not re.fullmatch(r"[\d\s$:.{}n]*", lit):
+            # 纯数字/占位符，或「月-日」样例日期（界面上周历就按 03-01 显示），都不是外文
+            if lit and not lit.endswith(".dart") and not CJK.search(lit) and not re.fullmatch(r"[\d\s$:.{}n]*", lit) \
+                    and not re.fullmatch(r"\d{1,2}-\d{1,2}", lit):
                 bad.append(f"{rel(zh)}: 国内版文字里有非中文：{lit[:50]!r}")
 
     if bad:
