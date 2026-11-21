@@ -123,6 +123,12 @@ SAFETY_CONFIG = {
         "wish i were dead", "wish i was never born",
         "harm myself", "ending it all", "my life is worthless",
         "better dead than alive", "if i died", "when i die",
+        # 2026-11-21 真实模型 UI 测试：'I feel hopeless and want to end it all' 只算成了情绪困扰
+        "end it all", "want to end it", "end everything", "end things for good",
+        "take my own life", "taking my own life", "don't want to be alive", "do not want to live",
+        "want to be dead", "no point in living", "not worth living",
+        "don't want to wake up", "never wake up again", "go to sleep and never wake up",
+        "can't go on anymore", "cannot go on anymore",
     ],
 
     # 情绪困扰关键词

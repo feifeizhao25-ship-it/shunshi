@@ -1,4 +1,5 @@
 import 'dart:convert';
+import '../safety/crisis_resources.dart';
 
 /// 风险等级
 enum RiskLevel { low, medium, high, crisis }
@@ -149,9 +150,11 @@ class AISafetyService {
   }
 
   /// 获取危机响应文本
-  static String getCrisisResponse(RiskLevel level, {bool isEnglish = false}) {
+  /// [countryCode] is the device locale's country; a verified region gets its own
+  /// helpline (CrisisResources), anything else gets findahelpline.com.
+  static String getCrisisResponse(RiskLevel level, {bool isEnglish = false, String? countryCode}) {
     if (isEnglish) {
-      return _getCrisisResponseEn(level);
+      return _getCrisisResponseEn(level, countryCode);
     }
     return _getCrisisResponseCn(level);
   }
@@ -174,9 +177,17 @@ class AISafetyService {
     }
   }
 
-  static String _getCrisisResponseEn(RiskLevel level) {
+  static String _getCrisisResponseEn(RiskLevel level, [String? countryCode]) {
     switch (level) {
       case RiskLevel.crisis:
+        if (CrisisResources.forRegion(countryCode) != null) {
+          return 'It sounds like you\'re going through a really difficult time. '
+              'Please reach out to someone who can help:\n\n'
+              '${CrisisResources.lines(countryCode).map((l) => '• $l').join('\n')}\n'
+              '• Elsewhere: findahelpline.com\n\n'
+              'You don\'t have to face this alone. SEASONS cannot replace '
+              'professional medical care.';
+        }
         return 'It sounds like you\'re going through a really difficult time. '
             'Please reach out to someone who can help:\n\n'
             '• 988 Suicide & Crisis Lifeline (US & Canada)\n'
