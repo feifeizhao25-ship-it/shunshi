@@ -72,6 +72,14 @@ class CrisisResources {
       emergency: '111',
       sourceUrl: 'https://www.1737.org.nz/how-1737-works',
     ),
+    // Verified 2026-11-21: hope.hw.gov.ae and u.ae "Handling emergencies".
+    'AE': CrisisResource(
+      region: 'AE',
+      name: 'UAE Mental Support Line',
+      contact: 'call or WhatsApp 800-HOPE (800 4673), 8am-8pm daily',
+      emergency: '999 (police) or 998 (ambulance)',
+      sourceUrl: 'https://hope.hw.gov.ae/',
+    ),
   };
 
   /// [countryCode] is the device locale's country (for example `Locale.countryCode`).

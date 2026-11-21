@@ -73,7 +73,8 @@ class SafetyRule:
 
     def match(self, text: str) -> Optional[str]:
         """匹配文本, 返回匹配到的内容或None（大小写不敏感）"""
-        text_lower = text.lower()  # Case-insensitive matching
+        # Case-insensitive; 手机键盘常把 don't 打成 don’t（弯撇号），统一成直撇号再比
+        text_lower = text.lower().replace("\u2019", "'").replace("\u2018", "'")
         if self.is_regex:
             for pattern in self.compiled_patterns:
                 m = pattern.search(text_lower)

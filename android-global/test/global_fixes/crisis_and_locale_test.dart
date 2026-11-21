@@ -18,8 +18,15 @@ void main() {
       expect(CrisisResources.lines('IE').join(' '), contains('116 123'));
     });
 
+    test('UAE (verified 2026-11-21) shows 800-HOPE and 999 / 998', () {
+      final text = CrisisResources.lines('AE').join(' ');
+      expect(text, contains('800-HOPE'));
+      expect(text, contains('999'));
+      expect(text, contains('998'));
+    });
+
     test('unknown or missing region uses the directory, not a guessed number', () {
-      for (final code in [null, '', 'SE', 'AE', 'JP']) {
+      for (final code in [null, '', 'SE', 'BR', 'JP']) {
         final text = CrisisResources.lines(code).join(' ');
         expect(text, contains('findahelpline.com'), reason: '$code');
         expect(text, contains('your local emergency number'));

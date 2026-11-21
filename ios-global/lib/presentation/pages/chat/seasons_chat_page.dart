@@ -145,7 +145,9 @@ class _SeasonsChatPageState extends State<SeasonsChatPage>
     final riskLevel = AISafetyService.assessRisk(text);
     if (riskLevel == RiskLevel.crisis || riskLevel == RiskLevel.high) {
       final crisisResponse =
-          AISafetyService.getCrisisResponse(riskLevel, isEnglish: true);
+          AISafetyService.getCrisisResponse(riskLevel,
+              isEnglish: true,
+              countryCode: WidgetsBinding.instance.platformDispatcher.locale.countryCode);
       setState(() {
         _messages.add(_ChatMessage(role: 'user', text: text));
         _messages.add(_ChatMessage(

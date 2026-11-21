@@ -46,6 +46,12 @@ RESOURCES: dict[str, CrisisResource] = {
     "NZ": CrisisResource(
         "NZ", "1737, Need to talk?", "call or text 1737 (free)", "111",
         "https://www.1737.org.nz/how-1737-works", "24/7 support from trained counsellors."),
+    # Verified 2026-11-21: hope.hw.gov.ae (National Program for Happiness & Wellbeing) lists 800-HOPE (8004673),
+    # call or WhatsApp, 8am-8pm daily (not 24/7); u.ae "Handling emergencies" lists 999 police / 998 ambulance.
+    "AE": CrisisResource(
+        "AE", "UAE Mental Support Line", "call or WhatsApp 800-HOPE (800 4673), 8am-8pm daily",
+        "999 (police) or 998 (ambulance)", "https://hope.hw.gov.ae/",
+        "Free and confidential. Outside those hours, call 999 or 998, or see findahelpline.com."),
 }
 
 GENERIC_EMERGENCY = "your local emergency number"

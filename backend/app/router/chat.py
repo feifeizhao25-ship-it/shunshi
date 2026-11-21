@@ -11,6 +11,7 @@ import uuid
 import logging
 
 from app.aigc import ai_disclosure
+from app.locale_context import RequestLocale, request_locale
 
 logger = logging.getLogger(__name__)
 
@@ -288,22 +289,27 @@ async def chat(
     user_id: str = Depends(current_user),
     session: Session = Depends(get_session),
     settings: Settings = Depends(get_settings),
+    locale: RequestLocale = Depends(request_locale),
 ):
-    """Compatibility envelope around the authenticated domestic chat service."""
+    """Compatibility envelope around the shared chat service (routers/chat.py).
+
+    原来这里不传 locale，国际版（X-App-Market: global）走到这条路由时被当成国内用户：
+    英文问题得到中文回答、阿联酋用户拿到国内心理援助热线和北京的热线。现在和 /chat/send 一样按请求头分流。
+    """
     from app.routers.chat import ChatBody, chat as domestic_chat
 
     if request is not None:
         message = request.message
         conversation_id = request.conversation_id or conversation_id
     if not message:
-        raise HTTPException(status_code=422, detail="消息内容不能为空")
+        raise HTTPException(status_code=422, detail="消息内容不能为空" if not locale.is_global else "Message cannot be empty")
     if conversation_id:
         existing = conversations_db.get(conversation_id)
         if existing is None or existing.get("user_id") != user_id:
             raise HTTPException(status_code=404, detail="会话不存在")
     result = await domestic_chat(
         body=ChatBody(message=message), user_id=user_id,
-        session=session, settings=settings,
+        session=session, settings=settings, locale=locale,
     )
     from app.simple_models import Message as StoredMessage
     stored = [item for item in session.new if isinstance(item, StoredMessage) and item.user_id == user_id]
