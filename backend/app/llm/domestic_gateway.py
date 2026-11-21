@@ -159,6 +159,11 @@ def _payload(provider: Provider, model: str, messages: list, tier: str) -> dict:
         "stream": False,
     }
     # qwen3.5 默认开思考，文档 12 的价格按非思考档。
+    # deepseek-flash 同样默认开思考（https://api-docs.deepseek.com/guides/thinking_mode ）：
+    # 免费档 600 token 会先被推理过程吃光，正文只剩半句或干脆为空（2026-11-21 真实模型测试，
+    # 顺时国内 4/5 首答截断、SEASONS 4/10 次 502）。陪伴类短问答不需要推理，显式关掉。
+    if provider.name == "deepseek":
+        payload["thinking"] = {"type": "disabled"}
     if provider.name == "dashscope":
         payload["enable_thinking"] = False
     if provider.name == "ark":
@@ -199,12 +204,16 @@ async def _post_provider(
         failures.append(f"{provider.name}:{response.status_code}")
         return None
     try:
-        text = _extract_text(response.json())
+        text, truncated = _extract_answer(response.json())
     except ValueError:
-        text = None
+        text, truncated = None, False
     if text:
+        if truncated:
+            logger.info("%s answer hit max_tokens; trimmed to last full sentence", provider.name)
+            text += TRUNCATED_NOTE_EN if _is_english(messages) else TRUNCATED_NOTE_ZH
         return text
-    failures.append(f"{provider.name}:empty")
+    # 上游 200 但正文为空（多半是推理把额度吃光）：记成 empty，交给下一家；都这样时给可读的话而不是 502。
+    failures.append(f"{provider.name}:{'empty_length' if truncated else 'empty'}")
     return None
 
 
@@ -216,14 +225,60 @@ def provider_by_name(name: str) -> Provider | None:
 
 
 def _extract_text(data: Any) -> str | None:
+    text, _ = _extract_answer(data)
+    return text
+
+
+_SENTENCE_END = "。！？!?…\n"
+
+
+def _trim_to_sentence(text: str) -> str:
+    """被长度上限截断的回答：退回到最后一个完整句子；一句都没有就原样返回。"""
+    cut = max(text.rfind(ch) for ch in _SENTENCE_END)
+    # 英文句号要求后面原本跟空格或结尾，避免把 3.5 这类小数当句末
+    for i in range(len(text) - 1, -1, -1):
+        if text[i] == "." and (i + 1 == len(text) or text[i + 1] in " \n"):
+            cut = max(cut, i)
+            break
+    if cut <= 0:
+        return text.rstrip()
+    return text[: cut + 1].rstrip()
+
+
+def _extract_answer(data: Any) -> tuple[str | None, bool]:
+    """返回 (正文, 是否被长度上限截断)。截断时正文已退回到最后一个完整句子。"""
     if not isinstance(data, dict):
-        return None
+        return None, False
     choices = data.get("choices") or []
     if choices and isinstance(choices[0], dict):
         content = (choices[0].get("message") or {}).get("content")
+        truncated = choices[0].get("finish_reason") == "length"
         if isinstance(content, str) and content.strip():
-            return content.strip()
-    return None
+            text = content.strip()
+            if truncated:
+                text = _trim_to_sentence(text)
+            return text, truncated
+        return None, truncated
+    return None, False
+
+
+def _is_english(messages: list) -> bool:
+    for message in messages:
+        if message.get("role") == "system":
+            return "Always answer in clear, plain English" in str(message.get("content") or "")
+    return False
+
+
+TRUNCATED_NOTE_ZH = "\n\n（回答较长，这里先说到这。想了解哪一点，可以接着问。）"
+TRUNCATED_NOTE_EN = "\n\n(That answer ran long, so I stopped here. Ask me about any part you'd like more on.)"
+EMPTY_REPLY_ZH = (
+    "这次没能生成完整的回答，请换个说法或稍后再问一次。\n\n"
+    "仅供作息安排参考，不是医疗诊断或治疗建议。"
+)
+EMPTY_REPLY_EN = (
+    "I couldn't put together a complete answer this time. Please try rephrasing, or ask again in a moment.\n\n"
+    "This is general wellness information, not medical advice."
+)
 
 
 async def complete(
@@ -265,6 +320,9 @@ async def complete(
 
     # 不把供应商返回的原文带给客户端，只记日志。
     logger.warning("domestic model providers all failed: %s", ", ".join(failures))
+    if failures and all(item.split(":", 1)[1].startswith("empty") for item in failures):
+        # 供应商都回了 200，只是没给正文：这不是“服务不可用”，给用户一句能看懂的话。
+        return EMPTY_REPLY_EN if _is_english(messages) else EMPTY_REPLY_ZH
     raise HTTPException(
         status_code=502,
         detail={"detail": "模型暂时不可用，请稍后再试", "providers_tried": len(failures)},
