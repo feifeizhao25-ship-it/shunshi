@@ -3,6 +3,10 @@ name: Build Android APK
 on:
   push:
     branches: [main]
+  # Run on pull requests that change this workflow, so a fix to the build itself is checked before merge.
+  pull_request:
+    paths:
+      - '.github/workflows/android-apk.yml'
   workflow_dispatch:
 
 jobs:
@@ -19,8 +23,14 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      # setup-android@v3 installs 'tools platform-tools' by default. Google stopped serving the old
+      # 'tools' package (2026-09), so sdkmanager exits 1 with "Failed to find package 'tools'".
+      # Only platform-tools is needed; Flutter/Gradle pull the rest.
+      # https://github.com/android-actions/setup-android/issues/537
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools'
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
