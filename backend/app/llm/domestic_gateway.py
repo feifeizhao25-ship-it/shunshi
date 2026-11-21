@@ -210,7 +210,7 @@ async def _post_provider(
     if text:
         if truncated:
             logger.info("%s answer hit max_tokens; trimmed to last full sentence", provider.name)
-            text += TRUNCATED_NOTE_EN if _is_english(messages) else TRUNCATED_NOTE_ZH
+            text = _with_trim_note(text, _is_english(messages))
         return text
     # 上游 200 但正文为空（多半是推理把额度吃光）：记成 empty，交给下一家；都这样时给可读的话而不是 502。
     failures.append(f"{provider.name}:{'empty_length' if truncated else 'empty'}")
@@ -271,6 +271,18 @@ def _is_english(messages: list) -> bool:
 
 TRUNCATED_NOTE_ZH = "\n\n（回答较长，这里先说到这。想了解哪一点，可以接着问。）"
 TRUNCATED_NOTE_EN = "\n\n(That answer ran long, so I stopped here. Ask me about any part you'd like more on.)"
+# 系统提示要求每条回答带免责声明；被长度截断时它常在被截掉的那一段，这里补回。
+DISCLAIMER_ZH = "仅供作息安排参考，不是医疗诊断或治疗建议。"
+DISCLAIMER_EN = "For wellness routine guidance only; not medical diagnosis or treatment."
+
+
+def _with_trim_note(text: str, english: bool) -> str:
+    """截断后的回答：先加截断说明，再补免责声明（正文最后一句已经是免责声明就不重复）。"""
+    note, disclaimer = (TRUNCATED_NOTE_EN, DISCLAIMER_EN) if english else (TRUNCATED_NOTE_ZH, DISCLAIMER_ZH)
+    ends_with_disclaimer = text.rstrip().rstrip("*_ ").endswith(disclaimer)
+    return text + note + ("" if ends_with_disclaimer else "\n\n" + disclaimer)
+
+
 EMPTY_REPLY_ZH = (
     "这次没能生成完整的回答，请换个说法或稍后再问一次。\n\n"
     "仅供作息安排参考，不是医疗诊断或治疗建议。"
