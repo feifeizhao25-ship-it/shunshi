@@ -30,7 +30,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
   Future<void> _loadNotifications() async {
     setState(() { _loading = true; _error = null; });
     try {
-      final resp = await ApiClient().get('/api/v1/notifications/',
+      final resp = await ApiClient().get('/api/v1/notifications',
         queryParameters: {...userIdParam(), 'limit': 50});
       if (resp.data?['success'] == true) {
         final items = resp.data['data']['items'] as List<dynamic>? ?? [];
