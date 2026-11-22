@@ -5,6 +5,7 @@ import '../../core/theme/shunshi_colors.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/services/ai_safety.dart';
+import '../../core/network/locale_headers.dart';
 import '../../../data/services/speech_text.dart';
 import '../../../data/services/tts_player_service.dart';
 import '../../../data/services/voice_service.dart';
@@ -265,7 +266,10 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
     // 健康风险评估
     final riskLevel = AISafetyService.assessRisk(text);
     if (riskLevel == RiskLevel.crisis || riskLevel == RiskLevel.high) {
-      final crisisResponse = AISafetyService.getCrisisResponse(riskLevel);
+      // The routed /chat and /assistant page. Pass the device region so a verified region gets its own
+      // helpline (e.g. AE 800-HOPE); unknown regions get findahelpline.com, never a guessed number.
+      final crisisResponse = AISafetyService.getCrisisResponse(riskLevel,
+          isEnglish: true, countryCode: LocaleHeaders.deviceLocale().countryCode);
       setState(() {
         _messages.add(ChatMessage(role: 'user', text: text, time: _fmt(DateTime.now())));
         _messages.add(ChatMessage(
