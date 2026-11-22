@@ -252,7 +252,10 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
     // 健康风险评估
     final riskLevel = AISafetyService.assessRisk(text);
     if (riskLevel == RiskLevel.crisis || riskLevel == RiskLevel.high) {
-      final crisisResponse = AISafetyService.getCrisisResponse(riskLevel);
+      // The routed /chat and /assistant page. Pass the device region so a verified region gets its own
+      // helpline (e.g. AE 800-HOPE); unknown regions get findahelpline.com, never a guessed number.
+      final crisisResponse = AISafetyService.getCrisisResponse(riskLevel,
+          isEnglish: true, countryCode: LocaleHeaders.deviceLocale().countryCode);
       setState(() {
         _messages.add(ChatMessage(role: 'user', text: text, time: _fmt(DateTime.now())));
         _messages.add(ChatMessage(
