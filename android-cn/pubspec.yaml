@@ -120,6 +120,17 @@ flutter:
     - family: Manrope
       fonts:
         - asset: assets/fonts/Manrope-Variable.ttf
+    # Flutter 默认字体。随包打进去，网页版就不会去 fontFallbackBaseUrl 下载（那里没有 Roboto，会 404）。
+    # Apache-2.0，googlefonts/roboto v2.138，见 assets/fonts/LICENSE-Roboto.txt；与 android-global 相同。
+    - family: Roboto
+      fonts:
+        - asset: assets/fonts/Roboto-Light.ttf
+          weight: 300
+        - asset: assets/fonts/Roboto-Regular.ttf
+        - asset: assets/fonts/Roboto-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Roboto-Bold.ttf
+          weight: 700
     - family: NotoSansSC
       fonts:
         - asset: assets/fonts/NotoSansSC-Regular.ttf
