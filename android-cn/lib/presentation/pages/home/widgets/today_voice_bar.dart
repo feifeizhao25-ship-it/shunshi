@@ -65,6 +65,7 @@ class _TodayVoiceBarState extends State<TodayVoiceBar> {
   bool _recording = false;
   bool _busy = false;
   String? _note;
+  bool _speakRequested = false;
 
   VoiceChrome get _chrome => resolveVoiceChrome(widget.chrome);
 
@@ -87,7 +88,12 @@ class _TodayVoiceBarState extends State<TodayVoiceBar> {
   }
 
   void _onPlayback() {
-    if (mounted) setState(() {});
+    if (!mounted) return;
+    setState(() {
+      // 朗读失败（例如设备没有中文语音）要说出来，不能只是按钮变回去（问题 50）。
+      final err = _playback?.errorMsg ?? '';
+      if (_speakRequested && err.isNotEmpty) _note = err;
+    });
   }
 
   SpeechPlayback _ensurePlayback() {
@@ -100,6 +106,8 @@ class _TodayVoiceBarState extends State<TodayVoiceBar> {
   }
 
   Future<void> _onSpeak() async {
+    _speakRequested = true;
+    _note = null;
     final spoken = speakablePlainText(widget.spokenText);
     await SpeechToggle(_ensurePlayback()).toggle('today', spoken);
     if (mounted) setState(() {});
