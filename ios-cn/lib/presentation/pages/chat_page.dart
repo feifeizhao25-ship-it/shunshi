@@ -7,6 +7,7 @@ import '../../core/services/ai_safety.dart';
 import '../../data/services/speech_text.dart';
 import '../../data/services/tts_player_service.dart';
 import '../../data/services/voice_service.dart';
+import '../../data/services/web_speech.dart';
 import '../../design_system/theme.dart';
 import '../../design_system/theme_helper.dart';
 import '../widgets/feedback_sheet.dart';
@@ -646,6 +647,15 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
               ? text : '${_controller.text}\n$text');
         }
       } else {
+        if (voice is LateVoiceFailure) {
+          (voice as LateVoiceFailure).onLateFailure = (message) {
+            if (!mounted) return;
+            setState(() {
+              _isRecording = false;
+              _chatError = message;
+            });
+          };
+        }
         final started = await voice.startRecording();
         if (!mounted) {
           await voice.cancel();

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../data/services/speech_text.dart';
 import '../../../../data/services/tts_player_service.dart';
 import '../../../../data/services/voice_service.dart';
+import '../../../../data/services/web_speech.dart';
 import '../../chat/voice_chrome.dart';
 
 const kTodayVoiceReadLabel = '朗读今日';
@@ -123,6 +124,15 @@ class _TodayVoiceBarState extends State<TodayVoiceBar> {
         });
         if (text != null && text.isNotEmpty) widget.onTranscript?.call(text);
         return;
+      }
+      if (voice is LateVoiceFailure) {
+        (voice as LateVoiceFailure).onLateFailure = (message) {
+          if (!mounted) return;
+          setState(() {
+            _recording = false;
+            _note = message;
+          });
+        };
       }
       final started = await voice.startRecording();
       if (!mounted) return;

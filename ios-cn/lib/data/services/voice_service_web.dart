@@ -2,10 +2,18 @@ import 'voice_contract.dart';
 import 'web_speech.dart';
 
 /// Flutter web voice input: the browser speech recognizer, Chinese locale.
-class VoiceService implements VoiceInput {
+class VoiceService implements VoiceInput, LateVoiceFailure {
   static final VoiceService _instance = VoiceService._();
   factory VoiceService() => _instance;
-  VoiceService._();
+  VoiceService._() {
+    _session.onDenied = (message) {
+      _isListening = false;
+      onLateFailure?.call(message);
+    };
+  }
+
+  @override
+  void Function(String message)? onLateFailure;
 
   final _session = WebSpeechSession(
     localeId: 'zh_CN',
