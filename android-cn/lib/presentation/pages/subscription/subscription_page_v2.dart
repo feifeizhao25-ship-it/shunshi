@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../design_system/theme.dart';
+import '../../../design_system/app_colors.dart';
 import '../../../data/datasources/subscription_service.dart';
 import '../../../data/models/subscription.dart';
 import '../../../data/services/wechat_pay_client.dart';
@@ -242,7 +243,7 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
         elevation: 0,
         leading: IconButton(
           tooltip: '返回',
-          icon: const Icon(Icons.arrow_back, color: ShunShiColors.textPrimary),
+          icon: Icon(Icons.arrow_back, color: AppColors.textPrimary(context)),
           onPressed: () => context.pop(),
         ),
         title: Text(
@@ -251,7 +252,7 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
             fontFamily: ShunShiTypography.serifFamily,
             fontSize: 18,
             fontWeight: FontWeight.w600,
-            color: ShunShiColors.textPrimary,
+            color: AppColors.textPrimary(context), // 深色模式下跟主题走（问题 19）
           ),
         ),
         actions: [
@@ -499,7 +500,7 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
           style: TextStyle(
             fontSize: 17,
             fontWeight: FontWeight.w600,
-            color: ShunShiColors.textPrimary,
+            color: AppColors.textPrimary(context),
           ),
         ),
         const SizedBox(height: 12),

@@ -836,7 +836,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
                 ),
               ),
               const SizedBox(width: 12),
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -846,7 +846,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
                         fontFamily: ShunShiTypography.sansFamily,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: ShunShiColors.textPrimary,
+                        color: AppColors.textPrimary(context), // 深色模式下跟主题走（问题 19）
                       ),
                     ),
                     Text(
@@ -854,7 +854,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
                       style: TextStyle(
                         fontFamily: ShunShiTypography.sansFamily,
                         fontSize: 12,
-                        color: ShunShiColors.textTertiary,
+                        color: AppColors.textTertiary(context),
                       ),
                     ),
                   ],
