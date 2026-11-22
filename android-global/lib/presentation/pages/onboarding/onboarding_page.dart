@@ -15,6 +15,7 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/network/api_singleton.dart';
+import '../../../data/network/onboarding_sync.dart';
 
 class OnboardingPage extends StatefulWidget {
   const OnboardingPage({super.key});
@@ -112,18 +113,18 @@ class _OnboardingPageState extends State<OnboardingPage> {
     await prefs.setString('onboarding_support_time', _supportTime ?? '');
     await prefs.setString('onboarding_feel_style', _feelStyle ?? '');
 
-    // Post to backend
-    try {
-      final dio = apiClient.dio;
-      await dio.post('/api/v1/auth/me', data: {
-        'feeling': _feeling?.toLowerCase(),
-        'help_goal': _helpWith.toList(),
-        'life_stage': _lifeStage?.toLowerCase(),
-        'support_time': _supportTime?.toLowerCase(),
-        'style_preference': _feelStyle?.toLowerCase(),
-      });
-    } catch (_) {}
-    
+    // Open the visitor's session before Today loads, then save the answers on the server.
+    await finishOnboardingSession(
+      apiClient.dio,
+      onboardingBody(
+        feeling: _feeling,
+        helpWith: _helpWith,
+        lifeStage: _lifeStage,
+        supportTime: _supportTime,
+        feelStyle: _feelStyle,
+      ),
+    );
+
     if (mounted) {
       context.go('/home');
     }

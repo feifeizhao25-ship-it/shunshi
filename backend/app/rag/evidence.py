@@ -9,9 +9,12 @@ edition uses verified_global.md (CDC / WHO / NHS); it never cites the Chinese do
 """
 
 import json
+import re
 from datetime import date
 from functools import lru_cache
 from pathlib import Path
+
+from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
 
 from .embedder import get_embedder
 from .freshness_gate import MIN_RELEVANCE as _GATE_MIN_RELEVANCE
@@ -46,10 +49,35 @@ def _verified_chunks(lang: str, query: str, top_k: int) -> list[tuple[object, fl
             continue
         if date.fromisoformat(meta["valid_until"]) < today:
             continue
+        if lang != "cn" and not _shares_heading_term(query, chunk):
+            continue
         picked.append((chunk, float(score)))
         if len(picked) >= top_k:
             break
     return picked
+
+
+_EN_WORD = re.compile(r"[a-z]+")
+
+
+def _stem_en(word: str) -> str:
+    for suffix in ("ing", "ly", "ed", "es", "s"):
+        if word.endswith(suffix) and len(word) - len(suffix) >= 3:
+            return word[: -len(suffix)]
+    return word
+
+
+def _en_terms(text: str) -> set[str]:
+    return {_stem_en(w) for w in _EN_WORD.findall(text.lower()) if w not in ENGLISH_STOP_WORDS and len(w) > 2}
+
+
+def _shares_heading_term(query: str, chunk) -> bool:
+    """English sources must be about what was asked: the question has to share a word with the source's own
+    headings (for example "sleep", "salt", "activity", "mood"). A TF-IDF hit on a passing word in the body is
+    not enough: "plan meals for Ramadan" matched the sleep note only through "avoid large meals before bedtime",
+    and "waking at 3am" matched the seasonal-mood note through "try" and "waking times"."""
+    headings = " ".join(getattr(chunk, "heading_path", None) or [])
+    return bool(_en_terms(query) & _en_terms(headings))
 
 
 REVIEW_DUE_DAYS = 30  # shown as "review due" once the source expires within this many days
