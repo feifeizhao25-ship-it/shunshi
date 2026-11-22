@@ -4,6 +4,7 @@ library;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../home/elder_home_text.dart';
 import '../../../design_system/theme.dart';
 import '../../../data/services/notification_service.dart';
 import '../../../data/storage/local_session.dart';
@@ -258,7 +259,7 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
             child: Column(children: [
               _buildSwitchTile(context, '老年人模式', '提供更大字体与简洁界面',
                   Icons.family_restroom, _elderMode, (v) {
-                setState(() => _elderMode = v);
+                setState(() => _elderMode = v); ElderModeState.set(v);
                 _savePref('elder_mode', v);
               }),
               if (_elderMode)
