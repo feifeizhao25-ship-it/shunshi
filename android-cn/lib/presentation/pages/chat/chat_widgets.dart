@@ -471,6 +471,21 @@ class QuickQuestionChips extends StatelessWidget {
     '情绪低落怎么办',
   ];
 
+  /// 一行快捷问题的高度随字号变化。以前固定 34，系统字号 1.3 时字只露半行（问题 45）。
+  static double rowHeight(TextScaler scaler) {
+    // 34 是 1.0 字号下的原高度；字每放大 1 像素，行高按 1.4 倍跟着加。
+    final needed = 34 + (scaler.scale(13) - 13) * 1.4;
+    return needed < 34 ? 34 : needed;
+  }
+
+  /// 屏幕矮或字号大时，用户已经开始聊天就收起快捷问题，给消息区腾地方（问题 17）。
+  /// 还没开口时照常显示，方便第一次提问。
+  static bool shouldShow({required bool userHasSpoken, required Size screen, required double textScale}) {
+    if (!userHasSpoken) return true;
+    final compact = screen.height < 760 || textScale >= 1.2;
+    return !compact;
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -484,7 +499,7 @@ class QuickQuestionChips extends StatelessWidget {
         : ShunShiColors.textSecondary;
 
     return SizedBox(
-      height: 34,
+      height: rowHeight(MediaQuery.textScalerOf(context)),
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 16),

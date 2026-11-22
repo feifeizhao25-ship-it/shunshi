@@ -500,6 +500,12 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
 
   int get _aiMessageCount => _messages.where((m) => m.role == 'ai').length;
 
+  bool get _showQuickChips => QuickQuestionChips.shouldShow(
+        userHasSpoken: _messages.any((m) => m.role == 'user'),
+        screen: MediaQuery.sizeOf(context),
+        textScale: MediaQuery.textScalerOf(context).scale(1),
+      );
+
   // ── 弹窗 ──
 
   void _showUpgradePrompt() {
@@ -1044,10 +1050,11 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
               padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
               child: Text(_chatError!, key: const ValueKey('chat-error'), style: TextStyle(color: Theme.of(context).colorScheme.error)),
             ),
-          QuickQuestionChips(onTap: (q) {
-            _controller.text = q;
-            _sendMessage();
-          }),
+          if (_showQuickChips)
+            QuickQuestionChips(onTap: (q) {
+              _controller.text = q;
+              _sendMessage();
+            }),
           BrowserCompose(
             field: TextField(
               controller: _controller,
@@ -1113,14 +1120,16 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
                 Text('正在听你说', style: TextStyle(fontSize: 13, color: ShunShiColors.textSecondary)),
               ]),
             ),
-          // 快捷提问标签
-          QuickQuestionChips(
-            onTap: (q) {
-              _controller.text = q;
-              _sendMessage();
-            },
-          ),
-          const SizedBox(height: 8),
+          // 快捷提问标签（小屏/大字且已开始聊天时收起，右侧「+」仍可打开话题）
+          if (_showQuickChips) ...[
+            QuickQuestionChips(
+              onTap: (q) {
+                _controller.text = q;
+                _sendMessage();
+              },
+            ),
+            const SizedBox(height: 8),
+          ],
           // 输入行
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
