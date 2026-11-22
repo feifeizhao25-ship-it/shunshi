@@ -17,7 +17,13 @@ import httpx
 
 from app.llm import cost_cap, domestic_gateway as gateway
 from app.llm.guardrail import moderate_text
-from app.safety.config import HEALTH_BOUNDARY_REPLY, HEALTH_REFUSE_PATTERNS
+from app.safety.config import (
+    DIET_GENERAL_NOTE,
+    DIET_GENERAL_SYSTEM,
+    HEALTH_BOUNDARY_REPLY,
+    HEALTH_REFUSE_PATTERNS,
+    is_general_diet_question,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -43,8 +49,20 @@ _REWRITE_SYSTEM = (
 )
 
 
+_DIET_REWRITE_SYSTEM = (
+    "你是顺时的饮食作息助手，不是医生，也不要自称老师。"
+    "把下面的草稿改写成平实的日常饮食建议（清淡、少盐少油、规律三餐、饮品适量这类常识）。"
+    "禁止剂量、克数、疗程、疗效（不要写降血压、降血糖、治疗、预防疾病）、诊断，不推荐中药材、补品或保健品。"
+    "结尾提醒有慢性病、孕期或哺乳期的人具体吃法请咨询医生。"
+    "如果做不到，只回复：仅供作息安排参考，不是医疗诊断或治疗建议。"
+)
+
+
 def classify(text: str) -> str:
     sample = text or ""
+    if is_general_diet_question(sample):
+        # 一般饮食 / 饮品咨询：主人 2026-11-22 批准不再固定拒答，走更谨慎的边界模型并带免责声明。
+        return "diet"
     if any(pattern.search(sample) for pattern in _REFUSE):
         return "refuse"
     if any(pattern.search(sample) for pattern in _BOUNDARY):
@@ -85,6 +103,14 @@ def _output_blocked(text: str) -> bool:
 
     result = safety_guard.check_output(text, {"user_id": "route"})
     return bool(result.flag == "output_violation" or result.should_block)
+
+
+def _with_diet_note(text: str) -> str:
+    """一般饮食回答一律带免责声明和「咨询医生」提醒（模型自己写了也补上固定那句）。"""
+    body = (text or "").rstrip()
+    if DIET_GENERAL_NOTE in body:
+        return body
+    return f"{body}\n\n{DIET_GENERAL_NOTE}"
 
 
 async def _qwen(
@@ -145,12 +171,14 @@ async def answer(
             return HEALTH_BOUNDARY_REPLY
 
         route = classify(user_text)
-        model = "qwen3.5-plus" if route == "boundary" else "deepseek-flash"
+        if route == "diet":
+            messages = [{"role": "system", "content": DIET_GENERAL_SYSTEM}, *messages]
+        model = "qwen3.5-plus" if route in ("boundary", "diet") else "deepseek-flash"
         if _over_cap(user_id, model, messages, source):
             logger.info("domestic route cost cap: user=%s model=%s", user_id or "anonymous", model)
             return SAFE_UNAVAILABLE
 
-        if route == "boundary":
+        if route in ("boundary", "diet"):
             override = (source.get("SHUNSHI_QWEN_BOUNDARY_MODEL") or "qwen3.5-plus").strip()
             text = await _qwen(messages, override or "qwen3.5-plus", tier, client, source)
             used = override or "qwen3.5-plus"
@@ -167,12 +195,12 @@ async def answer(
             cost_cap.record("product", cost_cap.guardrail_cost_cny(1, source))
         blocked = _output_blocked(text) or outbound.hit
         if not blocked:
-            return text
+            return _with_diet_note(text) if route == "diet" else text
 
         review_model = (source.get("SHUNSHI_QWEN_REVIEW_MODEL") or "qwen3.5-plus").strip() or "qwen3.5-plus"
         rewritten = await _qwen(
             [
-                {"role": "system", "content": _REWRITE_SYSTEM},
+                {"role": "system", "content": _DIET_REWRITE_SYSTEM if route == "diet" else _REWRITE_SYSTEM},
                 {"role": "user", "content": text[:2000]},
             ],
             review_model,
@@ -184,7 +212,7 @@ async def answer(
             again = await moderate_text(rewritten, client=client, env=source)
             if not again.hit:
                 _charge(user_id, review_model, messages, rewritten, source)
-                return rewritten
+                return _with_diet_note(rewritten) if route == "diet" else rewritten
         return HEALTH_BOUNDARY_REPLY
     finally:
         if owns:

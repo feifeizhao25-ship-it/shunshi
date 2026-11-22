@@ -27,6 +27,7 @@ from app.safety.config import (
     CRISIS_HOTLINE_NAME,
     HEALTH_BOUNDARY_REPLY,
     SAFETY_CONFIG,
+    is_general_diet_question,
 )
 from app.safety.rules import (
     get_rules,
@@ -39,6 +40,9 @@ from app.safety.rules import (
 from app.safety.audit import SafetyAuditLog
 
 logger = logging.getLogger(__name__)
+
+# 一般饮食问题可以跳过的规则：只有这两条（固定拒答正则、「血压偏高」类正则）。危机、剂量、关键词规则不跳过。
+_DIET_RELAXED_RULES = frozenset({"health_boundary_refuse", "medical_block_patterns"})
 
 
 class SafetyLevel(str, Enum):
@@ -185,6 +189,9 @@ class SafetyGuard:
                 continue
 
             matched = rule.match(message)
+            if matched and rule.name in _DIET_RELAXED_RULES and is_general_diet_question(message):
+                # 一般饮食 / 饮品咨询不再走固定拒答（主人 2026-11-22 批准；见 config.DIET_GENERAL_PATTERNS）
+                matched = None
             if matched:
                 triggered_rules.append(rule.name)
                 matched_contents.append(matched)
