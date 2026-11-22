@@ -88,7 +88,16 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
   }
 
   void _nextStep() {
-    if (!_canProceed) return;
+    if (!_canProceed) {
+      // 以前这里静默 return，用户点「完成」没有任何反应（问题 6）。
+      final hint = profileSetupMissingHint(_currentStep);
+      if (hint != null) {
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(SnackBar(content: Text(hint)));
+      }
+      return;
+    }
     if (_currentStep < 3) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 300),
@@ -614,5 +623,19 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
         ],
       ),
     );
+  }
+}
+
+/// 引导某一步还没填完时，点「下一步 / 完成」给的提示。
+String? profileSetupMissingHint(int step) {
+  switch (step) {
+    case 0:
+      return '先填一个昵称，再点下一步';
+    case 1:
+      return '先选一下性别，再点下一步';
+    case 3:
+      return '先选一个最接近你的体质标签再点完成。只用于作息安排，不是诊断，拿不准就选感觉最像的一个';
+    default:
+      return null;
   }
 }
