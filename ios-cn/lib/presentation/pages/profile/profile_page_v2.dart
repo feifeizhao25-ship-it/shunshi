@@ -31,6 +31,7 @@ import '../../../data/network/progress_api.dart';
 import '../../../data/storage/storage_manager.dart';
 import '../../../design_system/app_colors.dart';
 import '../../account/account_surface.dart';
+import '../../widgets/status_bar_area.dart';
 
 class ProfilePageV2 extends StatefulWidget {
   const ProfilePageV2({super.key});
@@ -122,7 +123,7 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
 
     return Scaffold(
       backgroundColor: bg,
-      body: CustomScrollView(
+      body: StatusBarArea(child: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
           // Header
@@ -389,7 +390,7 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
             ),
           ),
         ],
-      ),
+      )),
     );
   }
 

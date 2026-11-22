@@ -8,6 +8,7 @@ import '../../../core/solar_term/solar_term_table.dart';
 import '../../../design_system/theme.dart';
 import '../../../design_system/app_colors.dart';
 import '../library/shunshi_reference_library.dart';
+import '../../widgets/status_bar_area.dart';
 
 class WellnessHomePage extends StatelessWidget {
   const WellnessHomePage({super.key});
@@ -22,7 +23,7 @@ class WellnessHomePage extends StatelessWidget {
     final field = isDark ? ShunShiColors.darkSurfaceContainerLow : AppColors.surfaceContainerLow(context);
     return Scaffold(
       backgroundColor: background,
-      body: SingleChildScrollView(
+      body: StatusBarArea(child: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: Column(
           children: [
@@ -176,7 +177,7 @@ class WellnessHomePage extends StatelessWidget {
             ),
           ],
         ),
-      ),
+      )),
     );
   }
 
