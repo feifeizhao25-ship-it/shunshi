@@ -31,7 +31,22 @@ class PersonalHomeBinding {
         dismiss: (cardId) async {
           await ApiClient().post('/api/v1/seasons/home/not-recommend', data: {'card_id': cardId});
         },
+        complete: complete,
       );
+
+  /// 首页「做完了」：写行为记录（首页连续天数 / 一周打卡条读它），后端同时记今天的打卡（和日记同一套进度）。
+  static Future<void> complete(PersonalHomeCard card) async {
+    await ApiClient().post(
+      '/api/v1/personalization/action/complete',
+      data: {
+        'action_type': card.kind.isNotEmpty ? card.kind : card.id,
+        'completed': true,
+        'skill_name': card.id,
+        'duration_seconds': (card.minutes ?? 0) * 60,
+      },
+      headers: testClockHeaders(),
+    );
+  }
 
   static Future<bool> loadEnabled() async {
     final res = await ApiClient().get('/api/v1/seasons/profile/preferences');

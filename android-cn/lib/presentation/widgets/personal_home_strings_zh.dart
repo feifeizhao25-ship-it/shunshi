@@ -38,6 +38,8 @@ const PersonalHomeStrings kPersonalHomeStringsZh = PersonalHomeStrings(
   weekNone: _weekNone,
   recallDismiss: '知道了',
   recallLabel: '欢迎回来',
+  markDone: '做完了',
+  markedDone: '记下了，今天算打卡',
 );
 
 /// 首页个性化区块里写死的句子，含带数字的那几条模板。
@@ -70,6 +72,8 @@ List<String> visiblePersonalHomeStaticCopy() {
     s.weekdays,
     s.recallDismiss,
     s.recallLabel,
+    s.markDone,
+    s.markedDone,
     s.minutes(10),
     s.days(3),
     s.weekDone('03-01'),
