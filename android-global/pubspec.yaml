@@ -116,6 +116,18 @@ flutter:
     - family: Manrope
       fonts:
         - asset: assets/fonts/Manrope-Variable.ttf
+    # Flutter's default text font. Bundled so the web build never fetches it from
+    # fontFallbackBaseUrl (Roboto was not shipped there; that 404 left all
+    # default-font text blank on web). Apache-2.0, googlefonts/roboto v2.138, see LICENSE-Roboto.txt.
+    - family: Roboto
+      fonts:
+        - asset: assets/fonts/Roboto-Light.ttf
+          weight: 300
+        - asset: assets/fonts/Roboto-Regular.ttf
+        - asset: assets/fonts/Roboto-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Roboto-Bold.ttf
+          weight: 700
     - family: NotoSansCJK
       fonts:
         - asset: assets/fonts/NotoSansCJKsc-Regular.otf
