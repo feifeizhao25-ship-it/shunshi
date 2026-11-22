@@ -350,3 +350,13 @@ def test_api_global_market_header_alone_is_enough_for_english_home(client, monke
         data = client.get("/api/v1/seasons/home/dashboard?tz=America/New_York", headers={**extra, **h}).json()
         assert not CJK.search(str(data)), (extra, data)
         assert data["greeting"] and data["personalization"]["note"]
+
+
+def test_library_copy_has_no_garbled_phrases_1122():
+    """2026-11-21 UI test: the home hero read 「周末起床时间和工作日相差别超过一小时」 (garbled; it means the opposite)."""
+    from app.services.personal_home import LIBRARY
+
+    card = next(c for c in LIBRARY if c["id"] == "sleep_weekend")
+    assert card["zh"] == "周末起床时间和工作日相差不超过一小时"
+    for c in LIBRARY:
+        assert "相差别" not in c["zh"] and "别超过" not in c["zh"], c["id"]

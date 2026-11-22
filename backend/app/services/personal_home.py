@@ -42,7 +42,7 @@ LIBRARY = [
     _c("sleep_earlier", "sleep", "今晚比平时早 20 分钟上床，睡前一小时把灯光调暗", "Go to bed 20 minutes earlier tonight and dim the lights an hour before.", ["sleep"], ["evening", "night"]),
     _c("sleep_screen", "sleep", "睡前 30 分钟放下手机，换成纸质书或轻音乐", "Put the phone down 30 minutes before bed; try a paper book or quiet music.", ["sleep"], ["evening", "night"]),
     _c("sleep_feet", "sleep", "睡前用温水泡脚 10 分钟，水温以舒适为准", "A warm foot soak for ten minutes before bed, at a comfortable temperature.", ["sleep"], ["evening", "night"], ["autumn", "winter"], cons=["阳虚", "气虚"]),
-    _c("sleep_weekend", "sleep", "周末起床时间和工作日相差别超过一小时", "Keep weekend wake-up within an hour of your weekday time.", ["sleep"], ["morning", "evening"], day="weekend"),
+    _c("sleep_weekend", "sleep", "周末起床时间和工作日相差不超过一小时", "Keep weekend wake-up within an hour of your weekday time.", ["sleep"], ["morning", "evening"], day="weekend"),
     _c("sleep_caffeine", "sleep", "下午不再喝咖啡和浓茶，晚上更容易入睡", "No coffee or strong tea after lunch; evenings go easier.", ["sleep"], ["midday", "afternoon"]),
     _c("sleep_dry", "sleep", "晚上少吃辛辣和夜宵，睡前喝杯温水", "Skip spicy food and late snacks tonight; a glass of warm water before bed.", ["sleep", "food"], ["evening", "night"], cons=["阴虚", "湿热"]),
     # breathing / calm
