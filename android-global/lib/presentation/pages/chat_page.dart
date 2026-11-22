@@ -300,7 +300,9 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
       var reply = aiText;
       final c = cards ?? [SuggestionCard(type: 'insight', title: AppLocalizations.of(context).t('chatpagedart_solar_term_care_tips'), subtitle: AppLocalizations.of(context).t('chatpagedart_follow_natural_rhythms_harmonize_body_and_min'))];
       if (hasRisk) reply = '⚠️ The following suggestions are for reference only and do not replace medical diagnosis. Please see a doctor if you feel unwell.\n\n$reply';
-      reply = '$reply\n\n💡 The above is based on TCM wellness principles, for reference only';
+      // No "based on TCM wellness principles" line under every reply: the international answers come from
+      // CDC / WHO / NHS notes or general wellness guidance, not TCM, and the line was also stamped under refusals and
+      // under "Sorry, unable to respond right now." The fixed AI notice under the chat stays as it is.
       if (convId != null) _conversationId = convId;
       setState(() {
         _messages.add(ChatMessage(role: 'ai', text: reply, cards: c, sources: sources ?? [], sourceDetails: sourceDetails, time: _fmt(DateTime.now())));

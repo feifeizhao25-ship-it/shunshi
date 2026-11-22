@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../core/network/api_singleton.dart';
+import '../../../data/network/session.dart';
 import '../../../core/theme/seasons_colors.dart';
 import '../../../core/theme/seasons_text_styles.dart';
 import '../../../core/theme/seasons_spacing.dart';
@@ -62,6 +64,10 @@ class _SplashPageState extends State<SplashPage>
       final onboardingCompleted =
           prefs.getBool('onboarding_completed') ?? false;
       if (onboardingCompleted) {
+        // A visitor who finished onboarding earlier but has no session any more (cleared storage, expired guest)
+        // gets one before Today loads, instead of a page of 401s.
+        await ensureSessionToken(apiClient.dio);
+        if (!mounted) return;
         context.go('/home');
       } else {
         context.go('/onboarding');
