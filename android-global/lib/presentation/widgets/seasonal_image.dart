@@ -23,7 +23,8 @@ class SeasonalImage extends StatelessWidget {
       ),
       child: Center(
         child: Text(term, style: const TextStyle(
-          fontFamily: 'serif',
+          fontFamily: ShunShiTypography.serifFamily,
+          fontFamilyFallback: ShunShiTypography.fontFallback,
           fontSize: 28,
           fontWeight: FontWeight.bold,
           color: Colors.white70,
