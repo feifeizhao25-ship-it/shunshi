@@ -187,8 +187,12 @@ class ThemeNotifier extends ChangeNotifier {
 class ShunShiTypography {
   // ── 标题字体：Noto Serif SC（"Voice of Wisdom"）──
   static const String serifFamily = 'NotoSerifSC';
-  // ── 正文字体：Noto Sans SC（Notion风格系统字体）──
-  static const String sansFamily = 'NotoSansSC';
+  // ── 正文字体：Noto Sans CJK SC ──
+  // 必须和 pubspec.yaml 里的 family 名一致（NotoSansCJK）。以前写成 'NotoSansSC'，清单里没有这个名字，
+  // 正文全部落到引擎默认字体（2026-11-21 测试）。
+  static const String sansFamily = 'NotoSansCJK';
+  // 主字体缺字时依次用这些已打包的字体（中日韩、拉丁扩展、西里尔、希腊），网页端不必再去下载回退字体。
+  static const List<String> fontFallback = <String>[sansFamily, 'Roboto'];
   
   // Display 级 — 季节问候、大标题
   static const TextStyle displayLarge = TextStyle(
@@ -198,6 +202,7 @@ class ShunShiTypography {
     height: 1.1,
     letterSpacing: -0.5,
     fontFamily: serifFamily,
+    fontFamilyFallback: fontFallback,
   );
   
   static const TextStyle displayMedium = TextStyle(
@@ -207,6 +212,7 @@ class ShunShiTypography {
     height: 1.15,
     letterSpacing: -0.3,
     fontFamily: serifFamily,
+    fontFamilyFallback: fontFallback,
   );
   
   // Headline 级 — 页面标题
@@ -217,6 +223,7 @@ class ShunShiTypography {
     height: 1.2,
     letterSpacing: -0.5,
     fontFamily: serifFamily,
+    fontFamilyFallback: fontFallback,
   );
   
   static const TextStyle headlineMedium = TextStyle(
@@ -226,6 +233,7 @@ class ShunShiTypography {
     height: 1.25,
     letterSpacing: -0.3,
     fontFamily: serifFamily,
+    fontFamilyFallback: fontFallback,
   );
   
   static const TextStyle headlineSmall = TextStyle(
@@ -234,6 +242,7 @@ class ShunShiTypography {
     color: ShunShiColors.textPrimary,
     height: 1.3,
     fontFamily: serifFamily,
+    fontFamilyFallback: fontFallback,
   );
   
   // Title 级
@@ -243,6 +252,7 @@ class ShunShiTypography {
     color: ShunShiColors.textPrimary,
     height: 1.4,
     fontFamily: sansFamily,
+    fontFamilyFallback: fontFallback,
   );
   
   static const TextStyle titleMedium = TextStyle(
@@ -251,6 +261,7 @@ class ShunShiTypography {
     color: ShunShiColors.textPrimary,
     height: 1.4,
     fontFamily: sansFamily,
+    fontFamilyFallback: fontFallback,
   );
   
   // Body 级 — 正文
@@ -260,6 +271,7 @@ class ShunShiTypography {
     color: ShunShiColors.textPrimary,
     height: 1.6,
     fontFamily: sansFamily,
+    fontFamilyFallback: fontFallback,
   );
   
   static const TextStyle bodyMedium = TextStyle(
@@ -268,6 +280,7 @@ class ShunShiTypography {
     color: ShunShiColors.textPrimary,
     height: 1.6,
     fontFamily: sansFamily,
+    fontFamilyFallback: fontFallback,
   );
   
   static const TextStyle bodySmall = TextStyle(
@@ -276,6 +289,7 @@ class ShunShiTypography {
     color: ShunShiColors.textSecondary,
     height: 1.5,
     fontFamily: sansFamily,
+    fontFamilyFallback: fontFallback,
   );
   
   // Label 级 — 高端印刷感，letter-spacing 加大
@@ -286,6 +300,7 @@ class ShunShiTypography {
     height: 1.4,
     letterSpacing: 0.5,
     fontFamily: sansFamily,
+    fontFamilyFallback: fontFallback,
   );
   
   static const TextStyle labelMedium = TextStyle(
@@ -295,6 +310,7 @@ class ShunShiTypography {
     height: 1.4,
     letterSpacing: 0.5,
     fontFamily: sansFamily,
+    fontFamilyFallback: fontFallback,
   );
   
   static const TextStyle caption = TextStyle(
@@ -304,6 +320,7 @@ class ShunShiTypography {
     height: 1.4,
     letterSpacing: 0.3,
     fontFamily: sansFamily,
+    fontFamilyFallback: fontFallback,
   );
   
   // Serif 辅助 — 用于卡片内标题
@@ -313,6 +330,7 @@ class ShunShiTypography {
     color: ShunShiColors.textPrimary,
     height: 1.3,
     fontFamily: serifFamily,
+    fontFamilyFallback: fontFallback,
   );
   
   static const TextStyle serifBody = TextStyle(
@@ -321,6 +339,7 @@ class ShunShiTypography {
     color: ShunShiColors.textSecondary,
     height: 1.7,
     fontFamily: serifFamily,
+    fontFamilyFallback: fontFallback,
   );
 }
 
@@ -406,6 +425,8 @@ class ShunShiTheme {
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
+      // 没指定样式的文字仍用默认字体 Roboto，缺字时落到已打包的 Noto Sans CJK。
+      fontFamilyFallback: ShunShiTypography.fontFallback,
       brightness: Brightness.light,
       colorScheme: ColorScheme.light(
         primary: ShunShiColors.primary,
@@ -527,6 +548,8 @@ class ShunShiTheme {
   static ThemeData get darkTheme {
     return ThemeData(
       useMaterial3: true,
+      // 没指定样式的文字仍用默认字体 Roboto，缺字时落到已打包的 Noto Sans CJK。
+      fontFamilyFallback: ShunShiTypography.fontFallback,
       brightness: Brightness.dark,
       colorScheme: ColorScheme.dark(
         primary: ShunShiColors.darkPrimary,
