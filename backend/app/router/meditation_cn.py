@@ -13,7 +13,7 @@ from __future__ import annotations
 import json
 import os
 import re
-from datetime import datetime, timedelta, timezone
+from datetime import date
 from functools import lru_cache
 from pathlib import Path
 from typing import Optional
@@ -23,6 +23,8 @@ from ..locale_context import RequestLocale, request_locale
 
 from ..aigc import AI_HEADERS
 from ..safety.config import CRISIS_HOTLINE
+from ..services.home_recommend import season_on
+from ..utils import solar_term_calendar
 
 router = APIRouter(prefix="/api/v1/meditation", tags=["meditation-cn"])
 
@@ -56,10 +58,10 @@ def _audio_url(track_id: str) -> str:
     return f"{base}/{track_id}.mp3" if base else f"{AUDIO_URL_PREFIX}{track_id}.mp3"
 
 
-def _current_season() -> str:
-    month = datetime.now(timezone(timedelta(hours=8))).month
-    return {3: "spring", 4: "spring", 5: "spring", 6: "summer", 7: "summer", 8: "summer",
-            9: "autumn", 10: "autumn", 11: "autumn"}.get(month, "winter")
+def _current_season(day: date | None = None) -> str:
+    """国内季节跟节气表走（立冬起算冬），和首页、今日推荐用同一张表；不按公历月份桶
+    （按月份算，11 月 7 日立冬以后还会把「霜降：收敛」标成当季推荐）。"""
+    return season_on(day or solar_term_calendar.beijing_today())
 
 
 def _available(track: dict) -> bool:
