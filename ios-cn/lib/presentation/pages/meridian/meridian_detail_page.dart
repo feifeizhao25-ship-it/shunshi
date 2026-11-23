@@ -23,6 +23,11 @@ class _MeridianDetailPageState extends State<MeridianDetailPage> {
   @override
   void initState() {
     super.initState();
+    // 首页「心经按揉指南」等入口不带经络 id；以前照样去请求，页面只剩两个空标题（问题 23）。
+    if (widget.meridianId.isEmpty) {
+      _loading = false;
+      return;
+    }
     _loadData();
   }
 
@@ -50,7 +55,7 @@ class _MeridianDetailPageState extends State<MeridianDetailPage> {
         title: Text(_data?['title'] ?? '经络详情',
           style: TextStyle(fontFamily: ShunShiTypography.serifFamily, fontSize: 18, fontWeight: FontWeight.w600)),
       ),
-      body: StateView<Map<String, dynamic>>(
+      body: widget.meridianId.isEmpty ? const MeridianPickHint() : StateView<Map<String, dynamic>>(
         loading: _loading,
         error: !_loading && _data == null ? '内容加载失败' : null,
         data: _data,
@@ -190,5 +195,33 @@ class _MeridianDetailPageState extends State<MeridianDetailPage> {
         ]),
       );
     }).toList());
+  }
+}
+
+/// 没有指定经络时的空状态：说清楚怎么看到内容，并给一个去列表的入口。
+class MeridianPickHint extends StatelessWidget {
+  const MeridianPickHint({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 32),
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          Icon(Icons.spa_outlined, size: 48, color: theme.colorScheme.primary),
+          const SizedBox(height: 16),
+          Text('还没有选具体的经络', style: theme.textTheme.titleMedium),
+          const SizedBox(height: 8),
+          Text('去穴位按揉列表里选一条，就能看到经络概述和按揉步骤。',
+              textAlign: TextAlign.center, style: theme.textTheme.bodyMedium),
+          const SizedBox(height: 20),
+          FilledButton(
+            onPressed: () => context.push('/wellness-category/acupressure'),
+            child: const Text('去看穴位按揉列表'),
+          ),
+        ]),
+      ),
+    );
   }
 }
