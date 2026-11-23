@@ -24,6 +24,13 @@ from app.safety.config import (
     HEALTH_REFUSE_PATTERNS,
     is_general_diet_question,
 )
+from app.safety.pregnancy_drink import (
+    is_pregnancy_drink_question,
+    pregnancy_dose_or_symptom_kind,
+    pregnancy_dose_symptom_reply,
+    pregnancy_drink_reply,
+)
+from app.safety.scope import off_topic_kind, off_topic_reply
 
 logger = logging.getLogger(__name__)
 
@@ -60,6 +67,12 @@ _DIET_REWRITE_SYSTEM = (
 
 def classify(text: str) -> str:
     sample = text or ""
+    if off_topic_kind(sample):
+        # 写代码、投资理财这类明显不在养生范围的请求：不调模型，礼貌引回（2026-11-23 真模型复测发现会直接写代码）。
+        return "off_topic"
+    if pregnancy_dose_or_symptom_kind(sample):
+        # 孕期 / 哺乳期的用量、症状类问题：不调模型，固定建议就医（主人 2026-11-23 定，待定57）。
+        return "refuse"
     if is_general_diet_question(sample):
         # 一般饮食 / 饮品咨询：主人 2026-11-22 批准不再固定拒答，走更谨慎的边界模型并带免责声明。
         return "diet"
@@ -105,12 +118,34 @@ def _output_blocked(text: str) -> bool:
     return bool(result.flag == "output_violation" or result.should_block)
 
 
+_ROUTINE_DISCLAIMER = "仅供作息安排参考，不是医疗诊断或治疗建议。"
+# 模型按系统提示自己写的「咨询医生」尾句；饮食固定尾注已经包含同样的意思。
+_MODEL_DIET_TAIL = re.compile(r"有慢性病、?(正在)?孕期或哺乳期的(人)?，?具体(吃法|饮食)请咨询医生(或注册营养师)?[。.]?")
+
+
+def _tidy_paragraphs(text: str) -> str:
+    text = re.sub(r"[ \t]+\n", "\n", text)
+    text = re.sub(r"\n{3,}", "\n\n", text)
+    return text.strip()
+
+
 def _with_diet_note(text: str) -> str:
-    """一般饮食回答一律带免责声明和「咨询医生」提醒（模型自己写了也补上固定那句）。"""
-    body = (text or "").rstrip()
-    if DIET_GENERAL_NOTE in body:
-        return body
-    return f"{body}\n\n{DIET_GENERAL_NOTE}"
+    """一般饮食回答只留一段尾注：去掉模型自己写的「仅供作息安排参考…」和「有慢性病…请咨询医生」，
+    再补固定的饮食尾注（它已包含「不是医疗诊断」和「咨询医生」）。
+    2026-11-23 真模型复测：茶饮回答末尾三段免责重复。"""
+    body = (text or "").replace(DIET_GENERAL_NOTE, "")
+    body = body.replace(_ROUTINE_DISCLAIMER, "")
+    body = _MODEL_DIET_TAIL.sub("", body)
+    body = _tidy_paragraphs(body)
+    return f"{body}\n\n{DIET_GENERAL_NOTE}" if body else DIET_GENERAL_NOTE
+
+
+def _dedupe_disclaimer(text: str) -> str:
+    """作息回答里「仅供作息安排参考…」出现多次时只留最后一处。"""
+    if (text or "").count(_ROUTINE_DISCLAIMER) <= 1:
+        return text
+    head, _, tail = text.rpartition(_ROUTINE_DISCLAIMER)
+    return _tidy_paragraphs(head.replace(_ROUTINE_DISCLAIMER, "") + _ROUTINE_DISCLAIMER + tail)
 
 
 async def _qwen(
@@ -157,7 +192,14 @@ async def answer(
 
     warn_if_present(source)
     user_text = _last_user_text(messages)
-    if classify(user_text) == "refuse":
+    first = classify(user_text)
+    if first == "off_topic":
+        return off_topic_reply(off_topic_kind(user_text) or "")
+    if first == "refuse":
+        if pregnancy_dose_or_symptom_kind(user_text):
+            return pregnancy_dose_symptom_reply(user_text)
+        if is_pregnancy_drink_question(user_text):
+            return pregnancy_drink_reply(user_text)
         return HEALTH_BOUNDARY_REPLY
 
     owns = client is None
@@ -195,7 +237,7 @@ async def answer(
             cost_cap.record("product", cost_cap.guardrail_cost_cny(1, source))
         blocked = _output_blocked(text) or outbound.hit
         if not blocked:
-            return _with_diet_note(text) if route == "diet" else text
+            return _with_diet_note(text) if route == "diet" else _dedupe_disclaimer(text)
 
         review_model = (source.get("SHUNSHI_QWEN_REVIEW_MODEL") or "qwen3.5-plus").strip() or "qwen3.5-plus"
         rewritten = await _qwen(

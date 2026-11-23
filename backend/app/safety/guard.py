@@ -29,6 +29,12 @@ from app.safety.config import (
     SAFETY_CONFIG,
     is_general_diet_question,
 )
+from app.safety.pregnancy_drink import (
+    is_pregnancy_drink_question,
+    pregnancy_dose_or_symptom_kind,
+    pregnancy_dose_symptom_reply,
+    pregnancy_drink_reply,
+)
 from app.safety.rules import (
     get_rules,
     reload_rules,
@@ -244,6 +250,11 @@ class SafetyGuard:
             result.flag = "medical_boundary" if any("medical" in r for r in triggered_rules) else "blocked"
             result.override_response = response_template or "抱歉，这个问题超出了我的能力范围。建议咨询专业医生。"
             result.log_reason = f"Blocked: {', '.join(matched_contents)}"
+            if set(triggered_rules) <= _DIET_RELAXED_RULES and is_pregnancy_drink_question(message):
+                # 孕期 / 哺乳期问茶饮：不再一律「不能回答症状、用药或剂量问题」，换成谨慎可执行的建议
+                # （不下能否饮用的结论、不调模型；见 safety/pregnancy_drink.py）。
+                result.flag = "pregnancy_drink_caution"
+                result.override_response = pregnancy_drink_reply(message)
 
             if self._config.get("log_all_checks"):
                 self._audit.log(
@@ -311,6 +322,20 @@ class SafetyGuard:
                     model_used=None,
                     latency_ms=elapsed_ms,
                 )
+
+        if result.level != SafetyLevel.CRISIS and pregnancy_dose_or_symptom_kind(message):
+            # 孕期 / 哺乳期的用量、症状类问题：拦下并建议就医（主人 2026-11-23 定，待定57）。
+            # 原先「孕期菊花茶一天喝几杯」「孕期喝菊花茶肚子疼怎么办」不命中任何规则，直接进模型。
+            result.level = SafetyLevel.NORMAL
+            result.should_block = True
+            result.flag = "pregnancy_dose_symptom"
+            result.prefix = None
+            result.override_response = pregnancy_dose_symptom_reply(message)
+            result.log_reason = "Blocked: pregnancy dose/symptom"
+            logger.info(
+                "[SafetyGuard] Pregnancy dose/symptom blocked: user=%s, rules=%s",
+                user_context.get("user_id", "?"), triggered_rules,
+            )
 
         return result
 
