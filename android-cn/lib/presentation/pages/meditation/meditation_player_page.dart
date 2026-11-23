@@ -100,11 +100,7 @@ class _MeditationPlayerPageState extends State<MeditationPlayerPage> {
     super.dispose();
   }
 
-  String _fmt(Duration d) {
-    final m = d.inMinutes.remainder(60).toString().padLeft(2, '0');
-    final s = d.inSeconds.remainder(60).toString().padLeft(2, '0');
-    return '$m:$s';
-  }
+  String _fmt(Duration d) => formatPlayerClock(d);
 
   Future<void> _seekBy(int seconds) async {
     final total = _player.duration ?? Duration.zero;
@@ -266,4 +262,13 @@ class _MeditationPlayerPageState extends State<MeditationPlayerPage> {
       ]),
     ]);
   }
+}
+
+/// 播放器上的 mm:ss。按四舍五入到整秒，和冥想列表里「2 分 46 秒」
+/// （目录登记的整秒时长）对得上；不再把 165.6 秒截成 02:45。
+String formatPlayerClock(Duration d) {
+  final total = (d.inMilliseconds / 1000).round();
+  final m = (total ~/ 60).toString().padLeft(2, '0');
+  final s = (total % 60).toString().padLeft(2, '0');
+  return '$m:$s';
 }
