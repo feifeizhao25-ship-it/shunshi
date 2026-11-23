@@ -1,5 +1,11 @@
 import 'package:speech_to_text/speech_to_text.dart';
 
+/// 录音已经开始以后才知道失败（浏览器拒绝麦克风权限是异步报的）时，通知界面。
+/// 以前界面会一直显示「正在听」，要等点了停止才说没权限（问题 51）。
+abstract class LateVoiceFailure {
+  void Function(String message)? onLateFailure;
+}
+
 /// Browser (and any platform) speech-to-text session.
 /// Used for Flutter web, where the file recorder cannot upload audio.
 class WebSpeechSession {
@@ -23,6 +29,9 @@ class WebSpeechSession {
   String errorMsg = '';
   bool permissionDenied = false;
 
+  /// 拒绝麦克风权限时马上调用（参数是 [permissionMessage]）。
+  void Function(String message)? onDenied;
+
   Future<bool> start() async {
     _transcript = '';
     errorMsg = '';
@@ -34,6 +43,7 @@ class WebSpeechSession {
           if (code.contains('not-allowed') || code.contains('permission')) {
             permissionDenied = true;
             errorMsg = permissionMessage;
+            onDenied?.call(permissionMessage);
           } else if (errorMsg.isEmpty) {
             errorMsg = missedMessage;
           }
@@ -54,6 +64,8 @@ class WebSpeechSession {
           listenMode: ListenMode.dictation,
         ),
       );
+      // 权限在 listen 过程中就被拒了：不要报「开始了」。
+      if (permissionDenied) return false;
       return true;
     } catch (_) {
       errorMsg = unavailableMessage;

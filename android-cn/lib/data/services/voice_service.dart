@@ -21,10 +21,19 @@ abstract class VoiceInput {
   Future<void> cancel();
 }
 
-class VoiceService implements VoiceInput {
+class VoiceService implements VoiceInput, LateVoiceFailure {
   static final VoiceService _instance = VoiceService._();
   factory VoiceService() => _instance;
-  VoiceService._();
+  VoiceService._() {
+    _web.onDenied = (message) {
+      _isListening = false;
+      _errorMsg = message;
+      onLateFailure?.call(message);
+    };
+  }
+
+  @override
+  void Function(String message)? onLateFailure;
 
   final _recorder = AudioRecorder();
   static String _baseUrl = normalizeApiBaseUrl(AppConfig.apiBaseUrl);
