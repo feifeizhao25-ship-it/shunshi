@@ -92,6 +92,9 @@ def _source_metadata(path: str | Path) -> dict:
     return meta
 
 
+_SECTION_REVIEWED = re.compile(r"顺时复核日期：(\d{4}-\d{2}-\d{2})")
+
+
 def _apply_section_policies(filename: str, chunk: KnowledgeChunk) -> None:
     """按清单把膳食指南等条目改成一般原则，并写上复核截止日。"""
     manifest = json.loads(_SOURCE_MANIFEST_PATH.read_text(encoding="utf-8"))
@@ -108,6 +111,12 @@ def _apply_section_policies(filename: str, chunk: KnowledgeChunk) -> None:
             chunk.metadata["stale"] = date.fromisoformat(until) < date.today()
         except (TypeError, ValueError):
             chunk.metadata["stale"] = True
+    # 来源卡的「复核日期」用这一节正文自己写的「顺时复核日期」，不用整份文件的日期
+    # （verified_cn.md 各节复核时间不同，比如饮水一节是 2026-11-01，文件级是 2026-08-30）。
+    reviewed = _SECTION_REVIEWED.search(chunk.content)
+    if reviewed:
+        chunk.metadata["reviewed_at"] = reviewed.group(1)
+
 
 # 中文知识库标题 → 分类/季节/节气的映射
 _CN_SEASON_MAP = {
