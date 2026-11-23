@@ -88,4 +88,23 @@ void main() {
     expect(heard, ['泡脚']);
     expect(find.text('泡脚'), findsOneWidget);
   });
+
+  testWidgets('朗读失败时首页语音条显示原因（问题 50）', (tester) async {
+    final playback = FakePlayback();
+    await tester.pumpWidget(MaterialApp(
+      home: Scaffold(
+        body: TodayVoiceBar(spokenText: '小雪', playback: playback, chrome: VoiceChrome.browser),
+      ),
+    ));
+    await tester.tap(find.byKey(const ValueKey('today-speaker')));
+    await tester.pump();
+    playback
+      ..isSpeaking = false
+      ..activeKey = null
+      ..errorMsg = '这台设备没有中文朗读语音，暂时读不了。可以在系统设置里添加中文语音后再试。';
+    playback.notifyListeners();
+    await tester.pump();
+    expect(find.text(kTodayVoiceReadLabel), findsOneWidget);
+    expect(find.textContaining('没有中文朗读语音'), findsOneWidget);
+  });
 }

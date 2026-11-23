@@ -51,6 +51,8 @@ class TtsPlayerService extends SpeechPlayback {
     this.language = 'zh-CN',
     this.emptyMessage = '没有可以朗读的文字',
     this.failedMessage = '语音播报暂不可用，请稍后再试',
+    this.noVoiceMessage = '这台设备没有中文朗读语音，暂时读不了。可以在系统设置里添加中文语音后再试。',
+    bool? checkDeviceVoices,
     FlutterTts? tts,
     AudioPlayer? player,
   }) : _dio = dio ??
@@ -59,6 +61,7 @@ class TtsPlayerService extends SpeechPlayback {
               connectTimeout: const Duration(seconds: 10),
               receiveTimeout: const Duration(seconds: 60),
             ))),
+        _checkDeviceVoices = checkDeviceVoices ?? kIsWeb,
         _injectedTts = tts,
         _player = player;
 
@@ -68,6 +71,11 @@ class TtsPlayerService extends SpeechPlayback {
   final String language;
   final String emptyMessage;
   final String failedMessage;
+  final String noVoiceMessage;
+
+  /// 浏览器里没有中文语音时 speechSynthesis 不报错、也不出声（问题 50），
+  /// 所以网页端先查一遍语音列表。手机端照旧：系统语言设置失败时走原来的服务器朗读。
+  final bool _checkDeviceVoices;
   final FlutterTts? _injectedTts;
   AudioPlayer? _player;
   FlutterTts? _tts;
@@ -102,6 +110,16 @@ class TtsPlayerService extends SpeechPlayback {
   }
 
   Future<void> _run(int generation, String spoken) async {
+    if (_checkDeviceVoices && await _hasChineseVoice() == false) {
+      if (generation != _generation) return;
+      // 只提示，不改走服务器朗读（那条路要不要在网页端开、费用怎么算，留给主人定）。
+      isSpeaking = false;
+      activeKey = null;
+      errorMsg = noVoiceMessage;
+      notifyListeners();
+      return;
+    }
+    if (generation != _generation) return;
     var ok = await _speakDevice(generation, spoken);
     if (generation != _generation) return;
     if (!ok) ok = await _speakServer(generation, spoken);
@@ -129,6 +147,30 @@ class TtsPlayerService extends SpeechPlayback {
     } catch (e) {
       debugPrint('[TtsPlayer] device voice failed: $e');
       return false;
+    }
+  }
+
+  /// true：有中文语音；false：确定没有；null：查不到（照旧尝试朗读）。
+  /// 浏览器的语音列表是异步加载的，空列表时稍等再查两次。
+  Future<bool?> _hasChineseVoice() async {
+    try {
+      final tts = _tts ??= _injectedTts ?? FlutterTts();
+      for (var attempt = 0; attempt < 3; attempt++) {
+        final voices = await tts.getVoices;
+        if (voices is! List) return null;
+        if (voices.isNotEmpty) {
+          return voices.any((v) {
+            if (v is! Map) return false;
+            final locale = (v['locale'] ?? v['lang'] ?? '').toString().toLowerCase();
+            return locale.startsWith('zh') || locale.startsWith('cmn');
+          });
+        }
+        if (attempt < 2) await Future<void>.delayed(const Duration(milliseconds: 400));
+      }
+      return false;
+    } catch (e) {
+      debugPrint('[TtsPlayer] voice list unavailable: $e');
+      return null;
     }
   }
 
