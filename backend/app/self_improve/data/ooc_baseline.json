@@ -1,0 +1,8 @@
+{
+  "measured_at": "2026-11-21",
+  "retriever": "app.rag.retriever.retrieve (RAG_HYBRID default, aliases on, include_legacy)",
+  "top_k": 5,
+  "ooc_cited_rate": 0.875,
+  "heldout_ooc_cited_rate": 0.75,
+  "note": "只许变好不许变差；降低需要语义打分，见 ooc_eval.py 文档"
+}
