@@ -7,6 +7,7 @@ import '../../../data/network/api_client.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/solar_term/solar_term_table.dart';
 import '../library/shunshi_reference_library.dart';
+import '../../widgets/status_bar_area.dart';
 
 // ── 卡片数据模型 ──
 class _WellnessCategory {
@@ -159,7 +160,7 @@ class _WellnessHomePageState extends State<WellnessHomePage>
 
     return Scaffold(
       backgroundColor: bg,
-      body: SingleChildScrollView(
+      body: StatusBarArea(child: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: Column(
           children: [
@@ -358,7 +359,7 @@ class _WellnessHomePageState extends State<WellnessHomePage>
             ),
           ],
         ),
-      ),
+      )),
     );
   }
 
