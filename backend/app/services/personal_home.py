@@ -361,7 +361,7 @@ def compose(profile: Profile, activity: Activity, user_key: str, now: datetime, 
         "week": week_strip(activity.completed, day),
         "milestone": milestone(streak, lang),
         "recall": recall(activity, day, lang, lightest),
-        "personalization": {"enabled": True, "used": used, "note": _on_note(lang)},
+        "personalization": {"enabled": True, "used": used, "note": _on_note(lang, used)},
     }
 
 
@@ -447,10 +447,24 @@ def _streak_card(streak: int, activity: Activity, day: date, lang: str) -> dict:
             "text": "今天再做一件小行动就很好" if lang == "zh" else "One more small action today is plenty."}
 
 
-def _on_note(lang: str) -> str:
-    return ("这些建议根据你自己填写的目标、地区和你在应用里的操作生成，只是生活方式提示，不是诊断或治疗建议。可在设置里关闭个性化。"
-            if lang == "zh" else
-            "These tips use only what you entered and did in the app. They are lifestyle ideas, not medical advice. You can turn personalisation off in settings.")
+# 说明里只列这次真的用到的依据（问题 21：用户没填过地区，说明却写「地区」）。
+_NOTE_BASIS_ZH = (
+    ("goal", "你填写的目标"), ("support", "你希望被提醒的时段"), ("cons", "你自己选的体质倾向"),
+    ("life_stage", "你填写的人生阶段"), ("activity", "你在应用里的操作"), ("reinforce", "你在应用里的操作"), ("region", "你所在的地区"),
+    ("solar_term", "节气"), ("season", "季节"), ("time", "当前时段"), ("day", "日期"),
+)
+
+
+def _on_note(lang: str, used=()) -> str:
+    if lang != "zh":
+        return "These tips use only what you entered and did in the app. They are lifestyle ideas, not medical advice. You can turn personalisation off in settings."
+    used = set(used or ())
+    bits = []
+    for key, label in _NOTE_BASIS_ZH:
+        if key in used and label not in bits:
+            bits.append(label)
+    basis = "、".join(bits) if bits else "日期和节气"
+    return f"这些建议参考了{basis}，只是生活方式提示，不是诊断或治疗建议。可在设置里关闭个性化。"
 
 
 def _off_note(lang: str) -> str:
