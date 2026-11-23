@@ -186,6 +186,9 @@ def complete_action(
     log = log[-ACTION_LOG_LIMIT:]
     session.merge(UserSetting(user_id=user_id, key=ACTION_LOG_KEY, value=json.dumps(log, ensure_ascii=False)))
     session.commit()
+    # 和日记同一套进度：今天做完一件小事也算今天打卡（同一天只记一次、只发一次积分），
+    # 「我的」「记录」「成就」页的养生天数 / 连续天数因此和首页一致。失败不影响行为记录本身。
+    checkin = _award_checkin(user_id) if body.completed else None
     return {
         "success": True,
         "data": {
@@ -193,8 +196,25 @@ def complete_action(
             "action_type": body.action_type,
             "completed": body.completed,
             "total_recorded": len(log),
+            "checkin": checkin,
         },
     }
+
+
+def _award_checkin(user_id: str):
+    try:
+        from ..db.database import session_factory
+        from .gamification import award_checkin
+    except Exception:
+        return None
+    db = session_factory()
+    try:
+        return award_checkin(db, user_id)
+    except Exception:
+        db.rollback()
+        return None
+    finally:
+        db.close()
 
 
 @router.get("/anomaly-alert")

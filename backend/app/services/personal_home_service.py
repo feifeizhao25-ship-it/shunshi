@@ -155,6 +155,29 @@ def load_profile(session: Session, user_id: str, *, lang: str, is_global: bool, 
     )
 
 
+def progress_days(user_id: str) -> set:
+    """「记录」「成就」页那套进度（gamification）里，这个用户打过卡或写过日记的日子。
+
+    首页的连续天数 / 一周打卡条以前只看 /personalization/action/complete 的行为记录，写了日记首页仍是 0 天，
+    「我的」页却显示养生天数 1——两套进度互相不认。现在首页把这些日子也算作「当天做过一件小事」。
+    读不到（表不在、库连不上）时返回空集合，首页照常出，只是少了这部分日子。
+    """
+    try:
+        from ..db.database import session_factory
+        from ..router.gamification import activity_days
+    except Exception:
+        return set()
+    db = session_factory()
+    try:
+        days = activity_days(db, user_id)
+        return set(days.get("checkin") or set()) | set(days.get("journal") or set())
+    except Exception:
+        db.rollback()
+        return set()
+    finally:
+        db.close()
+
+
 def load_activity(session: Session, user_id: str, tz) -> ph.Activity:
     log = _read(session, user_id, home_cards.ACTION_LOG_KEY) or []
     completed = []
@@ -162,6 +185,11 @@ def load_activity(session: Session, user_id: str, tz) -> ph.Activity:
         if item.get("completed") and item.get("at"):
             cat = str(item.get("action_type") or "")
             completed.append((_category(cat), datetime.fromtimestamp(item["at"], tz)))
+    # 打卡 / 日记的日子按当天中午记一条「journal」，只影响连续天数、一周打卡条和里程碑，不会让某类卡片加分。
+    logged = {at.date() for _, at in completed}
+    for d in sorted(progress_days(user_id)):
+        if d not in logged:
+            completed.append(("journal", datetime(d.year, d.month, d.day, 12, tzinfo=tz)))
     seen = []
     for item in _read(session, user_id, SEEN_KEY) or []:
         try:

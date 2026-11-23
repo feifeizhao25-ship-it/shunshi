@@ -25,6 +25,7 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
   bool _loggedIn = false;
   String _userName = '';
   int _checkinDays = 0;
+  bool _serverProgress = false;
   String _constitution = '';
 
   @override
@@ -59,6 +60,9 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
         setState(() {
           _wellnessDays = p.totalCheckinDays;
           _points = p.points;
+          // 「已记下 N 天」取服务端的连续天数 streakDays（日记、首页「做完了」都算），不再读本机的 checkin_days。
+          _checkinDays = p.streakDays;
+          _serverProgress = true;
         });
       }
     } catch (_) {}
@@ -73,7 +77,7 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
       if (mounted) {
         setState(() {
           if (name != null) _userName = name;
-          _checkinDays = days;
+          if (!_serverProgress) _checkinDays = days;
           _constitution = constitution;
         });
       }

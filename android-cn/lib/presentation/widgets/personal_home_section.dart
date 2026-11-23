@@ -46,9 +46,17 @@ class PersonalHomeStrings {
     required this.weekNone,
     required this.recallDismiss,
     required this.recallLabel,
+    this.markDone = '',
+    this.markedDone = '',
   });
 
   final String heading;
+
+  /// 卡片上「做完了」按钮的文字；空串时不显示这个按钮（没接行为记录的版本不受影响）。
+  final String markDone;
+
+  /// 记下后弹出的一句提示。
+  final String markedDone;
   final String why;
   final String notRecommend;
   final String turnOff;
@@ -83,7 +91,7 @@ class PersonalHomeStrings {
 
 /// What the screen needs from the network; the page supplies the real calls, tests supply fakes.
 class PersonalHomeApi {
-  const PersonalHomeApi({required this.load, required this.setEnabled, this.dismiss});
+  const PersonalHomeApi({required this.load, required this.setEnabled, this.dismiss, this.complete});
 
   /// Returns the dashboard JSON exactly as the backend sends it.
   final Future<Map<String, dynamic>> Function() load;
@@ -93,6 +101,9 @@ class PersonalHomeApi {
 
   /// 「不再推荐」这张卡。没接后端时按钮仍会刷新列表。
   final Future<void> Function(String cardId)? dismiss;
+
+  /// 「做完了」：把这张卡记成今天完成的一件小事（顺时：/personalization/action/complete，同时算今天打卡）。
+  final Future<void> Function(PersonalHomeCard card)? complete;
 }
 
 class PersonalHomeCard {
@@ -341,6 +352,24 @@ class _PersonalHomeSectionState extends State<PersonalHomeSection> {
     if (ok == true) await _toggle(false);
   }
 
+  Future<void> _completeCard(PersonalHomeCard card) async {
+    if (_saving) return;
+    setState(() => _saving = true);
+    try {
+      await widget.api.complete!.call(card);
+      if (!mounted) return;
+      setState(() => _saving = false);
+      if (_t.markedDone.isNotEmpty) {
+        ScaffoldMessenger.maybeOf(context)?.showSnackBar(SnackBar(content: Text(_t.markedDone)));
+      }
+      await _load();
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _saving = false);
+      ScaffoldMessenger.maybeOf(context)?.showSnackBar(SnackBar(content: Text(_t.saveFailed)));
+    }
+  }
+
   Future<void> _hideCard(String id) async {
     if (_saving) return;
     setState(() => _saving = true);
@@ -470,6 +499,7 @@ class _PersonalHomeSectionState extends State<PersonalHomeSection> {
             featured: i == 0,
             onTap: widget.onOpen == null || d.cards[i].href == null ? null : () => widget.onOpen!(d.cards[i]),
             onDismiss: d.enabled ? () => _hideCard(d.cards[i].id) : null,
+            onDone: widget.api.complete == null || _t.markDone.isEmpty || _saving ? null : () => _completeCard(d.cards[i]),
           ),
           const SizedBox(height: 8),
         ],
@@ -637,12 +667,13 @@ IconData _iconFor(String kind) {
 }
 
 class _CardTile extends StatelessWidget {
-  const _CardTile({required this.card, required this.strings, required this.featured, this.onTap, this.onDismiss});
+  const _CardTile({required this.card, required this.strings, required this.featured, this.onTap, this.onDismiss, this.onDone});
   final PersonalHomeCard card;
   final PersonalHomeStrings strings;
   final bool featured;
   final VoidCallback? onTap;
   final VoidCallback? onDismiss;
+  final VoidCallback? onDone;
 
   @override
   Widget build(BuildContext context) {
@@ -705,20 +736,28 @@ class _CardTile extends StatelessWidget {
             color: Colors.transparent,
             child: InkWell(borderRadius: BorderRadius.circular(16), onTap: onTap, child: tile),
           );
-    if (onDismiss == null) return body;
+    if (onDismiss == null && onDone == null) return body;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         body,
-        Align(
-          alignment: Alignment.centerLeft,
-          child: TextButton(
-            key: Key('personal-home-not-recommend-${card.id}'),
-            onPressed: onDismiss,
-            style: TextButton.styleFrom(visualDensity: VisualDensity.compact, padding: const EdgeInsets.symmetric(horizontal: 8)),
-            child: Text(strings.notRecommend),
-          ),
-        ),
+        Wrap(spacing: 4, children: [
+          if (onDone != null)
+            TextButton.icon(
+              key: Key('personal-home-done-${card.id}'),
+              onPressed: onDone,
+              icon: const Icon(Icons.check_circle_outline_rounded, size: 18),
+              style: TextButton.styleFrom(visualDensity: VisualDensity.compact, padding: const EdgeInsets.symmetric(horizontal: 8)),
+              label: Text(strings.markDone),
+            ),
+          if (onDismiss != null)
+            TextButton(
+              key: Key('personal-home-not-recommend-${card.id}'),
+              onPressed: onDismiss,
+              style: TextButton.styleFrom(visualDensity: VisualDensity.compact, padding: const EdgeInsets.symmetric(horizontal: 8)),
+              child: Text(strings.notRecommend),
+            ),
+        ]),
       ],
     );
   }
