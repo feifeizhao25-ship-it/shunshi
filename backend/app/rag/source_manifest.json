@@ -47,7 +47,7 @@
       "reviewed_at": "2026-08-30",
       "valid_until": "2026-12-31",
       "principle_only": true,
-      "review_reason": "膳食指南第五次修订已于2026-06启动，新版发布后须复核。"
+      "review_reason": "膳食指南第五次修订已于2025-09启动（2026-06召开修订工作会议），新版发布后须复核。"
     },
     {
       "title": "减油、增豆、加奶核心信息",
@@ -99,7 +99,7 @@
       "title": "《中国居民膳食指南（2022）》平衡膳食八准则（身体活动）",
       "publisher": "中国营养学会",
       "url": "http://dg.cnsoc.org/article/04/J4-AsD_DR3OLQMnHG0-jZA.html",
-      "published_at": "",
+      "published_at": "2022-04-26",
       "reviewed_at": "2026-11-01",
       "valid_until": "2026-12-31",
       "principle_only": true
@@ -160,7 +160,7 @@
         "principle_only": true,
         "medical_efficacy": false,
         "review_by": "2026-12-31",
-        "review_reason": "《中国居民膳食指南》第五次修订已于2026-06启动，新版发布后须复核。"
+        "review_reason": "《中国居民膳食指南》第五次修订已于2025-09启动（2026-06召开修订工作会议），新版发布后须复核。"
       }
     ]
   },
