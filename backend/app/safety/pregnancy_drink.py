@@ -52,8 +52,10 @@ def _listed_names(text: str, stage: str) -> list[str]:
 
     names = list(names_for(frozenset({stage})))
     if stage == "pregnancy":
-        from app.router.maternity import FORBIDDEN_HERBS_DATA
-
+        try:
+            from app.router.maternity import FORBIDDEN_HERBS_DATA
+        except Exception:  # noqa: BLE001 — 路由包导入失败（如未配 JWT_SECRET 的脚本环境）时只用 contraindications 名单
+            FORBIDDEN_HERBS_DATA = []
         names.extend(str(row["name"]) for row in FORBIDDEN_HERBS_DATA if row.get("name"))
     found: list[str] = []
     rest = text
@@ -87,4 +89,62 @@ def pregnancy_drink_reply(text: str) -> str:
     if listed:
         lines.append(f"4. 「{'、'.join(listed)}」在顺时现有的{label}忌口清单里，先不要自己喝。")
     lines += ["", warning, "", DISCLAIMER]
+    return "\n".join(lines)
+
+
+# ── 2026-11-23 主人定（待定57）：孕期 / 哺乳期的用量、症状类问题拦下并建议就医 ──
+# 「孕期菊花茶一天喝几杯」「孕期喝菊花茶肚子疼怎么办」原先被分到 bulk 路由、不经拒答直接进模型。
+# 用量类必须同时出现入口相关的词（喝、吃、茶、水…），避免把「孕期每天睡几个小时」这类作息问题拦掉。
+_DOSE = re.compile(
+    r"几杯|多少杯|几碗|多少碗|几次|多少次|几克|多少克|几毫升|多少毫升|几包|多少包|几勺|多少勺|喝多少|吃多少|"
+    r"用量|剂量|(一天|每天|每日|一次|每次).{0,6}(几|多少)"
+)
+_INTAKE = re.compile(r"喝|吃|茶|饮|咖啡|水|汤|奶|补充|服")
+_SYMPTOM = re.compile(
+    r"疼|痛|恶心|想吐|呕吐|吐了|出血|见红|流血|流液|拉肚子|腹泻|头晕|心慌|心悸|胸闷|过敏|起疹|皮疹|"
+    r"宫缩|肚子发紧|胎动|发烧|发热|不舒服|难受|抽筋|水肿|浮肿|晕倒|呼吸困难"
+)
+
+
+def pregnancy_dose_or_symptom_kind(text: str) -> str | None:
+    """孕期 / 哺乳期问用量（且和吃喝有关）返回 "dose"，提到身体不适返回 "symptom"（优先），否则 None。"""
+    sample = (text or "").strip()
+    if not sample or _stage(sample) is None:
+        return None
+    if _SYMPTOM.search(sample):
+        return "symptom"
+    if _DOSE.search(sample) and _INTAKE.search(sample):
+        return "dose"
+    return None
+
+
+def pregnancy_dose_symptom_reply(text: str) -> str:
+    stage = _stage(text or "") or "pregnancy"
+    kind = pregnancy_dose_or_symptom_kind(text) or "dose"
+    label = "孕期" if stage == "pregnancy" else "哺乳期"
+    doctor = "产检医生" if stage == "pregnancy" else "给你看诊的医生或妇幼保健机构"
+    factors = "孕周、体重、身体情况" if stage == "pregnancy" else "宝宝月龄和你的身体情况"
+    if kind == "symptom":
+        urgent = (
+            "如果腹痛加重、阴道出血或流液、胎动明显减少，或者头晕、呼吸困难，请立即就医或拨打 120。"
+            if stage == "pregnancy"
+            else "如果你或宝宝症状加重，比如持续腹泻、呕吐、起疹或呼吸困难，请立即就医或拨打 120。"
+        )
+        lines = [
+            f"{label}出现身体不适，顺时不能判断原因，也不能给处理办法。",
+            "",
+            "1. 先停下刚才吃或喝的东西，不要再自己尝试别的茶饮、食物或药材。",
+            f"2. 请尽快联系{doctor}或去医院，说清楚吃了 / 喝了什么、多少、什么时候开始不舒服。",
+            "",
+            urgent,
+        ]
+    else:
+        lines = [
+            f"{label}一天能喝多少、吃多少，和{factors}都有关，顺时不能给你具体的量。",
+            "",
+            f"1. 请把想喝 / 想吃的东西和包装配料表拍下来，问问{doctor}，按医生说的量来。",
+            "2. 问清楚之前，日常补水以白开水、温水为主，少量多次。",
+            "3. 喝了或吃了之后有任何不舒服，请及时就医；紧急情况拨打 120。",
+        ]
+    lines += ["", DISCLAIMER]
     return "\n".join(lines)

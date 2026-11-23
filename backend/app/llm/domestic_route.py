@@ -24,7 +24,12 @@ from app.safety.config import (
     HEALTH_REFUSE_PATTERNS,
     is_general_diet_question,
 )
-from app.safety.pregnancy_drink import is_pregnancy_drink_question, pregnancy_drink_reply
+from app.safety.pregnancy_drink import (
+    is_pregnancy_drink_question,
+    pregnancy_dose_or_symptom_kind,
+    pregnancy_dose_symptom_reply,
+    pregnancy_drink_reply,
+)
 from app.safety.scope import off_topic_kind, off_topic_reply
 
 logger = logging.getLogger(__name__)
@@ -65,6 +70,9 @@ def classify(text: str) -> str:
     if off_topic_kind(sample):
         # 写代码、投资理财这类明显不在养生范围的请求：不调模型，礼貌引回（2026-11-23 真模型复测发现会直接写代码）。
         return "off_topic"
+    if pregnancy_dose_or_symptom_kind(sample):
+        # 孕期 / 哺乳期的用量、症状类问题：不调模型，固定建议就医（主人 2026-11-23 定，待定57）。
+        return "refuse"
     if is_general_diet_question(sample):
         # 一般饮食 / 饮品咨询：主人 2026-11-22 批准不再固定拒答，走更谨慎的边界模型并带免责声明。
         return "diet"
@@ -188,6 +196,8 @@ async def answer(
     if first == "off_topic":
         return off_topic_reply(off_topic_kind(user_text) or "")
     if first == "refuse":
+        if pregnancy_dose_or_symptom_kind(user_text):
+            return pregnancy_dose_symptom_reply(user_text)
         if is_pregnancy_drink_question(user_text):
             return pregnancy_drink_reply(user_text)
         return HEALTH_BOUNDARY_REPLY
