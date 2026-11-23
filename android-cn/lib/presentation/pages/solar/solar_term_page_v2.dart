@@ -16,6 +16,21 @@ import '../../../core/loading/loading_state_manager.dart';
 import '../../widgets/cn_back_button.dart';
 
 // ── 季节渐变色配置 ──
+
+/// 头图上日期和「距下一节气 N 天」两个小标签的底色和字色（问题 47）。
+/// 以前倒计时用季节强调色字压在同色系渐变上，对比度不到 2:1；现在白字配半透明黑底，
+/// 四个季节的渐变上都 ≥ 4.5:1（见 test/solar_hero_chip_contrast_test.dart）。
+const Color solarHeroChipScrim = Color(0x73000000); // 黑色 45%
+const Color solarHeroChipText = Colors.white;
+
+/// 四季头图渐变色（与 _SeasonColors 保持一致），只给对比度测试用。
+const List<Color> solarHeroGradientColors = [
+  Color(0xFF2D5A3D), Color(0xFF4A7C59),
+  Color(0xFF8B3A3A), Color(0xFFC05050),
+  Color(0xFF8B6914), Color(0xFFC49B2A),
+  Color(0xFF3A5A7A), Color(0xFF5A8AAF),
+];
+
 class _SeasonColors {
   final List<Color> gradient;
   final Color accent;
@@ -361,20 +376,20 @@ class _SolarTermPageV2State extends State<SolarTermPageV2>
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.15),
+                color: solarHeroChipScrim,
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.calendar_today,
-                      size: 14, color: Colors.white.withValues(alpha: 0.9)),
+                  const Icon(Icons.calendar_today,
+                      size: 14, color: solarHeroChipText),
                   const SizedBox(width: 6),
                   Text(
                     '${_term['date']}',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 13,
-                      color: Colors.white.withValues(alpha: 0.9),
+                      color: solarHeroChipText,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -386,20 +401,20 @@ class _SolarTermPageV2State extends State<SolarTermPageV2>
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: season.accent.withValues(alpha: 0.2),
+                color: solarHeroChipScrim,
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.access_time,
-                      size: 14, color: season.accent),
+                  const Icon(Icons.access_time,
+                      size: 14, color: solarHeroChipText),
                   const SizedBox(width: 6),
                   Text(
                     '距下一节气 ${_term['days_remaining']} 天',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 13,
-                      color: season.accent,
+                      color: solarHeroChipText,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
