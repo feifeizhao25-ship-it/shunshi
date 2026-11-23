@@ -70,8 +70,8 @@ _CHAT_PASSTHROUGH_FIELDS = frozenset({
 class TTSRequest(BaseModel):
     """TTS 请求"""
     text: str = Field(..., min_length=1, max_length=5000, description="要转换的文本")
-    model: str = Field(default="fish-speech-1.5", description="TTS 模型 (fish-speech-1.5, fish-speech-1.4)")
-    voice: str = Field(default="benjamin", description="音色 (benjamin, diana, alex)")
+    model: str = Field(default="fish-speech-1.5", description="TTS 模型：本接口默认 fish-speech-1.5；可选 cosyvoice2、fish-speech-1.5、fish-speech-1.4（各模型音色见 GET /voices）")
+    voice: str = Field(default="benjamin", description="音色，须是所选模型支持的（见 GET /voices）")
     response_format: str = Field(default="mp3", description="输出格式 (mp3, wav, pcm, opus)")
     speed: float = Field(default=1.0, ge=0.5, le=2.0, description="语速 (0.5-2.0)")
 
@@ -104,8 +104,9 @@ async def text_to_speech(request: TTSRequest):
     """
     将文字转换为语音
     
-    支持的模型和音色:
-    - fish-speech-1.5: benjamin (男声), diana (女声), alex (中性)
+    支持的模型和音色（以 GET /api/v1/speech/voices 的返回为准）:
+    - cosyvoice2: alex, benjamin, diana, anna, eric, shuangkuai（双快，童声·活泼）
+    - fish-speech-1.5（本接口默认）: benjamin (男声), diana (女声), alex (中性)
     - fish-speech-1.4: benjamin (男声)
     
     返回音频文件 (mp3/wav 格式)

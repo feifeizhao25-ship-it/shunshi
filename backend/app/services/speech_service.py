@@ -224,7 +224,7 @@ class SpeechService:
         
         Args:
             text: 要转换的文本 (最多 5000 字符)
-            model: TTS 模型 (fish-speech-1.5, fish-speech-1.4)
+            model: TTS 模型（cosyvoice2 为本服务默认；另有 fish-speech-1.5、fish-speech-1.4）
             voice: 音色 (benjamin, diana, alex)
             response_format: 输出格式 (mp3, wav, pcm, opus)
             speed: 语速 (0.5 - 2.0, 默认 1.0)
