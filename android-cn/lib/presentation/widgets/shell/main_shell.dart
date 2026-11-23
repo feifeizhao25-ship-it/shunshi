@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'desktop_shell.dart';
 import '../../../design_system/theme.dart';
+import '../../pages/home/elder_home_text.dart';
 
 /// MainShell — 5 Tab 底部导航
 ///
@@ -76,7 +77,9 @@ class MainShell extends StatelessWidget {
                   padding: const EdgeInsets.only(top: 12, bottom: 4),
                   child: MediaQuery(
                     data: MediaQuery.of(context).copyWith(textScaler: MediaQuery.textScalerOf(context).clamp(maxScaleFactor: 1.3)),
-                    child: Row(
+                    child: ValueListenableBuilder<bool>(
+                    valueListenable: ElderModeState.enabled,
+                    builder: (context, elder, _) => Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: _tabs.asMap().entries.map((entry) {
                       final index = entry.key;
@@ -90,6 +93,7 @@ class MainShell extends StatelessWidget {
                           activeIcon: tab.activeIcon,
                           label: tab.label,
                           isActive: isActive,
+                        elder: elder,
                           onTap: () => context.go(tab.path),
                         );
                       }
@@ -99,10 +103,12 @@ class MainShell extends StatelessWidget {
                         activeIcon: tab.activeIcon,
                         label: tab.label,
                         isActive: isActive,
+                        elder: elder,
                         isDark: isDark,
                         onTap: () => context.go(tab.path),
                       );
                     }).toList(),
+                  ),
                   ),
                   ),
                 ),
@@ -134,6 +140,7 @@ class _NavTab extends StatelessWidget {
   final IconData activeIcon;
   final String label;
   final bool isActive;
+  final bool elder;
   final bool isDark;
   final VoidCallback onTap;
 
@@ -142,6 +149,7 @@ class _NavTab extends StatelessWidget {
     required this.activeIcon,
     required this.label,
     required this.isActive,
+    this.elder = false,
     required this.isDark,
     required this.onTap,
   });
@@ -200,7 +208,7 @@ class _NavTab extends StatelessWidget {
               duration: const Duration(milliseconds: 250),
               style: TextStyle(
                 fontFamily: ShunShiTypography.sansFamily,
-                fontSize: 10,
+                fontSize: elder ? ElderModeState.navLabelSize : 10,
                 fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
                 color: isActive ? activeColor : inactiveColor,
               ),
@@ -219,6 +227,7 @@ class _CenterNavTab extends StatelessWidget {
   final IconData activeIcon;
   final String label;
   final bool isActive;
+  final bool elder;
   final VoidCallback onTap;
 
   const _CenterNavTab({
@@ -226,6 +235,7 @@ class _CenterNavTab extends StatelessWidget {
     required this.activeIcon,
     required this.label,
     required this.isActive,
+    this.elder = false,
     required this.onTap,
   });
 
@@ -282,19 +292,17 @@ class _CenterNavTab extends StatelessWidget {
               ),
             ),
           ),
-          // Label below
-          Transform.translate(
-            offset: const Offset(0, -6),
-            child: AnimatedDefaultTextStyle(
-              duration: const Duration(milliseconds: 250),
-              style: TextStyle(
-                fontFamily: ShunShiTypography.sansFamily,
-                fontSize: 10,
-                fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
-                color: isActive ? ShunShiColors.primary : ShunShiColors.textTertiary,
-              ),
-              child: Text(label),
+          // Label below — 以前往上挪 6 像素，字被圆按钮压住（问题 10）；现在留 2 像素间距。
+          const SizedBox(height: 2),
+          AnimatedDefaultTextStyle(
+            duration: const Duration(milliseconds: 250),
+            style: TextStyle(
+              fontFamily: ShunShiTypography.sansFamily,
+              fontSize: elder ? ElderModeState.navLabelSize : 10,
+              fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
+              color: isActive ? ShunShiColors.primary : ShunShiColors.textTertiary,
             ),
+            child: Text(label),
           ),
         ],
       ),

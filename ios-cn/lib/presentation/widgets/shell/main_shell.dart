@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'desktop_shell.dart';
 import '../../../design_system/theme.dart';
+import '../../pages/home/elder_home_text.dart';
 import '../../../design_system/app_colors.dart';
 
 /// MainShell — 5 Tab 底部导航
@@ -69,7 +70,9 @@ class MainShell extends StatelessWidget {
                   // tab labels keep a 1.3 text-scale cap: five tabs cannot hold 200% type ('Wellness' broke mid-word)
                   child: MediaQuery(
                     data: MediaQuery.of(context).copyWith(textScaler: MediaQuery.textScalerOf(context).clamp(maxScaleFactor: 1.3)),
-                    child: Row(
+                    child: ValueListenableBuilder<bool>(
+                    valueListenable: ElderModeState.enabled,
+                    builder: (context, elder, _) => Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: _tabs.map((tab) {
                       final isActive = currentPath == tab.path;
@@ -78,10 +81,12 @@ class MainShell extends StatelessWidget {
                         activeIcon: tab.activeIcon,
                         label: tab.label,
                         isActive: isActive,
+                        elder: elder,
                         isDark: isDark,
                         onTap: () => context.go(tab.path),
                       );
                     }).toList(),
+                  ),
                   ),
                   ),
                 ),
@@ -112,6 +117,7 @@ class _NavTab extends StatelessWidget {
   final IconData activeIcon;
   final String label;
   final bool isActive;
+  final bool elder;
   final bool isDark;
   final VoidCallback onTap;
 
@@ -120,6 +126,7 @@ class _NavTab extends StatelessWidget {
     required this.activeIcon,
     required this.label,
     required this.isActive,
+    this.elder = false,
     required this.isDark,
     required this.onTap,
   });
@@ -151,7 +158,7 @@ class _NavTab extends StatelessWidget {
               label,
               style: TextStyle(
                 fontFamily: ShunShiTypography.sansFamily,
-                fontSize: 10,
+                fontSize: elder ? ElderModeState.navLabelSize : 10,
                 fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
                 color: isActive ? active : inactive,
               ),

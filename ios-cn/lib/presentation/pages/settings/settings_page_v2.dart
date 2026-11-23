@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../data/storage/local_session.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../home/elder_home_text.dart';
 import '../../../design_system/theme.dart';
 import '../../../data/services/notification_service.dart';
 import '../../../design_system/app_colors.dart';
@@ -183,7 +184,7 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
             child: Material(color: Colors.transparent, child: Column(children: [
               SwitchListTile(
                 value: _elderMode,
-                onChanged: (v) { setState(() => _elderMode = v); _savePref('elder_mode', v); },
+                onChanged: (v) { setState(() => _elderMode = v); ElderModeState.set(v); _savePref('elder_mode', v); },
                 title: Row(children: [
                   Icon(Icons.family_restroom, color: AppColors.primary(context), size: 20),
                   const SizedBox(width: 8),
