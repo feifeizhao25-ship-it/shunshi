@@ -23,7 +23,7 @@
   },
   "note": "只出对比报告，不切换线上默认检索。BM25 用现有词面索引，食材名和节气名仍走这条精确匹配。",
   "k": 8,
-  "corpus_entries": 16,
+  "corpus_entries": 19,
   "sets": {
     "golden": {
       "n": 165,
