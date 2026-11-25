@@ -908,9 +908,23 @@ async def get_solar_term_notifications(locale: str = Depends(_request_term_local
     }
 
 @router.get("/enhanced/current", summary="增强版当前节气", description="返回当前节气含倒计时和进度信息")
-async def get_enhanced_current_term():
-    """获取当前节气（含倒计时和进度）"""
-    return {"success": True, "data": solar_term_enhanced_service.get_current_term()}
+async def get_enhanced_current_term(
+    request: Request,
+    constitution: Optional[str] = Query(None),
+    life_stage: Optional[str] = Query(None),
+):
+    """获取当前节气（含倒计时和进度）。带上体质或人生阶段时附上人群提示。"""
+    data = solar_term_enhanced_service.get_current_term()
+    cons, stage = _resolve_audience(request, constitution, life_stage)
+    if cons or stage:
+        from app.services.solar_audience import filter_solar_term
+        softened = filter_solar_term(
+            {"foods": [], "suggestions": ["作息规律"], "description": ""},
+            constitution=cons,
+            life_stage=stage,
+        )
+        data["audience_notes"] = softened["audience_notes"]
+    return {"success": True, "data": data}
 
 
 @router.get("/enhanced/all", summary="增强版所有节气", description="返回所有节气含当前/过去/未来状态和高亮标记")

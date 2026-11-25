@@ -54,6 +54,14 @@ def test_generic_term_is_unchanged_without_audience():
     assert filtered["audience_notes"] == []
 
 
+def test_enhanced_current_includes_pregnancy_note(client):
+    res = client.get("/api/v1/solar-terms/enhanced/current", params={"life_stage": "孕期", "constitution": "阴虚"})
+    assert res.status_code == 200
+    notes = " ".join(res.json()["data"].get("audience_notes") or [])
+    assert "孕期" in notes
+    assert "阴虚" in notes
+
+
 def test_current_endpoint_filters_for_query(client):
     plain = client.get("/api/v1/solar-terms/current")
     assert plain.status_code == 200
