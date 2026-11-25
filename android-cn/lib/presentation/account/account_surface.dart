@@ -77,7 +77,7 @@ String? profileDisplayName({String? userInfoJson, String? userName, String? remo
   final local = accountNickname(userInfoJson: userInfoJson, userName: userName) ?? '';
   if (!_placeholderName(remote)) return remote;
   if (!_placeholderName(local)) return local;
-  if (remote.isNotEmpty) return remote;
+  if (remote == '游客') return remote;
   return local.isEmpty ? null : local;
 }
 
