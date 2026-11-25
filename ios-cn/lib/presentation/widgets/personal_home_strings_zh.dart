@@ -8,7 +8,7 @@ String _weekNone(String d) => '$d 没有记录';
 
 const PersonalHomeStrings kPersonalHomeStringsZh = PersonalHomeStrings(
   heading: '今天为你准备的',
-  why: '为什么推荐',
+  why: '为什么推荐给你',
   notRecommend: '不再推荐',
   turnOff: '关闭个性化',
   turnOn: '重新打开',

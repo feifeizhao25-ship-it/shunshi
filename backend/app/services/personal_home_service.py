@@ -79,6 +79,32 @@ def hide_not_recommended(board: dict, hidden: set[str]) -> dict:
     return dict(board, cards=cards, hero=hero)
 
 
+def _paid_tier(session: Session, user_id: str) -> Optional[str]:
+    try:
+        from .membership_status import membership_status
+        state = membership_status(session, user_id)
+    except Exception:
+        return None
+    if state.get("active") and state.get("plan") not in (None, "free"):
+        return state.get("plan")
+    return None
+
+
+def _recent_mood(session: Session, user_id: str) -> Optional[str]:
+    try:
+        from sqlalchemy import select
+        from ..simple_models import Reflection
+        row = session.execute(
+            select(Reflection).where(Reflection.user_id == user_id).order_by(Reflection.created_at.desc())
+        ).scalars().first()
+    except Exception:
+        return None
+    text = (row.mood if row else "") or ""
+    if any(word in text for word in ("低", "难过", "焦虑", "low", "sad")):
+        return "low"
+    return None
+
+
 def preferences(session: Session, user_id: str) -> dict:
     flag = _read(session, user_id, PERSONALIZATION_KEY) or {}
     cons = (_read(session, user_id, CONSTITUTION_KEY) or {}).get("label")
@@ -148,10 +174,16 @@ def load_profile(session: Session, user_id: str, *, lang: str, is_global: bool, 
         season = domestic_season(day)
     from .age_policy import read_group
 
+    region = _read(session, user_id, home_cards.REGION_KEY) or {}
+    province = region.get("province") if isinstance(region, dict) else None
+    zone = home_cards.zone_for(province) if province and not is_global else None
+    tier = _paid_tier(session, user_id) if not is_global else None
+    mood = _recent_mood(session, user_id) if not is_global else None
     return ph.Profile(
         lang=lang, goals=goals, support_time=ph.time_from_text(str(onboarding.get("support_time") or "")),
         constitution=cons if cons in ph.CONSTITUTIONS else None, life_stage=onboarding.get("life_stage"),
-        age_group=read_group(session, user_id, day), season=season, enabled=flag.get("enabled", True),
+        age_group=read_group(session, user_id, day), season=season, zone=zone,
+        membership_tier=tier, recent_mood=mood, enabled=flag.get("enabled", True),
     )
 
 
@@ -237,6 +269,7 @@ def build(session: Session, user_id: str, *, lang: str, is_global: bool, hemisph
         else:
             # 算法推荐规定第 17 条：关闭后不再按个人特征给卡片，只留当天的通用节气/假期卡。
             anchors = home_cards.nonpersonalized_cards(day)
+    profile.recent_checkin = any(0 <= (day - at.date()).days <= 2 for _, at in activity.completed)
     board = ph.compose(profile, activity, user_id, now, daytype, extra_cards=anchors)
     if record and profile.enabled:
         remember_shown(session, user_id, day, [c["id"] for c in board["cards"]])

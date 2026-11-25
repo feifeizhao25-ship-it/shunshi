@@ -68,9 +68,9 @@ def home_dashboard(
     if not is_global:  # 官方资料库只在国内版；国际版没有这张卡
         board = phs.with_library_card(session, user_id, board)
         board = phs.hide_not_recommended(board, phs.not_recommend_ids(session, user_id))
-        board["cards"] = [{**card, "why_label": "为什么推荐"} for card in board["cards"]]
+        board["cards"] = [{**card, "why_label": "为什么推荐给你"} for card in board["cards"]]
         if isinstance(board.get("hero"), dict):
-            board["hero"] = {**board["hero"], "why_label": "为什么推荐"}
+            board["hero"] = {**board["hero"], "why_label": "为什么推荐给你"}
     out = {
         "greeting": board["greeting"],
         "hero": board["hero"],

@@ -26,16 +26,65 @@ from typing import Iterable, Optional, Sequence
 TIMES = ("morning", "midday", "afternoon", "evening", "night")
 SEASONS = ("spring", "summer", "autumn", "winter")
 GOALS = ("sleep", "breathing", "exercise", "family", "mood", "food")
-CONSTITUTIONS = ("平和", "气虚", "阳虚", "阴虚", "痰湿", "湿热", "血瘀", "气郁")
+CONSTITUTIONS = ("平和", "气虚", "阳虚", "阴虚", "痰湿", "湿热", "血瘀", "气郁", "特禀")
 
 FORBIDDEN_ZH = ("治疗", "治愈", "诊断", "确诊", "处方", "药", "疗效", "根治", "保证", "投资")
 FORBIDDEN_EN = ("cure", "diagnos", "prescri", "medicat", "treatment", "guarantee", "invest", "disease", "therapy")
 
 
-def _c(cid, cat, zh, en, goals=(), times=(), seasons=(), day=None, cons=(), minutes=3):
+def _c(cid, cat, zh, en, goals=(), times=(), seasons=(), day=None, cons=(), minutes=3,
+      zones=(), tiers=(), ages=(), moods=(), checkin=False, cons_lead=False):
     return {"id": cid, "category": cat, "zh": zh, "en": en, "goals": tuple(goals), "times": tuple(times),
-            "seasons": tuple(seasons), "day": day, "cons": tuple(cons), "minutes": minutes}
+            "seasons": tuple(seasons), "day": day, "cons": tuple(cons), "minutes": minutes,
+            "zones": tuple(zones), "tiers": tuple(tiers), "ages": tuple(ages), "moods": tuple(moods),
+            "checkin": bool(checkin), "cons_lead": bool(cons_lead)}
 
+
+def _lead(cid, cons, zh, en):
+    return _c(cid, "food" if "吃" in zh or "喝" in zh or "饭" in zh else "rest", zh, en, cons=(cons,), cons_lead=True, minutes=5)
+
+
+_AUDIENCE_CARDS = [
+    _lead("lead_yin_1", "阴虚", "今天喝点温的银耳或梨水，少吃煎炸", "Have warm pear or white-fungus water today, and skip fried food."),
+    _lead("lead_yin_2", "阴虚", "下午少吃辛辣，晚饭清淡一点", "Keep the afternoon less spicy and dinner light."),
+    _lead("lead_yin_3", "阴虚", "睡前用温水漱口，晚上不喝浓茶", "Rinse with warm water before bed and skip strong tea tonight."),
+    _lead("lead_shi_1", "湿热", "午饭少油少辣，七分饱就停", "Keep lunch low in oil and spice, and stop around 70% full."),
+    _lead("lead_shi_2", "湿热", "少喝冰的，改喝温水", "Skip iced drinks and have warm water instead."),
+    _lead("lead_shi_3", "湿热", "晚饭后出去走十分钟，少在屋里闷着", "Walk for ten minutes after dinner instead of staying shut indoors."),
+    _lead("lead_yang_1", "阳虚", "早餐喝碗热粥，出门多加一件", "Have warm porridge for breakfast and add a layer when you go out."),
+    _lead("lead_yang_2", "阳虚", "手脚冷的时候先捂暖，再慢慢活动", "Warm cold hands and feet before you start moving."),
+    _lead("lead_yang_3", "阳虚", "晚上早点关灯，被窝暖了再睡", "Turn the lights down early and get into a warm bed."),
+    _lead("lead_qi_1", "气虚", "今天把活动放轻，慢走十分钟就够", "Keep it light today: a ten-minute easy walk is enough."),
+    _lead("lead_qi_2", "气虚", "觉得累就坐下歇几分钟，不追求出汗", "If you feel tired, sit for a few minutes. No need to sweat."),
+    _lead("lead_qi_3", "气虚", "午饭后先歇一会儿，再继续做事", "Pause after lunch before you pick the day back up."),
+    _lead("lead_tan_1", "痰湿", "午饭七分饱，饭后起来走五分钟", "Stop lunch around 70% full and walk for five minutes after."),
+    _lead("lead_tan_2", "痰湿", "少吃甜食和油炸，喝水就好", "Fewer sweets and fried snacks today; water is enough."),
+    _lead("lead_tan_3", "痰湿", "坐下超过一小时就站起来活动一下", "If you have been sitting for an hour, stand up and move."),
+    _lead("lead_xue_1", "血瘀", "肩颈慢慢转几圈，再走两分钟", "Roll your shoulders slowly, then walk for two minutes."),
+    _lead("lead_xue_2", "血瘀", "白天起来接杯水，顺便走一圈", "Get a glass of water and take a short loop."),
+    _lead("lead_xue_3", "血瘀", "晚饭后散步十分钟，步伐放慢", "A slow ten-minute walk after dinner."),
+    _lead("lead_yu_1", "气郁", "到窗边或户外站一会儿，慢慢吐气", "Stand by a window or outside and breathe out slowly."),
+    _lead("lead_yu_2", "气郁", "把今天紧绷的一件事写下来，写完合上", "Write down the one tight thing from today, then close the page."),
+    _lead("lead_yu_3", "气郁", "给朋友发一句近况，不求长谈", "Send a friend one line about how you are. It does not need to be long."),
+    _lead("lead_ping_1", "平和", "按平时的点吃饭睡觉，今天保持就好", "Keep your usual meal and sleep times today."),
+    _lead("lead_ping_2", "平和", "出门走十五分钟，留意呼吸", "Walk outside for fifteen minutes and notice your breath."),
+    _lead("lead_ping_3", "平和", "晚上把灯光调暗，准备休息", "Dim the lights in the evening and get ready to rest."),
+    _lead("lead_te_1", "特禀", "换季少去让自己不舒服的地方", "In a change of season, spend less time in places that bother you."),
+    _lead("lead_te_2", "特禀", "已知不能吃的食物继续避开", "Keep avoiding foods you already know do not suit you."),
+    _lead("lead_te_3", "特禀", "回家后洗手洗脸，换上家居衣服", "Wash your hands and face when you get home, and change clothes."),
+    _c("zone_north_winter", "seasonal", "供暖后室内干燥，记得多喝水，开一会儿窗", "Heated rooms are dry: drink water and air the room briefly.", seasons=["winter"], zones=["华北", "东北", "西北"]),
+    _c("zone_east_winter", "seasonal", "湿冷没有暖气时，出门多穿一件", "When it is damp and cold without heating, add a layer outside.", seasons=["winter"], zones=["华东华中"]),
+    _c("zone_south_winter", "seasonal", "冬天仍偏暖，早晚凉一点就好", "Winter stays mild here; a light layer morning and evening is enough.", seasons=["winter"], zones=["华南"]),
+    _c("zone_sw_winter", "seasonal", "阴冷潮湿，有太阳时出去站一会儿", "It is damp and chilly; stand in the sun for a bit when it appears.", seasons=["winter"], zones=["西南"]),
+    _c("zone_plateau_winter", "seasonal", "白天活动放轻，夜里多加一件", "Keep daytime effort light and add a layer at night.", seasons=["winter"], zones=["青藏高原"]),
+    _c("age_senior_1", "rest", "起身前先在床边坐一会儿，站稳再走", "Sit on the edge of the bed before you stand, and wait until you feel steady.", ages=["senior", "长辈"]),
+    _c("age_senior_2", "exercise", "今天在家里慢走几分钟，不追求出汗", "A few slow minutes of walking at home is enough today.", ages=["senior", "长辈"], minutes=8),
+    _c("age_senior_3", "rest", "晚上把过道的灯打开，少走黑路", "Leave the hallway light on in the evening.", ages=["senior", "长辈"]),
+    _c("tier_member", "rest", "会员多看一条：把今天最想完成的一件小事写下来", "Members get one extra note: write down the one small thing you most want to finish today.", tiers=["yiyang", "jiahe"], minutes=4),
+    _c("tier_content", "rest", "内容订阅多看一条：今晚只读一段节气说明", "The content plan adds one note: read a single seasonal note tonight, then stop.", tiers=["yangxin"], minutes=5),
+    _c("mood_low_1", "mood", "你最近的心情记录偏低。今天只做一件最轻的小事", "Your recent mood note was low. Do only the lightest thing today.", moods=["low"], minutes=2),
+    _c("checkin_recent", "rest", "你最近有打卡。顺着这个节奏，今天再做一件小事", "You checked in recently. Keep that pace with one more small thing today.", checkin=True, minutes=3),
+]
 
 LIBRARY = [
     # sleep
@@ -99,7 +148,7 @@ LIBRARY = [
     _c("family_walk", "family", "晚饭后和家人散步 15 分钟", "Walk with family for 15 minutes after dinner.", ["family", "exercise"], ["evening"], minutes=15),
     _c("family_photo", "family", "翻翻旧照片，和家人聊聊那天的事", "Look through old photos and talk with family about that day.", ["family", "mood"], ["afternoon", "evening"], minutes=15),
     _c("rest_break", "rest", "工作 50 分钟就起来接杯水，走一圈", "After 50 minutes of work, get some water and take a short walk.", [], ["midday", "afternoon"], minutes=3),
-]
+] + _AUDIENCE_CARDS
 BY_ID = {c["id"]: c for c in LIBRARY}
 
 GOAL_WORDS = (
@@ -124,6 +173,10 @@ class Profile:
     age_group: Optional[str] = None
     season: str = "spring"
     zone_tip: Optional[str] = None       # domestic region sentence
+    zone: Optional[str] = None
+    membership_tier: Optional[str] = None
+    recent_mood: Optional[str] = None
+    recent_checkin: bool = False
     enabled: bool = True
 
 
@@ -166,7 +219,13 @@ def season_of(day: date, hemisphere: str = "north") -> str:
     return s
 
 
-def greeting(bucket: str, lang: str) -> str:
+def greeting(bucket: str, lang: str, life_stage: str | None = None, age_group: str | None = None) -> str:
+    senior = lang == "zh" and (age_group == "senior" or life_stage in {"senior", "elder", "长辈"})
+    if senior:
+        zh = {"morning": "早上好。今天起身慢一点，先坐一会儿再站起来", "midday": "中午好。吃完歇一会儿，不着急",
+              "afternoon": "下午好。在家里慢走几分钟就好", "evening": "晚上好。把过道的灯打开，早点休息",
+              "night": "夜深了。放下手机，躺好再睡"}
+        return zh[bucket]
     zh = {"morning": "早上好，今天从一件小事开始", "midday": "中午好，歇一歇再继续", "afternoon": "下午好，起来动一动",
           "evening": "晚上好，今天也照顾好自己", "night": "夜深了，早点放下手机休息"}
     en = {"morning": "Good morning. Start with one small thing.", "midday": "Good afternoon. Pause before you go on.",
@@ -239,6 +298,16 @@ def _reason(parts: list, lang: str) -> tuple[str, list]:
             bits.append(f"今天是{nm[value]}" if lang == "zh" else f"today is {nm[value]}")
         elif kind == "cons":
             bits.append(f"{_label('cons', lang)}：{value}")
+        elif kind == "region":
+            bits.append(f"你所在的地区是{value}" if lang == "zh" else "your region")
+        elif kind == "tier":
+            bits.append("你的会员档位" if lang == "zh" else "your plan")
+        elif kind == "mood":
+            bits.append("你最近的心情记录" if lang == "zh" else "your recent mood note")
+        elif kind == "age":
+            bits.append("你填写的年龄段" if lang == "zh" else "your age group")
+        elif kind == "checkin":
+            bits.append("你最近的打卡" if lang == "zh" else "your recent check-in")
         elif kind == "reinforce":
             bits.append(_label("reinforce", lang))
     if not bits:
@@ -276,8 +345,23 @@ def score_card(card: dict, profile: Profile, activity: Activity, user_key: str, 
         else:
             score -= 3
     if profile.lang == "zh" and profile.constitution and profile.constitution in card["cons"]:  # domestic only
-        score += 2
+        score += 7 if card.get("cons_lead") else 2
         parts.append(("cons", profile.constitution))
+    if profile.zone and profile.zone in card.get("zones", ()):
+        score += 6
+        parts.append(("region", profile.zone))
+    if profile.membership_tier and profile.membership_tier in card.get("tiers", ()):
+        score += 6
+        parts.append(("tier", profile.membership_tier))
+    if profile.recent_mood and profile.recent_mood in card.get("moods", ()):
+        score += 6
+        parts.append(("mood", profile.recent_mood))
+    if profile.age_group in card.get("ages", ()) or profile.life_stage in card.get("ages", ()):
+        score += 6
+        parts.append(("age", profile.age_group or profile.life_stage or ""))
+    if card.get("checkin") and profile.recent_checkin:
+        score += 4
+        parts.append(("checkin", ""))
     if card["category"] in recent_cats and card["goals"]:
         score += 1.5
         parts.append(("reinforce", ""))
@@ -305,13 +389,27 @@ def compose(profile: Profile, activity: Activity, user_key: str, now: datetime, 
     streak = streak_days(activity.completed, day)
 
     if not profile.enabled:
-        return {"greeting": greeting(bucket, lang), "hero": None, "cards": list(extra_cards)[:limit],
+        return {"greeting": greeting(bucket, lang, profile.life_stage, profile.age_group), "hero": None, "cards": list(extra_cards)[:limit],
                 "streak": None, "personalization": {"enabled": False, "used": [], "note": _off_note(lang)}}
 
     scored = []
     for card in LIBRARY:
         if (card["seasons"] and profile.season not in card["seasons"]) or (card["day"] and card["day"] != daytype):
             continue  # a weekend card on a Wednesday, or a winter card in summer, is simply wrong
+        if card.get("zones") and profile.zone not in card["zones"]:
+            continue
+        if card.get("tiers") and profile.membership_tier not in card["tiers"]:
+            continue
+        if card.get("ages") and profile.age_group not in card["ages"] and profile.life_stage not in card["ages"]:
+            continue
+        if card.get("moods") and profile.recent_mood not in card["moods"]:
+            continue
+        if card.get("checkin") and not profile.recent_checkin:
+            continue
+        if card.get("cons_lead") and not (lang == "zh" and profile.constitution in card["cons"]):
+            continue
+        if _senior_profile(profile) and _office_copy(card.get(lang, "")):
+            continue
         if _blocked_for_life_stage(card.get(lang, ""), profile.life_stage):
             continue
         s, parts = score_card(card, profile, activity, user_key, day, bucket, daytype, recent_cats)
@@ -335,13 +433,19 @@ def compose(profile: Profile, activity: Activity, user_key: str, now: datetime, 
     take(1.0 if profile.goals else -1, limit)
     if len(picked) < 3:
         take(-1, 3)
+    _append_matching(picked, scored, lang, lambda card: card.get("cons_lead") and profile.constitution in card["cons"])
+    _append_matching(picked, scored, lang, lambda card: bool(card.get("zones")))
+    _append_matching(picked, scored, lang, lambda card: bool(card.get("tiers")))
+    _append_matching(picked, scored, lang, lambda card: bool(card.get("ages")))
+    _append_matching(picked, scored, lang, lambda card: bool(card.get("moods")))
+    _append_matching(picked, scored, lang, lambda card: bool(card.get("checkin")))
 
     anchors = [
         dict(c, bases=[c.get("basis", "calendar")])
         for c in extra_cards
         if not _blocked_for_life_stage(str(c.get("title") or "") + str(c.get("description") or ""), profile.life_stage)
     ][:2]
-    cards = anchors + picked[: max(1, 5 - len(anchors))]
+    cards = anchors + picked[: max(1, 8 - len(anchors))]
     hero = next((c for c in cards if str(c.get("id", "")).startswith("day_")), picked[0] if picked else (cards[0] if cards else None))
     streak_card = _streak_card(streak, activity, day, lang)
     lightest = min(picked, key=lambda c: (c["duration_min"], c["id"])) if picked else None
@@ -354,7 +458,7 @@ def compose(profile: Profile, activity: Activity, user_key: str, now: datetime, 
         | ({"life_stage"} if stage_used else set())
     )
     return {
-        "greeting": greeting(bucket, lang),
+        "greeting": greeting(bucket, lang, profile.life_stage, profile.age_group),
         "hero": hero,
         "cards": cards,
         "streak": streak_card,
@@ -451,6 +555,7 @@ def _streak_card(streak: int, activity: Activity, day: date, lang: str) -> dict:
 _NOTE_BASIS_ZH = (
     ("goal", "你填写的目标"), ("support", "你希望被提醒的时段"), ("cons", "你自己选的体质倾向"),
     ("life_stage", "你填写的人生阶段"), ("activity", "你在应用里的操作"), ("reinforce", "你在应用里的操作"), ("region", "你所在的地区"),
+    ("tier", "你的会员档位"), ("mood", "你最近的心情记录"), ("age", "你填写的年龄段"), ("checkin", "你最近的打卡"),
     ("solar_term", "节气"), ("season", "季节"), ("time", "当前时段"), ("day", "日期"),
 )
 
@@ -469,6 +574,27 @@ def _on_note(lang: str, used=()) -> str:
 
 def _off_note(lang: str) -> str:
     return "个性化已关闭，显示通用提示。" if lang == "zh" else "Personalisation is off; showing general tips."
+
+
+def _senior_profile(profile: Profile) -> bool:
+    return profile.age_group == "senior" or profile.life_stage in {"senior", "elder", "长辈"}
+
+
+def _office_copy(text: str) -> bool:
+    return any(word in (text or "") for word in ("刷手机", "工作", "午休", "上班"))
+
+
+def _append_matching(picked: list, scored: list, lang: str, match) -> None:
+    """把已经打分、但可能被「每类只留一张」挤掉的专属卡补回一张。"""
+    chosen = next((item for item in scored if match(item[1])), None)
+    if not chosen:
+        return
+    _, card, parts = chosen
+    if any(existing["id"] == card["id"] for existing in picked):
+        return
+    reason, basis = _reason(parts, lang)
+    picked.append({"id": card["id"], "category": card["category"], "title": card[lang], "description": card[lang],
+                   "reason": reason, "basis": basis[0], "bases": basis, "duration_min": card["minutes"], "score": round(chosen[0], 2)})
 
 
 def _blocked_for_life_stage(text: str, life_stage: str | None) -> bool:
