@@ -81,6 +81,12 @@ class _PlanUsagePageState extends State<PlanUsagePage> {
     return '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
   }
 
+  static String _cnDate(dynamic epochSeconds) {
+    if (epochSeconds is! num) return '';
+    final d = DateTime.fromMillisecondsSinceEpoch(epochSeconds.toInt() * 1000);
+    return '${d.year}年${d.month}月${d.day}日';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -113,8 +119,10 @@ class _PlanUsagePageState extends State<PlanUsagePage> {
       );
     }
     final active = d['active'] == true;
+    final expired = d['membership_state'] == 'expired';
     final items = (d['items'] is List ? d['items'] as List : const []).whereType<Map>().toList();
     final until = _date(d['expires_at']);
+    final expiredOn = _cnDate(d['expires_at']);
     return RefreshIndicator(
       onRefresh: _fetch,
       child: ListView(
@@ -130,11 +138,17 @@ class _PlanUsagePageState extends State<PlanUsagePage> {
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text(_S.plan, style: text.labelMedium?.copyWith(color: scheme.onSurfaceVariant)),
-                  Text('${d['plan_name'] ?? ''}', key: const Key('plan-usage-name'), style: text.titleLarge?.copyWith(fontWeight: FontWeight.w700)),
-                  Text(active && until.isNotEmpty ? _S.until(until) : (active ? '' : _S.free), style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+                  Text(expired ? '已过期' : '${d['plan_name'] ?? ''}', key: const Key('plan-usage-name'), style: text.titleLarge?.copyWith(fontWeight: FontWeight.w700)),
+                  Text(
+                    expired && expiredOn.isNotEmpty
+                        ? '已过期（$expiredOn到期）'
+                        : (active && until.isNotEmpty ? _S.until(until) : (active ? '' : _S.free)),
+                    style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+                  ),
                 ]),
               ),
-              if (!active && widget.onUpgrade != null) FilledButton(key: const Key('plan-usage-upgrade'), onPressed: widget.onUpgrade, child: const Text(_S.upgrade)),
+              if (!active && widget.onUpgrade != null)
+                FilledButton(key: const Key('plan-usage-upgrade'), onPressed: widget.onUpgrade, child: Text(expired ? '续费' : _S.upgrade)),
             ]),
           ),
           const SizedBox(height: 20),

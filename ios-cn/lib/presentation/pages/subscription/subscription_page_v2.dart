@@ -145,6 +145,7 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2>
   @override
   Widget build(BuildContext context) {
     final paid = _status?.isActive == true && _status?.planId != 'free';
+    final expired = _status?.expired == true;
     final expiry = _status?.expiresAt?.toLocal();
     return Scaffold(
       backgroundColor: AppColors.background(context),
@@ -182,6 +183,8 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2>
                       ? '正在查询…'
                       : _error != null
                       ? '暂时无法查询'
+                      : expired
+                      ? _status!.headline
                       : paid
                       ? _status!.planName
                       : '免费版',
@@ -266,7 +269,7 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2>
                     !_prices.containsKey(_selected)
                 ? null
                 : _purchase,
-            child: Text(_busy ? '正在处理…' : '前往商店确认购买'),
+            child: Text(_busy ? '正在处理…' : (expired ? '续费' : '前往商店确认购买')),
           ),
           OutlinedButton(
             onPressed: _busy || _loading ? null : _restore,

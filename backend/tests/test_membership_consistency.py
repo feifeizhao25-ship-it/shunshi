@@ -93,6 +93,29 @@ def test_core_failure_does_not_report_free_membership(client,account,monkeypatch
         assert 'private-database' not in r.text
         assert 'is_premium' not in r.text
 
+def test_expired_paid_entitlement_keeps_date_without_paid_access(client, account):
+    """过期会员不再是付费，但接口要留下真实到期日，不能把到期时间清空后显示成从没买过。"""
+    _, uid, headers = account
+    past = int(time.time()) - 86400
+    seed(client, uid, 'yiyang_yearly', past)
+    state = assert_views(client, account, 'free')
+    assert state['membership_state'] == 'expired'
+    assert state['active'] is False
+    assert state['expires_at'] == past
+    assert state['data']['status'] == 'expired'
+    assert state['data']['membership_state'] == 'expired'
+    assert state['data']['expires_at'] == past
+    assert state['data']['previous_plan'] == 'yiyang'
+    assert state['data']['previous_plan_name'] == '会员'
+    assert state['data']['is_active'] is False
+    assert 'family' not in state['data']['features']
+    usage = client.get('/api/v1/subscription/plan-usage', headers=headers).json()
+    assert usage['plan'] == 'free' and usage['active'] is False
+    assert usage['membership_state'] == 'expired'
+    assert usage['expires_at'] == past
+    assert usage['previous_plan_name'] == '会员'
+
+
 def test_every_registered_product_has_exact_domestic_plan():
     reg = get_registry()
     assert set(reg['product_tier_map']) | set(reg['legacy_product_tier_map']) == set(_PRODUCT_PLANS)

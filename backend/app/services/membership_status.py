@@ -58,20 +58,29 @@ def entitlement_plan(user_id):
 
 
 def membership_status(session, user_id):
+    """付费是否有效仍只看未过期的权益。过期用户保持免费权限，但返回真实到期时间和 expired。"""
     row = session.get(Entitlement, user_id)
-    tier = tier_for_product(row.product_id) if row and row.expires_at > time.time() else 'free'
-    plan = _PRODUCT_PLANS.get(row.product_id, 'free') if tier != 'free' else 'free'
-    active = plan != 'free'
-    if not active:
-        tier = 'free'
+    now = time.time()
+    recorded = _PRODUCT_PLANS.get(row.product_id, 'free') if row else 'free'
+    active = bool(row and recorded != 'free' and row.expires_at > now)
+    expired = bool(row and recorded != 'free' and row.expires_at <= now)
+    plan = recorded if active else 'free'
+    tier = tier_for_product(row.product_id) if active else 'free'
+    state = 'active' if active else 'expired' if expired else 'free'
+    expires = row.expires_at if (active or expired) else None
     return {
         'active': active, 'plan': plan, 'tier': tier, 'success': True,
+        'membership_state': state,
+        'previous_plan': recorded if expired else None,
         'product_id': row.product_id if active else None,
         'store': row.store if active else None,
-        'expires_at': row.expires_at if active else None,
+        'expires_at': expires,
         'data': {'plan': plan, 'plan_name': _DOMESTIC_PLAN_NAMES[plan],
-                 'status': 'active' if active else 'inactive', 'is_active': active,
-                 'expires_at': row.expires_at if active else None,
+                 'status': state if expired else ('active' if active else 'inactive'),
+                 'membership_state': state, 'is_active': active,
+                 'expires_at': expires,
+                 'previous_plan': recorded if expired else None,
+                 'previous_plan_name': _DOMESTIC_PLAN_NAMES[recorded] if expired else None,
                  'features': dict(_DOMESTIC_FEATURES[plan])},
     }
 
