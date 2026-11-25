@@ -522,6 +522,9 @@ class ConstitutionTypeSummary(BaseModel):
     characteristics: List[str] = []
     diet_recommendations: List[str] = []
     lifestyle_advice: List[str] = []
+    diet_avoid: List[str] = []
+    source: str = ""
+    review_status: str = "待审核"
 
 
 class ConstitutionTypeDetail(BaseModel):
@@ -537,6 +540,63 @@ class ConstitutionTypeDetail(BaseModel):
     avoid_list: List[str] = []
     diet_recommendations: List[str] = []
     lifestyle_advice: List[str] = []
+    diet_avoid: List[str] = []
+    source: str = ""
+    review_status: str = "待审核"
+
+
+# 九种体质的特征、宜食、忌食、起居对照学会标准整理，先作候选，不能标成已审核。
+CONSTITUTION_SOURCE = (
+    "特征、宜食、忌食和起居对照《中医体质分类与判定》"
+    "（中华中医药学会标准 ZYYXH/T157-2009）整理。"
+    "这是候选资料，待具名中医或药学审核人核对，不是诊断。"
+)
+
+
+def _advice_pieces(text: str) -> List[str]:
+    raw = (text or "").strip()
+    if not raw:
+        return []
+    body = raw.split("：", 1)[1] if "：" in raw else raw
+    pieces = [part.strip() for part in body.replace("，", "、").split("、") if part.strip()]
+    return pieces or [raw]
+
+
+def _memory_constitution(key: str) -> Optional[dict]:
+    info = CONSTITUTION_TYPES.get(key)
+    if not info:
+        return None
+    return {
+        "characteristics": list(info.get("characteristics") or []),
+        "diet_recommendations": _advice_pieces(info.get("diet_advice") or ""),
+        "lifestyle_advice": _advice_pieces(info.get("exercise_advice") or ""),
+        "diet_avoid": list(info.get("avoid_list") or []),
+    }
+
+
+def _filled(key: str, characteristics, diet, lifestyle, avoid=None) -> dict:
+    """数据库里的空数组用内置候选资料补上，避免接口把九种体质的三项都返回成空。"""
+    memory = _memory_constitution(key) or {}
+    characteristics = list(characteristics or [])
+    diet = list(diet or [])
+    lifestyle = list(lifestyle or [])
+    avoid = list(avoid or [])
+    if not characteristics:
+        characteristics = list(memory.get("characteristics") or [])
+    if not diet:
+        diet = list(memory.get("diet_recommendations") or [])
+    if not lifestyle:
+        lifestyle = list(memory.get("lifestyle_advice") or [])
+    if not avoid:
+        avoid = list(memory.get("diet_avoid") or [])
+    return {
+        "characteristics": characteristics,
+        "diet_recommendations": diet,
+        "lifestyle_advice": lifestyle,
+        "diet_avoid": avoid,
+        "source": CONSTITUTION_SOURCE,
+        "review_status": "待审核",
+    }
 
 
 # ==================== 辅助函数 ====================
@@ -966,18 +1026,22 @@ async def get_constitution_types():
             """)
             rows = result.fetchall()
             if rows:
-                return [
-                    ConstitutionTypeSummary(
+                filled = []
+                for r in rows:
+                    lists = _filled(
+                        r[0],
+                        r[4] if isinstance(r[4], list) else (eval(r[4]) if r[4] else []),
+                        r[5] if isinstance(r[5], list) else (eval(r[5]) if r[5] else []),
+                        r[6] if isinstance(r[6], list) else (eval(r[6]) if r[6] else []),
+                    )
+                    filled.append(ConstitutionTypeSummary(
                         type=r[0],
                         name=r[1],
                         name_en=r[2] or "",
                         description=r[3] or "",
-                        characteristics=r[4] if isinstance(r[4], list) else (eval(r[4]) if r[4] else []),
-                        diet_recommendations=r[5] if isinstance(r[5], list) else (eval(r[5]) if r[5] else []),
-                        lifestyle_advice=r[6] if isinstance(r[6], list) else (eval(r[6]) if r[6] else []),
-                    )
-                    for r in rows
-                ]
+                        **lists,
+                    ))
+                return filled
         finally:
             db.close()
     except Exception:
@@ -987,11 +1051,13 @@ async def get_constitution_types():
     result = []
     for key in CONSTITUTION_KEYS:
         info = CONSTITUTION_TYPES[key]
+        lists = _filled(key, info.get("characteristics"), None, None, info.get("avoid_list"))
         result.append(ConstitutionTypeSummary(
             type=key,
             name=info["name"],
             name_en=info["name_en"],
             description=info["description"],
+            **lists,
         ))
     return result
 
@@ -1056,16 +1122,22 @@ async def get_constitution_detail(name: str):
         )
 
     info = CONSTITUTION_TYPES[name]
+    lists = _filled(name, info.get("characteristics"), None, None, info.get("avoid_list"))
     return ConstitutionTypeDetail(
         type=name,
         name=info["name"],
         name_en=info["name_en"],
         description=info["description"],
-        characteristics=info["characteristics"],
+        characteristics=lists["characteristics"],
         diet_advice=info["diet_advice"],
         tea_advice=info["tea_advice"],
         exercise_advice=info["exercise_advice"],
-        avoid_list=info["avoid_list"],
+        avoid_list=lists["diet_avoid"],
+        diet_recommendations=lists["diet_recommendations"],
+        lifestyle_advice=lists["lifestyle_advice"],
+        diet_avoid=lists["diet_avoid"],
+        source=lists["source"],
+        review_status=lists["review_status"],
     )
 
 

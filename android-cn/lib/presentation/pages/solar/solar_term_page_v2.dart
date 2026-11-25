@@ -8,6 +8,7 @@ import '../../../core/solar_term/solar_cover.dart';
 import 'dart:math' as math;
 import '../../widgets/state_view.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/network/api_client.dart';
@@ -93,6 +94,7 @@ class _SolarTermPageV2State extends State<SolarTermPageV2>
   Map<String, dynamic> _term = {};
   Map<String, dynamic> _next = {};
   Map<String, dynamic> _wellness = {};
+  List<String> _audienceNotes = const [];
   bool _loading = true;
   bool _showLoading = false;
 
@@ -154,10 +156,17 @@ class _SolarTermPageV2State extends State<SolarTermPageV2>
       persist: true,
     );
 
+    final prefs = await SharedPreferences.getInstance();
+    final constitution = prefs.getString('constitution_name') ?? prefs.getString('constitution_type') ?? '';
+    final lifeStage = prefs.getString('life_stage') ?? prefs.getString('user_life_stage') ?? '';
+    final query = <String, dynamic>{
+      if (constitution.isNotEmpty) 'constitution': constitution,
+      if (lifeStage.isNotEmpty) 'life_stage': lifeStage,
+    };
     final path = widget.termName != null
         ? '/solar-terms/enhanced/${Uri.encodeComponent(widget.termName!)}'
         : '/solar-terms/enhanced/current';
-    final cacheKey = CacheKeys.solarTerm(widget.termName ?? 'current');
+    final cacheKey = CacheKeys.solarTerm('${widget.termName ?? 'current'}|$constitution|$lifeStage');
 
     final cached =
         _cache.get<Map<String, dynamic>>(cacheKey, config: cacheConfig);
@@ -172,7 +181,7 @@ class _SolarTermPageV2State extends State<SolarTermPageV2>
     }
 
     try {
-      final res = await _api.get(path, level: SpeedLevel.s2);
+      final res = await _api.get(path, queryParameters: query, level: SpeedLevel.s2);
       if (!mounted) return;
       final data = res.data;
       if (data is Map && data['data'] is Map) {
@@ -192,6 +201,10 @@ class _SolarTermPageV2State extends State<SolarTermPageV2>
         if (d['wellness_plan'] is Map) {
           _wellness = Map<String, dynamic>.from(d['wellness_plan']);
           cacheData['wellness_plan'] = _wellness;
+        }
+        if (d['audience_notes'] is List) {
+          _audienceNotes = [for (final note in d['audience_notes']) note.toString()];
+          cacheData['audience_notes'] = _audienceNotes;
         }
         await _cache.set(cacheKey, cacheData, config: cacheConfig);
       }
@@ -222,6 +235,9 @@ class _SolarTermPageV2State extends State<SolarTermPageV2>
     }
     if (data['wellness_plan'] is Map) {
       _wellness = Map<String, dynamic>.from(data['wellness_plan']);
+    }
+    if (data['audience_notes'] is List) {
+      _audienceNotes = [for (final note in data['audience_notes']) note.toString()];
     }
   }
 
@@ -275,6 +291,9 @@ class _SolarTermPageV2State extends State<SolarTermPageV2>
                     child: _buildNextAndProgress(isDark, season),
                   ),
                 ),
+
+                if (_audienceNotes.isNotEmpty)
+                  SliverToBoxAdapter(child: _buildAudienceNotes(isDark)),
 
                 // ── 3. 养生建议 Tab 分组 ──
                 SliverToBoxAdapter(
@@ -543,6 +562,32 @@ class _SolarTermPageV2State extends State<SolarTermPageV2>
                     ],
                   ),
                 ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAudienceNotes(bool isDark) {
+    final textColor = isDark ? ShunShiColors.darkTextPrimary : ShunShiColors.textPrimary;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
+      child: Container(
+        key: const Key('solar-audience-notes'),
+        width: double.infinity,
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: isDark ? ShunShiColors.darkSurfaceContainerLow : ShunShiColors.surfaceContainerLow,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            for (final note in _audienceNotes)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 6),
+                child: Text(note, style: TextStyle(fontSize: 14, height: 1.5, color: textColor)),
               ),
           ],
         ),
