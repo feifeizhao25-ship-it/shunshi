@@ -69,11 +69,24 @@ String membershipLabel({required bool loggedIn, bool? active}) {
 }
 
 /// Account record first, then the name saved during profile setup.
+bool _placeholderName(String name) => name.isEmpty || name == '顺时用户' || name == '游客';
+
+/// 我的页用的名字。接口里的真名优先；接口只有「游客 / 顺时用户」时，用本机保存的昵称。
+String? profileDisplayName({String? userInfoJson, String? userName, String? remoteName}) {
+  final remote = remoteName?.trim() ?? '';
+  final local = accountNickname(userInfoJson: userInfoJson, userName: userName) ?? '';
+  if (!_placeholderName(remote)) return remote;
+  if (!_placeholderName(local)) return local;
+  if (remote == '游客') return remote;
+  return local.isEmpty ? null : local;
+}
+
 String? accountNickname({String? userInfoJson, String? userName}) {
   final fromInfo = _nameFromUserInfo(userInfoJson);
-  if (fromInfo != null) return fromInfo;
   final pref = userName?.trim() ?? '';
-  return pref.isEmpty ? null : pref;
+  if (fromInfo != null && !_placeholderName(fromInfo)) return fromInfo;
+  if (pref.isNotEmpty && !_placeholderName(pref)) return pref;
+  return fromInfo ?? (pref.isEmpty ? null : pref);
 }
 
 AccountSurface accountSurface({

@@ -72,9 +72,21 @@ class _ProfilePageV2State extends State<ProfilePageV2> {
 
   Future<void> _loadLocalProfile(SharedPreferences prefs) async {
     try {
-      final name = prefs.getString('user_name');
       final days = prefs.getInt('checkin_days') ?? 0;
       final constitution = prefs.getString('constitution_type') ?? '';
+      String? remote;
+      if ((prefs.getString('auth_token') ?? '').trim().isNotEmpty) {
+        try {
+          final me = await ApiClient().get('/api/v1/auth/me');
+          final data = me.data is Map ? me.data['data'] : null;
+          if (data is Map) remote = (data['nickname'] ?? data['name'])?.toString();
+        } catch (_) {}
+      }
+      final name = profileDisplayName(
+        userInfoJson: prefs.getString('user_info'),
+        userName: prefs.getString('user_name'),
+        remoteName: remote,
+      );
       if (mounted) {
         setState(() {
           if (name != null) _userName = name;

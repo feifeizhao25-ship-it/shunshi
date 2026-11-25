@@ -35,6 +35,10 @@ void main() {
     expect(accountSurface(loggedIn: true, nickname: '小林', membershipActive: true, beijingDay: DateTime(2026, 11, 11)).membership, '会员');
     expect(accountSurface(loggedIn: true, nickname: '小林', beijingDay: DateTime(2026, 11, 11)).membership, '状态待查询');
     expect(accountName(loggedIn: true), '顺时用户');
+    expect(accountNickname(userInfoJson: '{"nickname":"游客"}', userName: '林晓雨'), '林晓雨');
+    expect(profileDisplayName(userInfoJson: '{"nickname":"林晓雨"}', remoteName: '游客'), '林晓雨');
+    expect(profileDisplayName(remoteName: '周秀兰', userName: '林晓雨'), '周秀兰');
+    expect(profileDisplayName(remoteName: '顺时用户'), isNull);
   });
 
   test('settings loader does not invent a member when logged out', () async {
