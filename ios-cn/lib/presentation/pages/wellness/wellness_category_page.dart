@@ -107,6 +107,11 @@ class WellnessCategoryPage extends StatelessWidget {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          if (type == 'food_therapy')
+            const Padding(
+              padding: EdgeInsets.fromLTRB(24, 0, 24, 8),
+              child: Text('下面是节气时令举例，不是按体质筛过的资料。安全提示请看完整一行。', style: TextStyle(fontSize: 13, height: 1.4)),
+            ),
           Padding(
             padding: const EdgeInsets.fromLTRB(24, 4, 24, 16),
             child: CategoryCover(

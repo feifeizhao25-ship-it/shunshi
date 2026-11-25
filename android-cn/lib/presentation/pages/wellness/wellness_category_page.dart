@@ -23,6 +23,7 @@ class _WellnessCategoryPageState extends State<WellnessCategoryPage> {
   final _api = ApiClient();
   List<_Item> _items = [];
   bool _isLoading = true;
+  bool _usingFallback = false;
   String? _constitutionType;
 
   @override
@@ -63,6 +64,7 @@ class _WellnessCategoryPageState extends State<WellnessCategoryPage> {
 
       if (raw.isNotEmpty) {
         setState(() {
+          _usingFallback = false;
           _items = raw.map<_Item>((e) {
             final m = e as Map<String, dynamic>;
             return _Item(
@@ -88,6 +90,7 @@ class _WellnessCategoryPageState extends State<WellnessCategoryPage> {
 
   void _useFallback() {
     setState(() {
+      _usingFallback = true;
       _items = widget.type == 'food_therapy' ? _seasonalFoodFallback() : (_fallbackItems[widget.type] ?? []);
       _isLoading = false;
     });
@@ -112,9 +115,7 @@ class _WellnessCategoryPageState extends State<WellnessCategoryPage> {
         if (item.id != null) {
           context.push('/content/${item.id}');
         } else {
-          context.push('/diet-recommend', extra: {
-            'constitutionType': _constitutionType,
-          });
+          _showItemDetail(item);
         }
         break;
       case 'exercise':
@@ -146,6 +147,8 @@ class _WellnessCategoryPageState extends State<WellnessCategoryPage> {
         }
     }
   }
+
+  void _showItemDetail(_Item item) => _showTeaDetail(item);
 
   void _showTeaDetail(_Item item) {
     showDialog(context: context, builder: (_) => AlertDialog(
@@ -199,6 +202,11 @@ class _WellnessCategoryPageState extends State<WellnessCategoryPage> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          if (_usingFallback && widget.type == 'food_therapy')
+            const Padding(
+              padding: EdgeInsets.fromLTRB(24, 0, 24, 8),
+              child: Text('下面是节气时令举例，不是按体质筛过的资料。安全提示请看完整一行。', style: TextStyle(fontSize: 13, height: 1.4)),
+            ),
           Padding(
             padding: const EdgeInsets.fromLTRB(24, 4, 24, 16),
             child: CategoryCover(

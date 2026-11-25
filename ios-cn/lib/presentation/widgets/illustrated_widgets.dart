@@ -151,7 +151,7 @@ class IllustratedCard extends StatelessWidget {
                               child: Icon(Icons.tips_and_updates_outlined, size: 16, color: ShunShiColors.secondary),
                             ),
                             const SizedBox(width: 6),
-                            Flexible(child: Text(tip, maxLines: 2, overflow: TextOverflow.ellipsis,
+                            Flexible(child: Text(tip,
                                 style: TextStyle(fontSize: 14, height: 1.45, color: isDark ? ShunShiColors.darkSecondary : ShunShiColors.secondary))),
                           ],
                         ),
