@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/router/safe_pop.dart';
+import '../../../data/services/family_api.dart';
 import '../../../design_system/app_colors.dart';
 
 class FamilyInvitePage extends StatefulWidget {
-  const FamilyInvitePage({super.key});
+  const FamilyInvitePage({super.key, this.api});
+
+  final FamilyApi? api;
 
   @override
   State<FamilyInvitePage> createState() => _FamilyInvitePageState();
@@ -15,6 +17,8 @@ class _FamilyInvitePageState extends State<FamilyInvitePage> {
   String _inviteCode = '';
   List<Map<String, String>> _members = [];
   bool _loading = true;
+  bool _failed = false;
+  late final FamilyApi _api = widget.api ?? FamilyApi();
 
   @override
   void initState() {
@@ -22,30 +26,33 @@ class _FamilyInvitePageState extends State<FamilyInvitePage> {
     _loadData();
   }
 
+  @override
+  void dispose() {
+    if (widget.api == null) _api.dispose();
+    super.dispose();
+  }
+
   Future<void> _loadData() async {
-    final prefs = await SharedPreferences.getInstance();
-    // Generate or load invite code
-    var code = prefs.getString('family_invite_code');
-    if (code == null || code.isEmpty) {
-      code = 'SS${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}';
-      await prefs.setString('family_invite_code', code);
-    }
-    // Load existing members
-    final membersRaw = prefs.getString('family_members');
-    List<Map<String, String>> members = [];
-    if (membersRaw != null) {
-      // Simple format: "name1:relation1,name2:relation2"
-      for (final entry in membersRaw.split(',')) {
-        final parts = entry.split(':');
-        if (parts.length == 2) {
-          members.add({'name': parts[0], 'relation': parts[1]});
-        }
+    try {
+      final body = await _api.load();
+      final members = <Map<String, String>>[];
+      for (final raw in body['members'] as List) {
+        if (raw is! Map) continue;
+        members.add({'name': '${raw['name'] ?? ''}', 'relation': '${raw['relation'] ?? ''}'});
       }
-    }
-    if (mounted) {
+      if (!mounted) return;
       setState(() {
-        _inviteCode = code!;
+        _inviteCode = (body['invite_code'] as String?)?.trim() ?? '';
         _members = members;
+        _failed = false;
+        _loading = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _inviteCode = '';
+        _members = [];
+        _failed = true;
         _loading = false;
       });
     }
@@ -88,7 +95,7 @@ class _FamilyInvitePageState extends State<FamilyInvitePage> {
                           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                           decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(12)),
                           child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                            Text(_inviteCode, style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 4)),
+                            Text(_inviteCode.isEmpty ? '还没有邀请码' : _inviteCode, style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 4)),
                             const SizedBox(width: 12),
                             IconButton(icon: const Icon(Icons.copy, color: Colors.white), onPressed: _copyCode),
                           ]),
@@ -107,7 +114,12 @@ class _FamilyInvitePageState extends State<FamilyInvitePage> {
                   // Family members list
                   Text('已添加的家人', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary(context))),
                   const SizedBox(height: 16),
-                  if (_members.isEmpty)
+                  if (_failed)
+                    const Padding(
+                      padding: EdgeInsets.all(32),
+                      child: Text('家人列表暂时读不到，请确认已登录后重试', textAlign: TextAlign.center),
+                    )
+                  else if (_members.isEmpty)
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.all(32),
@@ -153,6 +165,7 @@ class _FamilyInvitePageState extends State<FamilyInvitePage> {
   }
 
   void _copyCode() {
+    if (_inviteCode.isEmpty) return;
     Clipboard.setData(ClipboardData(text: _inviteCode));
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('邀请码已复制'), duration: Duration(seconds: 2)),

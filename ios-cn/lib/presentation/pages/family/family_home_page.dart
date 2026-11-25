@@ -2,6 +2,7 @@ import '../../../core/router/safe_pop.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../data/network/api_client.dart';
+import '../../../data/services/family_api.dart';
 import '../../../design_system/theme.dart';
 import '../../../design_system/app_colors.dart';
 
@@ -26,22 +27,22 @@ class _FamilyHomePageState extends State<FamilyHomePage> {
   Future<void> _loadMembers() async {
     try {
       final api = ApiClient();
-      final res = await api.get('/api/v1/family/members');
-      if (res.data is List) {
-        setState(() {
-          _members = List<Map<String, dynamic>>.from(res.data);
-          _loading = false;
-        });
-        return;
-      }
-    } catch (_) {}
-    // Demo
-    setState(() {
-      _members = [
-        {'id': '1', 'name': '妈妈', 'avatar': '👩', 'relation': '母亲', 'status': 'stable', 'lastActive': '今天 08:30', 'lastCheckin': '3小时前'},
-        {'id': '2', 'name': '爸爸', 'avatar': '👨', 'relation': '父亲', 'status': 'tired', 'lastActive': '今天 07:15', 'lastCheckin': '5小时前'},
-        {'id': '3', 'name': '奶奶', 'avatar': '👵', 'relation': '其他', 'status': 'attention', 'lastActive': '昨天 22:00', 'lastCheckin': '1天前'},
+      final res = await api.get('/api/v1/family/');
+      final body = familyBody(res.data);
+      final members = [
+        for (final raw in body['members'] as List)
+          if (raw is Map) Map<String, dynamic>.from(raw),
       ];
+      if (!mounted) return;
+      setState(() {
+        _members = members;
+        _loading = false;
+      });
+      return;
+    } catch (_) {}
+    if (!mounted) return;
+    setState(() {
+      _members = [];
       _loading = false;
     });
   }

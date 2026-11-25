@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/config/app_config.dart';
 import '../../../data/network/session.dart';
+import '../../../data/services/family_body.dart';
 
 class FamilyPageV2 extends StatefulWidget {
   const FamilyPageV2({super.key});
@@ -48,12 +49,12 @@ class _FamilyPageV2State extends State<FamilyPageV2> {
     if (_token == null) { setState(() => _loading = false); return; }
     try {
       final res = await _dio.get('/api/v1/family/', options: Options(headers: _authHeaders));
-      final data = res.data;
-      if (data is Map && data['data'] is Map) {
-        final d = data['data'] as Map<String, dynamic>;
-        _familyName = d['family_name']?.toString() ?? 'ProfileFamily';
-        _members = (d['members'] as List?)?.cast<Map<String, dynamic>>() ?? [];
-      }
+      final d = familyBody(res.data);
+      _familyName = d['family_name']?.toString() ?? 'ProfileFamily';
+      _members = [
+        for (final raw in d['members'] as List)
+          if (raw is Map) Map<String, dynamic>.from(raw),
+      ];
     } catch (_) {}
     setState(() => _loading = false);
   }
