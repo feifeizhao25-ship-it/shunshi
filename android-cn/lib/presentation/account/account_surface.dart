@@ -83,9 +83,10 @@ String? profileDisplayName({String? userInfoJson, String? userName, String? remo
 
 String? accountNickname({String? userInfoJson, String? userName}) {
   final fromInfo = _nameFromUserInfo(userInfoJson);
-  if (fromInfo != null) return fromInfo;
   final pref = userName?.trim() ?? '';
-  return pref.isEmpty ? null : pref;
+  if (fromInfo != null && !_placeholderName(fromInfo)) return fromInfo;
+  if (pref.isNotEmpty && !_placeholderName(pref)) return pref;
+  return fromInfo ?? (pref.isEmpty ? null : pref);
 }
 
 AccountSurface accountSurface({
