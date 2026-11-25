@@ -30,6 +30,29 @@ def knowledge_version() -> str:
     return str(data.get("knowledge_version") or "")
 
 MIN_RELEVANCE = _GATE_MIN_RELEVANCE  # TF-IDF 余弦相似度下限：低于它的片段不当作来源
+# 国内版来源卡。打开评测旧文档后，「每天喝多少水」对同题只有 0.1163，
+# 「平衡膳食八项基本原则」对同题约 0.26，报告里无关卡大约 0.10–0.13。
+# 低于 0.10 不挂。0.10 到 0.20 必须和标题整段或连续四字重合，避免无关的膳食原则被挂上。
+# 0.20 及以上单靠分数挂上。固定 0.30 会把直接命中也丢掉。
+CN_SOURCE_CARD_MIN = 0.10
+CN_SOURCE_CARD_CLEAR = 0.20
+
+
+def _cn_card_ok(query: str, chunk, score: float) -> bool:
+    if score < CN_SOURCE_CARD_MIN:
+        return False
+    if score >= CN_SOURCE_CARD_CLEAR:
+        return True
+    headings = [str(item) for item in (getattr(chunk, "heading_path", None) or []) if len(str(item)) >= 2]
+    for heading in headings:
+        if heading in query:
+            return True
+        if len(heading) < 4:
+            continue
+        for index in range(len(heading) - 3):
+            if heading[index:index + 4] in query:
+                return True
+    return False
 
 
 def _verified_chunks(lang: str, query: str, top_k: int) -> list[tuple[object, float]]:
@@ -151,11 +174,17 @@ def verified_cn_context(
     today: date | None = None,
 ) -> tuple[str, list[str], list[dict]]:
     picked = select_verified(query, today=today or date.today(), top_k=top_k, lang="cn")
-    context = picked["text"]
-    details = _details(picked["current"], "官方健康资料", today=today, citation_depth=citation_depth)
+    current = [(chunk, score) for chunk, score in picked["current"] if _cn_card_ok(query, chunk, score)]
+    details = _details(current, "官方健康资料", today=today, citation_depth=citation_depth)
     labels = [_label_cn(item) for item in details]
-    if picked["notice"] and not context.startswith(REVISION_NOTICE):
-        context = picked["notice"] + ("\n" + context if context else "")
+    # 来源卡用上面的过滤结果。给模型的上下文仍保留有效期闸门写好的版本说明；
+    # 一张卡都没有、也没有到期修订说明时，不再把低相关片段送进去。
+    if current or picked["notice"] or picked.get("expired_2022"):
+        context = picked["text"]
+        if picked["notice"] and context and not context.startswith(REVISION_NOTICE):
+            context = picked["notice"] + "\n" + context
+    else:
+        context = ""
     return context, labels, details
 
 

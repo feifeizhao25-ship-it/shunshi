@@ -75,7 +75,7 @@ void main() {
       await tester.pumpWidget(host(ReferenceLibraryPage(strings: strings, loader: () async => raw, showPending: false)));
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('library-empty-review')), findsOneWidget);
-      expect(find.text('资料正在审核中'), findsOneWidget);
+      expect(find.text('资料还在审核，暂时只能给通用建议。核对通过之前，这里不展示条目。'), findsOneWidget);
       expect(find.byKey(const Key('library-search')), findsNothing);
     });
 
