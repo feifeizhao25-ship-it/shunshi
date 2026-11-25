@@ -1057,56 +1057,14 @@ class SolarTermAIDetailPage extends StatelessWidget {
     );
   }
 
-  // ── 资料来源 / 待审核（可折叠） ──
+  // 官方链接还在条目数据里，但没有具名审核人之前不挂来源卡。
   Widget _buildSourcesSection(_TermData d) {
-    if (d.sources.isEmpty) return const SizedBox.shrink();
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
-      child: Container(
-        key: const ValueKey('solar-sources'),
-        decoration: BoxDecoration(
-          color: ShunShiColors.surfaceContainerLowest,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: ShunShiColors.textTertiary.withValues(alpha: 0.12)),
-        ),
-        child: Theme(
-          data: ThemeData(dividerColor: Colors.transparent),
-          child: ExpansionTile(
-            initiallyExpanded: false,
-            tilePadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 2),
-            childrenPadding: const EdgeInsets.fromLTRB(18, 0, 18, 16),
-            leading: const Icon(Icons.menu_book_outlined, size: 22, color: ShunShiColors.secondary),
-            title: Row(
-              children: [
-                const Text('资料来源', style: TextStyle(fontSize: 15, color: ShunShiColors.textPrimary)),
-                const SizedBox(width: 10),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                  decoration: BoxDecoration(color: ShunShiColors.apricot.withValues(alpha: 0.18), borderRadius: BorderRadius.circular(999)),
-                  child: const Text('待审核', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: ShunShiColors.secondary)),
-                ),
-              ],
-            ),
-            expandedCrossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              for (final src in d.sources)
-                InkWell(
-                  onTap: () => launchUrl(Uri.parse(src.url), mode: LaunchMode.externalApplication),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 6),
-                    child: Text.rich(TextSpan(children: [
-                      TextSpan(text: '${src.label}\n', style: const TextStyle(fontSize: 14, height: 1.5, color: ShunShiColors.textPrimary)),
-                      TextSpan(text: src.url, style: const TextStyle(
-                        fontSize: 12, height: 1.4, color: ShunShiColors.primary, decoration: TextDecoration.underline)),
-                    ])),
-                  ),
-                ),
-              const SizedBox(height: 6),
-              const Text('内容仅为节气物候、民俗与传统文化介绍，不构成医疗建议；条目待专家审核后正式发布。',
-                  style: TextStyle(fontSize: 12, height: 1.5, color: ShunShiColors.textTertiary)),
-            ],
-          ),
-        ),
+    return const Padding(
+      padding: EdgeInsets.fromLTRB(24, 8, 24, 0),
+      child: Text(
+        '资料还在审核，暂时只能给通用建议。',
+        key: Key('solar-source-pending'),
+        style: TextStyle(fontSize: 14, height: 1.6, color: ShunShiColors.textSecondary),
       ),
     );
   }

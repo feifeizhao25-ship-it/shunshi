@@ -1,0 +1,117 @@
+{
+  "schema_version": "1.0",
+  "library": "顺时·候选资料（未审核，不进入现行引用）",
+  "review_status": "待审核",
+  "reviewer": null,
+  "note": "按修改单顺4整理的候选。没有具名审核人之前不得标成已审核，也不得进入现行检索。",
+  "entries": [
+    {
+      "id": "cand-const-pinghe",
+      "title": "平和质的日常作息",
+      "summary": "饮食有节，作息规律，适度活动。",
+      "source": "《中医体质分类与判定》中华中医药学会标准 ZYYXH/T157-2009",
+      "valid_until": "2027-12-31",
+      "review_status": "待审核",
+      "reviewer": null
+    },
+    {
+      "id": "cand-const-qixu",
+      "title": "气虚质少耗气",
+      "summary": "活动放轻，避免大汗和熬夜。宜食写山药、红枣一类平补食物，待审核。",
+      "source": "《中医体质分类与判定》中华中医药学会标准 ZYYXH/T157-2009",
+      "valid_until": "2027-12-31",
+      "review_status": "待审核",
+      "reviewer": null
+    },
+    {
+      "id": "cand-const-yangxu",
+      "title": "阳虚质注意保暖",
+      "summary": "怕冷时先保暖，早餐用热食。温补食物只作为阳虚倾向的候选，不推给阴虚和湿热。",
+      "source": "《中医体质分类与判定》中华中医药学会标准 ZYYXH/T157-2009",
+      "valid_until": "2027-12-31",
+      "review_status": "待审核",
+      "reviewer": null
+    },
+    {
+      "id": "cand-const-yinxu",
+      "title": "阴虚质少温燥",
+      "summary": "少把羊肉、桂圆当作主食建议。可以考虑梨、银耳、百合这一类清润食物，待审核。",
+      "source": "《中医体质分类与判定》中华中医药学会标准 ZYYXH/T157-2009",
+      "valid_until": "2027-12-31",
+      "review_status": "待审核",
+      "reviewer": null
+    },
+    {
+      "id": "cand-const-tanshi",
+      "title": "痰湿质饮食清淡",
+      "summary": "少油腻甜食，饭后起来走一走。",
+      "source": "《中医体质分类与判定》中华中医药学会标准 ZYYXH/T157-2009",
+      "valid_until": "2027-12-31",
+      "review_status": "待审核",
+      "reviewer": null
+    },
+    {
+      "id": "cand-const-shire",
+      "title": "湿热质少辛辣油腻",
+      "summary": "少酒、少煎炸。清热利湿的食物名单待审核，不写成治疗。",
+      "source": "《中医体质分类与判定》中华中医药学会标准 ZYYXH/T157-2009",
+      "valid_until": "2027-12-31",
+      "review_status": "待审核",
+      "reviewer": null
+    },
+    {
+      "id": "cand-const-xueyu",
+      "title": "血瘀质多活动",
+      "summary": "久坐时起来走一走。不把活血食物写成药效。",
+      "source": "《中医体质分类与判定》中华中医药学会标准 ZYYXH/T157-2009",
+      "valid_until": "2027-12-31",
+      "review_status": "待审核",
+      "reviewer": null
+    },
+    {
+      "id": "cand-const-qiyu",
+      "title": "气郁质到户外走走",
+      "summary": "心情发紧时出门走走、和人说说话。不把花茶写成治疗。",
+      "source": "《中医体质分类与判定》中华中医药学会标准 ZYYXH/T157-2009",
+      "valid_until": "2027-12-31",
+      "review_status": "待审核",
+      "reviewer": null
+    },
+    {
+      "id": "cand-const-tebing",
+      "title": "特禀质避开已知不适",
+      "summary": "换季少去让自己不舒服的环境，已知不能吃的食物继续避开。",
+      "source": "《中医体质分类与判定》中华中医药学会标准 ZYYXH/T157-2009",
+      "valid_until": "2027-12-31",
+      "review_status": "待审核",
+      "reviewer": null
+    },
+    {
+      "id": "cand-xiaoxue-audience",
+      "title": "小雪食养要分人群",
+      "summary": "小雪的通用温补做法不适用于阴虚、湿热，也不作为孕期主建议。",
+      "source": "节气物候见中国气象局节气专题；体质过滤对照 ZYYXH/T157-2009。待审核。",
+      "valid_until": "2027-12-31",
+      "review_status": "待审核",
+      "reviewer": null
+    },
+    {
+      "id": "cand-pregnancy-caution",
+      "title": "孕期进补慎用提示",
+      "summary": "桂圆、羊肉等偏温进补在孕期只提示慎用，并建议先问产科医生。",
+      "source": "候选禁忌提示，待产科或药学审核人核对。",
+      "valid_until": "2027-06-30",
+      "review_status": "待审核",
+      "reviewer": null
+    },
+    {
+      "id": "cand-diet-guideline-2022",
+      "title": "中国居民膳食指南 2022 要点待复核",
+      "summary": "平衡膳食、少盐少油可以作为通用原则引用，但须核对现行版本和有效期。",
+      "source": "《中国居民膳食指南（2022）》中国营养学会",
+      "valid_until": "2026-12-31",
+      "review_status": "待审核",
+      "reviewer": null
+    }
+  ]
+}

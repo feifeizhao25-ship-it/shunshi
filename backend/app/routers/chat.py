@@ -377,6 +377,7 @@ async def chat(
         "safety_flag": output_safety.flag or safety_result.flag or "none",
         "sources": rag_sources,
         "source_details": rag_source_details,
+        "source_note": None if (is_global or rag_source_details) else "资料还在审核，暂时只能给通用建议",
         "retrieval": {"verified_sources": len(rag_source_details), "used_for_grounding": bool(rag_context)},
         "usage_reminder": reminder,
         "locale": {"market": locale.market, "lang": locale.lang, "region": locale.region},
