@@ -1,6 +1,5 @@
 import '../../../data/storage/storage_manager.dart';
 // ignore_for_file: unused_field
-import '../../../core/router/safe_pop.dart';
 import 'package:audioplayers/audioplayers.dart';
 import '../../../data/network/api_client.dart';
 import 'dart:async';
@@ -310,18 +309,6 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
     if (_hasError) {
       return Column(
         children: [
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Padding(
-              padding: const EdgeInsets.all(ShunshiSpacing.md),
-              child: IconButton(
-                tooltip: '关闭',
-                icon: const Icon(Icons.close, size: 22),
-                onPressed: () => safePop(context),
-                color: ShunshiDarkColors.textSecondary,
-              ),
-            ),
-          ),
           const Spacer(),
           Column(
             mainAxisSize: MainAxisSize.min,
@@ -352,19 +339,6 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
 
     return Column(
       children: [
-        // 关闭按钮
-        Align(
-          alignment: Alignment.centerLeft,
-          child: Padding(
-            padding: const EdgeInsets.all(ShunshiSpacing.md),
-            child: IconButton(
-              tooltip: '关闭',
-              icon: const Icon(Icons.close, size: 22),
-              onPressed: () => safePop(context),
-              color: ShunshiDarkColors.textSecondary,
-            ),
-          ),
-        ),
 
         const Spacer(flex: 1),
 
