@@ -11,6 +11,7 @@ import jwt
 from fastapi import HTTPException
 
 from .config import Settings
+from .error_catalog import text as catalog_text
 
 _revoked_jtis: dict[str, float] = {}
 _revoked_lock = threading.Lock()
@@ -102,7 +103,7 @@ def verify_token(settings: Settings, token: str) -> str:
         if payload.get("type") == "refresh":
             # 登录接口签发的 refresh token（30 天）与 access token 同一把密钥；
             # 不拦的话 refresh token 就能当 access token 用，过期时间从 1 小时变成 30 天。
-            raise HTTPException(status_code=401, detail="登录状态已失效")
+            raise HTTPException(status_code=401, detail=catalog_text("session_expired", "zh"))
         jti = payload.get("jti")
         now = token_now()
         with _revoked_lock:
@@ -110,12 +111,14 @@ def verify_token(settings: Settings, token: str) -> str:
             for key in expired:
                 _revoked_jtis.pop(key, None)
             if jti and jti in _revoked_jtis:
-                raise HTTPException(status_code=401, detail="登录状态已失效")
+                raise HTTPException(status_code=401, detail=catalog_text("session_expired", "zh"))
         return str(payload["sub"])
     except HTTPException:
         raise
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail=catalog_text("session_expired", "zh")) from None
     except jwt.PyJWTError:
-        raise HTTPException(status_code=401, detail="登录状态已失效") from None
+        raise HTTPException(status_code=401, detail=catalog_text("not_signed_in", "zh")) from None
 
 
 def revoke_token(settings: Settings, token: str) -> None:

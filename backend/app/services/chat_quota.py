@@ -9,6 +9,7 @@ import redis.asyncio as redis
 from fastapi import HTTPException
 
 from app.entitlements import get_registry
+from app.error_catalog import text as catalog_text
 
 logger = logging.getLogger(__name__)
 RESERVE = """
@@ -39,11 +40,12 @@ def keys_for(user_id: str, now: datetime | None = None):
     return counter, f"{counter}:{uuid.uuid4().hex}", expires
 
 
-MESSAGES = {
-    "unavailable": ("对话额度服务暂不可用，请稍后重试", "The chat quota service is temporarily unavailable. Please try again shortly."),
-    "misconfigured": ("对话额度配置异常，请稍后重试", "The chat quota is misconfigured. Please try again later."),
-    "exhausted": ("今日对话次数已达上限，将于北京时间零点重置", "You have used today's chat messages. The limit resets once a day; Plan & usage shows when, in your own time zone."),
+_KINDS = {
+    "unavailable": "quota_unavailable",
+    "misconfigured": "quota_misconfigured",
+    "exhausted": "quota_exhausted",
 }
+MESSAGES = {kind: (catalog_text(code, "zh"), catalog_text(code, "en")) for kind, code in _KINDS.items()}
 
 
 def message(kind: str, lang: str = "zh") -> str:

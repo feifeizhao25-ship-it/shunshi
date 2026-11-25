@@ -344,7 +344,9 @@ async def chat(
 
             answer = boundary_reply_en(locale.region)
         else:
-            answer = output_safety.override_response or output_safety.prefix or "这份回答未通过安全检查，请换个问题或咨询专业人员。"
+            from ..error_catalog import text as catalog_text
+
+            answer = output_safety.override_response or output_safety.prefix or catalog_text("compliance_blocked", "zh")
     elif output_safety.prefix and not is_global:
         answer = answer + output_safety.prefix
     if safety_result.level == SafetyLevel.EMOTIONAL_DISTRESS:
