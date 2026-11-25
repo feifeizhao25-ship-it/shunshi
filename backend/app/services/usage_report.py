@@ -29,6 +29,15 @@ def _reset_at(now: datetime) -> datetime:
     return datetime.combine(local.date() + timedelta(days=1), datetime.min.time(), tzinfo=SH)
 
 
+def _previous_plan_name(status: dict, lang: str) -> str | None:
+    previous = status.get("previous_plan")
+    if not previous:
+        return None
+    if lang == "en":
+        return {"yangxin": "Content plan", "yiyang": "Member", "jiahe": "Family"}.get(previous, previous)
+    return (status.get("data") or {}).get("previous_plan_name") or PLAN_NAMES.get(previous, (previous, previous))[0]
+
+
 def _item(key: str, limit, used, unit: str) -> dict:
     unlimited = limit == -1
     known = used is not None
@@ -57,6 +66,8 @@ async def build(session: Session, redis_url: str, user_id: str, lang: str = "zh"
         "tier": tier,
         "active": status["active"],
         "expires_at": status["expires_at"],
+        "membership_state": status.get("membership_state") or ("active" if status["active"] else "free"),
+        "previous_plan_name": _previous_plan_name(status, lang),
         "resets_at": reset.astimezone(timezone.utc).isoformat(),
         "reset_note": ("Daily limits reset once a day. See resets_at for the exact moment in your own time zone." if lang == "en" else "每日额度于北京时间零点重置。"),
         "items": [

@@ -176,6 +176,8 @@ class UserSubscriptionStatus {
   final DateTime? expiresAt;
   final int dayRemaining;
   final Map<String, bool> features;
+  final String membershipState;
+  final String? previousPlanName;
 
   UserSubscriptionStatus({
     required this.planId,
@@ -184,15 +186,29 @@ class UserSubscriptionStatus {
     this.expiresAt,
     this.dayRemaining = 0,
     required this.features,
+    this.membershipState = 'free',
+    this.previousPlanName,
   });
 
+  bool get expired => membershipState == 'expired';
+
+  String get headline {
+    if (!expired) return planName;
+    final d = expiresAt?.toLocal();
+    if (d == null) return '已过期';
+    return '已过期（${d.year}年${d.month}月${d.day}日到期）';
+  }
+
   factory UserSubscriptionStatus.fromJson(Map<String, dynamic> json) {
+    final active = json['is_active'] == true;
     return UserSubscriptionStatus(
       planId: json['plan_id'] ?? json['plan'] ?? 'free',
       planName: json['plan_name'] ?? '免费版',
-      isActive: json['is_active'] ?? false,
+      isActive: active,
       expiresAt: _parseMembershipExpiry(json['expires_at']),
       dayRemaining: json['day_remaining'] ?? 0,
+      membershipState: json['membership_state'] as String? ?? (active ? 'active' : 'free'),
+      previousPlanName: json['previous_plan_name'] as String?,
       // features 里混有 daily_chat_limit 等数字项，强转 bool 会抛错并让整页显示“查询失败”
       features: json['features'] is Map
           ? Map<String, bool>.fromEntries(

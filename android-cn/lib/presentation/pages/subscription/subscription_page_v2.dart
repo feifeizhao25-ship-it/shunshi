@@ -363,6 +363,7 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
   Widget _buildCurrentPlanBanner() {
     final planId = _currentStatus?.planId ?? 'free';
     final isActive = _currentStatus?.isActive ?? false;
+    final expired = _currentStatus?.expired ?? false;
     final days = _currentStatus?.dayRemaining ?? 0;
 
     return Container(
@@ -400,7 +401,9 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
-                  isActive && planId != 'free' ? '会员有效' : '免费版',
+                  expired
+                      ? '已过期'
+                      : (isActive && planId != 'free' ? '会员有效' : '免费版'),
                   style: const TextStyle(
                     fontSize: 11,
                     color: Colors.white,
@@ -421,7 +424,7 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
           ),
           const SizedBox(height: 12),
           Text(
-            _currentStatus?.planName ?? '免费版',
+            _currentStatus?.headline ?? '免费版',
             style: const TextStyle(
               fontSize: 26,
               fontWeight: FontWeight.bold,
@@ -720,7 +723,7 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
           borderRadius: BorderRadius.circular(8),
         ),
         child: Text(
-          '开通',
+          (_currentStatus?.expired ?? false) ? '续费' : '开通',
           style: const TextStyle(
             fontSize: 12,
             color: Colors.white,
