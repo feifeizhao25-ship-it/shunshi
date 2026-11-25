@@ -286,7 +286,7 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
           ),
           if (planId != 'free' && isActive) ...[
             const SizedBox(height: 10),
-            _buildFeatureRow('unlimited_chat', 'Unlimited Chat'),
+            _buildFeatureRow('today_plan', '${_currentStatus?.dailyChatLimit ?? 200} messages a day'),
             _buildFeatureRow('today_plan', 'Daily Plan'),
           ],
         ],
@@ -309,7 +309,7 @@ class _SubscriptionPageV2State extends State<SubscriptionPageV2> {
   String _getPlanSubtitle(String planId) {
     switch (planId) {
       case 'free': return 'Basic features for daily wellness';
-      case 'yangxin': return 'Unlimited Chat + Daily Plan';
+      case 'yangxin': return 'Daily messages follow your plan';
       case 'yiyang': return 'Deep advice + weekly summary';
       case 'jiahe': return 'Yearly family plan, 3 people including you';
       default: return '';

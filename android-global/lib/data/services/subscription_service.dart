@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'rights_status.dart';
 import 'store_pricing.dart';
 import '../../core/config/app_config.dart';
 
@@ -66,7 +67,7 @@ class SubscriptionProducts {
     yearlyPriceUSD: 0,
     features: [
       'Daily insight',
-      '3 AI companion conversations per day',
+      '20 AI messages a day',
       'Basic reflection tracking',
       'Seasonal content',
     ],
@@ -81,7 +82,7 @@ class SubscriptionProducts {
     yearlyPriceUSD: 79.99,
     trialDays: 7,
     features: [
-      'Unlimited AI conversations',
+      '200 AI messages a day',
       'Full content library',
       'Audio guides & soundscapes',
       'Weekly reflection summaries',
@@ -213,29 +214,13 @@ class SubscriptionService {
         queryParameters: {'user_id': _userId},
       );
       final data = response.data as Map<String, dynamic>;
-      final tierStr = data['tier'] ?? 'free';
-      final expiresAtStr = data['expires_at'] as String?;
-
-      SubscriptionTier tier;
-      switch (tierStr.toString()) {
-        case 'serenity':
-          tier = SubscriptionTier.serenity;
-          break;
-        case 'harmony': // legacy Harmony subscribers are Premium now
-          tier = SubscriptionTier.serenity;
-          break;
-        case 'family':
-          tier = SubscriptionTier.family;
-          break;
-        default:
-          tier = SubscriptionTier.free;
-      }
+      final snap = rightsFromStatusBody(data);
 
       return SubscriptionState(
-        currentTier: tier,
+        currentTier: snap.tier,
         plans: SubscriptionProducts.plans,
         isLoading: false,
-        expiresAt: expiresAtStr != null ? DateTime.tryParse(expiresAtStr) : null,
+        expiresAt: snap.expiresAt,
       );
     } catch (e) {
       return SubscriptionState(

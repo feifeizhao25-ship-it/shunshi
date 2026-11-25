@@ -33,7 +33,7 @@ PLANS: dict[str, dict] = {
         "yearly_price": 0,
         "trial_days": 0,
         "features": [
-            "5 messages per day",
+            "20 AI messages a day",
             "Basic content library",
             "Limited reflections",
             "Daily suggestions",
@@ -49,7 +49,7 @@ PLANS: dict[str, dict] = {
         "yearly_price": 79.99,
         "trial_days": 7,
         "features": [
-            "Unlimited AI conversations",
+            "200 AI messages a day",
             "Full content library",
             "Audio guides & soundscapes",
             "Weekly reflection summaries",
@@ -74,6 +74,30 @@ PLANS: dict[str, dict] = {
         "description": "Share calm with your household, billed yearly",
     },
 }
+
+# 对话条数只认权益注册表。premium 用 pro 档（200），family 用 family 档（200），free 用 free 档（20）。
+# 价格仍是本文件里的年付美元价，这里不改价。
+_SEASONS_QUOTA_TIER = {"free": "free", "premium": "pro", "family": "family"}
+
+
+def message_line_for_plan(plan_id: str) -> str:
+    from app.entitlements import get_registry
+
+    tier = _SEASONS_QUOTA_TIER[plan_id]
+    limit = int(get_registry()["tiers"][tier]["quotas"]["ai_daily_messages"])
+    if limit < 0:
+        return "AI messages with no daily cap"
+    return f"{limit} AI messages a day"
+
+
+def _apply_registry_message_lines() -> None:
+    for plan_id, features in ((pid, PLANS[pid]["features"]) for pid in ("free", "premium")):
+        line = message_line_for_plan(plan_id)
+        if features:
+            features[0] = line
+
+
+_apply_registry_message_lines()
 
 PAID_PLAN_IDS = tuple(p for p in PLANS if p != "free")
 

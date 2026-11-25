@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/services/ai_safety.dart';
+import '../../../data/services/rights_status.dart';
 import '../../../data/services/speech_text.dart';
 import '../../../data/services/tts_player_service.dart';
 import '../../../data/services/voice_service.dart';
@@ -184,12 +185,12 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
     try {
       _dio.options.headers['Authorization'] = 'Bearer $_token';
       final res = await _dio.get('/api/v1/subscription/status');
-      if (res.data != null && res.data['data'] != null) {
-        final data = res.data['data'];
+      if (res.data is Map) {
+        final snap = rightsFromStatusBody(Map<String, dynamic>.from(res.data as Map));
         setState(() {
-          _quotaLimit = data['limit'] ?? 10;
-          _quotaRemaining = data['remaining'] ?? (data['limit'] ?? 10);
-          _isVip = data['tier'] != 'free';
+          _quotaLimit = snap.dailyChatLimit;
+          _quotaRemaining = snap.dailyChatLimit;
+          _isVip = snap.paid;
         });
       }
     } catch (_) {}
