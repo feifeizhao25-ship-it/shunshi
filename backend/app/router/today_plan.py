@@ -173,6 +173,33 @@ log = logging.getLogger(__name__)
 
 # ============ Helper Functions ============
 
+def _solar_for_user(user_id: Optional[str], is_global: bool) -> dict:
+    term = get_current_solar_term(is_global)
+    if is_global or not user_id:
+        return term
+    constitution, life_stage = _stored_audience(user_id)
+    if not constitution and not life_stage:
+        return term
+    from app.services.solar_audience import filter_solar_term
+    return filter_solar_term(term, constitution=constitution, life_stage=life_stage)
+
+
+def _stored_audience(user_id: str) -> tuple:
+    try:
+        from app.db.database import session_factory
+        from app.services import personal_home_service as phs
+        session = session_factory()
+        try:
+            chosen = (phs.preferences(session, user_id) or {}).get("constitution")
+            stored = phs._read(session, user_id, "profile:onboarding") or {}
+            stage = stored.get("life_stage") if isinstance(stored, dict) else None
+            return chosen, stage
+        finally:
+            session.close()
+    except Exception:
+        return None, None
+
+
 def get_current_solar_term(is_global: bool = False):
     """获取当前节气：查天文计算的节气表（北京时间），见 app/utils/solar_term_calendar.py。"""
     from app.utils import solar_term_calendar
@@ -345,7 +372,7 @@ def build_plan(user_id: Optional[str], loc: RequestLocale, variant: int = 0) -> 
         insights=generate_insights(rng, needs, loc.is_global),
         tasks=generate_tasks(rng, needs, loc.is_global),
         recommendations=generate_recommendations(loc.is_global),
-        solar_term=get_current_solar_term(loc.is_global),
+        solar_term=_solar_for_user(user_id, loc.is_global),
     )
 
 

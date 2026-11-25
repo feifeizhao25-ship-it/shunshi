@@ -702,16 +702,62 @@ async def get_solar_terms(
         "limit": limit
     }
 
+def _resolve_audience(request: Request, constitution: Optional[str], life_stage: Optional[str]):
+    """查询参数优先。没传时，登录用户读自己填写的体质和人生阶段。读不到就保持通用节气。"""
+    if constitution or life_stage:
+        return constitution, life_stage
+    auth = request.headers.get("authorization") or ""
+    if not auth.lower().startswith("bearer "):
+        return None, None
+    try:
+        from app.security import verify_token
+        user_id = verify_token(request.app.state.settings, auth.split(" ", 1)[1].strip())
+    except Exception:
+        return None, None
+    try:
+        from ..services import personal_home_service as phs
+        session = request.app.state.session_factory()
+        try:
+            chosen = (phs.preferences(session, user_id) or {}).get("constitution")
+            stored = phs._read(session, user_id, "profile:onboarding") or {}
+            stage = stored.get("life_stage") if isinstance(stored, dict) else None
+            return chosen, stage
+        finally:
+            session.close()
+    except Exception:
+        return None, None
+
+
+def _maybe_filter_term(data: dict, locale: str, constitution: Optional[str], life_stage: Optional[str]) -> dict:
+    if locale == "en-US" or not (constitution or life_stage):
+        return data
+    from app.services.solar_audience import filter_solar_term
+    return filter_solar_term(data, constitution=constitution, life_stage=life_stage)
+
+
 @router.get("/current", response_model=dict, summary="当前节气", description="返回当前所处的节气信息")
-async def get_current(request: Request, locale: str = Depends(_request_term_locale)):
+async def get_current(
+    request: Request,
+    locale: str = Depends(_request_term_locale),
+    constitution: Optional[str] = Query(None, description="体质倾向，如阴虚、湿热"),
+    life_stage: Optional[str] = Query(None, description="人生阶段，如孕期、儿童"),
+):
     """获取当前节气。测试环境可被 X-Shunshi-Test-Now 钉住；其他环境忽略该头。"""
     current = get_current_solar_term(_test_clock_day(request))
-    return {"success": True, "data": _localize_term(current, locale)}
+    data = _localize_term(current, locale)
+    cons, stage = _resolve_audience(request, constitution, life_stage)
+    return {"success": True, "data": _maybe_filter_term(data, locale, cons, stage)}
 
 @router.get("/today", response_model=dict, summary="今日节气建议", description="返回当前节气及前后节气信息，附带七日养生建议")
-async def get_today_solar_term(request: Request, locale: str = Depends(_request_term_locale)):
+async def get_today_solar_term(
+    request: Request,
+    locale: str = Depends(_request_term_locale),
+    constitution: Optional[str] = Query(None),
+    life_stage: Optional[str] = Query(None),
+):
     """获取今日节气和建议。测试环境的「今天」跟随测试时钟。"""
     current = get_current_solar_term(_test_clock_day(request))
+    cons, stage = _resolve_audience(request, constitution, life_stage)
     
     # 获取前后两个节气
     current_idx = SOLAR_TERMS.index(current)
@@ -725,7 +771,7 @@ async def get_today_solar_term(request: Request, locale: str = Depends(_request_
     seven_day_suggestions = []
     for i in range(7):
         day_term = get_solar_term_by_name(solar_term_calendar.term_on(today + timedelta(days=i))) or current
-        localized = _localize_term(day_term, locale)
+        localized = _maybe_filter_term(_localize_term(day_term, locale), locale, cons, stage)
         seven_day_suggestions.append({
             "day": i + 1,
             "term": localized["name"],
@@ -736,7 +782,7 @@ async def get_today_solar_term(request: Request, locale: str = Depends(_request_
     return {
         "success": True,
         "data": {
-            "current": _localize_term(current, locale),
+            "current": _maybe_filter_term(_localize_term(current, locale), locale, cons, stage),
             "previous": _localize_term(prev_term, locale),
             "next": _localize_term(next_term, locale),
             "seven_day_suggestions": seven_day_suggestions
@@ -862,9 +908,23 @@ async def get_solar_term_notifications(locale: str = Depends(_request_term_local
     }
 
 @router.get("/enhanced/current", summary="增强版当前节气", description="返回当前节气含倒计时和进度信息")
-async def get_enhanced_current_term():
-    """获取当前节气（含倒计时和进度）"""
-    return {"success": True, "data": solar_term_enhanced_service.get_current_term()}
+async def get_enhanced_current_term(
+    request: Request,
+    constitution: Optional[str] = Query(None),
+    life_stage: Optional[str] = Query(None),
+):
+    """获取当前节气（含倒计时和进度）。带上体质或人生阶段时附上人群提示。"""
+    data = solar_term_enhanced_service.get_current_term()
+    cons, stage = _resolve_audience(request, constitution, life_stage)
+    if cons or stage:
+        from app.services.solar_audience import filter_solar_term
+        softened = filter_solar_term(
+            {"foods": [], "suggestions": ["作息规律"], "description": ""},
+            constitution=cons,
+            life_stage=stage,
+        )
+        data["audience_notes"] = softened["audience_notes"]
+    return {"success": True, "data": data}
 
 
 @router.get("/enhanced/all", summary="增强版所有节气", description="返回所有节气含当前/过去/未来状态和高亮标记")
@@ -878,13 +938,30 @@ async def get_all_terms_with_status(
 @router.get("/enhanced/{term_name}", summary="节气详细养生方案", description="返回指定节气的详细养生方案，包括食疗/茶饮/运动/穴位/睡眠/作息")
 async def get_enhanced_term_detail(
     term_name: str,
+    request: Request,
     locale: str = Depends(_request_term_locale),
+    constitution: Optional[str] = Query(None),
+    life_stage: Optional[str] = Query(None),
 ):
     """获取节气详细养生方案（食疗/茶饮/运动/穴位/睡眠/作息）"""
     try:
-        return {"success": True, "data": solar_term_enhanced_service.get_term_detail(term_name, locale)}
+        data = solar_term_enhanced_service.get_term_detail(term_name, locale)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
+    cons, stage = _resolve_audience(request, constitution, life_stage)
+    if locale != "en-US" and (cons or stage):
+        from app.services.solar_audience import filter_solar_term, filter_text_items
+        plan = data.get("wellness_plan") or {}
+        if isinstance(plan.get("diet"), list):
+            plan["diet"] = filter_text_items(plan["diet"], constitution=cons, life_stage=stage)
+        softened = filter_solar_term(
+            {"foods": [], "suggestions": ["作息规律"], "description": ""},
+            constitution=cons,
+            life_stage=stage,
+        )
+        data["wellness_plan"] = plan
+        data["audience_notes"] = softened["audience_notes"]
+    return {"success": True, "data": data}
 
 
 @router.get("/wisdom", response_model=dict, summary="季节养生智慧", description="返回春/夏/秋/冬四季的养生智慧和核心建议")
