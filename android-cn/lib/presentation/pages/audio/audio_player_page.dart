@@ -374,7 +374,9 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
           builder: (context, child) {
             return Transform.scale(
               scale: _breathScale.value,
-              child: Container(
+              child: GestureDetector(
+                onTap: _togglePlay,
+                child: Container(
                 width: 200,
                 height: 200,
                 decoration: BoxDecoration(
@@ -409,6 +411,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
                   ),
                 ),
               ),
+            ),
             );
           },
         ),
