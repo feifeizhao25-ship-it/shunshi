@@ -69,6 +69,13 @@ String membershipLabel({required bool loggedIn, bool? active}) {
 }
 
 /// Account record first, then the name saved during profile setup.
+/// 我的页用的名字：接口里的昵称优先，占位「顺时用户」不当成真名。
+String? profileDisplayName({String? userInfoJson, String? userName, String? remoteName}) {
+  final remote = remoteName?.trim() ?? '';
+  if (remote.isNotEmpty && remote != '顺时用户') return remote;
+  return accountNickname(userInfoJson: userInfoJson, userName: userName);
+}
+
 String? accountNickname({String? userInfoJson, String? userName}) {
   final fromInfo = _nameFromUserInfo(userInfoJson);
   if (fromInfo != null) return fromInfo;
