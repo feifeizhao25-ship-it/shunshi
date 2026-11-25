@@ -45,11 +45,18 @@ def entitlements_registry():
 
 @router.get("/subscription/status")
 def subscription_status(
+    locale: RequestLocale = Depends(request_locale),
     user_id: str = Depends(current_user),
     session: Session = Depends(get_session),
 ):
     from ..services.membership_status import membership_status
-    return membership_status(session, user_id)
+    from ..services.usage_report import PLAN_NAMES
+
+    state = membership_status(session, user_id)
+    if locale.is_global:
+        # 国际版不把「免费版 / 会员」这类中文档名返回去。额度数字仍是同一份权益。
+        state = {**state, "data": {**state["data"], "plan_name": PLAN_NAMES[state["plan"]][1]}}
+    return state
 
 
 @router.get("/subscription/plan-usage")

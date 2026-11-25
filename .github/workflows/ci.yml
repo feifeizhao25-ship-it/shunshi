@@ -81,6 +81,16 @@ jobs:
         run: python -m compileall -q app
       - name: Lint (ruff)
         run: pip install ruff && ruff check app/ --select=E9,F63,F7,F82
+      - name: 语言检查（国内响应无整句英文，国际响应无汉字）
+        env:
+          DATABASE_URL: sqlite:///test.db
+          REDIS_URL: redis://localhost
+          JWT_SECRET: ci-only-secret-with-at-least-32-characters
+          SHUNSHI_JWT_SECRET: ci-only-secret-with-at-least-32-characters
+          ADMIN_JWT_SECRET: ci-admin-secret-with-at-least-32-characters
+          ADMIN_PASSWORD_HASH: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+          APP_ENV: testing
+        run: python -m pytest tests/test_api_language_gate.py --tb=short
       - name: Test
         env:
           DATABASE_URL: sqlite:///test.db

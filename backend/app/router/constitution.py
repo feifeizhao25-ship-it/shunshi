@@ -7,8 +7,15 @@ from pydantic import BaseModel, Field
 from typing import List, Optional, Dict
 from datetime import datetime
 
+from fastapi import Depends
+
 from app.database.db import get_db
+from app.locale_context import RequestLocale, request_locale
 from sqlalchemy import text
+
+def _english_constitution_line(name_en: str) -> str:
+    name = name_en or "Constitution"
+    return f"{name}. A self-check lifestyle tendency, not a diagnosis."
 
 router = APIRouter(prefix="/api/v1/constitution", tags=["体质辨识"])
 
@@ -940,20 +947,44 @@ async def get_result(user_id: str):
 
 
 @router.get("", response_model=dict, summary="体质列表", description="返回9种中医体质类型的名称和描述")
-async def list_constitutions():
-    """获取体质列表（兼容测试格式）"""
+async def list_constitutions(locale: RequestLocale = Depends(request_locale)):
+    """获取体质列表（兼容测试格式）。国际版只返回英文名。"""
     result = []
     for key, info in CONSTITUTION_TYPES.items():
-        result.append({
-            "id": key,
-            "name": info["name"],
-            "description": info["description"],
-        })
+        if locale.is_global:
+            result.append({
+                "id": key,
+                "name": info["name_en"],
+                "description": _english_constitution_line(info["name_en"]),
+            })
+        else:
+            result.append({
+                "id": key,
+                "name": info["name"],
+                "description": info["description"],
+            })
     return {"success": True, "data": result}
 
 
+def _types_for_locale(items: List[ConstitutionTypeSummary], locale: RequestLocale) -> List[ConstitutionTypeSummary]:
+    if not locale.is_global:
+        return items
+    localized = []
+    for item in items:
+        localized.append(ConstitutionTypeSummary(
+            type=item.type,
+            name=item.name_en or "Constitution",
+            name_en=item.name_en or "Constitution",
+            description=_english_constitution_line(item.name_en),
+            characteristics=[],
+            diet_recommendations=[],
+            lifestyle_advice=[],
+        ))
+    return localized
+
+
 @router.get("/types", response_model=List[ConstitutionTypeSummary], summary="体质类型定义", description="获取9种体质的详细定义，包含特点、饮食推荐和生活方式建议")
-async def get_constitution_types():
+async def get_constitution_types(locale: RequestLocale = Depends(request_locale)):
     """获取9种体质定义列表（从数据库读取）"""
     try:
         from app.db.database import Session
@@ -966,7 +997,7 @@ async def get_constitution_types():
             """)
             rows = result.fetchall()
             if rows:
-                return [
+                return _types_for_locale([
                     ConstitutionTypeSummary(
                         type=r[0],
                         name=r[1],
@@ -977,7 +1008,7 @@ async def get_constitution_types():
                         lifestyle_advice=r[6] if isinstance(r[6], list) else (eval(r[6]) if r[6] else []),
                     )
                     for r in rows
-                ]
+                ], locale)
         finally:
             db.close()
     except Exception:
@@ -993,7 +1024,7 @@ async def get_constitution_types():
             name_en=info["name_en"],
             description=info["description"],
         ))
-    return result
+    return _types_for_locale(result, locale)
 
 
 @router.get("/types/{name}", response_model=ConstitutionTypeDetail, summary="体质类型详情", description="获取指定体质的完整信息，含饮食/茶饮/运动建议和禁忌")
