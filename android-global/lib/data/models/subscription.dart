@@ -177,6 +177,7 @@ class UserSubscriptionStatus {
   final bool isActive;
   final DateTime? expiresAt;
   final int dayRemaining;
+  final int? dailyChatLimit;
   final Map<String, bool> features;
 
   UserSubscriptionStatus({
@@ -185,6 +186,7 @@ class UserSubscriptionStatus {
     required this.isActive,
     this.expiresAt,
     this.dayRemaining = 0,
+    this.dailyChatLimit,
     required this.features,
   });
 
@@ -201,12 +203,14 @@ class UserSubscriptionStatus {
       exp = DateTime.tryParse(rawExp);
     }
     final rawFeatures = json['features'];
+    final rawLimit = rawFeatures is Map ? rawFeatures['daily_chat_limit'] : null;
     return UserSubscriptionStatus(
       planId: id,
       planName: enNames[id] ?? 'Free',
       isActive: json['is_active'] ?? false,
       expiresAt: exp,
       dayRemaining: json['day_remaining'] ?? 0,
+      dailyChatLimit: rawLimit is num ? rawLimit.toInt() : null,
       features: rawFeatures is Map
           ? Map<String, bool>.fromEntries(rawFeatures.entries
               .where((e) => e.value is bool)

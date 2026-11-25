@@ -7,9 +7,13 @@ import logging
 import stripe
 from datetime import datetime, timedelta, timezone
 from typing import Optional, List, Any
-from fastapi import APIRouter, Query, HTTPException, Header, Request
+from fastapi import APIRouter, Depends, Query, HTTPException, Header, Request
 from pydantic import BaseModel
 from pydantic import Field
+from sqlalchemy.orm import Session
+
+from app.deps import get_session
+from app.services.membership_status import membership_status
 
 logger = logging.getLogger(__name__)
 
@@ -55,32 +59,35 @@ class StripeWebhookRequest(BaseModel):
     livemode: Optional[bool] = False
 
 
+def _seasons_tier(plan: str) -> str:
+    """国内档位 → 国际版档名。价格不在这里定，只做同一条权益的称呼。"""
+    if plan == "jiahe":
+        return "family"
+    if plan in ("yiyang", "yangxin"):
+        return "premium"
+    return "free"
+
+
 @router.get("/status")
-async def get_subscription_status(user_id: str = Query(...)):
-    """Get current subscription status for a user"""
-    sub = subscriptions_db.get(user_id, {})
-    
-    now = datetime.now()
-    tier = canonical_plan_id(sub.get("tier")) or "free"  # 旧 serenity/harmony → premium
-    expires_at = sub.get("expires_at")
-    trial_ends_at = sub.get("trial_ends_at")
-    
-    is_in_trial = False
-    if trial_ends_at:
-        try:
-            trial_end = datetime.fromisoformat(trial_ends_at)
-            is_in_trial = trial_end > now
-        except Exception as e:            pass
-    
+async def get_subscription_status(user_id: str = Query(...), session: Session = Depends(get_session)):
+    """当前用户的档位、额度和到期日。只读权益表，不读内存里的第二份订阅。"""
+    state = membership_status(session, user_id)
+    plan = state["plan"]
+    expires_at = state["expires_at"]
+    iso = datetime.fromtimestamp(int(expires_at), timezone.utc).isoformat() if expires_at else None
     return {
-        "tier": tier,
-        "product_id": sub.get("product_id"),
-        "status": sub.get("status", "active"),
-        "expires_at": expires_at,
-        "trial_ends_at": trial_ends_at,
-        "is_in_trial": is_in_trial,
-        "is_in_intro_offer": sub.get("is_in_intro_offer", False),
-        "billing": sub.get("billing"),
+        "tier": _seasons_tier(plan),
+        "plan": plan,
+        "product_id": state["product_id"],
+        "status": "active" if state["active"] else "inactive",
+        "active": bool(state["active"]),
+        "expires_at": iso,
+        "expires_at_unix": expires_at,
+        "daily_chat_limit": int(state["data"]["features"]["daily_chat_limit"]),
+        "trial_ends_at": None,
+        "is_in_trial": False,
+        "is_in_intro_offer": False,
+        "billing": "yearly" if state["active"] else None,
     }
 
 

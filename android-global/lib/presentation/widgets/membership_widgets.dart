@@ -78,7 +78,7 @@ class _MembershipCardState extends State<MembershipCard> {
           ),
           const SizedBox(height: 16),
           ...[
-            ('💬', 'Unlimited AI conversations'),
+            ('💬', '200 AI messages a day'),
             ('📊', 'Deep wellness insights'),
             ('👨‍👩‍👧‍👦', 'Family sharing'),
             ('📅', 'Exclusive seasonal reports'),

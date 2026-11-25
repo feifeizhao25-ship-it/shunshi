@@ -134,7 +134,7 @@ class SubscriptionPage extends ConsumerWidget {
     final tiers = [
       (SubscriptionTier.free, 'Free', '\$0', null, false, <String>[]),
       (SubscriptionTier.serenity, 'Premium', StorePricing.price('serenity'), StorePricing.price('serenity') == StorePricing.pending ? null : 'year', true, [
-        'Unlimited AI companion',
+        '200 AI messages a day',
         'All content library',
         'Seasonal insights',
         'Unlimited reflections',

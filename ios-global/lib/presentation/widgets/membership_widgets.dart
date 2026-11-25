@@ -78,7 +78,7 @@ class _MembershipCardState extends State<MembershipCard> {
           ),
           const SizedBox(height: 16),
           ...[
-            ('💬', 'Unlimited AI conversations'),
+            ('💬', '200 AI messages a day'),
             ('📊', 'Deep wellness insights'),
             ('👨‍👩‍👧‍👦', 'Family sharing'),
             ('📅', 'Exclusive seasonal reports'),
@@ -168,7 +168,7 @@ class TokenBalanceBar extends StatelessWidget {
             const SizedBox(width: 8),
             Expanded(
               child: Text(
-                isLow ? 'Upgrade for unlimited conversations' : '$remaining conversations remaining today',
+                isLow ? 'Upgrade for 200 messages a day' : '$remaining conversations remaining today',
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,

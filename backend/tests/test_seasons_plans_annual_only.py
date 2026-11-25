@@ -52,10 +52,15 @@ def test_products_endpoint_lists_yearly_only():
         assert p["has_intro_offer"] is False
 
 
-def test_status_maps_legacy_tier_to_premium():
+def test_status_ignores_the_in_memory_table(client):
+    """内存里的旧档不能再当成第二份会员。没有权益记录就是免费版。"""
     ss.subscriptions_db["legacy-user"] = {"tier": "harmony", "status": "active"}
     try:
-        assert asyncio.run(ss.get_subscription_status(user_id="legacy-user"))["tier"] == "premium"
+        with client.app.state.session_factory() as session:
+            body = asyncio.run(ss.get_subscription_status(user_id="legacy-user", session=session))
+        assert body["tier"] == "free"
+        assert body["plan"] == "free"
+        assert body["active"] is False
     finally:
         ss.subscriptions_db.pop("legacy-user", None)
 

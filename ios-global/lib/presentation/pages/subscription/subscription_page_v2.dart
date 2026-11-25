@@ -45,7 +45,7 @@ class SubscriptionPageV2 extends StatelessWidget {
           const SgHeroBanner(
             asset: 'assets/images/sg_hero_member.webp',
             title: 'SEASONS Premium',
-            subtitle: 'Unlock the full library and unlimited conversations.',
+            subtitle: 'Unlock the full library. Premium includes 200 messages a day.',
             height: 160,
           ),
           const SizedBox(height: 16),

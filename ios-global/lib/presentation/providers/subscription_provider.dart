@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
+import '../../../data/services/rights_status.dart';
 import '../../../data/services/subscription_service.dart';
 import '../../core/config/app_config.dart';
 import '../../data/network/session.dart';
@@ -52,29 +53,13 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
         queryParameters: {'user_id': _userId},
       );
       final data = response.data as Map<String, dynamic>;
-      final tierStr = data['tier'] ?? 'free';
-      final expiresAtStr = data['expires_at'] as String?;
-
-      SubscriptionTier tier;
-      switch (tierStr.toString()) {
-        case 'serenity':
-          tier = SubscriptionTier.serenity;
-          break;
-        case 'harmony': // legacy Harmony subscribers are Premium now
-          tier = SubscriptionTier.serenity;
-          break;
-        case 'family':
-          tier = SubscriptionTier.family;
-          break;
-        default:
-          tier = SubscriptionTier.free;
-      }
+      final snap = rightsFromStatusBody(data);
 
       return SubscriptionState(
-        currentTier: tier,
+        currentTier: snap.tier,
         plans: SubscriptionProducts.plans,
         isLoading: false,
-        expiresAt: expiresAtStr != null ? DateTime.tryParse(expiresAtStr) : null,
+        expiresAt: snap.expiresAt,
       );
     } catch (e) {
       return SubscriptionState(
@@ -146,27 +131,11 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
       final data = response.data as Map<String, dynamic>;
       final restored = data['restored'] == true;
       if (restored) {
-        final tierStr = data['tier'] ?? 'free';
-        final expiresAtStr = data['expires_at'] as String?;
-
-        SubscriptionTier tier;
-        switch (tierStr) {
-          case 'serenity':
-            tier = SubscriptionTier.serenity;
-            break;
-          case 'harmony': // legacy Harmony subscribers are Premium now
-            tier = SubscriptionTier.serenity;
-            break;
-          case 'family':
-            tier = SubscriptionTier.family;
-            break;
-          default:
-            tier = SubscriptionTier.free;
-        }
+        final snap = rightsFromStatusBody(data);
         state = state.copyWith(
-          currentTier: tier,
+          currentTier: snap.tier,
           isRestoring: false,
-          expiresAt: expiresAtStr != null ? DateTime.tryParse(expiresAtStr) : null,
+          expiresAt: snap.expiresAt,
         );
       } else {
         state = state.copyWith(isRestoring: false);
