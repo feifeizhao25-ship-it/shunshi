@@ -67,6 +67,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
   ));
 
   final _clock = ListenClock();
+  bool _bundledStarted = false;
   StreamSubscription? _stateSub;
   Timer? _listenTimer;
   bool _limitShown = false;
@@ -212,10 +213,17 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
     if (_isPlaying) {
       await _player.pause();
       _reportProgress();
+      if (mounted) setState(() => _isPlaying = false);
+      return;
+    }
+    // setSource 之后直接 resume，内置呼吸音频不会开始走秒，时间停在 00:00。
+    if (breathNeedsPlay(bundled: _usingBundled, started: _bundledStarted)) {
+      _bundledStarted = true;
+      await _player.play(AssetSource('audio/audio_breathe_1.mp3'));
     } else {
       await _player.resume();
-      if (_usingBundled && mounted) setState(() => _isPlaying = true);
     }
+    if (mounted) setState(() => _isPlaying = true);
   }
 
   void _seekRelative(int seconds) {
@@ -366,7 +374,9 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
           builder: (context, child) {
             return Transform.scale(
               scale: _breathScale.value,
-              child: Container(
+              child: GestureDetector(
+                onTap: _togglePlay,
+                child: Container(
                 width: 200,
                 height: 200,
                 decoration: BoxDecoration(
@@ -401,6 +411,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
                   ),
                 ),
               ),
+            ),
             );
           },
         ),
@@ -506,3 +517,6 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
     );
   }
 }
+
+/// 内置呼吸音频只 setSource 过、还没 play 过时，下一次开始必须 play，不能 resume。
+bool breathNeedsPlay({required bool bundled, required bool started}) => bundled && !started;
