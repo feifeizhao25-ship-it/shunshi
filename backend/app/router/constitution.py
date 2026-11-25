@@ -1069,14 +1069,28 @@ async def get_constitution_detail(name: str):
     )
 
 
+def constitution_key(type_name: str) -> str | None:
+    """拼音 id、中文名、去掉「质」的中文名，都指同一种体质。"""
+    raw = (type_name or "").strip()
+    if raw in CONSTITUTION_TYPES:
+        return raw
+    for key, info in CONSTITUTION_TYPES.items():
+        name = str(info.get("name") or "")
+        short = name[:-1] if name.endswith("质") else name
+        if raw in {name, short, str(info.get("name_en") or "")}:
+            return key
+    return None
+
+
 # ============ 兼容测试端点 ============
 
 @router.get("/{type_name}", response_model=dict, summary="体质详情(兼容)", description="兼容测试格式的体质详情查询，返回名称、描述、特点和饮食建议")
 async def get_constitution_by_type(type_name: str):
     """获取单个体质详情（兼容测试格式）"""
-    if type_name not in CONSTITUTION_TYPES:
+    key = constitution_key(type_name)
+    if key is None:
         raise HTTPException(status_code=404, detail="体质类型不存在")
-    info = CONSTITUTION_TYPES[type_name]
+    info = CONSTITUTION_TYPES[key]
     return {
         "success": True,
         "data": {
@@ -1093,9 +1107,10 @@ async def get_constitution_by_type(type_name: str):
 @router.get("/{type_name}/foods", response_model=dict, summary="体质推荐食物", description="返回指定体质类型的推荐食物列表")
 async def get_constitution_foods(type_name: str):
     """获取体质推荐食物"""
-    if type_name not in CONSTITUTION_TYPES:
+    key = constitution_key(type_name)
+    if key is None:
         raise HTTPException(status_code=404, detail="体质类型不存在")
-    info = CONSTITUTION_TYPES[type_name]
+    info = CONSTITUTION_TYPES[key]
     foods = info.get("diet_recommendations", []) or info.get("diet_advice", "").split("。") or []
     return {
         "success": True,
@@ -1106,9 +1121,10 @@ async def get_constitution_foods(type_name: str):
 @router.get("/{type_name}/exercises", response_model=dict, summary="体质推荐运动", description="返回指定体质类型的推荐运动列表")
 async def get_constitution_exercises(type_name: str):
     """获取体质推荐运动"""
-    if type_name not in CONSTITUTION_TYPES:
+    key = constitution_key(type_name)
+    if key is None:
         raise HTTPException(status_code=404, detail="体质类型不存在")
-    info = CONSTITUTION_TYPES[type_name]
+    info = CONSTITUTION_TYPES[key]
     exercises = info.get("exercise_recommendations", []) or info.get("exercise_advice", "").split("。") or []
     return {
         "success": True,
