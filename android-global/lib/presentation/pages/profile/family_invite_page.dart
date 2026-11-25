@@ -1,10 +1,13 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import '../../../design_system/app_colors.dart';
 import 'package:flutter/services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/router/safe_pop.dart';
 import '../../../core/theme/app_localizations.dart';
+import '../../../core/network/api_singleton.dart';
+import '../../../data/network/session.dart';
+import '../../../data/services/family_body.dart';
 
 class FamilyInvitePage extends StatefulWidget {
   const FamilyInvitePage({super.key});
@@ -25,29 +28,26 @@ class _FamilyInvitePageState extends State<FamilyInvitePage> {
   }
 
   Future<void> _loadData() async {
-    final prefs = await SharedPreferences.getInstance();
-    // Generate or load invite code
-    var code = prefs.getString('family_invite_code');
-    if (code == null || code.isEmpty) {
-      code = 'SS${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}';
-      await prefs.setString('family_invite_code', code);
-    }
-    // Load existing members
-    final membersRaw = prefs.getString('family_members');
-    List<Map<String, String>> members = [];
-    if (membersRaw != null) {
-      // Simple format: "name1:relation1,name2:relation2"
-      for (final entry in membersRaw.split(',')) {
-        final parts = entry.split(':');
-        if (parts.length == 2) {
-          members.add({'name': parts[0], 'relation': parts[1]});
-        }
+    try {
+      final token = await ensureSessionToken(apiClient.dio);
+      final res = await apiClient.dio.get('/api/v1/family/', options: Options(headers: {'Authorization': 'Bearer $token'}));
+      final body = familyBody(res.data);
+      final members = <Map<String, String>>[];
+      for (final raw in body['members'] as List) {
+        if (raw is! Map) continue;
+        members.add({'name': '${raw['name'] ?? ''}', 'relation': '${raw['relation'] ?? ''}'});
       }
-    }
-    if (mounted) {
+      if (!mounted) return;
       setState(() {
-        _inviteCode = code!;
+        _inviteCode = (body['invite_code'] as String?)?.trim() ?? '';
         _members = members;
+        _loading = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _inviteCode = '';
+        _members = [];
         _loading = false;
       });
     }
@@ -91,7 +91,7 @@ class _FamilyInvitePageState extends State<FamilyInvitePage> {
                           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                           decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(12)),
                           child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                            Text(_inviteCode, style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 4)),
+                            Text(_inviteCode.isEmpty ? 'No invite code yet' : _inviteCode, style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 4)),
                             const SizedBox(width: 12),
                             IconButton(icon: const Icon(Icons.copy, color: Colors.white), onPressed: _copyCode),
                           ]),
@@ -156,6 +156,7 @@ class _FamilyInvitePageState extends State<FamilyInvitePage> {
   }
 
   void _copyCode() {
+    if (_inviteCode.isEmpty) return;
     Clipboard.setData(ClipboardData(text: _inviteCode));
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(AppLocalizations.of(context).t('profile_invite_code_copied')), duration: Duration(seconds: 2)),

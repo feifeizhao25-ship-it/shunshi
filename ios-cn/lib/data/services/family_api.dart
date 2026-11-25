@@ -2,6 +2,17 @@ import 'package:dio/dio.dart';
 import '../network/api_client.dart';
 import '../storage/storage_manager.dart';
 
+/// `/api/v1/family` 有时直接返回家庭对象，有时包在 `data` 里。两种都认，不认就抛错。
+Map<String, dynamic> familyBody(dynamic body) {
+  if (body is Map && body['members'] is List) {
+    return Map<String, dynamic>.from(body);
+  }
+  if (body is Map && body['data'] is Map && (body['data'] as Map)['members'] is List) {
+    return Map<String, dynamic>.from(body['data'] as Map);
+  }
+  throw const FormatException('家庭信息格式不正确');
+}
+
 class FamilyApi {
   FamilyApi({Dio? dio, String? Function()? readToken})
     : _dio =
@@ -37,10 +48,8 @@ class FamilyApi {
   }
 
   Future<Map<String, dynamic>> load() async {
-    final body = await _request('GET', '/api/v1/family');
-    if (body is! Map ||
-        body['family_name'] is! String ||
-        body['members'] is! List) {
+    final body = familyBody(await _request('GET', '/api/v1/family'));
+    if (body['family_name'] is! String || body['members'] is! List) {
       throw const FormatException('家庭信息格式不正确');
     }
     for (final member in body['members']) {

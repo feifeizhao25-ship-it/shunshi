@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/shunshi_colors.dart';
 import 'package:go_router/go_router.dart';
 import '../../../data/network/api_client.dart';
+import '../../../data/services/family_body.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/theme/app_localizations.dart';
 
@@ -28,22 +29,22 @@ class _FamilyHomePageState extends State<FamilyHomePage> {
   Future<void> _loadMembers() async {
     try {
       final api = ApiClient();
-      final res = await api.get('/api/v1/family/members');
-      if (res.data is List) {
-        setState(() {
-          _members = List<Map<String, dynamic>>.from(res.data);
-          _loading = false;
-        });
-        return;
-      }
-    } catch (_) {}
-    // Demo
-    setState(() {
-      _members = [
-        {'id': '1', 'name': 'Mom', 'avatar': '👩', 'relation': 'Mother', 'status': 'stable', 'lastActive': 'Today 08:30', 'lastCheckin': '3h ago'},
-        {'id': '2', 'name': 'Dad', 'avatar': '👨', 'relation': 'Father', 'status': 'tired', 'lastActive': 'Today 07:15', 'lastCheckin': '5h ago'},
-        {'id': '3', 'name': 'Grandma', 'avatar': '👵', 'relation': 'Other', 'status': 'attention', 'lastActive': 'Yesterday 22:00', 'lastCheckin': '1d ago'},
+      final res = await api.get('/api/v1/family/');
+      final body = familyBody(res.data);
+      final members = [
+        for (final raw in body['members'] as List)
+          if (raw is Map) Map<String, dynamic>.from(raw),
       ];
+      if (!mounted) return;
+      setState(() {
+        _members = members;
+        _loading = false;
+      });
+      return;
+    } catch (_) {}
+    if (!mounted) return;
+    setState(() {
+      _members = [];
       _loading = false;
     });
   }
