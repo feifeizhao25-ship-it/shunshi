@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../design_system/theme.dart';
 import '../../../core/router/safe_pop.dart';
 import '../../widgets/cn_back_button.dart';
@@ -30,8 +31,7 @@ class PrivacyPolicyPage extends StatelessWidget {
           _sectionTitle('顺时隐私政策'),
           _body(
             '最后更新日期：2026年11月10日\n'
-            '运营者：北京艾瑞见时科技有限公司。个人信息存放在中国境内。\n'
-            '这是上线前按代码事实改过的稿子，律师定稿之前不能当成已经审过的法律文本。',
+            '运营者：北京艾瑞见时科技有限公司。个人信息存放在中国境内。',
             textColor,
           ),
           const SizedBox(height: 12),
@@ -118,7 +118,7 @@ class PrivacyPolicyPage extends StatelessWidget {
             '• 撤回同意权：随时撤回对数据处理的同意\n'
             '• 自动化决策拒绝权：拒绝仅通过自动化决策做出的分析\n\n'
             '5.2 行使权利\n'
-            '你可以通过应用内「设置」里的导出和注销行使这些权利。公司联系邮箱开通前。我们将在 15 个工作日内回复。',
+            '你可以通过应用内「设置」里的导出和注销行使这些权利，也可以打开「意见反馈」联系我们。我们将在 15 个工作日内回复。',
             textColor,
           ),
           const SizedBox(height: 12),
@@ -147,10 +147,18 @@ class PrivacyPolicyPage extends StatelessWidget {
           _body(
             '数据保护相关问题：\n'
             '• 运营者：北京艾瑞见时科技有限公司\n'
-            '• 联系邮箱：待公司开通后填写\n'
-            '• 通信地址：以营业执照住所为准，备案材料里填写\n\n'
+            '• 联系方式：请打开应用内「意见反馈」\n\n'
             '我们将在 15 个工作日内回复您的请求。',
             textColor,
+          ),
+          const SizedBox(height: 8),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton(
+              key: const Key('privacy-feedback-entry'),
+              onPressed: () => context.push('/feedback'),
+              child: const Text('打开意见反馈'),
+            ),
           ),
           const SizedBox(height: 40),
         ],
