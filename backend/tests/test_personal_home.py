@@ -182,6 +182,39 @@ def test_noise_is_stable_per_user_day_card_but_differs_between_users():
     assert a != ph._noise("u2", START, "x") and a != ph._noise("u1", START + timedelta(days=1), "x")
 
 
+def test_review_personas_on_xiaoxue_morning_are_not_the_same_board():
+    """修改单顺2：同一天早晨，体质、年龄、城市、会员不同的人不应拿到几乎同一套标题。"""
+    when = datetime(2026, 11, 24, 8, tzinfo=SH)
+    personas = {
+        "office": ph.Profile(lang="zh", season="winter", goals=frozenset({"mood"}), constitution="气郁", zone="华北"),
+        "member": ph.Profile(lang="zh", season="winter", goals=frozenset({"food"}), constitution="痰湿", zone="华北", membership_tier="yiyang"),
+        "elder": ph.Profile(lang="zh", season="winter", goals=frozenset({"food"}), constitution="阳虚", zone="华东华中", life_stage="长辈", age_group="senior"),
+        "quiet": ph.Profile(lang="zh", season="winter", goals=frozenset({"sleep"}), constitution="气虚", zone="华东华中", recent_mood="low"),
+        "south": ph.Profile(lang="zh", season="winter", goals=frozenset({"food"}), constitution="阴虚", zone="华南"),
+    }
+    boards = {name: ph.compose(profile, ph.Activity(), name, when, "weekday") for name, profile in personas.items()}
+    titles = {name: [card["title"] for card in board["cards"]] for name, board in boards.items()}
+    names = list(personas)
+    for i, left in enumerate(names):
+        for right in names[i + 1:]:
+            a, b = set(titles[left]), set(titles[right])
+            overlap = len(a & b) / len(a | b)
+            assert overlap <= 0.5, (left, right, overlap, a & b)
+    assert "刷手机" not in " ".join(titles["elder"])
+    assert boards["elder"]["greeting"] != boards["office"]["greeting"]
+    assert any("会员" in title for title in titles["member"])
+    assert any("银耳" in title or "梨" in title for title in titles["south"])
+    assert any("供暖" in title for title in titles["office"])
+    assert any("偏暖" in title for title in titles["south"])
+    assert any("心情" in card["reason"] or "心情" in card["title"] for card in boards["quiet"]["cards"])
+    for board in boards.values():
+        assert all(card["reason"] for card in board["cards"])
+    off = ph.Profile(lang="zh", season="winter", enabled=False, constitution="阴虚", zone="华南", membership_tier="yiyang", age_group="senior")
+    generic = ph.compose(off, ph.Activity(), "off", when, "weekday", extra_cards=[{"id": "term", "category": "seasonal", "title": "小雪", "reason": "节气", "basis": "solar_term"}])
+    assert generic["personalization"]["enabled"] is False
+    assert [card["title"] for card in generic["cards"]] == ["小雪"]
+
+
 # ── API ─────────────────────────────────────────────────────────────────────
 def _guest(client):
     r = client.post("/api/v1/auth/guest-login", json={})
