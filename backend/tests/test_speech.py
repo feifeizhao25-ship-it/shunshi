@@ -22,7 +22,7 @@ class TestTextToSpeech:
             "text": "这是一个测试文本"
         }
         response = client.post("/api/v1/speech/tts", json=payload)
-        assert response.status_code in [200, 400, 500]  # 可能依赖外部服务
+        assert response.status_code in [200, 400, 500, 503]  # 可能依赖外部服务
 
     def test_tts_requires_text(self):
         """缺少 text 参数应返回错误"""
@@ -37,7 +37,7 @@ class TestTextToSpeech:
             "model": "fish-speech-1.5"
         }
         response = client.post("/api/v1/speech/tts", json=payload)
-        assert response.status_code in [200, 400, 500]
+        assert response.status_code in [200, 400, 500, 503]
 
     def test_tts_with_voice(self):
         """POST /api/v1/speech/tts 支持指定音色"""
@@ -46,7 +46,7 @@ class TestTextToSpeech:
             "voice": "benjamin"
         }
         response = client.post("/api/v1/speech/tts", json=payload)
-        assert response.status_code in [200, 400, 500]
+        assert response.status_code in [200, 400, 500, 503]
 
     def test_tts_with_format(self):
         """POST /api/v1/speech/tts 支持指定输出格式"""
@@ -55,7 +55,7 @@ class TestTextToSpeech:
             "response_format": "mp3"
         }
         response = client.post("/api/v1/speech/tts", json=payload)
-        assert response.status_code in [200, 400, 500]
+        assert response.status_code in [200, 400, 500, 503]
 
     def test_tts_with_speed(self):
         """POST /api/v1/speech/tts 支持指定语速"""
@@ -64,7 +64,7 @@ class TestTextToSpeech:
             "speed": 1.5
         }
         response = client.post("/api/v1/speech/tts", json=payload)
-        assert response.status_code in [200, 400, 500]
+        assert response.status_code in [200, 400, 500, 503]
 
     def test_tts_speed_range(self):
         """语速应该在 0.5-2.0 之间"""
@@ -73,7 +73,7 @@ class TestTextToSpeech:
             "speed": 3.0
         }
         response = client.post("/api/v1/speech/tts", json=payload)
-        assert response.status_code in [200, 400, 422, 500]
+        assert response.status_code in [200, 400, 422, 500, 503]
 
     def test_tts_text_max_length(self):
         """文本长度不能超过 5000 字符"""
@@ -81,7 +81,7 @@ class TestTextToSpeech:
             "text": "a" * 6000
         }
         response = client.post("/api/v1/speech/tts", json=payload)
-        assert response.status_code in [400, 422, 500]
+        assert response.status_code in [400, 422, 500, 503]
 
     def test_tts_with_all_parameters(self):
         """支持同时设置所有参数"""
@@ -93,7 +93,7 @@ class TestTextToSpeech:
             "speed": 1.0
         }
         response = client.post("/api/v1/speech/tts", json=payload)
-        assert response.status_code in [200, 400, 500]
+        assert response.status_code in [200, 400, 500, 503]
 
 
 class TestSpeechToText:
@@ -114,7 +114,7 @@ class TestSpeechToText:
             files = {"file": ("test.wav", f, "audio/wav")}
             data = {"model": "sensevoice"}
             response = client.post("/api/v1/speech/asr", files=files, data=data)
-            assert response.status_code in [200, 400, 500]
+            assert response.status_code in [200, 400, 500, 503]
 
     def test_asr_with_language(self):
         """POST /api/v1/speech/asr 支持指定语言"""
@@ -125,7 +125,7 @@ class TestSpeechToText:
             files = {"file": ("test.wav", f, "audio/wav")}
             data = {"language": "zh"}
             response = client.post("/api/v1/speech/asr", files=files, data=data)
-            assert response.status_code in [200, 400, 500]
+            assert response.status_code in [200, 400, 500, 503]
 
 
 class TestGetModels:
@@ -216,7 +216,7 @@ class TestChatVoice:
         with open("/tmp/test_chat.wav", "rb") as f:
             files = {"file": ("test.wav", f, "audio/wav")}
             response = client.post("/api/v1/speech/chat-voice", files=files)
-            assert response.status_code in [200, 400, 500]
+            assert response.status_code in [200, 400, 500, 503]
 
     def test_chat_voice_with_model(self):
         """POST /api/v1/speech/chat-voice 支持指定 ASR 模型"""
@@ -227,7 +227,7 @@ class TestChatVoice:
             files = {"file": ("test.wav", f, "audio/wav")}
             data = {"model": "sensevoice"}
             response = client.post("/api/v1/speech/chat-voice", files=files, data=data)
-            assert response.status_code in [200, 400, 500]
+            assert response.status_code in [200, 400, 500, 503]
 
     def test_chat_voice_with_tts_model(self):
         """POST /api/v1/speech/chat-voice 支持指定 TTS 模型"""
@@ -238,7 +238,7 @@ class TestChatVoice:
             files = {"file": ("test.wav", f, "audio/wav")}
             data = {"tts_model": "fish-speech-1.5"}
             response = client.post("/api/v1/speech/chat-voice", files=files, data=data)
-            assert response.status_code in [200, 400, 500]
+            assert response.status_code in [200, 400, 500, 503]
 
     def test_chat_voice_with_voice(self):
         """POST /api/v1/speech/chat-voice 支持指定回复音色"""
@@ -249,7 +249,7 @@ class TestChatVoice:
             files = {"file": ("test.wav", f, "audio/wav")}
             data = {"voice": "diana"}
             response = client.post("/api/v1/speech/chat-voice", files=files, data=data)
-            assert response.status_code in [200, 400, 500]
+            assert response.status_code in [200, 400, 500, 503]
 
     def test_chat_voice_response_structure(self):
         """语音对话响应应该包含特定字段"""

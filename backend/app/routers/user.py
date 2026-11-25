@@ -20,6 +20,7 @@ from sqlalchemy import delete, select, update, func
 from sqlalchemy.orm import Session
 
 from ..config import Settings
+from ..error_catalog import text as catalog_text
 from ..deps import current_user, get_session, get_settings
 from ..middleware.user_concurrency import InflightGate
 from ..simple_models import (
@@ -196,7 +197,7 @@ async def sms_send(
         # fail-closed：未配置短信服务商时不静默放行
         raise HTTPException(
             status_code=503,
-            detail={"detail": "短信服务尚未配置", "configured": False},
+                detail={"detail": catalog_text("sms_unconfigured", "zh"), "configured": False},
         )
     now = _now()
     phone_digest = _digest(settings, "phone:" + body.phone)
@@ -235,7 +236,7 @@ def sms_verify(
     if not settings.sms_provider_url or not settings.sms_provider_token:
         raise HTTPException(
             status_code=503,
-            detail={"detail": "短信服务尚未配置", "configured": False},
+                detail={"detail": catalog_text("sms_unconfigured", "zh"), "configured": False},
         )
     row = session.get(SmsCode, body.phone)
     digest = hash_sms_code(settings.jwt_secret or "sms-only", body.phone, body.code)

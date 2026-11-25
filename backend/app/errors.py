@@ -21,6 +21,8 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+from app.error_catalog import STATUS_CODE, code_for, text as catalog_text
+
 logger = logging.getLogger(__name__)
 
 _CJK = re.compile(r"[一-鿿]")
@@ -31,18 +33,8 @@ _TECH = re.compile(
     re.IGNORECASE,
 )
 
-GENERIC_BY_STATUS = {
-    400: "请求内容有误，请检查后重试",
-    401: "请先登录",
-    403: "没有权限进行此操作",
-    404: "没有找到相关内容",
-    405: "不支持这种操作",
-    409: "当前状态下无法完成此操作，请刷新后重试",
-    413: "提交的内容太大",
-    422: "填写的内容不正确，请检查后重试",
-    429: "操作太频繁，请稍后再试",
-}
-SERVER_GENERIC = "服务暂时不可用，请稍后再试"
+GENERIC_BY_STATUS = {status: catalog_text(code, "zh") for status, code in STATUS_CODE.items()}
+SERVER_GENERIC = catalog_text("service_unavailable", "zh")
 
 _VALIDATION_MSG = (
     ("missing", "缺少必填项"),
@@ -63,18 +55,8 @@ _VALIDATION_MSG = (
 )
 
 
-GENERIC_BY_STATUS_EN = {
-    400: "The request looks wrong. Please check it and try again.",
-    401: "Please sign in first.",
-    403: "You don't have permission to do this.",
-    404: "We couldn't find what you were looking for.",
-    405: "That action isn't supported.",
-    409: "This can't be done in the current state. Please refresh and try again.",
-    413: "The content you submitted is too large.",
-    422: "Some of the information isn't valid. Please check it and try again.",
-    429: "Too many requests. Please try again shortly.",
-}
-SERVER_GENERIC_EN = "The service is unavailable right now. Please try again later."
+GENERIC_BY_STATUS_EN = {status: catalog_text(code, "en") for status, code in STATUS_CODE.items()}
+SERVER_GENERIC_EN = catalog_text("service_unavailable", "en")
 
 _VALIDATION_MSG_EN = (
     ("missing", "This field is required"),
@@ -104,7 +86,10 @@ def _is_global(request: Request) -> bool:
 
 
 def _generic_en(status: int) -> str:
-    return GENERIC_BY_STATUS_EN.get(status, SERVER_GENERIC_EN if status >= 500 else "The request couldn't be completed. Please try again later.")
+    code = STATUS_CODE.get(status)
+    if code:
+        return catalog_text(code, "en")
+    return catalog_text("service_unavailable", "en") if status >= 500 else catalog_text("request_incomplete", "en")
 
 
 _BARE_HTTP_PHRASES = {
@@ -120,6 +105,9 @@ def _needs_replacing_en(text: str) -> bool:
 def _clean_en(value: Any, status: int) -> Any:
     """International edition: never show Chinese or operator text; keep plain English messages."""
     if isinstance(value, str):
+        known = code_for(value)
+        if known:
+            return catalog_text(known, "en")
         if _needs_replacing_en(value):
             logger.info("replaced a user-visible Chinese/technical error (status=%s): %s", status, value[:300])
             return _generic_en(status)
@@ -139,7 +127,10 @@ def _validation_message_en(error_type: str) -> str:
 
 
 def _generic(status: int) -> str:
-    return GENERIC_BY_STATUS.get(status, SERVER_GENERIC if status >= 500 else "请求未能完成，请稍后再试")
+    code = STATUS_CODE.get(status)
+    if code:
+        return catalog_text(code, "zh")
+    return catalog_text("service_unavailable", "zh") if status >= 500 else catalog_text("request_incomplete", "zh")
 
 
 def _needs_replacing(text: str) -> bool:
@@ -148,6 +139,9 @@ def _needs_replacing(text: str) -> bool:
 
 def _clean(value: Any, status: int) -> Any:
     if isinstance(value, str):
+        known = code_for(value)
+        if known:
+            return catalog_text(known, "zh")
         if _needs_replacing(value):
             logger.info("替换用户可见的非中文/技术性报错(status=%s): %s", status, value[:300])
             return _generic(status)
@@ -174,11 +168,7 @@ def install_chinese_error_handlers(app: FastAPI) -> None:
         # 不把异常文本返回给客户端：连接串里可能有口令。
         logger.warning("数据库连接池耗尽: %s %s", request.method, request.url.path)
         del exc
-        detail = (
-            "The service is busy. Please try again shortly."
-            if _is_global(request)
-            else "服务繁忙，请稍后再试"
-        )
+        detail = catalog_text("busy", "en" if _is_global(request) else "zh")
         return JSONResponse({"detail": detail}, status_code=503, headers={"Retry-After": "1"})
 
     @app.exception_handler(StarletteHTTPException)

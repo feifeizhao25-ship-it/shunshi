@@ -28,6 +28,7 @@ from sqlalchemy.orm import Session
 
 from app.config import Settings
 from app.deps import current_user, get_session, get_settings
+from app.error_catalog import text as catalog_text
 from app.locale_context import RequestLocale, request_locale
 from app.services.speech_service import (
     SpeechService,
@@ -100,7 +101,7 @@ class VoicesResponse(BaseModel):
 # ==================== 端点 ====================
 
 @router.post("/tts", summary="文字转语音")
-async def text_to_speech(request: TTSRequest):
+async def text_to_speech(request: TTSRequest, locale: RequestLocale = Depends(request_locale)):
     """
     将文字转换为语音
     
@@ -142,10 +143,16 @@ async def text_to_speech(request: TTSRequest):
         )
         
     except TTSError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        lang = "en" if locale.is_global else "zh"
+        raw = str(e)
+        # 没配好朗读服务时，不把密钥名返回去，也不写成「请求内容有误」。
+        if "未配置" in raw or "API_KEY" in raw or "not configured" in raw.lower():
+            raise HTTPException(status_code=503, detail=catalog_text("speech_unconfigured", lang))
+        raise HTTPException(status_code=503, detail=catalog_text("service_unavailable", lang))
     except Exception as e:
-        logger.error(f"[Speech API] TTS 错误: {e}")
-        raise HTTPException(status_code=500, detail=f"TTS 服务异常: {e}")
+        logger.error("[Speech API] TTS 错误: %s", type(e).__name__)
+        lang = "en" if locale.is_global else "zh"
+        raise HTTPException(status_code=503, detail=catalog_text("service_unavailable", lang))
 
 
 @router.post("/asr", summary="语音识别")
