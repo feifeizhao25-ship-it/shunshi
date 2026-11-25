@@ -274,12 +274,16 @@ class _PrivacyPageState extends State<PrivacyPage> {
                   ),
                 ),
                 const SizedBox(height: 4),
-                Text(
-                  '联系邮箱待公司开通后填写',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: AppColors.primary(context),
-                    fontWeight: FontWeight.w500,
+                TextButton(
+                  key: const Key('privacy-feedback-entry'),
+                  onPressed: () => context.push('/feedback'),
+                  child: Text(
+                    '打开意见反馈',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: AppColors.primary(context),
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
               ],

@@ -99,7 +99,7 @@ class MedicalDisclaimerPage extends StatelessWidget {
           _body(
             '如有关于医疗免责声明的问题：\n'
             '• 运营者：北京艾瑞见时科技有限公司\n'
-            '• 联系邮箱：待公司开通后填写',
+            '• 联系方式：请打开应用内「意见反馈」',
             textColor,
           ),
           const SizedBox(height: 40),

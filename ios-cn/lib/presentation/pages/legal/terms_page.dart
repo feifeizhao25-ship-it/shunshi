@@ -30,7 +30,7 @@ class TermsPage extends StatelessWidget {
           _sectionTitle(context, '顺时用户协议'),
           _body(
             '最后更新日期：2026年10月23日\n'
-            '运营者：北京艾瑞见时科技有限公司。律师定稿前，这是按产品事实改过的稿子。',
+            '运营者：北京艾瑞见时科技有限公司。',
             textColor,
           ),
           const SizedBox(height: 12),
