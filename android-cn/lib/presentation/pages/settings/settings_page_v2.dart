@@ -202,7 +202,7 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
             child: _buildSwitchTile(
               context,
               '个性化推荐',
-              '关掉之后，首页不再按你的目标和地区来排，卡片和大家看到的一样。',
+              '关掉之后，首页不再按你的目标、时段、体质和地区来挑，只留当天的节气和假期提示。',
               Icons.tune,
               _personalization,
               _setPersonalization,
