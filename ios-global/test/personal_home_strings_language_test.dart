@@ -5,7 +5,7 @@ import 'package:seasons/presentation/widgets/personal_home_strings_en.dart';
 
 List<String> _all(PersonalHomeStrings s) => [
       s.heading, s.why, s.turnOff, s.turnOn, s.offTitle, s.offBody, s.confirmTitle, s.confirmBody, s.cancel, s.confirm,
-      s.errorTitle, s.errorBody, s.retry, s.emptyTitle, s.emptyBody, s.saveFailed, s.loading, s.minutes(3), s.days(3),
+      s.errorTitle, s.errorBody, s.retry, s.emptyTitle, s.emptyBody, s.setup, s.saveFailed, s.loading, s.minutes(3), s.days(3),
     ];
 
 void main() {

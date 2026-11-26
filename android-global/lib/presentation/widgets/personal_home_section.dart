@@ -41,6 +41,7 @@ class PersonalHomeStrings {
     required this.weekNone,
     required this.recallDismiss,
     required this.recallLabel,
+    this.setup = '',
   });
 
   final String heading;
@@ -69,6 +70,9 @@ class PersonalHomeStrings {
   final String Function(String date) weekNone;
   final String recallDismiss;
   final String recallLabel;
+
+  /// Button on the empty state. Empty means this edition does not offer one.
+  final String setup;
 }
 
 /// What the screen needs from the network; the page supplies the real calls, tests supply fakes.
@@ -203,7 +207,7 @@ class PersonalHomeData {
 enum _Phase { loading, ready, empty, off, error }
 
 class PersonalHomeSection extends StatefulWidget {
-  const PersonalHomeSection({super.key, required this.api, required this.strings, this.onOpen, this.margin = const EdgeInsets.symmetric(horizontal: 20, vertical: 8)});
+  const PersonalHomeSection({super.key, required this.api, required this.strings, this.onOpen, this.onSetup, this.margin = const EdgeInsets.symmetric(horizontal: 20, vertical: 8)});
 
   final PersonalHomeApi api;
 
@@ -215,6 +219,9 @@ class PersonalHomeSection extends StatefulWidget {
 
   /// Called with a card's in-app link (Energy Intelligence only) when the card is tapped.
   final void Function(PersonalHomeCard card)? onOpen;
+
+  /// Opens profile setup from the empty state.
+  final VoidCallback? onSetup;
 
   @override
   State<PersonalHomeSection> createState() => _PersonalHomeSectionState();
@@ -321,10 +328,25 @@ class _PersonalHomeSectionState extends State<PersonalHomeSection> {
           action: FilledButton.tonal(key: const Key('personal-home-turn-on'), onPressed: _saving ? null : () => _toggle(true), child: Text(_t.turnOn)),
         );
       case _Phase.empty:
-        return _Message(key: const Key('personal-home-empty'), icon: Icons.spa_outlined, title: _t.emptyTitle, body: _t.emptyBody, action: _offButton());
+        return _Message(key: const Key('personal-home-empty'), icon: Icons.spa_outlined, title: _t.emptyTitle, body: _t.emptyBody, action: _emptyActions());
       case _Phase.ready:
         return _content(context, _data!);
     }
+  }
+
+  Widget _emptyActions() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (_t.setup.isNotEmpty && widget.onSetup != null)
+          FilledButton.tonal(
+            key: const Key('personal-home-setup'),
+            onPressed: widget.onSetup,
+            child: Text(_t.setup),
+          ),
+        _offButton(),
+      ],
+    );
   }
 
   Widget _offButton() => TextButton.icon(

@@ -136,6 +136,15 @@ def domestic_season(day: date) -> str:
     return {"春": "spring", "夏": "summer", "秋": "autumn", "冬": "winter"}[label]
 
 
+_ANSWER_KEYS = ("help_goal", "feeling", "support_time", "life_stage")
+
+
+def has_personal_answers(session: Session, user_id: str) -> bool:
+    """True when the person has told us something the home can rank on."""
+    onboarding = _read(session, user_id, home_cards.ONBOARDING_KEY) or {}
+    return any(str(onboarding.get(key) or "").strip() for key in _ANSWER_KEYS)
+
+
 def load_profile(session: Session, user_id: str, *, lang: str, is_global: bool, day: date, hemisphere: str) -> ph.Profile:
     onboarding = _read(session, user_id, home_cards.ONBOARDING_KEY) or {}
     goals = ph.goals_from_text(" ".join(str(onboarding.get(k) or "") for k in ("help_goal", "feeling")))
@@ -238,6 +247,18 @@ def build(session: Session, user_id: str, *, lang: str, is_global: bool, hemisph
             # 算法推荐规定第 17 条：关闭后不再按个人特征给卡片，只留当天的通用节气/假期卡。
             anchors = home_cards.nonpersonalized_cards(day)
     board = ph.compose(profile, activity, user_id, now, daytype, extra_cards=anchors)
+    if is_global and profile.enabled and not has_personal_answers(session, user_id):
+        # No profile yet: do not fill the international home with generic cards that look chosen for this person.
+        board = dict(
+            board,
+            cards=[],
+            hero=None,
+            personalization={
+                "enabled": True,
+                "used": [],
+                "note": "Add a goal or a time you want company, and this page will choose a few small actions.",
+            },
+        )
     if record and profile.enabled:
         remember_shown(session, user_id, day, [c["id"] for c in board["cards"]])
     board["date"] = day.isoformat()

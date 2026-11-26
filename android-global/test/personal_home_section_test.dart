@@ -124,6 +124,19 @@ void main() {
     await tester.pumpWidget(host(PersonalHomeSection(strings: strings, api: fake(() async => shunshiJson(cards: 0)))));
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('personal-home-empty')), findsOneWidget);
+    expect(find.text('No profile yet'), findsOneWidget);
+  });
+
+  testWidgets('empty state offers profile setup when the page provides it', (tester) async {
+    var opened = 0;
+    await tester.pumpWidget(host(PersonalHomeSection(
+      strings: strings,
+      api: fake(() async => shunshiJson(cards: 0)),
+      onSetup: () => opened++,
+    )));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('personal-home-setup')));
+    expect(opened, 1);
   });
 
   testWidgets('turning off asks first, saves, and shows the off state; turning on restores', (tester) async {
