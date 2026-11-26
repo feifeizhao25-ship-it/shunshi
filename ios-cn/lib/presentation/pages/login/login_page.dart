@@ -13,6 +13,7 @@ import '../../../design_system/app_colors.dart';
 import '../../../core/theme/shunshi_spacing.dart';
 import '../../../core/theme/shunshi_text_styles.dart';
 import '../../../data/network/api_client.dart';
+import '../../../data/network/sms_send_error.dart';
 import '../../../data/storage/storage_manager.dart';
 
 /// 登录方式
@@ -64,9 +65,9 @@ class _LoginPageState extends State<LoginPage> {
         _countdown = 60;
       });
       _startCountdown();
-    } catch (_) {
+    } catch (error) {
       setState(() {
-        _errorMessage = '发送失败，请稍后重试';
+        _errorMessage = smsSendError(error);
         _isLoading = false;
       });
     }
