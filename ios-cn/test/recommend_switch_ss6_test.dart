@@ -24,7 +24,7 @@ void main() {
     ));
     await tester.pumpAndSettle();
     expect(find.text('个性化推荐'), findsOneWidget);
-    expect(find.textContaining('卡片和大家看到的一样'), findsOneWidget);
+    expect(find.textContaining('只留当天的节气和假期提示'), findsOneWidget);
 
     await tester.tap(find.byKey(const Key('settings-personalization')));
     await tester.pumpAndSettle();

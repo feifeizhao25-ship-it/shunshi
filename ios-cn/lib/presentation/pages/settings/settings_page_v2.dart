@@ -147,7 +147,7 @@ class _SettingsPageV2State extends State<SettingsPageV2> {
                   value: _personalization,
                   onChanged: _savingPersonalization ? null : _setPersonalization,
                   title: Text('个性化推荐', style: TextStyle(fontSize: 15, color: AppColors.textPrimary(context))),
-                  subtitle: Text('关掉之后，首页不再按你的目标和地区来排，卡片和大家看到的一样。', style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context))),
+                  subtitle: Text('关掉之后，首页不再按你的目标、时段、体质和地区来挑，只留当天的节气和假期提示。', style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context))),
                   activeThumbColor: AppColors.primary(context),
                   contentPadding: EdgeInsets.zero,
                 ),

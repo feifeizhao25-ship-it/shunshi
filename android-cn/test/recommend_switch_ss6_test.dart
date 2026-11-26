@@ -24,9 +24,9 @@ void main() {
     ));
     await tester.pumpAndSettle();
     expect(find.text('个性化推荐'), findsOneWidget);
-    expect(find.textContaining('卡片和大家看到的一样'), findsOneWidget);
+    expect(find.textContaining('只留当天的节气和假期提示'), findsOneWidget);
     final latin = RegExp(r'[A-Za-z]');
-    expect(latin.hasMatch('关掉之后，首页不再按你的目标和地区来排，卡片和大家看到的一样。'), isFalse);
+    expect(latin.hasMatch('关掉之后，首页不再按你的目标、时段、体质和地区来挑，只留当天的节气和假期提示。'), isFalse);
 
     await tester.tap(find.byKey(const Key('settings-personalization')));
     await tester.pumpAndSettle();
