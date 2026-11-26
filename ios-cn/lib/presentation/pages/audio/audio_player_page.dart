@@ -5,6 +5,7 @@ import 'package:just_audio/just_audio.dart';
 import '../../../data/network/api_client.dart';
 import 'dart:async';
 import '../../../core/audio/listen_clock.dart';
+import '../../../core/audio/listen_report.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import '../../../core/theme/shunshi_colors.dart';
@@ -160,6 +161,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
   }
 
   Future<void> _onCompleted() async {
+    if (!reportsListenProgress(widget.audioId)) return;
     final secs = _clock.takeSeconds();
     try {
       final res = await ApiClient().post(
@@ -186,6 +188,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
   }
 
   Future<void> _reportProgress() async {
+    if (!reportsListenProgress(widget.audioId)) return;
     final secs = _clock.takeSeconds();
     try {
       final res = await ApiClient().post(
@@ -408,6 +411,15 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
               color: ShunshiDarkColors.textPrimary, fontWeight: FontWeight.w300),
             textAlign: TextAlign.center),
         ),
+        if (!reportsListenProgress(widget.audioId))
+          const Padding(
+            padding: EdgeInsets.fromLTRB(28, 12, 28, 0),
+            child: Text(
+              '没有对应的音频条目。这段只在本机播放，不上传收听进度。',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 13, height: 1.5, color: ShunshiDarkColors.textHint),
+            ),
+          ),
         const SizedBox(height: ShunshiSpacing.xl),
 
         // 进度条
