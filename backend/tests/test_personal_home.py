@@ -239,6 +239,22 @@ def test_api_five_users_seven_days_differ_rotate_and_are_stable_within_a_day(cli
             assert len(non_anchor(a) & non_anchor(b)) <= 2, (name, a, b)
 
 
+def test_api_global_home_without_a_profile_is_empty(client):
+    """A guest who has not answered onboarding must not get filler cards labelled as picked for them."""
+    h = _guest(client)
+    domestic = client.get("/api/v1/seasons/home/dashboard", headers=h).json()
+    assert domestic["suggestions"], domestic
+    en = {"Accept-Language": "en", "X-App-Market": "global", **h}
+    data = client.get("/api/v1/seasons/home/dashboard", headers=en).json()
+    assert data["suggestions"] == [] and data["hero"] is None
+    assert data["personalization"]["enabled"] is True
+    assert not CJK.search(str(data))
+    client.post("/api/v1/seasons/onboarding/complete", json={"help_goal": "sleep better", "support_time": "night"}, headers=h)
+    filled = client.get("/api/v1/seasons/home/dashboard", headers=en).json()
+    assert filled["suggestions"]
+    assert not CJK.search(str(filled))
+
+
 def test_api_international_user_gets_english_with_local_time_and_hemisphere(client, monkeypatch):
     h = _guest(client)
     client.post("/api/v1/seasons/onboarding/complete", json={"help_goal": "sleep better", "support_time": "night"}, headers=h)
