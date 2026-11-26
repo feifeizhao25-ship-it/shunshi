@@ -225,11 +225,11 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
     return '${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
   }
 
-  String get _categoryEmoji {
+  IconData get _categoryIcon {
     switch (_category.toLowerCase()) {
-      case 'soundscape': return '🌧️';
-      case 'meditation': return '🧘';
-      default: return '🌿';
+      case 'soundscape': return Icons.water_drop_outlined;
+      case 'meditation': return Icons.self_improvement_outlined;
+      default: return Icons.spa_outlined;
     }
   }
 
@@ -381,7 +381,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(_categoryEmoji, style: const TextStyle(fontSize: 40)),
+                      Icon(_categoryIcon, size: 40, color: ShunshiDarkColors.primary),
                       const SizedBox(height: ShunshiSpacing.sm),
                       Text(_categoryLabel,
                         style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w300,

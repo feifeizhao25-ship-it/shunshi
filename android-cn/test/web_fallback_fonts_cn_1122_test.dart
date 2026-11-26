@@ -38,10 +38,28 @@ void main() {
         .where((f) => f.path.endsWith('.woff2'))
         .map((f) => f.path.substring(f.path.indexOf('notocoloremoji/')))
         .toSet();
-    expect(shipped.length, 12);
     // ignore: avoid_print
     print('engine fallback table: ${data.path} (${expected.length} emoji shards)');
-    if (expected.isNotEmpty) expect(shipped, equals(expected), reason: 'Flutter upgrade changed emoji fallback files');
+    // Flutter 3.38 asks for v32 and Flutter 3.50 asks for v39. Ship both, and require whichever this SDK lists.
+    if (expected.isNotEmpty) {
+      expect(shipped, containsAll(expected), reason: 'Flutter upgrade changed emoji fallback files');
+    }
+    expect(shipped.where((p) => p.contains('/v32/')).length, 12);
+    expect(shipped.where((p) => p.contains('/v39/')).length, 10);
     expect(File('web/assets/fallback_fonts/notocoloremoji/LICENSE-OFL.txt').readAsStringSync(), contains('Open Font License'));
+  });
+
+  test('Noto Sans Symbols 2 shards used by the web player are shipped', () {
+    const names = [
+      'notosanssymbols2/v25/I_uyMoGduATTei9eI8daxVHDyfisHr71-jrBWXPM4Q.woff2',
+      'notosanssymbols2/v25/I_uyMoGduATTei9eI8daxVHDyfisHr71-ujgfE71.woff2',
+      'notosanssymbols2/v25/I_uyMoGduATTei9eI8daxVHDyfisHr71-gTBWXPM4Q.woff2',
+      'notosanssymbols2/v25/I_uyMoGduATTei9eI8daxVHDyfisHr71-vrgfE71.woff2',
+      'notosanssymbols2/v25/I_uyMoGduATTei9eI8daxVHDyfisHr71-prgfE71.woff2',
+      'notosanssymbols2/v25/I_uyMoGduATTei9eI8daxVHDyfisHr71-pTgfA.woff2',
+    ];
+    for (final name in names) {
+      expect(File('web/assets/fallback_fonts/$name').lengthSync(), greaterThan(1000), reason: name);
+    }
   });
 }
